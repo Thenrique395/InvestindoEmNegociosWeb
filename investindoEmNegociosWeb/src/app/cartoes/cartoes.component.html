@@ -46,7 +46,7 @@
                 name="numero"
                 maxlength="19"
                 inputmode="numeric"
-                pattern="\\d*"
+                pattern="\d*"
                 (input)="onNumeroInput($event)"
                 placeholder="**** **** **** ****"
                 required
@@ -61,41 +61,6 @@
             Nome impresso no cartão
             <input [(ngModel)]="nome" name="nome" placeholder="FULANO DA SILVA" required />
           </label>
-
-          <div class="row">
-            <label>
-              Vencimento
-              <input
-                [(ngModel)]="vencimento"
-                name="vencimento"
-                placeholder="MM/AA"
-                maxlength="5"
-                inputmode="numeric"
-                pattern="\\d*"
-                (input)="onVencimentoInput($event)"
-                required
-              />
-            </label>
-            <label>
-              CVV
-              <div class="input-wrap">
-                <input
-                  type="{{ mostrarCvv ? 'text' : 'password' }}"
-                  [(ngModel)]="cvv"
-                  name="cvv"
-                  maxlength="3"
-                  inputmode="numeric"
-                  pattern="\\d*"
-                  (input)="onCvvInput($event)"
-                  placeholder="***"
-                  required
-                />
-                <button type="button" (click)="toggleCvv()" aria-label="Mostrar CVV">
-                  {{ mostrarCvv ? '🙈' : '👁️' }}
-                </button>
-              </div>
-            </label>
-          </div>
 
           <div class="actions">
             <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
@@ -122,8 +87,8 @@
                 <p>{{ nome || 'SEU NOME' }}</p>
               </div>
               <div>
-                <span class="label">Validade</span>
-                <p>{{ vencimento || 'MM/AA' }}</p>
+                <span class="label">Bandeira</span>
+                <p>{{ bandeira | uppercase }}</p>
               </div>
             </div>
           </div>

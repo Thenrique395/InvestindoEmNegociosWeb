@@ -16,10 +16,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   bandeira = 'mastercard';
   numero = '';
   nome = '';
-  vencimento = '';
-  cvv = '';
   mostrarNumero = false;
-  mostrarCvv = false;
   cards: StoredCard[] = [];
   expenses: StoredExpense[] = [];
   mostrarModal = false;
@@ -51,15 +48,12 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   salvar(): void {
-    if (!this.numero || !this.nome || !this.vencimento || !this.cvv) return;
+    if (!this.numero || !this.nome) return;
     const numeroLimpo = this.numero.replace(/\D/g, '').slice(0, 16);
-    const cvvLimpo = this.cvv.replace(/\D/g, '').slice(0, 3);
     const payload = {
       bandeira: this.bandeira,
       numero: numeroLimpo,
       nome: this.nome,
-      vencimento: this.vencimento,
-      cvv: cvvLimpo,
       userId: this.currentUser
     };
 
@@ -72,8 +66,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.fecharModal();
     this.numero = '';
     this.nome = '';
-    this.vencimento = '';
-    this.cvv = '';
     this.bandeira = 'mastercard';
     this.editandoId = null;
   }
@@ -85,13 +77,10 @@ export class CartoesComponent implements OnInit, OnDestroy {
   fecharModal(): void {
     this.mostrarModal = false;
     this.mostrarNumero = false;
-    this.mostrarCvv = false;
     this.editandoId = null;
     this.bandeira = 'mastercard';
     this.numero = '';
     this.nome = '';
-    this.vencimento = '';
-    this.cvv = '';
   }
 
   remover(id: string): void {
@@ -113,41 +102,16 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (target) target.value = formatted;
   }
 
-  onVencimentoInput(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    const raw = target?.value ?? '';
-    const digits = raw.replace(/\D/g, '').slice(0, 4);
-    const mm = digits.slice(0, 2);
-    const yy = digits.slice(2, 4);
-    const masked = [mm, yy].filter(Boolean).join('/');
-    this.vencimento = masked;
-    if (target) target.value = masked;
-  }
-
-  onCvvInput(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    const raw = target?.value ?? '';
-    const digits = raw.replace(/\D/g, '').slice(0, 3);
-    this.cvv = digits;
-    if (target) target.value = digits;
-  }
-
   editar(card: StoredCard): void {
     this.editandoId = card.id;
     this.mostrarModal = true;
     this.bandeira = card.bandeira;
     this.numero = this.formatarNumeroEntrada(card.numero.replace(/\D/g, ''));
     this.nome = card.nome;
-    this.vencimento = card.vencimento;
-    this.cvv = card.cvv.replace(/\D/g, '').slice(0, 3);
   }
 
   toggleNumero(): void {
     this.mostrarNumero = !this.mostrarNumero;
-  }
-
-  toggleCvv(): void {
-    this.mostrarCvv = !this.mostrarCvv;
   }
 
   private formatarNumeroParaDisplay(numero: string): string {

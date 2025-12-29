@@ -28,12 +28,7 @@ export class LoginComponent {
 
     this.auth.login(this.email, this.password).subscribe({
       next: (res: AuthResponse) => {
-        this.feedback = `Autenticado! Token mock salvo (expira em ${res.expiresIn}s).`;
-        try {
-          localStorage.setItem('current_user', this.email);
-        } catch {
-          /* ignore in non-browser */
-        }
+        this.feedback = `Autenticado! Bem-vindo, ${res.name}.`;
         this.loading = false;
         this.router.navigateByUrl('/');
       },

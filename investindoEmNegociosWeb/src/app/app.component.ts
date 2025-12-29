@@ -1,12 +1,13 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIf } from '@angular/common';
+import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgIf, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [NgIf, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -15,6 +16,8 @@ export class AppComponent implements OnDestroy {
   isLoginRoute = false;
   isHomeRoute = false;
   isLightTheme = false;
+  showSignupModal = false;
+  signupAlert = '';
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
@@ -40,6 +43,20 @@ export class AppComponent implements OnDestroy {
 
   goToLogin(): void {
     this.router.navigateByUrl('/login');
+  }
+
+  openSignup(): void {
+    this.showSignupModal = true;
+  }
+
+  closeSignup(): void {
+    this.showSignupModal = false;
+  }
+
+  handleSignupDone(): void {
+    this.showSignupModal = false;
+    this.signupAlert = 'Conta criada com sucesso. Faça login para entrar.';
+    setTimeout(() => (this.signupAlert = ''), 5000);
   }
 
   logout(): void {

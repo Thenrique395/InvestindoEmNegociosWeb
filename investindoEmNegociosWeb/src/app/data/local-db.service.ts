@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs';
 
 export interface StoredExpense {
   id: string;
@@ -7,6 +7,7 @@ export interface StoredExpense {
   categoria: string;
   valor: number;
   vencimento: string; // DD/MM/AAAA
+  userId?: string;
   cartao?: string;
   parcelaNumero?: number;
   parcelasTotal?: number;
@@ -18,8 +19,6 @@ export interface StoredCard {
   bandeira: string;
   numero: string;
   nome: string;
-  vencimento: string;
-  cvv: string;
   userId: string;
 }
 
@@ -31,6 +30,7 @@ export interface StoredIncome {
   fixa?: boolean;
   fixaInicio?: string; // MM/AAAA
   fixaFim?: string; // MM/AAAA
+  userId?: string;
 }
 
 type PersistedDb = {
@@ -40,107 +40,126 @@ type PersistedDb = {
 };
 
 const STORAGE_KEY = 'investindo-db';
+const EMPTY_DB: PersistedDb = { expenses: [], cards: [], incomes: [] };
 
 @Injectable({ providedIn: 'root' })
 export class LocalDbService {
   private static memoryDb: PersistedDb | null = null;
-  private db: PersistedDb = { expenses: [], cards: [], incomes: [] };
-  private expensesSubject = new BehaviorSubject<StoredExpense[]>([]);
-  private cardsSubject = new BehaviorSubject<StoredCard[]>([]);
-  private incomesSubject = new BehaviorSubject<StoredIncome[]>([]);
-  expenses$ = this.expensesSubject.asObservable();
-  cards$ = this.cardsSubject.asObservable();
-  incomes$ = this.incomesSubject.asObservable();
+  private static readonly guestUser = 'guest';
+  private readonly dbSubject = new BehaviorSubject<PersistedDb>(EMPTY_DB);
+  private readonly db$ = this.dbSubject.asObservable();
+
+  readonly expenses$ = this.db$.pipe(
+    map((state) => state.expenses.filter((expense) => this.isCurrentUser(expense.userId))),
+    distinctUntilChanged()
+  );
+  readonly cards$ = this.db$.pipe(
+    map((state) => state.cards.filter((card) => this.isCurrentUser(card.userId))),
+    distinctUntilChanged()
+  );
+  readonly incomes$ = this.db$.pipe(
+    map((state) => state.incomes.filter((income) => this.isCurrentUser(income.userId))),
+    distinctUntilChanged()
+  );
 
   constructor() {
-    // carrega assincronamente; emite dados assim que recuperar
-    this.load();
+    void this.restore();
   }
 
   addExpense(expense: Omit<StoredExpense, 'id'>): void {
-    const record = { ...expense, id: this.uid() };
-    this.db.expenses = [...this.db.expenses, record];
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      expenses: [...db.expenses, { ...expense, id: this.uid(), userId: this.currentUser }]
+    }));
   }
 
   updateExpense(id: string, data: Partial<StoredExpense>): void {
-    this.db.expenses = this.db.expenses.map((e) => (e.id === id ? { ...e, ...data } : e));
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      expenses: db.expenses.map((expense) =>
+        expense.id === id && this.isCurrentUser(expense.userId) ? { ...expense, ...data } : expense
+      )
+    }));
   }
 
   removeExpense(id: string): void {
-    this.db.expenses = this.db.expenses.filter((e) => e.id !== id);
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      expenses: db.expenses.filter((expense) => !(expense.id === id && this.isCurrentUser(expense.userId)))
+    }));
   }
 
   removeExpenseSeries(serieId: string): void {
-    this.db.expenses = this.db.expenses.filter((e) => e.serieId !== serieId);
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      expenses: db.expenses.filter(
+        (expense) => !(expense.serieId === serieId && this.isCurrentUser(expense.userId))
+      )
+    }));
   }
 
   addCard(card: Omit<StoredCard, 'id'>): void {
-    const record = { ...card, id: this.uid() };
-    this.db.cards = [...this.db.cards, record];
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      cards: [...db.cards, { ...card, id: this.uid(), userId: this.currentUser }]
+    }));
   }
 
   updateCard(id: string, data: Partial<StoredCard>): void {
-    this.db.cards = this.db.cards.map((c) => (c.id === id ? { ...c, ...data } : c));
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      cards: db.cards.map((card) => (card.id === id && this.isCurrentUser(card.userId) ? { ...card, ...data } : card))
+    }));
   }
 
   removeCard(id: string): void {
-    this.db.cards = this.db.cards.filter((c) => c.id !== id);
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      cards: db.cards.filter((card) => !(card.id === id && this.isCurrentUser(card.userId)))
+    }));
   }
 
   addIncome(income: Omit<StoredIncome, 'id'>): void {
-    const record = { ...income, id: this.uid() };
-    this.db.incomes = [...this.db.incomes, record];
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      incomes: [...db.incomes, { ...income, id: this.uid(), userId: this.currentUser }]
+    }));
   }
 
   updateIncome(id: string, data: Partial<StoredIncome>): void {
-    this.db.incomes = this.db.incomes.map((i) => (i.id === id ? { ...i, ...data } : i));
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      incomes: db.incomes.map((income) =>
+        income.id === id && this.isCurrentUser(income.userId) ? { ...income, ...data } : income
+      )
+    }));
   }
 
   removeIncome(id: string): void {
-    this.db.incomes = this.db.incomes.filter((i) => i.id !== id);
-    this.persist();
+    this.updateDb((db) => ({
+      ...db,
+      incomes: db.incomes.filter((income) => !(income.id === id && this.isCurrentUser(income.userId)))
+    }));
   }
 
-  private async persist(): Promise<void> {
-    LocalDbService.memoryDb = this.db;
-    this.storage?.setItem(STORAGE_KEY, JSON.stringify(this.db));
-    await this.saveIndexed(this.db);
-    this.emit();
+  private updateDb(mutator: (db: PersistedDb) => PersistedDb): void {
+    const updatedDb = mutator(this.dbSubject.value);
+    this.dbSubject.next(updatedDb);
+    LocalDbService.memoryDb = updatedDb;
+    void this.persist(updatedDb);
   }
 
-  private async load(): Promise<void> {
-    // prioridade: IndexedDB -> localStorage -> memória
+  private async persist(db: PersistedDb): Promise<void> {
+    this.writeToLocalStorage(db);
+    await this.saveIndexed(db);
+  }
+
+  private async restore(): Promise<void> {
     const fromIndexed = await this.readIndexed();
-    if (fromIndexed) {
-      this.db = fromIndexed;
-    } else {
-      const raw = this.storage?.getItem(STORAGE_KEY);
-      if (raw) {
-        try {
-          this.db = JSON.parse(raw) as PersistedDb;
-        } catch {
-          this.db = { expenses: [], cards: [], incomes: [] };
-        }
-      } else if (LocalDbService.memoryDb) {
-        this.db = LocalDbService.memoryDb;
-      }
-    }
-    this.emit();
-  }
-
-  private emit(): void {
-    this.expensesSubject.next([...this.db.expenses]);
-    this.cardsSubject.next([...this.db.cards]);
-    this.incomesSubject.next([...this.db.incomes]);
+    const fromStorage = fromIndexed ?? this.readFromLocalStorage() ?? LocalDbService.memoryDb;
+    const db = this.normalizeOwners(fromStorage || EMPTY_DB);
+    this.dbSubject.next(db);
+    LocalDbService.memoryDb = db;
   }
 
   private uid(): string {
@@ -151,6 +170,40 @@ export class LocalDbService {
 
   private get storage(): Storage | null {
     return typeof localStorage !== 'undefined' ? localStorage : null;
+  }
+
+  private get currentUser(): string {
+    return this.storage?.getItem('current_user') || LocalDbService.guestUser;
+  }
+
+  private isCurrentUser(ownerId?: string): boolean {
+    return (ownerId || LocalDbService.guestUser) === this.currentUser;
+  }
+
+  private normalizeOwners(db: PersistedDb): PersistedDb {
+    const owner = this.currentUser;
+    const withOwner = <T extends { userId?: string }>(collection: T[]) =>
+      collection.map((item) => ({ ...item, userId: item.userId ?? owner }));
+
+    return {
+      expenses: withOwner(db.expenses),
+      cards: withOwner(db.cards),
+      incomes: withOwner(db.incomes)
+    };
+  }
+
+  private readFromLocalStorage(): PersistedDb | null {
+    const raw = this.storage?.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as PersistedDb;
+    } catch {
+      return null;
+    }
+  }
+
+  private writeToLocalStorage(db: PersistedDb): void {
+    this.storage?.setItem(STORAGE_KEY, JSON.stringify(db));
   }
 
   // Persistência em IndexedDB

@@ -23,7 +23,8 @@
           <span *ngIf="!isLightTheme">☀️</span>
           <span *ngIf="isLightTheme">🌙</span>
         </button>
-        <button class="login-link" type="button" (click)="goToLogin()">Login</button>
+        <button class="signup-link" type="button" (click)="openSignup()">Criar conta</button>
+        <button class="login-link" type="button" (click)="goToLogin()">Entrar</button>
       </div>
     </ng-container>
 
@@ -62,35 +63,37 @@
               e visual.
             </p>
             <div class="hero__actions">
-              <button class="primary">Começar agora</button>
+              <button class="primary" type="button" (click)="openSignup()">Começar agora</button>
               <a class="ghost-link" href="#">Ver como funciona</a>
             </div>
             <div class="pill">Carteira 360° • Alertas inteligentes • Simulador em tempo real</div>
           </div>
-          <div class="hero__panel">
-            <div class="panel__header">
-              <span class="eyebrow">Progresso do plano</span>
-              <span class="badge success">+12,4% YTD</span>
-            </div>
-            <div class="panel__chart">
-              <div class="chart__bar bar--1"></div>
-              <div class="chart__bar bar--2"></div>
-              <div class="chart__bar bar--3"></div>
-              <div class="chart__bar bar--4"></div>
-              <div class="chart__bar bar--5"></div>
-            </div>
-            <div class="panel__stats">
-              <div>
-                <p class="eyebrow">Patrimônio monitorado</p>
-                <h3>R$ 1,2 mi</h3>
+          <div class="hero__aside">
+            <div class="hero__panel">
+              <div class="panel__header">
+                <span class="eyebrow">Progresso do plano</span>
+                <span class="badge success">+12,4% YTD</span>
               </div>
-              <div>
-                <p class="eyebrow">Metas ativas</p>
-                <h3>4 metas</h3>
+              <div class="panel__chart">
+                <div class="chart__bar bar--1"></div>
+                <div class="chart__bar bar--2"></div>
+                <div class="chart__bar bar--3"></div>
+                <div class="chart__bar bar--4"></div>
+                <div class="chart__bar bar--5"></div>
               </div>
-              <div>
-                <p class="eyebrow">Tempo médio</p>
-                <h3>8 min</h3>
+              <div class="panel__stats">
+                <div>
+                  <p class="eyebrow">Patrimônio monitorado</p>
+                  <h3>R$ 1,2 mi</h3>
+                </div>
+                <div>
+                  <p class="eyebrow">Metas ativas</p>
+                  <h3>4 metas</h3>
+                </div>
+                <div>
+                  <p class="eyebrow">Tempo médio</p>
+                  <h3>8 min</h3>
+                </div>
               </div>
             </div>
           </div>
@@ -105,4 +108,29 @@
     </ng-container>
     <router-outlet />
   </main>
+
+  <div class="global-alert success" *ngIf="signupAlert">
+    {{ signupAlert }}
+    <button type="button" aria-label="Fechar alerta" (click)="signupAlert = ''">✕</button>
+  </div>
+
+  <div class="signup-modal" *ngIf="showSignupModal">
+    <div class="signup-modal__backdrop" (click)="closeSignup()"></div>
+    <div class="signup-modal__dialog">
+      <div class="signup-modal__left">
+        <p class="eyebrow brand-green">Crie sua conta grátis</p>
+        <h2>Teste completo por 14 dias, sem cartão.</h2>
+        <p class="lead">Desbloqueie Despesas e Rendas agora, Cartões e Investimentos quando estiver pronto.</p>
+        <ul>
+          <li>Dashboard em tempo real</li>
+          <li>Alertas inteligentes</li>
+          <li>Dados locais e seguros</li>
+        </ul>
+      </div>
+      <div class="signup-modal__right">
+        <button class="close" type="button" aria-label="Fechar cadastro" (click)="closeSignup()">✕</button>
+        <app-signup (signedUp)="handleSignupDone()"></app-signup>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,0 +1,113 @@
+.signup-card {
+  background: var(--card, #0b3546);
+  border: 1px solid var(--stroke, rgba(255, 255, 255, 0.08));
+  border-radius: 18px;
+  box-shadow: var(--shadow, 0 14px 36px rgba(0, 22, 31, 0.4));
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--text, #edebec);
+}
+
+h3 {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.muted {
+  color: var(--muted, #c7d2d0);
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-weight: 600;
+  color: var(--text, #edebec);
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'] {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--stroke, rgba(255, 255, 255, 0.12));
+  padding: 0.85rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text, #edebec);
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+input:focus {
+  border-color: rgba(52, 144, 99, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--muted, #c7d2d0);
+}
+
+button.primary {
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(120deg, #2f8a5d, #1f7c55);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+}
+
+button.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+button.primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.helper {
+  margin: 0;
+  color: var(--muted, #c7d2d0);
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #ffb4a2;
+}
+
+.feedback {
+  margin: 0;
+  font-weight: 600;
+}
+
+.feedback.success {
+  color: #b2f0c8;
+}
+
+.feedback.error {
+  color: #ffb4a2;
+}
+
+@media (max-width: 768px) {
+  .signup-card {
+    padding: 1.25rem;
+  }
+}

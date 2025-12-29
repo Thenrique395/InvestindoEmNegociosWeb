@@ -25,6 +25,12 @@ export class CartoesListagemComponent {
     return (bandeira || '').toLowerCase() === 'mastercard';
   }
 
+  finalCartao(numero?: string): string {
+    if (!numero) return '••••';
+    const digits = numero.replace(/\D/g, '');
+    return digits.slice(-4).padStart(4, '•');
+  }
+
   onEditar(card: StoredCard): void {
     this.editar.emit(card);
   }

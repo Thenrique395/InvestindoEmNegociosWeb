@@ -27,7 +27,7 @@
           <option *ngIf="!cartoes.length" [ngValue]="null" disabled>Nenhum cartão cadastrado</option>
           <ng-container *ngIf="cartoes.length">
             <option *ngFor="let c of cartoes" [ngValue]="c.id">
-              Cartão - {{ c.bandeira }} {{ c.vencimento }}
+              {{ cartaoLabel(c) }}
             </option>
           </ng-container>
         </select>

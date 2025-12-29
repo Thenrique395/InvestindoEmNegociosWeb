@@ -34,6 +34,17 @@ export class DespesasFormComponent {
   @Output() submitForm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 
+  private finalCartao(numero?: string): string {
+    if (!numero) return '••••';
+    const digits = numero.replace(/\D/g, '');
+    return digits.slice(-4).padStart(4, '•');
+  }
+
+  cartaoLabel(cartao: StoredCard): string {
+    const bandeira = cartao?.bandeira || 'Cartão';
+    return `Cartão - ${bandeira} •••• ${this.finalCartao(cartao?.numero)}`;
+  }
+
   onValorChange(value: string): void {
     this.valorChange.emit(value);
   }
