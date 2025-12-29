@@ -1,0 +1,315 @@
+<section class="calculator">
+  <div class="calc__header">
+    <div>
+      <p class="eyebrow brand-green">Calculadoras</p>
+      <h2>Escolha o simulador e veja detalhes e tabelas.</h2>
+      <p>Simulações financeiras e trabalhistas em um só painel.</p>
+    </div>
+    <a class="back-link" *ngIf="selected" (click)="backToCatalog()"
+      >Voltar para catálogo</a
+    >
+  </div>
+
+  <ng-container *ngIf="!selected">
+    <div class="calc__selector">
+      <div>
+        <p class="section-title">Financeiras</p>
+        <div class="selector__grid">
+          <button
+            *ngFor="let item of financeiras"
+            [routerLink]="['/calculadora', item.id]"
+          >
+            <span class="icon">{{ item.icon }}</span>
+            <div>
+              <span>{{ item.title }}</span>
+              <small>{{ item.subtitle }}</small>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc__selector">
+      <div>
+        <div>
+          <p class="section-title">Trabalhistas</p>
+          <div class="selector__grid">
+            <button
+              *ngFor="let item of trabalhistas"
+              [routerLink]="['/calculadora', item.id]"
+            >
+              <span class="icon">{{ item.icon }}</span>
+              <div>
+                <span>{{ item.title }}</span>
+                <small>{{ item.subtitle }}</small>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="selected">
+    <div class="calc__panel" *ngIf="isImplementado; else emBreve">
+      <ng-container [ngSwitch]="selected">
+        <ng-container *ngSwitchCase="'jurosCompostos'">
+          <div class="panel__title">
+            <h3>Juros Compostos</h3>
+            <p class="muted">
+              Aportes, taxa e tempo para projetar valor futuro. Tabelas mensal e
+              anual.
+            </p>
+          </div>
+          <form class="form">
+            <label>
+              Aporte inicial (R$)
+              <input
+                type="number"
+                [(ngModel)]="aporteInicial"
+                name="aporteInicial"
+              />
+            </label>
+            <label>
+              Aporte mensal (R$)
+              <input
+                type="number"
+                [(ngModel)]="aporteMensal"
+                name="aporteMensal"
+              />
+            </label>
+            <label>
+              Taxa mensal (%)
+              <input type="number" [(ngModel)]="taxa" name="taxa" step="0.1" />
+            </label>
+            <label>
+              Meses
+              <input type="number" [(ngModel)]="meses" name="meses" />
+            </label>
+            <button type="button" (click)="calcularJuros()">Calcular</button>
+          </form>
+          <p class="result" *ngIf="jurosResultado">
+            Valor futuro:
+            <strong>R$ {{ jurosResultado | number : "1.2-2" }}</strong>
+          </p>
+          <div class="chart" *ngIf="jurosSeries.length">
+            <div
+              class="chart__bar"
+              *ngFor="let item of jurosSeries"
+              [style.height.%]="(item.valor / jurosMax) * 100"
+            >
+              <span class="chart__label">{{ item.mes }}m</span>
+            </div>
+          </div>
+          <div class="table">
+            <div class="table__head">
+              <span>Mês</span>
+              <span>Valor</span>
+            </div>
+            <div class="table__row" *ngFor="let item of jurosSeries">
+              <span>{{ item.mes }}</span>
+              <span>R$ {{ item.valor | number : "1.2-2" }}</span>
+            </div>
+          </div>
+          <div class="table table--wide" *ngIf="jurosAnual.length">
+            <div class="table__head">
+              <span>Ano</span>
+              <span>Investimento anual</span>
+              <span>Juros do ano</span>
+              <span>Total investido</span>
+              <span>Total juros</span>
+              <span>Total acumulado</span>
+            </div>
+            <div
+              class="table__row table__row--wide"
+              *ngFor="let ano of jurosAnual"
+            >
+              <span>{{ ano.ano }}</span>
+              <span>R$ {{ ano.aporteAno | number : "1.2-2" }}</span>
+              <span>R$ {{ ano.jurosAno | number : "1.2-2" }}</span>
+              <span>R$ {{ ano.totalInvestido | number : "1.2-2" }}</span>
+              <span>R$ {{ ano.totalJuros | number : "1.2-2" }}</span>
+              <span>R$ {{ ano.totalAcumulado | number : "1.2-2" }}</span>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'jurosSimples'">
+          <div class="panel__title">
+            <h3>Juros Simples</h3>
+            <p class="muted">Cálculo linear: capital x taxa x tempo.</p>
+          </div>
+          <form class="form">
+            <label>
+              Capital (R$)
+              <input
+                type="number"
+                [(ngModel)]="capitalSimples"
+                name="capitalSimples"
+              />
+            </label>
+            <label>
+              Taxa mensal (%)
+              <input
+                type="number"
+                [(ngModel)]="taxaSimples"
+                name="taxaSimples"
+                step="0.1"
+              />
+            </label>
+            <label>
+              Meses
+              <input
+                type="number"
+                [(ngModel)]="mesesSimples"
+                name="mesesSimples"
+              />
+            </label>
+            <button type="button" (click)="calcularJurosSimples()">
+              Calcular
+            </button>
+          </form>
+          <p class="result" *ngIf="jurosSimplesResultado">
+            Juros simples:
+            <strong>R$ {{ jurosSimplesResultado | number : "1.2-2" }}</strong>
+          </p>
+          <div class="table" *ngIf="jurosSimplesResultado">
+            <div class="table__head">
+              <span>Período</span>
+              <span>Juros</span>
+            </div>
+            <div class="table__row">
+              <span>{{ mesesSimples }} meses</span>
+              <span>R$ {{ jurosSimplesResultado | number : "1.2-2" }}</span>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'renda'">
+          <div class="panel__title">
+            <h3>Calculadora de Renda</h3>
+            <p class="muted">
+              Projeção de renda mensal considerando sua rentabilidade.
+            </p>
+          </div>
+          <form class="form">
+            <label>
+              Patrimônio (R$)
+              <input type="number" [(ngModel)]="patrimonio" name="patrimonio" />
+            </label>
+            <label>
+              Rentabilidade mensal esperada (%)
+              <input
+                type="number"
+                [(ngModel)]="rentabilidadeMensal"
+                name="rentabilidadeMensal"
+                step="0.1"
+              />
+            </label>
+            <button type="button" (click)="calcularRenda()">Calcular</button>
+          </form>
+          <p class="result" *ngIf="rendaResultado">
+            Renda mensal estimada:
+            <strong>R$ {{ rendaResultado | number : "1.2-2" }}</strong>
+          </p>
+          <div class="chart chart--inline" *ngIf="rendaResultado">
+            <div class="chart__bar chart__bar--renda" [style.height.%]="100">
+              <span class="chart__label">Renda</span>
+            </div>
+            <div
+              class="chart__bar chart__bar--patrimonio"
+              [style.height.%]="100"
+            >
+              <span class="chart__label">Patrimônio</span>
+            </div>
+          </div>
+          <div class="table">
+            <div class="table__head">
+              <span>Patrimônio</span>
+              <span>Renda (mês)</span>
+            </div>
+            <div class="table__row">
+              <span>R$ {{ patrimonio | number : "1.0-0" }}</span>
+              <span>R$ {{ rendaResultado | number : "1.2-2" }}</span>
+            </div>
+          </div>
+          <div class="table" *ngIf="rendaResultado">
+            <div class="table__head">
+              <span>Mês</span>
+              <span>Renda estimada</span>
+            </div>
+            <div class="table__row" *ngFor="let mes of rendaMeses">
+              <span>{{ mes }}</span>
+              <span>R$ {{ rendaResultado | number : "1.2-2" }}</span>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'milhao'">
+          <div class="panel__title">
+            <h3>Primeiro Milhão</h3>
+            <p class="muted">
+              Descubra quanto tempo leva para atingir R$ 1.000.000.
+            </p>
+          </div>
+          <form class="form">
+            <label>
+              Aporte mensal (R$)
+              <input
+                type="number"
+                [(ngModel)]="aporteMilhao"
+                name="aporteMilhao"
+              />
+            </label>
+            <label>
+              Rentabilidade mensal (%)
+              <input
+                type="number"
+                [(ngModel)]="taxaMilhao"
+                name="taxaMilhao"
+                step="0.1"
+              />
+            </label>
+            <button type="button" (click)="calcularMilhao()">Calcular</button>
+          </form>
+          <p class="result" *ngIf="mesesMilhao">
+            Você alcança R$ 1.000.000 em
+            <strong>{{ mesesMilhao }}</strong> meses ({{
+              mesesMilhao / 12 | number : "1.1-1"
+            }}
+            anos).
+          </p>
+          <div class="chart" *ngIf="milhaoSeries.length">
+            <div
+              class="chart__bar"
+              *ngFor="let item of milhaoSeries"
+              [style.height.%]="(item.valor / milhaoMax) * 100"
+            >
+              <span class="chart__label">{{ item.mes }}m</span>
+            </div>
+          </div>
+          <div class="table" *ngIf="milhaoSeries.length">
+            <div class="table__head">
+              <span>Mês</span>
+              <span>Valor acumulado</span>
+            </div>
+            <div class="table__row" *ngFor="let item of milhaoSeries">
+              <span>{{ item.mes }}</span>
+              <span>R$ {{ item.valor | number : "1.2-2" }}</span>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <ng-template #emBreve>
+      <div class="calc__panel">
+        <h3>{{ selecionado?.title || "Selecione uma calculadora" }}</h3>
+        <p class="muted">
+          {{ selecionado?.subtitle || "Escolha um simulador para começar." }}
+        </p>
+        <p class="muted">Este simulador estará disponível em breve.</p>
+      </div>
+    </ng-template>
+  </ng-container>
+</section>

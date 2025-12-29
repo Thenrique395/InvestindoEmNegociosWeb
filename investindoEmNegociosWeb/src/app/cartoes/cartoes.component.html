@@ -1,0 +1,134 @@
+<section class="card-form">
+  <div class="card-form__header">
+    <div>
+      <h2>Meus cartões</h2>
+      <p class="muted">Cartões salvos para o usuário atual.</p>
+    </div>
+    <button class="add btn-primary" type="button" (click)="abrirModal()">
+      <span class="add__icon">+</span>
+      <span>Cadastrar novo cartão</span>
+    </button>
+  </div>
+
+  <div *ngIf="alerta" class="inline-alert">
+    {{ alerta }}
+  </div>
+
+  <app-cartoes-listagem [cards]="cards" (remover)="remover($event)" (editar)="editar($event)"></app-cartoes-listagem>
+
+  <div class="modal" *ngIf="mostrarModal">
+    <div class="modal__backdrop" (click)="fecharModal()"></div>
+    <div class="modal__content wide">
+      <div class="modal__header">
+        <div>
+          <p class="eyebrow">Incluir cartão</p>
+          <h3>Cadastre e visualize em tempo real</h3>
+        </div>
+        <button class="modal__close" type="button" (click)="fecharModal()">✕</button>
+      </div>
+      <div class="card-form__layout">
+        <form class="form" (ngSubmit)="salvar()">
+          <label>
+            Bandeira
+            <select [(ngModel)]="bandeira" name="bandeira">
+              <option value="mastercard">Mastercard</option>
+              <option value="visa">Visa</option>
+              <option value="elo">Elo</option>
+            </select>
+          </label>
+
+          <label>
+            Número do cartão
+            <div class="input-wrap">
+              <input
+                type="{{ mostrarNumero ? 'text' : 'password' }}"
+                [(ngModel)]="numero"
+                name="numero"
+                maxlength="19"
+                inputmode="numeric"
+                pattern="\\d*"
+                (input)="onNumeroInput($event)"
+                placeholder="**** **** **** ****"
+                required
+              />
+              <button type="button" (click)="toggleNumero()" aria-label="Mostrar número">
+                {{ mostrarNumero ? '🙈' : '👁️' }}
+              </button>
+            </div>
+          </label>
+
+          <label>
+            Nome impresso no cartão
+            <input [(ngModel)]="nome" name="nome" placeholder="FULANO DA SILVA" required />
+          </label>
+
+          <div class="row">
+            <label>
+              Vencimento
+              <input
+                [(ngModel)]="vencimento"
+                name="vencimento"
+                placeholder="MM/AA"
+                maxlength="5"
+                inputmode="numeric"
+                pattern="\\d*"
+                (input)="onVencimentoInput($event)"
+                required
+              />
+            </label>
+            <label>
+              CVV
+              <div class="input-wrap">
+                <input
+                  type="{{ mostrarCvv ? 'text' : 'password' }}"
+                  [(ngModel)]="cvv"
+                  name="cvv"
+                  maxlength="3"
+                  inputmode="numeric"
+                  pattern="\\d*"
+                  (input)="onCvvInput($event)"
+                  placeholder="***"
+                  required
+                />
+                <button type="button" (click)="toggleCvv()" aria-label="Mostrar CVV">
+                  {{ mostrarCvv ? '🙈' : '👁️' }}
+                </button>
+              </div>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
+            <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar cartão' }}</button>
+          </div>
+        </form>
+
+        <div class="preview">
+          <div class="credit-card" [class.mastercard]="bandeira === 'mastercard'" [class.visa]="bandeira === 'visa'" [class.elo]="bandeira === 'elo'">
+            <div class="card__chip"></div>
+            <div class="card__logo" [ngSwitch]="bandeira">
+              <div *ngSwitchCase="'mastercard'" class="logo-mc" aria-label="Mastercard">
+                <span class="mc-circle mc-circle--left"></span>
+                <span class="mc-circle mc-circle--right"></span>
+              </div>
+              <span *ngSwitchCase="'visa'" class="logo-text">VISA</span>
+              <span *ngSwitchCase="'elo'" class="logo-text">ELO</span>
+              <span *ngSwitchDefault class="logo-text">{{ bandeira | uppercase }}</span>
+            </div>
+            <p class="card__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</p>
+            <div class="card__footer">
+              <div>
+                <span class="label">Nome</span>
+                <p>{{ nome || 'SEU NOME' }}</p>
+              </div>
+              <div>
+                <span class="label">Validade</span>
+                <p>{{ vencimento || 'MM/AA' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

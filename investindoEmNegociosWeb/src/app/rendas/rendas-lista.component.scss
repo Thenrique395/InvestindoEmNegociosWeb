@@ -1,0 +1,34 @@
+.lista {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lista__head,
+.lista__row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 0.8fr 0.8fr;
+  padding: 0.65rem 0.85rem;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lista__head {
+  background: rgba(255, 255, 255, 0.05);
+  font-weight: 700;
+}
+
+.lista__row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lista__row--empty span {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.acoes {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}

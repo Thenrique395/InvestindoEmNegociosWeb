@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
+  background: #002e3e;
+  color: #edebec;
+  min-height: 100vh;
+}
+
+/* Botões padrão de mercado */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(52, 144, 99, 0.8);
+  background: linear-gradient(135deg, #2db37a, #1f8a5d);
+  color: #07241f;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(45, 179, 122, 0.35);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.03);
+  box-shadow: 0 16px 36px rgba(45, 179, 122, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0.5px);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 92, 92, 0.7);
+  background: rgba(255, 92, 92, 0.12);
+  color: #ffd7d7;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.btn-danger:hover {
+  background: rgba(255, 92, 92, 0.18);
+  border-color: rgba(255, 92, 92, 0.85);
+}
+
+.btn-danger:active {
+  transform: translateY(0.5px);
+}
+
+.btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(64, 169, 255, 0.35);
+  background: rgba(64, 169, 255, 0.08);
+  color: #cfe7ff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.btn-edit:hover {
+  background: rgba(64, 169, 255, 0.14);
+  border-color: rgba(64, 169, 255, 0.55);
+}
+
+.btn-edit:active {
+  transform: translateY(0.5px);
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #edebec;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.sm {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* Alert padrão */
+.inline-alert {
+  border: 1px solid rgba(255, 92, 92, 0.6);
+  background: rgba(255, 92, 92, 0.12);
+  color: #ffd7d7;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+}

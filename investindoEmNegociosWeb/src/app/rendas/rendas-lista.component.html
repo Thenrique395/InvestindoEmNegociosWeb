@@ -1,0 +1,22 @@
+<div class="lista">
+  <div class="lista__head">
+    <span>Fonte</span>
+    <span>Valor</span>
+    <span>Recebimento</span>
+    <span>Tipo</span>
+    <span class="acoes-head">Ações</span>
+  </div>
+  <div class="lista__row lista__row--empty" *ngIf="!rendas.length">
+    <span class="muted">Nenhuma renda cadastrada.</span>
+  </div>
+  <div class="lista__row" *ngFor="let r of rendas">
+    <span>{{ r.fonte }}</span>
+    <span>R$ {{ r.valor | number:'1.2-2' }}</span>
+    <span>{{ r.recebimento || '—' }}</span>
+    <span>{{ r.fixa ? 'Fixa' : 'Avulsa' }}</span>
+    <span class="acoes">
+      <button type="button" class="btn-edit sm" (click)="onEditar(r.id!)">✏️ Editar</button>
+      <button type="button" class="btn-danger sm" (click)="onRemover(r.id!)">🗑 Excluir</button>
+    </span>
+  </div>
+</div>

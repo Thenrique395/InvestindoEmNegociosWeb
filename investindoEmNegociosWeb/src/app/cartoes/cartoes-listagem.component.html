@@ -1,0 +1,36 @@
+<div class="cards-list">
+  <div *ngIf="cards.length; else emptyCards" class="cards-grid">
+    <article class="card-item" *ngFor="let c of cards">
+      <header class="card-item__top">
+        <div class="brand" [class.brand--mastercard]="isMastercard(c.bandeira)">
+          <div *ngIf="isMastercard(c.bandeira)" class="mc-logo" aria-label="Mastercard"></div>
+          <span *ngIf="!isMastercard(c.bandeira)" class="pill">{{ c.bandeira | uppercase }}</span>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn-edit sm" (click)="onEditar(c)">✏️ Editar</button>
+          <button type="button" class="btn-danger sm" (click)="onRemover(c.id)">🗑 Remover</button>
+        </div>
+      </header>
+
+      <p class="card-item__number">{{ numeroProtegido(c.numero) }}</p>
+
+      <div class="card-item__meta">
+        <div>
+          <span class="label">Nome</span>
+          <p>{{ c.nome }}</p>
+        </div>
+        <div>
+          <span class="label">Validade</span>
+          <p>{{ c.vencimento }}</p>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyCards>
+    <div class="empty-state">
+      <p class="muted">Nenhum cartão cadastrado para este usuário.</p>
+      <p class="muted">Clique em “Cadastrar novo cartão”.</p>
+    </div>
+  </ng-template>
+</div>

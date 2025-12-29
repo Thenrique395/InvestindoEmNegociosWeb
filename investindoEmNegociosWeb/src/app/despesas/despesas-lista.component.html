@@ -1,0 +1,27 @@
+<div class="lista">
+  <div class="lista__head">
+    <button type="button" class="linkish" (click)="ordenarPor('nome')">Nome</button>
+    <button type="button" class="linkish" (click)="ordenarPor('categoria')">Categoria</button>
+    <button type="button" class="linkish" (click)="ordenarPor('pagamento')">Pagamento</button>
+    <button type="button" class="linkish" (click)="ordenarPor('vencimento')">Vencimento</button>
+    <button type="button" class="linkish" (click)="ordenarPor('valor')">Valor</button>
+    <span>Ações</span>
+  </div>
+  <div class="lista__row lista__row--empty" *ngIf="!despesas.length">
+    <span class="muted">Nenhuma despesa cadastrada para este mês.</span>
+  </div>
+  <div class="lista__row" *ngFor="let d of despesas">
+    <span>{{ d.nome }}</span>
+    <span>{{ d.categoria }}</span>
+    <span>{{ pagamentoLabel(d) }}</span>
+    <span>{{ d.vencimento || '—' }}</span>
+    <span>
+      R$ {{ d.valor | number:'1.2-2' }}
+      <small *ngIf="d.parcelasTotal"> ({{ d.parcelaNumero }}/{{ d.parcelasTotal }})</small>
+    </span>
+    <span class="acoes">
+      <button type="button" class="btn-edit" (click)="editar.emit(d.id!)">✏️ Editar</button>
+      <button type="button" class="btn-danger sm" (click)="remover.emit(d.id!)">🗑 Excluir</button>
+    </span>
+  </div>
+</div>

@@ -1,0 +1,106 @@
+<section class="home-dashboard" *ngIf="isLogged">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Resumo financeiro</p>
+      <h1>Visão geral de {{ mesAtualLabel }}</h1>
+      <p class="muted">Combine rendas, despesas e cartões para saber o quanto pode gastar.</p>
+    </div>
+    <div class="hero__actions">
+      <a class="btn-primary" routerLink="/despesas">Ir para despesas</a>
+      <a class="btn-edit" routerLink="/rendas">Ir para rendas</a>
+      <a class="btn-danger ghost" routerLink="/cartoes">Gerenciar cartões</a>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="stat-card income">
+      <p class="label">Total de rendas</p>
+      <h2>R$ {{ totalRendas | number:'1.2-2' }}</h2>
+      <p class="muted">Inclui rendas fixas e avulsas do mês.</p>
+    </div>
+    <div class="stat-card expense">
+      <p class="label">Total de despesas</p>
+      <h2>R$ {{ totalDespesas | number:'1.2-2' }}</h2>
+      <p class="muted">Somente despesas com vencimento neste mês.</p>
+    </div>
+    <div class="stat-card balance">
+      <p class="label">Disponível para gastar</p>
+      <h2>R$ {{ saldo | number:'1.2-2' }}</h2>
+      <p class="muted">Rendas menos despesas do mês.</p>
+    </div>
+    <div class="stat-card cards">
+      <p class="label">Cartões cadastrados</p>
+      <h3>{{ cardsCount }}</h3>
+      <p class="muted">Usados para vincular despesas.</p>
+    </div>
+  </div>
+
+  <div class="chart">
+    <div class="chart__header">
+      <p class="label">Rendas x Despesas no ano</p>
+      <span class="muted">Valores mensais de {{ dataAtual.getFullYear() }}</span>
+      <div class="chart__controls">
+        <button type="button" [class.active]="chartType === 'bar'" (click)="trocarTipo('bar')">Barras</button>
+        <button type="button" [class.active]="chartType === 'line'" (click)="trocarTipo('line')">Linha</button>
+      </div>
+    </div>
+    <div class="chart__legend">
+      <span class="legend income"></span> Rendas
+      <span class="legend expense"></span> Despesas
+    </div>
+    <div class="chart__bars" *ngIf="chartType === 'bar'">
+      <div class="chart__bar" *ngFor="let m of monthlyData">
+        <div class="bars-wrap">
+          <div class="bar income" [style.height.%]="maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0"></div>
+          <div class="bar expense" [style.height.%]="maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0"></div>
+          <div class="bar-tooltip">
+            <p>{{ m.label | uppercase }}</p>
+            <span>Rendas: <strong>R$ {{ m.incomes | number:'1.2-2' }}</strong></span>
+            <span>Despesas: <strong>R$ {{ m.expenses | number:'1.2-2' }}</strong></span>
+          </div>
+        </div>
+        <span class="bar__label">{{ m.label }}</span>
+      </div>
+    </div>
+    <div class="chart__line" *ngIf="chartType === 'line'">
+      <div class="line-wrap">
+        <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
+          <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
+          <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
+          <ng-container *ngFor="let p of incomesPoints">
+            <circle
+              class="dot income"
+              [attr.cx]="p.x"
+              [attr.cy]="p.y"
+              r="6"
+              (mouseenter)="showLineTooltip(p, 'income')"
+              (mouseleave)="hideLineTooltip()"></circle>
+          </ng-container>
+          <ng-container *ngFor="let p of expensesPoints">
+            <circle
+              class="dot expense"
+              [attr.cx]="p.x"
+              [attr.cy]="p.y"
+              r="6"
+              (mouseenter)="showLineTooltip(p, 'expense')"
+              (mouseleave)="hideLineTooltip()"></circle>
+          </ng-container>
+        </svg>
+        <div
+          class="line-tooltip"
+          *ngIf="lineTooltip"
+          [style.left.%]="lineTooltip.left"
+          [style.top.%]="lineTooltip.top">
+          <p>{{ lineTooltip.label | uppercase }}</p>
+          <span>
+            {{ lineTooltip.type === 'income' ? 'Rendas' : 'Despesas' }}:
+            <strong>R$ {{ lineTooltip.value | number:'1.2-2' }}</strong>
+          </span>
+        </div>
+      </div>
+      <div class="chart__months">
+        <span *ngFor="let m of monthlyData">{{ m.label }}</span>
+      </div>
+    </div>
+  </div>
+</section>

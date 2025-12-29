@@ -1,0 +1,79 @@
+<section class="despesas">
+  <div class="header">
+    <div>
+      <p class="eyebrow">Despesas</p>
+      <h2>{{ mesAtualLabel | titlecase }}</h2>
+      <p class="muted">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
+      <div class="nav">
+        <button type="button" (click)="mesAnterior()">◀ Mês anterior</button>
+        <button type="button" (click)="proximoMes()">Próximo mês ▶</button>
+      </div>
+    </div>
+    <div class="total">
+      <span>Total do mês</span>
+      <strong>R$ {{ totalMes() | number:'1.2-2' }}</strong>
+      <button type="button" class="add btn-primary" (click)="abrirModal()">
+        Adicionar despesa
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="alerta" class="inline-alert">
+    {{ alerta }}
+  </div>
+
+  <div class="layout">
+    <app-despesas-lista
+      [despesas]="despesasOrdenadas"
+      [sortBy]="sortBy"
+      [sortDir]="sortDir"
+      [pagamentoLabelFn]="pagamentoLabel.bind(this)"
+      [cardLabelFn]="cardLabel.bind(this)"
+      (ordenar)="ordenarPor($event)"
+      (editar)="editarDespesaPorId($event)"
+      (remover)="openRemocaoPorId($event)" />
+  </div>
+
+  <app-despesas-form
+    [mostrarForm]="mostrarForm"
+    [categorias]="categorias"
+    [cartoes]="cartoes"
+    [novaDespesa]="novaDespesa"
+    [valorInput]="valorInput"
+    [valorParcelaLabel]="valorParcelaLabel"
+    [vencimentoInput]="vencimentoInput"
+    [erroData]="erroData"
+    [formaPagamento]="formaPagamento"
+    [parcelar]="parcelar"
+    [parcelasCount]="parcelasCount"
+    [cartaoSelecionadoId]="cartaoSelecionadoId"
+    [cartaoSelecionadoLabel]="cartaoSelecionadoLabel"
+    (valorChange)="onValorChange($event)"
+    (vencimentoChange)="onVencimentoChange($event)"
+    (formaPagamentoChange)="formaPagamento = $event"
+    (parcelarChange)="parcelar = $event"
+    (parcelasChange)="parcelasCount = +$event"
+    (cartaoChange)="cartaoSelecionadoId = $event"
+    (submitForm)="adicionar()"
+    (cancel)="fecharModal()" />
+
+  <div class="modal" *ngIf="confirmRemocao">
+    <div class="modal__backdrop" (click)="cancelarRemocao()"></div>
+    <div class="modal__content small">
+      <div class="modal__header">
+        <div>
+          <p class="eyebrow">Excluir despesa</p>
+          <h3>Confirmar remoção</h3>
+        </div>
+        <button class="modal__close" type="button" (click)="cancelarRemocao()">✕</button>
+      </div>
+      <p class="muted">
+        Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?
+      </p>
+      <div class="modal__actions">
+        <button type="button" class="ghost" (click)="confirmarRemocao(false)">Somente esta</button>
+        <button type="button" class="btn-danger" (click)="confirmarRemocao(true)">Todas as parcelas</button>
+      </div>
+    </div>
+  </div>
+</section>

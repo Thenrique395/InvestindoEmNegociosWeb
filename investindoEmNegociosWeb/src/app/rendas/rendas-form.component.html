@@ -1,0 +1,85 @@
+<div class="modal" *ngIf="mostrarForm">
+  <div class="modal__backdrop" (click)="fecharModal()"></div>
+  <div class="modal__content">
+    <div class="modal__header">
+      <div>
+        <p class="eyebrow">Nova renda</p>
+        <h3>{{ editandoId ? 'Editar renda' : 'Adicionar renda' }}</h3>
+        <p class="muted">Cadastre o valor e a recorrência deste recebimento.</p>
+      </div>
+      <button class="modal__close" type="button" (click)="fecharModal()">✕</button>
+    </div>
+
+    <form class="form" (ngSubmit)="salvar()" autocomplete="off">
+      <label>
+        Fonte
+        <input type="text" [(ngModel)]="novaRenda.fonte" name="fonte" (ngModelChange)="onFonteChange($event)" placeholder="Ex: Salário, PLR, Freela" required />
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" [(ngModel)]="novaRenda.fixa" name="fixa" (ngModelChange)="onFixaChange($event)" />
+        <span>Renda fixa mensal</span>
+      </label>
+      <label *ngIf="novaRenda.fixa">
+        Vigência inicial (MM/AAAA)
+        <input
+          type="text"
+          inputmode="numeric"
+          placeholder="01/2024"
+          maxlength="7"
+          [ngModel]="fixaInicioInput"
+          (ngModelChange)="onFixaInicioChange($event)"
+          name="fixaInicio" />
+      </label>
+      <label *ngIf="novaRenda.fixa">
+        Vigência final (MM/AAAA)
+        <input
+          type="text"
+          inputmode="numeric"
+          placeholder="12/2024"
+          maxlength="7"
+          [ngModel]="fixaFimInput"
+          (ngModelChange)="onFixaFimChange($event)"
+          name="fixaFim" />
+      </label>
+      <label>
+        Valor (R$)
+        <input
+          type="text"
+          inputmode="decimal"
+          placeholder="R$ 0,00"
+          [ngModel]="valorInput"
+          (ngModelChange)="onValorChange($event)"
+          name="valor"
+          required />
+      </label>
+      <label>
+        Data de recebimento (DD/MM/AAAA)
+        <input
+          type="text"
+          inputmode="numeric"
+          placeholder="05/09/2024"
+          maxlength="10"
+          [ngModel]="recebimentoInput"
+          (ngModelChange)="onRecebimentoChange($event)"
+          name="recebimento"
+          required />
+        <div *ngIf="erroData" class="mt-1 text-sm text-red-500" aria-live="polite">{{ erroData }}</div>
+      </label>
+
+      <div class="sugestao" *ngIf="valorSugestao">
+        Valor anterior para esta fonte: <strong>R$ {{ valorSugestao | number:'1.2-2' }}</strong>
+        <button type="button" class="btn-edit sm" (click)="usarSugestao()">Usar valor fixo</button>
+      </div>
+
+      <div class="resumo" *ngIf="resumoTexto">
+        <span>Resumo</span>
+        <p>{{ resumoTexto }}</p>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
+        <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar renda' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

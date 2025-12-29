@@ -1,0 +1,25 @@
+<section class="login">
+  <div class="login__layout">
+    <div class="login__visual" aria-hidden="true"></div>
+    <div class="login__card">
+      <h1>Entrar</h1>
+      <p class="muted">Acesse para acompanhar seu plano, carteira e alertas.</p>
+      <form class="login__form" (ngSubmit)="onSubmit()">
+        <label>
+          Email
+          <input [(ngModel)]="email" name="email" type="email" placeholder="seu@email.com" required />
+        </label>
+        <label>
+          Senha
+          <input [(ngModel)]="password" name="password" type="password" placeholder="••••••••" required />
+        </label>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Autenticando...' : 'Entrar' }}
+        </button>
+        <a class="helper" href="#">Esqueci minha senha</a>
+      </form>
+      <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
+      <p class="error" *ngIf="error">{{ error }}</p>
+    </div>
+  </div>
+</section>

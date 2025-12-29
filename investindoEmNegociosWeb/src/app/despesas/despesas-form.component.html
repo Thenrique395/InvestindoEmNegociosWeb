@@ -1,0 +1,103 @@
+<div class="modal" *ngIf="mostrarForm">
+  <div class="modal__backdrop" (click)="fechar()"></div>
+  <div class="modal__content">
+    <div class="modal__header">
+      <div>
+        <p class="eyebrow">Nova despesa</p>
+        <h3>Adicionar lançamento</h3>
+      </div>
+      <button class="modal__close" type="button" (click)="fechar()">✕</button>
+    </div>
+
+    <form class="form" (ngSubmit)="salvar()" autocomplete="off">
+      <label>
+        Nome da despesa
+        <input type="text" [(ngModel)]="novaDespesa.nome" name="nome" placeholder="Ex: aluguel, mercado..." required />
+      </label>
+      <label>
+        Forma de pagamento
+        <select [(ngModel)]="formaPagamento" name="formaPagamento" (ngModelChange)="onFormaPagamentoChange($event)">
+          <option value="avista">À vista</option>
+          <option value="cartao">Cartão de crédito</option>
+        </select>
+      </label>
+      <label *ngIf="formaPagamento === 'cartao'">
+        Cartão
+        <select [(ngModel)]="cartaoSelecionadoId" name="cartao" [disabled]="!cartoes.length" (ngModelChange)="onCartaoChange($event)">
+          <option *ngIf="!cartoes.length" [ngValue]="null" disabled>Nenhum cartão cadastrado</option>
+          <ng-container *ngIf="cartoes.length">
+            <option *ngFor="let c of cartoes" [ngValue]="c.id">
+              Cartão - {{ c.bandeira }} {{ c.vencimento }}
+            </option>
+          </ng-container>
+        </select>
+        <small class="muted" *ngIf="cartoes.length">Selecionado: {{ cartaoSelecionadoLabel }}</small>
+        <small class="muted" *ngIf="!cartoes.length">Cadastre um cartão para usar aqui.</small>
+      </label>
+      <label *ngIf="formaPagamento === 'cartao'">
+        Parcelar?
+        <div class="toggle-row">
+          <input type="checkbox" [(ngModel)]="parcelar" name="parcelar" (ngModelChange)="onParcelarToggle($event)" />
+          <span>{{ parcelar ? 'Sim, parcelar' : 'Não, à vista' }}</span>
+        </div>
+      </label>
+      <label *ngIf="formaPagamento === 'cartao' && parcelar">
+        Número de parcelas
+        <input
+          type="number"
+          min="1"
+          max="36"
+          [(ngModel)]="parcelasCount"
+          name="parcelas"
+          (ngModelChange)="onParcelasChange($event)"
+          placeholder="Ex: 10"
+          required />
+      </label>
+      <label>
+        Categoria
+        <select [(ngModel)]="novaDespesa.categoria" name="categoria">
+          <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+        </select>
+      </label>
+      <label>
+        Valor (R$)
+        <input
+          type="text"
+          inputmode="decimal"
+          placeholder="R$ 0,00"
+          [ngModel]="valorInput"
+          (ngModelChange)="onValorChange($event)"
+          name="valor"
+          required />
+      </label>
+      <label>
+        Primeiro vencimento (DD/MM/AAAA)
+        <input
+          type="text"
+          inputmode="numeric"
+          placeholder="15/08/2026"
+          maxlength="10"
+          [ngModel]="vencimentoInput"
+          (ngModelChange)="onVencimentoChange($event)"
+          name="vencimento"
+          required />
+        <div *ngIf="erroData" class="mt-1 text-sm text-red-500" aria-live="polite">{{ erroData }}</div>
+      </label>
+      <div class="resumo" *ngIf="valorInput">
+        <span>Resumo</span>
+        <p *ngIf="formaPagamento === 'cartao' && parcelar && parcelasCount > 1">
+          Serão {{ parcelasCount }}x de
+          <strong>{{ valorParcelaLabel }}</strong>
+          no cartão {{ cartaoSelecionadoLabel }}.
+        </p>
+        <p *ngIf="!(formaPagamento === 'cartao' && parcelar && parcelasCount > 1)">
+          Pagamento único de <strong>{{ valorInput }}</strong>.
+        </p>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn-danger ghost" (click)="fechar()">↩ Cancelar</button>
+        <button type="submit" class="btn-primary">Salvar despesa</button>
+      </div>
+    </form>
+  </div>
+</div>

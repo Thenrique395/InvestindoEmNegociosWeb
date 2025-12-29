@@ -1,0 +1,239 @@
+.despesas {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: rgba(4, 56, 74, 0.7);
+  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.35);
+  display: grid;
+  gap: 1.25rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.total {
+  background: rgba(52, 144, 99, 0.15);
+  border: 1px solid rgba(52, 144, 99, 0.4);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  display: grid;
+  gap: 0.15rem;
+  text-align: right;
+  align-items: center;
+}
+
+.total .add {
+  margin-top: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nav button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: #edebec;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.inline-alert {
+}
+
+.layout {
+  display: grid;
+  gap: 1rem;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: #edebec;
+  font-weight: 600;
+}
+
+input,
+select {
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  color: #edebec;
+}
+
+button {
+  border: none;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #349063, #2a7a53);
+  color: #002e3e;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(52, 144, 99, 0.35);
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #edebec;
+  box-shadow: none;
+}
+
+.lista {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lista__head,
+.lista__row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 0.9fr;
+  padding: 0.65rem 0.85rem;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lista__head {
+  background: rgba(255, 255, 255, 0.05);
+  font-weight: 700;
+}
+
+.lista__head .linkish {
+  all: unset;
+  cursor: pointer;
+  color: #edebec;
+  font-weight: 700;
+  padding: 0.25rem 0.1rem;
+}
+
+.lista__row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lista__row--empty span {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.muted {
+  color: #b9c6c2;
+}
+
+.acoes {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.acoes button:not(.btn-danger):not(.btn-edit):not(.btn-primary) {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.07);
+  color: #edebec;
+}
+
+.sm {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 14, 24, 0.65);
+  backdrop-filter: blur(3px);
+}
+
+.modal__content {
+  position: relative;
+  background: #032533;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  width: min(720px, 92vw);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  display: grid;
+  gap: 1rem;
+}
+
+.modal__content.small {
+  width: min(460px, 92vw);
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.modal__close {
+  background: rgba(255, 255, 255, 0.05);
+  color: #edebec;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  grid-column: 1 / -1;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.resumo {
+  grid-column: 1 / -1;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(52, 144, 99, 0.5);
+  background: rgba(52, 144, 99, 0.08);
+  color: #edebec;
+  display: grid;
+  gap: 0.25rem;
+}

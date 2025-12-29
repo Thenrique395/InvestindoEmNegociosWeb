@@ -1,0 +1,14 @@
+
+.brand__logo {
+  height: 44px; /* ajuste conforme necessário */
+  width: auto;
+  display: inline-block;
+}
+
+.brand__logo--fallback {
+  display: inline-block;
+  font-weight: 600;
+  color: #2c7a7b;
+  line-height: 44px;
+}
+
