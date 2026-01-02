@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
-import { StoredCard } from '../data/local-db.service';
+import { StoredCard } from '../data/api-data.service';
 
 @Component({
   selector: 'app-cartoes-listagem',

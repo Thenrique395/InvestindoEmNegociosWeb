@@ -3,8 +3,8 @@
   <div class="modal__content">
     <div class="modal__header">
       <div>
-        <p class="eyebrow">Nova renda</p>
-        <h3>{{ editandoId ? 'Editar renda' : 'Adicionar renda' }}</h3>
+        <p class="eyebrow">Nova receita</p>
+        <h3>{{ editandoId ? 'Editar receita' : 'Adicionar receita' }}</h3>
         <p class="muted">Cadastre o valor e a recorrência deste recebimento.</p>
       </div>
       <button class="modal__close" type="button" (click)="fecharModal()">✕</button>
@@ -17,7 +17,7 @@
       </label>
       <label class="toggle-row">
         <input type="checkbox" [(ngModel)]="novaRenda.fixa" name="fixa" (ngModelChange)="onFixaChange($event)" />
-        <span>Renda fixa mensal</span>
+        <span>Receita fixa mensal</span>
       </label>
       <label *ngIf="novaRenda.fixa">
         Vigência inicial (MM/AAAA)
@@ -30,17 +30,6 @@
           (ngModelChange)="onFixaInicioChange($event)"
           name="fixaInicio" />
       </label>
-      <label *ngIf="novaRenda.fixa">
-        Vigência final (MM/AAAA)
-        <input
-          type="text"
-          inputmode="numeric"
-          placeholder="12/2024"
-          maxlength="7"
-          [ngModel]="fixaFimInput"
-          (ngModelChange)="onFixaFimChange($event)"
-          name="fixaFim" />
-      </label>
       <label>
         Valor (R$)
         <input
@@ -52,7 +41,7 @@
           name="valor"
           required />
       </label>
-      <label>
+      <label *ngIf="!novaRenda.fixa">
         Data de recebimento (DD/MM/AAAA)
         <input
           type="text"
@@ -78,7 +67,7 @@
 
       <div class="modal__actions">
         <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
-        <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar renda' }}</button>
+        <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar receita' }}</button>
       </div>
     </form>
   </div>

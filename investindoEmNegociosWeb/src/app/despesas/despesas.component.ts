@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TitleCasePipe, NgIf, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { LocalDbService, StoredExpense, StoredCard } from '../data/local-db.service';
+import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
 
@@ -34,7 +34,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
-  constructor(private db: LocalDbService) {}
+  constructor(private db: ApiDataService) {}
 
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
@@ -301,14 +301,12 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   tituloBandeira(b: string): string {
-    const map: Record<string, string> = { mastercard: 'Mastercard', visa: 'Visa', elo: 'Elo' };
-    return map[b?.toLowerCase()] || b || 'Cartão';
+    return `Marca ${b}`;
   }
 
   formatarCartaoLabel(card: StoredCard): string {
-    const titulo = this.tituloBandeira(card.bandeira);
     const final = this.finaisCartao(card.numero);
-    return `Cartão - ${titulo} ${final}`;
+    return `Cartão ${final}`;
   }
 
   private finaisCartao(numero: string): string {

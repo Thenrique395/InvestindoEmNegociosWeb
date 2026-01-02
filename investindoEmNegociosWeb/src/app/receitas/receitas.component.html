@@ -1,0 +1,77 @@
+<section class="rendas">
+  <div class="nav-row">
+    <div>
+      <p class="eyebrow">Receitas</p>
+      <h2>Suas fontes de receita</h2>
+      <p class="muted">Cadastre salários, PLR, freelas e demais recebimentos.</p>
+      <div class="nav">
+        <button type="button" (click)="mesAnterior()">◀ Mês anterior</button>
+        <button type="button" (click)="proximoMes()">Próximo mês ▶</button>
+      </div>
+    </div>
+    <div class="total">
+      <span>Total {{ mesAtualLabel }}</span>
+      <strong>R$ {{ totalRendas | number:'1.2-2' }}</strong>
+      <div class="total__actions">
+        <button type="button" class="btn-primary" (click)="abrirModal()">Adicionar receita</button>
+      </div>
+    </div>
+  </div>
+
+  <app-receitas-lista [rendas]="rendas" (editar)="editarPorId($event)" (remover)="remover($event)"></app-receitas-lista>
+
+  <app-receitas-form
+    [mostrarForm]="mostrarForm"
+    [novaRenda]="novaRenda"
+    [valorInput]="valorInput"
+    [recebimentoInput]="recebimentoInput"
+    [fixaInicioInput]="fixaInicioInput"
+    [erroData]="erroData"
+    [valorSugestao]="valorSugestao"
+    [editandoId]="editandoId"
+    [resumoTexto]="resumoTexto"
+    (valorChange)="onValorChange($event)"
+    (recebimentoChange)="onRecebimentoChange($event)"
+    (fonteChange)="onFonteChange($event)"
+    (fixaChange)="novaRenda.fixa = $event"
+    (fixaInicioChange)="onFixaInicioChange($event)"
+    (aplicarSugestao)="aplicarSugestao()"
+    (salvarForm)="salvar()"
+    (fechar)="fecharModal()" />
+</section>
+
+<!-- Modal de confirmação de exclusão -->
+<div class="modal" *ngIf="showDeleteModal">
+  <div class="modal__backdrop" (click)="fecharModalExcluir()"></div>
+  <div class="modal__content">
+    <div class="modal__header">
+      <div>
+        <p class="eyebrow">Excluir receita</p>
+        <h3>{{ deleteFonte || 'Receita' }}</h3>
+        <p class="muted">Escolha se deseja excluir apenas esta parcela ou toda a recorrência.</p>
+      </div>
+      <button class="modal__close" type="button" (click)="fecharModalExcluir()">✕</button>
+    </div>
+
+    <div class="modal__body">
+      <p *ngIf="deleteIsRecurring" class="muted">
+        Esta receita é recorrente. Você pode remover só o mês atual ou toda a série.
+      </p>
+      <p *ngIf="!deleteIsRecurring" class="muted">
+        Esta receita não é recorrente. A exclusão removerá apenas este lançamento.
+      </p>
+    </div>
+
+    <div class="modal__actions">
+      <button type="button" class="btn-danger ghost" (click)="fecharModalExcluir()">Cancelar</button>
+      <button
+        *ngIf="deleteIsRecurring"
+        type="button"
+        class="btn-edit"
+        (click)="confirmarExcluirSomenteEsta()">
+        Excluir só este mês
+      </button>
+      <button type="button" class="btn-danger" (click)="confirmarExcluirRecorrencia()">Excluir recorrência</button>
+    </div>
+  </div>
+</div>

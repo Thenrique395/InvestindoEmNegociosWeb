@@ -31,9 +31,7 @@
           <label>
             Bandeira
             <select [(ngModel)]="bandeira" name="bandeira">
-              <option value="mastercard">Mastercard</option>
-              <option value="visa">Visa</option>
-              <option value="elo">Elo</option>
+              <option *ngFor="let b of brands" [ngValue]="b.id">{{ b.name }}</option>
             </select>
           </label>
 
@@ -69,16 +67,16 @@
         </form>
 
         <div class="preview">
-          <div class="credit-card" [class.mastercard]="bandeira === 'mastercard'" [class.visa]="bandeira === 'visa'" [class.elo]="bandeira === 'elo'">
+          <div class="credit-card" [class.mastercard]="bandeiraCode === 'mastercard'" [class.visa]="bandeiraCode === 'visa'" [class.elo]="bandeiraCode === 'elo'">
             <div class="card__chip"></div>
-            <div class="card__logo" [ngSwitch]="bandeira">
+            <div class="card__logo" [ngSwitch]="bandeiraCode">
               <div *ngSwitchCase="'mastercard'" class="logo-mc" aria-label="Mastercard">
                 <span class="mc-circle mc-circle--left"></span>
                 <span class="mc-circle mc-circle--right"></span>
               </div>
               <span *ngSwitchCase="'visa'" class="logo-text">VISA</span>
               <span *ngSwitchCase="'elo'" class="logo-text">ELO</span>
-              <span *ngSwitchDefault class="logo-text">{{ bandeira | uppercase }}</span>
+              <span *ngSwitchDefault class="logo-text">{{ bandeiraNome || 'BANDEIRA' | uppercase }}</span>
             </div>
             <p class="card__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</p>
             <div class="card__footer">
@@ -88,7 +86,7 @@
               </div>
               <div>
                 <span class="label">Bandeira</span>
-                <p>{{ bandeira | uppercase }}</p>
+                <p>{{ bandeiraNome || 'BANDEIRA' }}</p>
               </div>
             </div>
           </div>

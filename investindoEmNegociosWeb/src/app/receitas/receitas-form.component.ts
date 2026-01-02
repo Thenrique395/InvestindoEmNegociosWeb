@@ -1,22 +1,21 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf, DecimalPipe } from '@angular/common';
-import { StoredIncome } from '../data/local-db.service';
+import { StoredIncome } from '../data/api-data.service';
 
 @Component({
-  selector: 'app-rendas-form',
+  selector: 'app-receitas-form',
   standalone: true,
   imports: [FormsModule, NgIf, DecimalPipe],
-  templateUrl: './rendas-form.component.html',
-  styleUrls: ['./rendas-form.component.scss']
+  templateUrl: './receitas-form.component.html',
+  styleUrls: ['./receitas-form.component.scss']
 })
-export class RendasFormComponent {
+export class ReceitasFormComponent {
   @Input() mostrarForm = false;
   @Input() novaRenda!: StoredIncome;
   @Input() valorInput = '';
   @Input() recebimentoInput = '';
   @Input() fixaInicioInput = '';
-  @Input() fixaFimInput = '';
   @Input() erroData = '';
   @Input() valorSugestao: number | null = null;
   @Input() editandoId: string | null = null;
@@ -27,7 +26,6 @@ export class RendasFormComponent {
   @Output() fonteChange = new EventEmitter<string>();
   @Output() fixaChange = new EventEmitter<boolean>();
   @Output() fixaInicioChange = new EventEmitter<string>();
-  @Output() fixaFimChange = new EventEmitter<string>();
   @Output() aplicarSugestao = new EventEmitter<void>();
   @Output() salvarForm = new EventEmitter<void>();
   @Output() fechar = new EventEmitter<void>();
@@ -50,10 +48,6 @@ export class RendasFormComponent {
 
   onFixaInicioChange(v: string): void {
     this.fixaInicioChange.emit(v);
-  }
-
-  onFixaFimChange(v: string): void {
-    this.fixaFimChange.emit(v);
   }
 
   usarSugestao(): void {

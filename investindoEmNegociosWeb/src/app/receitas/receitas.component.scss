@@ -1,0 +1,110 @@
+.rendas {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: rgba(4, 56, 74, 0.7);
+  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.35);
+  display: grid;
+  gap: 1rem;
+}
+
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nav button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: #edebec;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.total {
+  background: rgba(52, 144, 99, 0.15);
+  border: 1px solid rgba(52, 144, 99, 0.4);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  display: grid;
+  gap: 0.15rem;
+  text-align: right;
+  align-items: center;
+}
+
+/* Modal de confirmação */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.modal__content {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 92vw);
+  background: linear-gradient(140deg, rgba(6, 67, 87, 0.92), rgba(0, 46, 62, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  padding: 1.4rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.modal__header h3 {
+  margin: 0.25rem 0 0 0;
+}
+
+.modal__close {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #edebec;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.modal__close:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.modal__body {
+  color: var(--muted);
+  line-height: 1.5;
+}

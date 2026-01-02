@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { LocalDbService, StoredExpense, StoredIncome, StoredCard } from './data/local-db.service';
+import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
 
 @Component({
   selector: 'app-home',
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   incomesPoints: { x: number; y: number; label: string; value: number }[] = [];
   expensesPoints: { x: number; y: number; label: string; value: number }[] = [];
 
-  constructor(private db: LocalDbService) {}
+  constructor(private db: ApiDataService) {}
 
   ngOnInit(): void {
     this.subExpenses = this.db.expenses$.subscribe((lista) => {
@@ -89,16 +89,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private somarRendasMes(lista: StoredIncome[], key = this.mesKey()): number {
-    const anoKey = Number(key.slice(0, 4));
     return lista
-      .filter((r) => {
-        if (r.fixa) {
-          const inicio = this.mesKeyFromMes(r.fixaInicio) || `${anoKey}-01`;
-          const fim = this.mesKeyFromMes(r.fixaFim) || `${anoKey}-12`;
-          return this.mesKeyBetween(key, inicio, fim);
-        }
-        return this.mesKeyFromRecebimento(r.recebimento) === key;
-      })
+      .filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key)
       .reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 

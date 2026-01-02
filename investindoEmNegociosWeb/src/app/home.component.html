@@ -3,20 +3,20 @@
     <div>
       <p class="eyebrow">Resumo financeiro</p>
       <h1>Visão geral de {{ mesAtualLabel }}</h1>
-      <p class="muted">Combine rendas, despesas e cartões para saber o quanto pode gastar.</p>
+      <p class="muted">Combine receitas, despesas e cartões para saber o quanto pode gastar.</p>
     </div>
     <div class="hero__actions">
       <a class="btn-primary" routerLink="/despesas">Ir para despesas</a>
-      <a class="btn-edit" routerLink="/rendas">Ir para rendas</a>
+      <a class="btn-edit" routerLink="/receitas">Ir para receitas</a>
       <a class="btn-danger ghost" routerLink="/cartoes">Gerenciar cartões</a>
     </div>
   </header>
 
   <div class="grid">
     <div class="stat-card income">
-      <p class="label">Total de rendas</p>
+      <p class="label">Total de receitas</p>
       <h2>R$ {{ totalRendas | number:'1.2-2' }}</h2>
-      <p class="muted">Inclui rendas fixas e avulsas do mês.</p>
+      <p class="muted">Inclui receitas fixas e avulsas do mês.</p>
     </div>
     <div class="stat-card expense">
       <p class="label">Total de despesas</p>
@@ -26,7 +26,7 @@
     <div class="stat-card balance">
       <p class="label">Disponível para gastar</p>
       <h2>R$ {{ saldo | number:'1.2-2' }}</h2>
-      <p class="muted">Rendas menos despesas do mês.</p>
+      <p class="muted">Receitas menos despesas do mês.</p>
     </div>
     <div class="stat-card cards">
       <p class="label">Cartões cadastrados</p>
@@ -37,7 +37,7 @@
 
   <div class="chart">
     <div class="chart__header">
-      <p class="label">Rendas x Despesas no ano</p>
+      <p class="label">Receitas x Despesas no ano</p>
       <span class="muted">Valores mensais de {{ dataAtual.getFullYear() }}</span>
       <div class="chart__controls">
         <button type="button" [class.active]="chartType === 'bar'" (click)="trocarTipo('bar')">Barras</button>
@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="chart__legend">
-      <span class="legend income"></span> Rendas
+      <span class="legend income"></span> Receitas
       <span class="legend expense"></span> Despesas
     </div>
     <div class="chart__bars" *ngIf="chartType === 'bar'">
@@ -55,7 +55,7 @@
           <div class="bar expense" [style.height.%]="maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0"></div>
           <div class="bar-tooltip">
             <p>{{ m.label | uppercase }}</p>
-            <span>Rendas: <strong>R$ {{ m.incomes | number:'1.2-2' }}</strong></span>
+            <span>Receitas: <strong>R$ {{ m.incomes | number:'1.2-2' }}</strong></span>
             <span>Despesas: <strong>R$ {{ m.expenses | number:'1.2-2' }}</strong></span>
           </div>
         </div>
@@ -93,7 +93,7 @@
           [style.top.%]="lineTooltip.top">
           <p>{{ lineTooltip.label | uppercase }}</p>
           <span>
-            {{ lineTooltip.type === 'income' ? 'Rendas' : 'Despesas' }}:
+            {{ lineTooltip.type === 'income' ? 'Receitas' : 'Despesas' }}:
             <strong>R$ {{ lineTooltip.value | number:'1.2-2' }}</strong>
           </span>
         </div>

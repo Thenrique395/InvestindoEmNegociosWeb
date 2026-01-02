@@ -7,7 +7,7 @@
     <span class="acoes-head">Ações</span>
   </div>
   <div class="lista__row lista__row--empty" *ngIf="!rendas.length">
-    <span class="muted">Nenhuma renda cadastrada.</span>
+    <span class="muted">Nenhuma receita cadastrada.</span>
   </div>
   <div class="lista__row" *ngFor="let r of rendas">
     <span>{{ r.fonte }}</span>
@@ -16,7 +16,7 @@
     <span>{{ r.fixa ? 'Fixa' : 'Avulsa' }}</span>
     <span class="acoes">
       <button type="button" class="btn-edit sm" (click)="onEditar(r.id!)">✏️ Editar</button>
-      <button type="button" class="btn-danger sm" (click)="onRemover(r.id!)">🗑 Excluir</button>
+      <button type="button" class="btn-danger sm" (click)="onRemover(r.planId, r.id)">🗑 Excluir</button>
     </span>
   </div>
 </div>

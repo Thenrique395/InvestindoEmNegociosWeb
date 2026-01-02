@@ -1,0 +1,94 @@
+.onboarding {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.5rem;
+}
+
+.card {
+  width: min(720px, 100%);
+  background: #04384a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  box-shadow: 0 24px 60px rgba(0, 22, 31, 0.35);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+  color: #8fe0b4;
+  margin-bottom: 0.35rem;
+}
+
+.muted {
+  color: #c7d2d0;
+  margin-bottom: 1rem;
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  color: #edebec;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(143, 224, 180, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.error {
+  color: #ff9b9b;
+  font-size: 0.85rem;
+}
+
+.actions {
+  margin-top: 0.35rem;
+}
+
+.primary {
+  width: 100%;
+  background: linear-gradient(135deg, #3aa66f, #2f8a5d);
+  color: #0b2532;
+  border: 1px solid rgba(143, 224, 180, 0.6);
+  border-radius: 10px;
+  padding: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0, 22, 31, 0.3);
+}
+
+.feedback.success {
+  color: #8fe0b4;
+}
+
+.feedback.error {
+  color: #ff9b9b;
+}

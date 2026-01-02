@@ -187,9 +187,9 @@
 
         <ng-container *ngSwitchCase="'renda'">
           <div class="panel__title">
-            <h3>Calculadora de Renda</h3>
+            <h3>Calculadora de Receitas</h3>
             <p class="muted">
-              Projeção de renda mensal considerando sua rentabilidade.
+              Projeção de receita mensal considerando sua rentabilidade.
             </p>
           </div>
           <form class="form">
@@ -209,12 +209,12 @@
             <button type="button" (click)="calcularRenda()">Calcular</button>
           </form>
           <p class="result" *ngIf="rendaResultado">
-            Renda mensal estimada:
+            Receita mensal estimada:
             <strong>R$ {{ rendaResultado | number : "1.2-2" }}</strong>
           </p>
           <div class="chart chart--inline" *ngIf="rendaResultado">
             <div class="chart__bar chart__bar--renda" [style.height.%]="100">
-              <span class="chart__label">Renda</span>
+              <span class="chart__label">Receita</span>
             </div>
             <div
               class="chart__bar chart__bar--patrimonio"
@@ -226,7 +226,7 @@
           <div class="table">
             <div class="table__head">
               <span>Patrimônio</span>
-              <span>Renda (mês)</span>
+              <span>Receita (mês)</span>
             </div>
             <div class="table__row">
               <span>R$ {{ patrimonio | number : "1.0-0" }}</span>
@@ -236,7 +236,7 @@
           <div class="table" *ngIf="rendaResultado">
             <div class="table__head">
               <span>Mês</span>
-              <span>Renda estimada</span>
+              <span>Receita estimada</span>
             </div>
             <div class="table__row" *ngFor="let mes of rendaMeses">
               <span>{{ mes }}</span>

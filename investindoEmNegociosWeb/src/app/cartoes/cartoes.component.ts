@@ -1,19 +1,20 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { LocalDbService, StoredCard, StoredExpense } from '../data/local-db.service';
+import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
+import { LookupsService, CardBrandLookup } from '../lookups.service';
 
 @Component({
   selector: 'app-cartoes',
   standalone: true,
-  imports: [FormsModule, UpperCasePipe, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, CartoesListagemComponent],
+  imports: [FormsModule, UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, CartoesListagemComponent],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
 })
 export class CartoesComponent implements OnInit, OnDestroy {
-  bandeira = 'mastercard';
+  bandeira: number | null = null;
   numero = '';
   nome = '';
   mostrarNumero = false;
@@ -22,10 +23,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
   mostrarModal = false;
   editandoId: string | null = null;
   alerta = '';
+  brands: CardBrandLookup[] = [];
   private sub?: Subscription;
   private expensesSub?: Subscription;
 
-  constructor(private db: LocalDbService) {}
+  constructor(private db: ApiDataService, private lookups: LookupsService) {}
 
   ngOnInit(): void {
     this.sub = this.db.cards$.subscribe((lista) => {
@@ -34,6 +36,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
     });
     this.expensesSub = this.db.expenses$.subscribe((lista) => {
       this.expenses = lista;
+    });
+    this.lookups.cardBrands().subscribe((brands) => {
+      const active = brands.filter((b) => b.isActive !== false);
+      this.brands = active;
+      if (this.bandeira == null && active.length) this.bandeira = active[0].id;
     });
   }
 
@@ -48,10 +55,10 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   salvar(): void {
-    if (!this.numero || !this.nome) return;
-    const numeroLimpo = this.numero.replace(/\D/g, '').slice(0, 16);
+    if (!this.numero || !this.nome || !this.bandeira) return;
+    const numeroLimpo = this.numero.replace(/\D/g, '').slice(-4);
     const payload = {
-      bandeira: this.bandeira,
+      bandeira: String(this.bandeira),
       numero: numeroLimpo,
       nome: this.nome,
       userId: this.currentUser
@@ -66,11 +73,14 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.fecharModal();
     this.numero = '';
     this.nome = '';
-    this.bandeira = 'mastercard';
+    this.bandeira = this.brands[0]?.id ?? null;
     this.editandoId = null;
   }
 
   abrirModal(): void {
+    if (this.bandeira == null && this.brands.length) {
+      this.bandeira = this.brands[0].id;
+    }
     this.mostrarModal = true;
   }
 
@@ -78,7 +88,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.mostrarModal = false;
     this.mostrarNumero = false;
     this.editandoId = null;
-    this.bandeira = 'mastercard';
+    this.bandeira = this.brands[0]?.id ?? null;
     this.numero = '';
     this.nome = '';
   }
@@ -105,7 +115,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   editar(card: StoredCard): void {
     this.editandoId = card.id;
     this.mostrarModal = true;
-    this.bandeira = card.bandeira;
+    this.bandeira = Number(card.bandeira);
     this.numero = this.formatarNumeroEntrada(card.numero.replace(/\D/g, ''));
     this.nome = card.nome;
   }
@@ -115,17 +125,33 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   private formatarNumeroParaDisplay(numero: string): string {
-    const num = numero.replace(/\s+/g, '');
-    const padded = num.padEnd(16, '•').slice(0, 16);
-    return padded.match(/.{1,4}/g)?.join(' ') || '';
+    const digits = numero.replace(/\D/g, '').slice(-4);
+    return `•••• ${digits.padStart(4, '•')}`;
   }
 
   private formatarNumeroEntrada(digits: string): string {
     return digits.match(/.{1,4}/g)?.join(' ') || digits;
   }
 
+  get bandeiraSelecionada(): CardBrandLookup | undefined {
+    return this.brands.find((b) => b.id === this.bandeira);
+  }
+
+  get bandeiraCode(): string {
+    return this.bandeiraSelecionada?.code ?? '';
+  }
+
+  get bandeiraNome(): string {
+    return this.bandeiraSelecionada?.name ?? '';
+  }
+
   private get currentUser(): string {
     if (typeof localStorage === 'undefined') return 'guest';
     return localStorage.getItem('current_user') || 'guest';
+  }
+
+  tituloBandeira(id: string): string {
+    const brand = this.brands.find((b) => String(b.id) === id);
+    return brand?.name || 'Cartão';
   }
 }

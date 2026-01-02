@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { StoredCard, StoredExpense } from '../data/local-db.service';
+import { StoredCard, StoredExpense } from '../data/api-data.service';
 
 @Component({
   selector: 'app-despesas-form',

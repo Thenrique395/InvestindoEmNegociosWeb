@@ -70,7 +70,7 @@ export class CalculatorComponent implements OnDestroy {
     { id: 'comparadorRendaFixa', title: 'Comparador de Renda Fixa', subtitle: 'CDI x prefixado x IPCA', category: 'financeiras', implemented: false, icon: 'leaderboard' },
     { id: 'jurosSimples', title: 'Juros Simples', subtitle: 'Rendimento linear para curto prazo', category: 'financeiras', implemented: true, icon: 'percent' },
     { id: 'jurosCompostos', title: 'Juros Compostos', subtitle: 'Poder dos juros ao longo do tempo', category: 'financeiras', implemented: true, icon: 'calculate' },
-    { id: 'renda', title: 'Calculadora de Renda', subtitle: 'Renda mensal sobre patrimônio', category: 'financeiras', implemented: true, icon: 'savings' },
+    { id: 'renda', title: 'Calculadora de Receitas', subtitle: 'Receita mensal sobre patrimônio', category: 'financeiras', implemented: true, icon: 'savings' },
     { id: 'milhao', title: 'Primeiro Milhão', subtitle: 'Quando chego a R$ 1 mi?', category: 'financeiras', implemented: true, icon: 'military_tech' },
     { id: 'rescisao', title: 'Rescisão Trabalhista', subtitle: 'Verbas rescisórias', category: 'trabalhistas', implemented: false, icon: 'gavel' },
     { id: 'irIsencao', title: 'Isenção de IR', subtitle: 'Verifique elegibilidade', category: 'trabalhistas', implemented: false, icon: 'policy' },

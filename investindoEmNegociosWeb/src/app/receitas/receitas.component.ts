@@ -1,18 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgIf } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { LocalDbService, StoredIncome } from '../data/local-db.service';
-import { RendasListaComponent } from './rendas-lista.component';
-import { RendasFormComponent } from './rendas-form.component';
+import { ApiDataService, StoredIncome } from '../data/api-data.service';
+import { ReceitasListaComponent } from './receitas-lista.component';
+import { ReceitasFormComponent } from './receitas-form.component';
 
 @Component({
-  selector: 'app-rendas',
+  selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, RendasListaComponent, RendasFormComponent],
-  templateUrl: './rendas.component.html',
-  styleUrls: ['./rendas.component.scss']
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf],
+  templateUrl: './receitas.component.html',
+  styleUrls: ['./receitas.component.scss']
 })
-export class RendasComponent implements OnInit, OnDestroy {
+export class ReceitasComponent implements OnInit, OnDestroy {
   dataAtual = new Date();
   rendasAll: StoredIncome[] = [];
   mostrarForm = false;
@@ -20,13 +20,17 @@ export class RendasComponent implements OnInit, OnDestroy {
   valorInput = '';
   recebimentoInput = '';
   fixaInicioInput = '';
-  fixaFimInput = '';
   erroData = '';
   editandoId: string | null = null;
   valorSugestao: number | null = null;
   private sub?: Subscription;
+  showDeleteModal = false;
+  deletePlanId: string | null = null;
+  deleteInstallmentId: string | null = null;
+  deleteFonte = '';
+  deleteIsRecurring = false;
 
-  constructor(private db: LocalDbService) {}
+  constructor(private db: ApiDataService) {}
 
   ngOnInit(): void {
     this.sub = this.db.incomes$.subscribe((lista) => {
@@ -41,14 +45,7 @@ export class RendasComponent implements OnInit, OnDestroy {
 
   get rendas(): StoredIncome[] {
     const key = this.mesKey();
-    const filtradas = this.rendasAll.filter((r) => {
-      if (r.fixa) {
-        const inicio = this.mesKeyFromMes(r.fixaInicio) || key;
-        const fim = this.mesKeyFromMes(r.fixaFim);
-        return this.mesKeyBetween(key, inicio, fim);
-      }
-      return this.mesKeyFromRecebimento(r.recebimento) === key;
-    });
+    const filtradas = this.rendasAll.filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key);
     return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
   }
 
@@ -58,8 +55,7 @@ export class RendasComponent implements OnInit, OnDestroy {
     const data = this.recebimentoInput || 'DD/MM/AAAA';
     if (this.novaRenda.fixa) {
       const inicio = this.fixaInicioInput || 'MM/AAAA';
-      const fim = this.fixaFimInput ? ` até ${this.fixaFimInput}` : ' (sem fim definido)';
-      return `Recebimento de ${valor} todos os meses a partir de ${inicio}${fim}.`;
+      return `Recebimento de ${valor} todos os meses a partir de ${inicio}.`;
     }
     return `Recebimento de ${valor} em ${data}.`;
   }
@@ -94,11 +90,10 @@ export class RendasComponent implements OnInit, OnDestroy {
       ? this.normalizaData(this.recebimentoInput)
       : this.formatDate(this.dataAtual);
     const fixaInicio = this.novaRenda.fixa ? this.normalizaMes(this.fixaInicioInput) : undefined;
-    const fixaFim = this.novaRenda.fixa ? this.normalizaMes(this.fixaFimInput) : undefined;
 
     if (this.novaRenda.fixa) {
       if (!fixaInicio) {
-        this.erroData = 'Informe o mês de início no formato MM/AAAA para renda fixa.';
+        this.erroData = 'Informe o mês de início no formato MM/AAAA para receita fixa.';
         return;
       }
       this.erroData = '';
@@ -106,21 +101,21 @@ export class RendasComponent implements OnInit, OnDestroy {
 
     if (this.editandoId) {
       this.db.updateIncome(this.editandoId, {
+        planId: this.editandoId,
         fonte: this.novaRenda.fonte,
         valor,
         recebimento: recebimentoNormalizado,
         fixa: this.novaRenda.fixa,
-        fixaInicio,
-        fixaFim
+        fixaInicio
       });
     } else {
       this.db.addIncome({
+        planId: '',
         fonte: this.novaRenda.fonte,
         valor,
         recebimento: recebimentoNormalizado,
         fixa: this.novaRenda.fixa,
-        fixaInicio,
-        fixaFim
+        fixaInicio
       });
     }
 
@@ -128,18 +123,24 @@ export class RendasComponent implements OnInit, OnDestroy {
   }
 
   editar(renda: StoredIncome): void {
-    this.editandoId = renda.id;
+    this.editandoId = renda.planId ?? null;
     this.novaRenda = { ...renda };
     this.valorInput = renda.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     this.recebimentoInput = renda.recebimento;
     this.valorSugestao = this.getUltimoValorParaFonte(renda.fonte);
     this.fixaInicioInput = renda.fixaInicio || '';
-    this.fixaFimInput = renda.fixaFim || '';
     this.mostrarForm = true;
   }
 
-  remover(id: string): void {
-    this.db.removeIncome(id);
+  remover(payload: { planId?: string; installmentId: string }): void {
+    const renda = this.rendasAll.find((r) => r.id === payload.installmentId);
+    if (!renda) return;
+
+    this.deletePlanId = payload.planId || null;
+    this.deleteInstallmentId = payload.installmentId;
+    this.deleteFonte = renda.fonte;
+    this.deleteIsRecurring = renda.schedule === 'Recurring';
+    this.showDeleteModal = true;
   }
 
   editarPorId(id: string): void {
@@ -147,6 +148,26 @@ export class RendasComponent implements OnInit, OnDestroy {
     if (renda) {
       this.editar(renda);
     }
+  }
+
+  confirmarExcluirSomenteEsta(): void {
+    if (!this.deleteInstallmentId) return;
+    this.db.removeIncomeInstallment(this.deleteInstallmentId);
+    this.fecharModalExcluir();
+  }
+
+  confirmarExcluirRecorrencia(): void {
+    if (!this.deletePlanId) return;
+    this.db.removeIncome(this.deletePlanId);
+    this.fecharModalExcluir();
+  }
+
+  fecharModalExcluir(): void {
+    this.showDeleteModal = false;
+    this.deletePlanId = null;
+    this.deleteInstallmentId = null;
+    this.deleteFonte = '';
+    this.deleteIsRecurring = false;
   }
 
   onValorChange(raw: string): void {
@@ -175,10 +196,6 @@ export class RendasComponent implements OnInit, OnDestroy {
     this.fixaInicioInput = this.normalizaMes(raw);
   }
 
-  onFixaFimChange(raw: string): void {
-    this.fixaFimInput = this.normalizaMes(raw);
-  }
-
   aplicarSugestao(): void {
     if (!this.valorSugestao) return;
     this.valorInput = this.valorSugestao.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -189,12 +206,11 @@ export class RendasComponent implements OnInit, OnDestroy {
     this.valorInput = '';
     this.recebimentoInput = '';
     this.fixaInicioInput = '';
-    this.fixaFimInput = '';
     this.editandoId = null;
   }
 
   private criaRenda(): StoredIncome {
-    return { id: '', fonte: '', valor: 0, recebimento: '', fixa: false, fixaInicio: '', fixaFim: '' };
+    return { id: '', planId: '', fonte: '', valor: 0, recebimento: '', fixa: false, fixaInicio: '' };
   }
 
   private normalizaData(value: string): string {

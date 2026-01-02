@@ -72,6 +72,11 @@ export class AuthService {
       message = detail;
     }
 
+    if (httpErr?.status === 401) {
+      message = 'E-mail ou senha inválidos.';
+      code = 'unauthorized';
+    }
+
     if (httpErr?.status === 409 || (typeof detail === 'string' && detail.includes('E-mail já está em uso'))) {
       code = 'emailInUse';
       message = detail || 'E-mail já está em uso.';

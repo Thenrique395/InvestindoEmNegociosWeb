@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf, DecimalPipe } from '@angular/common';
-import { StoredExpense } from '../data/local-db.service';
+import { StoredExpense } from '../data/api-data.service';
 
 @Component({
   selector: 'app-despesas-lista',
