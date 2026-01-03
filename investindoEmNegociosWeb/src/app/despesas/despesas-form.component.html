@@ -53,6 +53,24 @@
           placeholder="Ex: 10"
           required />
       </label>
+      <label *ngIf="formaPagamento !== 'cartao'">
+        Despesa fixa mensal?
+        <div class="toggle-row">
+          <input type="checkbox" [(ngModel)]="fixa" name="fixa" (ngModelChange)="fixaChange.emit($event)" />
+          <span>{{ fixa ? 'Sim, repetir mensalmente' : 'Não' }}</span>
+        </div>
+      </label>
+      <label *ngIf="fixa && formaPagamento !== 'cartao'">
+        Duração (meses, opcional — deixe em branco para repetir indefinidamente)
+        <input
+          type="number"
+          min="1"
+          max="120"
+          [(ngModel)]="fixaMeses"
+          name="fixaMeses"
+          (ngModelChange)="fixaMesesChange.emit($event)"
+          placeholder="Ex: 12" />
+      </label>
       <label>
         Categoria
         <select [(ngModel)]="novaDespesa.categoria" name="categoria">
@@ -85,12 +103,16 @@
       </label>
       <div class="resumo" *ngIf="valorInput">
         <span>Resumo</span>
-        <p *ngIf="formaPagamento === 'cartao' && parcelar && parcelasCount > 1">
+        <p *ngIf="fixa">
+          Despesa fixa mensal de <strong>{{ valorInput }}</strong>
+          <ng-container *ngIf="fixaMeses"> por {{ fixaMeses }} meses</ng-container>.
+        </p>
+        <p *ngIf="!fixa && formaPagamento === 'cartao' && parcelar && parcelasCount > 1">
           Serão {{ parcelasCount }}x de
           <strong>{{ valorParcelaLabel }}</strong>
           no cartão {{ cartaoSelecionadoLabel }}.
         </p>
-        <p *ngIf="!(formaPagamento === 'cartao' && parcelar && parcelasCount > 1)">
+        <p *ngIf="!fixa && !(formaPagamento === 'cartao' && parcelar && parcelasCount > 1)">
           Pagamento único de <strong>{{ valorInput }}</strong>.
         </p>
       </div>

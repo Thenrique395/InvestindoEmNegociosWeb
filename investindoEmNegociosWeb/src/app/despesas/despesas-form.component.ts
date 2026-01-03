@@ -22,6 +22,8 @@ export class DespesasFormComponent {
   @Input() formaPagamento: 'avista' | 'cartao' = 'avista';
   @Input() parcelar = false;
   @Input() parcelasCount = 1;
+  @Input() fixa = false;
+  @Input() fixaMeses: number | null = null;
   @Input() cartaoSelecionadoId: string | null = null;
   @Input() cartaoSelecionadoLabel = '';
 
@@ -31,6 +33,8 @@ export class DespesasFormComponent {
   @Output() parcelarChange = new EventEmitter<boolean>();
   @Output() parcelasChange = new EventEmitter<number>();
   @Output() cartaoChange = new EventEmitter<string | null>();
+  @Output() fixaChange = new EventEmitter<boolean>();
+  @Output() fixaMesesChange = new EventEmitter<number | null>();
   @Output() submitForm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 

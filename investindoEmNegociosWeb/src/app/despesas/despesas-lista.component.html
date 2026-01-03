@@ -12,7 +12,7 @@
   </div>
   <div class="lista__row" *ngFor="let d of despesas">
     <span>{{ d.nome }}</span>
-    <span>{{ d.categoria }}</span>
+    <span>{{ d.categoria || 'Sem categoria' }}</span>
     <span>{{ pagamentoLabel(d) }}</span>
     <span>{{ d.vencimento || '—' }}</span>
     <span>

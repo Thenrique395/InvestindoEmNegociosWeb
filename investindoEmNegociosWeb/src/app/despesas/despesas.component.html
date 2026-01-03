@@ -48,12 +48,16 @@
     [parcelasCount]="parcelasCount"
     [cartaoSelecionadoId]="cartaoSelecionadoId"
     [cartaoSelecionadoLabel]="cartaoSelecionadoLabel"
+    [fixa]="fixa"
+    [fixaMeses]="fixaMeses"
     (valorChange)="onValorChange($event)"
     (vencimentoChange)="onVencimentoChange($event)"
-    (formaPagamentoChange)="formaPagamento = $event"
+    (formaPagamentoChange)="onFormaPagamentoChange($event)"
     (parcelarChange)="parcelar = $event"
     (parcelasChange)="parcelasCount = +$event"
     (cartaoChange)="cartaoSelecionadoId = $event"
+    (fixaChange)="fixa = $event"
+    (fixaMesesChange)="fixaMeses = $event"
     (submitForm)="adicionar()"
     (cancel)="fecharModal()" />
 

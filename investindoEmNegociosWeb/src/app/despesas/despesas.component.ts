@@ -27,6 +27,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
   formaPagamento: 'avista' | 'cartao' = 'avista';
   parcelar = false;
   parcelasCount = 1;
+  fixa = false;
+  fixaMeses: number | null = null;
   cartaoSelecionadoId: string | null = null;
   editando: { id: string; isParcela: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number } | null = null;
@@ -75,6 +77,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   get valorParcelaLabel(): string {
     const valor = this.parseValor(this.valorInput);
+    if (this.fixa) return this.valorInput;
     if (!valor || !this.parcelar || this.parcelasCount < 2) return this.valorInput;
     const parcela = valor / (this.parcelasCount || 1);
     return parcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -169,26 +172,23 @@ export class DespesasComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const gerarParcela = (indice: number, total: number, data: Date, valorParcela: number): Omit<StoredExpense, 'id'> => ({
+    const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
+    const valorParcela = parcelas > 1 ? valor / parcelas : valor;
+    const fixaMeses = this.fixa ? this.fixaMeses || null : null;
+
+    // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
+    this.db.addExpense({
       nome: this.novaDespesa.nome,
       categoria: this.novaDespesa.categoria,
       valor: Number(valorParcela.toFixed(2)),
-      vencimento: this.formatDate(data),
+      vencimento: this.formatDate(dataBase),
       cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
-      parcelaNumero: total > 1 ? indice + 1 : undefined,
-      parcelasTotal: total > 1 ? total : undefined,
-      serieId: total > 1 ? serieId : undefined
+      parcelaNumero: parcelas > 1 ? 1 : undefined,
+      parcelasTotal: parcelas > 1 ? parcelas : undefined,
+      serieId: parcelas > 1 ? serieId : undefined,
+      fixa: this.fixa,
+      fixaMeses
     });
-
-    if (this.formaPagamento === 'cartao' && this.parcelar && this.parcelasCount > 1) {
-      const valorParcela = valor / this.parcelasCount;
-      for (let i = 0; i < this.parcelasCount; i++) {
-        const dataParcela = this.addMonthsClamped(dataBase, i);
-        this.db.addExpense(gerarParcela(i, this.parcelasCount, dataParcela, valorParcela));
-      }
-    } else {
-      this.db.addExpense(gerarParcela(0, 1, dataBase, valor));
-    }
 
     this.resetarForm();
   }
@@ -203,6 +203,24 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   mesAnterior(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
+  }
+
+  onFormaPagamentoChange(value: 'avista' | 'cartao'): void {
+    this.formaPagamento = value;
+
+    if (value === 'cartao') {
+      this.fixa = false;
+      this.fixaMeses = null;
+      this.parcelar = this.parcelasCount > 1 ? true : this.parcelar;
+      if (!this.cartaoSelecionadoId && this.cartoes.length) {
+        this.cartaoSelecionadoId = this.cartoes[0].id;
+      }
+      return;
+    }
+
+    this.parcelar = false;
+    this.parcelasCount = 1;
+    this.cartaoSelecionadoId = null;
   }
 
   onValorChange(raw: string): void {
@@ -222,6 +240,21 @@ export class DespesasComponent implements OnInit, OnDestroy {
       : 'Data inválida. Use o formato DD/MM/AAAA.';
   }
 
+  onFixaToggle(value: boolean): void {
+    this.fixa = value;
+    if (!value) {
+      this.fixaMeses = null;
+    }
+  }
+
+  onFixaMesesChange(value: number | null): void {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      this.fixaMeses = null;
+      return;
+    }
+    this.fixaMeses = value;
+  }
+
   abrirModal(): void {
     this.mostrarForm = true;
   }
@@ -230,6 +263,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.mostrarForm = false;
     this.erroData = '';
     this.editando = null;
+    this.fixa = false;
+    this.fixaMeses = null;
     this.resetarForm();
   }
 
@@ -254,6 +289,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.cartaoSelecionadoId = item.cartao || this.cartoes[0]?.id || null;
     this.parcelar = !!item.parcelasTotal;
     this.parcelasCount = item.parcelasTotal || 1;
+    this.fixa = !!item.fixa;
+    this.fixaMeses = item.fixaMeses ?? null;
+    this.parcelar = !this.fixa && this.parcelasCount > 1;
     this.mostrarForm = true;
   }
 
@@ -271,7 +309,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
       return;
     }
     if (d.parcelasTotal && d.serieId) {
-      this.confirmRemocao = { id: d.id!, serieId: d.serieId, totalParcelas: d.parcelasTotal };
+      this.confirmRemocao = { id: d.id!, serieId: d.planId || d.serieId, totalParcelas: d.parcelasTotal };
       return;
     }
     this.removerDespesa(mesKey, index);

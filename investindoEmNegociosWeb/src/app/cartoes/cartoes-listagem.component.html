@@ -2,9 +2,9 @@
   <div *ngIf="cards.length; else emptyCards" class="cards-grid">
     <article class="card-item" *ngFor="let c of cards">
       <header class="card-item__top">
-        <div class="brand" [class.brand--mastercard]="isMastercard(c.bandeira)">
-          <div *ngIf="isMastercard(c.bandeira)" class="mc-logo" aria-label="Mastercard"></div>
-          <span *ngIf="!isMastercard(c.bandeira)" class="pill">{{ c.bandeira | uppercase }}</span>
+        <div class="brand" [class.brand--mastercard]="isMastercard(brandCode(c))">
+          <div *ngIf="isMastercard(brandCode(c))" class="mc-logo" aria-label="Mastercard"></div>
+          <span *ngIf="!isMastercard(brandCode(c))" class="pill">{{ brandName(c) | uppercase }}</span>
         </div>
         <div class="actions">
           <button type="button" class="btn-edit sm" (click)="onEditar(c)">✏️ Editar</button>

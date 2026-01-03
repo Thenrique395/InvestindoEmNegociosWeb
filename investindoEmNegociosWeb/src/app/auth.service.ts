@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
+import { API_BASE_URL } from './api.config';
 
 export interface AuthResponse {
   userId: string;
@@ -17,7 +18,7 @@ export interface RegisterPayload {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'http://localhost:5059/api/auth';
+  private readonly baseUrl = `${API_BASE_URL}/auth`;
 
   constructor(private http: HttpClient) {}
 

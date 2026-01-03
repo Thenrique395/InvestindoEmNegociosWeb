@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from './api.config';
 
 export interface CardDto {
   id: string;
@@ -21,7 +22,7 @@ export interface CardPayload {
 
 @Injectable({ providedIn: 'root' })
 export class CardsService {
-  private readonly baseUrl = 'http://localhost:5059/api/cards';
+  private readonly baseUrl = `${API_BASE_URL}/cards`;
 
   constructor(private http: HttpClient) {}
 

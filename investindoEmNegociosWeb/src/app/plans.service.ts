@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MoneyType, ScheduleType } from './types/money-types';
+import { API_BASE_URL } from './api.config';
 
 export interface Plan {
   id: string;
@@ -10,6 +11,7 @@ export interface Plan {
   title: string;
   amount: number;
   schedule: ScheduleType;
+  categoryId?: string | null;
   frequency?: string | null;
   installmentsCount?: number | null;
   startDate: string;
@@ -30,7 +32,7 @@ export interface CreatePlanPayload {
 
 @Injectable({ providedIn: 'root' })
 export class PlansService {
-  private readonly baseUrl = 'http://localhost:5059/api/plans';
+  private readonly baseUrl = `${API_BASE_URL}/plans`;
 
   constructor(private http: HttpClient) {}
 

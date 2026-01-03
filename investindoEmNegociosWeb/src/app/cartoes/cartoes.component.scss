@@ -103,6 +103,14 @@ select:focus {
   background: linear-gradient(135deg, #3a1c71, #d76d77);
 }
 
+.credit-card.amex {
+  background: linear-gradient(135deg, #0077a6, #00c0f1);
+}
+
+.credit-card.hipercard {
+  background: linear-gradient(135deg, #7a0000, #b30000);
+}
+
 .card__chip {
   width: 50px;
   height: 35px;

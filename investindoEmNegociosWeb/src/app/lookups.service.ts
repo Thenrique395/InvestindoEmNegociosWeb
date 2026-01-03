@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from './api.config';
 
 export interface PaymentMethodLookup {
   id: number;
@@ -17,7 +18,7 @@ export interface CardBrandLookup {
 
 @Injectable({ providedIn: 'root' })
 export class LookupsService {
-  private readonly baseUrl = 'http://localhost:5059/api/lookups';
+  private readonly baseUrl = `${API_BASE_URL}/lookups`;
 
   constructor(private http: HttpClient) {}
 

@@ -14,7 +14,7 @@
     {{ alerta }}
   </div>
 
-  <app-cartoes-listagem [cards]="cards" (remover)="remover($event)" (editar)="editar($event)"></app-cartoes-listagem>
+  <app-cartoes-listagem [cards]="cards" [brands]="brands" (remover)="remover($event)" (editar)="editar($event)"></app-cartoes-listagem>
 
   <div class="modal" *ngIf="mostrarModal">
     <div class="modal__backdrop" (click)="fecharModal()"></div>
@@ -31,7 +31,7 @@
           <label>
             Bandeira
             <select [(ngModel)]="bandeira" name="bandeira">
-              <option *ngFor="let b of brands" [ngValue]="b.id">{{ b.name }}</option>
+              <option *ngFor="let b of brands" [ngValue]="b.id.toString()">{{ b.name }}</option>
             </select>
           </label>
 
@@ -67,7 +67,13 @@
         </form>
 
         <div class="preview">
-          <div class="credit-card" [class.mastercard]="bandeiraCode === 'mastercard'" [class.visa]="bandeiraCode === 'visa'" [class.elo]="bandeiraCode === 'elo'">
+          <div
+            class="credit-card"
+            [class.mastercard]="bandeiraCode === 'mastercard'"
+            [class.visa]="bandeiraCode === 'visa'"
+            [class.elo]="bandeiraCode === 'elo'"
+            [class.amex]="bandeiraCode === 'amex'"
+            [class.hipercard]="bandeiraCode === 'hipercard'">
             <div class="card__chip"></div>
             <div class="card__logo" [ngSwitch]="bandeiraCode">
               <div *ngSwitchCase="'mastercard'" class="logo-mc" aria-label="Mastercard">
@@ -76,6 +82,8 @@
               </div>
               <span *ngSwitchCase="'visa'" class="logo-text">VISA</span>
               <span *ngSwitchCase="'elo'" class="logo-text">ELO</span>
+              <span *ngSwitchCase="'amex'" class="logo-text">AMEX</span>
+              <span *ngSwitchCase="'hipercard'" class="logo-text">HIPER</span>
               <span *ngSwitchDefault class="logo-text">{{ bandeiraNome || 'BANDEIRA' | uppercase }}</span>
             </div>
             <p class="card__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</p>

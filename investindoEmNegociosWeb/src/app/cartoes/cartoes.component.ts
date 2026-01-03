@@ -14,7 +14,7 @@ import { LookupsService, CardBrandLookup } from '../lookups.service';
   styleUrls: ['./cartoes.component.scss']
 })
 export class CartoesComponent implements OnInit, OnDestroy {
-  bandeira: number | null = null;
+  bandeira: string = '';
   numero = '';
   nome = '';
   mostrarNumero = false;
@@ -24,6 +24,15 @@ export class CartoesComponent implements OnInit, OnDestroy {
   editandoId: string | null = null;
   alerta = '';
   brands: CardBrandLookup[] = [];
+
+  get bandeiraCode(): string {
+    const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
+    return (current?.code || '').toLowerCase();
+  }
+  get bandeiraNome(): string {
+    const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
+    return current?.name || '';
+  }
   private sub?: Subscription;
   private expensesSub?: Subscription;
 
@@ -37,10 +46,19 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.expensesSub = this.db.expenses$.subscribe((lista) => {
       this.expenses = lista;
     });
-    this.lookups.cardBrands().subscribe((brands) => {
-      const active = brands.filter((b) => b.isActive !== false);
-      this.brands = active;
-      if (this.bandeira == null && active.length) this.bandeira = active[0].id;
+    this.lookups.cardBrands().subscribe({
+      next: (brands) => {
+        const list = Array.isArray(brands) ? brands : [];
+        const active = list.filter((b) => b.isActive !== false);
+        this.brands = active;
+        console.log('Bandeiras carregadas:', this.brands);
+        this.bandeira = this.brands.length ? String(this.brands[0].id) : '';
+      },
+      error: () => {
+        this.brands = [];
+        this.alerta = 'Falha ao carregar bandeiras.';
+        setTimeout(() => (this.alerta = ''), 4000);
+      }
     });
   }
 
@@ -58,7 +76,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (!this.numero || !this.nome || !this.bandeira) return;
     const numeroLimpo = this.numero.replace(/\D/g, '').slice(-4);
     const payload = {
-      bandeira: String(this.bandeira),
+      bandeira: this.bandeira,
       numero: numeroLimpo,
       nome: this.nome,
       userId: this.currentUser
@@ -73,13 +91,13 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.fecharModal();
     this.numero = '';
     this.nome = '';
-    this.bandeira = this.brands[0]?.id ?? null;
+    this.bandeira = this.brands[0]?.id ? String(this.brands[0].id) : '';
     this.editandoId = null;
   }
 
   abrirModal(): void {
-    if (this.bandeira == null && this.brands.length) {
-      this.bandeira = this.brands[0].id;
+    if (!this.bandeira && this.brands.length) {
+      this.bandeira = this.brands[0].id.toString();
     }
     this.mostrarModal = true;
   }
@@ -88,7 +106,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.mostrarModal = false;
     this.mostrarNumero = false;
     this.editandoId = null;
-    this.bandeira = this.brands[0]?.id ?? null;
+    this.bandeira = this.brands[0]?.id ? String(this.brands[0].id) : '';
     this.numero = '';
     this.nome = '';
   }
@@ -115,7 +133,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   editar(card: StoredCard): void {
     this.editandoId = card.id;
     this.mostrarModal = true;
-    this.bandeira = Number(card.bandeira);
+    this.bandeira = card.bandeira;
     this.numero = this.formatarNumeroEntrada(card.numero.replace(/\D/g, ''));
     this.nome = card.nome;
   }
@@ -131,18 +149,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   private formatarNumeroEntrada(digits: string): string {
     return digits.match(/.{1,4}/g)?.join(' ') || digits;
-  }
-
-  get bandeiraSelecionada(): CardBrandLookup | undefined {
-    return this.brands.find((b) => b.id === this.bandeira);
-  }
-
-  get bandeiraCode(): string {
-    return this.bandeiraSelecionada?.code ?? '';
-  }
-
-  get bandeiraNome(): string {
-    return this.bandeiraSelecionada?.name ?? '';
   }
 
   private get currentUser(): string {

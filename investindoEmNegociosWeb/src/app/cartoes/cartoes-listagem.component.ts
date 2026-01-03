@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
+import { CardBrandLookup } from '../lookups.service';
 
 @Component({
   selector: 'app-cartoes-listagem',
@@ -11,8 +12,29 @@ import { StoredCard } from '../data/api-data.service';
 })
 export class CartoesListagemComponent {
   @Input() cards: StoredCard[] = [];
+  @Input() brands: CardBrandLookup[] = [];
   @Output() remover = new EventEmitter<string>();
   @Output() editar = new EventEmitter<StoredCard>();
+
+  private brandLookup(value: string): CardBrandLookup | undefined {
+    const normalized = (value || '').toString();
+    const target = normalized.toLowerCase();
+    return this.brands.find(
+      (b) =>
+        String(b.id) === normalized ||
+        (b.code || '').toLowerCase() === target ||
+        (b.name || '').toLowerCase() === target
+    );
+  }
+
+  brandCode(card: StoredCard): string {
+    const raw = this.brandLookup(card.bandeira)?.code || card.bandeira;
+    return (raw || '').toString().toLowerCase();
+  }
+
+  brandName(card: StoredCard): string {
+    return this.brandLookup(card.bandeira)?.name || card.bandeira || 'Sem bandeira';
+  }
 
   numeroProtegido(numero: string): string {
     const digits = (numero || '').replace(/\s+/g, '');
@@ -21,8 +43,8 @@ export class CartoesListagemComponent {
     return masked.match(/.{1,4}/g)?.join(' ') || '•••• •••• •••• ••••';
   }
 
-  isMastercard(bandeira: string): boolean {
-    return (bandeira || '').toLowerCase() === 'mastercard';
+  isMastercard(code: string): boolean {
+    return (code || '').toLowerCase() === 'mastercard';
   }
 
   finalCartao(numero?: string): string {

@@ -7,6 +7,7 @@ import { ScheduleType } from '../types/money-types';
 
 export interface StoredExpense {
   id: string;
+  planId?: string;
   nome: string;
   categoria: string;
   valor: number;
@@ -16,6 +17,8 @@ export interface StoredExpense {
   parcelaNumero?: number;
   parcelasTotal?: number;
   serieId?: string;
+  fixa?: boolean;
+  fixaMeses?: number | null;
 }
 
 export interface StoredCard {
@@ -80,11 +83,21 @@ export class ApiDataService {
   }
 
   removeExpense(_id: string): void {
-    console.warn('Delete de despesa ainda não implementado no backend.');
+    this.removeExpenseInstallment(_id);
   }
 
-  removeExpenseSeries(_serieId: string): void {
-    console.warn('Delete de série de despesa ainda não implementado no backend.');
+  removeExpenseSeries(planId: string): void {
+    this.plans.delete(planId).subscribe({
+      next: () => this.refresh(),
+      error: (err) => console.error('Falha ao remover série de despesas', err)
+    });
+  }
+
+  removeExpenseInstallment(installmentId: string): void {
+    this.installments.delete(installmentId).subscribe({
+      next: () => this.refresh(),
+      error: (err) => console.error('Falha ao remover parcela de despesa', err)
+    });
   }
 
   addCard(card: Omit<StoredCard, 'id'>): void {
@@ -201,17 +214,26 @@ export class ApiDataService {
     const lookup = new Map(plans.map((p) => [p.id, p]));
     return installments.map((inst) => {
       const plan = lookup.get(inst.planId);
+      const categoria =
+        (plan as any)?.categoryName ||
+        plan?.categoryId ||
+        (plan as any)?.category ||
+        'Outros';
       const isSeries = (plan?.installmentsCount ?? 0) > 1;
+      const isRecurring = plan?.schedule === 'Recurring';
       return {
         id: inst.id,
+        planId: plan?.id,
         nome: plan?.title || 'Despesa',
-        categoria: '',
+        categoria,
         valor: inst.amount,
         vencimento: this.formatDate(inst.dueDate),
         userId: plan?.userId,
         parcelaNumero: isSeries ? inst.installmentNo : undefined,
         parcelasTotal: isSeries ? plan?.installmentsCount ?? undefined : undefined,
-        serieId: isSeries ? plan?.id : undefined
+        serieId: isSeries ? plan?.id : undefined,
+        fixa: isRecurring,
+        fixaMeses: isRecurring ? null : undefined
       };
     });
   }
@@ -244,9 +266,26 @@ export class ApiDataService {
   }
 
   private toPlanPayloadFromExpense(expense: Omit<StoredExpense, 'id'>): CreatePlanPayload {
+    const startDate = this.toIsoDate(expense.vencimento) || this.todayIso();
+
+    // Despesa fixa mensal
+    if (expense.fixa) {
+      const months = expense.fixaMeses && expense.fixaMeses > 0 ? expense.fixaMeses : null;
+      const schedule: ScheduleType = months ? 'Installments' : 'Recurring';
+      return {
+        type: 'Expense',
+        title: expense.nome,
+        amount: expense.valor,
+        schedule,
+        startDate,
+        categoryId: expense.categoria || null,
+        frequency: schedule === 'Recurring' ? 'Monthly' : null,
+        installmentsCount: schedule === 'Installments' ? months : null
+      };
+    }
+
     const parcelas = expense.parcelasTotal && expense.parcelasTotal > 1 ? expense.parcelasTotal : 1;
     const schedule: ScheduleType = parcelas > 1 ? 'Installments' : 'OneTime';
-    const startDate = this.toIsoDate(expense.vencimento) || this.todayIso();
     const amount = parcelas > 1 ? expense.valor / parcelas : expense.valor;
 
     return {
@@ -255,6 +294,7 @@ export class ApiDataService {
       amount,
       schedule,
       startDate,
+      categoryId: expense.categoria || null,
       frequency: null,
       installmentsCount: schedule === 'Installments' ? parcelas : 1
     };
