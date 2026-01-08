@@ -4,6 +4,7 @@ import { PlansService, Plan, CreatePlanPayload } from '../plans.service';
 import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
 import { ScheduleType } from '../types/money-types';
+import { InstallmentStatus } from '../types/money-types';
 
 export interface StoredExpense {
   id: string;
@@ -19,6 +20,7 @@ export interface StoredExpense {
   serieId?: string;
   fixa?: boolean;
   fixaMeses?: number | null;
+  status?: InstallmentStatus;
 }
 
 export interface StoredCard {
@@ -173,7 +175,7 @@ export class ApiDataService {
     });
   }
 
-  private refresh(): void {
+  refresh(): void {
     forkJoin({
       incomePlans: this.plans.list('Income'),
       expensePlans: this.plans.list('Expense'),
@@ -221,6 +223,8 @@ export class ApiDataService {
         'Outros';
       const isSeries = (plan?.installmentsCount ?? 0) > 1;
       const isRecurring = plan?.schedule === 'Recurring';
+      const rawStatus = (inst as any)?.status || '';
+      const status = (rawStatus || '').toString().toUpperCase() as InstallmentStatus;
       return {
         id: inst.id,
         planId: plan?.id,
@@ -233,7 +237,8 @@ export class ApiDataService {
         parcelasTotal: isSeries ? plan?.installmentsCount ?? undefined : undefined,
         serieId: isSeries ? plan?.id : undefined,
         fixa: isRecurring,
-        fixaMeses: isRecurring ? null : undefined
+        fixaMeses: isRecurring ? null : undefined,
+        status: status || 'OPEN'
       };
     });
   }
@@ -267,6 +272,8 @@ export class ApiDataService {
 
   private toPlanPayloadFromExpense(expense: Omit<StoredExpense, 'id'>): CreatePlanPayload {
     const startDate = this.toIsoDate(expense.vencimento) || this.todayIso();
+    const parsedCategory = Number(expense.categoria);
+    const categoryId = Number.isFinite(parsedCategory) ? String(parsedCategory) : null;
 
     // Despesa fixa mensal
     if (expense.fixa) {
@@ -278,7 +285,7 @@ export class ApiDataService {
         amount: expense.valor,
         schedule,
         startDate,
-        categoryId: expense.categoria || null,
+        categoryId,
         frequency: schedule === 'Recurring' ? 'Monthly' : null,
         installmentsCount: schedule === 'Installments' ? months : null
       };
@@ -294,7 +301,7 @@ export class ApiDataService {
       amount,
       schedule,
       startDate,
-      categoryId: expense.categoria || null,
+      categoryId,
       frequency: null,
       installmentsCount: schedule === 'Installments' ? parcelas : 1
     };

@@ -7,7 +7,7 @@
 .lista__head,
 .lista__row {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 0.9fr;
+  grid-template-columns: 0.2fr 1.2fr 1fr 1fr 0.9fr 1fr 1fr 1.1fr;
   padding: 0.65rem 0.85rem;
   align-items: center;
   gap: 0.4rem;
@@ -44,4 +44,69 @@
   gap: 0.4rem;
   align-items: center;
   justify-content: flex-end;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: #16a34a;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.status-paid {
+  color: #34d399;
+}
+
+.status-paid .status-icon {
+  background: rgba(52, 211, 153, 0.15);
+}
+
+.status-partial {
+  color: #fbbf24;
+}
+
+.status-partial .status-icon {
+  background: rgba(251, 191, 36, 0.15);
+}
+
+.status-canceled {
+  color: #f87171;
+}
+
+.status-canceled .status-icon {
+  background: rgba(248, 113, 113, 0.15);
+}
+
+.status-open {
+  color: #a5b4fc;
+}
+
+.status-open .status-icon {
+  background: rgba(165, 180, 252, 0.15);
 }

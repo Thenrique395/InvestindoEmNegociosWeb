@@ -22,6 +22,15 @@
     {{ alerta }}
   </div>
 
+  <div class="bulk-bar" *ngIf="selecionados.length">
+    <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
+    <div class="bulk-actions">
+      <button type="button" class="btn-primary sm" [disabled]="!selecionadosPagaveis.length" (click)="pagarSelecionadas()">Marcar como pago</button>
+      <button type="button" class="ghost sm" (click)="anteciparSelecionadas()">Solicitar antecipação</button>
+      <button type="button" class="btn-danger sm" (click)="excluirSelecionadas()">Excluir</button>
+    </div>
+  </div>
+
   <div class="layout">
     <app-despesas-lista
       [despesas]="despesasOrdenadas"
@@ -29,9 +38,13 @@
       [sortDir]="sortDir"
       [pagamentoLabelFn]="pagamentoLabel.bind(this)"
       [cardLabelFn]="cardLabel.bind(this)"
+      [selectedIds]="selecionados"
       (ordenar)="ordenarPor($event)"
       (editar)="editarDespesaPorId($event)"
-      (remover)="openRemocaoPorId($event)" />
+      (remover)="openRemocaoPorId($event)"
+      (pagar)="pagarDespesaPorId($event)"
+      (selecionar)="toggleSelecionar($event.id, $event.checked)"
+      (selecionarTodos)="toggleSelecionarTodos($event)" />
   </div>
 
   <app-despesas-form

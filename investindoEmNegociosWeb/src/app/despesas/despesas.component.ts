@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TitleCasePipe, NgIf, DecimalPipe } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
+import { InstallmentsService } from '../installments.service';
 
 @Component({
   selector: 'app-despesas',
@@ -33,10 +34,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
   editando: { id: string; isParcela: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number } | null = null;
   private sub?: Subscription;
+  selectedIds = new Set<string>();
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
-  constructor(private db: ApiDataService) {}
+  constructor(private db: ApiDataService, private installments: InstallmentsService) {}
 
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
@@ -73,6 +75,14 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   get despesas(): StoredExpense[] {
     return this.despesasPorMes[this.mesKey()] || [];
+  }
+
+  get selecionados(): string[] {
+    return Array.from(this.selectedIds);
+  }
+
+  get selecionadosPagaveis(): StoredExpense[] {
+    return this.despesas.filter((d) => this.selectedIds.has(d.id) && d.status !== 'PAID' && d.status !== 'CANCELED');
   }
 
   get valorParcelaLabel(): string {
@@ -137,6 +147,94 @@ export class DespesasComponent implements OnInit, OnDestroy {
     if (!item) return;
     const index = lista.indexOf(item);
     this.openRemocao(item, this.mesKey(), index);
+  }
+
+  toggleSelecionar(id: string, checked: boolean): void {
+    if (checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+  }
+
+  toggleSelecionarTodos(checked: boolean): void {
+    if (checked) {
+      const ids = (this.despesasPorMes[this.mesKey()] || []).map((d) => d.id).filter(Boolean) as string[];
+      this.selectedIds = new Set(ids);
+    } else {
+      this.selectedIds.clear();
+    }
+  }
+
+  pagarDespesaPorId(id: string): void {
+    const lista = this.despesasPorMes[this.mesKey()] || [];
+    const item = lista.find((d) => d.id === id);
+    if (!item) return;
+    const payload = {
+      paidAmount: item.valor,
+      paidAt: new Date().toISOString(),
+      methodId: null,
+      note: null
+    };
+    this.installments.pay(id, payload).subscribe({
+      next: () => {
+        this.atualizarStatusLocal([id], 'PAID');
+        this.db.refresh();
+      },
+      error: () => {
+        this.alerta = 'Falha ao marcar como paga.';
+        setTimeout(() => (this.alerta = ''), 3000);
+      }
+    });
+  }
+
+  pagarSelecionadas(): void {
+    const pagaveis = this.selecionadosPagaveis;
+    if (!pagaveis.length) {
+      this.alerta = 'Nenhuma despesa selecionada para pagar.';
+      setTimeout(() => (this.alerta = ''), 2000);
+      return;
+    }
+
+    const pedidos = pagaveis.map((item) =>
+      this.installments.pay(item.id, {
+        paidAmount: item.valor,
+        paidAt: new Date().toISOString(),
+        methodId: null,
+        note: null
+      })
+    );
+
+    forkJoin(pedidos).subscribe({
+      next: () => {
+        this.atualizarStatusLocal(pagaveis.map((p) => p.id), 'PAID');
+        this.selectedIds.clear();
+        this.db.refresh();
+      },
+      error: () => {
+        this.alerta = 'Falha ao marcar pagamentos.';
+        setTimeout(() => (this.alerta = ''), 3000);
+      }
+    });
+  }
+
+  excluirSelecionadas(): void {
+    const ids = Array.from(this.selectedIds);
+    if (!ids.length) return;
+    ids.forEach((id) => this.db.removeExpense(id));
+    this.selectedIds.clear();
+  }
+
+  anteciparSelecionadas(): void {
+    this.alerta = 'Solicitação de antecipação ainda não implementada.';
+    setTimeout(() => (this.alerta = ''), 3000);
+  }
+
+  private atualizarStatusLocal(ids: string[], status: StoredExpense['status']): void {
+    const key = this.mesKey();
+    const lista = this.despesasPorMes[key] || [];
+    const atualizada = lista.map((d) => (ids.includes(d.id) ? { ...d, status } : d));
+    this.despesasPorMes = { ...this.despesasPorMes, [key]: atualizada };
   }
 
   adicionar(): void {

@@ -1,8 +1,17 @@
 <div class="lista">
   <div class="lista__head">
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        [checked]="despesas.length && selectedIds.length === despesas.length"
+        [indeterminate]="selectedIds.length > 0 && selectedIds.length < despesas.length"
+        (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
+        aria-label="Selecionar todas" />
+    </label>
     <button type="button" class="linkish" (click)="ordenarPor('nome')">Nome</button>
     <button type="button" class="linkish" (click)="ordenarPor('categoria')">Categoria</button>
     <button type="button" class="linkish" (click)="ordenarPor('pagamento')">Pagamento</button>
+    <span>Status</span>
     <button type="button" class="linkish" (click)="ordenarPor('vencimento')">Vencimento</button>
     <button type="button" class="linkish" (click)="ordenarPor('valor')">Valor</button>
     <span>Ações</span>
@@ -11,9 +20,34 @@
     <span class="muted">Nenhuma despesa cadastrada para este mês.</span>
   </div>
   <div class="lista__row" *ngFor="let d of despesas">
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        [checked]="isSelecionado(d.id)"
+        [disabled]="d.status === 'PAID'"
+        (change)="selecionar.emit({ id: d.id!, checked: $any($event.target)?.checked ?? false })"
+        aria-label="Selecionar despesa" />
+    </label>
     <span>{{ d.nome }}</span>
     <span>{{ d.categoria || 'Sem categoria' }}</span>
     <span>{{ pagamentoLabel(d) }}</span>
+    <span class="status-pill"
+      [ngClass]="{
+        'status-paid': d.status === 'PAID',
+        'status-partial': d.status === 'PARTIALLY_PAID',
+        'status-canceled': d.status === 'CANCELED',
+        'status-open': !d.status || d.status === 'OPEN'
+      }">
+      <span class="status-icon">
+        <ng-container [ngSwitch]="d.status">
+          <span *ngSwitchCase="'PAID'">✓</span>
+          <span *ngSwitchCase="'PARTIALLY_PAID'">≋</span>
+          <span *ngSwitchCase="'CANCELED'">×</span>
+          <span *ngSwitchDefault>•</span>
+        </ng-container>
+      </span>
+      <span>{{ statusLabel(d.status) }}</span>
+    </span>
     <span>{{ d.vencimento || '—' }}</span>
     <span>
       R$ {{ d.valor | number:'1.2-2' }}
@@ -21,7 +55,6 @@
     </span>
     <span class="acoes">
       <button type="button" class="btn-edit" (click)="editar.emit(d.id!)">✏️ Editar</button>
-      <button type="button" class="btn-danger sm" (click)="remover.emit(d.id!)">🗑 Excluir</button>
     </span>
   </div>
 </div>
