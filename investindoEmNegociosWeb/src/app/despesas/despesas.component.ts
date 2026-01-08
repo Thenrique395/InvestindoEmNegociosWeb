@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TitleCasePipe, NgIf, DecimalPipe, NgFor } from '@angular/common';
+import { TitleCasePipe, NgIf, DecimalPipe, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription, forkJoin } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
@@ -11,7 +12,7 @@ import { InstallmentStatus } from '../types/money-types';
 @Component({
   selector: 'app-despesas',
   standalone: true,
-  imports: [TitleCasePipe, NgIf, NgFor, DecimalPipe, FormsModule, DespesasListaComponent, DespesasFormComponent],
+  imports: [TitleCasePipe, NgIf, NgFor, NgClass, DecimalPipe, FormsModule, DespesasListaComponent, DespesasFormComponent],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss']
 })
@@ -24,6 +25,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   sortDir: 1 | -1 = 1;
   mostrarForm = false;
   alerta = '';
+  alertaTipo: 'info' | 'success' | 'error' = 'info';
   valorInput = '';
   vencimentoInput = '';
   erroData = '';
@@ -36,10 +38,13 @@ export class DespesasComponent implements OnInit, OnDestroy {
   editando: { id: string; isParcela: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number } | null = null;
   private sub?: Subscription;
+  private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
   filtroCategoria: string = 'ALL';
   filtroNome: string = '';
+  loadingPagar = false;
+  loadingAntecipar = false;
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
@@ -206,14 +211,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
       methodId: null,
       note: null
     };
-    this.installments.pay(id, payload).subscribe({
+    this.loadingPagar = true;
+    this.installments
+      .pay(id, payload)
+      .pipe(finalize(() => (this.loadingPagar = false)))
+      .subscribe({
       next: () => {
         this.atualizarStatusLocal([id], 'PAID');
         this.db.refresh();
+        this.setAlerta('Despesa marcada como paga.', 3000, 'success');
       },
       error: () => {
-        this.alerta = 'Falha ao marcar como paga.';
-        setTimeout(() => (this.alerta = ''), 3000);
+        this.setAlerta('Falha ao marcar como paga.', 3000, 'error');
       }
     });
   }
@@ -221,8 +230,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   pagarSelecionadas(): void {
     const pagaveis = this.selecionadosPagaveis;
     if (!pagaveis.length) {
-      this.alerta = 'Nenhuma despesa selecionada para pagar.';
-      setTimeout(() => (this.alerta = ''), 2000);
+      this.setAlerta('Nenhuma despesa selecionada para pagar.', 2000);
       return;
     }
 
@@ -235,15 +243,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
       })
     );
 
-    forkJoin(pedidos).subscribe({
+    this.loadingPagar = true;
+    forkJoin(pedidos)
+      .pipe(finalize(() => (this.loadingPagar = false)))
+      .subscribe({
       next: () => {
         this.atualizarStatusLocal(pagaveis.map((p) => p.id), 'PAID');
         this.selectedIds.clear();
         this.db.refresh();
+        this.setAlerta('Pagamentos registrados com sucesso.', 3000, 'success');
       },
       error: () => {
-        this.alerta = 'Falha ao marcar pagamentos.';
-        setTimeout(() => (this.alerta = ''), 3000);
+        this.setAlerta('Falha ao marcar pagamentos.', 3000, 'error');
       }
     });
   }
@@ -256,10 +267,21 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   anteciparSelecionadas(): void {
+    const selecionadas = this.selecionados;
+    if (!selecionadas.length) {
+      this.setAlerta('Selecione ao menos uma despesa para antecipar.', 2000);
+      return;
+    }
+
+    const doMesAtual = (this.despesas || []).filter((d) => this.selectedIds.has(d.id) && this.isMesAtual(d.vencimento));
+    if (doMesAtual.length) {
+      this.setAlerta('Não é possível antecipar despesas do mês atual.', 2500);
+      return;
+    }
+
     const antecipaveis = this.selecionadosAntecipaveis;
     if (!antecipaveis.length) {
-      this.alerta = 'Nenhuma despesa selecionada pode ser antecipada.';
-      setTimeout(() => (this.alerta = ''), 2000);
+      this.setAlerta('Nenhuma despesa selecionada pode ser antecipada.', 2000);
       return;
     }
 
@@ -268,15 +290,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
       this.installments.anticipate(item.id, { dueDate: novaDataIso })
     );
 
-    forkJoin(pedidos).subscribe({
+    this.loadingAntecipar = true;
+    forkJoin(pedidos)
+      .pipe(finalize(() => (this.loadingAntecipar = false)))
+      .subscribe({
       next: () => {
         this.moverParaMesAtual(antecipaveis.map((a) => a.id), novaDataIso, 'ANTICIPATED');
         this.selectedIds.clear();
         this.db.refresh();
+        this.setAlerta('Antecipação registrada.', 2500, 'success');
       },
       error: () => {
-        this.alerta = 'Falha ao antecipar despesas.';
-        setTimeout(() => (this.alerta = ''), 3000);
+        this.setAlerta('Falha ao antecipar despesas.', 3000, 'error');
       }
     });
   }
@@ -633,6 +658,24 @@ export class DespesasComponent implements OnInit, OnDestroy {
   private formataMoeda(value: string | number): string {
     const num = this.parseValor(value);
     return num ? num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '';
+  }
+
+  private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
+    if (this.alertaTimeout) {
+      clearTimeout(this.alertaTimeout);
+    }
+    this.alerta = msg;
+    this.alertaTipo = tipo;
+    this.alertaTimeout = setTimeout(() => {
+      this.alerta = '';
+    }, duracao);
+  }
+
+  private isMesAtual(vencimento?: string): boolean {
+    const data = this.parseData(vencimento || '');
+    if (!data) return false;
+    const hoje = new Date();
+    return data.getFullYear() === hoje.getFullYear() && data.getMonth() === hoje.getMonth();
   }
 
   private collate(a: string | undefined, b: string | undefined): number {

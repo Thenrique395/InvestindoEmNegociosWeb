@@ -51,6 +51,30 @@
 }
 
 .inline-alert {
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inline-alert.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #c7ddff;
+}
+
+.inline-alert.success {
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(22, 163, 74, 0.45);
+  color: #d5f3e3;
+}
+
+.inline-alert.error {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #ffd7d7;
 }
 
 .layout {

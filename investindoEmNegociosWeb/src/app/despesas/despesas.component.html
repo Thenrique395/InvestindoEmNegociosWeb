@@ -18,15 +18,21 @@
     </div>
   </div>
 
-  <div *ngIf="alerta" class="inline-alert">
+  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
     {{ alerta }}
   </div>
 
   <div class="bulk-bar" *ngIf="selecionados.length">
     <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
     <div class="bulk-actions">
-      <button type="button" class="btn-primary sm" [disabled]="!selecionados.length" (click)="pagarSelecionadas()">Marcar como pago</button>
-      <button type="button" class="ghost sm" [disabled]="!selecionadosAntecipaveis.length" (click)="anteciparSelecionadas()">Solicitar antecipação</button>
+      <button type="button" class="btn-primary sm" [disabled]="loadingPagar" (click)="pagarSelecionadas()">
+        <span *ngIf="loadingPagar">Processando...</span>
+        <span *ngIf="!loadingPagar">Marcar como pago</span>
+      </button>
+      <button type="button" class="ghost sm" [disabled]="loadingAntecipar" (click)="anteciparSelecionadas()">
+        <span *ngIf="loadingAntecipar">Antecipando...</span>
+        <span *ngIf="!loadingAntecipar">Solicitar antecipação</span>
+      </button>
       <button type="button" class="btn-danger sm" (click)="excluirSelecionadas()">Excluir</button>
     </div>
   </div>
