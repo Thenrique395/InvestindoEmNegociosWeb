@@ -56,6 +56,7 @@
       <small *ngIf="d.parcelasTotal"> ({{ d.parcelaNumero }}/{{ d.parcelasTotal }})</small>
     </span>
     <span class="acoes">
+      <button type="button" class="ghost sm" (click)="historico.emit(d.id!)">ℹ️ Histórico</button>
       <button type="button" class="btn-edit" (click)="editar.emit(d.id!)">✏️ Editar</button>
     </span>
   </div>

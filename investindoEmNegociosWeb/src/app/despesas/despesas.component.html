@@ -74,6 +74,7 @@
       (editar)="editarDespesaPorId($event)"
       (remover)="openRemocaoPorId($event)"
       (pagar)="pagarDespesaPorId($event)"
+      (historico)="abrirHistorico($event)"
       (selecionar)="toggleSelecionar($event.id, $event.checked)"
       (selecionarTodos)="toggleSelecionarTodos($event)" />
   </div>
@@ -121,6 +122,57 @@
       <div class="modal__actions">
         <button type="button" class="ghost" (click)="confirmarRemocao(false)">Somente esta</button>
         <button type="button" class="btn-danger" (click)="confirmarRemocao(true)">Todas as parcelas</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer" *ngIf="historicoAberto">
+    <div class="drawer__backdrop" (click)="fecharHistorico()"></div>
+    <div class="drawer__panel">
+      <div class="drawer__header">
+        <div>
+          <p class="eyebrow">Histórico</p>
+          <h3>{{ historicoTitulo }}</h3>
+        </div>
+        <button type="button" class="ghost sm" (click)="fecharHistorico()">✕</button>
+      </div>
+
+      <div class="drawer__section">
+        <h4>Pagas</h4>
+        <div *ngIf="historicoPagas.length; else semPagas">
+          <div class="drawer__row" *ngFor="let h of historicoPagas">
+            <div class="nome">
+              <div>{{ h.nome }}</div>
+              <small *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
+            </div>
+            <div class="muted">Venc.: {{ h.vencimento }}</div>
+            <div class="status-pill status-paid">Pago</div>
+            <div>R$ {{ h.valor | number:'1.2-2' }}</div>
+          </div>
+        </div>
+        <ng-template #semPagas><p class="muted">Nenhuma parcela paga.</p></ng-template>
+      </div>
+
+      <div class="drawer__section">
+        <h4>Pendentes / Antecipadas</h4>
+        <div *ngIf="historicoPendentes.length; else semPendentes">
+          <div class="drawer__row" *ngFor="let h of historicoPendentes">
+            <div class="nome">
+              <div>{{ h.nome }}</div>
+              <small *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
+            </div>
+            <div class="muted">Venc.: {{ h.vencimento }}</div>
+            <div class="status-pill"
+              [ngClass]="{
+                'status-anticipated': h.status === 'ANTICIPATED',
+                'status-open': h.status !== 'ANTICIPATED'
+              }">
+              {{ h.status === 'ANTICIPATED' ? 'Antecipada' : 'Pendente' }}
+            </div>
+            <div>R$ {{ h.valor | number:'1.2-2' }}</div>
+          </div>
+        </div>
+        <ng-template #semPendentes><p class="muted">Nenhuma parcela pendente.</p></ng-template>
       </div>
     </div>
   </div>

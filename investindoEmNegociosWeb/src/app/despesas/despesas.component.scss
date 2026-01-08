@@ -301,3 +301,72 @@ button {
   display: grid;
   gap: 0.25rem;
 }
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  z-index: 60;
+}
+
+.drawer__backdrop {
+  background: rgba(0, 14, 24, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.drawer__panel {
+  width: min(420px, 90vw);
+  background: #032533;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -12px 0 30px rgba(0, 0, 0, 0.35);
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer__section {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.drawer__row {
+  display: grid;
+  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.8fr;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.45rem 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.9rem;
+}
+
+.drawer__row .nome {
+  display: grid;
+  gap: 0.15rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.drawer__row .nome small {
+  font-weight: 400;
+  color: #9fb4b0;
+  font-size: 0.8rem;
+}
+
+.drawer__row .muted {
+  color: #b9c6c2;
+  font-size: 0.85rem;
+}
+
+.drawer__row:last-child {
+  border-bottom: none;
+}

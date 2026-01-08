@@ -45,6 +45,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
   filtroNome: string = '';
   loadingPagar = false;
   loadingAntecipar = false;
+  historicoAberto = false;
+  historicoTitulo = '';
+  historicoItens: StoredExpense[] = [];
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
@@ -199,6 +202,36 @@ export class DespesasComponent implements OnInit, OnDestroy {
     } else {
       this.selectedIds.clear();
     }
+  }
+
+  abrirHistorico(id: string): void {
+    const todas = Object.values(this.despesasPorMes).flat();
+    const alvo = todas.find((d) => d.id === id);
+    if (!alvo) return;
+    const chave = alvo.serieId || alvo.planId || alvo.id;
+    const relacionados = todas
+      .filter((d) => (d.serieId || d.planId || d.id) === chave)
+      .sort((a, b) => {
+        if (a.parcelaNumero && b.parcelaNumero) return a.parcelaNumero - b.parcelaNumero;
+        return this.compareDate(a.vencimento, b.vencimento);
+      });
+    this.historicoTitulo = `${alvo.nome}${alvo.parcelasTotal ? ` · ${alvo.parcelaNumero}/${alvo.parcelasTotal}` : ''}`;
+    this.historicoItens = relacionados;
+    this.historicoAberto = true;
+  }
+
+  get historicoPagas(): StoredExpense[] {
+    return this.historicoItens.filter((h) => h.status === 'PAID' || h.status === 'PARTIALLY_PAID');
+  }
+
+  get historicoPendentes(): StoredExpense[] {
+    return this.historicoItens.filter((h) => h.status !== 'PAID' && h.status !== 'PARTIALLY_PAID');
+  }
+
+  fecharHistorico(): void {
+    this.historicoAberto = false;
+    this.historicoItens = [];
+    this.historicoTitulo = '';
   }
 
   pagarDespesaPorId(id: string): void {

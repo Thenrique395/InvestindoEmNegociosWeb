@@ -21,6 +21,7 @@ export class DespesasListaComponent {
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<string>();
   @Output() pagar = new EventEmitter<string>();
+  @Output() historico = new EventEmitter<string>();
   @Output() selecionar = new EventEmitter<{ id: string; checked: boolean }>();
   @Output() selecionarTodos = new EventEmitter<boolean>();
 
