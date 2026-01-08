@@ -57,3 +57,6 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Possíveis melhorias
+- Lembretes configuráveis por parcela/série (dias antes do vencimento), com job diário na API para disparar notificações (SMTP MailHog/SendGrid ou web-push) e badges/toasts no front.
