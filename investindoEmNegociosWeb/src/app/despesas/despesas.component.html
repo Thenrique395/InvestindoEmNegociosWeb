@@ -31,9 +31,34 @@
     </div>
   </div>
 
+  <div class="filters">
+    <label>
+      Status
+      <select [(ngModel)]="filtroStatus">
+        <option value="ALL">Todos</option>
+        <option value="OPEN">Pendente</option>
+        <option value="PARTIALLY_PAID">Parcial</option>
+        <option value="PAID">Pago</option>
+        <option value="ANTICIPATED">Antecipada</option>
+        <option value="CANCELED">Cancelado</option>
+      </select>
+    </label>
+    <label>
+      Categoria
+      <select [(ngModel)]="filtroCategoria">
+        <option value="ALL">Todas</option>
+        <option *ngFor="let c of categorias" [value]="c">{{ c }}</option>
+      </select>
+    </label>
+    <label>
+      Buscar
+      <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
+    </label>
+  </div>
+
   <div class="layout">
     <app-despesas-lista
-      [despesas]="despesasOrdenadas"
+      [despesas]="despesasFiltradas"
       [sortBy]="sortBy"
       [sortDir]="sortDir"
       [pagamentoLabelFn]="pagamentoLabel.bind(this)"

@@ -1,15 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TitleCasePipe, NgIf, DecimalPipe } from '@angular/common';
+import { TitleCasePipe, NgIf, DecimalPipe, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription, forkJoin } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
 import { InstallmentsService } from '../installments.service';
+import { InstallmentStatus } from '../types/money-types';
 
 @Component({
   selector: 'app-despesas',
   standalone: true,
-  imports: [TitleCasePipe, NgIf, DecimalPipe, DespesasListaComponent, DespesasFormComponent],
+  imports: [TitleCasePipe, NgIf, NgFor, DecimalPipe, FormsModule, DespesasListaComponent, DespesasFormComponent],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss']
 })
@@ -35,6 +37,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number } | null = null;
   private sub?: Subscription;
   selectedIds = new Set<string>();
+  filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
+  filtroCategoria: string = 'ALL';
+  filtroNome: string = '';
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
@@ -111,8 +116,15 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return parcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  get despesasOrdenadas(): StoredExpense[] {
-    const base = [...this.despesas];
+  get despesasFiltradas(): StoredExpense[] {
+    const base = this.despesas.filter((d) => {
+      const statusOk = this.filtroStatus === 'ALL' ? true : (d.status || 'OPEN') === this.filtroStatus;
+      const categoriaOk = this.filtroCategoria === 'ALL' ? true : d.categoria === this.filtroCategoria;
+      const nomeOk = this.filtroNome
+        ? (d.nome || '').toLowerCase().includes(this.filtroNome.toLowerCase())
+        : true;
+      return statusOk && categoriaOk && nomeOk;
+    });
     if (!this.sortBy) return base;
     const compare = (a: StoredExpense, b: StoredExpense) => {
       switch (this.sortBy) {
