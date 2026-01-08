@@ -1,3 +1,18 @@
+<div class="status-strip">
+  <div class="status-card pending">
+    <p class="label">Pendentes</p>
+    <p class="value">R$ {{ totalPendentes | number:'1.2-2' }}</p>
+  </div>
+  <div class="status-card anticipated">
+    <p class="label">Antecipadas</p>
+    <p class="value">R$ {{ totalAntecipadas | number:'1.2-2' }}</p>
+  </div>
+  <div class="status-card paid">
+    <p class="label">Pagas</p>
+    <p class="value">R$ {{ totalPagas | number:'1.2-2' }}</p>
+  </div>
+</div>
+
 <section class="despesas">
   <div class="header">
     <div>

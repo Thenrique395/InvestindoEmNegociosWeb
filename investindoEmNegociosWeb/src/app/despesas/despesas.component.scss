@@ -1,3 +1,47 @@
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.status-card {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 0.2rem;
+}
+
+.status-card .label {
+  margin: 0;
+  color: #c5d4cf;
+  font-weight: 600;
+}
+
+.status-card .value {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #edebec;
+}
+
+.status-card.pending {
+  border-color: rgba(239, 200, 87, 0.4);
+  background: rgba(239, 200, 87, 0.08);
+}
+
+.status-card.anticipated {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.status-card.paid {
+  border-color: rgba(52, 144, 99, 0.5);
+  background: rgba(52, 144, 99, 0.1);
+}
+
 .despesas {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;

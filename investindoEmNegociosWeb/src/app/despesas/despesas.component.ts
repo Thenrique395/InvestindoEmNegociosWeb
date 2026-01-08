@@ -93,6 +93,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return this.despesasPorMes[this.mesKey()] || [];
   }
 
+  get totalPendentes(): number {
+    return this.somaPorStatus(['OPEN', 'PARTIALLY_PAID']);
+  }
+
+  get totalAntecipadas(): number {
+    return this.somaPorStatus(['ANTICIPATED']);
+  }
+
+  get totalPagas(): number {
+    return this.somaPorStatus(['PAID']);
+  }
+
   get selecionados(): string[] {
     return Array.from(this.selectedIds);
   }
@@ -691,6 +703,12 @@ export class DespesasComponent implements OnInit, OnDestroy {
   private formataMoeda(value: string | number): string {
     const num = this.parseValor(value);
     return num ? num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '';
+  }
+
+  private somaPorStatus(statuses: string[]): number {
+    return this.despesas
+      .filter((d) => statuses.includes(d.status || 'OPEN'))
+      .reduce((sum, d) => sum + (d.valor || 0), 0);
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
