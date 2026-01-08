@@ -24,7 +24,7 @@
       <input
         type="checkbox"
         [checked]="isSelecionado(d.id)"
-        [disabled]="d.status === 'PAID'"
+        [disabled]="d.status === 'PAID' || d.status === 'CANCELED'"
         (change)="selecionar.emit({ id: d.id!, checked: $any($event.target)?.checked ?? false })"
         aria-label="Selecionar despesa" />
     </label>
@@ -36,6 +36,7 @@
         'status-paid': d.status === 'PAID',
         'status-partial': d.status === 'PARTIALLY_PAID',
         'status-canceled': d.status === 'CANCELED',
+        'status-anticipated': d.status === 'ANTICIPATED',
         'status-open': !d.status || d.status === 'OPEN'
       }">
       <span class="status-icon">
@@ -43,6 +44,7 @@
           <span *ngSwitchCase="'PAID'">✓</span>
           <span *ngSwitchCase="'PARTIALLY_PAID'">≋</span>
           <span *ngSwitchCase="'CANCELED'">×</span>
+          <span *ngSwitchCase="'ANTICIPATED'">↻</span>
           <span *ngSwitchDefault>•</span>
         </ng-container>
       </span>

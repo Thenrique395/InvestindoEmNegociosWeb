@@ -44,6 +44,8 @@ export class DespesasListaComponent {
         return 'Parcial';
       case 'CANCELED':
         return 'Cancelado';
+      case 'ANTICIPATED':
+        return 'Antecipada';
       case 'OPEN':
       default:
         return 'Pendente';

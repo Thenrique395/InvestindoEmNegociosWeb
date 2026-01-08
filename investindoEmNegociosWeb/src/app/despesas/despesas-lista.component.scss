@@ -95,6 +95,14 @@
   background: rgba(251, 191, 36, 0.15);
 }
 
+.status-anticipated {
+  color: #38bdf8;
+}
+
+.status-anticipated .status-icon {
+  background: rgba(56, 189, 248, 0.15);
+}
+
 .status-canceled {
   color: #f87171;
 }

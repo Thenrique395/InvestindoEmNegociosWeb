@@ -43,7 +43,10 @@ export class DespesasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
       this.despesasPorMes = lista.reduce((acc, item) => {
-        const key = this.mesKeyFromVencimento(item.vencimento) || this.mesKey();
+        const isAntecipada = item.status === 'ANTICIPATED';
+        const key = isAntecipada
+          ? this.mesKeyFromDate(new Date()) || this.mesKey()
+          : this.mesKeyFromVencimento(item.vencimento) || this.mesKey();
         acc[key] = acc[key] ? [...acc[key], item] : [item];
         return acc;
       }, {} as Record<string, StoredExpense[]>);
@@ -83,6 +86,21 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   get selecionadosPagaveis(): StoredExpense[] {
     return this.despesas.filter((d) => this.selectedIds.has(d.id) && d.status !== 'PAID' && d.status !== 'CANCELED');
+  }
+
+  get selecionadosAntecipaveis(): StoredExpense[] {
+    // Regra: pode antecipar apenas se o vencimento for em mês futuro em relação à data de hoje
+    const hoje = new Date();
+    const mesHoje = hoje.getMonth();
+    const anoHoje = hoje.getFullYear();
+    return this.despesas.filter((d) => {
+      if (!this.selectedIds.has(d.id)) return false;
+      if (d.status === 'PAID' || d.status === 'CANCELED' || d.status === 'ANTICIPATED') return false;
+      const data = this.parseData(d.vencimento || '');
+      if (!data) return false;
+      // Vencimento precisa ser depois do mês atual (hoje) para ser elegível
+      return data.getFullYear() > anoHoje || (data.getFullYear() === anoHoje && data.getMonth() > mesHoje);
+    });
   }
 
   get valorParcelaLabel(): string {
@@ -226,8 +244,29 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   anteciparSelecionadas(): void {
-    this.alerta = 'Solicitação de antecipação ainda não implementada.';
-    setTimeout(() => (this.alerta = ''), 3000);
+    const antecipaveis = this.selecionadosAntecipaveis;
+    if (!antecipaveis.length) {
+      this.alerta = 'Nenhuma despesa selecionada pode ser antecipada.';
+      setTimeout(() => (this.alerta = ''), 2000);
+      return;
+    }
+
+    const novaDataIso = this.hojeIso();
+    const pedidos = antecipaveis.map((item) =>
+      this.installments.anticipate(item.id, { dueDate: novaDataIso })
+    );
+
+    forkJoin(pedidos).subscribe({
+      next: () => {
+        this.moverParaMesAtual(antecipaveis.map((a) => a.id), novaDataIso, 'ANTICIPATED');
+        this.selectedIds.clear();
+        this.db.refresh();
+      },
+      error: () => {
+        this.alerta = 'Falha ao antecipar despesas.';
+        setTimeout(() => (this.alerta = ''), 3000);
+      }
+    });
   }
 
   private atualizarStatusLocal(ids: string[], status: StoredExpense['status']): void {
@@ -235,6 +274,40 @@ export class DespesasComponent implements OnInit, OnDestroy {
     const lista = this.despesasPorMes[key] || [];
     const atualizada = lista.map((d) => (ids.includes(d.id) ? { ...d, status } : d));
     this.despesasPorMes = { ...this.despesasPorMes, [key]: atualizada };
+  }
+
+  private moverParaMesAtual(ids: string[], novaDataIso: string, status: StoredExpense['status']): void {
+    const targetDate = new Date(novaDataIso);
+    const targetKey = this.mesKeyFromDate(targetDate);
+    const novaData = this.formatDate(targetDate);
+
+    const novoMapa: Record<string, StoredExpense[]> = {};
+    Object.entries(this.despesasPorMes).forEach(([key, lista]) => {
+      const filtrada = lista.filter((d) => !ids.includes(d.id));
+      novoMapa[key] = filtrada;
+    });
+
+    const atuais = novoMapa[targetKey] || [];
+    const itensAtualizados = ids
+      .map((id) => {
+        const encontrado = Object.values(this.despesasPorMes).flat().find((d) => d.id === id);
+        if (!encontrado) return null;
+        return {
+          ...encontrado,
+          vencimento: novaData,
+          status
+        };
+      })
+      .filter(Boolean) as StoredExpense[];
+
+    novoMapa[targetKey] = [...atuais, ...itensAtualizados];
+    this.despesasPorMes = novoMapa;
+  }
+
+  private hojeIso(): string {
+    const hoje = new Date();
+    const d = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    return d.toISOString().slice(0, 10);
   }
 
   adicionar(): void {

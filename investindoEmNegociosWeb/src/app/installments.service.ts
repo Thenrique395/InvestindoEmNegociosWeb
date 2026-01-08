@@ -39,6 +39,14 @@ export class InstallmentsService {
     return this.http.post(`${this.baseUrl}/${id}/payments`, payload);
   }
 
+  anticipate(id: string, payload: { dueDate: string; note?: string | null }) {
+    // Se o backend não suportar PATCH, use POST /anticipations
+    return this.http.post(`${this.baseUrl}/${id}/anticipations`, {
+      dueDate: payload.dueDate,
+      note: payload.note || null
+    });
+  }
+
   delete(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
