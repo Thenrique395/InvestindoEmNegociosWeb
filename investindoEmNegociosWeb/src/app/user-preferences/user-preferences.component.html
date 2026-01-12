@@ -1,0 +1,44 @@
+<section class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">Preferências</p>
+      <h2>Configurações pessoais</h2>
+      <p class="muted">Defina moeda e localizações preferidas para formatação.</p>
+    </div>
+  </div>
+  <div class="form">
+    <label>
+      Moeda
+      <select [(ngModel)]="moedaSelecionada">
+        <option *ngFor="let m of moedas" [value]="m">{{ m }}</option>
+      </select>
+    </label>
+    <label>
+      Idioma da aplicação
+      <select [(ngModel)]="linguaSelecionada">
+        <option *ngFor="let l of linguas" [value]="l.id">{{ l.label }}</option>
+      </select>
+    </label>
+    <div class="full">
+      <label>
+        Localizações preferidas
+        <div class="chips">
+          <span class="chip" *ngFor="let loc of localizacoes; let i = index">
+            {{ loc }}
+            <button type="button" (click)="removerLocalizacao(i)">✕</button>
+          </span>
+        </div>
+      </label>
+      <div class="inline">
+        <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: Brasil (pt-BR) ou EUA (en-US)" />
+        <button type="button" class="btn-primary sm" (click)="adicionarLocalizacao()">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel__actions">
+    <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPreferencias()">
+      {{ loading ? 'Salvando...' : 'Salvar preferências' }}
+    </button>
+  </div>
+</section>

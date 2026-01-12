@@ -134,6 +134,36 @@
           </div>
         </ng-container>
 
+        <ng-container *ngSwitchCase="'reservaEmergencia'">
+          <div class="panel__title">
+            <h3>Reserva de emergência</h3>
+            <p class="muted">Calcule o valor ideal e quanto tempo leva para atingir com seus aportes.</p>
+          </div>
+          <form class="form">
+            <label>
+              Despesa mensal (R$)
+              <input type="number" [(ngModel)]="despesaMensal" name="despesaMensal" />
+            </label>
+            <label>
+              Meses de cobertura
+              <input type="number" [(ngModel)]="mesesCobertura" name="mesesCobertura" />
+            </label>
+            <label>
+              Aporte mensal (R$)
+              <input type="number" [(ngModel)]="aporteMensalReserva" name="aporteMensalReserva" />
+            </label>
+            <label>
+              Rendimento esperado (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="rendimentoReserva" name="rendimentoReserva" />
+            </label>
+            <button type="button" (click)="calcularReserva()">Calcular</button>
+          </form>
+          <div class="result" *ngIf="valorObjetivoReserva">
+            <p>Valor alvo: <strong>R$ {{ valorObjetivoReserva | number : '1.2-2' }}</strong></p>
+            <p *ngIf="mesesParaAtingir">Tempo estimado: <strong>{{ mesesParaAtingir }} meses</strong></p>
+          </div>
+        </ng-container>
+
         <ng-container *ngSwitchCase="'jurosSimples'">
           <div class="panel__title">
             <h3>Juros Simples</h3>

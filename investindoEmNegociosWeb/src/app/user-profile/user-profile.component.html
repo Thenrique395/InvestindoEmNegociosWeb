@@ -1,0 +1,87 @@
+<section class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">Perfil</p>
+      <h2>Dados do usuário</h2>
+      <p class="muted">Edite nome, e-mail, avatar e outras informações pessoais.</p>
+    </div>
+  </div>
+  <div class="form">
+    <label>
+      Nome
+      <input type="text" [(ngModel)]="nome" placeholder="Seu nome" />
+    </label>
+    <label>
+      E-mail
+      <input type="email" [(ngModel)]="email" placeholder="email@exemplo.com" />
+    </label>
+    <label>
+      Documento
+      <input type="text" [(ngModel)]="documento" placeholder="CPF/CNPJ" />
+    </label>
+    <label>
+      Avatar (URL)
+      <input type="text" [(ngModel)]="avatarUrl" placeholder="https://..." />
+    </label>
+    <label>
+      Idioma / Locale
+      <select [(ngModel)]="idioma">
+        <option value="pt-BR">Português (Brasil)</option>
+        <option value="en-US">English (US)</option>
+      </select>
+    </label>
+    <label>
+      Telefone
+      <input type="tel" [(ngModel)]="telefone" placeholder="(xx) xxxxx-xxxx" />
+    </label>
+    <label>
+      Data de nascimento
+      <input type="date" [(ngModel)]="dataNascimento" />
+    </label>
+    <label>
+      Cidade
+      <input type="text" [(ngModel)]="cidade" placeholder="Sua cidade" />
+    </label>
+    <label>
+      Estado
+      <input type="text" [(ngModel)]="estado" placeholder="UF/Estado" />
+    </label>
+    <label>
+      País
+      <input type="text" [(ngModel)]="pais" placeholder="País" />
+    </label>
+  </div>
+  <div class="panel__actions">
+    <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPerfil()">
+      {{ loading ? 'Salvando...' : 'Salvar perfil' }}
+    </button>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">Segurança</p>
+      <h2>Alterar senha</h2>
+      <p class="muted">Troque sua senha atual por uma nova.</p>
+    </div>
+  </div>
+  <div class="form">
+    <label>
+      Senha atual
+      <input type="password" [(ngModel)]="senhaAtual" />
+    </label>
+    <label>
+      Nova senha
+      <input type="password" [(ngModel)]="novaSenha" />
+    </label>
+    <label>
+      Confirmar nova senha
+      <input type="password" [(ngModel)]="confirmaSenha" />
+    </label>
+  </div>
+  <div class="panel__actions">
+    <button type="button" class="ghost" (click)="senhaAtual = novaSenha = confirmaSenha = ''">Cancelar</button>
+    <button type="button" class="btn-primary" (click)="alterarSenha()">Salvar nova senha</button>
+  </div>
+</section>

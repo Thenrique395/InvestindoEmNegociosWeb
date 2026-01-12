@@ -66,7 +66,7 @@ export class CalculatorComponent implements OnDestroy {
     { id: 'alugarOuFinanciar', title: 'Alugar x Financiar', subtitle: 'Compare o custo efetivo do imóvel', category: 'financeiras', implemented: false, icon: 'attach_money' },
     { id: 'poupancaSelic', title: 'Poupança x Selic', subtitle: 'Compare rentabilidade', category: 'financeiras', implemented: false, icon: 'trending_up' },
     { id: 'vistaPrazo', title: 'À vista ou a prazo', subtitle: 'Custo efetivo de pagamentos', category: 'financeiras', implemented: false, icon: 'payments' },
-    { id: 'reservaEmergencia', title: 'Reserva de emergência', subtitle: 'Calcule o valor ideal e prazo', category: 'financeiras', implemented: false, icon: 'shield' },
+    { id: 'reservaEmergencia', title: 'Reserva de emergência', subtitle: 'Calcule o valor ideal e prazo', category: 'financeiras', implemented: true, icon: 'shield' },
     { id: 'comparadorRendaFixa', title: 'Comparador de Renda Fixa', subtitle: 'CDI x prefixado x IPCA', category: 'financeiras', implemented: false, icon: 'leaderboard' },
     { id: 'jurosSimples', title: 'Juros Simples', subtitle: 'Rendimento linear para curto prazo', category: 'financeiras', implemented: true, icon: 'percent' },
     { id: 'jurosCompostos', title: 'Juros Compostos', subtitle: 'Poder dos juros ao longo do tempo', category: 'financeiras', implemented: true, icon: 'calculate' },
@@ -112,6 +112,14 @@ export class CalculatorComponent implements OnDestroy {
   mesesMilhao = 0;
   milhaoSeries: SeriePonto[] = [];
 
+  // Reserva de emergência
+  despesaMensal = 3000;
+  mesesCobertura = 6;
+  aporteMensalReserva = 500;
+  rendimentoReserva = 0.6; // % ao mês
+  valorObjetivoReserva = 0;
+  mesesParaAtingir = 0;
+
   constructor(private route: ActivatedRoute, private router: Router) {
     this.sub = this.route.paramMap.subscribe((params) => {
       const id = params.get('id') as CalculatorType | null;
@@ -121,6 +129,23 @@ export class CalculatorComponent implements OnDestroy {
         this.selected = null;
       }
     });
+  }
+
+  calcularReserva(): void {
+    this.valorObjetivoReserva = this.despesaMensal * this.mesesCobertura;
+    const alvo = this.valorObjetivoReserva;
+    const aporte = Math.max(0, this.aporteMensalReserva);
+    const r = Math.max(0, this.rendimentoReserva / 100);
+    if (aporte === 0) {
+      this.mesesParaAtingir = 0;
+      return;
+    }
+    if (r === 0) {
+      this.mesesParaAtingir = Math.ceil(alvo / aporte);
+      return;
+    }
+    const n = Math.log((alvo * r) / aporte + 1) / Math.log(1 + r);
+    this.mesesParaAtingir = Math.max(1, Math.ceil(n));
   }
 
   ngOnDestroy(): void {

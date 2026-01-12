@@ -60,3 +60,31 @@ For more information on using the Angular CLI, including detailed command refere
 
 ## Possíveis melhorias
 - Lembretes configuráveis por parcela/série (dias antes do vencimento), com job diário na API para disparar notificações (SMTP MailHog/SendGrid ou web-push) e badges/toasts no front.
+- Exportar/Importar: exportar despesas do mês em CSV/Excel e importar lista simples (nome, valor, vencimento, categoria) para agilizar migração.
+- Ações em lote: botão “Mover vencimento” para reagendar várias despesas de uma vez (apenas status elegíveis), salvando vencimento original e aplicando regras como evitar pagas/canceladas.
+- Agenda e lembretes smart: filtro “Atrasadas” com cor/total próprio; tolerância por categoria (ex.: aluguel 0 dias, academia 2 dias) para atraso real; tendência mês a mês (% a mais/menos) e previsão de fechamento.
+- Automação leve: regras por categoria (ex.: marcar como pago se valor <= X e status antecipada; reagendar para próximo dia útil se cair em fim de semana/feriado simples).
+- UX das listas: filtros salvos por usuário (status/categoria), busca por faixa de valor e vencimento, coluna “dias para vencer/atrasar” com semáforo.
+- Histórico e auditoria: timeline por despesa (criação, antecipações, pagamentos, notas) e exportação filtrada (apenas resultados do filtro atual) em CSV/Excel.
+- Qualidade de dados: aviso de possíveis duplicados (mesmo nome/valor/vencimento) e sugestão de categoria baseada em histórico.
+- Integração leve: importação colando texto “nome;valor;dd/mm/aaaa;categoria” e webhook “after pay/anticipate” para integrações futuras (mesmo que só logue).
+
+## Receitas — possíveis melhorias
+- Cards simples: Previstas, Recebidas e Atrasadas no mês.
+- Filtros rápidos: status (prevista/recebida/atrasada), categoria e busca por texto.
+- Ações básicas: marcar recebida, editar data/valor, excluir, exportar CSV do filtro atual.
+- Importação leve: colar linhas “nome;valor;dd/mm/aaaa;categoria” para cadastrar várias receitas.
+- Aviso discreto: badge no topo se houver receitas atrasadas (total e quantidade).
+
+## Cartões — possíveis melhorias
+- Resumos por cartão: limite, fatura atual/fechamento, próximos vencimentos e parcelas ativas.
+- Identificação rápida: badge de bandeira/cor e status ativo/inativo.
+- Cadastro/edição: coletar limite e dia de fechamento/vencimento; lembrete opcional se bandeira não carregar.
+- Lista de despesas do cartão: filtro “ver só este cartão”, totais parcelados/antecipados, botão para quitar fatura (se fizer sentido no modelo).
+- Ações rápidas: editar apelido, alterar vencimento, bloquear/excluir.
+- Histórico: timeline simples de alterações (limite, vencimento) e despesas vinculadas.
+- Exportação: baixar despesas do cartão em CSV; importação básica de cartões (limite/dados).
+
+## METAS — possíveis melhorias
+Se associar a uma conta/receita, permitir “registrar aporte automático” todo mês.
+Notificações: aviso quando ficar 2 meses abaixo do esperado ou quando atingir 90%/100%.

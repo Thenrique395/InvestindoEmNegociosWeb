@@ -34,6 +34,7 @@
         <a routerLink="/despesas" routerLinkActive="active">Despesas</a>
         <a routerLink="/receitas" routerLinkActive="active">Receitas</a>
         <a routerLink="/cartoes" routerLinkActive="active">Cartões</a>
+        <a routerLink="/metas" routerLinkActive="active">Metas</a>
         <a routerLink="/calculadora" routerLinkActive="active">Calculadoras</a>
       </nav>
       <div class="topbar__actions">
@@ -41,7 +42,38 @@
           <span *ngIf="!isLightTheme">☀️</span>
           <span *ngIf="isLightTheme">🌙</span>
         </button>
-        <button class="login-link" type="button" (click)="logout()">Sair</button>
+        <div class="user-menu" [class.open]="userMenuOpen">
+          <button class="user-trigger" type="button" (click)="toggleUserMenu()">
+            <span class="avatar">{{ userInitials }}</span>
+            <span class="user-name">{{ displayName }}</span>
+            <span class="caret">▾</span>
+          </button>
+          <div class="user-dropdown" *ngIf="userMenuOpen">
+            <div class="section">
+              <p class="section-title">Perfil</p>
+              <button type="button" routerLink="/perfil">Editar perfil</button>
+            </div>
+            <div class="section">
+              <p class="section-title">Preferências</p>
+              <button type="button" routerLink="/preferencias">Moeda/Locale</button>
+              <button type="button" routerLink="/preferencias">Página inicial padrão</button>
+              <button type="button" routerLink="/preferencias">Notificações & lembretes</button>
+            </div>
+            <div class="section">
+              <p class="section-title">Segurança</p>
+              <button type="button" routerLink="/seguranca">Sessões ativas</button>
+              <button type="button" routerLink="/seguranca">2FA / Últimos logins</button>
+            </div>
+            <div class="section">
+              <p class="section-title">Dados</p>
+              <button type="button" routerLink="/dados">Exportar/Importar</button>
+              <button type="button" routerLink="/dados">Backup / Apagar conta</button>
+            </div>
+            <div class="section">
+              <button type="button" class="logout" (click)="logout()">Sair</button>
+            </div>
+          </div>
+        </div>
       </div>
     </ng-template>
   </header>

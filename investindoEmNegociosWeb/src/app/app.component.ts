@@ -18,6 +18,7 @@ export class AppComponent implements OnDestroy {
   isLightTheme = false;
   showSignupModal = false;
   signupAlert = '';
+  userMenuOpen = false;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
@@ -28,6 +29,7 @@ export class AppComponent implements OnDestroy {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
         this.isHomeRoute = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/#');
+        this.userMenuOpen = false;
       }
     });
   }
@@ -35,6 +37,10 @@ export class AppComponent implements OnDestroy {
   ngOnInit(): void {
     const saved = this.storage?.getItem('theme');
     this.applyTheme(saved === 'light');
+    const lang = this.storage?.getItem('lang');
+    if (lang) {
+      document.documentElement.lang = lang;
+    }
   }
 
   ngOnDestroy(): void {
@@ -70,6 +76,20 @@ export class AppComponent implements OnDestroy {
     return !!this.storage?.getItem('access_token');
   }
 
+  get displayName(): string {
+    return this.storage?.getItem('current_user_name') || this.storage?.getItem('current_user') || 'Usuário';
+  }
+
+  get userInitials(): string {
+    const name = this.displayName.trim();
+    if (!name) return 'U';
+    const parts = name.split(/\s+/).filter(Boolean);
+    const first = parts.shift() || '';
+    const last = parts.pop() || '';
+    const initials = `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+    return initials || first.charAt(0).toUpperCase() || 'U';
+  }
+
   private get storage(): Storage | null {
     return typeof localStorage !== 'undefined' ? localStorage : null;
   }
@@ -81,5 +101,9 @@ export class AppComponent implements OnDestroy {
   private applyTheme(light: boolean): void {
     this.isLightTheme = light;
     this.storage?.setItem('theme', light ? 'light' : 'dark');
+  }
+
+  toggleUserMenu(): void {
+    this.userMenuOpen = !this.userMenuOpen;
   }
 }

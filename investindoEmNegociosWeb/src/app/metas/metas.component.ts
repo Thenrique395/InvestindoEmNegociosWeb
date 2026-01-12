@@ -1,0 +1,358 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.service';
+
+@Component({
+  selector: 'app-metas',
+  standalone: true,
+  imports: [CommonModule, NgIf, NgFor, FormsModule],
+  templateUrl: './metas.component.html',
+  styleUrls: ['./metas.component.scss']
+})
+export class MetasComponent implements OnInit {
+  mostrarModal = false;
+  metaNome = '';
+  metaValor = '';
+  metaAno = new Date().getFullYear();
+  metaDescricao = '';
+  metaMensal = '';
+  metas: Goal[] = [];
+  anos: number[] = [];
+  filtroAno: number | 'ALL' = new Date().getFullYear();
+  filtroStatus: GoalStatus | 'ALL' = 'ALL';
+  statusLista = [
+    { id: 'Planned' as GoalStatus, label: 'Planejada' },
+    { id: 'InProgress' as GoalStatus, label: 'Em andamento' },
+    { id: 'Completed' as GoalStatus, label: 'Concluída' },
+    { id: 'Canceled' as GoalStatus, label: 'Cancelada' }
+  ];
+  loading = false;
+  saving = false;
+  erro = '';
+  mostrarAporte = false;
+  aporteValor = '';
+  aporteData = new Date().toISOString().slice(0, 10);
+  aporteNota = '';
+  metaSelecionada?: Goal;
+  editando = false;
+  confirmModal = { show: false, goal: undefined as Goal | undefined, mode: 'cancel' as 'cancel' | 'reactivate' };
+  contribResumo: Record<string, { total: number; meses: number }> = {};
+  contribDetalhes: Record<string, GoalContribution[]> = {};
+  mostrarHistorico = false;
+  historicoMeta?: Goal;
+
+  statusLabel(status: GoalStatus): string {
+    switch (status) {
+      case 'Planned':
+        return 'Planejada';
+      case 'InProgress':
+        return 'Em andamento';
+      case 'Completed':
+        return 'Concluída';
+      case 'Canceled':
+        return 'Cancelada';
+      default:
+        return status;
+    }
+  }
+
+  statusClass(status?: GoalStatus): string {
+    if (!status) return 'neutral';
+    switch (status) {
+      case 'Completed':
+        return 'ok';
+      case 'InProgress':
+        return 'warn';
+      case 'Canceled':
+        return 'danger';
+      default:
+        return 'neutral';
+    }
+  }
+
+  constructor(private goalsService: GoalsService) {}
+
+  ngOnInit(): void {
+    this.prepararAnos();
+    this.carregarMetas();
+  }
+
+  prepararAnos(): void {
+    const atual = new Date().getFullYear();
+    this.anos = [];
+    for (let ano = atual - 2; ano <= atual + 3; ano++) {
+      this.anos.push(ano);
+    }
+  }
+
+  aplicarFiltros(): void {
+    this.carregarMetas();
+  }
+
+  abrirModal(): void {
+    this.editando = false;
+    this.mostrarModal = true;
+  }
+
+  abrirModalEditar(meta: Goal): void {
+    this.editando = true;
+    this.metaSelecionada = meta;
+    this.metaNome = meta.title;
+    this.metaValor = meta.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.metaAno = meta.year;
+    this.metaDescricao = meta.description || '';
+    this.metaMensal = meta.expectedMonthly
+      ? meta.expectedMonthly.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : '';
+    this.mostrarModal = true;
+    this.erro = '';
+  }
+
+  fecharModal(): void {
+    this.mostrarModal = false;
+    this.resetarForm();
+    this.erro = '';
+  }
+
+  salvar(): void {
+    this.erro = '';
+    const valor = this.parseValor(this.metaValor);
+    if (!this.metaNome.trim() || !valor || valor <= 0) {
+      this.erro = 'Informe nome e valor maior que zero.';
+      return;
+    }
+
+    const payload = {
+      title: this.metaNome.trim(),
+      targetAmount: valor,
+      currentAmount: this.metaSelecionada?.currentAmount ?? 0,
+      year: this.metaAno,
+      description: this.metaDescricao?.trim() || null,
+      status: (this.metaSelecionada?.status as GoalStatus) ?? ('Planned' as GoalStatus),
+      expectedMonthly: this.parseValor(this.metaMensal),
+      targetDate: null
+    };
+
+    this.saving = true;
+    const save$ = this.editando && this.metaSelecionada
+      ? this.goalsService.update(this.metaSelecionada.id, payload)
+      : this.goalsService.create({ ...payload, currentAmount: 0 });
+
+    save$.subscribe({
+      next: () => {
+        this.saving = false;
+        this.fecharModal();
+        this.aplicarFiltros();
+      },
+      error: (err) => {
+        this.saving = false;
+        this.erro = err?.error?.message ?? 'Falha ao salvar meta.';
+      }
+    });
+  }
+
+  formatarValor(): void {
+    const digits = (this.metaValor || '').replace(/\D/g, '');
+    if (!digits) {
+      this.metaValor = '';
+      return;
+    }
+    const num = Number(digits) / 100;
+    this.metaValor = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  formatarMensal(): void {
+    const digits = (this.metaMensal || '').replace(/\D/g, '');
+    if (!digits) {
+      this.metaMensal = '';
+      return;
+    }
+    const num = Number(digits) / 100;
+    this.metaMensal = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  formatarAporte(): void {
+    const digits = (this.aporteValor || '').replace(/[^\d]/g, '');
+    this.aporteValor = digits;
+  }
+
+  private carregarContribuicoes(goalId: string): void {
+    this.goalsService.listContributions(goalId).subscribe({
+      next: (items) => {
+        const meses = new Set(items.map((i) => i.date.slice(0, 7)));
+        this.contribResumo[goalId] = { total: items.length, meses: meses.size };
+        this.contribDetalhes[goalId] = items;
+      }
+    });
+  }
+
+  abrirModalAporte(meta: Goal): void {
+    this.metaSelecionada = meta;
+    this.carregarContribuicoes(meta.id);
+    this.aporteValor = '';
+    this.aporteData = new Date().toISOString().slice(0, 10);
+    this.aporteNota = '';
+    this.mostrarAporte = true;
+    this.erro = '';
+  }
+
+  fecharAporte(): void {
+    this.mostrarAporte = false;
+    this.metaSelecionada = undefined;
+    this.erro = '';
+  }
+
+  salvarAporte(): void {
+    if (!this.metaSelecionada) return;
+    const valor = this.parseValor(this.aporteValor);
+    if (!valor || valor <= 0) {
+      this.erro = 'Informe um valor de aporte válido.';
+      return;
+    }
+    const restante = this.metaSelecionada.targetAmount - this.metaSelecionada.currentAmount;
+    if (valor > restante) {
+      this.erro = 'Valor do aporte excede o restante da meta.';
+      return;
+    }
+    this.saving = true;
+    this.goalsService
+      .addContribution(this.metaSelecionada.id, {
+        amount: valor,
+        date: this.aporteData,
+        note: this.aporteNota?.trim() || null
+      })
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          const meta = this.metaSelecionada!;
+          const novoValor = meta.currentAmount + valor;
+          const novoStatus = novoValor >= meta.targetAmount ? ('Completed' as GoalStatus) : ('InProgress' as GoalStatus);
+          this.metas = this.metas.map((m) =>
+            m.id === meta.id ? { ...m, currentAmount: Math.min(novoValor, m.targetAmount), status: novoStatus } : m
+          );
+          this.fecharAporte();
+          this.aplicarFiltros();
+        },
+        error: () => {
+          this.saving = false;
+          this.erro = 'Falha ao registrar aporte.';
+        }
+      });
+  }
+
+  progresso(meta: Goal): number {
+    if (!meta.targetAmount) return 0;
+    return Math.min(100, Math.round((meta.currentAmount / meta.targetAmount) * 100));
+  }
+
+  cancelarMeta(meta: Goal): void {
+    this.confirmModal = { show: true, goal: meta, mode: 'cancel' };
+  }
+
+  reativarMeta(meta: Goal): void {
+    this.confirmModal = { show: true, goal: meta, mode: 'reactivate' };
+  }
+
+  confirmarAcao(): void {
+    if (!this.confirmModal.goal) {
+      this.confirmModal.show = false;
+      return;
+    }
+    const goal = this.confirmModal.goal;
+    const status =
+      this.confirmModal.mode === 'cancel'
+        ? ('Canceled' as GoalStatus)
+        : goal.currentAmount > 0
+        ? ('InProgress' as GoalStatus)
+        : ('Planned' as GoalStatus);
+
+    this.saving = true;
+    const payload = {
+      title: goal.title,
+      targetAmount: goal.targetAmount,
+      currentAmount: goal.currentAmount,
+      year: goal.year,
+      description: goal.description ?? null,
+      status,
+      expectedMonthly: goal.expectedMonthly,
+      targetDate: goal.targetDate ?? null
+    };
+    this.goalsService.update(goal.id, payload).subscribe({
+      next: (updated) => {
+        this.metas = this.metas.map((m) => (m.id === updated.id ? updated : m));
+        this.saving = false;
+        this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
+      },
+      error: () => {
+        this.saving = false;
+        this.erro = 'Falha ao atualizar o status da meta.';
+      }
+    });
+  }
+
+  fecharConfirm(): void {
+    this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
+  }
+
+  isCanceled(meta: Goal): boolean {
+    return meta.status === 'Canceled';
+  }
+
+  aporteTooltip(goalId: string): string {
+    const lista = this.contribDetalhes[goalId];
+    if (!lista?.length) return 'Nenhum aporte registrado';
+    const linhas = lista.slice(0, 4).map((c) => {
+      const data = new Date(c.date);
+      const dataStr = isNaN(data.getTime()) ? c.date : data.toLocaleDateString('pt-BR');
+      const valor = c.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return `${dataStr}: R$ ${valor}${c.note ? ' - ' + c.note : ''}`;
+    });
+    const restante = lista.length > 4 ? `+${lista.length - 4} aporte(s)...` : '';
+    return [...linhas, restante].filter(Boolean).join('\n');
+  }
+
+  abrirHistorico(meta: Goal): void {
+    this.historicoMeta = meta;
+    this.mostrarHistorico = true;
+    this.carregarContribuicoes(meta.id);
+  }
+
+  fecharHistorico(): void {
+    this.mostrarHistorico = false;
+    this.historicoMeta = undefined;
+  }
+
+  private carregarMetas(): void {
+    this.loading = true;
+    const ano = this.filtroAno === 'ALL' ? undefined : this.filtroAno;
+    const status = this.filtroStatus === 'ALL' ? undefined : this.filtroStatus;
+    this.goalsService.list(ano, status).subscribe({
+      next: (lista) => {
+        this.metas = lista;
+        this.loading = false;
+        this.metas.forEach((m) => this.carregarContribuicoes(m.id));
+      },
+      error: () => {
+        this.loading = false;
+        this.erro = 'Não foi possível carregar as metas.';
+      }
+    });
+  }
+
+  private parseValor(raw: string): number {
+    if (raw == null) return 0;
+    const clean = raw.toString().replace(/\./g, '').replace(',', '.');
+    return Number(clean);
+  }
+
+  private resetarForm(): void {
+    this.metaNome = '';
+    this.metaValor = '';
+    this.metaMensal = '';
+    this.metaAno = new Date().getFullYear();
+    this.metaDescricao = '';
+    this.metaSelecionada = undefined;
+    this.editando = false;
+  }
+}
