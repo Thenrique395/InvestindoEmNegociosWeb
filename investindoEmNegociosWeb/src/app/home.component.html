@@ -3,24 +3,26 @@
     <div>
       <p class="eyebrow">Resumo financeiro</p>
       <h1>Visão geral de {{ mesAtualLabel }}</h1>
-      <p class="muted">Combine receitas, despesas e cartões para saber o quanto pode gastar.</p>
+      <p class="muted">
+        Combine receitas, despesas e cartões para saber o quanto pode gastar.
+      </p>
     </div>
   </header>
 
   <div class="grid">
     <div class="stat-card income">
       <p class="label">Total de receitas</p>
-      <h2>R$ {{ totalRendas | number:'1.2-2' }}</h2>
+      <h2>R$ {{ totalRendas | number : "1.2-2" }}</h2>
       <p class="muted">Inclui receitas fixas e avulsas do mês.</p>
     </div>
     <div class="stat-card expense">
       <p class="label">Total de despesas</p>
-      <h2>R$ {{ totalDespesas | number:'1.2-2' }}</h2>
+      <h2>R$ {{ totalDespesas | number : "1.2-2" }}</h2>
       <p class="muted">Somente despesas com vencimento neste mês.</p>
     </div>
     <div class="stat-card balance">
       <p class="label">Disponível para gastar</p>
-      <h2>R$ {{ saldo | number:'1.2-2' }}</h2>
+      <h2>R$ {{ saldo | number : "1.2-2" }}</h2>
       <p class="muted">Receitas menos despesas do mês.</p>
     </div>
     <div class="stat-card cards">
@@ -30,13 +32,152 @@
     </div>
   </div>
 
+  <div class="goals" *ngIf="metasResumo.total">
+    <div class="goals__header">
+      <div>
+        <p class="eyebrow">Metas</p>
+        <h3>Visão de {{ dataAtual.getFullYear() }}</h3>
+        <p class="muted">Resumo rápido das metas anuais cadastradas.</p>
+      </div>
+    </div>
+    <div class="stat-card goal compact">
+      <div>
+        <p class="label">Metas ativas</p>
+      </div>
+      <div class="goal-nums">
+        <div class="goal-chip planned">
+          Planejadas {{ metasResumo.planned }}
+        </div>
+        <div class="goal-chip progress">
+          Em andamento {{ metasResumo.inProgress }}
+        </div>
+        <div class="goal-chip completed">
+          Concluídas {{ metasResumo.completed }}
+        </div>
+        <div class="goal-chip canceled">
+          Canceladas {{ metasResumo.canceled }}
+        </div>
+      </div>
+      <div class="goal-inline">
+        <span
+          >Alvo:
+          <strong
+            >R$ {{ metasResumo.targetTotal | number : "1.2-2" }}</strong
+          ></span
+        >
+        <span
+          >Acumulado:
+          <strong
+            >R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }}</strong
+          ></span
+        >
+        <span
+          >Falta:
+          <strong
+            >R$ {{ metasResumo.faltanteTotal | number : "1.2-2" }}</strong
+          ></span
+        >
+        <span
+          >Progresso médio das metas:
+          <strong
+            >{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong
+          ></span
+        >
+      </div>
+      <div class="goal-views">
+        <div class="goal-views__buttons">
+          <button
+            type="button"
+            [class.active]="metasVisao === 'status'"
+            (click)="metasVisao = 'status'"
+          >
+            Status
+          </button>
+          <button
+            type="button"
+            [class.active]="metasVisao === 'progresso'"
+            (click)="metasVisao = 'progresso'"
+          >
+            Progresso
+          </button>
+          <button
+            type="button"
+            [class.active]="metasVisao === 'aporte'"
+            (click)="metasVisao = 'aporte'"
+          >
+            Aporte x Falta
+          </button>
+        </div>
+        <div class="goal-views__chart" *ngIf="metasVisao === 'status'">
+          <div class="segmented">
+            <div class="seg planned" [style.flex]="metasResumo.planned"></div>
+            <div
+              class="seg progress"
+              [style.flex]="metasResumo.inProgress"
+            ></div>
+            <div
+              class="seg completed"
+              [style.flex]="metasResumo.completed"
+            ></div>
+            <div class="seg canceled" [style.flex]="metasResumo.canceled"></div>
+          </div>
+          <div class="pie-legend">
+            <span><span class="dot planned"></span>Planejadas</span>
+            <span><span class="dot progress"></span>Em andamento</span>
+            <span><span class="dot completed"></span>Concluídas</span>
+            <span><span class="dot canceled"></span>Canceladas</span>
+          </div>
+        </div>
+        <div class="goal-views__chart" *ngIf="metasVisao === 'progresso'">
+          <div class="mini-progress">
+            <div
+              class="mini-bar"
+              [style.width.%]="metasResumo.progressoMedio"
+            ></div>
+          </div>
+          <p class="muted">Progresso médio das metas do ano.</p>
+        </div>
+        <div class="goal-views__chart" *ngIf="metasVisao === 'aporte'">
+          <div class="stacked">
+            <div
+              class="stacked__fill"
+              [style.width.%]="
+                metasResumo.targetTotal
+                  ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100
+                  : 0
+              "
+            ></div>
+          </div>
+          <p class="muted">
+            Aportado: R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }} ·
+            Falta: R$ {{ metasResumo.faltanteTotal | number : "1.2-2" }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="chart">
     <div class="chart__header">
       <p class="label">Receitas x Despesas no ano</p>
-      <span class="muted">Valores mensais de {{ dataAtual.getFullYear() }}</span>
+      <span class="muted"
+        >Valores mensais de {{ dataAtual.getFullYear() }}</span
+      >
       <div class="chart__controls">
-        <button type="button" [class.active]="chartType === 'bar'" (click)="trocarTipo('bar')">Barras</button>
-        <button type="button" [class.active]="chartType === 'line'" (click)="trocarTipo('line')">Linha</button>
+        <button
+          type="button"
+          [class.active]="chartType === 'bar'"
+          (click)="trocarTipo('bar')"
+        >
+          Barras
+        </button>
+        <button
+          type="button"
+          [class.active]="chartType === 'line'"
+          (click)="trocarTipo('line')"
+        >
+          Linha
+        </button>
       </div>
     </div>
     <div class="chart__legend">
@@ -46,12 +187,28 @@
     <div class="chart__bars" *ngIf="chartType === 'bar'">
       <div class="chart__bar" *ngFor="let m of monthlyData">
         <div class="bars-wrap">
-          <div class="bar income" [style.height.%]="maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0"></div>
-          <div class="bar expense" [style.height.%]="maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0"></div>
+          <div
+            class="bar income"
+            [style.height.%]="
+              maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0
+            "
+          ></div>
+          <div
+            class="bar expense"
+            [style.height.%]="
+              maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0
+            "
+          ></div>
           <div class="bar-tooltip">
             <p>{{ m.label | uppercase }}</p>
-            <span>Receitas: <strong>R$ {{ m.incomes | number:'1.2-2' }}</strong></span>
-            <span>Despesas: <strong>R$ {{ m.expenses | number:'1.2-2' }}</strong></span>
+            <span
+              >Receitas:
+              <strong>R$ {{ m.incomes | number : "1.2-2" }}</strong></span
+            >
+            <span
+              >Despesas:
+              <strong>R$ {{ m.expenses | number : "1.2-2" }}</strong></span
+            >
           </div>
         </div>
         <span class="bar__label">{{ m.label }}</span>
@@ -60,8 +217,14 @@
     <div class="chart__line" *ngIf="chartType === 'line'">
       <div class="line-wrap">
         <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
-          <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
-          <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
+          <polyline
+            [attr.points]="incomesPolyline"
+            class="line income"
+          ></polyline>
+          <polyline
+            [attr.points]="expensesPolyline"
+            class="line expense"
+          ></polyline>
           <ng-container *ngFor="let p of incomesPoints">
             <circle
               class="dot income"
@@ -69,7 +232,8 @@
               [attr.cy]="p.y"
               r="6"
               (mouseenter)="showLineTooltip(p, 'income')"
-              (mouseleave)="hideLineTooltip()"></circle>
+              (mouseleave)="hideLineTooltip()"
+            ></circle>
           </ng-container>
           <ng-container *ngFor="let p of expensesPoints">
             <circle
@@ -78,18 +242,20 @@
               [attr.cy]="p.y"
               r="6"
               (mouseenter)="showLineTooltip(p, 'expense')"
-              (mouseleave)="hideLineTooltip()"></circle>
+              (mouseleave)="hideLineTooltip()"
+            ></circle>
           </ng-container>
         </svg>
         <div
           class="line-tooltip"
           *ngIf="lineTooltip"
           [style.left.%]="lineTooltip.left"
-          [style.top.%]="lineTooltip.top">
+          [style.top.%]="lineTooltip.top"
+        >
           <p>{{ lineTooltip.label | uppercase }}</p>
           <span>
-            {{ lineTooltip.type === 'income' ? 'Receitas' : 'Despesas' }}:
-            <strong>R$ {{ lineTooltip.value | number:'1.2-2' }}</strong>
+            {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
+            <strong>R$ {{ lineTooltip.value | number : "1.2-2" }}</strong>
           </span>
         </div>
       </div>
