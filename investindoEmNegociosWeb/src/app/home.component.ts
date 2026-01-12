@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
+import { GoalsService, Goal } from './goals.service';
 
 @Component({
   selector: 'app-home',
@@ -14,6 +15,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subExpenses?: Subscription;
   private subIncomes?: Subscription;
   private subCards?: Subscription;
+  private subGoals?: Subscription;
 
   dataAtual = new Date();
   chartType: 'bar' | 'line' = 'bar';
@@ -38,8 +40,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   expensesPolyline = '';
   incomesPoints: { x: number; y: number; label: string; value: number }[] = [];
   expensesPoints: { x: number; y: number; label: string; value: number }[] = [];
+  metasResumo = {
+    total: 0,
+    planned: 0,
+    inProgress: 0,
+    completed: 0,
+    canceled: 0,
+    targetTotal: 0,
+    acumuladoTotal: 0,
+    faltanteTotal: 0,
+    progressoMedio: 0
+  };
+  metasVisao: 'status' | 'progresso' | 'aporte' = 'status';
 
-  constructor(private db: ApiDataService) {}
+  constructor(private db: ApiDataService, private goalsService: GoalsService) {}
 
   ngOnInit(): void {
     this.subExpenses = this.db.expenses$.subscribe((lista) => {
@@ -58,12 +72,19 @@ export class HomeComponent implements OnInit, OnDestroy {
       const user = this.currentUser;
       this.cards = lista.filter((c) => (c.userId ? c.userId === user : true));
     });
+    if (this.isLogged) {
+      this.subGoals = this.goalsService.list(this.dataAtual.getFullYear()).subscribe({
+        next: (goals) => this.atualizarMetas(goals),
+        error: (err) => console.error('Falha ao carregar metas', err)
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.subExpenses?.unsubscribe();
     this.subIncomes?.unsubscribe();
     this.subCards?.unsubscribe();
+    this.subGoals?.unsubscribe();
   }
 
   get mesAtualLabel(): string {
@@ -199,5 +220,39 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private get storage(): Storage | null {
     return typeof localStorage !== 'undefined' ? localStorage : null;
+  }
+
+  private atualizarMetas(goals: Goal[]): void {
+    const planned = goals.filter((g) => g.status === 'Planned').length;
+    const inProgress = goals.filter((g) => g.status === 'InProgress').length;
+    const completed = goals.filter((g) => g.status === 'Completed').length;
+    const canceled = goals.filter((g) => g.status === 'Canceled').length;
+
+    const metasAtivas = goals.filter((g) => g.status !== 'Canceled' && g.targetAmount > 0);
+    const targetTotal = metasAtivas.reduce((sum, g) => sum + (g.targetAmount || 0), 0);
+    const acumuladoTotal = metasAtivas.reduce((sum, g) => sum + (g.currentAmount || 0), 0);
+    const faltanteTotal = metasAtivas.reduce(
+      (sum, g) => sum + Math.max((g.targetAmount || 0) - (g.currentAmount || 0), 0),
+      0
+    );
+    const progressoMedio =
+      metasAtivas.length > 0
+        ? metasAtivas.reduce((sum, g) => {
+            const ratio = g.targetAmount ? Math.min(g.currentAmount / g.targetAmount, 1) : 0;
+            return sum + ratio * 100;
+          }, 0) / metasAtivas.length
+        : 0;
+
+    this.metasResumo = {
+      total: goals.length,
+      planned,
+      inProgress,
+      completed,
+      canceled,
+      targetTotal,
+      acumuladoTotal,
+      faltanteTotal,
+      progressoMedio
+    };
   }
 }
