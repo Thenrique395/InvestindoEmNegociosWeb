@@ -43,6 +43,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   expensesPolyline = '';
   incomesPoints: { x: number; y: number; label: string; value: number }[] = [];
   expensesPoints: { x: number; y: number; label: string; value: number }[] = [];
+  recentTransactions: {
+    id: string;
+    title: string;
+    date: string;
+    amount: number;
+    type: 'income' | 'expense';
+    status?: string;
+  }[] = [];
   metasResumo = {
     total: 0,
     planned: 0,
@@ -54,7 +62,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     faltanteTotal: 0,
     progressoMedio: 0
   };
-  metasVisao: 'status' | 'progresso' | 'aporte' = 'status';
+  metasVisao: 'progresso' | 'aporte' = 'progresso';
 
   constructor(private db: ApiDataService, private goalsService: GoalsService, private cardsService: CardsService) {}
 
@@ -65,12 +73,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.atualizarSaldo();
       this.updateMonthlyData();
       this.atualizarDividaCartoes();
+      this.updateRecentTransactions();
     });
     this.subIncomes = this.db.incomes$.subscribe((lista) => {
       this.incomesRaw = lista;
       this.totalRendas = this.somarRendasMes(lista);
       this.atualizarSaldo();
       this.updateMonthlyData();
+      this.updateRecentTransactions();
     });
     this.subCards = this.db.cards$.subscribe((lista) => {
       const user = this.currentUser;
@@ -138,6 +148,32 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.monthlyData = months;
     this.maxMonthlyValue = Math.max(...months.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
     this.updatePolylineData();
+  }
+
+  private updateRecentTransactions(): void {
+    const expenseItems = this.expensesRaw.map((e) => ({
+      id: e.id,
+      title: e.nome || 'Despesa',
+      date: e.vencimento || '—',
+      amount: e.valor || 0,
+      type: 'expense' as const,
+      status: this.statusLabel(e.status)
+    }));
+    const incomeItems = this.incomesRaw.map((i) => ({
+      id: i.id,
+      title: i.fonte || 'Receita',
+      date: i.recebimento || '—',
+      amount: i.valor || 0,
+      type: 'income' as const,
+      status: this.incomeStatusLabel(i.recebimento)
+    }));
+    const all = [...expenseItems, ...incomeItems];
+    all.sort((a, b) => {
+      const da = this.parseDate(a.date)?.getTime() || 0;
+      const db = this.parseDate(b.date)?.getTime() || 0;
+      return db - da;
+    });
+    this.recentTransactions = all.slice(0, 6);
   }
 
   trocarTipo(tipo: 'bar' | 'line'): void {
@@ -265,5 +301,38 @@ export class HomeComponent implements OnInit, OnDestroy {
       faltanteTotal,
       progressoMedio
     };
+  }
+
+  private parseDate(value: string): Date | null {
+    const digits = (value || '').replace(/[^\d]/g, '').slice(0, 8);
+    if (digits.length !== 8) return null;
+    const dia = Number(digits.slice(0, 2));
+    const mes = Number(digits.slice(2, 4));
+    const ano = Number(digits.slice(4, 8));
+    const data = new Date(ano, mes - 1, dia);
+    if (data.getFullYear() !== ano || data.getMonth() + 1 !== mes || data.getDate() !== dia) return null;
+    return data;
+  }
+
+  private statusLabel(status?: string): string {
+    switch (status) {
+      case 'PAID':
+        return 'Pago';
+      case 'ANTICIPATED':
+        return 'Antecipada';
+      case 'CANCELED':
+        return 'Cancelada';
+      default:
+        return 'Pendente';
+    }
+  }
+
+  private incomeStatusLabel(recebimento?: string): string {
+    const data = recebimento ? this.parseDate(recebimento) : null;
+    if (!data) return 'Pendente';
+    const hoje = new Date();
+    const diaHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const diaReceb = new Date(data.getFullYear(), data.getMonth(), data.getDate());
+    return diaReceb <= diaHoje ? 'Pago' : 'Pendente';
   }
 }
