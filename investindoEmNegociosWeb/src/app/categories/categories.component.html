@@ -1,0 +1,82 @@
+<section class="categories-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Gerenciar categorias</p>
+      <h1>Organize receitas e despesas</h1>
+      <p class="muted">Categorias padrão são compartilhadas; crie e remova as suas conforme precisar.</p>
+    </div>
+    <div class="filter">
+      <span>Filtrar por tipo</span>
+      <select [(ngModel)]="filtroTipo" (change)="carregar()">
+        <option value="">Todos</option>
+        <option *ngFor="let t of tipos" [value]="t.id">{{ t.label }}</option>
+      </select>
+    </div>
+  </header>
+
+  <section class="card add-card">
+    <div class="add-card__header">
+      <h3>Adicionar nova categoria</h3>
+    </div>
+    <div class="add-card__form">
+      <label>
+        Nome da categoria
+        <input type="text" placeholder="Nome da categoria" [(ngModel)]="nome" />
+      </label>
+      <label>
+        Tipo
+        <select [(ngModel)]="tipo">
+          <option *ngFor="let t of tipos" [value]="t.id">{{ t.label }}</option>
+        </select>
+      </label>
+      <button class="btn-primary" type="button" [disabled]="saving" (click)="adicionar()">
+        {{ saving ? 'Salvando...' : 'Adicionar' }}
+      </button>
+    </div>
+    <p class="error" *ngIf="erro">{{ erro }}</p>
+  </section>
+
+  <section class="card list-card" *ngIf="!loading; else loadingTpl">
+    <div class="section-title">Categorias</div>
+
+    <div class="category-group">
+      <div class="group-title income">
+        Categorias de Receita <span class="count">({{ categoriasPorTipo('Income').length }})</span>
+      </div>
+      <div class="category-list">
+        <div class="category-item" *ngFor="let c of categoriasPorTipo('Income')">
+          <div class="category-icon" aria-hidden="true">{{ iconForCategory(c.name, 'Income') }}</div>
+          <div class="category-info">
+            <div class="category-name">{{ c.name }}</div>
+            <div class="category-sub">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
+          </div>
+          <span class="tag income">Receita</span>
+          <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
+        </div>
+        <div *ngIf="categoriasPorTipo('Income').length === 0" class="muted">Nenhuma categoria de receita.</div>
+      </div>
+    </div>
+
+    <div class="category-group">
+      <div class="group-title expense">
+        Categorias de Despesa <span class="count">({{ categoriasPorTipo('Expense').length }})</span>
+      </div>
+      <div class="category-list">
+        <div class="category-item" *ngFor="let c of categoriasPorTipo('Expense')">
+          <div class="category-icon" aria-hidden="true">{{ iconForCategory(c.name, 'Expense') }}</div>
+          <div class="category-info">
+            <div class="category-name">{{ c.name }}</div>
+            <div class="category-sub">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
+          </div>
+          <span class="tag expense">Despesa</span>
+          <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
+        </div>
+        <div *ngIf="categoriasPorTipo('Expense').length === 0" class="muted">Nenhuma categoria de despesa.</div>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #loadingTpl>
+    <div class="card">Carregando categorias...</div>
+  </ng-template>
+</section>

@@ -17,6 +17,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
   bandeira: string = '';
   numero = '';
   nome = '';
+  banco = '';
+  limiteCredito = 0;
+  limiteCreditoInput = '';
+  diaFechamento = 1;
+  diaVencimento = 1;
   mostrarNumero = false;
   cards: StoredCard[] = [];
   expenses: StoredExpense[] = [];
@@ -74,11 +79,18 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   salvar(): void {
     if (!this.numero || !this.nome || !this.bandeira) return;
+    if (this.diaFechamento < 1 || this.diaFechamento > 31) return;
+    if (this.diaVencimento < 1 || this.diaVencimento > 31) return;
+    if (this.limiteCredito < 0) return;
     const numeroLimpo = this.numero.replace(/\D/g, '').slice(-4);
     const payload = {
       bandeira: this.bandeira,
       numero: numeroLimpo,
       nome: this.nome,
+      banco: this.banco,
+      limiteCredito: this.limiteCredito,
+      diaFechamento: this.diaFechamento,
+      diaVencimento: this.diaVencimento,
       userId: this.currentUser
     };
 
@@ -99,6 +111,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (!this.bandeira && this.brands.length) {
       this.bandeira = this.brands[0].id.toString();
     }
+    this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
     this.mostrarModal = true;
   }
 
@@ -109,6 +122,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.bandeira = this.brands[0]?.id ? String(this.brands[0].id) : '';
     this.numero = '';
     this.nome = '';
+    this.banco = '';
+    this.limiteCredito = 0;
+    this.limiteCreditoInput = '';
+    this.diaFechamento = 1;
+    this.diaVencimento = 1;
   }
 
   remover(id: string): void {
@@ -136,6 +154,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.bandeira = card.bandeira;
     this.numero = this.formatarNumeroEntrada(card.numero.replace(/\D/g, ''));
     this.nome = card.nome;
+    this.banco = card.banco || '';
+    this.limiteCredito = card.limiteCredito ?? 0;
+    this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
+    this.diaFechamento = card.diaFechamento ?? 1;
+    this.diaVencimento = card.diaVencimento ?? 1;
   }
 
   toggleNumero(): void {
@@ -149,6 +172,49 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   private formatarNumeroEntrada(digits: string): string {
     return digits.match(/.{1,4}/g)?.join(' ') || digits;
+  }
+
+  onLimiteChange(value: string): void {
+    const digits = (value || '').replace(/[^\d]/g, '');
+    const number = Number(digits) / 100;
+    this.limiteCredito = Number.isFinite(number) ? number : 0;
+    this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
+  }
+
+  onDiaChange(value: string, field: 'fechamento' | 'vencimento'): void {
+    const digits = (value || '').replace(/[^\d]/g, '');
+    let day = Number(digits || '0');
+    if (!Number.isFinite(day)) day = 1;
+    if (day < 1) day = 1;
+    if (day > 31) day = 31;
+
+    if (field === 'fechamento') {
+      this.diaFechamento = day;
+    } else {
+      this.diaVencimento = day;
+    }
+  }
+
+  onDiaInput(event: Event, field: 'fechamento' | 'vencimento'): void {
+    const target = event.target as HTMLInputElement | null;
+    const raw = target?.value ?? '';
+    const digits = raw.replace(/[^\d]/g, '').slice(0, 2);
+    const day = Number(digits || '1');
+    const clamped = Math.min(31, Math.max(1, Number.isFinite(day) ? day : 1));
+
+    if (target) {
+      target.value = digits;
+    }
+
+    if (field === 'fechamento') {
+      this.diaFechamento = clamped;
+    } else {
+      this.diaVencimento = clamped;
+    }
+  }
+
+  private formatCurrency(value: number): string {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
   private get currentUser(): string {

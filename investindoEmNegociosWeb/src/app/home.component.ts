@@ -3,11 +3,12 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
 import { GoalsService, Goal } from './goals.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule, DecimalPipe, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

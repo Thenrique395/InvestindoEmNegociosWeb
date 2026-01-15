@@ -1,0 +1,114 @@
+<section class="investments">
+  <header class="header">
+    <div>
+      <p class="eyebrow">Investimentos</p>
+      <h1>Cadastro rápido de posições</h1>
+      <p class="muted">Registre posições, aportes e resgates para acompanhar custo médio e histórico.</p>
+    </div>
+  </header>
+
+  <div class="top-actions">
+    <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">
+      {{ showCadastro ? 'Fechar cadastro' : 'Nova posição' }}
+    </button>
+  </div>
+
+  <div class="card" *ngIf="showCadastro">
+    <h3>Nova posição</h3>
+    <div class="form grid-form">
+      <div>
+        <label>Tipo</label>
+        <select [(ngModel)]="novaPosicao.type" name="type">
+          <option *ngFor="let t of tipos" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+      <div>
+        <label>Ativo</label>
+        <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
+      </div>
+      <div>
+        <label>Quantidade</label>
+        <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
+      </div>
+      <div>
+        <label>Preço médio</label>
+        <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
+      </div>
+      <div>
+        <label>Data</label>
+        <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
+      </div>
+      <div>
+        <label>Conta/Corretora</label>
+        <input type="text" [(ngModel)]="novaPosicao.account" name="account" placeholder="Ex.: Nubank, XP" />
+      </div>
+      <div>
+        <label>Categoria (opcional)</label>
+        <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
+      </div>
+      <div class="actions">
+        <button class="btn-primary" type="button" (click)="salvarPosicao()">Salvar posição</button>
+        <button class="ghost sm" type="button" (click)="resetPosicao()">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Posições cadastradas</h3>
+    <div *ngIf="!positions.length" class="empty">Nenhuma posição ainda. Adicione a primeira.</div>
+    <div class="table-wrap" *ngIf="positions.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Ativo</th>
+            <th>Quantidade</th>
+            <th>Preço médio</th>
+            <th>Conta</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of positions">
+            <td>{{ p.type }}</td>
+            <td>{{ p.asset }}</td>
+            <td>{{ p.quantity }}</td>
+            <td>R$ {{ p.avgPrice | number : '1.2-2' }}</td>
+            <td>{{ p.account }}</td>
+            <td>
+              <button class="btn-edit sm" type="button" (click)="abrirMovimento(p)">Registrar movimento</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="showMovimento && posSelecionada">
+    <h3>Registrar movimento para {{ posSelecionada.asset }}</h3>
+    <div class="form inline">
+      <label>Tipo</label>
+      <select [(ngModel)]="movimento.type" name="movType">
+        <option value="APORTE">Aporte</option>
+        <option value="RESGATE">Resgate</option>
+      </select>
+
+      <label>Qtd.</label>
+      <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
+
+      <label>Preço</label>
+      <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
+
+      <label>Data</label>
+      <input type="date" [(ngModel)]="movimento.date" name="movDate" />
+
+      <label>Nota</label>
+      <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+
+      <div class="actions">
+        <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
+        <button class="ghost sm" type="button" (click)="showMovimento = false; posSelecionada = null; selectedId = null">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</section>

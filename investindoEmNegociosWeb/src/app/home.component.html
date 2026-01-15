@@ -36,7 +36,6 @@
     <div class="goals__header">
       <div>
         <p class="eyebrow">Metas</p>
-        <h3>Visão de {{ dataAtual.getFullYear() }}</h3>
         <p class="muted">Resumo rápido das metas anuais cadastradas.</p>
       </div>
     </div>
@@ -59,66 +58,32 @@
         </div>
       </div>
       <div class="goal-inline">
-        <span
-          >Alvo:
-          <strong
-            >R$ {{ metasResumo.targetTotal | number : "1.2-2" }}</strong
-          ></span
-        >
-        <span
-          >Acumulado:
-          <strong
-            >R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }}</strong
-          ></span
-        >
-        <span
-          >Falta:
-          <strong
-            >R$ {{ metasResumo.faltanteTotal | number : "1.2-2" }}</strong
-          ></span
-        >
-        <span
-          >Progresso médio das metas:
-          <strong
-            >{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong
-          ></span
-        >
+        <span>Alvo:
+          <strong>R$ {{ metasResumo.targetTotal | number : "1.2-2" }}</strong></span>
+        <span>Acumulado:
+          <strong>R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }}</strong></span>
+        <span>Falta:
+          <strong>R$ {{ metasResumo.faltanteTotal | number : "1.2-2" }}</strong></span>
+        <span>Progresso médio das metas:
+          <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong></span>
       </div>
       <div class="goal-views">
         <div class="goal-views__buttons">
-          <button
-            type="button"
-            [class.active]="metasVisao === 'status'"
-            (click)="metasVisao = 'status'"
-          >
+          <button type="button" [class.active]="metasVisao === 'status'" (click)="metasVisao = 'status'">
             Status
           </button>
-          <button
-            type="button"
-            [class.active]="metasVisao === 'progresso'"
-            (click)="metasVisao = 'progresso'"
-          >
+          <button type="button" [class.active]="metasVisao === 'progresso'" (click)="metasVisao = 'progresso'">
             Progresso
           </button>
-          <button
-            type="button"
-            [class.active]="metasVisao === 'aporte'"
-            (click)="metasVisao = 'aporte'"
-          >
+          <button type="button" [class.active]="metasVisao === 'aporte'" (click)="metasVisao = 'aporte'">
             Aporte x Falta
           </button>
         </div>
         <div class="goal-views__chart" *ngIf="metasVisao === 'status'">
           <div class="segmented">
             <div class="seg planned" [style.flex]="metasResumo.planned"></div>
-            <div
-              class="seg progress"
-              [style.flex]="metasResumo.inProgress"
-            ></div>
-            <div
-              class="seg completed"
-              [style.flex]="metasResumo.completed"
-            ></div>
+            <div class="seg progress" [style.flex]="metasResumo.inProgress"></div>
+            <div class="seg completed" [style.flex]="metasResumo.completed"></div>
             <div class="seg canceled" [style.flex]="metasResumo.canceled"></div>
           </div>
           <div class="pie-legend">
@@ -130,23 +95,17 @@
         </div>
         <div class="goal-views__chart" *ngIf="metasVisao === 'progresso'">
           <div class="mini-progress">
-            <div
-              class="mini-bar"
-              [style.width.%]="metasResumo.progressoMedio"
-            ></div>
+            <div class="mini-bar" [style.width.%]="metasResumo.progressoMedio"></div>
           </div>
           <p class="muted">Progresso médio das metas do ano.</p>
         </div>
         <div class="goal-views__chart" *ngIf="metasVisao === 'aporte'">
           <div class="stacked">
-            <div
-              class="stacked__fill"
-              [style.width.%]="
+            <div class="stacked__fill" [style.width.%]="
                 metasResumo.targetTotal
                   ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100
                   : 0
-              "
-            ></div>
+              "></div>
           </div>
           <p class="muted">
             Aportado: R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }} ·
@@ -160,22 +119,12 @@
   <div class="chart">
     <div class="chart__header">
       <p class="label">Receitas x Despesas no ano</p>
-      <span class="muted"
-        >Valores mensais de {{ dataAtual.getFullYear() }}</span
-      >
+      <span class="muted">Valores mensais de {{ dataAtual.getFullYear() }}</span>
       <div class="chart__controls">
-        <button
-          type="button"
-          [class.active]="chartType === 'bar'"
-          (click)="trocarTipo('bar')"
-        >
+        <button type="button" [class.active]="chartType === 'bar'" (click)="trocarTipo('bar')">
           Barras
         </button>
-        <button
-          type="button"
-          [class.active]="chartType === 'line'"
-          (click)="trocarTipo('line')"
-        >
+        <button type="button" [class.active]="chartType === 'line'" (click)="trocarTipo('line')">
           Linha
         </button>
       </div>
@@ -187,28 +136,18 @@
     <div class="chart__bars" *ngIf="chartType === 'bar'">
       <div class="chart__bar" *ngFor="let m of monthlyData">
         <div class="bars-wrap">
-          <div
-            class="bar income"
-            [style.height.%]="
+          <div class="bar income" [style.height.%]="
               maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0
-            "
-          ></div>
-          <div
-            class="bar expense"
-            [style.height.%]="
+            "></div>
+          <div class="bar expense" [style.height.%]="
               maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0
-            "
-          ></div>
+            "></div>
           <div class="bar-tooltip">
             <p>{{ m.label | uppercase }}</p>
-            <span
-              >Receitas:
-              <strong>R$ {{ m.incomes | number : "1.2-2" }}</strong></span
-            >
-            <span
-              >Despesas:
-              <strong>R$ {{ m.expenses | number : "1.2-2" }}</strong></span
-            >
+            <span>Receitas:
+              <strong>R$ {{ m.incomes | number : "1.2-2" }}</strong></span>
+            <span>Despesas:
+              <strong>R$ {{ m.expenses | number : "1.2-2" }}</strong></span>
           </div>
         </div>
         <span class="bar__label">{{ m.label }}</span>
@@ -217,41 +156,18 @@
     <div class="chart__line" *ngIf="chartType === 'line'">
       <div class="line-wrap">
         <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
-          <polyline
-            [attr.points]="incomesPolyline"
-            class="line income"
-          ></polyline>
-          <polyline
-            [attr.points]="expensesPolyline"
-            class="line expense"
-          ></polyline>
+          <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
+          <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
           <ng-container *ngFor="let p of incomesPoints">
-            <circle
-              class="dot income"
-              [attr.cx]="p.x"
-              [attr.cy]="p.y"
-              r="6"
-              (mouseenter)="showLineTooltip(p, 'income')"
-              (mouseleave)="hideLineTooltip()"
-            ></circle>
+            <circle class="dot income" [attr.cx]="p.x" [attr.cy]="p.y" r="6" (mouseenter)="showLineTooltip(p, 'income')"
+              (mouseleave)="hideLineTooltip()"></circle>
           </ng-container>
           <ng-container *ngFor="let p of expensesPoints">
-            <circle
-              class="dot expense"
-              [attr.cx]="p.x"
-              [attr.cy]="p.y"
-              r="6"
-              (mouseenter)="showLineTooltip(p, 'expense')"
-              (mouseleave)="hideLineTooltip()"
-            ></circle>
+            <circle class="dot expense" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
+              (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
           </ng-container>
         </svg>
-        <div
-          class="line-tooltip"
-          *ngIf="lineTooltip"
-          [style.left.%]="lineTooltip.left"
-          [style.top.%]="lineTooltip.top"
-        >
+        <div class="line-tooltip" *ngIf="lineTooltip" [style.left.%]="lineTooltip.left" [style.top.%]="lineTooltip.top">
           <p>{{ lineTooltip.label | uppercase }}</p>
           <span>
             {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:

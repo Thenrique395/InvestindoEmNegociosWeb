@@ -28,6 +28,10 @@ export interface StoredCard {
   bandeira: string;
   numero: string;
   nome: string;
+  banco?: string | null;
+  limiteCredito: number;
+  diaFechamento: number;
+  diaVencimento: number;
   userId: string;
 }
 
@@ -108,7 +112,11 @@ export class ApiDataService {
         brandId: Number(card.bandeira),
         holderName: card.nome,
         nickname: card.nome,
-        last4: (card.numero || '').replace(/\D/g, '').slice(-4)
+        last4: (card.numero || '').replace(/\D/g, '').slice(-4),
+        bank: card.banco || null,
+        creditLimit: card.limiteCredito ?? 0,
+        statementCloseDay: card.diaFechamento ?? 1,
+        dueDay: card.diaVencimento ?? 1
       })
       .subscribe({
         next: () => this.refresh(),
@@ -122,7 +130,11 @@ export class ApiDataService {
         brandId: data.bandeira ? Number(data.bandeira) : 0,
         holderName: data.nome || '',
         nickname: data.nome || '',
-        last4: (data.numero || '').replace(/\D/g, '').slice(-4)
+        last4: (data.numero || '').replace(/\D/g, '').slice(-4),
+        bank: data.banco || null,
+        creditLimit: data.limiteCredito ?? 0,
+        statementCloseDay: data.diaFechamento ?? 1,
+        dueDay: data.diaVencimento ?? 1
       })
       .subscribe({
         next: () => this.refresh(),
@@ -249,6 +261,10 @@ export class ApiDataService {
       bandeira: String(c.brandId),
       numero: c.last4,
       nome: c.nickname,
+      banco: c.bank ?? null,
+      limiteCredito: c.creditLimit ?? 0,
+      diaFechamento: c.statementCloseDay ?? 1,
+      diaVencimento: c.dueDay ?? 1,
       userId: ''
     }));
   }

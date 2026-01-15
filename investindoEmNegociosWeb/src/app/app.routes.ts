@@ -13,6 +13,8 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserPreferencesComponent } from './user-preferences/user-preferences.component';
 import { UserSecurityComponent } from './user-security/user-security.component';
 import { UserDataComponent } from './user-data/user-data.component';
+import { InvestmentsComponent } from './investments/investments.component';
+import { CategoriesComponent } from './categories/categories.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
@@ -24,6 +26,8 @@ export const routes: Routes = [
   { path: 'cartoes', component: CartoesComponent, canActivate: [authGuard] },
   { path: 'receitas', component: ReceitasComponent, canActivate: [authGuard] },
   { path: 'despesas', component: DespesasComponent, canActivate: [authGuard] },
+  { path: 'investimentos', component: InvestmentsComponent, canActivate: [authGuard] },
+  { path: 'categorias', component: CategoriesComponent, canActivate: [authGuard] },
   { path: 'metas', component: MetasComponent, canActivate: [authGuard] },
   { path: 'perfil', component: UserProfileComponent, canActivate: [authGuard] },
   { path: 'preferencias', component: UserPreferencesComponent, canActivate: [authGuard] },

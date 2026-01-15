@@ -60,6 +60,50 @@
             <input [(ngModel)]="nome" name="nome" placeholder="FULANO DA SILVA" required />
           </label>
 
+          <label>
+            Banco (opcional)
+            <input [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" />
+          </label>
+
+          <div class="row">
+            <label>
+              Limite de crédito
+              <input
+                type="text"
+                inputmode="decimal"
+                [(ngModel)]="limiteCreditoInput"
+                (ngModelChange)="onLimiteChange($event)"
+                name="limiteCredito"
+              />
+            </label>
+            <label>
+              Dia do fechamento
+              <input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="2"
+                [ngModel]="diaFechamento"
+                (ngModelChange)="onDiaChange($event, 'fechamento')"
+                (input)="onDiaInput($event, 'fechamento')"
+                name="diaFechamento"
+              />
+            </label>
+            <label>
+              Dia do vencimento
+              <input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="2"
+                [ngModel]="diaVencimento"
+                (ngModelChange)="onDiaChange($event, 'vencimento')"
+                (input)="onDiaInput($event, 'vencimento')"
+                name="diaVencimento"
+              />
+            </label>
+          </div>
+
           <div class="actions">
             <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
             <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar cartão' }}</button>

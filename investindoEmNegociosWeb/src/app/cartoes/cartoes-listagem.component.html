@@ -23,6 +23,22 @@
           <span class="label">Final</span>
           <p>•••• {{ finalCartao(c.numero) }}</p>
         </div>
+        <div>
+          <span class="label">Banco</span>
+          <p>{{ c.banco || '-' }}</p>
+        </div>
+        <div>
+          <span class="label">Limite</span>
+          <p>R$ {{ c.limiteCredito | number:'1.2-2' }}</p>
+        </div>
+        <div>
+          <span class="label">Fechamento</span>
+          <p>Dia {{ c.diaFechamento }}</p>
+        </div>
+        <div>
+          <span class="label">Vencimento</span>
+          <p>Dia {{ c.diaVencimento }}</p>
+        </div>
       </div>
     </article>
   </div>

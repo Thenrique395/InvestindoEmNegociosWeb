@@ -9,6 +9,10 @@ export interface CardDto {
   holderName: string;
   nickname: string;
   last4: string;
+  bank?: string | null;
+  creditLimit: number;
+  statementCloseDay: number;
+  dueDay: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,6 +22,10 @@ export interface CardPayload {
   holderName: string;
   last4: string;
   nickname?: string;
+  bank?: string | null;
+  creditLimit: number;
+  statementCloseDay: number;
+  dueDay: number;
 }
 
 @Injectable({ providedIn: 'root' })
