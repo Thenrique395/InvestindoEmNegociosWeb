@@ -44,11 +44,14 @@
       <label *ngIf="formaPagamento === 'cartao' && parcelar">
         Número de parcelas
         <input
-          type="number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
           min="1"
           max="36"
           [(ngModel)]="parcelasCount"
           name="parcelas"
+          (keydown)="bloquearNaoNumerico($event)"
           (ngModelChange)="onParcelasChange($event)"
           placeholder="Ex: 10"
           required />
@@ -84,6 +87,7 @@
           inputmode="decimal"
           placeholder="R$ 0,00"
           [ngModel]="valorInput"
+          (keydown)="bloquearNaoNumerico($event)"
           (ngModelChange)="onValorChange($event)"
           name="valor"
           required />
@@ -96,6 +100,7 @@
           placeholder="15/08/2026"
           maxlength="10"
           [ngModel]="vencimentoInput"
+          (keydown)="bloquearNaoNumerico($event)"
           (ngModelChange)="onVencimentoChange($event)"
           name="vencimento"
           required />

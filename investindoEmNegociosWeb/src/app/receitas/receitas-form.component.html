@@ -37,6 +37,7 @@
           inputmode="decimal"
           placeholder="R$ 0,00"
           [ngModel]="valorInput"
+          (keydown)="bloquearNaoNumerico($event)"
           (ngModelChange)="onValorChange($event)"
           name="valor"
           required />
@@ -49,6 +50,7 @@
           placeholder="05/09/2024"
           maxlength="10"
           [ngModel]="recebimentoInput"
+          (keydown)="bloquearNaoNumerico($event)"
           (ngModelChange)="onRecebimentoChange($event)"
           name="recebimento"
           required />

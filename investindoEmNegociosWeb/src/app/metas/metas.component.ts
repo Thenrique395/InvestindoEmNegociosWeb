@@ -14,7 +14,7 @@ export class MetasComponent implements OnInit {
   mostrarModal = false;
   metaNome = '';
   metaValor = '';
-  metaAno = new Date().getFullYear();
+  metaAno = String(new Date().getFullYear());
   metaDescricao = '';
   metaMensal = '';
   metas: Goal[] = [];
@@ -100,7 +100,7 @@ export class MetasComponent implements OnInit {
     this.metaSelecionada = meta;
     this.metaNome = meta.title;
     this.metaValor = meta.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    this.metaAno = meta.year;
+    this.metaAno = String(meta.year);
     this.metaDescricao = meta.description || '';
     this.metaMensal = meta.expectedMonthly
       ? meta.expectedMonthly.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -118,8 +118,13 @@ export class MetasComponent implements OnInit {
   salvar(): void {
     this.erro = '';
     const valor = this.parseValor(this.metaValor);
+    const ano = Number(String(this.metaAno || '').replace(/\D/g, ''));
     if (!this.metaNome.trim() || !valor || valor <= 0) {
       this.erro = 'Informe nome e valor maior que zero.';
+      return;
+    }
+    if (!ano) {
+      this.erro = 'Informe um ano válido.';
       return;
     }
 
@@ -127,7 +132,7 @@ export class MetasComponent implements OnInit {
       title: this.metaNome.trim(),
       targetAmount: valor,
       currentAmount: this.metaSelecionada?.currentAmount ?? 0,
-      year: this.metaAno,
+      year: ano,
       description: this.metaDescricao?.trim() || null,
       status: (this.metaSelecionada?.status as GoalStatus) ?? ('Planned' as GoalStatus),
       expectedMonthly: this.parseValor(this.metaMensal),
@@ -172,9 +177,31 @@ export class MetasComponent implements OnInit {
     this.metaMensal = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  formatarAno(): void {
+    const digits = String(this.metaAno || '').replace(/\D/g, '').slice(0, 4);
+    this.metaAno = digits;
+  }
+
   formatarAporte(): void {
     const digits = (this.aporteValor || '').replace(/[^\d]/g, '');
     this.aporteValor = digits;
+  }
+
+  bloquearNaoNumerico(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'Home',
+      'End'
+    ];
+    if (allowedKeys.includes(event.key)) return;
+    if (event.ctrlKey || event.metaKey) return;
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
   }
 
   private carregarContribuicoes(goalId: string): void {
@@ -350,7 +377,7 @@ export class MetasComponent implements OnInit {
     this.metaNome = '';
     this.metaValor = '';
     this.metaMensal = '';
-    this.metaAno = new Date().getFullYear();
+    this.metaAno = String(new Date().getFullYear());
     this.metaDescricao = '';
     this.metaSelecionada = undefined;
     this.editando = false;

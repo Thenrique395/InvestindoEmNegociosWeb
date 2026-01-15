@@ -11,24 +11,76 @@
 
   <div class="grid">
     <div class="stat-card balance">
-      <p class="label">Saldo Total</p>
-      <h2>R$ {{ saldo | number : "1.2-2" }}</h2>
+      <div class="stat-card__header">
+        <span class="stat-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path
+              d="M4 6h16a2 2 0 0 1 2 2v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V8a2 2 0 0 1 2-2zm0 4h18"
+              fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="label">Saldo Total</p>
+        <button class="stat-card__info" type="button" data-tooltip="Receitas menos despesas do mes."
+          aria-label="Mais informacoes sobre saldo total">
+          i
+        </button>
+      </div>
+      <h2>{{ saldo | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="muted">Receitas menos despesas do mês.</p>
     </div>
     <div class="stat-card income">
-      <p class="label">Total Receitas</p>
-      <h2>R$ {{ totalRendas | number : "1.2-2" }}</h2>
+      <div class="stat-card__header">
+        <span class="stat-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="label">Total Receitas</p>
+        <button class="stat-card__info" type="button" data-tooltip="Inclui receitas fixas e avulsas do mes."
+          aria-label="Mais informacoes sobre total de receitas">
+          i
+        </button>
+      </div>
+      <h2>{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="muted">Inclui receitas fixas e avulsas do mês.</p>
     </div>
     <div class="stat-card expense">
-      <p class="label">Total de despesas</p>
-      <h2>R$ {{ totalDespesas | number : "1.2-2" }}</h2>
+      <div class="stat-card__header">
+        <span class="stat-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="label">Total de despesas</p>
+        <button class="stat-card__info" type="button" data-tooltip="Somente despesas com vencimento neste mes."
+          aria-label="Mais informacoes sobre total de despesas">
+          i
+        </button>
+      </div>
+      <h2>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="muted">Somente despesas com vencimento neste mês.</p>
     </div>
 
     <div class="stat-card cards">
-      <p class="label">Dívida total nos cartões</p>
-      <h2>R$ {{ totalDividaCartoes | number : "1.2-2" }}</h2>
+      <div class="stat-card__header">
+        <span class="stat-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path
+              d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20"
+              fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="label">Divida total nos cartoes</p>
+        <button class="stat-card__info" type="button" data-tooltip="Somatorio de despesas vinculadas a cartoes."
+          aria-label="Mais informacoes sobre divida nos cartoes">
+          i
+        </button>
+      </div>
+      <h2>{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="muted">Somatório de despesas vinculadas a cartões.</p>
     </div>
   </div>
@@ -60,11 +112,11 @@
       </div>
       <div class="goal-inline">
         <span>Alvo:
-          <strong>R$ {{ metasResumo.targetTotal | number : "1.2-2" }}</strong></span>
+          <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
         <span>Acumulado:
-          <strong>R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }}</strong></span>
+          <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
         <span>Falta:
-          <strong>R$ {{ metasResumo.faltanteTotal | number : "1.2-2" }}</strong></span>
+          <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
         <span>Progresso médio das metas:
           <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong></span>
       </div>
@@ -102,15 +154,13 @@
         </div>
         <div class="goal-views__chart" *ngIf="metasVisao === 'aporte'">
           <div class="stacked">
-            <div class="stacked__fill" [style.width.%]="
-                metasResumo.targetTotal
-                  ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100
-                  : 0
-              "></div>
+            <div class="stacked__fill"
+            [style.width.%]=" metasResumo.targetTotal ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100 : 0">
+            </div>
           </div>
           <p class="muted">
-            Aportado: R$ {{ metasResumo.acumuladoTotal | number : "1.2-2" }} ·
-            Falta: R$ {{ metasResumo.faltanteTotal | number : "1.2-2" }}
+            Aportado: {{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }} ·
+            Falta: {{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}
           </p>
         </div>
       </div>
@@ -146,9 +196,9 @@
           <div class="bar-tooltip">
             <p>{{ m.label | uppercase }}</p>
             <span>Receitas:
-              <strong>R$ {{ m.incomes | number : "1.2-2" }}</strong></span>
+              <strong>{{ m.incomes | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
             <span>Despesas:
-              <strong>R$ {{ m.expenses | number : "1.2-2" }}</strong></span>
+              <strong>{{ m.expenses | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
           </div>
         </div>
         <span class="bar__label">{{ m.label }}</span>
@@ -159,10 +209,10 @@
         <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
           <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
           <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
-          <ng-container *ngFor="let p of incomesPoints">
+          <ng- *ngFor="let p of incomesPoints">
             <circle class="dot income" [attr.cx]="p.x" [attr.cy]="p.y" r="6" (mouseenter)="showLineTooltip(p, 'income')"
               (mouseleave)="hideLineTooltip()"></circle>
-          </ng-container>
+          </ng->
           <ng-container *ngFor="let p of expensesPoints">
             <circle class="dot expense" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
               (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
@@ -172,7 +222,7 @@
           <p>{{ lineTooltip.label | uppercase }}</p>
           <span>
             {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
-            <strong>R$ {{ lineTooltip.value | number : "1.2-2" }}</strong>
+            <strong>{{ lineTooltip.value | currency: 'BRL':'symbol':'1.2-2' }}</strong>
           </span>
         </div>
       </div>

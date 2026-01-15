@@ -181,6 +181,23 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
   }
 
+  bloquearNaoNumerico(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'Tab',
+      'ArrowLeft',
+      'ArrowRight',
+      'Home',
+      'End'
+    ];
+    if (allowedKeys.includes(event.key)) return;
+    if (event.ctrlKey || event.metaKey) return;
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   onDiaChange(value: string, field: 'fechamento' | 'vencimento'): void {
     const digits = (value || '').replace(/[^\d]/g, '');
     let day = Number(digits || '0');

@@ -8,6 +8,7 @@ import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
 import { InstallmentsService } from '../installments.service';
 import { InstallmentStatus } from '../types/money-types';
+import { CategoriesService } from '../categories.service';
 
 @Component({
   selector: 'app-despesas',
@@ -18,7 +19,8 @@ import { InstallmentStatus } from '../types/money-types';
 })
 export class DespesasComponent implements OnInit, OnDestroy {
   dataAtual = new Date();
-  categorias = ['Moradia', 'Transporte', 'Alimentação', 'Lazer', 'Saúde', 'Educação', 'Outros'];
+  private readonly categoriasPadrao = ['Moradia', 'Transporte', 'Alimentação', 'Lazer', 'Saúde', 'Educação', 'Outros'];
+  categorias = [...this.categoriasPadrao];
   cartoes: StoredCard[] = [];
   despesasPorMes: Record<string, StoredExpense[]> = {};
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | null = null;
@@ -38,6 +40,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   editando: { id: string; isParcela: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number } | null = null;
   private sub?: Subscription;
+  private categoriasSub?: Subscription;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
@@ -51,7 +54,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
-  constructor(private db: ApiDataService, private installments: InstallmentsService) {}
+  constructor(
+    private db: ApiDataService,
+    private installments: InstallmentsService,
+    private categoriesService: CategoriesService
+  ) {}
 
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
@@ -63,6 +70,20 @@ export class DespesasComponent implements OnInit, OnDestroy {
         acc[key] = acc[key] ? [...acc[key], item] : [item];
         return acc;
       }, {} as Record<string, StoredExpense[]>);
+    });
+
+    this.categoriasSub = this.categoriesService.list('Expense').subscribe({
+      next: (data) => {
+        const nomes = data.map((c) => c.name).filter(Boolean);
+        const unicos = Array.from(new Set(nomes));
+        this.categorias = unicos.length ? unicos : [...this.categoriasPadrao];
+        if (!this.novaDespesa.categoria && this.categorias.length) {
+          this.novaDespesa = { ...this.novaDespesa, categoria: this.categorias[0] };
+        }
+      },
+      error: () => {
+        this.categorias = [...this.categoriasPadrao];
+      }
     });
 
     this.db.cards$.subscribe((cards) => {
@@ -79,6 +100,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.categoriasSub?.unsubscribe();
   }
 
   get mesAtualLabel(): string {
@@ -767,7 +789,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return {
       id: '',
       nome: '',
-      categoria: this.categorias[0],
+      categoria: this.categorias[0] ?? '',
       valor: 0,
       vencimento: ''
     };

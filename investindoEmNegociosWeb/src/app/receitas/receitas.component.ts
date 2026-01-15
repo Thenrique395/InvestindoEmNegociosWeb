@@ -69,6 +69,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(): void {
+    this.resetarForm();
     this.mostrarForm = true;
   }
 
@@ -207,6 +208,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.recebimentoInput = '';
     this.fixaInicioInput = '';
     this.editandoId = null;
+    this.erroData = '';
+    this.valorSugestao = null;
   }
 
   private criaRenda(): StoredIncome {

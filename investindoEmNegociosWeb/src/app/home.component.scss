@@ -33,6 +33,99 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.stat-card__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6f3f2;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  flex: 0 0 auto;
+}
+
+.stat-card__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.stat-card__header .label {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.stat-card__info {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: #dbe4e1;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  position: relative;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.stat-card__info::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  background: rgba(12, 22, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transform: rotate(45deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.stat-card__info::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(12, 22, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ecf3f1;
+  font-size: 0.85rem;
+  line-height: 1.25;
+  min-width: 180px;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  transform: translateY(4px);
+}
+
+.stat-card__info:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.stat-card__info:hover::before,
+.stat-card__info:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .stat-card .label {
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -59,6 +152,30 @@
 
 .stat-card.cards {
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card.income .stat-card__icon {
+  background: rgba(52, 144, 99, 0.18);
+  border-color: rgba(52, 144, 99, 0.4);
+  color: #b6f3d5;
+}
+
+.stat-card.expense .stat-card__icon {
+  background: rgba(255, 92, 92, 0.16);
+  border-color: rgba(255, 92, 92, 0.45);
+  color: #ffd0d0;
+}
+
+.stat-card.balance .stat-card__icon {
+  background: rgba(64, 169, 255, 0.18);
+  border-color: rgba(64, 169, 255, 0.45);
+  color: #cde7ff;
+}
+
+.stat-card.cards .stat-card__icon {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #f2f2f2;
 }
 
 .chart {
