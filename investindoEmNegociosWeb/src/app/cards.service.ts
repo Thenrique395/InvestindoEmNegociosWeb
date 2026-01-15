@@ -49,4 +49,8 @@ export class CardsService {
   delete(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
+
+  debtTotal(): Observable<{ total: number }> {
+    return this.http.get<{ total: number }>(`${this.baseUrl}/debt/total`);
+  }
 }

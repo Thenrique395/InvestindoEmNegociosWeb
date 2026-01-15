@@ -10,8 +10,13 @@
   </header>
 
   <div class="grid">
+    <div class="stat-card balance">
+      <p class="label">Saldo Total</p>
+      <h2>R$ {{ saldo | number : "1.2-2" }}</h2>
+      <p class="muted">Receitas menos despesas do mês.</p>
+    </div>
     <div class="stat-card income">
-      <p class="label">Total de receitas</p>
+      <p class="label">Total Receitas</p>
       <h2>R$ {{ totalRendas | number : "1.2-2" }}</h2>
       <p class="muted">Inclui receitas fixas e avulsas do mês.</p>
     </div>
@@ -20,15 +25,11 @@
       <h2>R$ {{ totalDespesas | number : "1.2-2" }}</h2>
       <p class="muted">Somente despesas com vencimento neste mês.</p>
     </div>
-    <div class="stat-card balance">
-      <p class="label">Disponível para gastar</p>
-      <h2>R$ {{ saldo | number : "1.2-2" }}</h2>
-      <p class="muted">Receitas menos despesas do mês.</p>
-    </div>
+
     <div class="stat-card cards">
-      <p class="label">Cartões cadastrados</p>
-      <h3>{{ cardsCount }}</h3>
-      <p class="muted">Usados para vincular despesas.</p>
+      <p class="label">Dívida total nos cartões</p>
+      <h2>R$ {{ totalDividaCartoes | number : "1.2-2" }}</h2>
+      <p class="muted">Somatório de despesas vinculadas a cartões.</p>
     </div>
   </div>
 

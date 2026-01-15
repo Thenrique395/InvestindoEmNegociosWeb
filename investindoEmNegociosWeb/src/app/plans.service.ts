@@ -12,6 +12,7 @@ export interface Plan {
   amount: number;
   schedule: ScheduleType;
   categoryId?: string | null;
+  cardId?: string | null;
   frequency?: string | null;
   installmentsCount?: number | null;
   startDate: string;
@@ -28,6 +29,7 @@ export interface CreatePlanPayload {
   installmentsCount?: number | null;
   defaultPaymentMethodId?: number | null;
   categoryId?: string | null;
+  cardId?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

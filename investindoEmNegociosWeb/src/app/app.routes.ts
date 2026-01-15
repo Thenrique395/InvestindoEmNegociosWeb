@@ -18,7 +18,8 @@ import { CategoriesComponent } from './categories/categories.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
-  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'dashboard', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'home', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'onboarding', component: OnboardingComponent, canActivate: [authGuard] },
   { path: 'calculadora', component: CalculatorComponent, canActivate: [authGuard] },

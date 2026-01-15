@@ -245,6 +245,7 @@ export class ApiDataService {
         valor: inst.amount,
         vencimento: this.formatDate(inst.dueDate),
         userId: plan?.userId,
+        cartao: plan?.cardId || undefined,
         parcelaNumero: isSeries ? inst.installmentNo : undefined,
         parcelasTotal: isSeries ? plan?.installmentsCount ?? undefined : undefined,
         serieId: isSeries ? plan?.id : undefined,
@@ -282,7 +283,8 @@ export class ApiDataService {
       schedule,
       startDate,
       frequency: schedule === 'Recurring' ? 'Monthly' : null,
-      installmentsCount: schedule === 'OneTime' ? 1 : null
+      installmentsCount: schedule === 'OneTime' ? 1 : null,
+      cardId: null
     };
   }
 
@@ -295,17 +297,18 @@ export class ApiDataService {
     if (expense.fixa) {
       const months = expense.fixaMeses && expense.fixaMeses > 0 ? expense.fixaMeses : null;
       const schedule: ScheduleType = months ? 'Installments' : 'Recurring';
-      return {
-        type: 'Expense',
-        title: expense.nome,
-        amount: expense.valor,
-        schedule,
-        startDate,
-        categoryId,
-        frequency: schedule === 'Recurring' ? 'Monthly' : null,
-        installmentsCount: schedule === 'Installments' ? months : null
-      };
-    }
+    return {
+      type: 'Expense',
+      title: expense.nome,
+      amount: expense.valor,
+      schedule,
+      startDate,
+      categoryId,
+      frequency: schedule === 'Recurring' ? 'Monthly' : null,
+      installmentsCount: schedule === 'Installments' ? months : null,
+      cardId: expense.cartao || null
+    };
+  }
 
     const parcelas = expense.parcelasTotal && expense.parcelasTotal > 1 ? expense.parcelasTotal : 1;
     const schedule: ScheduleType = parcelas > 1 ? 'Installments' : 'OneTime';
@@ -319,7 +322,8 @@ export class ApiDataService {
       startDate,
       categoryId,
       frequency: null,
-      installmentsCount: schedule === 'Installments' ? parcelas : 1
+      installmentsCount: schedule === 'Installments' ? parcelas : 1,
+      cardId: expense.cartao || null
     };
   }
 

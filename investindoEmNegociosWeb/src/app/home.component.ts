@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
+import { CardsService } from './cards.service';
 import { GoalsService, Goal } from './goals.service';
 import { RouterModule } from '@angular/router';
 
@@ -35,6 +36,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   totalDespesas = 0;
   saldo = 0;
   cards: StoredCard[] = [];
+  totalDividaCartoes = 0;
   monthlyData: { label: string; incomes: number; expenses: number }[] = [];
   maxMonthlyValue = 0;
   incomesPolyline = '';
@@ -54,7 +56,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   };
   metasVisao: 'status' | 'progresso' | 'aporte' = 'status';
 
-  constructor(private db: ApiDataService, private goalsService: GoalsService) {}
+  constructor(private db: ApiDataService, private goalsService: GoalsService, private cardsService: CardsService) {}
 
   ngOnInit(): void {
     this.subExpenses = this.db.expenses$.subscribe((lista) => {
@@ -62,6 +64,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.totalDespesas = this.somarDespesasMes(lista);
       this.atualizarSaldo();
       this.updateMonthlyData();
+      this.atualizarDividaCartoes();
     });
     this.subIncomes = this.db.incomes$.subscribe((lista) => {
       this.incomesRaw = lista;
@@ -94,6 +97,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get cardsCount(): number {
     return this.cards.length;
+  }
+
+  private atualizarDividaCartoes(): void {
+    this.cardsService.debtTotal().subscribe({
+      next: ({ total }) => (this.totalDividaCartoes = total ?? 0),
+      error: (err) => console.error('Falha ao carregar dívida dos cartões', err)
+    });
   }
 
   get isLogged(): boolean {

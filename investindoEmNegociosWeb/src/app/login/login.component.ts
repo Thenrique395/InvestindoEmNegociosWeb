@@ -53,7 +53,7 @@ export class LoginComponent {
             if (incomplete) {
               this.router.navigateByUrl('/onboarding');
             } else {
-              this.router.navigateByUrl('/home');
+              this.router.navigateByUrl('/dashboard');
             }
           },
           error: () => {
