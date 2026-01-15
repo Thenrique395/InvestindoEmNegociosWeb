@@ -123,18 +123,18 @@
         </label>
         <label>
           Valor da meta (R$)
-          <input type="text" [(ngModel)]="metaValor" (keydown)="bloquearNaoNumerico($event)"
-            (input)="formatarValor()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
+          <input type="text" [(ngModel)]="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric"
+            pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
         </label>
         <label>
           Aporte mensal previsto (R$)
-          <input type="text" [(ngModel)]="metaMensal" (keydown)="bloquearNaoNumerico($event)"
-            (input)="formatarMensal()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
+          <input type="text" [(ngModel)]="metaMensal" digitOnly (input)="formatarMensal()" inputmode="numeric"
+            pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
         </label>
         <label>
           Ano
-          <input type="text" [(ngModel)]="metaAno" (keydown)="bloquearNaoNumerico($event)" (input)="formatarAno()"
-            inputmode="numeric" pattern="[0-9]*" maxlength="4" />
+          <input type="text" [(ngModel)]="metaAno" digitOnly (input)="formatarAno()" inputmode="numeric" pattern="[0-9]*"
+            maxlength="4" />
         </label>
         <label>
           Descrição (opcional)

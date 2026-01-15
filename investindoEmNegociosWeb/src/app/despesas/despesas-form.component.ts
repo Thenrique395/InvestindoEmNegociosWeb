@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { StoredCard, StoredExpense } from '../data/api-data.service';
+import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf],
+  imports: [FormsModule, NgFor, NgIf, DigitOnlyDirective],
   templateUrl: './despesas-form.component.html',
   styleUrls: ['./despesas-form.component.scss']
 })
@@ -81,20 +82,4 @@ export class DespesasFormComponent {
     this.cancel.emit();
   }
 
-  bloquearNaoNumerico(event: KeyboardEvent): void {
-    const allowedKeys = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Home',
-      'End'
-    ];
-    if (allowedKeys.includes(event.key)) return;
-    if (event.ctrlKey || event.metaKey) return;
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-    }
-  }
 }

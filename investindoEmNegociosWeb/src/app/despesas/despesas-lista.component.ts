@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf, DecimalPipe, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { StoredExpense } from '../data/api-data.service';
+import { expenseStatusLabel } from '../utils/status';
 
 @Component({
   selector: 'app-despesas-lista',
@@ -38,19 +39,7 @@ export class DespesasListaComponent {
   }
 
   statusLabel(status?: string): string {
-    switch (status) {
-      case 'PAID':
-        return 'Pago';
-      case 'PARTIALLY_PAID':
-        return 'Parcial';
-      case 'CANCELED':
-        return 'Cancelado';
-      case 'ANTICIPATED':
-        return 'Antecipada';
-      case 'OPEN':
-      default:
-        return 'Pendente';
-    }
+    return expenseStatusLabel(status);
   }
 
   isSelecionado(id?: string): boolean {

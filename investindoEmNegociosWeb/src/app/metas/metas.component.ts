@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.service';
+import { maskMoneyInput } from '../utils/input-mask';
+import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, FormsModule],
+  imports: [CommonModule, NgIf, NgFor, FormsModule, DigitOnlyDirective],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })
@@ -158,23 +160,11 @@ export class MetasComponent implements OnInit {
   }
 
   formatarValor(): void {
-    const digits = (this.metaValor || '').replace(/\D/g, '');
-    if (!digits) {
-      this.metaValor = '';
-      return;
-    }
-    const num = Number(digits) / 100;
-    this.metaValor = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.metaValor = maskMoneyInput(this.metaValor);
   }
 
   formatarMensal(): void {
-    const digits = (this.metaMensal || '').replace(/\D/g, '');
-    if (!digits) {
-      this.metaMensal = '';
-      return;
-    }
-    const num = Number(digits) / 100;
-    this.metaMensal = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.metaMensal = maskMoneyInput(this.metaMensal);
   }
 
   formatarAno(): void {
@@ -185,23 +175,6 @@ export class MetasComponent implements OnInit {
   formatarAporte(): void {
     const digits = (this.aporteValor || '').replace(/[^\d]/g, '');
     this.aporteValor = digits;
-  }
-
-  bloquearNaoNumerico(event: KeyboardEvent): void {
-    const allowedKeys = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Home',
-      'End'
-    ];
-    if (allowedKeys.includes(event.key)) return;
-    if (event.ctrlKey || event.metaKey) return;
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-    }
   }
 
   private carregarContribuicoes(goalId: string): void {

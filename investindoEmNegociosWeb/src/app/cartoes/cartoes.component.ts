@@ -5,11 +5,22 @@ import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
 import { LookupsService, CardBrandLookup } from '../lookups.service';
+import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
   selector: 'app-cartoes',
   standalone: true,
-  imports: [FormsModule, UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, CartoesListagemComponent],
+  imports: [
+    FormsModule,
+    UpperCasePipe,
+    NgIf,
+    NgFor,
+    NgSwitch,
+    NgSwitchCase,
+    NgSwitchDefault,
+    CartoesListagemComponent,
+    DigitOnlyDirective
+  ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
 })
@@ -179,23 +190,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
     const number = Number(digits) / 100;
     this.limiteCredito = Number.isFinite(number) ? number : 0;
     this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
-  }
-
-  bloquearNaoNumerico(event: KeyboardEvent): void {
-    const allowedKeys = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Home',
-      'End'
-    ];
-    if (allowedKeys.includes(event.key)) return;
-    if (event.ctrlKey || event.metaKey) return;
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-    }
   }
 
   onDiaChange(value: string, field: 'fechamento' | 'vencimento'): void {

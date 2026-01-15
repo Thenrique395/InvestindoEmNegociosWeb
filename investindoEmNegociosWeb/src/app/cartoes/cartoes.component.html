@@ -72,7 +72,7 @@
                 type="text"
                 inputmode="decimal"
                 [(ngModel)]="limiteCreditoInput"
-                (keydown)="bloquearNaoNumerico($event)"
+                digitOnly
                 (ngModelChange)="onLimiteChange($event)"
                 name="limiteCredito"
               />

@@ -51,7 +51,7 @@
           max="36"
           [(ngModel)]="parcelasCount"
           name="parcelas"
-          (keydown)="bloquearNaoNumerico($event)"
+          digitOnly
           (ngModelChange)="onParcelasChange($event)"
           placeholder="Ex: 10"
           required />
@@ -87,7 +87,7 @@
           inputmode="decimal"
           placeholder="R$ 0,00"
           [ngModel]="valorInput"
-          (keydown)="bloquearNaoNumerico($event)"
+          digitOnly
           (ngModelChange)="onValorChange($event)"
           name="valor"
           required />
@@ -100,7 +100,7 @@
           placeholder="15/08/2026"
           maxlength="10"
           [ngModel]="vencimentoInput"
-          (keydown)="bloquearNaoNumerico($event)"
+          digitOnly
           (ngModelChange)="onVencimentoChange($event)"
           name="vencimento"
           required />

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ApiDataService, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
 import { ReceitasFormComponent } from './receitas-form.component';
+import { maskDateDDMMYYYY, maskMoneyInput, maskMonthYear } from '../utils/input-mask';
 
 @Component({
   selector: 'app-receitas',
@@ -172,17 +173,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   onValorChange(raw: string): void {
-    const digits = (raw || '').replace(/\D/g, '');
-    if (!digits) {
-      this.valorInput = '';
-      return;
-    }
-    const num = Number(digits) / 100;
-    this.valorInput = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.valorInput = maskMoneyInput(raw);
   }
 
   onRecebimentoChange(raw: string): void {
-    this.recebimentoInput = this.normalizaData(raw);
+    this.recebimentoInput = maskDateDDMMYYYY(raw);
     this.erroData = !this.recebimentoInput || this.isDataValida(this.recebimentoInput)
       ? ''
       : 'Data inválida. Use o formato DD/MM/AAAA.';
@@ -194,7 +189,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   onFixaInicioChange(raw: string): void {
-    this.fixaInicioInput = this.normalizaMes(raw);
+    this.fixaInicioInput = maskMonthYear(raw);
   }
 
   aplicarSugestao(): void {
@@ -217,14 +212,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private normalizaData(value: string): string {
-    const digits = value.replace(/[^\d]/g, '').slice(0, 8);
-    const dia = digits.slice(0, 2);
-    const mes = digits.slice(2, 4);
-    const ano = digits.slice(4, 8);
-    if (mes && (Number(mes) < 1 || Number(mes) > 12)) {
-      return [dia].filter(Boolean).join('/');
-    }
-    return [dia, mes, ano].filter(Boolean).join('/');
+    return maskDateDDMMYYYY(value);
   }
 
   private parseValor(value: string | number): number {
@@ -335,12 +323,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private normalizaMes(value: string): string {
-    const digits = value.replace(/[^\d]/g, '').slice(0, 6);
-    const mm = digits.slice(0, 2);
-    const yyyy = digits.slice(2, 6);
-    if (mm && (Number(mm) < 1 || Number(mm) > 12)) {
-      return mm.slice(0, 1);
-    }
-    return [mm, yyyy].filter(Boolean).join('/');
+    return maskMonthYear(value);
   }
 }

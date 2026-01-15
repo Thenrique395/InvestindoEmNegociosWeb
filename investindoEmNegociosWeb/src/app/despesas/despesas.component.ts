@@ -9,6 +9,8 @@ import { DespesasFormComponent } from './despesas-form.component';
 import { InstallmentsService } from '../installments.service';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
+import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
+import { expenseStatusLabel } from '../utils/status';
 
 @Component({
   selector: 'app-despesas',
@@ -499,17 +501,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   onValorChange(raw: string): void {
-    const digits = (raw || '').replace(/\D/g, '');
-    if (!digits) {
-      this.valorInput = '';
-      return;
-    }
-    const num = Number(digits) / 100;
-    this.valorInput = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.valorInput = maskMoneyInput(raw);
   }
 
   onVencimentoChange(raw: string): void {
-    this.vencimentoInput = this.normalizaData(raw);
+    this.vencimentoInput = maskDateDDMMYYYY(raw);
     this.erroData = !this.vencimentoInput || this.isDataValida(this.vencimentoInput)
       ? ''
       : 'Data inválida. Use o formato DD/MM/AAAA.';
@@ -694,14 +690,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   private normalizaData(value: string): string {
-    const digits = value.replace(/[^\d]/g, '').slice(0, 8);
-    const dia = digits.slice(0, 2);
-    const mes = digits.slice(2, 4);
-    const ano = digits.slice(4, 8);
-    if (mes && (Number(mes) < 1 || Number(mes) > 12)) {
-      return [dia].filter(Boolean).join('/');
-    }
-    return [dia, mes, ano].filter(Boolean).join('/');
+    return maskDateDDMMYYYY(value);
+  }
+
+  statusLabel(status?: InstallmentStatus): string {
+    return expenseStatusLabel(status);
   }
 
   public parseValor(value: string | number): number {

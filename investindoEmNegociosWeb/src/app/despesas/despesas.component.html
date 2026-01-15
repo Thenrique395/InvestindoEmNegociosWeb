@@ -57,11 +57,11 @@
       Status
       <select [(ngModel)]="filtroStatus">
         <option value="ALL">Todos</option>
-        <option value="OPEN">Pendente</option>
-        <option value="PARTIALLY_PAID">Parcial</option>
-        <option value="PAID">Pago</option>
-        <option value="ANTICIPATED">Antecipada</option>
-        <option value="CANCELED">Cancelado</option>
+        <option value="OPEN">{{ statusLabel('OPEN') }}</option>
+        <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
+        <option value="PAID">{{ statusLabel('PAID') }}</option>
+        <option value="ANTICIPATED">{{ statusLabel('ANTICIPATED') }}</option>
+        <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
       </select>
     </label>
     <label>
@@ -161,7 +161,7 @@
               <small *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
             </div>
             <div class="muted">Venc.: {{ h.vencimento }}</div>
-            <div class="status-pill status-paid">Pago</div>
+            <div class="status-pill status-paid">{{ statusLabel('PAID') }}</div>
             <div>R$ {{ h.valor | number:'1.2-2' }}</div>
           </div>
         </div>
@@ -182,7 +182,7 @@
                 'status-anticipated': h.status === 'ANTICIPATED',
                 'status-open': h.status !== 'ANTICIPATED'
               }">
-              {{ h.status === 'ANTICIPATED' ? 'Antecipada' : 'Pendente' }}
+              {{ statusLabel(h.status) }}
             </div>
             <div>R$ {{ h.valor | number:'1.2-2' }}</div>
           </div>

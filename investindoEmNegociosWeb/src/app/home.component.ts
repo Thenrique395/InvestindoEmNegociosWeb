@@ -5,6 +5,8 @@ import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/
 import { CardsService } from './cards.service';
 import { GoalsService, Goal } from './goals.service';
 import { RouterModule } from '@angular/router';
+import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
+import { parseDateDDMMYYYY } from './utils/input-mask';
 
 @Component({
   selector: 'app-home',
@@ -157,7 +159,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       date: e.vencimento || '—',
       amount: e.valor || 0,
       type: 'expense' as const,
-      status: this.statusLabel(e.status)
+      status: expenseStatusLabel(e.status)
     }));
     const incomeItems = this.incomesRaw.map((i) => ({
       id: i.id,
@@ -165,12 +167,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       date: i.recebimento || '—',
       amount: i.valor || 0,
       type: 'income' as const,
-      status: this.incomeStatusLabel(i.recebimento)
+      status: incomeStatusLabel(i.recebimento)
     }));
     const all = [...expenseItems, ...incomeItems];
     all.sort((a, b) => {
-      const da = this.parseDate(a.date)?.getTime() || 0;
-      const db = this.parseDate(b.date)?.getTime() || 0;
+      const da = parseDateDDMMYYYY(a.date)?.getTime() || 0;
+      const db = parseDateDDMMYYYY(b.date)?.getTime() || 0;
       return db - da;
     });
     this.recentTransactions = all.slice(0, 6);
@@ -303,36 +305,4 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
   }
 
-  private parseDate(value: string): Date | null {
-    const digits = (value || '').replace(/[^\d]/g, '').slice(0, 8);
-    if (digits.length !== 8) return null;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    const data = new Date(ano, mes - 1, dia);
-    if (data.getFullYear() !== ano || data.getMonth() + 1 !== mes || data.getDate() !== dia) return null;
-    return data;
-  }
-
-  private statusLabel(status?: string): string {
-    switch (status) {
-      case 'PAID':
-        return 'Pago';
-      case 'ANTICIPATED':
-        return 'Antecipada';
-      case 'CANCELED':
-        return 'Cancelada';
-      default:
-        return 'Pendente';
-    }
-  }
-
-  private incomeStatusLabel(recebimento?: string): string {
-    const data = recebimento ? this.parseDate(recebimento) : null;
-    if (!data) return 'Pendente';
-    const hoje = new Date();
-    const diaHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    const diaReceb = new Date(data.getFullYear(), data.getMonth(), data.getDate());
-    return diaReceb <= diaHoje ? 'Pago' : 'Pendente';
-  }
 }

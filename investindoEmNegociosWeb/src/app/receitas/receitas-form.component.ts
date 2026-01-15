@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf, DecimalPipe } from '@angular/common';
 import { StoredIncome } from '../data/api-data.service';
+import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, NgIf, DecimalPipe],
+  imports: [FormsModule, NgIf, DecimalPipe, DigitOnlyDirective],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })
@@ -62,20 +63,4 @@ export class ReceitasFormComponent {
     this.fechar.emit();
   }
 
-  bloquearNaoNumerico(event: KeyboardEvent): void {
-    const allowedKeys = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'ArrowLeft',
-      'ArrowRight',
-      'Home',
-      'End'
-    ];
-    if (allowedKeys.includes(event.key)) return;
-    if (event.ctrlKey || event.metaKey) return;
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-    }
-  }
 }
