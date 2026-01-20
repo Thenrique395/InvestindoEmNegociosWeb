@@ -20,6 +20,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subIncomes?: Subscription;
   private subCards?: Subscription;
   private subGoals?: Subscription;
+  private expensesLoaded = false;
+  private incomesLoaded = false;
 
   dataAtual = new Date();
   chartType: 'bar' | 'line' = 'bar';
@@ -70,6 +72,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subExpenses = this.db.expenses$.subscribe((lista) => {
+      this.expensesLoaded = true;
       this.expensesRaw = lista;
       this.totalDespesas = this.somarDespesasMes(lista);
       this.atualizarSaldo();
@@ -78,6 +81,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.updateRecentTransactions();
     });
     this.subIncomes = this.db.incomes$.subscribe((lista) => {
+      this.incomesLoaded = true;
       this.incomesRaw = lista;
       this.totalRendas = this.somarRendasMes(lista);
       this.atualizarSaldo();
@@ -105,6 +109,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get mesAtualLabel(): string {
     return this.dataAtual.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+  }
+
+  get isLoadingDashboard(): boolean {
+    return !(this.expensesLoaded && this.incomesLoaded);
+  }
+
+  get hasChartData(): boolean {
+    return this.monthlyData.some((m) => (m.incomes || 0) > 0 || (m.expenses || 0) > 0);
   }
 
   get cardsCount(): number {

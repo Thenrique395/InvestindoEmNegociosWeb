@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 import { ProfileService, UserProfile } from '../profile.service';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgIf],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })
@@ -14,6 +15,8 @@ export class UserProfileComponent implements OnInit {
   email = '';
   documento = '';
   avatarUrl = '';
+  avatarError = '';
+  avatarUploading = false;
   idioma = 'pt-BR';
   telefone = '';
   dataNascimento = '';
@@ -37,12 +40,50 @@ export class UserProfileComponent implements OnInit {
       this.telefone = p.phone;
       this.dataNascimento = p.birthDate || '';
       this.avatarUrl = p.avatarUrl || '';
+      if (this.avatarUrl) {
+        localStorage.setItem('current_user_avatar', this.avatarUrl);
+      }
       this.cidade = p.city || '';
       this.estado = p.state || '';
       this.pais = p.country || '';
       this.idioma = p.language || 'pt-BR';
       this.email = ''; // email viria de outro endpoint; placeholder
     });
+  }
+
+  onAvatarFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.avatarError = 'Selecione uma imagem válida.';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      this.avatarError = 'Imagem muito grande. Use até 2MB.';
+      return;
+    }
+    this.avatarUploading = true;
+    this.avatarError = '';
+    this.profileService.uploadAvatar(file).subscribe({
+      next: (profile) => {
+        this.avatarUrl = profile.avatarUrl || '';
+        if (this.avatarUrl) {
+          localStorage.setItem('current_user_avatar', this.avatarUrl);
+        }
+        this.avatarUploading = false;
+      },
+      error: (err) => {
+        this.avatarUploading = false;
+        this.avatarError = err?.message || 'Falha ao enviar a imagem.';
+      }
+    });
+  }
+
+  limparAvatar(): void {
+    this.avatarUrl = '';
+    this.avatarError = '';
+    localStorage.removeItem('current_user_avatar');
   }
 
   salvarPerfil(): void {
@@ -62,6 +103,11 @@ export class UserProfileComponent implements OnInit {
       next: () => {
         localStorage.setItem('current_user_name', this.nome);
         localStorage.setItem('lang', this.idioma);
+        if (this.avatarUrl) {
+          localStorage.setItem('current_user_avatar', this.avatarUrl);
+        } else {
+          localStorage.removeItem('current_user_avatar');
+        }
         this.loading = false;
         alert('Perfil atualizado.');
       },

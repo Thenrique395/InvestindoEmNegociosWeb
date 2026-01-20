@@ -43,6 +43,12 @@ export class ProfileService {
     return this.http.put<UserProfile>(this.baseUrl, profile);
   }
 
+  uploadAvatar(file: File) {
+    const data = new FormData();
+    data.append('avatar', file);
+    return this.http.post<UserProfile>(`${this.baseUrl}/avatar`, data);
+  }
+
   changePassword(payload: { currentPassword: string; newPassword: string }) {
     return this.http.post<void>(`${API_BASE_URL}/auth/change-password`, payload);
   }

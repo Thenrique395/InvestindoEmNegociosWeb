@@ -18,6 +18,10 @@
     </div>
   </div>
 
+  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
+    {{ alerta }}
+  </div>
+
   <app-receitas-lista [rendas]="rendas" (editar)="editarPorId($event)" (remover)="remover($event)"></app-receitas-lista>
 
   <app-receitas-form
@@ -30,6 +34,7 @@
     [valorSugestao]="valorSugestao"
     [editandoId]="editandoId"
     [resumoTexto]="resumoTexto"
+    [saving]="saving"
     (valorChange)="onValorChange($event)"
     (recebimentoChange)="onRecebimentoChange($event)"
     (fonteChange)="onFonteChange($event)"

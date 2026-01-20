@@ -69,6 +69,9 @@ export class AppComponent implements OnDestroy {
     this.storage?.removeItem('access_token');
     this.storage?.removeItem('refresh_token');
     this.storage?.removeItem('current_user');
+    this.storage?.removeItem('current_user_name');
+    this.storage?.removeItem('user_name');
+    this.storage?.removeItem('user_id');
     this.router.navigateByUrl('/');
   }
 
@@ -77,7 +80,16 @@ export class AppComponent implements OnDestroy {
   }
 
   get displayName(): string {
-    return this.storage?.getItem('current_user_name') || this.storage?.getItem('current_user') || 'Usuário';
+    return (
+      this.storage?.getItem('current_user_name') ||
+      this.storage?.getItem('user_name') ||
+      this.storage?.getItem('current_user') ||
+      'Usuário'
+    );
+  }
+
+  get avatarUrl(): string {
+    return this.storage?.getItem('current_user_avatar') || '';
   }
 
   get userInitials(): string {

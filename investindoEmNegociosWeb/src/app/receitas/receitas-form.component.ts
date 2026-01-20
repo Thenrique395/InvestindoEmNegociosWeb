@@ -21,6 +21,7 @@ export class ReceitasFormComponent {
   @Input() valorSugestao: number | null = null;
   @Input() editandoId: string | null = null;
   @Input() resumoTexto = '';
+  @Input() saving = false;
 
   @Output() valorChange = new EventEmitter<string>();
   @Output() recebimentoChange = new EventEmitter<string>();

@@ -68,6 +68,7 @@
       Categoria
       <select [(ngModel)]="filtroCategoria">
         <option value="ALL">Todas</option>
+        <option *ngIf="!categorias.length" value="" disabled>Sem categorias cadastradas</option>
         <option *ngFor="let c of categorias" [value]="c">{{ c }}</option>
       </select>
     </label>
@@ -106,6 +107,7 @@
     [formaPagamento]="formaPagamento"
     [parcelar]="parcelar"
     [parcelasCount]="parcelasCount"
+    [saving]="saving"
     [cartaoSelecionadoId]="cartaoSelecionadoId"
     [cartaoSelecionadoLabel]="cartaoSelecionadoLabel"
     [fixa]="fixa"

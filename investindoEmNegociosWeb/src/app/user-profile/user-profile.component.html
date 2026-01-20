@@ -7,6 +7,21 @@
     </div>
   </div>
   <div class="form">
+    <div class="avatar-block">
+      <div class="avatar-preview" [class.is-empty]="!avatarUrl">
+        <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Foto de perfil" />
+        <span *ngIf="!avatarUrl">Sem foto</span>
+      </div>
+      <div class="avatar-actions">
+        <label class="upload">
+          <input type="file" accept="image/*" (change)="onAvatarFileChange($event)" [disabled]="avatarUploading" />
+          <span>{{ avatarUploading ? 'Enviando...' : 'Enviar foto' }}</span>
+        </label>
+        <button type="button" class="ghost" (click)="limparAvatar()" [disabled]="!avatarUrl || avatarUploading">Remover</button>
+        <small class="hint">PNG/JPG até 2MB.</small>
+        <small class="error" *ngIf="avatarError">{{ avatarError }}</small>
+      </div>
+    </div>
     <label>
       Nome
       <input type="text" [(ngModel)]="nome" placeholder="Seu nome" />

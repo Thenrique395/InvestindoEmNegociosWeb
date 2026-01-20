@@ -53,7 +53,7 @@
           <span class="tag income">Receita</span>
           <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
         </div>
-        <div *ngIf="categoriasPorTipo('Income').length === 0" class="muted">Nenhuma categoria de receita.</div>
+        <div *ngIf="categoriasPorTipo('Income').length === 0" class="muted">Sem categorias de receita. Crie uma nova acima.</div>
       </div>
     </div>
 
@@ -71,7 +71,7 @@
           <span class="tag expense">Despesa</span>
           <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
         </div>
-        <div *ngIf="categoriasPorTipo('Expense').length === 0" class="muted">Nenhuma categoria de despesa.</div>
+        <div *ngIf="categoriasPorTipo('Expense').length === 0" class="muted">Sem categorias de despesa. Crie uma nova acima.</div>
       </div>
     </div>
   </section>

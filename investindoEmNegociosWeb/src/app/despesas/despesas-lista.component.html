@@ -17,7 +17,7 @@
     <span>Ações</span>
   </div>
   <div class="lista__row lista__row--empty" *ngIf="!despesas.length">
-    <span class="muted">Nenhuma despesa cadastrada para este mês.</span>
+    <span class="muted">Sem despesas neste mês. Clique em “Adicionar despesa” para lançar a primeira.</span>
   </div>
   <div class="lista__row" *ngFor="let d of despesas">
     <label class="checkbox">

@@ -68,8 +68,10 @@
       </div>
 
       <div class="modal__actions">
-        <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
-        <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar receita' }}</button>
+        <button type="button" class="btn-danger ghost" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar receita') }}
+        </button>
       </div>
     </form>
   </div>

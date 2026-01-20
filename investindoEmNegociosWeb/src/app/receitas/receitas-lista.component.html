@@ -7,7 +7,7 @@
     <span class="acoes-head">Ações</span>
   </div>
   <div class="lista__row lista__row--empty" *ngIf="!rendas.length">
-    <span class="muted">Nenhuma receita cadastrada.</span>
+    <span class="muted">Sem receitas no mês. Clique em “Adicionar receita” para começar.</span>
   </div>
   <div class="lista__row" *ngFor="let r of rendas">
     <span>{{ r.fonte }}</span>

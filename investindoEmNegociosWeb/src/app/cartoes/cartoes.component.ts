@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, NgClass } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
@@ -19,6 +19,7 @@ import { DigitOnlyDirective } from '../utils/digit-only.directive';
     NgSwitchCase,
     NgSwitchDefault,
     CartoesListagemComponent,
+    NgClass,
     DigitOnlyDirective
   ],
   templateUrl: './cartoes.component.html',
@@ -33,12 +34,15 @@ export class CartoesComponent implements OnInit, OnDestroy {
   limiteCreditoInput = '';
   diaFechamento = 1;
   diaVencimento = 1;
+  saving = false;
   mostrarNumero = false;
   cards: StoredCard[] = [];
   expenses: StoredExpense[] = [];
   mostrarModal = false;
   editandoId: string | null = null;
   alerta = '';
+  alertaTipo: 'info' | 'success' | 'error' = 'info';
+  private alertaTimeout?: ReturnType<typeof setTimeout>;
   brands: CardBrandLookup[] = [];
 
   get bandeiraCode(): string {
@@ -73,6 +77,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
       error: () => {
         this.brands = [];
         this.alerta = 'Falha ao carregar bandeiras.';
+        this.alertaTipo = 'error';
         setTimeout(() => (this.alerta = ''), 4000);
       }
     });
@@ -89,10 +94,13 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   salvar(): void {
+    if (this.saving) return;
     if (!this.numero || !this.nome || !this.bandeira) return;
     if (this.diaFechamento < 1 || this.diaFechamento > 31) return;
     if (this.diaVencimento < 1 || this.diaVencimento > 31) return;
     if (this.limiteCredito < 0) return;
+    this.saving = true;
+    let ok = false;
     const numeroLimpo = this.numero.replace(/\D/g, '').slice(-4);
     const payload = {
       bandeira: this.bandeira,
@@ -111,11 +119,12 @@ export class CartoesComponent implements OnInit, OnDestroy {
       this.db.addCard(payload);
     }
 
-    this.fecharModal();
-    this.numero = '';
-    this.nome = '';
-    this.bandeira = this.brands[0]?.id ? String(this.brands[0].id) : '';
-    this.editandoId = null;
+    ok = true;
+    this.saving = false;
+    if (ok) {
+      this.setAlerta('Cartão salvo com sucesso.', 2500, 'success');
+      this.fecharModal();
+    }
   }
 
   abrirModal(): void {
@@ -127,6 +136,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   fecharModal(): void {
+    if (this.saving) return;
     this.mostrarModal = false;
     this.mostrarNumero = false;
     this.editandoId = null;
@@ -144,10 +154,18 @@ export class CartoesComponent implements OnInit, OnDestroy {
     const possuiDespesa = this.expenses.some((e) => e.cartao === id);
     if (possuiDespesa) {
       this.alerta = 'Não é possível remover este cartão; existem despesas vinculadas a ele.';
+      this.alertaTipo = 'error';
       setTimeout(() => (this.alerta = ''), 4000);
       return;
     }
     this.db.removeCard(id);
+  }
+
+  private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
+    this.alerta = msg;
+    this.alertaTipo = tipo;
+    if (this.alertaTimeout) clearTimeout(this.alertaTimeout);
+    this.alertaTimeout = setTimeout(() => (this.alerta = ''), duracao);
   }
 
   onNumeroInput(event: Event): void {

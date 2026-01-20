@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, DigitOnlyDirective],
+  imports: [FormsModule, NgFor, NgIf, DigitOnlyDirective, RouterLink],
   templateUrl: './despesas-form.component.html',
   styleUrls: ['./despesas-form.component.scss']
 })
@@ -25,6 +26,7 @@ export class DespesasFormComponent {
   @Input() parcelasCount = 1;
   @Input() fixa = false;
   @Input() fixaMeses: number | null = null;
+  @Input() saving = false;
   @Input() cartaoSelecionadoId: string | null = null;
   @Input() cartaoSelecionadoLabel = '';
 

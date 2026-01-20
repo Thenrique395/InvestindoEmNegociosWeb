@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.service';
-import { maskMoneyInput } from '../utils/input-mask';
+import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/input-mask';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
@@ -19,6 +19,7 @@ export class MetasComponent implements OnInit {
   metaAno = String(new Date().getFullYear());
   metaDescricao = '';
   metaMensal = '';
+  metaVencimento = '';
   metas: Goal[] = [];
   anos: number[] = [];
   filtroAno: number | 'ALL' = new Date().getFullYear();
@@ -32,6 +33,9 @@ export class MetasComponent implements OnInit {
   loading = false;
   saving = false;
   erro = '';
+  alerta = '';
+  alertaTipo: 'info' | 'success' | 'error' = 'info';
+  private alertaTimeout?: ReturnType<typeof setTimeout>;
   mostrarAporte = false;
   aporteValor = '';
   aporteData = new Date().toISOString().slice(0, 10);
@@ -94,6 +98,7 @@ export class MetasComponent implements OnInit {
 
   abrirModal(): void {
     this.editando = false;
+    this.resetarForm();
     this.mostrarModal = true;
   }
 
@@ -107,11 +112,13 @@ export class MetasComponent implements OnInit {
     this.metaMensal = meta.expectedMonthly
       ? meta.expectedMonthly.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
       : '';
+    this.metaVencimento = meta.targetDate ? this.formatarDataBR(meta.targetDate) : '';
     this.mostrarModal = true;
     this.erro = '';
   }
 
   fecharModal(): void {
+    if (this.saving) return;
     this.mostrarModal = false;
     this.resetarForm();
     this.erro = '';
@@ -138,7 +145,7 @@ export class MetasComponent implements OnInit {
       description: this.metaDescricao?.trim() || null,
       status: (this.metaSelecionada?.status as GoalStatus) ?? ('Planned' as GoalStatus),
       expectedMonthly: this.parseValor(this.metaMensal),
-      targetDate: null
+      targetDate: this.toTargetDate()
     };
 
     this.saving = true;
@@ -151,6 +158,7 @@ export class MetasComponent implements OnInit {
         this.saving = false;
         this.fecharModal();
         this.aplicarFiltros();
+        this.setAlerta('Meta salva com sucesso.', 2500, 'success');
       },
       error: (err) => {
         this.saving = false;
@@ -161,6 +169,7 @@ export class MetasComponent implements OnInit {
 
   formatarValor(): void {
     this.metaValor = maskMoneyInput(this.metaValor);
+    this.atualizarAportePrevisto();
   }
 
   formatarMensal(): void {
@@ -172,9 +181,13 @@ export class MetasComponent implements OnInit {
     this.metaAno = digits;
   }
 
+  formatarVencimento(): void {
+    this.metaVencimento = maskDateDDMMYYYY(this.metaVencimento);
+    this.atualizarAportePrevisto();
+  }
+
   formatarAporte(): void {
-    const digits = (this.aporteValor || '').replace(/[^\d]/g, '');
-    this.aporteValor = digits;
+    this.aporteValor = maskMoneyInput(this.aporteValor);
   }
 
   private carregarContribuicoes(goalId: string): void {
@@ -198,6 +211,7 @@ export class MetasComponent implements OnInit {
   }
 
   fecharAporte(): void {
+    if (this.saving) return;
     this.mostrarAporte = false;
     this.metaSelecionada = undefined;
     this.erro = '';
@@ -233,6 +247,7 @@ export class MetasComponent implements OnInit {
           );
           this.fecharAporte();
           this.aplicarFiltros();
+          this.setAlerta('Aporte registrado com sucesso.', 2500, 'success');
         },
         error: () => {
           this.saving = false;
@@ -282,7 +297,9 @@ export class MetasComponent implements OnInit {
       next: (updated) => {
         this.metas = this.metas.map((m) => (m.id === updated.id ? updated : m));
         this.saving = false;
+        const modo = this.confirmModal.mode;
         this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
+        this.setAlerta(modo === 'cancel' ? 'Meta cancelada.' : 'Meta reativada.', 2500, 'success');
       },
       error: () => {
         this.saving = false;
@@ -292,6 +309,7 @@ export class MetasComponent implements OnInit {
   }
 
   fecharConfirm(): void {
+    if (this.saving) return;
     this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
   }
 
@@ -319,8 +337,16 @@ export class MetasComponent implements OnInit {
   }
 
   fecharHistorico(): void {
+    if (this.saving) return;
     this.mostrarHistorico = false;
     this.historicoMeta = undefined;
+  }
+
+  private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
+    this.alerta = msg;
+    this.alertaTipo = tipo;
+    if (this.alertaTimeout) clearTimeout(this.alertaTimeout);
+    this.alertaTimeout = setTimeout(() => (this.alerta = ''), duracao);
   }
 
   private carregarMetas(): void {
@@ -346,10 +372,49 @@ export class MetasComponent implements OnInit {
     return Number(clean);
   }
 
+  private toTargetDate(): string | null {
+    if (!this.metaVencimento) return null;
+    const parsed = parseDateDDMMYYYY(this.metaVencimento);
+    if (!parsed) return null;
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatarDataBR(dateValue: string): string {
+    const iso = dateValue.split('T')[0];
+    const [year, month, day] = iso.split('-');
+    if (!year || !month || !day) return '';
+    return `${day}/${month}/${year}`;
+  }
+
+  private atualizarAportePrevisto(): void {
+    const parsed = parseDateDDMMYYYY(this.metaVencimento);
+    const total = this.parseValor(this.metaValor);
+    if (!parsed || !total) return;
+    const current = this.metaSelecionada?.currentAmount ?? 0;
+    const restante = Math.max(total - current, 0);
+    const months = this.monthsUntil(parsed);
+    if (months <= 0) return;
+    const mensal = restante / months;
+    this.metaMensal = mensal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.metaAno = String(parsed.getFullYear());
+  }
+
+  private monthsUntil(target: Date): number {
+    const now = new Date();
+    const currentIndex = now.getFullYear() * 12 + now.getMonth();
+    const targetIndex = target.getFullYear() * 12 + target.getMonth();
+    const months = targetIndex - currentIndex + 1;
+    return months > 0 ? months : 0;
+  }
+
   private resetarForm(): void {
     this.metaNome = '';
     this.metaValor = '';
     this.metaMensal = '';
+    this.metaVencimento = '';
     this.metaAno = String(new Date().getFullYear());
     this.metaDescricao = '';
     this.metaSelecionada = undefined;

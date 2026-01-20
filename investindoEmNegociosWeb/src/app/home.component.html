@@ -9,7 +9,7 @@
     </div>
   </header>
 
-  <div class="grid">
+  <div class="grid" *ngIf="!isLoadingDashboard; else loadingSummary">
     <div class="stat-card balance">
       <div class="stat-card__header">
         <span class="stat-card__icon" aria-hidden="true">
@@ -63,7 +63,6 @@
       <h2>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="muted">Somente despesas com vencimento neste mês.</p>
     </div>
-
     <div class="stat-card cards">
       <div class="stat-card__header">
         <span class="stat-card__icon" aria-hidden="true">
@@ -84,6 +83,26 @@
       <p class="muted">Somatório de despesas vinculadas a cartões.</p>
     </div>
   </div>
+  <ng-template #loadingSummary>
+    <div class="grid is-loading">
+      <div class="stat-card balance">
+        <p class="label">Carregando resumo...</p>
+        <p class="muted">Aguarde um instante.</p>
+      </div>
+      <div class="stat-card income">
+        <p class="label">Carregando receitas...</p>
+        <p class="muted">Aguarde um instante.</p>
+      </div>
+      <div class="stat-card expense">
+        <p class="label">Carregando despesas...</p>
+        <p class="muted">Aguarde um instante.</p>
+      </div>
+      <div class="stat-card cards">
+        <p class="label">Carregando cartões...</p>
+        <p class="muted">Calculando dívidas.</p>
+      </div>
+    </div>
+  </ng-template>
 
   <div class="goals" *ngIf="metasResumo.total">
     <div class="goals__header">
@@ -150,7 +169,7 @@
     </div>
   </div>
 
-  <div class="dashboard-row">
+  <div class="dashboard-row" *ngIf="!isLoadingDashboard">
     <div class="chart">
       <div class="chart__header">
         <p class="label">Receitas x Despesas no ano</p>
@@ -164,56 +183,62 @@
           </button>
         </div>
       </div>
-      <div class="chart__legend">
-        <span class="legend income"></span> Receitas
-        <span class="legend expense"></span> Despesas
+      <div class="chart__empty" *ngIf="!hasChartData">
+        <p class="muted">Cadastre sua primeira receita ou despesa para ver o gráfico anual.</p>
       </div>
-      <div class="chart__bars" *ngIf="chartType === 'bar'">
-        <div class="chart__bar" *ngFor="let m of monthlyData">
-          <div class="bars-wrap">
-            <div class="bar income" [style.height.%]="
-                maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0
-              "></div>
-            <div class="bar expense" [style.height.%]="
-                maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0
-              "></div>
-            <div class="bar-tooltip">
-              <p>{{ m.label | uppercase }}</p>
-              <span>Receitas:
-                <strong>{{ m.incomes | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-              <span>Despesas:
-                <strong>{{ m.expenses | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+      <ng-container *ngIf="hasChartData">
+        <div class="chart__legend">
+          <span class="legend income"></span> Receitas
+          <span class="legend expense"></span> Despesas
+        </div>
+        <div class="chart__bars" *ngIf="chartType === 'bar'">
+          <div class="chart__bar" *ngFor="let m of monthlyData">
+            <div class="bars-wrap">
+              <div class="bar income" [style.height.%]="
+                  maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0
+                "></div>
+              <div class="bar expense" [style.height.%]="
+                  maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0
+                "></div>
+              <div class="bar-tooltip">
+                <p>{{ m.label | uppercase }}</p>
+                <span>Receitas:
+                  <strong>{{ m.incomes | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                <span>Despesas:
+                  <strong>{{ m.expenses | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+              </div>
+            </div>
+            <span class="bar__label">{{ m.label }}</span>
+          </div>
+        </div>
+        <div class="chart__line" *ngIf="chartType === 'line'">
+          <div class="line-wrap">
+            <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
+              <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
+              <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
+              <ng-container *ngFor="let p of incomesPoints">
+                <circle class="dot income" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
+                  (mouseenter)="showLineTooltip(p, 'income')" (mouseleave)="hideLineTooltip()"></circle>
+              </ng-container>
+              <ng-container *ngFor="let p of expensesPoints">
+                <circle class="dot expense" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
+                  (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
+              </ng-container>
+            </svg>
+            <div class="line-tooltip" *ngIf="lineTooltip" [style.left.%]="lineTooltip.left"
+              [style.top.%]="lineTooltip.top">
+              <p>{{ lineTooltip.label | uppercase }}</p>
+              <span>
+                {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
+                <strong>{{ lineTooltip.value | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              </span>
             </div>
           </div>
-          <span class="bar__label">{{ m.label }}</span>
-        </div>
-      </div>
-      <div class="chart__line" *ngIf="chartType === 'line'">
-        <div class="line-wrap">
-          <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
-            <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
-            <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
-            <ng-container *ngFor="let p of incomesPoints">
-              <circle class="dot income" [attr.cx]="p.x" [attr.cy]="p.y" r="6" (mouseenter)="showLineTooltip(p, 'income')"
-                (mouseleave)="hideLineTooltip()"></circle>
-            </ng-container>
-            <ng-container *ngFor="let p of expensesPoints">
-              <circle class="dot expense" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
-                (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
-            </ng-container>
-          </svg>
-          <div class="line-tooltip" *ngIf="lineTooltip" [style.left.%]="lineTooltip.left" [style.top.%]="lineTooltip.top">
-            <p>{{ lineTooltip.label | uppercase }}</p>
-            <span>
-              {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
-              <strong>{{ lineTooltip.value | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-            </span>
+          <div class="chart__months">
+            <span *ngFor="let m of monthlyData">{{ m.label }}</span>
           </div>
         </div>
-        <div class="chart__months">
-          <span *ngFor="let m of monthlyData">{{ m.label }}</span>
-        </div>
-      </div>
+      </ng-container>
     </div>
 
     <aside class="recent">
@@ -249,7 +274,7 @@
         </div>
       </div>
       <ng-template #semMovimentos>
-        <p class="muted">Nenhum lançamento recente.</p>
+        <p class="muted">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
       </ng-template>
     </aside>
   </div>

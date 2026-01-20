@@ -10,7 +10,7 @@
     </button>
   </div>
 
-  <div *ngIf="alerta" class="inline-alert">
+  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
     {{ alerta }}
   </div>
 
@@ -106,8 +106,10 @@
           </div>
 
           <div class="actions">
-            <button type="button" class="btn-danger ghost" (click)="fecharModal()">↩ Cancelar</button>
-            <button type="submit" class="btn-primary">{{ editandoId ? 'Salvar alterações' : 'Salvar cartão' }}</button>
+            <button type="button" class="btn-danger ghost" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="saving">
+              {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar cartão') }}
+            </button>
           </div>
         </form>
 

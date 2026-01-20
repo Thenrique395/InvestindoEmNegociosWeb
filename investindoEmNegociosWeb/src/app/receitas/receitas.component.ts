@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DecimalPipe, NgIf } from '@angular/common';
+import { DecimalPipe, NgIf, NgClass } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
@@ -9,7 +9,7 @@ import { maskDateDDMMYYYY, maskMoneyInput, maskMonthYear } from '../utils/input-
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf, NgClass],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })
@@ -24,6 +24,10 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   erroData = '';
   editandoId: string | null = null;
   valorSugestao: number | null = null;
+  saving = false;
+  alerta = '';
+  alertaTipo: 'info' | 'success' | 'error' = 'info';
+  private alertaTimeout?: ReturnType<typeof setTimeout>;
   private sub?: Subscription;
   showDeleteModal = false;
   deletePlanId: string | null = null;
@@ -70,16 +74,19 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(): void {
+    if (this.saving) return;
     this.resetarForm();
     this.mostrarForm = true;
   }
 
   fecharModal(): void {
+    if (this.saving) return;
     this.mostrarForm = false;
     this.resetarForm();
   }
 
   salvar(): void {
+    if (this.saving) return;
     const valor = this.parseValor(this.valorInput);
     if (!this.novaRenda.fonte || !valor) return;
 
@@ -101,27 +108,37 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       this.erroData = '';
     }
 
-    if (this.editandoId) {
-      this.db.updateIncome(this.editandoId, {
-        planId: this.editandoId,
-        fonte: this.novaRenda.fonte,
-        valor,
-        recebimento: recebimentoNormalizado,
-        fixa: this.novaRenda.fixa,
-        fixaInicio
-      });
-    } else {
-      this.db.addIncome({
-        planId: '',
-        fonte: this.novaRenda.fonte,
-        valor,
-        recebimento: recebimentoNormalizado,
-        fixa: this.novaRenda.fixa,
-        fixaInicio
-      });
-    }
+    this.saving = true;
+    let ok = false;
+    try {
+      if (this.editandoId) {
+        this.db.updateIncome(this.editandoId, {
+          planId: this.editandoId,
+          fonte: this.novaRenda.fonte,
+          valor,
+          recebimento: recebimentoNormalizado,
+          fixa: this.novaRenda.fixa,
+          fixaInicio
+        });
+      } else {
+        this.db.addIncome({
+          planId: '',
+          fonte: this.novaRenda.fonte,
+          valor,
+          recebimento: recebimentoNormalizado,
+          fixa: this.novaRenda.fixa,
+          fixaInicio
+        });
+      }
 
-    this.fecharModal();
+      ok = true;
+    } finally {
+      this.saving = false;
+      if (ok) {
+        this.setAlerta('Receita salva com sucesso.', 2500, 'success');
+        this.fecharModal();
+      }
+    }
   }
 
   editar(renda: StoredIncome): void {
@@ -205,6 +222,13 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.editandoId = null;
     this.erroData = '';
     this.valorSugestao = null;
+  }
+
+  private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
+    this.alerta = msg;
+    this.alertaTipo = tipo;
+    if (this.alertaTimeout) clearTimeout(this.alertaTimeout);
+    this.alertaTimeout = setTimeout(() => (this.alerta = ''), duracao);
   }
 
   private criaRenda(): StoredIncome {

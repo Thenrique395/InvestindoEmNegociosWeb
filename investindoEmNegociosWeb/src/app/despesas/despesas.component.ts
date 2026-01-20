@@ -21,8 +21,7 @@ import { expenseStatusLabel } from '../utils/status';
 })
 export class DespesasComponent implements OnInit, OnDestroy {
   dataAtual = new Date();
-  private readonly categoriasPadrao = ['Moradia', 'Transporte', 'Alimentação', 'Lazer', 'Saúde', 'Educação', 'Outros'];
-  categorias = [...this.categoriasPadrao];
+  categorias: string[] = [];
   cartoes: StoredCard[] = [];
   despesasPorMes: Record<string, StoredExpense[]> = {};
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | null = null;
@@ -30,6 +29,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   mostrarForm = false;
   alerta = '';
   alertaTipo: 'info' | 'success' | 'error' = 'info';
+  saving = false;
   valorInput = '';
   vencimentoInput = '';
   erroData = '';
@@ -78,13 +78,13 @@ export class DespesasComponent implements OnInit, OnDestroy {
       next: (data) => {
         const nomes = data.map((c) => c.name).filter(Boolean);
         const unicos = Array.from(new Set(nomes));
-        this.categorias = unicos.length ? unicos : [...this.categoriasPadrao];
+        this.categorias = unicos;
         if (!this.novaDespesa.categoria && this.categorias.length) {
           this.novaDespesa = { ...this.novaDespesa, categoria: this.categorias[0] };
         }
       },
       error: () => {
-        this.categorias = [...this.categoriasPadrao];
+        this.categorias = [];
       }
     });
 
@@ -417,6 +417,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   adicionar(): void {
+    if (this.saving) return;
     const valor = this.parseValor(this.valorInput);
     if (!this.novaDespesa.nome || !valor) return;
 
@@ -435,39 +436,49 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
     const serieId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
 
-    // EDITAR item existente (sem regenerar série)
-    if (this.editando) {
-      const { id } = this.editando;
-      this.db.updateExpense(id, {
+    this.saving = true;
+    let ok = false;
+    try {
+      // EDITAR item existente (sem regenerar série)
+      if (this.editando) {
+        const { id } = this.editando;
+        this.db.updateExpense(id, {
+          nome: this.novaDespesa.nome,
+          categoria: this.novaDespesa.categoria,
+          valor,
+          vencimento: vencimentoNormalizado,
+          cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined
+        });
+        ok = true;
+        return;
+      }
+
+      const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
+      const valorParcela = parcelas > 1 ? valor / parcelas : valor;
+      const fixaMeses = this.fixa ? this.fixaMeses || null : null;
+
+      // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
+      this.db.addExpense({
         nome: this.novaDespesa.nome,
         categoria: this.novaDespesa.categoria,
-        valor,
-        vencimento: vencimentoNormalizado,
-        cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined
+        valor: Number(valorParcela.toFixed(2)),
+        vencimento: this.formatDate(dataBase),
+        cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
+        parcelaNumero: parcelas > 1 ? 1 : undefined,
+        parcelasTotal: parcelas > 1 ? parcelas : undefined,
+        serieId: parcelas > 1 ? serieId : undefined,
+        fixa: this.fixa,
+        fixaMeses
       });
-      this.resetarForm();
-      return;
+
+      ok = true;
+    } finally {
+      this.saving = false;
+      if (ok) {
+        this.setAlerta('Despesa salva com sucesso.', 2500, 'success');
+        this.fecharModal();
+      }
     }
-
-    const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
-    const valorParcela = parcelas > 1 ? valor / parcelas : valor;
-    const fixaMeses = this.fixa ? this.fixaMeses || null : null;
-
-    // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
-    this.db.addExpense({
-      nome: this.novaDespesa.nome,
-      categoria: this.novaDespesa.categoria,
-      valor: Number(valorParcela.toFixed(2)),
-      vencimento: this.formatDate(dataBase),
-      cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
-      parcelaNumero: parcelas > 1 ? 1 : undefined,
-      parcelasTotal: parcelas > 1 ? parcelas : undefined,
-      serieId: parcelas > 1 ? serieId : undefined,
-      fixa: this.fixa,
-      fixaMeses
-    });
-
-    this.resetarForm();
   }
 
   totalMes(): number {
@@ -527,16 +538,19 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(): void {
+    if (this.saving) return;
+    this.resetarFormulario();
     this.mostrarForm = true;
   }
 
   fecharModal(): void {
+    if (this.saving) return;
     this.mostrarForm = false;
     this.erroData = '';
     this.editando = null;
     this.fixa = false;
     this.fixaMeses = null;
-    this.resetarForm();
+    this.resetarFormulario();
   }
 
   editarDespesa(mesKey: string, index: number): void {
@@ -668,11 +682,10 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return `${dd}/${mm}/${date.getFullYear()}`;
   }
 
-  private resetarForm(): void {
+  private resetarFormulario(): void {
     this.novaDespesa = this.criaDespesa();
     this.valorInput = '';
     this.vencimentoInput = '';
-    this.mostrarForm = false;
     this.parcelar = false;
     this.parcelasCount = 1;
     this.formaPagamento = 'avista';

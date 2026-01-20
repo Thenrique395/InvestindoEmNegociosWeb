@@ -8,6 +8,10 @@
     <button type="button" class="btn-primary" (click)="abrirModal()">Adicionar meta</button>
   </header>
 
+  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
+    {{ alerta }}
+  </div>
+
   <div class="filters">
     <label>
       Ano
@@ -30,8 +34,8 @@
       <p class="muted">Carregando metas...</p>
     </div>
     <div *ngIf="!loading && metas.length === 0" class="placeholder">
-      <p class="muted">Nenhuma meta cadastrada ainda.</p>
-      <small>Use o botão "Adicionar meta" para criar sua primeira meta anual.</small>
+      <p class="muted">Sem metas cadastradas.</p>
+      <small>Clique em “Adicionar meta” para criar sua primeira meta anual.</small>
     </div>
 
     <div class="cards" *ngIf="!loading && metas.length">
@@ -82,7 +86,7 @@
         </div>
         <div class="goal-card__row actions">
           <button type="button" class="ghost sm" (click)="abrirModalEditar(meta)">Editar</button>
-          <button type="button" class="ghost sm" [disabled]="isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
+          <button type="button" class="ghost sm" *ngIf="!isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
           <button
             type="button"
             class="ghost sm danger"
@@ -112,7 +116,7 @@
           <p class="eyebrow">Cadastrar meta</p>
           <h3>Nova meta anual</h3>
         </div>
-        <button class="modal__close" type="button" (click)="fecharModal()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharModal()">✕</button>
       </div>
 
       <div class="form">
@@ -132,6 +136,11 @@
             pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
         </label>
         <label>
+          Data de vencimento (DD/MM/AAAA)
+          <input type="text" [(ngModel)]="metaVencimento" digitOnly (input)="formatarVencimento()" inputmode="numeric"
+            pattern="[0-9]*" placeholder="Ex.: 31/12/2026" />
+        </label>
+        <label>
           Ano
           <input type="text" [(ngModel)]="metaAno" digitOnly (input)="formatarAno()" inputmode="numeric" pattern="[0-9]*"
             maxlength="4" />
@@ -143,7 +152,7 @@
       </div>
 
       <div class="modal__actions">
-        <button type="button" class="ghost" (click)="fecharModal()">Cancelar</button>
+        <button type="button" class="ghost" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
         <button type="button" class="btn-primary" [disabled]="saving" (click)="salvar()">
           {{ saving ? 'Salvando...' : 'Salvar meta' }}
         </button>
@@ -159,7 +168,7 @@
           <p class="eyebrow">Registrar aporte</p>
           <h3>{{ metaSelecionada?.title }}</h3>
         </div>
-        <button class="modal__close" type="button" (click)="fecharAporte()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharAporte()">✕</button>
       </div>
 
       <div class="error-floating" *ngIf="erro">{{ erro }}</div>
@@ -167,7 +176,7 @@
       <div class="form">
         <label>
           Valor (R$)
-          <input type="text" [(ngModel)]="aporteValor" (input)="formatarAporte()" placeholder="Ex.: 1.500,00" />
+          <input type="text" [(ngModel)]="aporteValor" digitOnly (input)="formatarAporte()" inputmode="numeric" placeholder="Ex.: 1.500,00" />
         </label>
         <label>
           Data
@@ -180,7 +189,7 @@
       </div>
 
       <div class="modal__actions">
-        <button type="button" class="ghost" (click)="fecharAporte()">Cancelar</button>
+        <button type="button" class="ghost" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
         <button type="button" class="btn-primary" [disabled]="saving" (click)="salvarAporte()">
           {{ saving ? 'Salvando...' : 'Salvar aporte' }}
         </button>
@@ -196,7 +205,7 @@
           <p class="eyebrow">{{ confirmModal.mode === 'cancel' ? 'Cancelar meta' : 'Reativar meta' }}</p>
           <h3>{{ confirmModal.goal?.title }}</h3>
         </div>
-        <button class="modal__close" type="button" (click)="fecharConfirm()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharConfirm()">✕</button>
       </div>
       <p class="muted">
         {{ confirmModal.mode === 'cancel'
@@ -204,7 +213,7 @@
           : 'A meta voltará o status para planejada.' }}
       </p>
       <div class="modal__actions">
-        <button type="button" class="ghost" (click)="fecharConfirm()">Fechar</button>
+        <button type="button" class="ghost" [disabled]="saving" (click)="fecharConfirm()">Fechar</button>
         <button type="button" class="btn-primary" [disabled]="saving" (click)="confirmarAcao()">
           {{ saving ? 'Processando...' : (confirmModal.mode === 'cancel' ? 'Confirmar cancelamento' : 'Reativar meta') }}
         </button>
@@ -220,7 +229,7 @@
           <p class="eyebrow">Histórico de aportes</p>
           <h3>{{ historicoMeta?.title }}</h3>
         </div>
-        <button class="modal__close" type="button" (click)="fecharHistorico()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharHistorico()">✕</button>
       </div>
 
       <div *ngIf="historicoMeta && contribDetalhes[historicoMeta.id]?.length; else semAporte" class="history">
