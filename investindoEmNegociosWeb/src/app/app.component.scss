@@ -54,7 +54,10 @@
   background: linear-gradient(180deg, rgba(4, 56, 74, 0.85), rgba(2, 38, 52, 0.9));
   border-right: 1px solid var(--stroke);
   display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
   gap: 0.9rem;
+  min-height: 100vh;
 }
 
 .sidebar__brand {

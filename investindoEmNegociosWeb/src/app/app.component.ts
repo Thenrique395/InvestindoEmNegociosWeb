@@ -13,7 +13,11 @@ import { ProfileService, UserProfile } from './profile.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'Investindo em Negócios';
+  title = 'SaldoClaro';
+  brandName = 'SaldoClaro';
+  brandSlogan = 'Visão clara do seu dinheiro, todo mês.';
+  brandPositioning =
+    'Controle receitas, despesas e metas com clareza. Alertas inteligentes e decisões mais seguras.';
   isLoginRoute = false;
   isHomeRoute = false;
   isLightTheme = false;

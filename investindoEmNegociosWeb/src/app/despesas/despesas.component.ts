@@ -40,7 +40,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   fixaMeses: number | null = null;
   cartaoSelecionadoId: string | null = null;
   editando: { id: string; isParcela: boolean } | null = null;
-  confirmRemocao: { id: string; serieId?: string; totalParcelas?: number } | null = null;
+  confirmRemocao: { id: string; serieId?: string; totalParcelas?: number; isRecurring?: boolean } | null = null;
   private sub?: Subscription;
   private categoriasSub?: Subscription;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
@@ -592,8 +592,13 @@ export class DespesasComponent implements OnInit, OnDestroy {
       setTimeout(() => (this.alerta = ''), 4000);
       return;
     }
-    if (d.parcelasTotal && d.serieId) {
-      this.confirmRemocao = { id: d.id!, serieId: d.planId || d.serieId, totalParcelas: d.parcelasTotal };
+    if ((d.parcelasTotal && d.serieId) || d.fixa) {
+      this.confirmRemocao = {
+        id: d.id!,
+        serieId: d.planId || d.serieId,
+        totalParcelas: d.parcelasTotal,
+        isRecurring: !!d.fixa
+      };
       return;
     }
     this.removerDespesa(mesKey, index);

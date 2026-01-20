@@ -55,6 +55,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     amount: number;
     type: 'income' | 'expense';
     status?: string;
+    recurring?: boolean;
   }[] = [];
   metasResumo = {
     total: 0,
@@ -77,6 +78,30 @@ export class HomeComponent implements OnInit, OnDestroy {
   onboardingDone = false;
   hideOnboarding = false;
   onboardingDismissed = false;
+  onboardingScreens = [
+    {
+      title: 'Cadastre sua primeira receita',
+      description: 'Informe sua principal fonte para o app calcular seu saldo real.',
+      bullets: ['Salario, freelas ou beneficios', 'Defina se e fixa ou avulsa'],
+      ctaLabel: 'Cadastrar receita',
+      ctaLink: '/receitas'
+    },
+    {
+      title: 'Cadastre uma despesa',
+      description: 'Registre seus gastos para acompanhar o que sai do caixa.',
+      bullets: ['Escolha a categoria correta', 'Defina o vencimento'],
+      ctaLabel: 'Cadastrar despesa',
+      ctaLink: '/despesas'
+    },
+    {
+      title: 'Crie sua meta anual',
+      description: 'Tenha um objetivo claro e acompanhe o progresso.',
+      bullets: ['Valor total e prazo', 'Aportes mensais previstos'],
+      ctaLabel: 'Criar meta',
+      ctaLink: '/metas'
+    }
+  ];
+  showInsightDetails = false;
 
   constructor(
     private db: ApiDataService,
@@ -153,6 +178,31 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.isLogged && !this.onboardingDone && !this.onboardingDismissed;
   }
 
+  get onboardingCurrent() {
+    return this.onboardingScreens[Math.min(this.onboardingStep, this.onboardingScreens.length - 1)];
+  }
+
+  get onboardingTotal(): number {
+    return this.onboardingScreens.length;
+  }
+
+  get insightTips(): string[] {
+    switch (this.insight.tone) {
+      case 'danger':
+        return [
+          'Revise despesas com vencimento proximo',
+          'Priorize cortar gastos variaveis',
+          'Antecipe receitas se possivel'
+        ];
+      case 'warn':
+        return ['Acompanhe os gastos da semana', 'Evite novas compras parceladas', 'Defina um limite diario'];
+      case 'info':
+        return ['Cadastre receitas e despesas principais', 'Crie sua primeira meta anual'];
+      default:
+        return ['Mantenha o ritmo atual', 'Reavalie suas metas no fim do mes'];
+    }
+  }
+
   get cardsCount(): number {
     return this.cards.length;
   }
@@ -208,7 +258,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       date: e.vencimento || '—',
       amount: e.valor || 0,
       type: 'expense' as const,
-      status: expenseStatusLabel(e.status)
+      status: expenseStatusLabel(e.status),
+      recurring: !!e.fixa,
+      planId: e.planId
     }));
     const incomeItems = this.incomesRaw.map((i) => ({
       id: i.id,
@@ -216,9 +268,30 @@ export class HomeComponent implements OnInit, OnDestroy {
       date: i.recebimento || '—',
       amount: i.valor || 0,
       type: 'income' as const,
-      status: incomeStatusLabel(i.recebimento)
+      status: incomeStatusLabel(i.recebimento),
+      recurring: !!i.fixa,
+      planId: i.planId
     }));
-    const all = [...expenseItems, ...incomeItems];
+
+    const merged = [...expenseItems, ...incomeItems];
+    const grouped = new Map<string, (typeof merged)[number]>();
+
+    for (const item of merged) {
+      const keyBase = item.recurring ? item.planId || item.title : item.id;
+      const key = `${item.type}-${keyBase}`;
+      const prev = grouped.get(key);
+      if (!prev) {
+        grouped.set(key, item);
+        continue;
+      }
+      const prevDate = parseDateDDMMYYYY(prev.date)?.getTime() || 0;
+      const nextDate = parseDateDDMMYYYY(item.date)?.getTime() || 0;
+      if (nextDate >= prevDate) {
+        grouped.set(key, item);
+      }
+    }
+
+    const all = Array.from(grouped.values());
     all.sort((a, b) => {
       const da = parseDateDDMMYYYY(a.date)?.getTime() || 0;
       const db = parseDateDDMMYYYY(b.date)?.getTime() || 0;
@@ -228,11 +301,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   nextOnboarding(): void {
-    if (this.onboardingStep >= 2) {
+    if (this.onboardingStep >= this.onboardingScreens.length - 1) {
       this.finishOnboarding();
       return;
     }
     this.onboardingStep += 1;
+    this.persistOnboarding();
+  }
+
+  prevOnboarding(): void {
+    if (this.onboardingStep <= 0) return;
+    this.onboardingStep -= 1;
     this.persistOnboarding();
   }
 
@@ -244,6 +323,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.onboardingDismissed = true;
   }
 
+  openInsightDetails(): void {
+    this.showInsightDetails = true;
+  }
+
+  closeInsightDetails(): void {
+    this.showInsightDetails = false;
+  }
+
   toggleHideOnboarding(checked: boolean): void {
     this.hideOnboarding = checked;
     if (checked) {
@@ -253,7 +340,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private finishOnboarding(): void {
     this.onboardingDone = true;
-    this.onboardingStep = 2;
+    this.onboardingStep = this.onboardingScreens.length - 1;
     this.persistOnboarding();
   }
 
@@ -399,6 +486,31 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.totalRendas && this.totalDespesas > 0) {
+      this.insight = {
+        title: 'Sem receita registrada',
+        message: 'Cadastre uma receita para o saldo ficar correto.',
+        tone: 'danger'
+      };
+      return;
+    }
+
+    const despesasVencidas = this.expensesRaw.filter((e) => {
+      const data = parseDateDDMMYYYY(e.vencimento);
+      const hoje = new Date();
+      if (!data) return false;
+      if (e.status && e.status !== 'OPEN' && e.status !== 'PARTIALLY_PAID') return false;
+      return data < new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    });
+    if (despesasVencidas.length > 0) {
+      this.insight = {
+        title: 'Despesas vencidas em aberto',
+        message: `Você tem ${despesasVencidas.length} despesa(s) vencida(s). Priorize o pagamento.`,
+        tone: 'danger'
+      };
+      return;
+    }
+
     if (this.saldo < 0) {
       this.insight = {
         title: 'Saldo negativo neste mês',
@@ -409,10 +521,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     const taxaGasto = this.totalRendas ? this.totalDespesas / this.totalRendas : 0;
-    if (taxaGasto > 0.75) {
+    if (taxaGasto > 0.85) {
       this.insight = {
         title: 'Despesas consumindo sua renda',
-        message: 'Mais de 75% da sua renda já está comprometida neste mês.',
+        message: 'Mais de 85% da sua renda já está comprometida neste mês.',
+        tone: 'danger'
+      };
+      return;
+    }
+
+    if (taxaGasto > 0.7) {
+      this.insight = {
+        title: 'Despesas altas neste mês',
+        message: 'Mais de 70% da sua renda já foi usada.',
         tone: 'warn'
       };
       return;
@@ -423,6 +544,27 @@ export class HomeComponent implements OnInit, OnDestroy {
         title: 'Cartões com saldo elevado',
         message: 'O total em cartões passou de 30% da sua renda do mês.',
         tone: 'warn'
+      };
+      return;
+    }
+
+    const mesIndex = this.dataAtual.getMonth();
+    const atual = this.monthlyData[mesIndex]?.expenses || 0;
+    const anterior = this.monthlyData[mesIndex - 1]?.expenses || 0;
+    if (anterior > 0 && atual > anterior * 1.2) {
+      this.insight = {
+        title: 'Despesas subiram',
+        message: 'Seus gastos aumentaram mais de 20% em relação ao mês anterior.',
+        tone: 'warn'
+      };
+      return;
+    }
+
+    if (this.metasResumo.total === 0 && this.saldo > 0) {
+      this.insight = {
+        title: 'Defina uma meta para o ano',
+        message: 'Com saldo positivo, você pode planejar um objetivo maior.',
+        tone: 'info'
       };
       return;
     }

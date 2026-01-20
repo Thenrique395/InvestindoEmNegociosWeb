@@ -1,44 +1,106 @@
 <div class="onboarding">
   <div class="card">
-    <p class="eyebrow">Primeiro acesso</p>
-    <h2>Complete seus dados</h2>
-    <p class="muted">Usamos essas informações para personalizar sua experiência e manter sua conta segura.</p>
+    <div class="wizard">
+      <div class="wizard__steps">
+        <span [class.active]="step === 0" [class.done]="step > 0">1</span>
+        <span [class.active]="step === 1" [class.done]="step > 1">2</span>
+        <span [class.active]="step === 2">3</span>
+      </div>
+      <p class="wizard__label">Passo {{ step + 1 }} de 3</p>
+    </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <label>
-        <span>Nome completo</span>
-        <input type="text" formControlName="fullName" placeholder="Seu nome completo" />
-        <small class="error" *ngIf="hasError('fullName', 'required')">Informe seu nome.</small>
-        <small class="error" *ngIf="hasError('fullName', 'minlength')">Mínimo de 3 caracteres.</small>
-      </label>
+    <div *ngIf="step === 0">
+      <p class="eyebrow">Primeiro acesso</p>
+      <h2>Complete seus dados</h2>
+      <p class="muted">Usamos essas informações para personalizar sua experiência e manter sua conta segura.</p>
 
-      <label>
-        <span>CPF</span>
-        <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
-        <small class="error" *ngIf="hasError('document', 'required')">Informe o documento.</small>
-        <small class="error" *ngIf="hasError('document', 'cpf')">CPF deve ter exatamente 11 dígitos.</small>
-      </label>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <label>
+          <span>Nome completo</span>
+          <input type="text" formControlName="fullName" placeholder="Seu nome completo" />
+          <small class="error" *ngIf="hasError('fullName', 'required')">Informe seu nome.</small>
+          <small class="error" *ngIf="hasError('fullName', 'minlength')">Mínimo de 3 caracteres.</small>
+        </label>
 
-      <label>
-        <span>Telefone</span>
-        <input type="tel" formControlName="phone" placeholder="+55 81 999999999" (input)="onPhoneInput($event)" />
-        <small class="error" *ngIf="hasError('phone', 'required')">Informe o telefone.</small>
-        <small class="error" *ngIf="hasError('phone', 'phone')">Use o formato +55 81 999999999.</small>
-      </label>
+        <label>
+          <span>CPF</span>
+          <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
+          <small class="error" *ngIf="hasError('document', 'required')">Informe o documento.</small>
+          <small class="error" *ngIf="hasError('document', 'cpf')">CPF deve ter exatamente 11 dígitos.</small>
+        </label>
 
-      <label>
-        <span>Data de nascimento</span>
-        <input type="date" formControlName="birthDate" />
-      </label>
+        <label>
+          <span>Telefone</span>
+          <input type="tel" formControlName="phone" placeholder="+55 81 999999999" (input)="onPhoneInput($event)" />
+          <small class="error" *ngIf="hasError('phone', 'required')">Informe o telefone.</small>
+          <small class="error" *ngIf="hasError('phone', 'phone')">Use o formato +55 81 999999999.</small>
+        </label>
 
-      <div class="actions">
-        <button class="primary" type="submit" [disabled]="loading">
-          {{ loading ? 'Salvando...' : 'Salvar e continuar' }}
+        <label>
+          <span>Data de nascimento</span>
+          <input type="date" formControlName="birthDate" />
+        </label>
+
+        <div class="actions">
+          <button class="primary" type="submit" [disabled]="loading">
+            {{ loading ? 'Salvando...' : 'Salvar e continuar' }}
+          </button>
+        </div>
+
+        <p class="feedback success" *ngIf="feedback">{{ feedback }}</p>
+        <p class="feedback error" *ngIf="error">{{ error }}</p>
+      </form>
+    </div>
+
+    <div *ngIf="step === 1" class="step">
+      <p class="eyebrow">Seu foco inicial</p>
+      <h2>Onde voce quer comecar?</h2>
+      <p class="muted">Escolha o que deseja organizar primeiro. Voce pode mudar depois.</p>
+
+      <div class="focus-grid">
+        <button
+          type="button"
+          class="focus-card"
+          *ngFor="let item of focusOptions"
+          [class.active]="focus === item.id"
+          (click)="selectFocus(item.id)"
+        >
+          <h4>{{ item.title }}</h4>
+          <p>{{ item.description }}</p>
         </button>
       </div>
 
-      <p class="feedback success" *ngIf="feedback">{{ feedback }}</p>
-      <p class="feedback error" *ngIf="error">{{ error }}</p>
-    </form>
+      <div class="actions actions--split">
+        <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
+        <button class="primary" type="button" (click)="continueFromFocus()">Continuar</button>
+      </div>
+    </div>
+
+    <div *ngIf="step === 2" class="step">
+      <p class="eyebrow">Pronto para comecar</p>
+      <h2>Dashboard preparado</h2>
+      <p class="muted">
+        Seu ambiente esta configurado. Vamos para o painel e comece a registrar seus movimentos.
+      </p>
+
+      <div class="summary">
+        <div>
+          <h5>Proximo passo</h5>
+          <p>
+            {{ focus === 'receitas' ? 'Cadastre suas receitas' : focus === 'despesas' ? 'Registre suas despesas' : 'Crie sua meta anual' }}.
+          </p>
+        </div>
+        <div>
+          <h5>O que voce ganha</h5>
+          <p>Alertas inteligentes, metas claras e controle do saldo em tempo real.</p>
+        </div>
+      </div>
+
+      <div class="actions actions--split">
+        <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
+        <button class="primary" type="button" (click)="finishOnboarding()">Ir para o dashboard</button>
+      </div>
+      <button class="link" type="button" (click)="skipOnboarding()">Fazer depois</button>
+    </div>
   </div>
 </div>

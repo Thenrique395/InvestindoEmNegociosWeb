@@ -14,38 +14,17 @@
       <button type="button" class="onboarding__close" (click)="dismissOnboarding()" aria-label="Fechar onboarding">
         ×
       </button>
-      <div>
+      <div class="onboarding__header">
         <p class="eyebrow">Onboarding rápido</p>
-        <h3>3 passos para ativar suas análises</h3>
-        <p class="muted">Complete o básico para ver insights automáticos e metas.</p>
+        <p class="onboarding__step-count">Passo {{ onboardingStep + 1 }} de {{ onboardingTotal }}</p>
+        <h3>{{ onboardingCurrent.title }}</h3>
+        <p class="muted">{{ onboardingCurrent.description }}</p>
       </div>
-      <div class="onboarding__steps">
-        <div class="step" [class.done]="onboardingStep > 0" [class.active]="onboardingStep === 0">
-          <span>1</span>
-          <div>
-            <p>Cadastre sua primeira receita</p>
-            <small>Informe uma fonte e o valor.</small>
-          </div>
-        </div>
-        <div class="step" [class.done]="onboardingStep > 1" [class.active]="onboardingStep === 1">
-          <span>2</span>
-          <div>
-            <p>Cadastre uma despesa</p>
-            <small>Defina categoria e vencimento.</small>
-          </div>
-        </div>
-        <div class="step" [class.done]="onboardingStep > 2" [class.active]="onboardingStep === 2">
-          <span>3</span>
-          <div>
-            <p>Crie uma meta anual</p>
-            <small>Escolha objetivo e prazo.</small>
-          </div>
-        </div>
+      <div class="onboarding__bullets">
+        <span *ngFor="let item of onboardingCurrent.bullets">{{ item }}</span>
       </div>
       <div class="onboarding__cta">
-        <a *ngIf="onboardingStep === 0" routerLink="/receitas" class="btn-primary sm">Cadastrar receita</a>
-        <a *ngIf="onboardingStep === 1" routerLink="/despesas" class="btn-primary sm">Cadastrar despesa</a>
-        <a *ngIf="onboardingStep === 2" routerLink="/metas" class="btn-primary sm">Criar meta</a>
+        <a [routerLink]="onboardingCurrent.ctaLink" class="btn-primary sm">{{ onboardingCurrent.ctaLabel }}</a>
         <label class="onboarding__hide">
           <input
             type="checkbox"
@@ -56,8 +35,16 @@
         </label>
         <div class="onboarding__actions">
           <button type="button" class="ghost sm" (click)="skipOnboarding()">Pular</button>
+          <button
+            type="button"
+            class="ghost sm"
+            [disabled]="onboardingStep === 0"
+            (click)="prevOnboarding()"
+          >
+            Voltar
+          </button>
           <button type="button" class="btn-primary sm" (click)="nextOnboarding()">
-            {{ onboardingStep < 2 ? 'Próximo passo' : 'Concluir' }}
+            {{ onboardingStep < onboardingTotal - 1 ? 'Próximo passo' : 'Concluir' }}
           </button>
         </div>
       </div>
@@ -166,8 +153,29 @@
       <h3>{{ insight.title }}</h3>
       <p class="muted">{{ insight.message }}</p>
     </div>
-    <button class="ghost sm" type="button" routerLink="/dashboard">Ver detalhes</button>
+    <button class="ghost sm" type="button" (click)="openInsightDetails()">Ver detalhes</button>
   </section>
+
+  <div class="insight-overlay" *ngIf="showInsightDetails">
+    <div class="insight-dialog">
+      <button class="insight-dialog__close" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
+        ×
+      </button>
+      <p class="eyebrow">Insight automático</p>
+      <h3>{{ insight.title }}</h3>
+      <p class="muted">{{ insight.message }}</p>
+      <div class="insight-dialog__tips">
+        <p class="label">Sugestoes rapidas</p>
+        <ul>
+          <li *ngFor="let tip of insightTips">{{ tip }}</li>
+        </ul>
+      </div>
+      <div class="insight-dialog__actions">
+        <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
+        <a class="btn-primary sm" routerLink="/despesas">Ver despesas</a>
+      </div>
+    </div>
+  </div>
 
   <div class="goals" *ngIf="metasResumo.total">
     <div class="goals__header">
@@ -329,7 +337,10 @@
             <div class="recent__content">
               <strong class="recent__name">{{ item.title }}</strong>
               <div class="recent__meta">
-                <span>Criado: {{ item.date }} • Status: {{ item.status }}</span>
+                <span>Criado: {{ item.date }}</span>
+                <span class="dot">•</span>
+                <span>Status: {{ item.status }}</span>
+                <span *ngIf="item.recurring" class="recent__tag">Recorrente</span>
               </div>
             </div>
           </div>

@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
+import { OnboardingService } from '../onboarding.service';
+
+type FocusArea = 'receitas' | 'despesas' | 'metas';
 
 @Component({
   selector: 'app-onboarding',
@@ -11,13 +14,37 @@ import { ProfileService } from '../profile.service';
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.scss']
 })
-export class OnboardingComponent {
+export class OnboardingComponent implements OnInit {
   form: FormGroup;
   loading = false;
   feedback = '';
   error = '';
+  step = 0;
+  focus: FocusArea | null = null;
+  focusOptions: { id: FocusArea; title: string; description: string }[] = [
+    {
+      id: 'receitas',
+      title: 'Organizar receitas',
+      description: 'Cadastre suas fontes e recorrencias.'
+    },
+    {
+      id: 'despesas',
+      title: 'Controlar despesas',
+      description: 'Entenda para onde vai o dinheiro.'
+    },
+    {
+      id: 'metas',
+      title: 'Definir metas',
+      description: 'Planeje objetivos com clareza.'
+    }
+  ];
 
-  constructor(private fb: FormBuilder, private profile: ProfileService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private profile: ProfileService,
+    private router: Router,
+    private onboarding: OnboardingService
+  ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       document: ['', [Validators.required, this.cpfValidator()]],
@@ -44,6 +71,21 @@ export class OnboardingComponent {
     });
   }
 
+  ngOnInit(): void {
+    this.onboarding.getStatus().subscribe({
+      next: (status) => {
+        if (status.completed) {
+          this.router.navigateByUrl('/dashboard');
+          return;
+        }
+        this.step = Math.min(Math.max(status.step || 0, 0), 2);
+      },
+      error: () => {
+        /* ignore */
+      }
+    });
+  }
+
   submit(): void {
     if (this.loading) return;
     this.feedback = '';
@@ -59,9 +101,9 @@ export class OnboardingComponent {
     const payload = this.normalizePayload();
     this.profile.upsert(payload).subscribe({
       next: () => {
-        this.feedback = 'Dados salvos! Você já pode usar o app.';
         this.loading = false;
-        setTimeout(() => this.router.navigateByUrl('/login'), 1200);
+        this.feedback = 'Dados salvos! Vamos para o proximo passo.';
+        this.nextStep();
       },
       error: (err) => {
         if (err?.status === 401) {
@@ -73,6 +115,38 @@ export class OnboardingComponent {
         this.loading = false;
       }
     });
+  }
+
+  nextStep(): void {
+    if (this.step >= 2) {
+      this.finishOnboarding();
+      return;
+    }
+    this.step += 1;
+    this.persistStep(false);
+  }
+
+  prevStep(): void {
+    if (this.step <= 0) return;
+    this.step -= 1;
+    this.persistStep(false);
+  }
+
+  selectFocus(id: FocusArea): void {
+    this.focus = id;
+  }
+
+  continueFromFocus(): void {
+    this.nextStep();
+  }
+
+  finishOnboarding(): void {
+    this.persistStep(true);
+    this.router.navigateByUrl('/dashboard');
+  }
+
+  skipOnboarding(): void {
+    this.finishOnboarding();
   }
 
   hasError(control: 'fullName' | 'document' | 'phone', type: string): boolean {
@@ -132,6 +206,14 @@ export class OnboardingComponent {
       const digits = (control.value || '').toString().replace(/\D/g, '');
       return digits.length === 13 ? null : { phone: true };
     };
+  }
+
+  private persistStep(completed: boolean): void {
+    this.onboarding.updateStatus({ step: this.step, completed }).subscribe({
+      error: () => {
+        /* ignore */
+      }
+    });
   }
 
   private maskCpf(value: string): string {

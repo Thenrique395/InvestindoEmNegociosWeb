@@ -54,6 +54,32 @@
   gap: 0.6rem;
 }
 
+.onboarding__header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.onboarding__step-count {
+  color: #a9b7b4;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.onboarding__bullets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.onboarding__bullets span {
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+  color: #c7d5d2;
+}
+
 .onboarding__steps .step {
   display: grid;
   grid-template-columns: 40px 1fr;
@@ -142,6 +168,63 @@
 .insight-card.info {
   border-color: rgba(120, 200, 255, 0.35);
   background: rgba(120, 200, 255, 0.07);
+}
+
+.insight-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 20, 28, 0.7);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  z-index: 2100;
+  padding: 1.5rem;
+}
+
+.insight-dialog {
+  position: relative;
+  width: min(560px, 100%);
+  background: #04384a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.4rem;
+  box-shadow: 0 24px 60px rgba(0, 22, 31, 0.35);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.insight-dialog__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #eaf4f2;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.insight-dialog__tips {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+
+.insight-dialog__tips ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  color: #c7d2d0;
+}
+
+.insight-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
 
 .hero {
@@ -703,24 +786,30 @@
 .recent__name {
   font-size: 0.95rem;
   line-height: 1.1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .recent__meta {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.78rem;
   color: #b9c6c2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .recent__meta .dot {
   opacity: 0.7;
+}
+
+.recent__tag {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #d7e4e0;
 }
 
 .recent__amount {

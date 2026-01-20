@@ -14,6 +14,48 @@
   box-shadow: 0 24px 60px rgba(0, 22, 31, 0.35);
 }
 
+.wizard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.wizard__steps {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wizard__steps span {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #c7d2d0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.wizard__steps span.active {
+  border-color: rgba(143, 224, 180, 0.6);
+  background: rgba(143, 224, 180, 0.15);
+  color: #eaf4f2;
+}
+
+.wizard__steps span.done {
+  border-color: rgba(143, 224, 180, 0.4);
+  color: #8fe0b4;
+}
+
+.wizard__label {
+  color: #a9b7b4;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -31,6 +73,11 @@ form {
   display: grid;
   gap: 0.75rem;
   margin-top: 1rem;
+}
+
+.step {
+  display: grid;
+  gap: 1rem;
 }
 
 label {
@@ -63,8 +110,16 @@ input:focus {
   margin-top: 0.35rem;
 }
 
+.actions--split {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .primary {
-  width: 100%;
+  width: auto;
   background: linear-gradient(135deg, #3aa66f, #2f8a5d);
   color: #0b2532;
   border: 1px solid rgba(143, 224, 180, 0.6);
@@ -73,6 +128,10 @@ input:focus {
   font-weight: 800;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.actions .primary {
+  width: 100%;
 }
 
 .primary:disabled {
@@ -91,4 +150,75 @@ input:focus {
 
 .feedback.error {
   color: #ff9b9b;
+}
+
+.ghost {
+  background: transparent;
+  color: #c7d2d0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.75rem 1.1rem;
+  cursor: pointer;
+}
+
+.ghost:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.focus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.focus-card {
+  text-align: left;
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #eaf4f2;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.focus-card h4 {
+  margin: 0 0 0.4rem 0;
+}
+
+.focus-card p {
+  margin: 0;
+  color: #c7d2d0;
+  font-size: 0.9rem;
+}
+
+.focus-card.active {
+  border-color: rgba(143, 224, 180, 0.6);
+  background: rgba(143, 224, 180, 0.12);
+}
+
+.summary {
+  display: grid;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.summary h5 {
+  margin: 0 0 0.3rem 0;
+}
+
+.summary p {
+  margin: 0;
+  color: #c7d2d0;
+}
+
+.link {
+  margin-top: 0.75rem;
+  background: transparent;
+  border: none;
+  color: #8fe0b4;
+  cursor: pointer;
 }
