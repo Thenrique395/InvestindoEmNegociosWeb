@@ -45,6 +45,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   totalDividaCartoes = 0;
   monthlyData: { label: string; incomes: number; expenses: number }[] = [];
   maxMonthlyValue = 0;
+  currentMonthDays = 0;
+  expenseCategoryData: { label: string; total: number }[] = [];
+  incomeSourceData: { label: string; total: number }[] = [];
+  maxExpenseCategory = 0;
+  maxIncomeSource = 0;
   incomesPolyline = '';
   expensesPolyline = '';
   incomesPoints: { x: number; y: number; label: string; value: number }[] = [];
@@ -132,6 +137,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.totalDespesas = this.somarDespesasMes(lista);
       this.atualizarSaldo();
       this.updateMonthlyData();
+      this.updateCategoryCharts();
       this.atualizarDividaCartoes();
       this.updateRecentTransactions();
       this.updateInsight();
@@ -142,6 +148,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.totalRendas = this.somarRendasMes(lista);
       this.atualizarSaldo();
       this.updateMonthlyData();
+      this.updateCategoryCharts();
       this.updateRecentTransactions();
       this.updateInsight();
     });
@@ -281,6 +288,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     if (this.periodo === 'month') {
       const diasNoMes = new Date(ano, mesIndex + 1, 0).getDate();
+      this.currentMonthDays = diasNoMes;
       const data = Array.from({ length: diasNoMes }).map((_, idx) => {
         const day = idx + 1;
         const start = new Date(ano, mesIndex, day);
@@ -296,6 +304,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     if (this.periodo === 'quarter') {
+      this.currentMonthDays = 0;
       const quarterStart = Math.floor(mesIndex / 3) * 3;
       const data = Array.from({ length: 3 }).map((_, idx) => {
         const monthIndex = quarterStart + idx;
@@ -311,6 +320,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.currentMonthDays = 0;
     const data = Array.from({ length: 12 }).map((_, idx) => {
       const label = new Date(ano, idx, 1).toLocaleString('pt-BR', { month: 'short' });
       const key = `${ano}-${String(idx + 1).padStart(2, '0')}`;
@@ -321,6 +331,47 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.monthlyData = data;
     this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
     this.updatePolylineData();
+  }
+
+  private updateCategoryCharts(): void {
+    const range = this.getPeriodRange();
+    const expenses = this.expensesRaw.filter((d) => {
+      const key = this.mesKeyFromVencimento(d.vencimento);
+      return key ? this.isWithinRange(key, range) : false;
+    });
+    const incomes = this.incomesRaw.filter((r) => {
+      const key = this.mesKeyFromRecebimento(r.recebimento);
+      return key ? this.isWithinRange(key, range) : false;
+    });
+
+    const groupByLabel = <T extends { valor: number }>(
+      items: T[],
+      labelGetter: (item: T) => string
+    ): { label: string; total: number }[] => {
+      const map = new Map<string, number>();
+      for (const item of items) {
+        const label = labelGetter(item).trim() || 'Sem categoria';
+        map.set(label, (map.get(label) || 0) + (item.valor || 0));
+      }
+      return Array.from(map.entries())
+        .map(([label, total]) => ({ label, total }))
+        .sort((a, b) => b.total - a.total);
+    };
+
+    const cap = (items: { label: string; total: number }[], limit = 6) => {
+      if (items.length <= limit) return items;
+      const head = items.slice(0, limit - 1);
+      const rest = items.slice(limit - 1).reduce((sum, item) => sum + item.total, 0);
+      return [...head, { label: 'Outros', total: rest }];
+    };
+
+    const expenseData = cap(groupByLabel(expenses, (d) => d.categoria || 'Sem categoria'));
+    const incomeData = cap(groupByLabel(incomes, (r) => r.fonte || 'Sem fonte'));
+
+    this.expenseCategoryData = expenseData;
+    this.incomeSourceData = incomeData;
+    this.maxExpenseCategory = Math.max(...expenseData.map((item) => item.total), 0);
+    this.maxIncomeSource = Math.max(...incomeData.map((item) => item.total), 0);
   }
 
   private updateRecentTransactions(): void {
@@ -434,6 +485,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.totalRendas = this.somarRendasMes(this.incomesRaw);
     this.atualizarSaldo();
     this.updateMonthlyData();
+    this.updateCategoryCharts();
     this.updateRecentTransactions();
     this.updateInsight();
   }
@@ -456,17 +508,39 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private updatePolylineData(): void {
+    if (!this.monthlyData.length) {
+      this.incomesPolyline = '';
+      this.expensesPolyline = '';
+      this.incomesPoints = [];
+      this.expensesPoints = [];
+      return;
+    }
+    const lineData = this.buildLineData(this.monthlyData);
+    this.incomesPolyline = lineData.incomesPolyline;
+    this.expensesPolyline = lineData.expensesPolyline;
+    this.incomesPoints = lineData.incomesPoints;
+    this.expensesPoints = lineData.expensesPoints;
+  }
+
+  private buildLineData(
+    data: { label: string; incomes: number; expenses: number }[]
+  ): {
+    incomesPolyline: string;
+    expensesPolyline: string;
+    incomesPoints: { x: number; y: number; label: string; value: number }[];
+    expensesPoints: { x: number; y: number; label: string; value: number }[];
+  } {
     const width = 1100;
     const height = 200;
     const padding = 14;
     const usableW = width - padding * 2;
     const usableH = height - padding * 2;
     const max = this.maxMonthlyValue || 1;
-    const len = this.monthlyData.length || 1;
+    const len = data.length || 1;
     const step = len > 1 ? usableW / (len - 1) : usableW;
 
     const build = (field: 'incomes' | 'expenses') => {
-      const points = this.monthlyData.map((m, idx) => {
+      const points = data.map((m, idx) => {
         const x = padding + idx * step;
         const v = m[field];
         const ratio = v / max;
@@ -479,10 +553,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const incomesData = build('incomes');
     const expensesData = build('expenses');
-    this.incomesPolyline = incomesData.polyline;
-    this.expensesPolyline = expensesData.polyline;
-    this.incomesPoints = incomesData.points;
-    this.expensesPoints = expensesData.points;
+    return {
+      incomesPolyline: incomesData.polyline,
+      expensesPolyline: expensesData.polyline,
+      incomesPoints: incomesData.points,
+      expensesPoints: expensesData.points
+    };
   }
 
   private mesKey(): string {
