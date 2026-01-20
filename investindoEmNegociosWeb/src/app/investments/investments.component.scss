@@ -1,7 +1,7 @@
 .investments { display: grid; gap: 1rem; }
 .header .muted { color: var(--text-muted); }
 .top-actions { display: flex; justify-content: flex-end; }
-.card { border: 1px solid var(--card-border); background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: var(--shadow-elev); }
+.card { border: 1px solid var(--card-border); background: var(--card-bg); border-radius: var(--radius-lg); padding: 1.2rem; box-shadow: var(--shadow-elev); min-width: 0; }
 .summary { display: grid; gap: 0.9rem; }
 .summary__info { display: grid; gap: 0.8rem; }
 .summary__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; }

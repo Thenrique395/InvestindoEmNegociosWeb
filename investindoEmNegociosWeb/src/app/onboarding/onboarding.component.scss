@@ -9,9 +9,10 @@
   width: min(720px, 100%);
   background: #04384a;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: clamp(1.5rem, 2.5vw, 2rem);
   box-shadow: 0 24px 60px rgba(0, 22, 31, 0.35);
+  min-width: 0;
 }
 
 .wizard {

@@ -16,6 +16,53 @@ body {
   min-height: 100vh;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --control-h: 46px;
+  --control-pad: 0.75rem 0.9rem;
+  --text-muted: #b9c6c2;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.35rem 0;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+label {
+  line-height: 1.2;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  line-height: 1.2;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='date'],
+select,
+textarea {
+  min-height: var(--control-h);
+  padding: var(--control-pad);
+  border-radius: var(--radius-md);
+}
+
 /* Botões padrão de mercado */
 .btn-primary {
   display: inline-flex;

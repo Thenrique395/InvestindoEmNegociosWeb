@@ -44,12 +44,13 @@
 
 .despesas {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   background: rgba(4, 56, 74, 0.7);
   box-shadow: 0 16px 40px rgba(0, 22, 31, 0.35);
   display: grid;
   gap: 1.25rem;
+  min-width: 0;
 }
 
 .header {
@@ -186,7 +187,9 @@ button {
 .lista {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .lista__head,
@@ -196,6 +199,7 @@ button {
   padding: 0.65rem 0.85rem;
   align-items: center;
   gap: 0.4rem;
+  min-width: 860px;
 }
 
 .lista__head {

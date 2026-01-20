@@ -1,13 +1,14 @@
 .signup-card {
   background: var(--card, #0b3546);
   border: 1px solid var(--stroke, rgba(255, 255, 255, 0.08));
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow, 0 14px 36px rgba(0, 22, 31, 0.4));
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   color: var(--text, #edebec);
+  min-width: 0;
 }
 
 h3 {
