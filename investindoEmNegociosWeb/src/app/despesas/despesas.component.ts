@@ -8,7 +8,7 @@ import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
 import { InstallmentsService } from '../installments.service';
 import { InstallmentStatus } from '../types/money-types';
-import { CategoriesService } from '../categories.service';
+import { CategoriesService, CategoryDto } from '../categories.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 
@@ -21,7 +21,9 @@ import { expenseStatusLabel } from '../utils/status';
 })
 export class DespesasComponent implements OnInit, OnDestroy {
   dataAtual = new Date();
-  categorias: string[] = [];
+  categorias: CategoryDto[] = [];
+  private categoriaMap = new Map<string, string>();
+  private expensesCache: StoredExpense[] = [];
   cartoes: StoredCard[] = [];
   despesasPorMes: Record<string, StoredExpense[]> = {};
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | null = null;
@@ -64,27 +66,24 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
-      this.despesasPorMes = lista.reduce((acc, item) => {
-        const isAntecipada = item.status === 'ANTICIPATED';
-        const key = isAntecipada
-          ? this.mesKeyFromDate(new Date()) || this.mesKey()
-          : this.mesKeyFromVencimento(item.vencimento) || this.mesKey();
-        acc[key] = acc[key] ? [...acc[key], item] : [item];
-        return acc;
-      }, {} as Record<string, StoredExpense[]>);
+      this.expensesCache = lista;
+      this.rebuildDespesas();
     });
 
     this.categoriasSub = this.categoriesService.list('Expense').subscribe({
       next: (data) => {
-        const nomes = data.map((c) => c.name).filter(Boolean);
-        const unicos = Array.from(new Set(nomes));
-        this.categorias = unicos;
-        if (!this.novaDespesa.categoria && this.categorias.length) {
-          this.novaDespesa = { ...this.novaDespesa, categoria: this.categorias[0] };
+        this.categorias = data;
+        this.categoriaMap = new Map(data.map((c) => [c.id, c.name]));
+        if (!this.novaDespesa.categoryId && this.categorias.length) {
+          const first = this.categorias[0];
+          this.novaDespesa = { ...this.novaDespesa, categoryId: first.id, categoria: first.name };
         }
+        this.rebuildDespesas();
       },
       error: () => {
         this.categorias = [];
+        this.categoriaMap = new Map();
+        this.rebuildDespesas();
       }
     });
 
@@ -162,7 +161,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   get despesasFiltradas(): StoredExpense[] {
     const base = this.despesas.filter((d) => {
       const statusOk = this.filtroStatus === 'ALL' ? true : (d.status || 'OPEN') === this.filtroStatus;
-      const categoriaOk = this.filtroCategoria === 'ALL' ? true : d.categoria === this.filtroCategoria;
+      const categoriaOk = this.filtroCategoria === 'ALL' ? true : d.categoryId === this.filtroCategoria;
       const nomeOk = this.filtroNome
         ? (d.nome || '').toLowerCase().includes(this.filtroNome.toLowerCase())
         : true;
@@ -443,7 +442,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
         const { id } = this.editando;
         this.db.updateExpense(id, {
           nome: this.novaDespesa.nome,
-          categoria: this.novaDespesa.categoria,
+          categoria: this.resolveCategoriaNome(this.novaDespesa),
+          categoryId: this.novaDespesa.categoryId ?? null,
           valor,
           vencimento: vencimentoNormalizado,
           cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined
@@ -459,7 +459,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
       // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
       this.db.addExpense({
         nome: this.novaDespesa.nome,
-        categoria: this.novaDespesa.categoria,
+        categoria: this.resolveCategoriaNome(this.novaDespesa),
+        categoryId: this.novaDespesa.categoryId ?? null,
         valor: Number(valorParcela.toFixed(2)),
         vencimento: this.formatDate(dataBase),
         cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
@@ -559,6 +560,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.novaDespesa = {
       nome: item.nome,
       categoria: item.categoria,
+      categoryId: item.categoryId ?? null,
       valor: item.valor,
       vencimento: item.vencimento,
       id: item.id!,
@@ -794,9 +796,32 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return {
       id: '',
       nome: '',
-      categoria: this.categorias[0] ?? '',
+      categoria: this.categorias[0]?.name ?? '',
+      categoryId: this.categorias[0]?.id ?? null,
       valor: 0,
       vencimento: ''
     };
+  }
+
+  private resolveCategoriaNome(expense: Pick<StoredExpense, 'categoryId' | 'categoria'>): string {
+    const byId = expense.categoryId ? this.categoriaMap.get(expense.categoryId) : null;
+    if (byId) return byId;
+    return expense.categoria || 'Outros';
+  }
+
+  private rebuildDespesas(): void {
+    const lista = this.expensesCache.map((item) => ({
+      ...item,
+      categoria: this.resolveCategoriaNome(item)
+    }));
+
+    this.despesasPorMes = lista.reduce((acc, item) => {
+      const isAntecipada = item.status === 'ANTICIPATED';
+      const key = isAntecipada
+        ? this.mesKeyFromDate(new Date()) || this.mesKey()
+        : this.mesKeyFromVencimento(item.vencimento) || this.mesKey();
+      acc[key] = acc[key] ? [...acc[key], item] : [item];
+      return acc;
+    }, {} as Record<string, StoredExpense[]>);
   }
 }

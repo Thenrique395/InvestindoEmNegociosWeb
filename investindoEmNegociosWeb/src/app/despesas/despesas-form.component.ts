@@ -4,6 +4,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { RouterLink } from '@angular/router';
+import { CategoryDto } from '../categories.service';
 
 @Component({
   selector: 'app-despesas-form',
@@ -14,7 +15,7 @@ import { RouterLink } from '@angular/router';
 })
 export class DespesasFormComponent {
   @Input() mostrarForm = false;
-  @Input() categorias: string[] = [];
+  @Input() categorias: CategoryDto[] = [];
   @Input() cartoes: StoredCard[] = [];
   @Input() novaDespesa!: StoredExpense;
   @Input() valorInput = '';

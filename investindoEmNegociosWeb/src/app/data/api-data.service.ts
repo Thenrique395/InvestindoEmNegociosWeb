@@ -5,12 +5,14 @@ import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
 import { ScheduleType } from '../types/money-types';
 import { InstallmentStatus } from '../types/money-types';
+import { CategoriesService } from '../categories.service';
 
 export interface StoredExpense {
   id: string;
   planId?: string;
   nome: string;
   categoria: string;
+  categoryId?: string | null;
   valor: number;
   vencimento: string; // DD/MM/AAAA
   userId?: string;
@@ -72,7 +74,12 @@ export class ApiDataService {
     distinctUntilChanged()
   );
 
-  constructor(private plans: PlansService, private installments: InstallmentsService, private cardsApi: CardsService) {
+  constructor(
+    private plans: PlansService,
+    private installments: InstallmentsService,
+    private cardsApi: CardsService,
+    private categoriesApi: CategoriesService
+  ) {
     this.refresh();
   }
 
@@ -193,11 +200,13 @@ export class ApiDataService {
       expensePlans: this.plans.list('Expense'),
       incomeInstallments: this.installments.list({ type: 'Income' }),
       expenseInstallments: this.installments.list({ type: 'Expense' }),
-      cards: this.cardsApi.list()
+      cards: this.cardsApi.list(),
+      expenseCategories: this.categoriesApi.list('Expense')
     }).subscribe({
-      next: ({ incomePlans, expensePlans, incomeInstallments, expenseInstallments, cards }) => {
+      next: ({ incomePlans, expensePlans, incomeInstallments, expenseInstallments, cards, expenseCategories }) => {
+        const categoryMap = new Map(expenseCategories.map((c) => [c.id, c.name]));
         const incomes = this.mapIncomes(incomePlans, incomeInstallments);
-        const expenses = this.mapExpenses(expensePlans, expenseInstallments);
+        const expenses = this.mapExpenses(expensePlans, expenseInstallments, categoryMap);
         const mappedCards = this.mapCards(cards);
         this.dbSubject.next({ incomes, expenses, cards: mappedCards });
       },
@@ -224,15 +233,16 @@ export class ApiDataService {
     });
   }
 
-  private mapExpenses(plans: Plan[], installments: Installment[]): StoredExpense[] {
+  private mapExpenses(
+    plans: Plan[],
+    installments: Installment[],
+    categoryMap: Map<string, string>
+  ): StoredExpense[] {
     const lookup = new Map(plans.map((p) => [p.id, p]));
     return installments.map((inst) => {
       const plan = lookup.get(inst.planId);
-      const categoria =
-        (plan as any)?.categoryName ||
-        plan?.categoryId ||
-        (plan as any)?.category ||
-        'Outros';
+      const categoryId = (plan as any)?.categoryId ?? (plan as any)?.CategoryId ?? null;
+      const categoria = categoryMap.get(categoryId || '') || 'Outros';
       const isSeries = (plan?.installmentsCount ?? 0) > 1;
       const isRecurring = plan?.schedule === 'Recurring';
       const rawStatus = (inst as any)?.status || '';
@@ -242,6 +252,7 @@ export class ApiDataService {
         planId: plan?.id,
         nome: plan?.title || 'Despesa',
         categoria,
+        categoryId,
         valor: inst.amount,
         vencimento: this.formatDate(inst.dueDate),
         userId: plan?.userId,
@@ -290,8 +301,7 @@ export class ApiDataService {
 
   private toPlanPayloadFromExpense(expense: Omit<StoredExpense, 'id'>): CreatePlanPayload {
     const startDate = this.toIsoDate(expense.vencimento) || this.todayIso();
-    const parsedCategory = Number(expense.categoria);
-    const categoryId = Number.isFinite(parsedCategory) ? String(parsedCategory) : null;
+    const categoryId = expense.categoryId ?? null;
 
     // Despesa fixa mensal
     if (expense.fixa) {
