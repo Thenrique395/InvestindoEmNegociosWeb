@@ -40,6 +40,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   totalRendas = 0;
   totalDespesas = 0;
   saldo = 0;
+  periodo: 'month' | 'quarter' | 'year' = 'month';
   cards: StoredCard[] = [];
   totalDividaCartoes = 0;
   monthlyData: { label: string; incomes: number; expenses: number }[] = [];
@@ -163,7 +164,32 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get mesAtualLabel(): string {
+    if (this.periodo === 'quarter') {
+      const quarter = Math.floor(this.dataAtual.getMonth() / 3) + 1;
+      return `Trimestre ${quarter} de ${this.dataAtual.getFullYear()}`;
+    }
+    if (this.periodo === 'year') {
+      return `Ano de ${this.dataAtual.getFullYear()}`;
+    }
     return this.dataAtual.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+  }
+
+  get chartTitle(): string {
+    if (this.periodo === 'month') return 'Receitas x Despesas no mês';
+    if (this.periodo === 'quarter') return 'Receitas x Despesas no trimestre';
+    return 'Receitas x Despesas no ano';
+  }
+
+  get chartSubtitle(): string {
+    if (this.periodo === 'month') return `Valores diários de ${this.mesAtualLabel}`;
+    if (this.periodo === 'quarter') return `Valores mensais de ${this.mesAtualLabel}`;
+    return `Valores mensais de ${this.dataAtual.getFullYear()}`;
+  }
+
+  get chartEmptyMessage(): string {
+    if (this.periodo === 'month') return 'Cadastre sua primeira receita ou despesa para ver o gráfico diário.';
+    if (this.periodo === 'quarter') return 'Cadastre sua primeira receita ou despesa para ver o gráfico do trimestre.';
+    return 'Cadastre sua primeira receita ou despesa para ver o gráfico anual.';
   }
 
   get isLoadingDashboard(): boolean {
@@ -225,29 +251,75 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.saldo = this.totalRendas - this.totalDespesas;
   }
 
-  private somarDespesasMes(lista: StoredExpense[], key = this.mesKey()): number {
+  private somarDespesasMes(
+    lista: StoredExpense[],
+    range: { startKey: string; endKey: string } = this.getPeriodRange()
+  ): number {
     return lista
-      .filter((d) => this.mesKeyFromVencimento(d.vencimento) === key)
+      .filter((d) => {
+        const key = this.mesKeyFromVencimento(d.vencimento);
+        return key ? this.isWithinRange(key, range) : false;
+      })
       .reduce((sum, d) => sum + (d.valor || 0), 0);
   }
 
-  private somarRendasMes(lista: StoredIncome[], key = this.mesKey()): number {
+  private somarRendasMes(
+    lista: StoredIncome[],
+    range: { startKey: string; endKey: string } = this.getPeriodRange()
+  ): number {
     return lista
-      .filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key)
+      .filter((r) => {
+        const key = this.mesKeyFromRecebimento(r.recebimento);
+        return key ? this.isWithinRange(key, range) : false;
+      })
       .reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 
   private updateMonthlyData(): void {
     const ano = this.dataAtual.getFullYear();
-    const months = Array.from({ length: 12 }).map((_, idx) => {
+    const mesIndex = this.dataAtual.getMonth();
+
+    if (this.periodo === 'month') {
+      const diasNoMes = new Date(ano, mesIndex + 1, 0).getDate();
+      const data = Array.from({ length: diasNoMes }).map((_, idx) => {
+        const day = idx + 1;
+        const start = new Date(ano, mesIndex, day);
+        const end = new Date(ano, mesIndex, day, 23, 59, 59);
+        const incomes = this.sumByDateRange(this.incomesRaw, 'recebimento', start, end);
+        const expenses = this.sumByDateRange(this.expensesRaw, 'vencimento', start, end);
+        return { label: String(day).padStart(2, '0'), incomes, expenses };
+      });
+      this.monthlyData = data;
+      this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
+      this.updatePolylineData();
+      return;
+    }
+
+    if (this.periodo === 'quarter') {
+      const quarterStart = Math.floor(mesIndex / 3) * 3;
+      const data = Array.from({ length: 3 }).map((_, idx) => {
+        const monthIndex = quarterStart + idx;
+        const label = new Date(ano, monthIndex, 1).toLocaleString('pt-BR', { month: 'short' });
+        const key = `${ano}-${String(monthIndex + 1).padStart(2, '0')}`;
+        const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
+        const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
+        return { label, incomes, expenses };
+      });
+      this.monthlyData = data;
+      this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
+      this.updatePolylineData();
+      return;
+    }
+
+    const data = Array.from({ length: 12 }).map((_, idx) => {
       const label = new Date(ano, idx, 1).toLocaleString('pt-BR', { month: 'short' });
       const key = `${ano}-${String(idx + 1).padStart(2, '0')}`;
-      const incomes = this.somarRendasMes(this.incomesRaw, key);
-      const expenses = this.somarDespesasMes(this.expensesRaw, key);
+      const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
+      const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
       return { label, incomes, expenses };
     });
-    this.monthlyData = months;
-    this.maxMonthlyValue = Math.max(...months.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
+    this.monthlyData = data;
+    this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
     this.updatePolylineData();
   }
 
@@ -291,7 +363,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     }
 
-    const all = Array.from(grouped.values());
+    const range = this.getPeriodRange();
+    const all = Array.from(grouped.values()).filter((item) => {
+      const key = item.type === 'income' ? this.mesKeyFromRecebimento(item.date) : this.mesKeyFromVencimento(item.date);
+      return key ? this.isWithinRange(key, range) : false;
+    });
     all.sort((a, b) => {
       const da = parseDateDDMMYYYY(a.date)?.getTime() || 0;
       const db = parseDateDDMMYYYY(b.date)?.getTime() || 0;
@@ -350,6 +426,16 @@ export class HomeComponent implements OnInit, OnDestroy {
         /* ignore */
       }
     });
+  }
+
+  setPeriodo(periodo: 'month' | 'quarter' | 'year'): void {
+    this.periodo = periodo;
+    this.totalDespesas = this.somarDespesasMes(this.expensesRaw);
+    this.totalRendas = this.somarRendasMes(this.incomesRaw);
+    this.atualizarSaldo();
+    this.updateMonthlyData();
+    this.updateRecentTransactions();
+    this.updateInsight();
   }
 
   trocarTipo(tipo: 'bar' | 'line'): void {
@@ -428,6 +514,58 @@ export class HomeComponent implements OnInit, OnDestroy {
     const mes = digits.slice(0, 2);
     const ano = digits.slice(2, 6);
     return `${ano}-${mes}`;
+  }
+
+  private sumByMonthKey(
+    lista: Array<{ valor: number; vencimento?: string; recebimento?: string }>,
+    key: string
+  ): number {
+    return lista.reduce((sum, item) => {
+      const dateKey = item.vencimento
+        ? this.mesKeyFromVencimento(item.vencimento)
+        : item.recebimento
+          ? this.mesKeyFromRecebimento(item.recebimento)
+          : null;
+      if (dateKey !== key) return sum;
+      return sum + (item.valor || 0);
+    }, 0);
+  }
+
+  private sumByDateRange(
+    lista: Array<{ valor: number; vencimento?: string; recebimento?: string }>,
+    field: 'vencimento' | 'recebimento',
+    start: Date,
+    end: Date
+  ): number {
+    return lista.reduce((sum, item) => {
+      const raw = field === 'vencimento' ? item.vencimento : item.recebimento;
+      const date = raw ? parseDateDDMMYYYY(raw) : null;
+      if (!date) return sum;
+      if (date < start || date > end) return sum;
+      return sum + (item.valor || 0);
+    }, 0);
+  }
+
+  private getPeriodRange(): { startKey: string; endKey: string } {
+    const ano = this.dataAtual.getFullYear();
+    if (this.periodo === 'year') {
+      return { startKey: `${ano}-01`, endKey: `${ano}-12` };
+    }
+    if (this.periodo === 'quarter') {
+      const quarter = Math.floor(this.dataAtual.getMonth() / 3);
+      const startMonth = quarter * 3 + 1;
+      const endMonth = startMonth + 2;
+      return {
+        startKey: `${ano}-${String(startMonth).padStart(2, '0')}`,
+        endKey: `${ano}-${String(endMonth).padStart(2, '0')}`
+      };
+    }
+    const mes = this.dataAtual.getMonth() + 1;
+    return { startKey: `${ano}-${String(mes).padStart(2, '0')}`, endKey: `${ano}-${String(mes).padStart(2, '0')}` };
+  }
+
+  private isWithinRange(key: string, range: { startKey: string; endKey: string }): boolean {
+    return key >= range.startKey && key <= range.endKey;
   }
 
   private mesKeyBetween(target: string, inicio: string, fim: string | null): boolean {
@@ -549,8 +687,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     const mesIndex = this.dataAtual.getMonth();
-    const atual = this.monthlyData[mesIndex]?.expenses || 0;
-    const anterior = this.monthlyData[mesIndex - 1]?.expenses || 0;
+    const atual = this.sumByMonthKey(this.expensesRaw, `${this.dataAtual.getFullYear()}-${String(mesIndex + 1).padStart(2, '0')}`);
+    const anterior = this.sumByMonthKey(this.expensesRaw, `${this.dataAtual.getFullYear()}-${String(mesIndex).padStart(2, '0')}`);
     if (anterior > 0 && atual > anterior * 1.2) {
       this.insight = {
         title: 'Despesas subiram',

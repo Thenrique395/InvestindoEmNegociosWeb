@@ -235,6 +235,35 @@
   flex-wrap: wrap;
 }
 
+.hero__filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.hero__filters button {
+  border: 0;
+  background: transparent;
+  color: #c7d2d0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hero__filters button.active {
+  background: rgba(143, 224, 180, 0.2);
+  color: #eaf4f2;
+}
+
+.hero__filters button:hover {
+  color: #f1f6f4;
+}
+
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
@@ -491,10 +520,14 @@
 
 .chart__bars {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 0.5rem;
   align-items: end;
   min-height: 160px;
+}
+
+.chart__bars.dense {
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
 }
 
 .chart__bar {
@@ -536,6 +569,10 @@
   text-align: center;
   font-size: 0.8rem;
   color: #b9c6c2;
+}
+
+.chart__bars.dense .bar__label {
+  font-size: 0.7rem;
 }
 
 .chart__bar {
@@ -645,11 +682,16 @@
 
 .chart__months {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
   margin-top: 0.5rem;
   font-size: 0.85rem;
   color: #b9c6c2;
   text-align: center;
+}
+
+.chart__months.dense {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  font-size: 0.7rem;
 }
 
 .recent {

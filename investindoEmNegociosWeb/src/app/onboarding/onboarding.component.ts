@@ -4,8 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, A
 import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
-
-type FocusArea = 'receitas' | 'despesas' | 'metas';
+import { FocusArea } from './onboarding.types';
 
 @Component({
   selector: 'app-onboarding',

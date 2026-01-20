@@ -7,6 +7,17 @@
         Combine receitas, despesas e cartões para saber o quanto pode gastar.
       </p>
     </div>
+    <div class="hero__filters">
+      <button type="button" [class.active]="periodo === 'month'" (click)="setPeriodo('month')">
+        Mensal
+      </button>
+      <button type="button" [class.active]="periodo === 'quarter'" (click)="setPeriodo('quarter')">
+        Trimestral
+      </button>
+      <button type="button" [class.active]="periodo === 'year'" (click)="setPeriodo('year')">
+        Anual
+      </button>
+    </div>
   </header>
 
   <div class="onboarding-overlay" *ngIf="showOnboarding">
@@ -245,8 +256,8 @@
   <div class="dashboard-row" *ngIf="!isLoadingDashboard">
     <div class="chart">
       <div class="chart__header">
-        <p class="label">Receitas x Despesas no ano</p>
-        <span class="muted">Valores mensais de {{ dataAtual.getFullYear() }}</span>
+        <p class="label">{{ chartTitle }}</p>
+        <span class="muted">{{ chartSubtitle }}</span>
         <div class="chart__controls">
           <button type="button" [class.active]="chartType === 'bar'" (click)="trocarTipo('bar')">
             Barras
@@ -257,14 +268,19 @@
         </div>
       </div>
       <div class="chart__empty" *ngIf="!hasChartData">
-        <p class="muted">Cadastre sua primeira receita ou despesa para ver o gráfico anual.</p>
+        <p class="muted">{{ chartEmptyMessage }}</p>
       </div>
       <ng-container *ngIf="hasChartData">
         <div class="chart__legend">
           <span class="legend income"></span> Receitas
           <span class="legend expense"></span> Despesas
         </div>
-        <div class="chart__bars" *ngIf="chartType === 'bar'">
+        <div
+          class="chart__bars"
+          [class.dense]="periodo === 'month'"
+          [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(32px, 1fr))'"
+          *ngIf="chartType === 'bar'"
+        >
           <div class="chart__bar" *ngFor="let m of monthlyData">
             <div class="bars-wrap">
               <div class="bar income" [style.height.%]="
@@ -307,7 +323,11 @@
               </span>
             </div>
           </div>
-          <div class="chart__months">
+          <div
+            class="chart__months"
+            [class.dense]="periodo === 'month'"
+            [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(32px, 1fr))'"
+          >
             <span *ngFor="let m of monthlyData">{{ m.label }}</span>
           </div>
         </div>
