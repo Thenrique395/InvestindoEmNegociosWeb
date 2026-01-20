@@ -32,7 +32,7 @@ export interface StoredCard {
   limiteCredito: number;
   diaFechamento: number;
   diaVencimento: number;
-  userId: string;
+  userId?: string;
 }
 
 export interface StoredIncome {

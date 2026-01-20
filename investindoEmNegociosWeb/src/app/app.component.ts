@@ -3,6 +3,7 @@ import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } fro
 import { NgIf } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
+import { ProfileService, UserProfile } from './profile.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Investindo em Negócios';
   isLoginRoute = false;
   isHomeRoute = false;
@@ -19,12 +20,14 @@ export class AppComponent implements OnDestroy {
   showSignupModal = false;
   signupAlert = '';
   userMenuOpen = false;
+  profile: UserProfile | null = null;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
   private sub: Subscription;
+  private profileSub?: Subscription;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private profileService: ProfileService) {
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
@@ -35,16 +38,30 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
-    const saved = this.storage?.getItem('theme');
-    this.applyTheme(saved === 'light');
-    const lang = this.storage?.getItem('lang');
-    if (lang) {
-      document.documentElement.lang = lang;
+    this.applyTheme(false);
+    if (this.isLogged) {
+      this.profileSub = this.profileService.profile$.subscribe((profile) => {
+        this.profile = profile;
+      });
+      this.profileService.getProfile().subscribe({
+        error: () => {
+          /* ignore */
+        }
+      });
+      this.profileService.getPreferences().subscribe({
+        next: (prefs) => {
+          document.documentElement.lang = prefs.locales?.[0] || 'pt-BR';
+        },
+        error: () => {
+          /* ignore */
+        }
+      });
     }
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.profileSub?.unsubscribe();
   }
 
   goToLogin(): void {
@@ -68,10 +85,7 @@ export class AppComponent implements OnDestroy {
   logout(): void {
     this.storage?.removeItem('access_token');
     this.storage?.removeItem('refresh_token');
-    this.storage?.removeItem('current_user');
-    this.storage?.removeItem('current_user_name');
-    this.storage?.removeItem('user_name');
-    this.storage?.removeItem('user_id');
+    this.profile = null;
     this.router.navigateByUrl('/');
   }
 
@@ -80,16 +94,11 @@ export class AppComponent implements OnDestroy {
   }
 
   get displayName(): string {
-    return (
-      this.storage?.getItem('current_user_name') ||
-      this.storage?.getItem('user_name') ||
-      this.storage?.getItem('current_user') ||
-      'Usuário'
-    );
+    return this.profile?.fullName?.trim() || 'Usuário';
   }
 
   get avatarUrl(): string {
-    return this.storage?.getItem('current_user_avatar') || '';
+    return this.profile?.avatarUrl || '';
   }
 
   get userInitials(): string {
@@ -112,7 +121,6 @@ export class AppComponent implements OnDestroy {
 
   private applyTheme(light: boolean): void {
     this.isLightTheme = light;
-    this.storage?.setItem('theme', light ? 'light' : 'dark');
   }
 
   toggleUserMenu(): void {

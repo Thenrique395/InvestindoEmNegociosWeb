@@ -9,6 +9,61 @@
     </div>
   </header>
 
+  <div class="onboarding-overlay" *ngIf="showOnboarding">
+    <section class="onboarding onboarding--modal">
+      <button type="button" class="onboarding__close" (click)="dismissOnboarding()" aria-label="Fechar onboarding">
+        ×
+      </button>
+      <div>
+        <p class="eyebrow">Onboarding rápido</p>
+        <h3>3 passos para ativar suas análises</h3>
+        <p class="muted">Complete o básico para ver insights automáticos e metas.</p>
+      </div>
+      <div class="onboarding__steps">
+        <div class="step" [class.done]="onboardingStep > 0" [class.active]="onboardingStep === 0">
+          <span>1</span>
+          <div>
+            <p>Cadastre sua primeira receita</p>
+            <small>Informe uma fonte e o valor.</small>
+          </div>
+        </div>
+        <div class="step" [class.done]="onboardingStep > 1" [class.active]="onboardingStep === 1">
+          <span>2</span>
+          <div>
+            <p>Cadastre uma despesa</p>
+            <small>Defina categoria e vencimento.</small>
+          </div>
+        </div>
+        <div class="step" [class.done]="onboardingStep > 2" [class.active]="onboardingStep === 2">
+          <span>3</span>
+          <div>
+            <p>Crie uma meta anual</p>
+            <small>Escolha objetivo e prazo.</small>
+          </div>
+        </div>
+      </div>
+      <div class="onboarding__cta">
+        <a *ngIf="onboardingStep === 0" routerLink="/receitas" class="btn-primary sm">Cadastrar receita</a>
+        <a *ngIf="onboardingStep === 1" routerLink="/despesas" class="btn-primary sm">Cadastrar despesa</a>
+        <a *ngIf="onboardingStep === 2" routerLink="/metas" class="btn-primary sm">Criar meta</a>
+        <label class="onboarding__hide">
+          <input
+            type="checkbox"
+            [checked]="hideOnboarding"
+            (change)="toggleHideOnboarding($any($event.target).checked)"
+          />
+          Nao mostrar novamente
+        </label>
+        <div class="onboarding__actions">
+          <button type="button" class="ghost sm" (click)="skipOnboarding()">Pular</button>
+          <button type="button" class="btn-primary sm" (click)="nextOnboarding()">
+            {{ onboardingStep < 2 ? 'Próximo passo' : 'Concluir' }}
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div class="grid" *ngIf="!isLoadingDashboard; else loadingSummary">
     <div class="stat-card balance">
       <div class="stat-card__header">
@@ -103,6 +158,16 @@
       </div>
     </div>
   </ng-template>
+
+  <section class="insight-card" *ngIf="!isLoadingDashboard" [class.warn]="insight.tone === 'warn'"
+    [class.danger]="insight.tone === 'danger'" [class.info]="insight.tone === 'info'">
+    <div>
+      <p class="eyebrow">Insight automático</p>
+      <h3>{{ insight.title }}</h3>
+      <p class="muted">{{ insight.message }}</p>
+    </div>
+    <button class="ghost sm" type="button" routerLink="/dashboard">Ver detalhes</button>
+  </section>
 
   <div class="goals" *ngIf="metasResumo.total">
     <div class="goals__header">

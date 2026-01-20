@@ -42,9 +42,6 @@ export class UserPreferencesComponent implements OnInit {
     this.loading = true;
     this.profileService.updatePreferences(payload).subscribe({
       next: (resp) => {
-        localStorage.setItem('currency', resp.currency);
-        localStorage.setItem('locales', resp.locales.join(';'));
-        localStorage.setItem('lang', resp.locales[0] || this.linguaSelecionada);
         document.documentElement.lang = resp.locales[0] || 'pt-BR';
         this.loading = false;
         alert('Preferências salvas.');

@@ -1,24 +1,35 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InvestmentsService, InvestmentPosition, InvestmentType, MovementType } from '../investments.service';
+import {
+  InvestmentsService,
+  InvestmentPosition,
+  InvestmentPositionRequest,
+  InvestmentType,
+  MovementType
+} from '../investments.service';
+import { maskMoneyInput } from '../utils/input-mask';
+import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 type FormMode = 'create' | 'movement';
 
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DecimalPipe, CurrencyPipe, DigitOnlyDirective],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss']
 })
-export class InvestmentsComponent {
+export class InvestmentsComponent implements OnInit {
   positions: InvestmentPosition[] = [];
   mode: FormMode = 'create';
   selectedId: string | null = null;
   showCadastro = false;
   showMovimento = false;
   posSelecionada?: InvestmentPosition | null;
+  metaPatrimonioInput = '';
+  metaPatrimonio = 0;
+  metaSalvando = false;
 
   novaPosicao: Omit<InvestmentPosition, 'id' | 'movements'> = {
     type: 'RF',
@@ -45,17 +56,80 @@ export class InvestmentsComponent {
     { value: 'CRIPTO', label: 'Cripto' }
   ];
 
-  constructor(private investments: InvestmentsService) {
-    this.investments.positions$.subscribe((list) => (this.positions = list));
+  constructor(private investments: InvestmentsService) {}
+
+  ngOnInit(): void {
+    this.carregarMeta();
+    this.carregarPosicoes();
+  }
+
+  get patrimonioAtual(): number {
+    return this.positions.reduce((sum, p) => sum + p.quantity * p.avgPrice, 0);
+  }
+
+  get aporteTotal(): number {
+    return this.positions.reduce((sum, pos) => {
+      const inicial = pos.quantity * pos.avgPrice;
+      const movimentos = pos.movements.reduce((acc, mov) => {
+        const valor = mov.quantity * mov.price;
+        return mov.type === 'RESGATE' ? acc - valor : acc + valor;
+      }, 0);
+      return sum + (movimentos || inicial);
+    }, 0);
+  }
+
+  get crescimentoEstimado(): number {
+    return this.patrimonioAtual - this.aporteTotal;
+  }
+
+  get progressoMeta(): number {
+    if (!this.metaPatrimonio) return 0;
+    return Math.min((this.patrimonioAtual / this.metaPatrimonio) * 100, 100);
+  }
+
+  get faltaMeta(): number {
+    if (!this.metaPatrimonio) return 0;
+    return Math.max(this.metaPatrimonio - this.patrimonioAtual, 0);
+  }
+
+  formatarMeta(): void {
+    this.metaPatrimonioInput = maskMoneyInput(this.metaPatrimonioInput);
+    this.metaPatrimonio = this.parseValor(this.metaPatrimonioInput);
+  }
+
+  salvarMeta(): void {
+    if (!this.metaPatrimonio) return;
+    this.metaSalvando = true;
+    this.investments.upsertGoal(this.metaPatrimonio).subscribe({
+      next: (goal) => {
+        this.metaPatrimonio = goal.targetAmount || 0;
+        this.metaPatrimonioInput = this.metaPatrimonio.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        this.metaSalvando = false;
+      },
+      error: () => {
+        this.metaSalvando = false;
+      }
+    });
   }
 
   salvarPosicao(): void {
     if (!this.novaPosicao.asset || this.novaPosicao.quantity <= 0 || this.novaPosicao.avgPrice <= 0) {
       return;
     }
-    this.investments.addPosition(this.novaPosicao);
-    this.resetPosicao();
-    this.showCadastro = false;
+    const payload: InvestmentPositionRequest = {
+      ...this.novaPosicao,
+      category: this.novaPosicao.category || ''
+    };
+    this.investments.createPosition(payload).subscribe({
+      next: () => {
+        this.resetPosicao();
+        this.showCadastro = false;
+        this.carregarPosicoes();
+      }
+    });
   }
 
   abrirMovimento(pos: InvestmentPosition): void {
@@ -75,15 +149,18 @@ export class InvestmentsComponent {
   salvarMovimento(): void {
     if (!this.selectedId) return;
     if (this.movimento.quantity <= 0 || this.movimento.price <= 0) return;
-    try {
-      this.investments.addMovement(this.selectedId, this.movimento);
-      this.mode = 'create';
-      this.selectedId = null;
-      this.posSelecionada = null;
-      this.showMovimento = false;
-    } catch (e) {
-      alert((e as Error).message);
-    }
+    this.investments.addMovement(this.selectedId, this.movimento).subscribe({
+      next: () => {
+        this.mode = 'create';
+        this.selectedId = null;
+        this.posSelecionada = null;
+        this.showMovimento = false;
+        this.carregarPosicoes();
+      },
+      error: (err) => {
+        alert(err?.error?.detail || 'Falha ao registrar movimento.');
+      }
+    });
   }
 
   resetPosicao(): void {
@@ -96,5 +173,32 @@ export class InvestmentsComponent {
       account: '',
       category: ''
     };
+  }
+
+  private carregarMeta(): void {
+    this.investments.getGoal().subscribe({
+      next: (goal) => {
+        if (!goal) return;
+        this.metaPatrimonio = goal.targetAmount || 0;
+        if (this.metaPatrimonio) {
+          this.metaPatrimonioInput = this.metaPatrimonio.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        }
+      }
+    });
+  }
+
+  private carregarPosicoes(): void {
+    this.investments.listPositions().subscribe({
+      next: (list) => (this.positions = list)
+    });
+  }
+
+  private parseValor(raw: string): number {
+    if (!raw) return 0;
+    const clean = raw.toString().replace(/\./g, '').replace(',', '.');
+    return Number(clean) || 0;
   }
 }

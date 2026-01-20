@@ -47,9 +47,6 @@ export class AuthService {
   private persistSession(res: AuthResponse): AuthResponse {
     try {
       localStorage.setItem('access_token', res.token);
-      localStorage.setItem('current_user', res.email);
-      localStorage.setItem('user_name', res.name);
-      localStorage.setItem('user_id', res.userId);
     } catch {
       /* ignore storage errors em ambientes não browser */
     }

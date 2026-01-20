@@ -100,12 +100,14 @@
   padding: 0.7rem 0.9rem;
   border-radius: 14px;
   width: 100%;
+  min-height: 48px;
   color: var(--text);
   text-decoration: none;
   border: 1px solid transparent;
   background: transparent;
   transition: all 120ms ease;
   font-weight: 600;
+  line-height: 1.1;
 }
 
 .nav-icon {
@@ -148,9 +150,11 @@
   padding: 0.7rem 0.9rem;
   border-radius: 14px;
   width: 100%;
+  min-height: 48px;
   text-decoration: none;
   color: rgba(235, 240, 248, 0.82);
   border: 1px solid transparent;
+  line-height: 1.1;
 }
 
 .sidebar__settings:hover {
@@ -177,6 +181,13 @@
   padding: 0.9rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(4, 56, 74, 0.65);
+}
+
+.topbar__slogan {
+  font-size: 0.9rem;
+  color: rgba(237, 235, 236, 0.68);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .search {
@@ -228,6 +239,12 @@
   .sidebar {
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (max-width: 1200px) {
+  .topbar__slogan {
+    display: none;
   }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
+import { BehaviorSubject, catchError, of, tap } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 
 export interface UserProfile {
@@ -27,26 +27,37 @@ export interface Preferences {
 export class ProfileService {
   private readonly baseUrl = `${API_BASE_URL}/profile`;
   private readonly prefsUrl = `${API_BASE_URL}/preferences`;
+  private readonly profileSubject = new BehaviorSubject<UserProfile | null>(null);
+
+  readonly profile$ = this.profileSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   getProfile() {
     return this.http.get<UserProfile>(this.baseUrl).pipe(
+      tap((profile) => this.profileSubject.next(profile)),
       catchError((err) => {
-        if (err.status === 404) return of(null);
+        if (err.status === 404) {
+          this.profileSubject.next(null);
+          return of(null);
+        }
         throw err;
       })
     );
   }
 
   upsert(profile: Partial<UserProfile>) {
-    return this.http.put<UserProfile>(this.baseUrl, profile);
+    return this.http.put<UserProfile>(this.baseUrl, profile).pipe(
+      tap((saved) => this.profileSubject.next(saved))
+    );
   }
 
   uploadAvatar(file: File) {
     const data = new FormData();
     data.append('avatar', file);
-    return this.http.post<UserProfile>(`${this.baseUrl}/avatar`, data);
+    return this.http.post<UserProfile>(`${this.baseUrl}/avatar`, data).pipe(
+      tap((saved) => this.profileSubject.next(saved))
+    );
   }
 
   changePassword(payload: { currentPassword: string; newPassword: string }) {

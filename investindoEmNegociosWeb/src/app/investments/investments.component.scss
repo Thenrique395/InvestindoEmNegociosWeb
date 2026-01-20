@@ -2,6 +2,13 @@
 .header .muted { color: var(--text-muted); }
 .top-actions { display: flex; justify-content: flex-end; }
 .card { border: 1px solid var(--card-border); background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: var(--shadow-elev); }
+.summary { display: grid; gap: 0.9rem; }
+.summary__info { display: grid; gap: 0.8rem; }
+.summary__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; }
+.summary__grid strong { display: block; font-size: 1.1rem; }
+.summary__progress { display: grid; gap: 0.35rem; }
+.progress-bar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.progress-bar span { display: block; height: 100%; background: linear-gradient(90deg, rgba(52, 144, 99, 0.85), rgba(80, 197, 142, 0.9)); }
 .form { display: grid; gap: 0.5rem; }
 .grid-form { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .form.inline { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); align-items: end; }

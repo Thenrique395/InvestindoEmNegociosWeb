@@ -60,8 +60,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sub = this.db.cards$.subscribe((lista) => {
-      const user = this.currentUser;
-      this.cards = lista.filter((c) => (c.userId ? c.userId === user : true));
+      this.cards = lista;
     });
     this.expensesSub = this.db.expenses$.subscribe((lista) => {
       this.expenses = lista;
@@ -109,8 +108,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
       banco: this.banco,
       limiteCredito: this.limiteCredito,
       diaFechamento: this.diaFechamento,
-      diaVencimento: this.diaVencimento,
-      userId: this.currentUser
+      diaVencimento: this.diaVencimento
     };
 
     if (this.editandoId) {
@@ -244,11 +242,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   private formatCurrency(value: number): string {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  private get currentUser(): string {
-    if (typeof localStorage === 'undefined') return 'guest';
-    return localStorage.getItem('current_user') || 'guest';
   }
 
   tituloBandeira(id: string): string {

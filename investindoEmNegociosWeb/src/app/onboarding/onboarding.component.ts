@@ -49,13 +49,6 @@ export class OnboardingComponent {
     this.feedback = '';
     this.error = '';
 
-    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null;
-    if (!token) {
-      this.error = 'Você precisa estar autenticado. Faça login novamente.';
-      this.router.navigateByUrl('/login');
-      return;
-    }
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.error = 'Revise os campos.';

@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { API_BASE_URL } from './api.config';
 
 export type InvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
 export type MovementType = 'APORTE' | 'RESGATE';
+
+export interface InvestmentGoal {
+  id: string;
+  targetAmount: number;
+}
 
 export interface InvestmentMovement {
   id: string;
@@ -26,73 +33,56 @@ export interface InvestmentPosition {
   movements: InvestmentMovement[];
 }
 
+export interface InvestmentPositionRequest {
+  type: InvestmentType;
+  asset: string;
+  quantity: number;
+  avgPrice: number;
+  openedAt: string;
+  account: string;
+  category: string;
+  note?: string | null;
+}
+
+export interface InvestmentMovementRequest {
+  type: MovementType;
+  quantity: number;
+  price: number;
+  date: string;
+  note?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class InvestmentsService {
-  private readonly storageKey = 'invest_positions';
-  private readonly state$ = new BehaviorSubject<InvestmentPosition[]>(this.load());
+  private baseUrl = `${API_BASE_URL}/investments`;
 
-  readonly positions$ = this.state$.asObservable();
+  constructor(private http: HttpClient) {}
 
-  addPosition(position: Omit<InvestmentPosition, 'id' | 'movements'>): void {
-    const current = this.state$.getValue();
-    const novo: InvestmentPosition = {
-      ...position,
-      id: crypto.randomUUID(),
-      movements: []
-    };
-    const next = [...current, novo];
-    this.persist(next);
+  getGoal(): Observable<InvestmentGoal | null> {
+    return this.http.get<InvestmentGoal | null>(`${this.baseUrl}/goal`);
   }
 
-  addMovement(positionId: string, movement: Omit<InvestmentMovement, 'id'>): void {
-    const current = this.state$.getValue();
-    const updated = current.map((pos) => {
-      if (pos.id !== positionId) return pos;
-
-      if (movement.type === 'RESGATE' && movement.quantity > pos.quantity) {
-        throw new Error('Quantidade de resgate maior que posição.');
-      }
-
-      let quantity = pos.quantity;
-      let avgPrice = pos.avgPrice;
-
-      if (movement.type === 'APORTE') {
-        const totalAtual = quantity * avgPrice;
-        const totalNovo = movement.quantity * movement.price;
-        quantity = quantity + movement.quantity;
-        avgPrice = quantity > 0 ? (totalAtual + totalNovo) / quantity : 0;
-      } else {
-        // RESGATE: apenas reduz a quantidade, mantém preço médio
-        quantity = quantity - movement.quantity;
-      }
-
-      const mov: InvestmentMovement = { ...movement, id: crypto.randomUUID() };
-
-      return {
-        ...pos,
-        quantity,
-        avgPrice,
-        movements: [mov, ...pos.movements]
-      };
-    });
-
-    this.persist(updated);
+  upsertGoal(targetAmount: number): Observable<InvestmentGoal> {
+    return this.http.put<InvestmentGoal>(`${this.baseUrl}/goal`, { targetAmount });
   }
 
-  private persist(positions: InvestmentPosition[]): void {
-    this.state$.next(positions);
-    localStorage.setItem(this.storageKey, JSON.stringify(positions));
+  listPositions(): Observable<InvestmentPosition[]> {
+    return this.http.get<InvestmentPosition[]>(`${this.baseUrl}/positions`);
   }
 
-  private load(): InvestmentPosition[] {
-    if (typeof localStorage === 'undefined') return [];
-    const raw = localStorage.getItem(this.storageKey);
-    if (!raw) return [];
-    try {
-      return JSON.parse(raw) as InvestmentPosition[];
-    } catch (e) {
-      console.error('Falha ao carregar posições de investimento', e);
-      return [];
-    }
+  createPosition(payload: InvestmentPositionRequest): Observable<InvestmentPosition> {
+    return this.http.post<InvestmentPosition>(`${this.baseUrl}/positions`, payload);
+  }
+
+  updatePosition(id: string, payload: InvestmentPositionRequest): Observable<InvestmentPosition> {
+    return this.http.put<InvestmentPosition>(`${this.baseUrl}/positions/${id}`, payload);
+  }
+
+  deletePosition(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/positions/${id}`);
+  }
+
+  addMovement(positionId: string, payload: InvestmentMovementRequest): Observable<InvestmentMovement> {
+    return this.http.post<InvestmentMovement>(`${this.baseUrl}/positions/${positionId}/movements`, payload);
   }
 }

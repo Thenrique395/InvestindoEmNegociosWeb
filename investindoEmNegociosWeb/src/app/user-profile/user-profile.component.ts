@@ -40,9 +40,6 @@ export class UserProfileComponent implements OnInit {
       this.telefone = p.phone;
       this.dataNascimento = p.birthDate || '';
       this.avatarUrl = p.avatarUrl || '';
-      if (this.avatarUrl) {
-        localStorage.setItem('current_user_avatar', this.avatarUrl);
-      }
       this.cidade = p.city || '';
       this.estado = p.state || '';
       this.pais = p.country || '';
@@ -68,9 +65,6 @@ export class UserProfileComponent implements OnInit {
     this.profileService.uploadAvatar(file).subscribe({
       next: (profile) => {
         this.avatarUrl = profile.avatarUrl || '';
-        if (this.avatarUrl) {
-          localStorage.setItem('current_user_avatar', this.avatarUrl);
-        }
         this.avatarUploading = false;
       },
       error: (err) => {
@@ -83,7 +77,6 @@ export class UserProfileComponent implements OnInit {
   limparAvatar(): void {
     this.avatarUrl = '';
     this.avatarError = '';
-    localStorage.removeItem('current_user_avatar');
   }
 
   salvarPerfil(): void {
@@ -101,13 +94,6 @@ export class UserProfileComponent implements OnInit {
     this.loading = true;
     this.profileService.upsert(payload).subscribe({
       next: () => {
-        localStorage.setItem('current_user_name', this.nome);
-        localStorage.setItem('lang', this.idioma);
-        if (this.avatarUrl) {
-          localStorage.setItem('current_user_avatar', this.avatarUrl);
-        } else {
-          localStorage.removeItem('current_user_avatar');
-        }
         this.loading = false;
         alert('Perfil atualizado.');
       },

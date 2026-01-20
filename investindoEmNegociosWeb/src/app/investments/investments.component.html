@@ -2,10 +2,43 @@
   <header class="header">
     <div>
       <p class="eyebrow">Investimentos</p>
-      <h1>Cadastro rápido de posições</h1>
-      <p class="muted">Registre posições, aportes e resgates para acompanhar custo médio e histórico.</p>
+      <h1>Meta + crescimento do patrimônio</h1>
+      <p class="muted">Defina uma meta de patrimônio e acompanhe seus aportes e evolução.</p>
     </div>
   </header>
+
+  <div class="card summary">
+    <div class="summary__info">
+      <div>
+        <p class="label">Meta de patrimônio (R$)</p>
+        <input type="text" [(ngModel)]="metaPatrimonioInput" digitOnly (input)="formatarMeta()" inputmode="numeric"
+          placeholder="Ex.: 100.000,00" />
+        <button class="ghost sm" type="button" (click)="salvarMeta()" [disabled]="metaSalvando || !metaPatrimonio">
+          {{ metaSalvando ? 'Salvando...' : 'Salvar meta' }}
+        </button>
+      </div>
+      <div class="summary__grid">
+        <div>
+          <p class="label">Patrimônio atual</p>
+          <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div>
+          <p class="label">Crescimento estimado</p>
+          <strong>{{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div>
+          <p class="label">Falta para a meta</p>
+          <strong>{{ faltaMeta | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+    <div class="summary__progress">
+      <div class="progress-bar">
+        <span [style.width.%]="progressoMeta"></span>
+      </div>
+      <small>{{ progressoMeta | number : '1.0-0' }}% da meta atingida</small>
+    </div>
+  </div>
 
   <div class="top-actions">
     <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">

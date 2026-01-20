@@ -7,6 +7,7 @@ import { GoalsService, Goal } from './goals.service';
 import { RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { parseDateDDMMYYYY } from './utils/input-mask';
+import { OnboardingService } from './onboarding.service';
 
 @Component({
   selector: 'app-home',
@@ -67,10 +68,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     progressoMedio: 0
   };
   metasVisao: 'progresso' | 'aporte' = 'progresso';
+  insight = {
+    title: 'Tudo certo por aqui',
+    message: 'Vamos manter esse ritmo com pequenos ajustes ao longo do mês.',
+    tone: 'ok' as 'ok' | 'warn' | 'danger' | 'info'
+  };
+  onboardingStep = 0;
+  onboardingDone = false;
+  hideOnboarding = false;
+  onboardingDismissed = false;
 
-  constructor(private db: ApiDataService, private goalsService: GoalsService, private cardsService: CardsService) {}
+  constructor(
+    private db: ApiDataService,
+    private goalsService: GoalsService,
+    private cardsService: CardsService,
+    private onboardingService: OnboardingService
+  ) {}
 
   ngOnInit(): void {
+    if (this.isLogged) {
+      this.onboardingService.getStatus().subscribe({
+        next: (status) => {
+          this.onboardingStep = Math.min(Math.max(status.step || 0, 0), 2);
+          this.onboardingDone = !!status.completed;
+          this.hideOnboarding = this.onboardingDone;
+        },
+        error: () => {
+          this.onboardingStep = 0;
+          this.onboardingDone = false;
+          this.hideOnboarding = false;
+        }
+      });
+    }
     this.subExpenses = this.db.expenses$.subscribe((lista) => {
       this.expensesLoaded = true;
       this.expensesRaw = lista;
@@ -79,6 +108,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.updateMonthlyData();
       this.atualizarDividaCartoes();
       this.updateRecentTransactions();
+      this.updateInsight();
     });
     this.subIncomes = this.db.incomes$.subscribe((lista) => {
       this.incomesLoaded = true;
@@ -87,10 +117,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.atualizarSaldo();
       this.updateMonthlyData();
       this.updateRecentTransactions();
+      this.updateInsight();
     });
     this.subCards = this.db.cards$.subscribe((lista) => {
-      const user = this.currentUser;
-      this.cards = lista.filter((c) => (c.userId ? c.userId === user : true));
+      this.cards = lista;
     });
     if (this.isLogged) {
       this.subGoals = this.goalsService.list(this.dataAtual.getFullYear()).subscribe({
@@ -119,13 +149,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.monthlyData.some((m) => (m.incomes || 0) > 0 || (m.expenses || 0) > 0);
   }
 
+  get showOnboarding(): boolean {
+    return this.isLogged && !this.onboardingDone && !this.onboardingDismissed;
+  }
+
   get cardsCount(): number {
     return this.cards.length;
   }
 
   private atualizarDividaCartoes(): void {
     this.cardsService.debtTotal().subscribe({
-      next: ({ total }) => (this.totalDividaCartoes = total ?? 0),
+      next: ({ total }) => {
+        this.totalDividaCartoes = total ?? 0;
+        this.updateInsight();
+      },
       error: (err) => console.error('Falha ao carregar dívida dos cartões', err)
     });
   }
@@ -188,6 +225,44 @@ export class HomeComponent implements OnInit, OnDestroy {
       return db - da;
     });
     this.recentTransactions = all.slice(0, 6);
+  }
+
+  nextOnboarding(): void {
+    if (this.onboardingStep >= 2) {
+      this.finishOnboarding();
+      return;
+    }
+    this.onboardingStep += 1;
+    this.persistOnboarding();
+  }
+
+  skipOnboarding(): void {
+    this.finishOnboarding();
+  }
+
+  dismissOnboarding(): void {
+    this.onboardingDismissed = true;
+  }
+
+  toggleHideOnboarding(checked: boolean): void {
+    this.hideOnboarding = checked;
+    if (checked) {
+      this.finishOnboarding();
+    }
+  }
+
+  private finishOnboarding(): void {
+    this.onboardingDone = true;
+    this.onboardingStep = 2;
+    this.persistOnboarding();
+  }
+
+  private persistOnboarding(): void {
+    this.onboardingService.updateStatus({ step: this.onboardingStep, completed: this.onboardingDone }).subscribe({
+      error: () => {
+        /* ignore */
+      }
+    });
   }
 
   trocarTipo(tipo: 'bar' | 'line'): void {
@@ -274,11 +349,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  private get currentUser(): string {
-    if (typeof localStorage === 'undefined') return 'guest';
-    return localStorage.getItem('current_user') || 'guest';
-  }
-
   private get storage(): Storage | null {
     return typeof localStorage !== 'undefined' ? localStorage : null;
   }
@@ -314,6 +384,53 @@ export class HomeComponent implements OnInit, OnDestroy {
       acumuladoTotal,
       faltanteTotal,
       progressoMedio
+    };
+  }
+
+  private updateInsight(): void {
+    if (!this.expensesLoaded && !this.incomesLoaded) return;
+
+    if (!this.totalRendas && !this.totalDespesas) {
+      this.insight = {
+        title: 'Comece com o básico',
+        message: 'Cadastre uma receita e uma despesa para liberar análises automáticas.',
+        tone: 'info'
+      };
+      return;
+    }
+
+    if (this.saldo < 0) {
+      this.insight = {
+        title: 'Saldo negativo neste mês',
+        message: 'Priorize cortar despesas variáveis ou antecipar receitas.',
+        tone: 'danger'
+      };
+      return;
+    }
+
+    const taxaGasto = this.totalRendas ? this.totalDespesas / this.totalRendas : 0;
+    if (taxaGasto > 0.75) {
+      this.insight = {
+        title: 'Despesas consumindo sua renda',
+        message: 'Mais de 75% da sua renda já está comprometida neste mês.',
+        tone: 'warn'
+      };
+      return;
+    }
+
+    if (this.totalDividaCartoes > 0 && this.totalDividaCartoes > this.totalRendas * 0.3) {
+      this.insight = {
+        title: 'Cartões com saldo elevado',
+        message: 'O total em cartões passou de 30% da sua renda do mês.',
+        tone: 'warn'
+      };
+      return;
+    }
+
+    this.insight = {
+      title: 'Boa estabilidade no mês',
+      message: 'Você manteve o saldo positivo e as despesas sob controle.',
+      tone: 'ok'
     };
   }
 

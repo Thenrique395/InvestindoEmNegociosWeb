@@ -1,7 +1,147 @@
 .home-dashboard {
   display: grid;
   gap: 1.25rem;
+  padding: 0;
+}
+
+.onboarding {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 1rem;
+}
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 20, 28, 0.7);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+  padding: 1.5rem;
+}
+
+.onboarding--modal {
+  width: min(880px, 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+.onboarding__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #eaf4f2;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.onboarding__close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.onboarding__steps {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.onboarding__steps .step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.onboarding__steps .step span {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+}
+
+.onboarding__steps .step.active {
+  border-color: rgba(143, 224, 180, 0.4);
+  background: rgba(143, 224, 180, 0.08);
+}
+
+.onboarding__steps .step.done {
+  border-color: rgba(143, 224, 180, 0.35);
+}
+
+.onboarding__steps p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.onboarding__steps small {
+  color: #b9c6c2;
+}
+
+.onboarding__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.onboarding__hide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #b9c6c2;
+}
+
+.onboarding__hide input {
+  accent-color: #48b37f;
+}
+
+.onboarding__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.insight-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.insight-card.warn {
+  border-color: rgba(255, 190, 92, 0.45);
+  background: rgba(255, 190, 92, 0.08);
+}
+
+.insight-card.danger {
+  border-color: rgba(255, 122, 122, 0.45);
+  background: rgba(255, 122, 122, 0.08);
+}
+
+.insight-card.info {
+  border-color: rgba(120, 200, 255, 0.35);
+  background: rgba(120, 200, 255, 0.07);
 }
 
 .hero {

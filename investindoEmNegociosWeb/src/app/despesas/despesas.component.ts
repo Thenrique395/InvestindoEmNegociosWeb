@@ -89,8 +89,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     });
 
     this.db.cards$.subscribe((cards) => {
-      const user = this.currentUser;
-      this.cartoes = cards.filter((c) => (c.userId ? c.userId === user : true));
+      this.cartoes = cards;
       if (this.cartoes.length && !this.cartaoSelecionadoId) {
         this.cartaoSelecionadoId = this.cartoes[0].id;
       }
@@ -768,11 +767,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
     if (!da) return -1;
     if (!db) return 1;
     return da.getTime() - db.getTime();
-  }
-
-  private get currentUser(): string {
-    if (typeof localStorage === 'undefined') return 'guest';
-    return localStorage.getItem('current_user') || 'guest';
   }
 
   private isDataValida(value: string): boolean {
