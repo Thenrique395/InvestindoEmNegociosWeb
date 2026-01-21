@@ -12,6 +12,12 @@ services:
       Jwt__Issuer: InvestindoEmNegocio
       Jwt__Audience: InvestindoEmNegocio
       Jwt__SecretKey: ${JWT_SECRET}
+      OTEL_SERVICE_NAME: InvestindoEmNegocio
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}
+      OTEL_TRACES_EXPORTER: ${OTEL_TRACES_EXPORTER}
+      OTEL_METRICS_EXPORTER: ${OTEL_METRICS_EXPORTER}
+      OTEL_LOGS_EXPORTER: ${OTEL_LOGS_EXPORTER}
 
   frontend:
     build:
