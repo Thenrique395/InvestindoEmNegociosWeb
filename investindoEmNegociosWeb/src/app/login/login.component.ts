@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService, AuthResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
@@ -63,7 +64,19 @@ export class LoginComponent {
         });
       },
       error: (err: unknown) => {
-        this.error = err instanceof Error ? err.message : 'Erro ao autenticar';
+        if (err instanceof HttpErrorResponse) {
+          if (err.status === 423) {
+            this.error = 'Conta bloqueada temporariamente. Tente novamente em alguns minutos.';
+          } else if (err.status === 429) {
+            this.error = 'Muitas tentativas. Aguarde um pouco e tente novamente.';
+          } else if (err.status === 401) {
+            this.error = 'E-mail ou senha incorretos.';
+          } else {
+            this.error = err.error?.detail || err.error?.title || 'Erro ao autenticar';
+          }
+        } else {
+          this.error = err instanceof Error ? err.message : 'Erro ao autenticar';
+        }
         this.loading = false;
       }
     });

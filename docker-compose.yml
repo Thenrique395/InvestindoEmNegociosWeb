@@ -8,10 +8,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://0.0.0.0:5059
-      ConnectionStrings__Default: Host=192.168.1.87;Port=5432;Database=investindoEmNegocios_prd;Username=root;Password=Thenrique395@
+      ConnectionStrings__Default: ${DB_CONN}
       Jwt__Issuer: InvestindoEmNegocio
       Jwt__Audience: InvestindoEmNegocio
-      Jwt__SecretKey: "investindo_em_negocios_jwt_secret_32chars!"
+      Jwt__SecretKey: ${JWT_SECRET}
 
   frontend:
     build:

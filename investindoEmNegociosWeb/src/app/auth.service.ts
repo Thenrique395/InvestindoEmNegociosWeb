@@ -8,6 +8,8 @@ export interface AuthResponse {
   name: string;
   email: string;
   token: string;
+  refreshToken: string;
+  expiresAt: string;
 }
 
 export interface RegisterPayload {
@@ -33,6 +35,19 @@ export class AuthService {
     );
   }
 
+  refresh(refreshToken?: string) {
+    const token = refreshToken || this.getRefreshToken();
+    if (!token) {
+      return throwError(() => new Error('Refresh token ausente.'));
+    }
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken: token })
+      .pipe(
+        map((res) => this.persistSession(res)),
+        catchError((err) => this.wrapError(err, 'Erro ao renovar sessão.'))
+      );
+  }
+
   register(payload: RegisterPayload) {
     const body = {
       name: payload.nome.trim(),
@@ -47,10 +62,34 @@ export class AuthService {
   private persistSession(res: AuthResponse): AuthResponse {
     try {
       localStorage.setItem('access_token', res.token);
+      if (res.refreshToken) {
+        localStorage.setItem('refresh_token', res.refreshToken);
+      }
+      if (res.expiresAt) {
+        localStorage.setItem('access_expires_at', res.expiresAt);
+      }
     } catch {
       /* ignore storage errors em ambientes não browser */
     }
     return res;
+  }
+
+  getAccessToken(): string | null {
+    return typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null;
+  }
+
+  getRefreshToken(): string | null {
+    return typeof localStorage !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+  }
+
+  clearSession(): void {
+    try {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('access_expires_at');
+    } catch {
+      /* ignore */
+    }
   }
 
   private wrapError(err: unknown, fallback: string) {
