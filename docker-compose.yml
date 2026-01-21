@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ../InvestindoEmNegocio
+      dockerfile: Dockerfile
+    ports:
+      - "5059:5059"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://0.0.0.0:5059
+      ConnectionStrings__Default: Host=192.168.1.87;Port=5432;Database=investindoEmNegocios_prd;Username=root;Password=Thenrique395@
+      Jwt__Issuer: InvestindoEmNegocio
+      Jwt__Audience: InvestindoEmNegocio
+      Jwt__SecretKey: "investindo_em_negocios_jwt_secret_32chars!"
+
+  frontend:
+    build:
+      context: ./investindoEmNegociosWeb
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4000"
+    environment:
+      PORT: 4000
+      API_BASE_URL: http://backend:5059/api
+    depends_on:
+      - backend

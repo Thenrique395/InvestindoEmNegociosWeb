@@ -14,8 +14,8 @@
       <h2>Complete seus dados</h2>
       <p class="muted">Usamos essas informações para personalizar sua experiência e manter sua conta segura.</p>
 
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <label>
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="full">
           <span>Nome completo</span>
           <input type="text" formControlName="fullName" placeholder="Seu nome completo" />
           <small class="error" *ngIf="hasError('fullName', 'required')">Informe seu nome.</small>
@@ -39,6 +39,25 @@
         <label>
           <span>Data de nascimento</span>
           <input type="date" formControlName="birthDate" />
+        </label>
+
+        <label>
+          <span>Cidade</span>
+          <input type="text" formControlName="city" placeholder="Ex.: Recife" />
+          <small class="error" *ngIf="hasError('city', 'required')">Informe sua cidade.</small>
+        </label>
+
+        <label>
+          <span>Estado (UF)</span>
+          <input type="text" formControlName="state" placeholder="Ex.: PE" maxlength="2" />
+          <small class="error" *ngIf="hasError('state', 'required')">Informe seu estado.</small>
+          <small class="error" *ngIf="hasError('state', 'minlength')">Use 2 letras.</small>
+        </label>
+
+        <label class="full">
+          <span>País</span>
+          <input type="text" formControlName="country" placeholder="Ex.: Brasil" />
+          <small class="error" *ngIf="hasError('country', 'required')">Informe seu país.</small>
         </label>
 
         <div class="actions">

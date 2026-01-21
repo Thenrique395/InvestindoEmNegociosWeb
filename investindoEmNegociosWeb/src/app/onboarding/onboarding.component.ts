@@ -48,7 +48,10 @@ export class OnboardingComponent implements OnInit {
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       document: ['', [Validators.required, this.cpfValidator()]],
       phone: ['', [Validators.required, this.phoneValidator()]],
-      birthDate: ['']
+      birthDate: [''],
+      city: ['', [Validators.required]],
+      state: ['', [Validators.required, Validators.minLength(2)]],
+      country: ['', [Validators.required]]
     });
 
     this.profile.getProfile().subscribe({
@@ -58,7 +61,10 @@ export class OnboardingComponent implements OnInit {
             fullName: data.fullName,
             document: this.maskCpf(data.document),
             phone: this.maskPhone(data.phone),
-            birthDate: data.birthDate ? data.birthDate.substring(0, 10) : ''
+            birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
+            city: data.city ?? '',
+            state: data.state ?? '',
+            country: data.country ?? ''
           });
         }
       },
@@ -148,7 +154,7 @@ export class OnboardingComponent implements OnInit {
     this.finishOnboarding();
   }
 
-  hasError(control: 'fullName' | 'document' | 'phone', type: string): boolean {
+  hasError(control: 'fullName' | 'document' | 'phone' | 'city' | 'state' | 'country', type: string): boolean {
     const c = this.form.get(control);
     return !!c && c.touched && c.hasError(type);
   }
@@ -189,7 +195,12 @@ export class OnboardingComponent implements OnInit {
       fullName: (raw.fullName as string).trim(),
       document: docDigits,
       phone: formattedPhone,
-      birthDate: birthDateIso
+      birthDate: birthDateIso,
+      avatarUrl: '',
+      city: (raw.city as string).trim(),
+      state: (raw.state as string).trim().toUpperCase(),
+      country: (raw.country as string).trim(),
+      language: 'pt-BR'
     };
   }
 
