@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
+import { ApiDataService } from './data/api-data.service';
 
 @Component({
   selector: 'app-root',
@@ -33,12 +34,20 @@ export class AppComponent implements OnInit, OnDestroy {
   private sub: Subscription;
   private profileSub?: Subscription;
 
-  constructor(private router: Router, private profileService: ProfileService, private authService: AuthService) {
+  constructor(
+    private router: Router,
+    private profileService: ProfileService,
+    private authService: AuthService,
+    private apiDataService: ApiDataService
+  ) {
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
         this.isHomeRoute = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/#');
         this.userMenuOpen = false;
+        if (this.isLogged) {
+          this.apiDataService.refresh();
+        }
       }
     });
   }
@@ -144,7 +153,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const currentPath = this.router.url.split('?')[0];
     if (currentPath === path) {
       event?.preventDefault();
-      this.router.navigateByUrl(path);
+      this.apiDataService.refresh();
     }
   }
 }

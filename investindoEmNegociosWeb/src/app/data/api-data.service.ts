@@ -6,6 +6,7 @@ import { CardsService, CardDto } from '../cards.service';
 import { ScheduleType } from '../types/money-types';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
+import { AuthService } from '../auth.service';
 
 export interface StoredExpense {
   id: string;
@@ -78,7 +79,8 @@ export class ApiDataService {
     private plans: PlansService,
     private installments: InstallmentsService,
     private cardsApi: CardsService,
-    private categoriesApi: CategoriesService
+    private categoriesApi: CategoriesService,
+    private authService: AuthService
   ) {
     this.refresh();
   }
@@ -195,6 +197,10 @@ export class ApiDataService {
   }
 
   refresh(): void {
+    if (!this.authService.getAccessToken()) {
+      this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
+      return;
+    }
     forkJoin({
       incomePlans: this.plans.list('Income'),
       expensePlans: this.plans.list('Expense'),
