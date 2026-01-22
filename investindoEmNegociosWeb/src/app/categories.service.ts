@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
+import { applyListQuery, ListQuery } from './api-query';
 
 export type CategoryType = 'Income' | 'Expense';
 
@@ -23,9 +24,13 @@ export class CategoriesService {
 
   constructor(private http: HttpClient) {}
 
-  list(type?: CategoryType): Observable<CategoryDto[]> {
-    const url = type ? `${this.baseUrl}?appliesTo=${type}` : this.baseUrl;
-    return this.http.get<CategoryDto[]>(url);
+  list(type?: CategoryType, query?: ListQuery): Observable<CategoryDto[]> {
+    let params = new HttpParams();
+    if (type) {
+      params = params.set('appliesTo', type);
+    }
+    params = applyListQuery(params, query);
+    return this.http.get<CategoryDto[]>(this.baseUrl, { params });
   }
 
   create(payload: CreateCategoryRequest): Observable<CategoryDto> {

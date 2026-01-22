@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
+import { applyListQuery, ListQuery } from './api-query';
 
 export type GoalStatus = 'Planned' | 'InProgress' | 'Completed' | 'Canceled';
 
@@ -50,10 +51,11 @@ export class GoalsService {
 
   constructor(private http: HttpClient) {}
 
-  list(year?: number, status?: GoalStatus): Observable<Goal[]> {
-    const params: Record<string, string> = {};
-    if (year) params['year'] = year.toString();
-    if (status) params['status'] = status;
+  list(year?: number, status?: GoalStatus, query?: ListQuery): Observable<Goal[]> {
+    let params = new HttpParams();
+    if (year) params = params.set('year', year.toString());
+    if (status) params = params.set('status', status);
+    params = applyListQuery(params, query);
     return this.http.get<Goal[]>(this.baseUrl, { params });
   }
 
@@ -69,7 +71,8 @@ export class GoalsService {
     return this.http.post<GoalContribution>(`${this.baseUrl}/${goalId}/contributions`, payload);
   }
 
-  listContributions(goalId: string): Observable<GoalContribution[]> {
-    return this.http.get<GoalContribution[]>(`${this.baseUrl}/${goalId}/contributions`);
+  listContributions(goalId: string, query?: ListQuery): Observable<GoalContribution[]> {
+    const params = applyListQuery(new HttpParams(), query);
+    return this.http.get<GoalContribution[]>(`${this.baseUrl}/${goalId}/contributions`, { params });
   }
 }

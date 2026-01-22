@@ -1,0 +1,47 @@
+<section class="admin-params">
+  <header class="admin-params__header">
+    <div>
+      <h1>Parâmetros do sistema</h1>
+      <p>Controle bandeiras de cartão e formas de pagamento disponíveis.</p>
+    </div>
+    <button type="button" class="refresh" (click)="loadAll()" [disabled]="loading">Atualizar</button>
+  </header>
+
+  <div class="status" *ngIf="loading">Carregando parâmetros...</div>
+  <div class="status error" *ngIf="error">{{ error }}</div>
+
+  <div class="grid" *ngIf="!loading">
+    <div class="card">
+      <div class="card__title">Bandeiras de cartão</div>
+      <div class="list">
+        <div class="list__item" *ngFor="let brand of cardBrands">
+          <div>
+            <strong>{{ brand.name }}</strong>
+            <span class="muted">{{ brand.code }}</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [checked]="brand.isActive" (change)="toggleCardBrand(brand)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="empty" *ngIf="!cardBrands.length">Nenhuma bandeira cadastrada.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title">Formas de pagamento</div>
+      <div class="list">
+        <div class="list__item" *ngFor="let method of paymentMethods">
+          <div>
+            <strong>{{ method.name }}</strong>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [checked]="method.isActive" (change)="togglePaymentMethod(method)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="empty" *ngIf="!paymentMethods.length">Nenhuma forma de pagamento cadastrada.</div>
+      </div>
+    </div>
+  </div>
+</section>

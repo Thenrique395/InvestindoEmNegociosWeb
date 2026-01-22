@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">Gerenciar categorias</p>
       <h1>Organize receitas e despesas</h1>
-      <p class="muted">Categorias padrão são compartilhadas; crie e remova as suas conforme precisar.</p>
+      <p class="muted">Categorias padrão são compartilhadas; crie as suas e use as do sistema quando quiser.</p>
     </div>
     <div class="filter">
       <span>Filtrar por tipo</span>
@@ -22,6 +22,13 @@
       <label>
         Nome da categoria
         <input type="text" placeholder="Nome da categoria" [(ngModel)]="nome" />
+      </label>
+      <label *ngIf="isAdmin">
+        Escopo
+        <select [(ngModel)]="escopo">
+          <option value="user">Personalizada (usuário)</option>
+          <option value="default">Padrão (sistema)</option>
+        </select>
       </label>
       <label>
         Tipo
@@ -75,6 +82,67 @@
       </div>
     </div>
   </section>
+
+  <section class="card admin-card" *ngIf="isAdmin">
+    <div class="admin-header">
+      <div>
+        <h3>Categorias padrão (admin)</h3>
+        <p class="muted">Ative, edite ou desative as categorias globais do sistema.</p>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" [checked]="includeInactive" (change)="toggleIncludeInactive()" />
+        <span>Exibir inativas</span>
+      </label>
+    </div>
+
+    <div class="status" *ngIf="adminLoading">Carregando categorias padrão...</div>
+    <div class="status error" *ngIf="adminError">{{ adminError }}</div>
+
+    <div class="category-list admin-list" *ngIf="!adminLoading && adminCategories.length">
+      <div class="category-item" *ngFor="let c of adminCategories">
+        <div class="category-icon" aria-hidden="true">{{ iconForAdminCategory(c) }}</div>
+        <div class="category-info">
+          <div class="category-name">{{ c.name }}</div>
+          <div class="category-sub">{{ c.appliesTo || 'Todos' }}</div>
+        </div>
+        <span class="tag" [class.off]="!c.isActive">{{ c.isActive ? 'Ativa' : 'Inativa' }}</span>
+        <div class="admin-actions">
+          <button type="button" class="btn-ghost sm" (click)="openAdminEdit(c)">Editar</button>
+          <button type="button" class="btn-ghost sm" (click)="toggleDefaultStatus(c)">
+            {{ c.isActive ? 'Desativar' : 'Ativar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!adminLoading && !adminCategories.length" class="muted">Nenhuma categoria padrão cadastrada.</div>
+  </section>
+
+  <div class="modal" *ngIf="showAdminModal">
+    <div class="modal__backdrop" (click)="closeAdminModal()"></div>
+    <div class="modal__card">
+      <h2>Editar categoria padrão</h2>
+      <label>
+        Nome
+        <input type="text" [(ngModel)]="adminName" />
+      </label>
+      <label>
+        Aplica em
+        <select [(ngModel)]="adminAppliesTo">
+          <option value="">Todos</option>
+          <option value="Income">Receitas</option>
+          <option value="Expense">Despesas</option>
+        </select>
+      </label>
+      <div class="modal__actions">
+        <button type="button" class="btn-ghost" (click)="closeAdminModal()">Cancelar</button>
+        <button type="button" class="btn-primary" (click)="saveAdmin()" [disabled]="adminSaving">
+          {{ adminSaving ? 'Salvando...' : 'Salvar' }}
+        </button>
+      </div>
+      <p class="error" *ngIf="adminError">{{ adminError }}</p>
+    </div>
+  </div>
 
   <ng-template #loadingTpl>
     <div class="card">Carregando categorias...</div>

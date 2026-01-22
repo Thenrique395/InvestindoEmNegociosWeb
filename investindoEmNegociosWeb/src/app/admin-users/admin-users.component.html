@@ -1,0 +1,46 @@
+<section class="admin-users">
+  <header class="admin-users__header">
+    <div>
+      <h1>Controle de acessos</h1>
+      <p>Defina o nível de acesso de cada usuário.</p>
+    </div>
+    <button type="button" class="refresh" (click)="load()" [disabled]="loading">Atualizar</button>
+  </header>
+
+  <div class="status" *ngIf="loading">Carregando usuários...</div>
+  <div class="status error" *ngIf="error">{{ error }}</div>
+
+  <div class="table-wrap" *ngIf="!loading && users.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Status</th>
+          <th>Criado em</th>
+          <th>Nível</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span [class.inactive]="!user.isActive">{{ user.isActive ? 'Ativo' : 'Inativo' }}</span>
+          </td>
+          <td>{{ user.createdAt | date: 'short' }}</td>
+          <td>
+            <select
+              [(ngModel)]="user.role"
+              (ngModelChange)="updateRole(user, $event)"
+              [disabled]="savingId === user.id">
+              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="status empty" *ngIf="!loading && !users.length">Nenhum usuário encontrado.</div>
+</section>

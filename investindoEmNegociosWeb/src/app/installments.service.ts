@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { InstallmentStatus, MoneyType } from './types/money-types';
 import { API_BASE_URL } from './api.config';
+import { applyListQuery, ListQuery } from './api-query';
 
 export interface Installment {
   id: string;
@@ -26,12 +27,13 @@ export class InstallmentsService {
 
   constructor(private http: HttpClient) {}
 
-  list(options: { status?: InstallmentStatus; from?: string; to?: string; type?: MoneyType } = {}): Observable<Installment[]> {
+  list(options: { status?: InstallmentStatus; from?: string; to?: string; type?: MoneyType; query?: ListQuery } = {}): Observable<Installment[]> {
     let params = new HttpParams();
     if (options.status) params = params.set('status', options.status);
     if (options.from) params = params.set('from', options.from);
     if (options.to) params = params.set('to', options.to);
     if (options.type) params = params.set('type', options.type);
+    params = applyListQuery(params, options.query);
     return this.http.get<Installment[]>(this.baseUrl, { params });
   }
 

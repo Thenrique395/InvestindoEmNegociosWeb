@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
+import { applyListQuery, ListQuery } from './api-query';
 
 export interface CardDto {
   id: string;
@@ -34,8 +35,9 @@ export class CardsService {
 
   constructor(private http: HttpClient) {}
 
-  list(): Observable<CardDto[]> {
-    return this.http.get<CardDto[]>(this.baseUrl);
+  list(query?: ListQuery): Observable<CardDto[]> {
+    const params = applyListQuery(new HttpParams(), query);
+    return this.http.get<CardDto[]>(this.baseUrl, { params });
   }
 
   create(payload: CardPayload): Observable<CardDto> {

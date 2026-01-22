@@ -1,0 +1,158 @@
+.admin-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-categories__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+    color: #6d7480;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.primary {
+  border: none;
+  background: #111827;
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ghost {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.status {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: #f6f7fb;
+  color: #4b5563;
+}
+
+.status.error {
+  background: #ffe9e9;
+  color: #b42318;
+}
+
+.status.empty {
+  text-align: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.muted {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.tag {
+  background: #ecfdf3;
+  color: #15803d;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.tag.off {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.modal__card {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: min(420px, 90vw);
+  display: grid;
+  gap: 1rem;
+}
+
+.modal__card label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.modal__card input,
+.modal__card select {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}

@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
 import { API_BASE_URL } from './api.config';
+import { parseRole, UserRole } from './roles';
 
 export interface AuthResponse {
   userId: string;
   name: string;
   email: string;
+  role: UserRole;
   token: string;
   refreshToken: string;
   expiresAt: string;
@@ -62,6 +64,9 @@ export class AuthService {
   private persistSession(res: AuthResponse): AuthResponse {
     try {
       localStorage.setItem('access_token', res.token);
+      if (res.role) {
+        localStorage.setItem('user_role', res.role);
+      }
       if (res.refreshToken) {
         localStorage.setItem('refresh_token', res.refreshToken);
       }
@@ -82,13 +87,47 @@ export class AuthService {
     return typeof localStorage !== 'undefined' ? localStorage.getItem('refresh_token') : null;
   }
 
+  getRole(): UserRole | null {
+    if (typeof localStorage === 'undefined') return null;
+    const stored = parseRole(localStorage.getItem('user_role'));
+    if (stored) return stored;
+
+    const tokenRole = parseRole(this.readRoleFromToken(this.getAccessToken()));
+    if (tokenRole) {
+      localStorage.setItem('user_role', tokenRole);
+      return tokenRole;
+    }
+    if (this.getAccessToken()) {
+      localStorage.setItem('user_role', 'Basic');
+      return 'Basic';
+    }
+    return null;
+  }
+
   clearSession(): void {
     try {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('access_expires_at');
+      localStorage.removeItem('user_role');
     } catch {
       /* ignore */
+    }
+  }
+
+  private readRoleFromToken(token: string | null): string | null {
+    if (!token || typeof atob === 'undefined') return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
+
+    try {
+      const decoded = JSON.parse(atob(padded));
+      return decoded?.role || decoded?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
+    } catch {
+      return null;
     }
   }
 

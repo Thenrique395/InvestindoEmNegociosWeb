@@ -15,24 +15,29 @@ import { UserSecurityComponent } from './user-security/user-security.component';
 import { UserDataComponent } from './user-data/user-data.component';
 import { InvestmentsComponent } from './investments/investments.component';
 import { CategoriesComponent } from './categories/categories.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { roleGuard } from './role.guard';
+import { AdminParametersComponent } from './admin-parameters/admin-parameters.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
-  { path: 'dashboard', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'dashboard', component: HomeComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
   { path: 'home', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'onboarding', component: OnboardingComponent, canActivate: [authGuard] },
-  { path: 'calculadora', component: CalculatorComponent, canActivate: [authGuard] },
-  { path: 'calculadora/:id', component: CalculatorComponent, canActivate: [authGuard] },
-  { path: 'cartoes', component: CartoesComponent, canActivate: [authGuard] },
-  { path: 'receitas', component: ReceitasComponent, canActivate: [authGuard] },
-  { path: 'despesas', component: DespesasComponent, canActivate: [authGuard] },
-  { path: 'investimentos', component: InvestmentsComponent, canActivate: [authGuard] },
-  { path: 'categorias', component: CategoriesComponent, canActivate: [authGuard] },
-  { path: 'metas', component: MetasComponent, canActivate: [authGuard] },
-  { path: 'perfil', component: UserProfileComponent, canActivate: [authGuard] },
-  { path: 'preferencias', component: UserPreferencesComponent, canActivate: [authGuard] },
-  { path: 'seguranca', component: UserSecurityComponent, canActivate: [authGuard] },
-  { path: 'dados', component: UserDataComponent, canActivate: [authGuard] },
+  { path: 'onboarding', component: OnboardingComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'calculadora', component: CalculatorComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'calculadora/:id', component: CalculatorComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'cartoes', component: CartoesComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Intermediate' } },
+  { path: 'receitas', component: ReceitasComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'despesas', component: DespesasComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'investimentos', component: InvestmentsComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Advanced' } },
+  { path: 'categorias', component: CategoriesComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'metas', component: MetasComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Intermediate' } },
+  { path: 'perfil', component: UserProfileComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'preferencias', component: UserPreferencesComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'seguranca', component: UserSecurityComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'dados', component: UserDataComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  { path: 'admin/usuarios', component: AdminUsersComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Admin' } },
+  { path: 'admin/parametros', component: AdminParametersComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Admin' } },
   { path: '**', redirectTo: '' }
 ];

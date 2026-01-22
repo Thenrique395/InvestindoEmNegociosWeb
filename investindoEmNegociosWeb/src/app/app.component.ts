@@ -4,6 +4,8 @@ import { NgIf } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
+import { AuthService } from './auth.service';
+import { hasAtLeastRole, UserRole } from './roles';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private sub: Subscription;
   private profileSub?: Subscription;
 
-  constructor(private router: Router, private profileService: ProfileService) {
+  constructor(private router: Router, private profileService: ProfileService, private authService: AuthService) {
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
@@ -87,8 +89,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.storage?.removeItem('access_token');
-    this.storage?.removeItem('refresh_token');
+    this.authService.clearSession();
     this.profile = null;
     this.router.navigateByUrl('/');
   }
@@ -119,6 +120,14 @@ export class AppComponent implements OnInit, OnDestroy {
     return typeof localStorage !== 'undefined' ? localStorage : null;
   }
 
+  get currentRole(): UserRole | null {
+    return this.authService.getRole();
+  }
+
+  hasAccess(minRole: UserRole): boolean {
+    return hasAtLeastRole(this.currentRole, minRole);
+  }
+
   toggleTheme(): void {
     this.applyTheme(!this.isLightTheme);
   }
@@ -129,5 +138,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
+  }
+
+  reloadIfSame(path: string, event?: Event): void {
+    const currentPath = this.router.url.split('?')[0];
+    if (currentPath === path) {
+      event?.preventDefault();
+      this.router.navigateByUrl(path);
+    }
   }
 }

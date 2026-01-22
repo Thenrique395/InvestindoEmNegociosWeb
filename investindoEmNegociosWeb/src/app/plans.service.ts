@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MoneyType, ScheduleType } from './types/money-types';
 import { API_BASE_URL } from './api.config';
+import { applyListQuery, ListQuery } from './api-query';
 
 export interface Plan {
   id: string;
@@ -38,9 +39,10 @@ export class PlansService {
 
   constructor(private http: HttpClient) {}
 
-  list(type?: MoneyType): Observable<Plan[]> {
+  list(type?: MoneyType, query?: ListQuery): Observable<Plan[]> {
     let params = new HttpParams();
     if (type) params = params.set('type', type);
+    params = applyListQuery(params, query);
     return this.http.get<Plan[]>(this.baseUrl, { params });
   }
 

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
+import { applyListQuery, ListQuery } from './api-query';
 
 export type InvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
 export type MovementType = 'APORTE' | 'RESGATE';
@@ -66,8 +67,9 @@ export class InvestmentsService {
     return this.http.put<InvestmentGoal>(`${this.baseUrl}/goal`, { targetAmount });
   }
 
-  listPositions(): Observable<InvestmentPosition[]> {
-    return this.http.get<InvestmentPosition[]>(`${this.baseUrl}/positions`);
+  listPositions(query?: ListQuery): Observable<InvestmentPosition[]> {
+    const params = applyListQuery(new HttpParams(), query);
+    return this.http.get<InvestmentPosition[]>(`${this.baseUrl}/positions`, { params });
   }
 
   createPosition(payload: InvestmentPositionRequest): Observable<InvestmentPosition> {

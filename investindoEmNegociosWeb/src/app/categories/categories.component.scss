@@ -52,7 +52,7 @@
 
 .add-card__form {
   display: grid;
-  grid-template-columns: 1fr 180px auto;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
   gap: 0.75rem;
   align-items: end;
 }
@@ -61,6 +61,7 @@
   display: grid;
   gap: 0.35rem;
   font-weight: 600;
+  min-width: 0;
 }
 
 .add-card__form input,
@@ -70,6 +71,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(255, 255, 255, 0.06);
   color: #edebec;
+  width: 100%;
 }
 
 .error {
@@ -163,6 +165,111 @@
   border: 1px solid rgba(244, 114, 114, 0.35);
 }
 
+.tag.off {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5f5;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.admin-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.status {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+.status.error {
+  background: rgba(185, 28, 28, 0.2);
+  color: #fecaca;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn-ghost.sm {
+  font-size: 0.8rem;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 40;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 15, 24, 0.6);
+}
+
+.modal__card {
+  position: relative;
+  background: #042834;
+  border-radius: 18px;
+  padding: 1.5rem;
+  width: min(420px, 92vw);
+  display: grid;
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 10, 20, 0.45);
+}
+
+.modal__card label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.modal__card input,
+.modal__card select {
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #edebec;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
 @media (max-width: 860px) {
   .add-card__form {
     grid-template-columns: 1fr;
@@ -175,6 +282,11 @@
 
   .category-item .tag,
   .category-item .btn-danger {
+    grid-column: 2 / 3;
+    justify-self: start;
+  }
+
+  .admin-actions {
     grid-column: 2 / 3;
     justify-self: start;
   }
