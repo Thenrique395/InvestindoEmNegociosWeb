@@ -38,6 +38,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   constructor(private db: ApiDataService) {}
 
   ngOnInit(): void {
+    this.db.refreshIncomes(this.mesKey());
     this.sub = this.db.incomes$.subscribe((lista) => {
       this.rendasAll = [...lista];
       this.valorSugestao = this.getUltimoValorParaFonte(this.novaRenda.fonte);
@@ -307,10 +308,12 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   mesAnterior(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
+    this.db.refreshIncomes(this.mesKey());
   }
 
   proximoMes(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() + 1, 1);
+    this.db.refreshIncomes(this.mesKey());
   }
 
   private mesKey(): string {

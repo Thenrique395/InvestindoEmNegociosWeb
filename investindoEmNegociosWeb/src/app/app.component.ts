@@ -46,7 +46,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isHomeRoute = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/#');
         this.userMenuOpen = false;
         if (this.isLogged) {
-          this.apiDataService.refresh();
+          if (!event.urlAfterRedirects.startsWith('/receitas')) {
+            this.apiDataService.refresh();
+          }
         }
       }
     });
@@ -153,7 +155,11 @@ export class AppComponent implements OnInit, OnDestroy {
     const currentPath = this.router.url.split('?')[0];
     if (currentPath === path) {
       event?.preventDefault();
-      this.apiDataService.refresh();
+      if (path === '/receitas') {
+        this.apiDataService.refreshIncomes();
+      } else {
+        this.apiDataService.refresh();
+      }
     }
   }
 }

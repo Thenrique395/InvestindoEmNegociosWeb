@@ -7,6 +7,7 @@ import { ScheduleType } from '../types/money-types';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
 import { AuthService } from '../auth.service';
+import { ReceitasSummaryService } from '../receitas-summary.service';
 
 export interface StoredExpense {
   id: string;
@@ -80,7 +81,8 @@ export class ApiDataService {
     private installments: InstallmentsService,
     private cardsApi: CardsService,
     private categoriesApi: CategoriesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private receitasSummary: ReceitasSummaryService
   ) {
     this.refresh();
   }
@@ -217,6 +219,33 @@ export class ApiDataService {
         this.dbSubject.next({ incomes, expenses, cards: mappedCards });
       },
       error: (err) => console.error('Falha ao carregar dados do backend', err)
+    });
+  }
+
+  refreshIncomes(month?: string): void {
+    if (!this.authService.getAccessToken()) {
+      this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
+      return;
+    }
+
+    this.receitasSummary.getSummary(month).subscribe({
+      next: (summary) => {
+        const incomes: StoredIncome[] = summary.items.map((item) => ({
+          id: item.id,
+          planId: item.planId,
+          fonte: item.source,
+          valor: item.amount,
+          recebimento: item.receivedOn,
+          schedule: item.schedule,
+          startDateIso: item.startDateIso,
+          fixa: item.isRecurring,
+          fixaInicio: item.recurringStart || ''
+        }));
+
+        const current = this.dbSubject.value;
+        this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
+      },
+      error: (err) => console.error('Falha ao carregar receitas do backend', err)
     });
   }
 
