@@ -19,6 +19,18 @@
       <p class="eyebrow">Despesas</p>
       <h2>{{ mesAtualLabel | titlecase }}</h2>
       <p class="muted">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
+      <div class="chip-row" *ngIf="previousComparison as comparison">
+        <span class="chip muted">
+          Comparativo com {{ comparison.month }}:
+          <span class="delta" [ngClass]="comparison.trend">
+            <ng-container *ngIf="comparison.isNew; else diffValue">Novo</ng-container>
+            <ng-template #diffValue>
+              {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
+              ({{ comparison.percent | number:'1.0-0' }}%)
+            </ng-template>
+          </span>
+        </span>
+      </div>
       <div class="nav">
         <button type="button" (click)="mesAnterior()">◀ Mês anterior</button>
         <button type="button" (click)="proximoMes()">Próximo mês ▶</button>

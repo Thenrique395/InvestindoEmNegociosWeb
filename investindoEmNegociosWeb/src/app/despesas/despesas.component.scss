@@ -95,6 +95,49 @@
   cursor: pointer;
 }
 
+.chip-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.75rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #e7f2f5;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chip.muted {
+  color: #9db1ba;
+}
+
+.chip .delta {
+  margin-left: 0.35rem;
+  font-weight: 600;
+  color: #cfe9df;
+}
+
+.chip .delta.up {
+  color: #7ee2b8;
+}
+
+.chip .delta.down {
+  color: #ff9a9a;
+}
+
+.chip .delta.flat {
+  color: #c7d2d0;
+}
+
 .inline-alert {
   padding: 0.65rem 0.9rem;
   border-radius: 10px;

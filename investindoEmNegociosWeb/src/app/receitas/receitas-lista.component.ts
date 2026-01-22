@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf, DecimalPipe } from '@angular/common';
 import { StoredIncome } from '../data/api-data.service';
+import { incomeStatusLabel } from '../utils/status';
 
 @Component({
   selector: 'app-receitas-lista',
@@ -11,6 +12,7 @@ import { StoredIncome } from '../data/api-data.service';
 })
 export class ReceitasListaComponent {
   @Input() rendas: StoredIncome[] = [];
+  @Input() showStatus = false;
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<{ planId?: string; installmentId: string }>();
 
@@ -21,5 +23,9 @@ export class ReceitasListaComponent {
   onRemover(planId?: string, installmentId?: string): void {
     if (!installmentId) return;
     this.remover.emit({ planId, installmentId });
+  }
+
+  statusLabel(renda: StoredIncome): string {
+    return incomeStatusLabel(renda.recebimento);
   }
 }

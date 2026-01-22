@@ -16,6 +16,12 @@
   min-width: 640px;
 }
 
+.lista--status .lista__head,
+.lista--status .lista__row {
+  grid-template-columns: 1.3fr 0.9fr 0.9fr 0.7fr 0.6fr 0.8fr;
+  min-width: 720px;
+}
+
 .lista__head {
   background: rgba(255, 255, 255, 0.05);
   font-weight: 700;
@@ -34,4 +40,24 @@
   display: flex;
   gap: 0.4rem;
   justify-content: flex-end;
+}
+
+.acoes .icon-action {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.status {
+  font-weight: 600;
+  color: #f2c96d;
+}
+
+.status.paid {
+  color: #8fe0b4;
 }

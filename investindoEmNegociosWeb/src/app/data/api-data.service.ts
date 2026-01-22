@@ -7,7 +7,7 @@ import { ScheduleType } from '../types/money-types';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
 import { AuthService } from '../auth.service';
-import { ReceitasSummaryService } from '../receitas-summary.service';
+import { ReceitasSummaryService, IncomeMonthSummary } from '../receitas-summary.service';
 
 export interface StoredExpense {
   id: string;
@@ -52,6 +52,15 @@ export interface StoredIncome {
   userId?: string;
 }
 
+export interface IncomeSummaryState {
+  month: string;
+  total: number;
+  totalRecurring: number;
+  totalOneTime: number;
+  previousMonth?: IncomeMonthSummary | null;
+  history: IncomeMonthSummary[];
+}
+
 type PersistedDb = {
   expenses: StoredExpense[];
   cards: StoredCard[];
@@ -62,6 +71,9 @@ type PersistedDb = {
 export class ApiDataService {
   private readonly dbSubject = new BehaviorSubject<PersistedDb>({ expenses: [], cards: [], incomes: [] });
   private readonly db$ = this.dbSubject.asObservable();
+  private readonly incomeSummarySubject = new BehaviorSubject<IncomeSummaryState | null>(null);
+  readonly incomeSummary$ = this.incomeSummarySubject.asObservable();
+  private lastIncomeMonth?: string;
 
   readonly expenses$ = this.db$.pipe(
     map((state) => state.expenses),
@@ -163,7 +175,7 @@ export class ApiDataService {
   addIncome(income: Omit<StoredIncome, 'id'>): void {
     const payload = this.toPlanPayloadFromIncome(income);
     this.plans.create(payload).subscribe({
-      next: () => this.refresh(),
+      next: () => this.refreshIncomes(this.lastIncomeMonth),
       error: (err) => console.error('Falha ao criar receita', err)
     });
   }
@@ -179,21 +191,21 @@ export class ApiDataService {
     });
 
     this.plans.update(planId, payload).subscribe({
-      next: () => this.refresh(),
+      next: () => this.refreshIncomes(this.lastIncomeMonth),
       error: (err) => console.error('Falha ao atualizar receita', err)
     });
   }
 
   removeIncome(planId: string): void {
     this.plans.delete(planId).subscribe({
-      next: () => this.refresh(),
+      next: () => this.refreshIncomes(this.lastIncomeMonth),
       error: (err) => console.error('Falha ao remover receita', err)
     });
   }
 
   removeIncomeInstallment(installmentId: string): void {
     this.installments.delete(installmentId).subscribe({
-      next: () => this.refresh(),
+      next: () => this.refreshIncomes(this.lastIncomeMonth),
       error: (err) => console.error('Falha ao remover parcela de receita', err)
     });
   }
@@ -201,6 +213,7 @@ export class ApiDataService {
   refresh(): void {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
+      this.incomeSummarySubject.next(null);
       return;
     }
     forkJoin({
@@ -225,8 +238,10 @@ export class ApiDataService {
   refreshIncomes(month?: string): void {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
+      this.incomeSummarySubject.next(null);
       return;
     }
+    this.lastIncomeMonth = month;
 
     this.receitasSummary.getSummary(month).subscribe({
       next: (summary) => {
@@ -244,6 +259,14 @@ export class ApiDataService {
 
         const current = this.dbSubject.value;
         this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
+        this.incomeSummarySubject.next({
+          month: summary.month,
+          total: summary.total,
+          totalRecurring: summary.totalRecurring,
+          totalOneTime: summary.totalOneTime,
+          previousMonth: summary.previousMonth ?? null,
+          history: summary.history ?? []
+        });
       },
       error: (err) => console.error('Falha ao carregar receitas do backend', err)
     });

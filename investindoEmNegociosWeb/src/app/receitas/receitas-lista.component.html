@@ -1,9 +1,10 @@
-<div class="lista">
+<div class="lista" [class.lista--status]="showStatus">
   <div class="lista__head">
     <span>Fonte</span>
     <span>Valor</span>
     <span>Recebimento</span>
     <span>Tipo</span>
+    <span *ngIf="showStatus">Status</span>
     <span class="acoes-head">Ações</span>
   </div>
   <div class="lista__row lista__row--empty" *ngIf="!rendas.length">
@@ -14,9 +15,12 @@
     <span>R$ {{ r.valor | number:'1.2-2' }}</span>
     <span>{{ r.recebimento || '—' }}</span>
     <span>{{ r.fixa ? 'Fixa' : 'Avulsa' }}</span>
+    <span *ngIf="showStatus" class="status" [class.paid]="statusLabel(r) === 'Pago'">
+      {{ statusLabel(r) }}
+    </span>
     <span class="acoes">
-      <button type="button" class="btn-edit sm" (click)="onEditar(r.id!)">✏️ Editar</button>
-      <button type="button" class="btn-danger sm" (click)="onRemover(r.planId, r.id)">🗑 Excluir</button>
+      <button type="button" class="btn-edit sm icon-action" (click)="onEditar(r.id!)" aria-label="Editar" title="Editar">✏️</button>
+      <button type="button" class="btn-danger sm icon-action" (click)="onRemover(r.planId, r.id)" aria-label="Excluir" title="Excluir">🗑</button>
     </span>
   </div>
 </div>

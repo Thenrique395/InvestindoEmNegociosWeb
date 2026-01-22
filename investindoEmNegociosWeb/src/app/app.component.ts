@@ -23,6 +23,7 @@ export class AppComponent implements OnInit, OnDestroy {
     'Controle receitas, despesas e metas com clareza. Alertas inteligentes e decisões mais seguras.';
   isLoginRoute = false;
   isHomeRoute = false;
+  isReceitasRoute = false;
   isLightTheme = false;
   showSignupModal = false;
   signupAlert = '';
@@ -44,6 +45,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
         this.isHomeRoute = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/#');
+        this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
         this.userMenuOpen = false;
         if (this.isLogged) {
           if (!event.urlAfterRedirects.startsWith('/receitas')) {

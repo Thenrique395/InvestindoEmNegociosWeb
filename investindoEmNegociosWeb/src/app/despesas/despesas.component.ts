@@ -111,6 +111,32 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return this.mesAtualLabel;
   }
 
+  get previousComparison(): {
+    month: string;
+    delta: number;
+    deltaAbs: number;
+    percent: number;
+    trend: 'up' | 'down' | 'flat';
+    isNew: boolean;
+  } | null {
+    const prevKey = this.previousMonthKey();
+    const prevTotal = this.totalMesByKey(prevKey);
+    const currentTotal = this.totalMes();
+    if (prevTotal === 0 && currentTotal === 0) return null;
+    const delta = currentTotal - prevTotal;
+    const trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const isNew = prevTotal === 0 && currentTotal > 0;
+    const percent = prevTotal === 0 ? (currentTotal ? 100 : 0) : (delta / prevTotal) * 100;
+    return {
+      month: this.formatMonthLabel(prevKey),
+      delta,
+      deltaAbs: Math.abs(delta),
+      percent,
+      trend,
+      isNew
+    };
+  }
+
   get despesas(): StoredExpense[] {
     return this.despesasPorMes[this.mesKey()] || [];
   }
@@ -645,6 +671,25 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   private mesKeyFromDate(date: Date): string {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private previousMonthKey(): string {
+    const prev = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
+    return this.mesKeyFromDate(prev);
+  }
+
+  private totalMesByKey(key: string): number {
+    const lista = this.despesasPorMes[key] || [];
+    return lista.reduce((sum, d) => sum + d.valor, 0);
+  }
+
+  private formatMonthLabel(value: string): string {
+    const match = /^(\d{4})-(\d{2})$/.exec(value);
+    if (!match) return value;
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    if (Number.isNaN(year) || Number.isNaN(month)) return value;
+    return new Date(year, month, 1).toLocaleString('pt-BR', { month: 'long' });
   }
 
   private mesKeyFromVencimento(vencimento: string): string | null {

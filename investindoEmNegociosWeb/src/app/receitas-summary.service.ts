@@ -22,6 +22,15 @@ export interface IncomeSummaryResponse {
   totalRecurring: number;
   totalOneTime: number;
   items: IncomeItemResponse[];
+  previousMonth?: IncomeMonthSummary | null;
+  history: IncomeMonthSummary[];
+}
+
+export interface IncomeMonthSummary {
+  month: string; // yyyy-MM
+  total: number;
+  totalRecurring: number;
+  totalOneTime: number;
 }
 
 @Injectable({ providedIn: 'root' })

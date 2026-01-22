@@ -11,11 +11,7 @@
     </div>
     <nav class="menu">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="reloadIfSame('/', $event)">Home</a>
-      <a routerLink="/quem-somos" class="disabled">Quem somos</a>
-      <a routerLink="/planos" class="disabled">Planos</a>
-      <a routerLink="/recursos" class="disabled">Recursos</a>
       <a routerLink="/calculadora" routerLinkActive="active" (click)="reloadIfSame('/calculadora', $event)">Calculadora</a>
-      <a routerLink="/blog" class="disabled">Blog</a>
     </nav>
     <div class="topbar__actions">
       <button class="theme-toggle icon" type="button" (click)="toggleTheme()" [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
@@ -89,7 +85,7 @@
         </div>
       </aside>
 
-      <div class="content">
+      <div class="content" [class.content--compact]="isReceitasRoute">
         <header class="topbar">
           <div class="topbar__slogan">{{ brandSlogan }}</div>
           <div class="topbar__actions">
@@ -136,7 +132,7 @@
           </div>
         </header>
 
-        <main class="main">
+        <main class="main" [class.main--compact]="isReceitasRoute">
           <router-outlet />
         </main>
       </div>

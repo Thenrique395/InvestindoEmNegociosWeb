@@ -1,21 +1,27 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DecimalPipe, NgIf, NgClass } from '@angular/common';
+import { DecimalPipe, NgIf, NgClass, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ApiDataService, StoredIncome } from '../data/api-data.service';
+import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
 import { ReceitasFormComponent } from './receitas-form.component';
 import { maskDateDDMMYYYY, maskMoneyInput, maskMonthYear } from '../utils/input-mask';
+import { AuthService } from '../auth.service';
+import { GoalsService } from '../goals.service';
+import { hasAtLeastRole, UserRole } from '../roles';
+import { incomeStatusLabel } from '../utils/status';
 
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf, NgClass],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf, NgClass, NgFor, FormsModule],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })
 export class ReceitasComponent implements OnInit, OnDestroy {
   dataAtual = new Date();
   rendasAll: StoredIncome[] = [];
+  summary: IncomeSummaryState | null = null;
   mostrarForm = false;
   novaRenda: StoredIncome = this.criaRenda();
   valorInput = '';
@@ -29,27 +35,60 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   alertaTipo: 'info' | 'success' | 'error' = 'info';
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   private sub?: Subscription;
+  private summarySub?: Subscription;
   showDeleteModal = false;
   deletePlanId: string | null = null;
   deleteInstallmentId: string | null = null;
   deleteFonte = '';
   deleteIsRecurring = false;
+  filtroTexto = '';
+  filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
+  filtroStatus: 'all' | 'paid' | 'pending' = 'all';
+  goalInput = '';
+  goalValue: number | null = null;
 
-  constructor(private db: ApiDataService) {}
+  constructor(
+    private db: ApiDataService,
+    private authService: AuthService,
+    private goalsService: GoalsService
+  ) {}
 
   ngOnInit(): void {
     this.db.refreshIncomes(this.mesKey());
+    this.loadGoal();
     this.sub = this.db.incomes$.subscribe((lista) => {
       this.rendasAll = [...lista];
       this.valorSugestao = this.getUltimoValorParaFonte(this.novaRenda.fonte);
+    });
+    this.summarySub = this.db.incomeSummary$.subscribe((summary) => {
+      this.summary = summary;
     });
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.summarySub?.unsubscribe();
+  }
+
+  get currentRole(): UserRole | null {
+    return this.authService.getRole();
+  }
+
+  hasAccess(minRole: UserRole): boolean {
+    return hasAtLeastRole(this.currentRole, minRole);
   }
 
   get rendas(): StoredIncome[] {
+    const key = this.mesKey();
+    const filtradas = this.rendasAll
+      .filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key)
+      .filter((r) => this.filtroTextoMatch(r))
+      .filter((r) => this.filtroTipoMatch(r))
+      .filter((r) => this.filtroStatusMatch(r));
+    return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
+  }
+
+  get rendasMes(): StoredIncome[] {
     const key = this.mesKey();
     const filtradas = this.rendasAll.filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key);
     return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
@@ -67,11 +106,168 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   get totalRendas(): number {
-    return this.rendas.reduce((sum, r) => sum + (r.valor || 0), 0);
+    if (this.summary) return this.summary.total;
+    return this.rendasMes.reduce((sum, r) => sum + (r.valor || 0), 0);
+  }
+
+  get totalRecorrentes(): number {
+    if (this.summary) return this.summary.totalRecurring;
+    return this.rendasMes.filter((r) => r.fixa).reduce((sum, r) => sum + (r.valor || 0), 0);
+  }
+
+  get totalAvulsas(): number {
+    if (this.summary) return this.summary.totalOneTime;
+    return this.rendasMes.filter((r) => !r.fixa).reduce((sum, r) => sum + (r.valor || 0), 0);
+  }
+
+  get statusResumo(): { pagos: number; pendentes: number; pagosValor: number; pendentesValor: number } {
+    let pagos = 0;
+    let pendentes = 0;
+    let pagosValor = 0;
+    let pendentesValor = 0;
+
+    for (const renda of this.rendasMes) {
+      const status = incomeStatusLabel(renda.recebimento);
+      if (status === 'Pago') {
+        pagos += 1;
+        pagosValor += renda.valor || 0;
+      } else {
+        pendentes += 1;
+        pendentesValor += renda.valor || 0;
+      }
+    }
+
+    return { pagos, pendentes, pagosValor, pendentesValor };
+  }
+
+  get topFontes(): { fonte: string; total: number }[] {
+    const map = new Map<string, number>();
+    for (const renda of this.rendasMes) {
+      const key = renda.fonte || 'Sem fonte';
+      map.set(key, (map.get(key) ?? 0) + (renda.valor || 0));
+    }
+    return Array.from(map.entries())
+      .map(([fonte, total]) => ({ fonte, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+  }
+
+  get historyData(): IncomeSummaryState['history'] {
+    return this.summary?.history ?? [];
+  }
+
+  get historyMax(): number {
+    return Math.max(...this.historyData.map((h) => h.total), 0);
+  }
+
+  get previousDelta(): { total: number; percent: number } | null {
+    if (!this.summary?.previousMonth) return null;
+    const prev = this.summary.previousMonth.total;
+    const current = this.summary.total;
+    if (!prev) return { total: current, percent: current ? 100 : 0 };
+    return { total: current - prev, percent: ((current - prev) / prev) * 100 };
+  }
+
+  get previousComparison(): {
+    month: string;
+    delta: number;
+    deltaAbs: number;
+    percent: number;
+    trend: 'up' | 'down' | 'flat';
+    isNew: boolean;
+  } | null {
+    if (!this.summary?.previousMonth) return null;
+    const prev = this.summary.previousMonth.total;
+    const current = this.summary.total;
+    const delta = current - prev;
+    const trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const isNew = prev === 0 && current > 0;
+    const percent = prev === 0 ? (current ? 100 : 0) : (delta / prev) * 100;
+    return {
+      month: this.formatMonthLabel(this.summary.previousMonth.month),
+      delta,
+      deltaAbs: Math.abs(delta),
+      percent,
+      trend,
+      isNew
+    };
+  }
+
+  private formatMonthLabel(value: string): string {
+    const match = /^(\d{4})-(\d{2})$/.exec(value);
+    if (!match) return value;
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    if (Number.isNaN(year) || Number.isNaN(month)) return value;
+    return new Date(year, month, 1).toLocaleString('pt-BR', { month: 'long' });
+  }
+
+  get adminInsights(): { label: string; value: number }[] {
+    const semData = this.rendasMes.filter((r) => !r.recebimento).length;
+    const semFonte = this.rendasMes.filter((r) => !r.fonte).length;
+    const recorrentes = this.rendasMes.filter((r) => r.fixa).length;
+    const fontesDuplicadas = this.countDuplicatedSources();
+    return [
+      { label: 'Receitas sem data', value: semData },
+      { label: 'Receitas sem fonte', value: semFonte },
+      { label: 'Recorrentes ativas', value: recorrentes },
+      { label: 'Fontes duplicadas', value: fontesDuplicadas }
+    ];
   }
 
   get mesAtualLabel(): string {
     return this.dataAtual.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+  }
+
+  get goalProgress(): number {
+    if (!this.goalValue) return 0;
+    return Math.min(100, (this.totalRendas / this.goalValue) * 100);
+  }
+
+  get goalRemaining(): number {
+    if (!this.goalValue) return 0;
+    return Math.max(0, this.goalValue - this.totalRendas);
+  }
+
+  get advancedAlerts(): { type: 'info' | 'warning' | 'success' | 'danger'; title: string; message: string }[] {
+    const alerts: { type: 'info' | 'warning' | 'success' | 'danger'; title: string; message: string }[] = [];
+    if (this.statusResumo.pendentes > 0) {
+      alerts.push({
+        type: 'info',
+        title: 'Receitas pendentes',
+        message: `Você tem ${this.statusResumo.pendentes} lançamento(s) pendente(s) neste mês.`
+      });
+    }
+    if (this.previousComparison && this.previousComparison.trend === 'down') {
+      alerts.push({
+        type: 'warning',
+        title: 'Receitas caíram',
+        message: `Queda de ${this.previousComparison.percent.toFixed(0)}% em relação a ${this.previousComparison.month}.`
+      });
+    }
+    if (this.goalValue) {
+      if (this.goalRemaining > 0) {
+        alerts.push({
+          type: 'warning',
+          title: 'Meta não atingida',
+          message: `Faltam R$ ${this.goalRemaining.toFixed(2).replace('.', ',')} para a meta do mês.`
+        });
+      } else {
+        alerts.push({
+          type: 'success',
+          title: 'Meta atingida',
+          message: 'Parabéns! Você já superou a meta de receita.'
+        });
+      }
+    }
+    if (this.totalRendas === 0) {
+      alerts.push({
+        type: 'danger',
+        title: 'Sem receitas no mês',
+        message: 'Nenhuma receita registrada. Cadastre ao menos uma fonte recorrente.'
+      });
+    }
+    return alerts.slice(0, 3);
   }
 
   abrirModal(): void {
@@ -240,6 +436,29 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return maskDateDDMMYYYY(value);
   }
 
+  private loadGoal(): void {
+    const year = this.dataAtual.getFullYear();
+    this.goalsService.getIncomeGoal(year).subscribe({
+      next: (goal) => {
+        if (!goal || !goal.expectedMonthly) {
+          this.goalValue = null;
+          this.goalInput = '';
+          return;
+        }
+        this.goalValue = goal.expectedMonthly;
+        this.goalInput = goal.expectedMonthly.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      },
+      error: () => {
+        this.goalValue = null;
+        this.goalInput = '';
+        this.setAlerta('Falha ao carregar a meta de receita.', 2500, 'error');
+      }
+    });
+  }
+
   private parseValor(value: string | number): number {
     if (typeof value === 'number') return value;
     const raw = value ?? '';
@@ -309,11 +528,112 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   mesAnterior(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
     this.db.refreshIncomes(this.mesKey());
+    this.loadGoal();
   }
 
   proximoMes(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() + 1, 1);
     this.db.refreshIncomes(this.mesKey());
+    this.loadGoal();
+  }
+
+  applyGoal(): void {
+    const value = this.parseValor(this.goalInput);
+    if (!value || value <= 0) {
+      this.setAlerta('Informe um valor mensal válido para a meta.', 2500, 'error');
+      return;
+    }
+    const year = this.dataAtual.getFullYear();
+    this.goalsService.upsertIncomeGoal(year, value).subscribe({
+      next: (goal) => {
+        this.goalValue = goal.expectedMonthly;
+        this.goalInput = goal.expectedMonthly.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        this.setAlerta('Meta atualizada com sucesso.', 2500, 'success');
+      },
+      error: (err) => {
+        this.setAlerta('Falha ao salvar a meta. Tente novamente.', 2500, 'error');
+        console.error(err);
+      }
+    });
+  }
+
+  exportCsv(): void {
+    const rows = [
+      ['Fonte', 'Valor', 'Recebimento', 'Tipo', 'Status'],
+      ...this.rendasMes.map((r) => [
+        r.fonte || '',
+        r.valor.toFixed(2).replace('.', ','),
+        r.recebimento || '',
+        r.fixa ? 'Recorrente' : 'Avulsa',
+        incomeStatusLabel(r.recebimento)
+      ])
+    ];
+    const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `receitas-${this.mesKey()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportPdf(): void {
+    if (typeof window === 'undefined') return;
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!printWindow) return;
+
+    const rows = this.rendasMes
+      .map(
+        (r) => `
+        <tr>
+          <td>${r.fonte || '-'}</td>
+          <td>R$ ${r.valor.toFixed(2).replace('.', ',')}</td>
+          <td>${r.recebimento || '-'}</td>
+          <td>${r.fixa ? 'Recorrente' : 'Avulsa'}</td>
+          <td>${incomeStatusLabel(r.recebimento)}</td>
+        </tr>`
+      )
+      .join('');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Receitas ${this.mesAtualLabel}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 24px; }
+            h1 { margin-bottom: 8px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
+            th { background: #f4f4f4; }
+          </style>
+        </head>
+        <body>
+          <h1>Receitas - ${this.mesAtualLabel}</h1>
+          <p>Total do mês: R$ ${this.totalRendas.toFixed(2).replace('.', ',')}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Fonte</th>
+                <th>Valor</th>
+                <th>Recebimento</th>
+                <th>Tipo</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
   }
 
   private mesKey(): string {
@@ -351,5 +671,33 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   private normalizaMes(value: string): string {
     return maskMonthYear(value);
+  }
+
+  private filtroTextoMatch(renda: StoredIncome): boolean {
+    if (!this.filtroTexto) return true;
+    return (renda.fonte || '').toLowerCase().includes(this.filtroTexto.trim().toLowerCase());
+  }
+
+  private filtroTipoMatch(renda: StoredIncome): boolean {
+    if (this.filtroTipo === 'all') return true;
+    if (this.filtroTipo === 'recurring') return !!renda.fixa;
+    return !renda.fixa;
+  }
+
+  private filtroStatusMatch(renda: StoredIncome): boolean {
+    if (this.filtroStatus === 'all') return true;
+    const status = incomeStatusLabel(renda.recebimento);
+    if (this.filtroStatus === 'paid') return status === 'Pago';
+    return status !== 'Pago';
+  }
+
+  private countDuplicatedSources(): number {
+    const counter = new Map<string, number>();
+    for (const renda of this.rendasMes) {
+      const key = (renda.fonte || '').trim().toLowerCase();
+      if (!key) continue;
+      counter.set(key, (counter.get(key) ?? 0) + 1);
+    }
+    return Array.from(counter.values()).filter((count) => count > 1).length;
   }
 }
