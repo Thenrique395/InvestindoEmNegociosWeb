@@ -4,7 +4,10 @@
       <h1>Parâmetros do sistema</h1>
       <p>Controle bandeiras de cartão e formas de pagamento disponíveis.</p>
     </div>
-    <button type="button" class="refresh" (click)="loadAll()" [disabled]="loading">Atualizar</button>
+    <button type="button" class="ghost sm" (click)="loadAll()" [disabled]="loading" [attr.aria-busy]="loading">
+      <span *ngIf="!loading">Atualizar</span>
+      <span *ngIf="loading">Atualizando...</span>
+    </button>
   </header>
 
   <div class="status" *ngIf="loading">Carregando parâmetros...</div>
@@ -13,34 +16,114 @@
   <div class="grid" *ngIf="!loading">
     <div class="card">
       <div class="card__title">Bandeiras de cartão</div>
+      <div class="create-row">
+        <input
+          type="text"
+          class="create-input"
+          placeholder="Nome da bandeira"
+          [(ngModel)]="newBrandName"
+          name="newBrandName" />
+        <input
+          type="text"
+          class="create-input"
+          placeholder="Código (ex: visa)"
+          [(ngModel)]="newBrandCode"
+          name="newBrandCode" />
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="createCardBrand()"
+          [disabled]="savingCreateBrand || loading">
+          {{ savingCreateBrand ? 'Salvando...' : 'Cadastrar' }}
+        </button>
+      </div>
+      <div class="status error" *ngIf="createBrandError">{{ createBrandError }}</div>
+      <div class="card__toolbar">
+        <input
+          type="text"
+          class="search"
+          placeholder="Buscar por nome ou codigo"
+          [(ngModel)]="brandFilter" />
+        <span class="count" *ngIf="brandFilter">
+          {{ filteredCardBrands.length }} de {{ cardBrands.length }}
+        </span>
+      </div>
+      <div class="status error" *ngIf="errorCardBrands">{{ errorCardBrands }}</div>
       <div class="list">
-        <div class="list__item" *ngFor="let brand of cardBrands">
-          <div>
+        <div class="list__item" *ngFor="let brand of filteredCardBrands">
+          <div class="item-info">
             <strong>{{ brand.name }}</strong>
             <span class="muted">{{ brand.code }}</span>
+            <span class="item-meta">{{ brand.isActive ? 'Ativo' : 'Desativado' }}</span>
+            <span class="item-meta" *ngIf="brandUpdatedLabel(brand)">{{ brandUpdatedLabel(brand) }}</span>
+            <span class="item-meta saving" *ngIf="isSavingBrand(brand)">Salvando...</span>
           </div>
           <label class="switch">
-            <input type="checkbox" [checked]="brand.isActive" (change)="toggleCardBrand(brand)" />
+            <input
+              type="checkbox"
+              [checked]="brand.isActive"
+              [disabled]="isSavingBrand(brand)"
+              (change)="toggleCardBrand(brand)" />
             <span class="slider"></span>
           </label>
         </div>
-        <div class="empty" *ngIf="!cardBrands.length">Nenhuma bandeira cadastrada.</div>
+        <div class="empty" *ngIf="!filteredCardBrands.length">
+          {{ brandFilter ? 'Nenhuma bandeira encontrada.' : 'Nenhuma bandeira cadastrada.' }}
+          <span class="empty-hint" *ngIf="!brandFilter">Use o cadastro acima para adicionar a primeira.</span>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card__title">Formas de pagamento</div>
+      <div class="create-row">
+        <input
+          type="text"
+          class="create-input"
+          placeholder="Nome da forma de pagamento"
+          [(ngModel)]="newMethodName"
+          name="newMethodName" />
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="createPaymentMethod()"
+          [disabled]="savingCreateMethod || loading">
+          {{ savingCreateMethod ? 'Salvando...' : 'Cadastrar' }}
+        </button>
+      </div>
+      <div class="status error" *ngIf="createMethodError">{{ createMethodError }}</div>
+      <div class="card__toolbar">
+        <input
+          type="text"
+          class="search"
+          placeholder="Buscar por nome"
+          [(ngModel)]="methodFilter" />
+        <span class="count" *ngIf="methodFilter">
+          {{ filteredPaymentMethods.length }} de {{ paymentMethods.length }}
+        </span>
+      </div>
+      <div class="status error" *ngIf="errorPaymentMethods">{{ errorPaymentMethods }}</div>
       <div class="list">
-        <div class="list__item" *ngFor="let method of paymentMethods">
-          <div>
+        <div class="list__item" *ngFor="let method of filteredPaymentMethods">
+          <div class="item-info">
             <strong>{{ method.name }}</strong>
+            <span class="item-meta">{{ method.isActive ? 'Ativo' : 'Desativado' }}</span>
+            <span class="item-meta" *ngIf="methodUpdatedLabel(method)">{{ methodUpdatedLabel(method) }}</span>
+            <span class="item-meta saving" *ngIf="isSavingMethod(method)">Salvando...</span>
           </div>
           <label class="switch">
-            <input type="checkbox" [checked]="method.isActive" (change)="togglePaymentMethod(method)" />
+            <input
+              type="checkbox"
+              [checked]="method.isActive"
+              [disabled]="isSavingMethod(method)"
+              (change)="togglePaymentMethod(method)" />
             <span class="slider"></span>
           </label>
         </div>
-        <div class="empty" *ngIf="!paymentMethods.length">Nenhuma forma de pagamento cadastrada.</div>
+        <div class="empty" *ngIf="!filteredPaymentMethods.length">
+          {{ methodFilter ? 'Nenhuma forma encontrada.' : 'Nenhuma forma de pagamento cadastrada.' }}
+          <span class="empty-hint" *ngIf="!methodFilter">Use o cadastro acima para adicionar a primeira.</span>
+        </div>
       </div>
     </div>
   </div>

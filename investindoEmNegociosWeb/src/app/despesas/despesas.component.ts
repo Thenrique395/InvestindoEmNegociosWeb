@@ -11,6 +11,17 @@ import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
+import {
+  formatCurrencyValue,
+  formatLocaleDate,
+  formatMonthLabelFromKey,
+  formatMonthYearLabel,
+  formatNumberValue,
+  getActiveLocale,
+  monthKeyFromLocaleDate,
+  parseLocaleDate,
+  parseLocalizedNumber
+} from '../utils/locale-utils';
 
 @Component({
   selector: 'app-despesas',
@@ -104,7 +115,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   get mesAtualLabel(): string {
-    return this.dataAtual.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+    return formatMonthYearLabel(this.dataAtual);
   }
 
   get mesAtual(): string {
@@ -181,7 +192,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     if (this.fixa) return this.valorInput;
     if (!valor || !this.parcelar || this.parcelasCount < 2) return this.valorInput;
     const parcela = valor / (this.parcelasCount || 1);
-    return parcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return formatNumberValue(parcela);
   }
 
   get despesasFiltradas(): StoredExpense[] {
@@ -684,38 +695,15 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   private formatMonthLabel(value: string): string {
-    const match = /^(\d{4})-(\d{2})$/.exec(value);
-    if (!match) return value;
-    const year = Number(match[1]);
-    const month = Number(match[2]) - 1;
-    if (Number.isNaN(year) || Number.isNaN(month)) return value;
-    return new Date(year, month, 1).toLocaleString('pt-BR', { month: 'long' });
+    return formatMonthLabelFromKey(value, 'long');
   }
 
   private mesKeyFromVencimento(vencimento: string): string | null {
-    const digits = vencimento.replace(/[^\d]/g, '');
-    if (digits.length < 8) return null;
-
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const anoInput = digits.slice(4, 8);
-    const anoNum = Number(anoInput);
-
-    if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return null;
-    if (Number.isNaN(anoNum) || anoInput.length !== 4) return null;
-
-    return `${anoNum}-${String(mes).padStart(2, '0')}`;
+    return monthKeyFromLocaleDate(vencimento);
   }
 
   private parseData(value: string): Date | null {
-    const digits = value.replace(/[^\d]/g, '');
-    if (digits.length !== 8) return null;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    const data = new Date(ano, mes - 1, dia);
-    if (data.getFullYear() !== ano || data.getMonth() + 1 !== mes || data.getDate() !== dia) return null;
-    return data;
+    return parseLocaleDate(value);
   }
 
   private addMonthsClamped(date: Date, months: number): Date {
@@ -728,9 +716,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   private formatDate(date: Date): string {
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    return `${dd}/${mm}/${date.getFullYear()}`;
+    return formatLocaleDate(date);
   }
 
   private resetarFormulario(): void {
@@ -762,26 +748,12 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   public parseValor(value: string | number): number {
-    if (typeof value === 'number') return value;
-    const raw = value ?? '';
-    const hasSeparator = /[,.]/.test(raw);
-
-    if (hasSeparator) {
-      const normalized = raw.replace(/\./g, '').replace(',', '.');
-      const parsed = Number(normalized);
-      return Number.isNaN(parsed) ? 0 : parsed;
-    }
-
-    const digits = raw.replace(/[^\d]/g, '');
-    if (!digits) return 0;
-    const inteiro = digits.slice(0, -2) || '0';
-    const centavos = digits.slice(-2);
-    return Number(`${inteiro}.${centavos}`);
+    return parseLocalizedNumber(value);
   }
 
   private formataMoeda(value: string | number): string {
     const num = this.parseValor(value);
-    return num ? num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '';
+    return num ? formatCurrencyValue(num) : '';
   }
 
   private somaPorStatus(statuses: string[]): number {
@@ -809,7 +781,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   private collate(a: string | undefined, b: string | undefined): number {
-    return (a || '').localeCompare(b || '', 'pt-BR', { sensitivity: 'base' });
+    return (a || '').localeCompare(b || '', getActiveLocale(), { sensitivity: 'base' });
   }
 
   private compareDate(a: string | undefined, b: string | undefined): number {
@@ -822,19 +794,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   private isDataValida(value: string): boolean {
-    const digits = value.replace(/[^\d]/g, '').slice(0, 8);
-    if (digits.length !== 8) return false;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    if (mes < 1 || mes > 12) return false;
-    if (dia < 1 || dia > 31) return false;
-    if (Number.isNaN(ano)) return false;
-
-    const data = new Date(ano, mes - 1, dia);
-    if (data.getMonth() + 1 !== mes || data.getDate() !== dia || data.getFullYear() !== ano) return false;
-
-    return true;
+    return !!parseLocaleDate(value);
   }
 
   private criaDespesa(): StoredExpense {

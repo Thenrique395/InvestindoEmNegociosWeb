@@ -14,7 +14,7 @@
     <span>{{ r.fonte }}</span>
     <span>R$ {{ r.valor | number:'1.2-2' }}</span>
     <span>{{ r.recebimento || '—' }}</span>
-    <span>{{ r.fixa ? 'Fixa' : 'Avulsa' }}</span>
+    <span>{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</span>
     <span *ngIf="showStatus" class="status" [class.paid]="statusLabel(r) === 'Pago'">
       {{ statusLabel(r) }}
     </span>

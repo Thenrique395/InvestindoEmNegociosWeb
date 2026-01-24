@@ -3,6 +3,7 @@ import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.service';
 import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/input-mask';
+import { formatLocaleDateFromIso, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
@@ -106,11 +107,11 @@ export class MetasComponent implements OnInit {
     this.editando = true;
     this.metaSelecionada = meta;
     this.metaNome = meta.title;
-    this.metaValor = meta.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.metaValor = formatNumberValue(meta.targetAmount);
     this.metaAno = String(meta.year);
     this.metaDescricao = meta.description || '';
     this.metaMensal = meta.expectedMonthly
-      ? meta.expectedMonthly.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      ? formatNumberValue(meta.expectedMonthly)
       : '';
     this.metaVencimento = meta.targetDate ? this.formatarDataBR(meta.targetDate) : '';
     this.mostrarModal = true;
@@ -323,7 +324,7 @@ export class MetasComponent implements OnInit {
     const linhas = lista.slice(0, 4).map((c) => {
       const data = new Date(c.date);
       const dataStr = isNaN(data.getTime()) ? c.date : data.toLocaleDateString('pt-BR');
-      const valor = c.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const valor = formatNumberValue(c.amount);
       return `${dataStr}: R$ ${valor}${c.note ? ' - ' + c.note : ''}`;
     });
     const restante = lista.length > 4 ? `+${lista.length - 4} aporte(s)...` : '';
@@ -367,9 +368,7 @@ export class MetasComponent implements OnInit {
   }
 
   private parseValor(raw: string): number {
-    if (raw == null) return 0;
-    const clean = raw.toString().replace(/\./g, '').replace(',', '.');
-    return Number(clean);
+    return parseLocalizedNumber(raw);
   }
 
   private toTargetDate(): string | null {
@@ -383,10 +382,7 @@ export class MetasComponent implements OnInit {
   }
 
   private formatarDataBR(dateValue: string): string {
-    const iso = dateValue.split('T')[0];
-    const [year, month, day] = iso.split('-');
-    if (!year || !month || !day) return '';
-    return `${day}/${month}/${year}`;
+    return formatLocaleDateFromIso(dateValue);
   }
 
   private atualizarAportePrevisto(): void {
@@ -398,7 +394,7 @@ export class MetasComponent implements OnInit {
     const months = this.monthsUntil(parsed);
     if (months <= 0) return;
     const mensal = restante / months;
-    this.metaMensal = mensal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.metaMensal = formatNumberValue(mensal);
     this.metaAno = String(parsed.getFullYear());
   }
 

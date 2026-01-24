@@ -6,6 +6,7 @@ import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.serv
 import { CartoesListagemComponent } from './cartoes-listagem.component';
 import { LookupsService, CardBrandLookup } from '../lookups.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { formatCurrencyValue } from '../utils/locale-utils';
 
 @Component({
   selector: 'app-cartoes',
@@ -241,7 +242,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   private formatCurrency(value: number): string {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return formatCurrencyValue(value);
   }
 
   tituloBandeira(id: string): string {

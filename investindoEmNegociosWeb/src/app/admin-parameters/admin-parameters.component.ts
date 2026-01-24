@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { catchError, forkJoin, of } from 'rxjs';
 import { AdminParametersService, CardBrandAdmin, PaymentMethodAdmin } from '../admin-parameters.service';
 
 @Component({
   selector: 'app-admin-parameters',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-parameters.component.html',
   styleUrls: ['./admin-parameters.component.scss']
 })
@@ -14,7 +16,20 @@ export class AdminParametersComponent implements OnInit {
   paymentMethods: PaymentMethodAdmin[] = [];
   loading = false;
   error = '';
+  errorCardBrands = '';
+  errorPaymentMethods = '';
   savingKey = '';
+  brandFilter = '';
+  methodFilter = '';
+  newBrandName = '';
+  newBrandCode = '';
+  newMethodName = '';
+  createBrandError = '';
+  createMethodError = '';
+  savingCreateBrand = false;
+  savingCreateMethod = false;
+  private lastUpdatedBrands: Record<number, Date> = {};
+  private lastUpdatedMethods: Record<number, Date> = {};
 
   constructor(private adminParameters: AdminParametersService) {}
 
@@ -25,53 +40,191 @@ export class AdminParametersComponent implements OnInit {
   loadAll(): void {
     this.loading = true;
     this.error = '';
-    this.adminParameters.listCardBrands().subscribe({
-      next: (brands) => (this.cardBrands = brands),
+    this.errorCardBrands = '';
+    this.errorPaymentMethods = '';
+    forkJoin({
+      brands: this.adminParameters.listCardBrands().pipe(
+        catchError(() => {
+          this.errorCardBrands = 'Não foi possível carregar as bandeiras.';
+          return of([] as CardBrandAdmin[]);
+        })
+      ),
+      methods: this.adminParameters.listPaymentMethods().pipe(
+        catchError(() => {
+          this.errorPaymentMethods = 'Não foi possível carregar as formas de pagamento.';
+          return of([] as PaymentMethodAdmin[]);
+        })
+      )
+    }).subscribe({
+      next: ({ brands, methods }) => {
+        this.cardBrands = brands;
+        this.paymentMethods = methods;
+        if (this.errorCardBrands && this.errorPaymentMethods) {
+          this.error = 'Não foi possível carregar os parâmetros.';
+        }
+      },
       error: () => {
-        this.error = 'Não foi possível carregar as bandeiras.';
-        this.loading = false;
+        this.error = 'Não foi possível carregar os parâmetros.';
       },
       complete: () => {
-        this.adminParameters.listPaymentMethods().subscribe({
-          next: (methods) => (this.paymentMethods = methods),
-          error: () => (this.error = 'Não foi possível carregar as formas de pagamento.'),
-          complete: () => (this.loading = false)
-        });
+        this.loading = false;
       }
     });
   }
 
   toggleCardBrand(brand: CardBrandAdmin): void {
-    const key = `brand-${brand.id}`;
+    const key = this.brandKey(brand.id);
     if (this.savingKey) return;
-    this.savingKey = key;
     const next = !brand.isActive;
+    if (!next && !window.confirm('Desativar esta bandeira pode impactar novos cadastros. Deseja continuar?')) {
+      return;
+    }
+    this.savingKey = key;
     brand.isActive = next;
 
     this.adminParameters.updateCardBrandStatus(brand.id, next).subscribe({
-      next: (updated) => (brand.isActive = updated.isActive),
+      next: (updated) => {
+        brand.isActive = updated.isActive;
+        this.lastUpdatedBrands[brand.id] = new Date();
+      },
       error: () => {
         brand.isActive = !next;
-        this.error = 'Erro ao atualizar a bandeira.';
+        this.errorCardBrands = 'Erro ao atualizar a bandeira.';
+        this.savingKey = '';
       },
       complete: () => (this.savingKey = '')
     });
   }
 
+  createCardBrand(): void {
+    if (this.savingCreateBrand) return;
+    const name = this.newBrandName.trim();
+    const code = this.newBrandCode.trim();
+    if (!name || !code) {
+      this.createBrandError = 'Informe nome e código da bandeira.';
+      return;
+    }
+
+    this.savingCreateBrand = true;
+    this.createBrandError = '';
+    this.adminParameters.createCardBrand(name, code).subscribe({
+      next: (created) => {
+        this.cardBrands = [...this.cardBrands, created].sort((a, b) => a.id - b.id);
+        this.lastUpdatedBrands[created.id] = new Date();
+        this.newBrandName = '';
+        this.newBrandCode = '';
+        this.createBrandError = '';
+      },
+      error: (err) => {
+        this.createBrandError = this.resolveErrorMessage(err, 'Erro ao cadastrar a bandeira.');
+      },
+      complete: () => {
+        this.savingCreateBrand = false;
+      }
+    });
+  }
+
   togglePaymentMethod(method: PaymentMethodAdmin): void {
-    const key = `method-${method.id}`;
+    const key = this.methodKey(method.id);
     if (this.savingKey) return;
-    this.savingKey = key;
     const next = !method.isActive;
+    if (!next && !window.confirm('Desativar esta forma de pagamento pode impactar novos cadastros. Deseja continuar?')) {
+      return;
+    }
+    this.savingKey = key;
     method.isActive = next;
 
     this.adminParameters.updatePaymentMethodStatus(method.id, next).subscribe({
-      next: (updated) => (method.isActive = updated.isActive),
+      next: (updated) => {
+        method.isActive = updated.isActive;
+        this.lastUpdatedMethods[method.id] = new Date();
+      },
       error: () => {
         method.isActive = !next;
-        this.error = 'Erro ao atualizar a forma de pagamento.';
+        this.errorPaymentMethods = 'Erro ao atualizar a forma de pagamento.';
+        this.savingKey = '';
       },
       complete: () => (this.savingKey = '')
     });
+  }
+
+  createPaymentMethod(): void {
+    if (this.savingCreateMethod) return;
+    const name = this.newMethodName.trim();
+    if (!name) {
+      this.createMethodError = 'Informe o nome da forma de pagamento.';
+      return;
+    }
+
+    this.savingCreateMethod = true;
+    this.createMethodError = '';
+    this.adminParameters.createPaymentMethod(name).subscribe({
+      next: (created) => {
+        this.paymentMethods = [...this.paymentMethods, created].sort((a, b) => a.id - b.id);
+        this.lastUpdatedMethods[created.id] = new Date();
+        this.newMethodName = '';
+        this.createMethodError = '';
+      },
+      error: (err) => {
+        this.createMethodError = this.resolveErrorMessage(err, 'Erro ao cadastrar a forma de pagamento.');
+      },
+      complete: () => {
+        this.savingCreateMethod = false;
+      }
+    });
+  }
+
+  get filteredCardBrands(): CardBrandAdmin[] {
+    return this.filterList(this.cardBrands, this.brandFilter, (brand) => `${brand.name} ${brand.code}`);
+  }
+
+  get filteredPaymentMethods(): PaymentMethodAdmin[] {
+    return this.filterList(this.paymentMethods, this.methodFilter, (method) => method.name);
+  }
+
+  isSavingBrand(brand: CardBrandAdmin): boolean {
+    return this.savingKey === this.brandKey(brand.id);
+  }
+
+  isSavingMethod(method: PaymentMethodAdmin): boolean {
+    return this.savingKey === this.methodKey(method.id);
+  }
+
+  brandUpdatedLabel(brand: CardBrandAdmin): string {
+    return this.formatUpdatedLabel(this.lastUpdatedBrands[brand.id]);
+  }
+
+  methodUpdatedLabel(method: PaymentMethodAdmin): string {
+    return this.formatUpdatedLabel(this.lastUpdatedMethods[method.id]);
+  }
+
+  private brandKey(id: number): string {
+    return `brand-${id}`;
+  }
+
+  private methodKey(id: number): string {
+    return `method-${id}`;
+  }
+
+  private filterList<T>(items: T[], needle: string, labeler: (item: T) => string): T[] {
+    const normalized = needle.trim().toLowerCase();
+    if (!normalized) return items;
+    return items.filter((item) => labeler(item).toLowerCase().includes(normalized));
+  }
+
+  private formatUpdatedLabel(updatedAt?: Date): string {
+    if (!updatedAt) return '';
+    const diff = Date.now() - updatedAt.getTime();
+    if (diff < 60_000) return 'Atualizado agora';
+    const time = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `Atualizado às ${time}`;
+  }
+
+  private resolveErrorMessage(err: any, fallback: string): string {
+    const detail = err?.error?.detail || err?.error?.title;
+    if (detail) return detail;
+    if (err?.status === 0) return 'Falha de conexão com o servidor.';
+    if (err?.status) return `${fallback} (HTTP ${err.status}).`;
+    return fallback;
   }
 }

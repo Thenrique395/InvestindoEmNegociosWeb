@@ -29,11 +29,19 @@ export class AdminParametersService {
     return this.http.put<CardBrandAdmin>(`${this.baseUrl}/card-brands/${id}/status`, { isActive });
   }
 
+  createCardBrand(name: string, code: string) {
+    return this.http.post<CardBrandAdmin>(`${this.baseUrl}/card-brands`, { name, code });
+  }
+
   listPaymentMethods() {
     return this.http.get<PaymentMethodAdmin[]>(`${this.baseUrl}/payment-methods`);
   }
 
   updatePaymentMethodStatus(id: number, isActive: boolean) {
     return this.http.put<PaymentMethodAdmin>(`${this.baseUrl}/payment-methods/${id}/status`, { isActive });
+  }
+
+  createPaymentMethod(name: string) {
+    return this.http.post<PaymentMethodAdmin>(`${this.baseUrl}/payment-methods`, { name });
   }
 }

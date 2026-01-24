@@ -6,8 +6,8 @@ import { CardsService } from './cards.service';
 import { GoalsService, Goal } from './goals.service';
 import { RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
-import { parseDateDDMMYYYY } from './utils/input-mask';
 import { OnboardingService } from './onboarding.service';
+import { formatMonthLabel, formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 
 @Component({
   selector: 'app-home',
@@ -178,7 +178,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.periodo === 'year') {
       return `Ano de ${this.dataAtual.getFullYear()}`;
     }
-    return this.dataAtual.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+    return formatMonthYearLabel(this.dataAtual);
   }
 
   get chartTitle(): string {
@@ -305,13 +305,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     if (this.periodo === 'quarter') {
       this.currentMonthDays = 0;
-      const quarterStart = Math.floor(mesIndex / 3) * 3;
-      const data = Array.from({ length: 3 }).map((_, idx) => {
-        const monthIndex = quarterStart + idx;
-        const label = new Date(ano, monthIndex, 1).toLocaleString('pt-BR', { month: 'short' });
-        const key = `${ano}-${String(monthIndex + 1).padStart(2, '0')}`;
-        const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
-        const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
+        const quarterStart = Math.floor(mesIndex / 3) * 3;
+        const data = Array.from({ length: 3 }).map((_, idx) => {
+          const monthIndex = quarterStart + idx;
+          const label = formatMonthLabel(ano, monthIndex, 'short');
+          const key = `${ano}-${String(monthIndex + 1).padStart(2, '0')}`;
+          const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
+          const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
         return { label, incomes, expenses };
       });
       this.monthlyData = data;
@@ -322,7 +322,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.currentMonthDays = 0;
     const data = Array.from({ length: 12 }).map((_, idx) => {
-      const label = new Date(ano, idx, 1).toLocaleString('pt-BR', { month: 'short' });
+      const label = formatMonthLabel(ano, idx, 'short');
       const key = `${ano}-${String(idx + 1).padStart(2, '0')}`;
       const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
       const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
@@ -407,8 +407,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         grouped.set(key, item);
         continue;
       }
-      const prevDate = parseDateDDMMYYYY(prev.date)?.getTime() || 0;
-      const nextDate = parseDateDDMMYYYY(item.date)?.getTime() || 0;
+      const prevDate = parseLocaleDate(prev.date)?.getTime() || 0;
+      const nextDate = parseLocaleDate(item.date)?.getTime() || 0;
       if (nextDate >= prevDate) {
         grouped.set(key, item);
       }
@@ -420,8 +420,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       return key ? this.isWithinRange(key, range) : false;
     });
     all.sort((a, b) => {
-      const da = parseDateDDMMYYYY(a.date)?.getTime() || 0;
-      const db = parseDateDDMMYYYY(b.date)?.getTime() || 0;
+      const da = parseLocaleDate(a.date)?.getTime() || 0;
+      const db = parseLocaleDate(b.date)?.getTime() || 0;
       return db - da;
     });
     this.recentTransactions = all.slice(0, 6);
@@ -568,19 +568,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private mesKeyFromVencimento(vencimento: string): string | null {
-    const digits = vencimento?.replace(/[^\d]/g, '') || '';
-    if (digits.length < 8) return null;
-    const mes = digits.slice(2, 4);
-    const ano = digits.slice(4, 8);
-    return `${ano}-${mes}`;
+    return monthKeyFromLocaleDate(vencimento);
   }
 
   private mesKeyFromRecebimento(recebimento: string): string | null {
-    const digits = recebimento?.replace(/[^\d]/g, '') || '';
-    if (digits.length < 8) return null;
-    const mes = digits.slice(2, 4);
-    const ano = digits.slice(4, 8);
-    return `${ano}-${mes}`;
+    return monthKeyFromLocaleDate(recebimento);
   }
 
   private mesKeyFromMes(mesAno?: string): string | null {
@@ -615,7 +607,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ): number {
     return lista.reduce((sum, item) => {
       const raw = field === 'vencimento' ? item.vencimento : item.recebimento;
-      const date = raw ? parseDateDDMMYYYY(raw) : null;
+      const date = raw ? parseLocaleDate(raw) : null;
       if (!date) return sum;
       if (date < start || date > end) return sum;
       return sum + (item.valor || 0);
@@ -710,7 +702,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     const despesasVencidas = this.expensesRaw.filter((e) => {
-      const data = parseDateDDMMYYYY(e.vencimento);
+      const data = parseLocaleDate(e.vencimento);
       const hoje = new Date();
       if (!data) return false;
       if (e.status && e.status !== 'OPEN' && e.status !== 'PARTIALLY_PAID') return false;

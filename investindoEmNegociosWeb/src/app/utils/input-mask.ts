@@ -1,3 +1,5 @@
+import { getActiveLocale } from './locale-utils';
+
 export const onlyDigits = (value: string): string => (value || '').replace(/\D/g, '');
 
 export const allowOnlyDigitsKeydown = (event: KeyboardEvent): void => {
@@ -9,11 +11,11 @@ export const allowOnlyDigitsKeydown = (event: KeyboardEvent): void => {
   }
 };
 
-export const formatCurrencyFromDigits = (digits: string): string => {
+export const formatCurrencyFromDigits = (digits: string, locale = getActiveLocale()): string => {
   if (!digits) return '';
   const num = Number(digits) / 100;
   if (!Number.isFinite(num)) return '';
-  return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
 };
 
 export const maskMoneyInput = (value: string): string => {
@@ -22,14 +24,18 @@ export const maskMoneyInput = (value: string): string => {
 };
 
 export const maskDateDDMMYYYY = (value: string): string => {
+  const locale = getActiveLocale();
+  const monthFirst = locale.toLowerCase().startsWith('en');
   const digits = onlyDigits(value).slice(0, 8);
-  const dia = digits.slice(0, 2);
-  const mes = digits.slice(2, 4);
+  const partA = digits.slice(0, 2);
+  const partB = digits.slice(2, 4);
   const ano = digits.slice(4, 8);
+  const mes = monthFirst ? partA : partB;
+  const dia = monthFirst ? partB : partA;
   if (mes && (Number(mes) < 1 || Number(mes) > 12)) {
-    return [dia].filter(Boolean).join('/');
+    return [partA].filter(Boolean).join('/');
   }
-  return [dia, mes, ano].filter(Boolean).join('/');
+  return [partA, partB, ano].filter(Boolean).join('/');
 };
 
 export const maskMonthYear = (value: string): string => {
@@ -43,11 +49,15 @@ export const maskMonthYear = (value: string): string => {
 };
 
 export const parseDateDDMMYYYY = (value: string): Date | null => {
+  const locale = getActiveLocale();
+  const monthFirst = locale.toLowerCase().startsWith('en');
   const digits = onlyDigits(value).slice(0, 8);
   if (digits.length !== 8) return null;
-  const dia = Number(digits.slice(0, 2));
-  const mes = Number(digits.slice(2, 4));
+  const partA = Number(digits.slice(0, 2));
+  const partB = Number(digits.slice(2, 4));
   const ano = Number(digits.slice(4, 8));
+  const mes = monthFirst ? partA : partB;
+  const dia = monthFirst ? partB : partA;
   const data = new Date(ano, mes - 1, dia);
   if (data.getFullYear() !== ano || data.getMonth() + 1 !== mes || data.getDate() !== dia) return null;
   return data;

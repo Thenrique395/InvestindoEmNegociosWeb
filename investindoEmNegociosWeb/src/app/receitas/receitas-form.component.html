@@ -17,7 +17,7 @@
       </label>
       <label class="toggle-row">
         <input type="checkbox" [(ngModel)]="novaRenda.fixa" name="fixa" (ngModelChange)="onFixaChange($event)" />
-        <span>Receita fixa mensal</span>
+        <span>Receita recorrente mensal</span>
       </label>
       <label *ngIf="novaRenda.fixa">
         Vigência inicial (MM/AAAA)

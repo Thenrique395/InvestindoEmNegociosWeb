@@ -10,6 +10,7 @@ import {
 } from '../investments.service';
 import { maskMoneyInput } from '../utils/input-mask';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 
 type FormMode = 'create' | 'movement';
 
@@ -103,10 +104,7 @@ export class InvestmentsComponent implements OnInit {
     this.investments.upsertGoal(this.metaPatrimonio).subscribe({
       next: (goal) => {
         this.metaPatrimonio = goal.targetAmount || 0;
-        this.metaPatrimonioInput = this.metaPatrimonio.toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
+        this.metaPatrimonioInput = formatNumberValue(this.metaPatrimonio);
         this.metaSalvando = false;
       },
       error: () => {
@@ -181,10 +179,7 @@ export class InvestmentsComponent implements OnInit {
         if (!goal) return;
         this.metaPatrimonio = goal.targetAmount || 0;
         if (this.metaPatrimonio) {
-          this.metaPatrimonioInput = this.metaPatrimonio.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          });
+          this.metaPatrimonioInput = formatNumberValue(this.metaPatrimonio);
         }
       }
     });
@@ -197,8 +192,6 @@ export class InvestmentsComponent implements OnInit {
   }
 
   private parseValor(raw: string): number {
-    if (!raw) return 0;
-    const clean = raw.toString().replace(/\./g, '').replace(',', '.');
-    return Number(clean) || 0;
+    return parseLocalizedNumber(raw);
   }
 }

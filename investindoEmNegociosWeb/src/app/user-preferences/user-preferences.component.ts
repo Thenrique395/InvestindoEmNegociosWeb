@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
+import { getInitialLocale, persistLocaleSettings, setLocaleSettings } from '../utils/locale-settings';
 
 @Component({
   selector: 'app-user-preferences',
@@ -13,7 +14,7 @@ import { ProfileService, Preferences } from '../profile.service';
 export class UserPreferencesComponent implements OnInit {
   moedas = ['BRL', 'USD', 'EUR'];
   moedaSelecionada = 'BRL';
-  localizacoes: string[] = ['Brasil (pt-BR)'];
+  localizacoes: string[] = ['pt-BR'];
   novaLocalizacao = '';
   linguas = [
     { id: 'pt-BR', label: 'Português (Brasil)' },
@@ -35,16 +36,27 @@ export class UserPreferencesComponent implements OnInit {
   }
 
   salvarPreferencias(): void {
+    const previousLocale = getInitialLocale();
+    const locales = this.localizacoes.length
+      ? [this.linguaSelecionada, ...this.localizacoes.filter((l) => l !== this.linguaSelecionada)]
+      : [this.linguaSelecionada];
     const payload: Preferences = {
       currency: this.moedaSelecionada,
-      locales: this.localizacoes.length ? this.localizacoes : [this.linguaSelecionada]
+      locales
     };
     this.loading = true;
     this.profileService.updatePreferences(payload).subscribe({
       next: (resp) => {
-        document.documentElement.lang = resp.locales[0] || 'pt-BR';
+        const locale = resp.locales[0] || 'pt-BR';
+        const currency = resp.currency || 'BRL';
+        document.documentElement.lang = locale;
+        setLocaleSettings({ locale, currency });
+        persistLocaleSettings(locale, currency);
         this.loading = false;
         alert('Preferências salvas.');
+        if (locale !== previousLocale) {
+          window.location.reload();
+        }
       },
       error: () => {
         this.loading = false;
@@ -54,13 +66,23 @@ export class UserPreferencesComponent implements OnInit {
   }
 
   adicionarLocalizacao(): void {
-    const loc = this.novaLocalizacao.trim();
+    const loc = this.normalizeLocale(this.novaLocalizacao);
     if (!loc) return;
-    this.localizacoes.push(loc);
+    if (!this.localizacoes.includes(loc)) {
+      this.localizacoes.push(loc);
+    }
     this.novaLocalizacao = '';
   }
 
   removerLocalizacao(index: number): void {
     this.localizacoes.splice(index, 1);
+  }
+
+  private normalizeLocale(value: string): string {
+    const raw = value.trim();
+    if (!raw) return '';
+    const match = raw.match(/[a-z]{2}[-_][A-Z]{2}/);
+    if (match) return match[0].replace('_', '-');
+    return raw;
   }
 }

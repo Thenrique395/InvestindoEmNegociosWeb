@@ -1,3 +1,26 @@
+<div class="insights" *ngIf="hasAccess('Basic')">
+  <div class="insight-card">
+    <p class="label">Recebidas</p>
+    <strong>R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</strong>
+    <span class="muted">{{ statusResumo.pagos }} lançamentos</span>
+  </div>
+  <div class="insight-card">
+    <p class="label">Pendentes</p>
+    <strong>R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</strong>
+    <span class="muted">{{ statusResumo.pendentes }} lançamentos</span>
+  </div>
+  <div class="insight-card">
+    <p class="label">Top fontes</p>
+    <div class="source-list">
+      <div class="source-row" *ngFor="let item of topFontes">
+        <span>{{ item.fonte }}</span>
+        <strong>R$ {{ item.total | number:'1.2-2' }}</strong>
+      </div>
+    <div class="muted" *ngIf="!topFontes.length">Sem fontes no mês.</div>
+    </div>
+  </div>
+</div>
+
 <section class="rendas">
   <div class="nav-row">
     <div>
@@ -61,29 +84,6 @@
         <option value="pending">Pendente</option>
       </select>
     </label>
-  </div>
-
-  <div class="insights" *ngIf="hasAccess('Basic')">
-    <div class="insight-card">
-      <p class="label">Recebidas</p>
-      <strong>R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</strong>
-      <span class="muted">{{ statusResumo.pagos }} lançamentos</span>
-    </div>
-    <div class="insight-card">
-      <p class="label">Pendentes</p>
-      <strong>R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</strong>
-      <span class="muted">{{ statusResumo.pendentes }} lançamentos</span>
-    </div>
-    <div class="insight-card">
-      <p class="label">Top fontes</p>
-      <div class="source-list">
-        <div class="source-row" *ngFor="let item of topFontes">
-          <span>{{ item.fonte }}</span>
-          <strong>R$ {{ item.total | number:'1.2-2' }}</strong>
-        </div>
-      <div class="muted" *ngIf="!topFontes.length">Sem fontes no mês.</div>
-      </div>
-    </div>
   </div>
 
   <div class="goals" *ngIf="hasAccess('Intermediate')">

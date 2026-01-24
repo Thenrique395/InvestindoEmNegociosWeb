@@ -7,6 +7,7 @@ import { ProfileService, UserProfile } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
+import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 
 @Component({
   selector: 'app-root',
@@ -58,6 +59,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.applyTheme(false);
+    const initialLocale = getInitialLocale();
+    const initialCurrency = getInitialCurrency();
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = initialLocale;
+    }
+    setLocaleSettings({ locale: initialLocale, currency: initialCurrency });
     if (this.isLogged) {
       this.profileSub = this.profileService.profile$.subscribe((profile) => {
         this.profile = profile;
@@ -69,7 +76,13 @@ export class AppComponent implements OnInit, OnDestroy {
       });
       this.profileService.getPreferences().subscribe({
         next: (prefs) => {
-          document.documentElement.lang = prefs.locales?.[0] || 'pt-BR';
+          const locale = prefs.locales?.[0] || 'pt-BR';
+          const currency = prefs.currency || 'BRL';
+          if (typeof document !== 'undefined') {
+            document.documentElement.lang = locale;
+          }
+          setLocaleSettings({ locale, currency });
+          persistLocaleSettings(locale, currency);
         },
         error: () => {
           /* ignore */

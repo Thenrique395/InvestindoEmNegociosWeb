@@ -25,4 +25,12 @@ export class AdminUsersService {
   updateRole(id: string, role: UserRole) {
     return this.http.put<AdminUserSummary>(`${this.baseUrl}/${id}/role`, { role });
   }
+
+  updateStatus(id: string, isActive: boolean) {
+    return this.http.put<AdminUserSummary>(`${this.baseUrl}/${id}/status`, { isActive });
+  }
+
+  remove(id: string) {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }

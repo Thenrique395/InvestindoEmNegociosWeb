@@ -8,6 +8,7 @@ import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
 import { AuthService } from '../auth.service';
 import { ReceitasSummaryService, IncomeMonthSummary } from '../receitas-summary.service';
+import { formatLocaleDateFromIso, toIsoDateFromLocale } from '../utils/locale-utils';
 
 export interface StoredExpense {
   id: string;
@@ -396,9 +397,7 @@ export class ApiDataService {
   }
 
   private formatDate(iso: string): string {
-    const [yyyy, mm, dd] = (iso || '').split('T')[0].split('-');
-    if (!yyyy || !mm || !dd) return '';
-    return `${dd}/${mm}/${yyyy}`;
+    return formatLocaleDateFromIso(iso);
   }
 
   private formatMonth(iso: string): string {
@@ -408,13 +407,7 @@ export class ApiDataService {
   }
 
   private toIsoDate(ddmmyyyy: string): string | null {
-    const digits = (ddmmyyyy || '').replace(/[^\d]/g, '');
-    if (digits.length !== 8) return null;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    const date = new Date(Date.UTC(ano, mes - 1, dia));
-    return Number.isNaN(date.getTime()) ? null : date.toISOString().slice(0, 10);
+    return toIsoDateFromLocale(ddmmyyyy);
   }
 
   private firstDayIso(mmYYYY?: string): string {

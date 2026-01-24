@@ -10,6 +10,15 @@ import { AuthService } from '../auth.service';
 import { GoalsService } from '../goals.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
+import {
+  formatLocaleDate,
+  formatMonthLabelFromKey,
+  formatMonthYearLabel,
+  formatNumberValue,
+  monthKeyFromLocaleDate,
+  parseLocaleDate,
+  parseLocalizedNumber
+} from '../utils/locale-utils';
 
 @Component({
   selector: 'app-receitas',
@@ -194,12 +203,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private formatMonthLabel(value: string): string {
-    const match = /^(\d{4})-(\d{2})$/.exec(value);
-    if (!match) return value;
-    const year = Number(match[1]);
-    const month = Number(match[2]) - 1;
-    if (Number.isNaN(year) || Number.isNaN(month)) return value;
-    return new Date(year, month, 1).toLocaleString('pt-BR', { month: 'long' });
+    return formatMonthLabelFromKey(value, 'long');
   }
 
   get adminInsights(): { label: string; value: number }[] {
@@ -216,7 +220,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   get mesAtualLabel(): string {
-    return this.dataAtual.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+    return formatMonthYearLabel(this.dataAtual);
   }
 
   get goalProgress(): number {
@@ -298,8 +302,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     const fixaInicio = this.novaRenda.fixa ? this.normalizaMes(this.fixaInicioInput) : undefined;
 
     if (this.novaRenda.fixa) {
-      if (!fixaInicio) {
-        this.erroData = 'Informe o mês de início no formato MM/AAAA para receita fixa.';
+      if (!fixaInicio || !this.isMesValido(fixaInicio)) {
+        this.erroData = 'Informe o mês de início no formato MM/AAAA para receita recorrente.';
         return;
       }
       this.erroData = '';
@@ -341,7 +345,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   editar(renda: StoredIncome): void {
     this.editandoId = renda.planId ?? null;
     this.novaRenda = { ...renda };
-    this.valorInput = renda.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.valorInput = formatNumberValue(renda.valor);
     this.recebimentoInput = renda.recebimento;
     this.valorSugestao = this.getUltimoValorParaFonte(renda.fonte);
     this.fixaInicioInput = renda.fixaInicio || '';
@@ -408,7 +412,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   aplicarSugestao(): void {
     if (!this.valorSugestao) return;
-    this.valorInput = this.valorSugestao.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.valorInput = formatNumberValue(this.valorSugestao);
   }
 
   private resetarForm(): void {
@@ -446,10 +450,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
           return;
         }
         this.goalValue = goal.expectedMonthly;
-        this.goalInput = goal.expectedMonthly.toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
+        this.goalInput = formatNumberValue(goal.expectedMonthly);
       },
       error: () => {
         this.goalValue = null;
@@ -460,37 +461,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private parseValor(value: string | number): number {
-    if (typeof value === 'number') return value;
-    const raw = value ?? '';
-    const hasSeparator = /[,.]/.test(raw);
-
-    if (hasSeparator) {
-      const normalized = raw.replace(/\./g, '').replace(',', '.');
-      const parsed = Number(normalized);
-      return Number.isNaN(parsed) ? 0 : parsed;
-    }
-
-    const digits = raw.replace(/[^\d]/g, '');
-    if (!digits) return 0;
-    const inteiro = digits.slice(0, -2) || '0';
-    const centavos = digits.slice(-2);
-    return Number(`${inteiro}.${centavos}`);
+    return parseLocalizedNumber(value);
   }
 
   private isDataValida(value: string): boolean {
-    const digits = value.replace(/[^\d]/g, '').slice(0, 8);
-    if (digits.length !== 8) return false;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    if (mes < 1 || mes > 12) return false;
-    if (dia < 1 || dia > 31) return false;
-    if (Number.isNaN(ano)) return false;
-
-    const data = new Date(ano, mes - 1, dia);
-    if (data.getMonth() + 1 !== mes || data.getDate() !== dia || data.getFullYear() !== ano) return false;
-
-    return true;
+    return !!parseLocaleDate(value);
   }
 
   private compareDateDesc(a: string, b: string): number {
@@ -503,26 +478,20 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private parseData(value: string): Date | null {
-    const digits = value.replace(/[^\d]/g, '');
-    if (digits.length !== 8) return null;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    const data = new Date(ano, mes - 1, dia);
-    if (data.getFullYear() !== ano || data.getMonth() + 1 !== mes || data.getDate() !== dia) return null;
-    return data;
+    return parseLocaleDate(value);
   }
 
   private formatDate(date: Date): string {
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    return `${dd}/${mm}/${date.getFullYear()}`;
+    return formatLocaleDate(date);
   }
 
   private getUltimoValorParaFonte(fonte: string): number | null {
     if (!fonte) return null;
-    const encontrada = this.rendasAll.find((r) => r.fonte.toLowerCase() === fonte.toLowerCase());
-    return encontrada ? encontrada.valor : null;
+    const needle = fonte.trim().toLowerCase();
+    const candidatas = this.rendasAll.filter((r) => (r.fonte || '').trim().toLowerCase() === needle);
+    if (!candidatas.length) return null;
+    const ordenadas = [...candidatas].sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
+    return ordenadas[0].valor;
   }
 
   mesAnterior(): void {
@@ -547,10 +516,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.goalsService.upsertIncomeGoal(year, value).subscribe({
       next: (goal) => {
         this.goalValue = goal.expectedMonthly;
-        this.goalInput = goal.expectedMonthly.toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
+        this.goalInput = formatNumberValue(goal.expectedMonthly);
         this.setAlerta('Meta atualizada com sucesso.', 2500, 'success');
       },
       error: (err) => {
@@ -643,13 +609,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private mesKeyFromRecebimento(recebimento: string): string | null {
-    const digits = recebimento.replace(/[^\d]/g, '');
-    if (digits.length < 8) return null;
-    const dia = Number(digits.slice(0, 2));
-    const mes = Number(digits.slice(2, 4));
-    const ano = Number(digits.slice(4, 8));
-    if (mes < 1 || mes > 12 || dia < 1 || dia > 31 || Number.isNaN(ano)) return null;
-    return `${ano}-${String(mes).padStart(2, '0')}`;
+    return monthKeyFromLocaleDate(recebimento);
   }
 
   private mesKeyFromMes(mesAno?: string): string | null {
@@ -671,6 +631,16 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   private normalizaMes(value: string): string {
     return maskMonthYear(value);
+  }
+
+  private isMesValido(value: string): boolean {
+    const digits = value.replace(/[^\d]/g, '');
+    if (digits.length !== 6) return false;
+    const mes = Number(digits.slice(0, 2));
+    const ano = Number(digits.slice(2, 6));
+    if (mes < 1 || mes > 12) return false;
+    if (Number.isNaN(ano)) return false;
+    return true;
   }
 
   private filtroTextoMatch(renda: StoredIncome): boolean {
