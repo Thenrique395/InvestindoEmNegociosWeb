@@ -1,9 +1,9 @@
 .panel {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  background: rgba(4, 56, 74, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.35);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1rem;
   min-width: 0;
@@ -21,19 +21,19 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.8rem;
-  color: #9fb4b0;
+  color: var(--text-muted);
   margin: 0;
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .placeholder {
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed var(--border);
   border-radius: 12px;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
 .form {
@@ -55,12 +55,12 @@
   width: 120px;
   height: 120px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
   display: grid;
   place-items: center;
   overflow: hidden;
-  color: #9fb4b0;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -86,9 +86,9 @@
   gap: 0.5rem;
   padding: 0.6rem 0.85rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.06);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
   font-weight: 600;
   cursor: pointer;
   width: fit-content;
@@ -99,12 +99,12 @@
 }
 
 .avatar-actions .hint {
-  color: #9fb4b0;
+  color: var(--text-muted);
   font-size: 0.75rem;
 }
 
 .avatar-actions .error {
-  color: #ff8a8a;
+  color: var(--danger);
   font-size: 0.8rem;
 }
 
@@ -112,7 +112,7 @@ label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -120,9 +120,9 @@ input,
 select {
   padding: 0.75rem 0.9rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .panel__actions {
@@ -133,8 +133,8 @@ select {
 
 .ghost {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #edebec;
+  border: 1px solid var(--border);
+  color: var(--text);
   box-shadow: none;
   padding: 0.75rem 1rem;
   border-radius: 10px;

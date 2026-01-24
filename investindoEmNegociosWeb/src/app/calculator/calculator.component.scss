@@ -1,9 +1,9 @@
 .calculator {
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  background: rgba(4, 56, 74, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.4);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1.25rem;
   min-width: 0;
@@ -15,7 +15,7 @@
 
 .calc__header p {
   margin: 0;
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .calc__selector {
@@ -26,7 +26,7 @@
 
 .section-title {
   margin: 0 0 0.25rem 0;
-  color: #b9c6c2;
+  color: var(--text-muted);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -38,11 +38,11 @@
 }
 
 .calc__selector button {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.85rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  color: #edebec;
+  background: var(--surface-2);
+  color: var(--text);
   font-weight: 700;
   text-align: left;
   cursor: pointer;
@@ -56,27 +56,27 @@
 }
 
 .calc__selector button small {
-  color: #b9c6c2;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 .calc__selector button.active {
-  border-color: rgba(52, 144, 99, 0.6);
-  background: rgba(52, 144, 99, 0.12);
+  border-color: rgba(37, 99, 235, 0.45);
+  background: rgba(37, 99, 235, 0.12);
   transform: translateY(-1px);
 }
 
 .calc__panel {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
   display: grid;
   gap: 0.6rem;
 }
 
 .calc__panel .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -91,37 +91,37 @@ label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
 input {
   padding: 0.7rem 0.85rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 input:focus {
-  outline: 1px solid #349063;
-  border-color: #349063;
+  outline: 1px solid var(--primary);
+  border-color: var(--primary);
 }
 
 button[type='button'] {
   border: none;
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: linear-gradient(135deg, #349063, #2a7a53);
-  color: #002e3e;
+  background: var(--primary);
+  color: var(--on-primary);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(52, 144, 99, 0.35);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
 }
 
 .result {
   margin: 0.35rem 0 0 0;
-  color: #8fe0b4;
+  color: var(--info);
   font-weight: 700;
 }
 
@@ -131,15 +131,15 @@ button[type='button'] {
   gap: 0.35rem;
   margin-top: 0.75rem;
   padding: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
 .chart__bar {
   flex: 1;
   min-height: 20px;
-  background: linear-gradient(180deg, #8fe0b4 0%, #349063 100%);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.6) 0%, rgba(37, 99, 235, 0.2) 100%);
   border-radius: 8px 8px 4px 4px;
   position: relative;
 }
@@ -149,7 +149,7 @@ button[type='button'] {
   inset: auto 0 -20px 0;
   text-align: center;
   font-size: 0.8rem;
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .chart--inline .chart__bar {
@@ -157,16 +157,16 @@ button[type='button'] {
 }
 
 .chart__bar--renda {
-  background: linear-gradient(180deg, #8fe0b4 0%, #2a7a53 100%);
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.6) 0%, rgba(34, 197, 94, 0.2) 100%);
 }
 
 .chart__bar--patrimonio {
-  background: linear-gradient(180deg, #89a9ff 0%, #355a87 100%);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.7) 0%, rgba(37, 99, 235, 0.25) 100%);
 }
 
 .table {
   margin-top: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -189,16 +189,16 @@ button[type='button'] {
 }
 
 .table__head {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
   font-weight: 700;
 }
 
 .table__row:nth-child(even) {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
 }
 
 .back-link {
-  color: #8fe0b4;
+  color: var(--primary);
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;

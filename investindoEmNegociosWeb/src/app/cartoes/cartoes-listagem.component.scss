@@ -3,7 +3,7 @@
   display: grid;
   gap: 0.75rem;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border);
 }
 
 .cards-grid {
@@ -14,13 +14,13 @@
 }
 
 .card-item {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  background: var(--surface);
   display: grid;
   gap: 0.6rem;
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-sm);
   min-width: 0;
 }
 
@@ -73,7 +73,7 @@
 .pill {
   padding: 0.25rem 0.65rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-2);
   font-size: 0.85rem;
 }
 
@@ -83,9 +83,9 @@
 }
 
 .danger {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffc6c6;
-  background: rgba(255, 92, 92, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.12);
 }
 
 .card-item__number {
@@ -109,13 +109,13 @@
 }
 
 .empty-state {
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed var(--border);
   border-radius: 12px;
   padding: 0.9rem;
   text-align: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }

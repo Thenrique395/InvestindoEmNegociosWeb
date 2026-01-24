@@ -1,9 +1,9 @@
 .panel {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  background: rgba(4, 56, 74, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.35);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1rem;
   min-width: 0;
@@ -21,19 +21,19 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.8rem;
-  color: #9fb4b0;
+  color: var(--text-muted);
   margin: 0;
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .placeholder {
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed var(--border);
   border-radius: 12px;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
 .form {
@@ -61,7 +61,7 @@ label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -69,9 +69,9 @@ select,
 input {
   padding: 0.75rem 0.9rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .panel__actions {
@@ -92,14 +92,14 @@ input {
   gap: 0.25rem;
   padding: 0.35rem 0.5rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
 }
 
 .chip button {
   border: none;
   background: transparent;
-  color: #edebec;
+  color: var(--text);
   cursor: pointer;
   padding: 0;
 }
@@ -132,8 +132,8 @@ input {
 
 .preview-card {
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
   padding: 0.75rem 0.9rem;
   display: grid;
   gap: 0.2rem;

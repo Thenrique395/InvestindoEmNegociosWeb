@@ -1,5 +1,5 @@
 .lista {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -17,20 +17,20 @@
 }
 
 .lista__head {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
   font-weight: 700;
 }
 
 .lista__head .linkish {
   all: unset;
   cursor: pointer;
-  color: #edebec;
+  color: var(--text);
   font-weight: 700;
   padding: 0.25rem 0.1rem;
 }
 
 .lista__row:nth-child(even) {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
 }
 
 .lista__row--empty span {
@@ -39,7 +39,7 @@
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .acoes {
@@ -58,7 +58,7 @@
 .checkbox input {
   width: 18px;
   height: 18px;
-  accent-color: #16a34a;
+  accent-color: var(--primary);
 }
 
 .status-pill {
@@ -68,7 +68,7 @@
   padding: 0.25rem 0.5rem;
   border-radius: 999px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
 }
 
 .status-icon {
@@ -79,45 +79,45 @@
   height: 18px;
   border-radius: 999px;
   font-size: 0.8rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-3);
 }
 
 .status-paid {
-  color: #34d399;
+  color: var(--success);
 }
 
 .status-paid .status-icon {
-  background: rgba(52, 211, 153, 0.15);
+  background: rgba(34, 197, 94, 0.15);
 }
 
 .status-partial {
-  color: #fbbf24;
+  color: var(--warning);
 }
 
 .status-partial .status-icon {
-  background: rgba(251, 191, 36, 0.15);
+  background: rgba(245, 158, 11, 0.15);
 }
 
 .status-anticipated {
-  color: #38bdf8;
+  color: var(--info);
 }
 
 .status-anticipated .status-icon {
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(14, 165, 233, 0.15);
 }
 
 .status-canceled {
-  color: #f87171;
+  color: var(--danger);
 }
 
 .status-canceled .status-icon {
-  background: rgba(248, 113, 113, 0.15);
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .status-open {
-  color: #a5b4fc;
+  color: var(--primary);
 }
 
 .status-open .status-icon {
-  background: rgba(165, 180, 252, 0.15);
+  background: rgba(37, 99, 235, 0.15);
 }

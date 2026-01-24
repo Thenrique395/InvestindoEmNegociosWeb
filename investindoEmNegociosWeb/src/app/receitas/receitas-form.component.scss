@@ -9,18 +9,18 @@
 .modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 14, 24, 0.65);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(3px);
 }
 
 .modal__content {
   position: relative;
-  background: #032533;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
   width: min(600px, 92vw);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1rem;
 }
@@ -33,8 +33,8 @@
 }
 
 .modal__close {
-  background: rgba(255, 255, 255, 0.05);
-  color: #edebec;
+  background: var(--surface-2);
+  color: var(--text);
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -47,17 +47,17 @@
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   align-items: start;
   gap: 0.85rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
 }
 
 label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -66,20 +66,20 @@ input {
   min-height: 48px;
   font-size: 1rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 input:focus {
-  outline: 1px solid #349063;
-  border-color: #349063;
+  outline: 1px solid var(--primary);
+  border-color: var(--primary);
 }
 
 .resumo {
   grid-column: 1 / -1;
-  background: rgba(52, 144, 99, 0.1);
-  border: 1px solid rgba(52, 144, 99, 0.3);
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 12px;
   padding: 0.75rem;
   display: grid;
@@ -90,7 +90,7 @@ input:focus {
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #8fe0b4;
+  color: var(--primary);
 }
 
 .sugestao {
@@ -99,8 +99,8 @@ input:focus {
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
-  background: rgba(52, 144, 99, 0.1);
-  border: 1px dashed rgba(52, 144, 99, 0.4);
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px dashed rgba(34, 197, 94, 0.35);
   padding: 0.6rem 0.75rem;
   border-radius: 10px;
 }
@@ -111,9 +111,9 @@ input:focus {
   justify-content: space-between;
   gap: 0.8rem;
   padding: 0.75rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
   min-height: 48px;
   font-weight: 600;
 }

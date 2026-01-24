@@ -8,15 +8,15 @@
 .status-card {
   padding: 0.9rem 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
   display: grid;
   gap: 0.2rem;
 }
 
 .status-card .label {
   margin: 0;
-  color: #c5d4cf;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -24,30 +24,30 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 800;
-  color: #edebec;
+  color: var(--text);
 }
 
 .status-card.pending {
-  border-color: rgba(239, 200, 87, 0.4);
-  background: rgba(239, 200, 87, 0.08);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.12);
 }
 
 .status-card.anticipated {
-  border-color: rgba(59, 130, 246, 0.4);
-  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(14, 165, 233, 0.35);
+  background: rgba(14, 165, 233, 0.12);
 }
 
 .status-card.paid {
-  border-color: rgba(52, 144, 99, 0.5);
-  background: rgba(52, 144, 99, 0.1);
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
 }
 
 .despesas {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  background: rgba(4, 56, 74, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.35);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1.25rem;
   min-width: 0;
@@ -62,8 +62,8 @@
 }
 
 .total {
-  background: rgba(52, 144, 99, 0.15);
-  border: 1px solid rgba(52, 144, 99, 0.4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   padding: 0.75rem 1rem;
   border-radius: 12px;
   display: grid;
@@ -87,9 +87,9 @@
 }
 
 .nav button {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
   cursor: pointer;
@@ -108,34 +108,34 @@
   gap: 0.35rem;
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--border);
   font-size: 0.75rem;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: #e7f2f5;
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  background: var(--surface-2);
 }
 
 .chip.muted {
-  color: #9db1ba;
+  color: var(--text-muted);
 }
 
 .chip .delta {
   margin-left: 0.35rem;
   font-weight: 600;
-  color: #cfe9df;
+  color: var(--text-secondary);
 }
 
 .chip .delta.up {
-  color: #7ee2b8;
+  color: var(--success);
 }
 
 .chip .delta.down {
-  color: #ff9a9a;
+  color: var(--danger);
 }
 
 .chip .delta.flat {
-  color: #c7d2d0;
+  color: var(--text-muted);
 }
 
 .inline-alert {
@@ -149,20 +149,20 @@
 
 .inline-alert.info {
   background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #c7ddff;
+  border-color: rgba(37, 99, 235, 0.35);
+  color: var(--text);
 }
 
 .inline-alert.success {
   background: rgba(22, 163, 74, 0.12);
-  border-color: rgba(22, 163, 74, 0.45);
-  color: #d5f3e3;
+  border-color: rgba(34, 197, 94, 0.35);
+  color: var(--text);
 }
 
 .inline-alert.error {
   background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.45);
-  color: #ffd7d7;
+  color: var(--danger);
 }
 
 .layout {
@@ -186,17 +186,17 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
 }
 
 label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -204,31 +204,31 @@ input,
 select {
   padding: 0.75rem 0.9rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 button {
   border: none;
   padding: 0.85rem 1rem;
   border-radius: 10px;
-  background: linear-gradient(135deg, #349063, #2a7a53);
-  color: #002e3e;
+  background: var(--primary);
+  color: var(--on-primary);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(52, 144, 99, 0.35);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
 }
 
 .ghost {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #edebec;
+  border: 1px solid var(--border);
+  color: var(--text);
   box-shadow: none;
 }
 
 .lista {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -246,20 +246,20 @@ button {
 }
 
 .lista__head {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
   font-weight: 700;
 }
 
 .lista__head .linkish {
   all: unset;
   cursor: pointer;
-  color: #edebec;
+  color: var(--text);
   font-weight: 700;
   padding: 0.25rem 0.1rem;
 }
 
 .lista__row:nth-child(even) {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
 }
 
 .lista__row--empty span {
@@ -268,7 +268,7 @@ button {
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .acoes {
@@ -282,8 +282,8 @@ button {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.5rem 0.75rem;
 }
@@ -303,13 +303,13 @@ button {
 .checkbox input {
   width: 18px;
   height: 18px;
-  accent-color: #16a34a;
+  accent-color: var(--primary);
 }
 
 .acoes button:not(.btn-danger):not(.btn-edit):not(.btn-primary) {
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.07);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .sm {
@@ -328,18 +328,18 @@ button {
 .modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 14, 24, 0.65);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(3px);
 }
 
 .modal__content {
   position: relative;
-  background: #032533;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
   width: min(720px, 92vw);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1rem;
 }
@@ -356,8 +356,8 @@ button {
 }
 
 .modal__close {
-  background: rgba(255, 255, 255, 0.05);
-  color: #edebec;
+  background: var(--surface-2);
+  color: var(--text);
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -377,18 +377,18 @@ button {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
 .resumo {
   grid-column: 1 / -1;
   padding: 0.8rem 1rem;
   border-radius: 10px;
-  border: 1px dashed rgba(52, 144, 99, 0.5);
-  background: rgba(52, 144, 99, 0.08);
-  color: #edebec;
+  border: 1px dashed rgba(37, 99, 235, 0.4);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--text);
   display: grid;
   gap: 0.25rem;
 }
@@ -402,14 +402,14 @@ button {
 }
 
 .drawer__backdrop {
-  background: rgba(0, 14, 24, 0.55);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(3px);
 }
 
 .drawer__panel {
   width: min(420px, 90vw);
-  background: #032533;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
   box-shadow: -12px 0 30px rgba(0, 0, 0, 0.35);
   padding: 1rem;
   display: grid;
@@ -423,7 +423,7 @@ button {
 }
 
 .drawer__section {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.75rem;
   display: grid;
@@ -436,7 +436,7 @@ button {
   gap: 0.35rem;
   align-items: center;
   padding: 0.45rem 0.35rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
 }
 
@@ -449,12 +449,12 @@ button {
 
 .drawer__row .nome small {
   font-weight: 400;
-  color: #9fb4b0;
+  color: var(--text-muted);
   font-size: 0.8rem;
 }
 
 .drawer__row .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 

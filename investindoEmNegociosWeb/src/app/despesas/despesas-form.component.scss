@@ -9,18 +9,18 @@
 .modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 14, 24, 0.65);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(3px);
 }
 
 .modal__content {
   position: relative;
-  background: #032533;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
   width: min(720px, 92vw);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1rem;
 }
@@ -33,8 +33,8 @@
 }
 
 .modal__close {
-  background: rgba(255, 255, 255, 0.05);
-  color: #edebec;
+  background: var(--surface-2);
+  color: var(--text);
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -46,17 +46,17 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
 }
 
 label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -64,15 +64,15 @@ input,
 select {
   padding: 0.75rem 0.9rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .resumo {
   grid-column: 1 / -1;
-  background: rgba(52, 144, 99, 0.1);
-  border: 1px solid rgba(52, 144, 99, 0.3);
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 12px;
   padding: 0.75rem;
   display: grid;
@@ -83,7 +83,7 @@ select {
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #8fe0b4;
+  color: var(--primary);
 }
 
 .modal__actions {
@@ -97,9 +97,9 @@ select {
   grid-column: 1 / -1;
   padding: 0.6rem 0.75rem;
   border-radius: 10px;
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.03);
-  color: #b9c6c2;
+  border: 1px dashed var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
   font-size: 0.85rem;
   display: flex;
   justify-content: space-between;
@@ -108,7 +108,7 @@ select {
 }
 
 .alert-link {
-  color: #c0ffe2;
+  color: var(--primary);
   text-decoration: none;
   font-weight: 600;
   white-space: nowrap;
@@ -123,11 +123,11 @@ select {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }

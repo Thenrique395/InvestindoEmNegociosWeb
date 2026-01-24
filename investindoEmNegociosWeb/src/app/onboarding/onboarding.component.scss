@@ -7,11 +7,11 @@
 
 .card {
   width: min(720px, 100%);
-  background: #04384a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: clamp(1.5rem, 2.5vw, 2rem);
-  box-shadow: 0 24px 60px rgba(0, 22, 31, 0.35);
+  box-shadow: var(--shadow-md);
   min-width: 0;
 }
 
@@ -33,26 +33,26 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #c7d2d0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   font-weight: 700;
   font-size: 0.9rem;
 }
 
 .wizard__steps span.active {
-  border-color: rgba(143, 224, 180, 0.6);
-  background: rgba(143, 224, 180, 0.15);
-  color: #eaf4f2;
+  border-color: rgba(37, 99, 235, 0.45);
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--text);
 }
 
 .wizard__steps span.done {
-  border-color: rgba(143, 224, 180, 0.4);
-  color: #8fe0b4;
+  border-color: rgba(37, 99, 235, 0.35);
+  color: var(--primary);
 }
 
 .wizard__label {
-  color: #a9b7b4;
+  color: var(--text-muted);
   font-size: 0.85rem;
   margin: 0;
 }
@@ -61,12 +61,12 @@
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.85rem;
-  color: #8fe0b4;
+  color: var(--success);
   margin-bottom: 0.35rem;
 }
 
 .muted {
-  color: #c7d2d0;
+  color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
@@ -102,22 +102,22 @@ label {
 
 input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.75rem 0.85rem;
-  color: #edebec;
+  color: var(--text);
   transition: border 0.2s ease, background 0.2s ease;
 }
 
 input:focus {
   outline: none;
-  border-color: rgba(143, 224, 180, 0.6);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(37, 99, 235, 0.45);
+  background: var(--surface-2);
 }
 
 .error {
-  color: #ff9b9b;
+  color: var(--danger);
   font-size: 0.85rem;
 }
 
@@ -135,9 +135,9 @@ input:focus {
 
 .primary {
   width: auto;
-  background: linear-gradient(135deg, #3aa66f, #2f8a5d);
-  color: #0b2532;
-  border: 1px solid rgba(143, 224, 180, 0.6);
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 1px solid rgba(37, 99, 235, 0.6);
   border-radius: 10px;
   padding: 0.9rem;
   font-weight: 800;
@@ -156,28 +156,28 @@ input:focus {
 
 .primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(0, 22, 31, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .feedback.success {
-  color: #8fe0b4;
+  color: var(--success);
 }
 
 .feedback.error {
-  color: #ff9b9b;
+  color: var(--danger);
 }
 
 .ghost {
   background: transparent;
-  color: #c7d2d0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.75rem 1.1rem;
   cursor: pointer;
 }
 
 .ghost:hover {
-  border-color: rgba(255, 255, 255, 0.24);
+  border-color: var(--border-strong);
 }
 
 .focus-grid {
@@ -190,9 +190,9 @@ input:focus {
   text-align: left;
   padding: 0.9rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: #eaf4f2;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -203,20 +203,20 @@ input:focus {
 
 .focus-card p {
   margin: 0;
-  color: #c7d2d0;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
 .focus-card.active {
-  border-color: rgba(143, 224, 180, 0.6);
-  background: rgba(143, 224, 180, 0.12);
+  border-color: rgba(37, 99, 235, 0.45);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .summary {
   display: grid;
   gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.9rem;
 }
@@ -227,13 +227,13 @@ input:focus {
 
 .summary p {
   margin: 0;
-  color: #c7d2d0;
+  color: var(--text-muted);
 }
 
 .link {
   margin-top: 0.75rem;
   background: transparent;
   border: none;
-  color: #8fe0b4;
+  color: var(--primary);
   cursor: pointer;
 }

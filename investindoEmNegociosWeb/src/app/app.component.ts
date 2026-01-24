@@ -17,11 +17,11 @@ import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleS
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'SaldoClaro';
-  brandName = 'SaldoClaro';
-  brandSlogan = 'Visão clara do seu dinheiro, todo mês.';
+  title = 'Investindo em Negócios';
+  brandName = 'Investindo em Negócios';
+  brandSlogan = 'Finanças com clareza, controle e confiança.';
   brandPositioning =
-    'Controle receitas, despesas e metas com clareza. Alertas inteligentes e decisões mais seguras.';
+    'Controle receitas, despesas e metas com simplicidade. Informação confiável para decisões seguras.';
   isLoginRoute = false;
   isHomeRoute = false;
   isReceitasRoute = false;
@@ -58,7 +58,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.applyTheme(false);
+    this.applyTheme(true);
     const initialLocale = getInitialLocale();
     const initialCurrency = getInitialCurrency();
     if (typeof document !== 'undefined') {
@@ -160,6 +160,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private applyTheme(light: boolean): void {
     this.isLightTheme = light;
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('theme-dark', !light);
+    }
   }
 
   toggleUserMenu(): void {

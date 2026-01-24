@@ -17,7 +17,7 @@
 
   p {
     margin: 0.4rem 0 0;
-    color: #6d7480;
+    color: var(--text-muted);
   }
 }
 
@@ -32,21 +32,22 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 .primary {
   border: none;
-  background: #111827;
-  color: #fff;
+  background: var(--primary);
+  color: var(--on-primary);
   padding: 0.6rem 1rem;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .ghost {
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
   cursor: pointer;
@@ -55,13 +56,13 @@
 .status {
   padding: 0.8rem 1rem;
   border-radius: 10px;
-  background: #f6f7fb;
-  color: #4b5563;
+  background: var(--surface-2);
+  color: var(--text-muted);
 }
 
 .status.error {
-  background: #ffe9e9;
-  color: #b42318;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
 }
 
 .status.empty {
@@ -80,8 +81,8 @@
   align-items: center;
   padding: 0.8rem 1rem;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .info {
@@ -91,21 +92,21 @@
 }
 
 .muted {
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
 .tag {
-  background: #ecfdf3;
-  color: #15803d;
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   font-size: 0.75rem;
 }
 
 .tag.off {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--surface-2);
+  color: var(--text-muted);
 }
 
 .item-actions {
@@ -129,7 +130,7 @@
 
 .modal__card {
   position: relative;
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   padding: 1.5rem;
   width: min(420px, 90vw);
@@ -141,12 +142,12 @@
   display: grid;
   gap: 0.4rem;
   font-size: 0.9rem;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .modal__card input,
 .modal__card select {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border);
   padding: 0.5rem 0.6rem;
   border-radius: 8px;
 }

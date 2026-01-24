@@ -2,10 +2,10 @@
   display: grid;
   gap: 1rem;
   padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: rgba(4, 56, 74, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 22, 31, 0.3);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
   min-width: 0;
 }
 
@@ -13,24 +13,24 @@
   margin: 0.5rem 0;
   padding: 0.65rem 0.8rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: #e9f4ef;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .inline-alert.info {
-  border-color: rgba(64, 169, 255, 0.4);
-  background: rgba(64, 169, 255, 0.12);
+  border-color: rgba(14, 165, 233, 0.35);
+  background: rgba(14, 165, 233, 0.12);
 }
 
 .inline-alert.success {
-  border-color: rgba(45, 179, 122, 0.5);
-  background: rgba(45, 179, 122, 0.14);
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
 }
 
 .inline-alert.error {
-  border-color: rgba(255, 92, 92, 0.5);
-  background: rgba(255, 92, 92, 0.16);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
 }
 
 .card-form__header {
@@ -58,7 +58,7 @@ label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #edebec;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -66,15 +66,15 @@ input,
 select {
   padding: 0.75rem 0.9rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
-  color: #edebec;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 input:focus,
 select:focus {
-  outline: 1px solid #349063;
-  border-color: #349063;
+  outline: 1px solid var(--primary);
+  border-color: var(--primary);
 }
 
 .input-wrap {
@@ -85,8 +85,8 @@ select:focus {
 
 .input-wrap button {
   border: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: #edebec;
+  background: var(--surface-2);
+  color: var(--text);
   padding: 0.55rem 0.8rem;
   border-radius: 8px;
   cursor: pointer;
@@ -201,7 +201,7 @@ select:focus {
 }
 
 .muted {
-  color: #b9c6c2;
+  color: var(--text-muted);
 }
 
 .actions {
@@ -242,19 +242,19 @@ select:focus {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--surface-2);
   font-size: 1.1rem;
 }
 
 .add:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(15, 191, 132, 0.4);
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.25);
   filter: brightness(1.02);
 }
 
 .add:active {
   transform: translateY(0);
-  box-shadow: 0 10px 20px rgba(15, 191, 132, 0.3);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
 }
 
 .modal {
@@ -268,18 +268,18 @@ select:focus {
 .modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 14, 24, 0.65);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(3px);
 }
 
 .modal__content {
   position: relative;
-  background: #032533;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
   width: min(880px, 92vw);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
   display: grid;
   gap: 1rem;
 }
@@ -296,8 +296,8 @@ select:focus {
 }
 
 .modal__close {
-  background: rgba(255, 255, 255, 0.05);
-  color: #edebec;
+  background: var(--surface-2);
+  color: var(--text);
   border-radius: 50%;
   width: 32px;
   height: 32px;

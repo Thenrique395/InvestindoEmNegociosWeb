@@ -570,11 +570,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
         <head>
           <title>Receitas ${this.mesAtualLabel}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 24px; }
+            body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; color: #0f172a; }
             h1 { margin-bottom: 8px; }
             table { width: 100%; border-collapse: collapse; }
-            th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
-            th { background: #f4f4f4; }
+            th, td { padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+            th { background: #f1f5f9; }
           </style>
         </head>
         <body>

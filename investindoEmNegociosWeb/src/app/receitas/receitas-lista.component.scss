@@ -1,5 +1,5 @@
 .lista {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -23,12 +23,12 @@
 }
 
 .lista__head {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
   font-weight: 700;
 }
 
 .lista__row:nth-child(even) {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
 }
 
 .lista__row--empty span {
@@ -55,9 +55,9 @@
 
 .status {
   font-weight: 600;
-  color: #f2c96d;
+  color: var(--warning);
 }
 
 .status.paid {
-  color: #8fe0b4;
+  color: var(--success);
 }
