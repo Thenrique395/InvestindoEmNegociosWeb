@@ -102,14 +102,16 @@
 }
 
 .nav-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   font-size: 1rem;
+  color: #334155;
+  transition: color 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
 .nav-text {
@@ -124,8 +126,25 @@
 }
 
 .sidebar__nav a.active .nav-icon {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: var(--primary);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15);
+}
+
+.sidebar__nav a.expense.active .nav-icon {
+  color: var(--danger);
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.18);
+}
+
+.sidebar__nav a.income.active .nav-icon {
+  color: var(--success);
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.18);
+}
+
+.nav-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .sidebar__footer {

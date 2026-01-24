@@ -230,8 +230,8 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem;
-  background: var(--surface-2);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .grid.is-loading .stat-card {
@@ -277,21 +277,21 @@
 }
 
 .stat-card__icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-3);
+  background: var(--surface-2);
   color: var(--text-secondary);
-  border: 1px solid var(--border);
+  border: none;
   flex: 0 0 auto;
 }
 
 .stat-card__icon svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
 .stat-card__header .label {
@@ -375,43 +375,39 @@
 }
 
 .stat-card.income {
-  border-color: rgba(34, 197, 94, 0.35);
+  border-color: var(--border);
 }
 
 .stat-card.expense {
-  border-color: rgba(239, 68, 68, 0.35);
+  border-color: var(--border);
 }
 
 .stat-card.balance {
-  border-color: rgba(14, 165, 233, 0.35);
+  border-color: var(--border);
 }
 
 .stat-card.cards {
   border-color: var(--border);
 }
 
-.stat-card.income .stat-card__icon {
-  background: rgba(34, 197, 94, 0.12);
-  border-color: rgba(34, 197, 94, 0.35);
-  color: var(--success);
+.stat-card__icon--balance {
+  background: rgba(37, 99, 235, 0.18);
+  color: #2563eb;
 }
 
-.stat-card.expense .stat-card__icon {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.35);
-  color: var(--danger);
+.stat-card__icon--income {
+  background: rgba(34, 197, 94, 0.2);
+  color: #16a34a;
 }
 
-.stat-card.balance .stat-card__icon {
-  background: rgba(14, 165, 233, 0.12);
-  border-color: rgba(14, 165, 233, 0.35);
-  color: var(--info);
+.stat-card__icon--expense {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
 }
 
-.stat-card.cards .stat-card__icon {
-  background: var(--surface-3);
-  border-color: var(--border);
-  color: var(--text);
+.stat-card__icon--cards {
+  background: rgba(148, 163, 184, 0.24);
+  color: #64748b;
 }
 
 .dashboard-row {
