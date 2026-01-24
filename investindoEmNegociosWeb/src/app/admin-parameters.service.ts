@@ -15,6 +15,13 @@ export interface PaymentMethodAdmin {
   isActive: boolean;
 }
 
+export interface InstitutionAdmin {
+  id: number;
+  name: string;
+  type: 'Bank' | 'Broker';
+  isActive: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminParametersService {
   private readonly baseUrl = `${API_BASE_URL}/admin/parameters`;
@@ -43,5 +50,17 @@ export class AdminParametersService {
 
   createPaymentMethod(name: string) {
     return this.http.post<PaymentMethodAdmin>(`${this.baseUrl}/payment-methods`, { name });
+  }
+
+  listInstitutions() {
+    return this.http.get<InstitutionAdmin[]>(`${this.baseUrl}/institutions`);
+  }
+
+  createInstitution(name: string, type: 'Bank' | 'Broker') {
+    return this.http.post<InstitutionAdmin>(`${this.baseUrl}/institutions`, { name, type });
+  }
+
+  updateInstitutionStatus(id: number, isActive: boolean) {
+    return this.http.put<InstitutionAdmin>(`${this.baseUrl}/institutions/${id}/status`, { isActive });
   }
 }

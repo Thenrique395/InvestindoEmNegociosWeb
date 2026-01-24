@@ -16,6 +16,12 @@ export interface CardBrandLookup {
   isActive?: boolean;
 }
 
+export interface InstitutionLookup {
+  id: number;
+  name: string;
+  type: 'Bank' | 'Broker';
+}
+
 @Injectable({ providedIn: 'root' })
 export class LookupsService {
   private readonly baseUrl = `${API_BASE_URL}/lookups`;
@@ -28,5 +34,10 @@ export class LookupsService {
 
   cardBrands(): Observable<CardBrandLookup[]> {
     return this.http.get<CardBrandLookup[]>(`${this.baseUrl}/card-brands`);
+  }
+
+  institutions(type?: 'Bank' | 'Broker'): Observable<InstitutionLookup[]> {
+    const query = type ? `?type=${type}` : '';
+    return this.http.get<InstitutionLookup[]>(`${this.baseUrl}/institutions${query}`);
   }
 }

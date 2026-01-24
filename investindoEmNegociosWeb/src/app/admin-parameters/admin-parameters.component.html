@@ -126,5 +126,66 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card__title">Bancos e corretoras</div>
+      <div class="create-row">
+        <input
+          type="text"
+          class="create-input"
+          placeholder="Nome da instituição"
+          [(ngModel)]="newInstitutionName"
+          name="newInstitutionName" />
+        <select
+          class="create-select"
+          [(ngModel)]="newInstitutionType"
+          name="newInstitutionType">
+          <option value="Bank">Banco</option>
+          <option value="Broker">Corretora</option>
+        </select>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="createInstitution()"
+          [disabled]="savingCreateInstitution || loading">
+          {{ savingCreateInstitution ? 'Salvando...' : 'Cadastrar' }}
+        </button>
+      </div>
+      <div class="status error" *ngIf="createInstitutionError">{{ createInstitutionError }}</div>
+      <div class="card__toolbar">
+        <input
+          type="text"
+          class="search"
+          placeholder="Buscar por nome"
+          [(ngModel)]="institutionFilter" />
+        <span class="count" *ngIf="institutionFilter">
+          {{ filteredInstitutions.length }} de {{ institutions.length }}
+        </span>
+      </div>
+      <div class="status error" *ngIf="errorInstitutions">{{ errorInstitutions }}</div>
+      <div class="list">
+        <div class="list__item" *ngFor="let inst of filteredInstitutions">
+          <div class="item-info">
+            <strong>{{ inst.name }}</strong>
+            <span class="item-meta">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
+            <span class="item-meta">{{ inst.isActive ? 'Ativo' : 'Desativado' }}</span>
+            <span class="item-meta" *ngIf="institutionUpdatedLabel(inst)">{{ institutionUpdatedLabel(inst) }}</span>
+            <span class="item-meta saving" *ngIf="isSavingInstitution(inst)">Salvando...</span>
+          </div>
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="inst.isActive"
+              [disabled]="isSavingInstitution(inst)"
+              (change)="toggleInstitution(inst)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="empty" *ngIf="!filteredInstitutions.length">
+          {{ institutionFilter ? 'Nenhuma instituição encontrada.' : 'Nenhuma instituição cadastrada.' }}
+          <span class="empty-hint" *ngIf="!institutionFilter">Use o cadastro acima para adicionar a primeira.</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>

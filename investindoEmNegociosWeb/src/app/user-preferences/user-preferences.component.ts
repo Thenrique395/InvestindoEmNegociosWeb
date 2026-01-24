@@ -31,6 +31,7 @@ export class UserPreferencesComponent implements OnInit {
       if (prefs.locales?.length) {
         this.localizacoes = prefs.locales;
         this.linguaSelecionada = prefs.locales[0];
+        this.ensurePrimaryLocale();
       }
     });
   }
@@ -78,11 +79,46 @@ export class UserPreferencesComponent implements OnInit {
     this.localizacoes.splice(index, 1);
   }
 
+  onLanguageChange(value: string): void {
+    this.linguaSelecionada = value;
+    this.ensurePrimaryLocale();
+  }
+
+  applyPreset(locale: string, currency: string): void {
+    this.linguaSelecionada = locale;
+    this.moedaSelecionada = currency;
+    this.localizacoes = [locale];
+  }
+
+  get previewDate(): string {
+    const locale = this.linguaSelecionada;
+    const sample = new Date(2026, 0, 24);
+    return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(sample);
+  }
+
+  get previewNumber(): string {
+    const locale = this.linguaSelecionada;
+    return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(12345.67);
+  }
+
+  get previewCurrency(): string {
+    const locale = this.linguaSelecionada;
+    const currency = this.moedaSelecionada || 'BRL';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(12345.67);
+  }
+
   private normalizeLocale(value: string): string {
     const raw = value.trim();
     if (!raw) return '';
     const match = raw.match(/[a-z]{2}[-_][A-Z]{2}/);
     if (match) return match[0].replace('_', '-');
     return raw;
+  }
+
+  private ensurePrimaryLocale(): void {
+    if (!this.linguaSelecionada) return;
+    if (!this.localizacoes.includes(this.linguaSelecionada)) {
+      this.localizacoes.unshift(this.linguaSelecionada);
+    }
   }
 }

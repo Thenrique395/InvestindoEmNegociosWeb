@@ -62,7 +62,10 @@
 
           <label>
             Banco (opcional)
-            <input [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" />
+            <input [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
+            <datalist id="bankOptions">
+              <option *ngFor="let inst of institutions" [value]="inst.name"></option>
+            </datalist>
           </label>
 
           <div class="row">

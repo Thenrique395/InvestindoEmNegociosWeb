@@ -73,7 +73,15 @@
       </div>
       <div>
         <label>Conta/Corretora</label>
-        <input type="text" [(ngModel)]="novaPosicao.account" name="account" placeholder="Ex.: Nubank, XP" />
+        <input
+          type="text"
+          [(ngModel)]="novaPosicao.account"
+          name="account"
+          placeholder="Ex.: Nubank, XP"
+          list="brokerOptions" />
+        <datalist id="brokerOptions">
+          <option *ngFor="let inst of institutions" [value]="inst.name"></option>
+        </datalist>
       </div>
       <div>
         <label>Categoria (opcional)</label>

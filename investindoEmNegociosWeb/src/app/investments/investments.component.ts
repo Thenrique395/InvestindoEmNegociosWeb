@@ -8,6 +8,7 @@ import {
   InvestmentType,
   MovementType
 } from '../investments.service';
+import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
@@ -23,6 +24,7 @@ type FormMode = 'create' | 'movement';
 })
 export class InvestmentsComponent implements OnInit {
   positions: InvestmentPosition[] = [];
+  institutions: InstitutionLookup[] = [];
   mode: FormMode = 'create';
   selectedId: string | null = null;
   showCadastro = false;
@@ -57,11 +59,19 @@ export class InvestmentsComponent implements OnInit {
     { value: 'CRIPTO', label: 'Cripto' }
   ];
 
-  constructor(private investments: InvestmentsService) {}
+  constructor(private investments: InvestmentsService, private lookups: LookupsService) {}
 
   ngOnInit(): void {
     this.carregarMeta();
     this.carregarPosicoes();
+    this.lookups.institutions('Broker').subscribe({
+      next: (items) => {
+        this.institutions = items || [];
+      },
+      error: () => {
+        this.institutions = [];
+      }
+    });
   }
 
   get patrimonioAtual(): number {

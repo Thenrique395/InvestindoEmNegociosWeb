@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
-import { AdminParametersService, CardBrandAdmin, PaymentMethodAdmin } from '../admin-parameters.service';
+import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, PaymentMethodAdmin } from '../admin-parameters.service';
 
 @Component({
   selector: 'app-admin-parameters',
@@ -14,22 +14,30 @@ import { AdminParametersService, CardBrandAdmin, PaymentMethodAdmin } from '../a
 export class AdminParametersComponent implements OnInit {
   cardBrands: CardBrandAdmin[] = [];
   paymentMethods: PaymentMethodAdmin[] = [];
+  institutions: InstitutionAdmin[] = [];
   loading = false;
   error = '';
   errorCardBrands = '';
   errorPaymentMethods = '';
+  errorInstitutions = '';
   savingKey = '';
   brandFilter = '';
   methodFilter = '';
+  institutionFilter = '';
   newBrandName = '';
   newBrandCode = '';
   newMethodName = '';
+  newInstitutionName = '';
+  newInstitutionType: 'Bank' | 'Broker' = 'Bank';
   createBrandError = '';
   createMethodError = '';
+  createInstitutionError = '';
   savingCreateBrand = false;
   savingCreateMethod = false;
+  savingCreateInstitution = false;
   private lastUpdatedBrands: Record<number, Date> = {};
   private lastUpdatedMethods: Record<number, Date> = {};
+  private lastUpdatedInstitutions: Record<number, Date> = {};
 
   constructor(private adminParameters: AdminParametersService) {}
 
@@ -42,6 +50,7 @@ export class AdminParametersComponent implements OnInit {
     this.error = '';
     this.errorCardBrands = '';
     this.errorPaymentMethods = '';
+    this.errorInstitutions = '';
     forkJoin({
       brands: this.adminParameters.listCardBrands().pipe(
         catchError(() => {
@@ -54,12 +63,19 @@ export class AdminParametersComponent implements OnInit {
           this.errorPaymentMethods = 'Não foi possível carregar as formas de pagamento.';
           return of([] as PaymentMethodAdmin[]);
         })
+      ),
+      institutions: this.adminParameters.listInstitutions().pipe(
+        catchError(() => {
+          this.errorInstitutions = 'Não foi possível carregar as instituições.';
+          return of([] as InstitutionAdmin[]);
+        })
       )
     }).subscribe({
-      next: ({ brands, methods }) => {
+      next: ({ brands, methods, institutions }) => {
         this.cardBrands = brands;
         this.paymentMethods = methods;
-        if (this.errorCardBrands && this.errorPaymentMethods) {
+        this.institutions = institutions;
+        if (this.errorCardBrands && this.errorPaymentMethods && this.errorInstitutions) {
           this.error = 'Não foi possível carregar os parâmetros.';
         }
       },
@@ -148,6 +164,30 @@ export class AdminParametersComponent implements OnInit {
     });
   }
 
+  toggleInstitution(institution: InstitutionAdmin): void {
+    const key = `institution-${institution.id}`;
+    if (this.savingKey) return;
+    const next = !institution.isActive;
+    if (!next && !window.confirm('Desativar esta instituição pode impactar novos cadastros. Deseja continuar?')) {
+      return;
+    }
+    this.savingKey = key;
+    institution.isActive = next;
+
+    this.adminParameters.updateInstitutionStatus(institution.id, next).subscribe({
+      next: (updated) => {
+        institution.isActive = updated.isActive;
+        this.lastUpdatedInstitutions[institution.id] = new Date();
+      },
+      error: () => {
+        institution.isActive = !next;
+        this.errorInstitutions = 'Erro ao atualizar a instituição.';
+        this.savingKey = '';
+      },
+      complete: () => (this.savingKey = '')
+    });
+  }
+
   createPaymentMethod(): void {
     if (this.savingCreateMethod) return;
     const name = this.newMethodName.trim();
@@ -174,12 +214,41 @@ export class AdminParametersComponent implements OnInit {
     });
   }
 
+  createInstitution(): void {
+    if (this.savingCreateInstitution) return;
+    const name = this.newInstitutionName.trim();
+    if (!name) {
+      this.createInstitutionError = 'Informe o nome da instituição.';
+      return;
+    }
+
+    this.savingCreateInstitution = true;
+    this.createInstitutionError = '';
+    this.adminParameters.createInstitution(name, this.newInstitutionType).subscribe({
+      next: (created) => {
+        this.institutions = [...this.institutions, created].sort((a, b) => a.name.localeCompare(b.name));
+        this.lastUpdatedInstitutions[created.id] = new Date();
+        this.newInstitutionName = '';
+      },
+      error: (err) => {
+        this.createInstitutionError = this.resolveErrorMessage(err, 'Erro ao cadastrar a instituição.');
+      },
+      complete: () => {
+        this.savingCreateInstitution = false;
+      }
+    });
+  }
+
   get filteredCardBrands(): CardBrandAdmin[] {
     return this.filterList(this.cardBrands, this.brandFilter, (brand) => `${brand.name} ${brand.code}`);
   }
 
   get filteredPaymentMethods(): PaymentMethodAdmin[] {
     return this.filterList(this.paymentMethods, this.methodFilter, (method) => method.name);
+  }
+
+  get filteredInstitutions(): InstitutionAdmin[] {
+    return this.filterList(this.institutions, this.institutionFilter, (inst) => `${inst.name} ${inst.type}`);
   }
 
   isSavingBrand(brand: CardBrandAdmin): boolean {
@@ -190,12 +259,20 @@ export class AdminParametersComponent implements OnInit {
     return this.savingKey === this.methodKey(method.id);
   }
 
+  isSavingInstitution(inst: InstitutionAdmin): boolean {
+    return this.savingKey === `institution-${inst.id}`;
+  }
+
   brandUpdatedLabel(brand: CardBrandAdmin): string {
     return this.formatUpdatedLabel(this.lastUpdatedBrands[brand.id]);
   }
 
   methodUpdatedLabel(method: PaymentMethodAdmin): string {
     return this.formatUpdatedLabel(this.lastUpdatedMethods[method.id]);
+  }
+
+  institutionUpdatedLabel(inst: InstitutionAdmin): string {
+    return this.formatUpdatedLabel(this.lastUpdatedInstitutions[inst.id]);
   }
 
   private brandKey(id: number): string {

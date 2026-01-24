@@ -4,7 +4,7 @@ import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, Ng
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
-import { LookupsService, CardBrandLookup } from '../lookups.service';
+import { LookupsService, CardBrandLookup, InstitutionLookup } from '../lookups.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatCurrencyValue } from '../utils/locale-utils';
 
@@ -39,6 +39,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   mostrarNumero = false;
   cards: StoredCard[] = [];
   expenses: StoredExpense[] = [];
+  institutions: InstitutionLookup[] = [];
   mostrarModal = false;
   editandoId: string | null = null;
   alerta = '';
@@ -79,6 +80,14 @@ export class CartoesComponent implements OnInit, OnDestroy {
         this.alerta = 'Falha ao carregar bandeiras.';
         this.alertaTipo = 'error';
         setTimeout(() => (this.alerta = ''), 4000);
+      }
+    });
+    this.lookups.institutions('Bank').subscribe({
+      next: (items) => {
+        this.institutions = items || [];
+      },
+      error: () => {
+        this.institutions = [];
       }
     });
   }

@@ -15,10 +15,17 @@
     </label>
     <label>
       Idioma da aplicação
-      <select [(ngModel)]="linguaSelecionada">
+      <select [(ngModel)]="linguaSelecionada" (ngModelChange)="onLanguageChange($event)">
         <option *ngFor="let l of linguas" [value]="l.id">{{ l.label }}</option>
       </select>
     </label>
+    <div class="full quick">
+      <span class="muted">Configuração rápida</span>
+      <div class="preset-row">
+        <button type="button" class="ghost sm" (click)="applyPreset('pt-BR', 'BRL')">🇧🇷 Português + BRL</button>
+        <button type="button" class="ghost sm" (click)="applyPreset('en-US', 'USD')">🇺🇸 English + USD</button>
+      </div>
+    </div>
     <div class="full">
       <label>
         Localizações preferidas
@@ -30,8 +37,27 @@
         </div>
       </label>
       <div class="inline">
-        <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: Brasil (pt-BR) ou EUA (en-US)" />
+        <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: pt-BR ou en-US" />
         <button type="button" class="btn-primary sm" (click)="adicionarLocalizacao()">Adicionar</button>
+      </div>
+    </div>
+    <div class="full preview">
+      <div>
+        <p class="muted">Pré-visualização</p>
+        <div class="preview-grid">
+          <div class="preview-card">
+            <span class="muted">Data</span>
+            <strong>{{ previewDate }}</strong>
+          </div>
+          <div class="preview-card">
+            <span class="muted">Número</span>
+            <strong>{{ previewNumber }}</strong>
+          </div>
+          <div class="preview-card">
+            <span class="muted">Moeda</span>
+            <strong>{{ previewCurrency }}</strong>
+          </div>
+        </div>
       </div>
     </div>
   </div>
