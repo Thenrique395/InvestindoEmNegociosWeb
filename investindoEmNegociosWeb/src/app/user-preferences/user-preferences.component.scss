@@ -138,3 +138,26 @@ input {
   display: grid;
   gap: 0.2rem;
 }
+
+.notifications {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.notify-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-weight: 600;
+}

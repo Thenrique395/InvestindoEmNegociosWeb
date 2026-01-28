@@ -22,6 +22,23 @@ export interface InstitutionAdmin {
   isActive: boolean;
 }
 
+export interface NotificationSettings {
+  incomeUpcomingEnabled: boolean;
+  incomeDaysBefore: number;
+  expenseUpcomingEnabled: boolean;
+  expenseDaysBefore: number;
+  expenseOverdueEnabled: boolean;
+  cardCloseSoonEnabled: boolean;
+  cardCloseDaysBefore: number;
+  cardCloseDayEnabled: boolean;
+  monthCloseEnabled: boolean;
+  monthSummaryEnabled: boolean;
+  goalBelowExpectedEnabled: boolean;
+  goalCompletedEnabled: boolean;
+  goalInactivityEnabled: boolean;
+  goalInactivityDays: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminParametersService {
   private readonly baseUrl = `${API_BASE_URL}/admin/parameters`;
@@ -62,5 +79,13 @@ export class AdminParametersService {
 
   updateInstitutionStatus(id: number, isActive: boolean) {
     return this.http.put<InstitutionAdmin>(`${this.baseUrl}/institutions/${id}/status`, { isActive });
+  }
+
+  getNotificationSettings() {
+    return this.http.get<NotificationSettings>(`${this.baseUrl}/notification-settings`);
+  }
+
+  updateNotificationSettings(settings: NotificationSettings) {
+    return this.http.put<NotificationSettings>(`${this.baseUrl}/notification-settings`, settings);
   }
 }

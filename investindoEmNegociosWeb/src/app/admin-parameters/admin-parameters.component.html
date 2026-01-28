@@ -187,5 +187,104 @@
         </div>
       </div>
     </div>
+
+    <div class="card notification-card">
+      <div class="card__title">Notificações globais</div>
+      <p class="muted">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
+      <div class="status error" *ngIf="errorNotifications">{{ errorNotifications }}</div>
+
+      <div class="settings-grid">
+        <div class="settings-block">
+          <strong>Receitas</strong>
+          <label class="toggle-row">
+            <span>Ativar lembretes</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.incomeUpcomingEnabled" />
+          </label>
+          <label class="field-row">
+            <span>Receber em</span>
+            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.incomeDaysBefore" />
+            <span>dias</span>
+          </label>
+        </div>
+
+        <div class="settings-block">
+          <strong>Despesas</strong>
+          <label class="toggle-row">
+            <span>Vencimento próximo</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.expenseUpcomingEnabled" />
+          </label>
+          <label class="field-row">
+            <span>Vence em</span>
+            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.expenseDaysBefore" />
+            <span>dias</span>
+          </label>
+          <label class="toggle-row">
+            <span>Atraso</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.expenseOverdueEnabled" />
+          </label>
+        </div>
+
+        <div class="settings-block">
+          <strong>Fechamento de fatura</strong>
+          <label class="toggle-row">
+            <span>Avisar antes</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.cardCloseSoonEnabled" />
+          </label>
+          <label class="field-row">
+            <span>Fechar em</span>
+            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.cardCloseDaysBefore" />
+            <span>dias</span>
+          </label>
+          <label class="toggle-row">
+            <span>No dia do fechamento</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.cardCloseDayEnabled" />
+          </label>
+        </div>
+
+        <div class="settings-block">
+          <strong>Fechamento do mês</strong>
+          <label class="toggle-row">
+            <span>Último dia do mês</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.monthCloseEnabled" />
+          </label>
+          <label class="toggle-row">
+            <span>Resumo no dia 1</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.monthSummaryEnabled" />
+          </label>
+        </div>
+
+        <div class="settings-block">
+          <strong>Metas</strong>
+          <label class="toggle-row">
+            <span>Progresso abaixo do esperado</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.goalBelowExpectedEnabled" />
+          </label>
+          <label class="toggle-row">
+            <span>Meta atingida</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.goalCompletedEnabled" />
+          </label>
+          <label class="toggle-row">
+            <span>Sem movimentações</span>
+            <input type="checkbox" [(ngModel)]="notificationSettings.goalInactivityEnabled" />
+          </label>
+          <label class="field-row">
+            <span>Sem aporte há</span>
+            <input type="number" min="1" max="180" [(ngModel)]="notificationSettings.goalInactivityDays" />
+            <span>dias</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="card__actions">
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="salvarNotificacoes()"
+          [disabled]="savingNotificationSettings || loading">
+          {{ savingNotificationSettings ? 'Salvando...' : 'Salvar regras' }}
+        </button>
+        <span class="item-meta" *ngIf="notificationUpdatedLabel()">{{ notificationUpdatedLabel() }}</span>
+      </div>
+    </div>
   </div>
 </section>

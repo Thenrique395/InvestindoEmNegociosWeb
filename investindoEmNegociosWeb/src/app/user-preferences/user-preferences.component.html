@@ -60,6 +60,20 @@
         </div>
       </div>
     </div>
+    <div class="full notifications">
+      <p class="muted">Notificações</p>
+      <div class="notify-grid">
+        <label class="toggle-row">
+          <span>Notificações no app</span>
+          <input type="checkbox" [(ngModel)]="notifyInApp" />
+        </label>
+        <label class="toggle-row">
+          <span>Notificações por e-mail</span>
+          <input type="checkbox" [(ngModel)]="notifyEmail" />
+        </label>
+      </div>
+      <p class="muted">As regras e prazos são definidos pelo administrador.</p>
+    </div>
   </div>
 
   <div class="panel__actions">

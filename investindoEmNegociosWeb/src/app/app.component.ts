@@ -1,6 +1,6 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
@@ -8,11 +8,12 @@ import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
+import { NotificationsService, NotificationItem } from './notifications.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgIf, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
+  imports: [NgIf, NgFor, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -29,6 +30,9 @@ export class AppComponent implements OnInit, OnDestroy {
   showSignupModal = false;
   signupAlert = '';
   userMenuOpen = false;
+  notificationsOpen = false;
+  notifications: NotificationItem[] = [];
+  unreadCount = 0;
   profile: UserProfile | null = null;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
@@ -40,7 +44,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private profileService: ProfileService,
     private authService: AuthService,
-    private apiDataService: ApiDataService
+    private apiDataService: ApiDataService,
+    private notificationsService: NotificationsService
   ) {
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -48,6 +53,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isHomeRoute = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/#');
         this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
         this.userMenuOpen = false;
+        this.notificationsOpen = false;
         if (this.isLogged) {
           if (!event.urlAfterRedirects.startsWith('/receitas')) {
             this.apiDataService.refresh();
@@ -88,6 +94,7 @@ export class AppComponent implements OnInit, OnDestroy {
           /* ignore */
         }
       });
+      this.refreshNotifications();
     }
   }
 
@@ -167,6 +174,49 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
+  }
+
+  toggleNotifications(): void {
+    this.notificationsOpen = !this.notificationsOpen;
+  }
+
+  refreshNotifications(): void {
+    this.notificationsService.generate().subscribe({
+      next: () => this.fetchNotifications(),
+      error: () => this.fetchNotifications()
+    });
+  }
+
+  markNotificationRead(item: NotificationItem, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (item.readAt) return;
+    this.notificationsService.markRead(item.id).subscribe({
+      next: () => {
+        item.readAt = new Date().toISOString();
+        this.recalculateUnread();
+      },
+      error: () => {
+        /* ignore */
+      }
+    });
+  }
+
+  private fetchNotifications(): void {
+    this.notificationsService.list(false, 20).subscribe({
+      next: (items) => {
+        this.notifications = items || [];
+        this.recalculateUnread();
+      },
+      error: () => {
+        this.notifications = [];
+        this.unreadCount = 0;
+      }
+    });
+  }
+
+  private recalculateUnread(): void {
+    this.unreadCount = this.notifications.filter((n) => !n.readAt).length;
   }
 
   reloadIfSame(path: string, event?: Event): void {

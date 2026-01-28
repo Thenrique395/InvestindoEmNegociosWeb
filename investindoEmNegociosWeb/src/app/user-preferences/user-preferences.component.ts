@@ -22,6 +22,8 @@ export class UserPreferencesComponent implements OnInit {
   ];
   linguaSelecionada = 'pt-BR';
   loading = false;
+  notifyInApp = true;
+  notifyEmail = false;
 
   constructor(private profileService: ProfileService) {}
 
@@ -33,6 +35,10 @@ export class UserPreferencesComponent implements OnInit {
         this.linguaSelecionada = prefs.locales[0];
         this.ensurePrimaryLocale();
       }
+      if (prefs.notifications) {
+        this.notifyInApp = prefs.notifications.inAppEnabled;
+        this.notifyEmail = prefs.notifications.emailEnabled;
+      }
     });
   }
 
@@ -43,7 +49,11 @@ export class UserPreferencesComponent implements OnInit {
       : [this.linguaSelecionada];
     const payload: Preferences = {
       currency: this.moedaSelecionada,
-      locales
+      locales,
+      notifications: {
+        inAppEnabled: this.notifyInApp,
+        emailEnabled: this.notifyEmail
+      }
     };
     this.loading = true;
     this.profileService.updatePreferences(payload).subscribe({

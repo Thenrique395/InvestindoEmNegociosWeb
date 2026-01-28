@@ -21,6 +21,12 @@ export interface UserProfile {
 export interface Preferences {
   currency: string;
   locales: string[];
+  notifications?: NotificationPreferences;
+}
+
+export interface NotificationPreferences {
+  inAppEnabled: boolean;
+  emailEnabled: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

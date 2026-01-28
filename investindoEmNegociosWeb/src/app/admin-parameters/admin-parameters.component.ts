@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
-import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, PaymentMethodAdmin } from '../admin-parameters.service';
+import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin } from '../admin-parameters.service';
 
 @Component({
   selector: 'app-admin-parameters',
@@ -15,11 +15,28 @@ export class AdminParametersComponent implements OnInit {
   cardBrands: CardBrandAdmin[] = [];
   paymentMethods: PaymentMethodAdmin[] = [];
   institutions: InstitutionAdmin[] = [];
+  notificationSettings: NotificationSettings = {
+    incomeUpcomingEnabled: true,
+    incomeDaysBefore: 2,
+    expenseUpcomingEnabled: true,
+    expenseDaysBefore: 2,
+    expenseOverdueEnabled: true,
+    cardCloseSoonEnabled: true,
+    cardCloseDaysBefore: 2,
+    cardCloseDayEnabled: true,
+    monthCloseEnabled: true,
+    monthSummaryEnabled: true,
+    goalBelowExpectedEnabled: true,
+    goalCompletedEnabled: true,
+    goalInactivityEnabled: true,
+    goalInactivityDays: 30
+  };
   loading = false;
   error = '';
   errorCardBrands = '';
   errorPaymentMethods = '';
   errorInstitutions = '';
+  errorNotifications = '';
   savingKey = '';
   brandFilter = '';
   methodFilter = '';
@@ -35,6 +52,8 @@ export class AdminParametersComponent implements OnInit {
   savingCreateBrand = false;
   savingCreateMethod = false;
   savingCreateInstitution = false;
+  savingNotificationSettings = false;
+  notificationsUpdatedAt?: Date;
   private lastUpdatedBrands: Record<number, Date> = {};
   private lastUpdatedMethods: Record<number, Date> = {};
   private lastUpdatedInstitutions: Record<number, Date> = {};
@@ -51,6 +70,7 @@ export class AdminParametersComponent implements OnInit {
     this.errorCardBrands = '';
     this.errorPaymentMethods = '';
     this.errorInstitutions = '';
+    this.errorNotifications = '';
     forkJoin({
       brands: this.adminParameters.listCardBrands().pipe(
         catchError(() => {
@@ -69,13 +89,22 @@ export class AdminParametersComponent implements OnInit {
           this.errorInstitutions = 'Não foi possível carregar as instituições.';
           return of([] as InstitutionAdmin[]);
         })
+      ),
+      notifications: this.adminParameters.getNotificationSettings().pipe(
+        catchError(() => {
+          this.errorNotifications = 'Não foi possível carregar as notificações.';
+          return of(null);
+        })
       )
     }).subscribe({
-      next: ({ brands, methods, institutions }) => {
+      next: ({ brands, methods, institutions, notifications }) => {
         this.cardBrands = brands;
         this.paymentMethods = methods;
         this.institutions = institutions;
-        if (this.errorCardBrands && this.errorPaymentMethods && this.errorInstitutions) {
+        if (notifications) {
+          this.notificationSettings = notifications;
+        }
+        if (this.errorCardBrands && this.errorPaymentMethods && this.errorInstitutions && this.errorNotifications) {
           this.error = 'Não foi possível carregar os parâmetros.';
         }
       },
@@ -239,6 +268,24 @@ export class AdminParametersComponent implements OnInit {
     });
   }
 
+  salvarNotificacoes(): void {
+    if (this.savingNotificationSettings) return;
+    this.savingNotificationSettings = true;
+    this.errorNotifications = '';
+    this.adminParameters.updateNotificationSettings(this.notificationSettings).subscribe({
+      next: (updated) => {
+        this.notificationSettings = updated;
+        this.notificationsUpdatedAt = new Date();
+      },
+      error: (err) => {
+        this.errorNotifications = this.resolveErrorMessage(err, 'Erro ao salvar notificações.');
+      },
+      complete: () => {
+        this.savingNotificationSettings = false;
+      }
+    });
+  }
+
   get filteredCardBrands(): CardBrandAdmin[] {
     return this.filterList(this.cardBrands, this.brandFilter, (brand) => `${brand.name} ${brand.code}`);
   }
@@ -273,6 +320,10 @@ export class AdminParametersComponent implements OnInit {
 
   institutionUpdatedLabel(inst: InstitutionAdmin): string {
     return this.formatUpdatedLabel(this.lastUpdatedInstitutions[inst.id]);
+  }
+
+  notificationUpdatedLabel(): string {
+    return this.formatUpdatedLabel(this.notificationsUpdatedAt);
   }
 
   private brandKey(id: number): string {
