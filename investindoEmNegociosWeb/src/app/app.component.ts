@@ -33,6 +33,8 @@ export class AppComponent implements OnInit, OnDestroy {
   notificationsOpen = false;
   notifications: NotificationItem[] = [];
   unreadCount = 0;
+  notificationsLoading = false;
+  notificationsError = '';
   profile: UserProfile | null = null;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
@@ -178,12 +180,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleNotifications(): void {
     this.notificationsOpen = !this.notificationsOpen;
+    if (this.notificationsOpen && !this.notifications.length) {
+      this.fetchNotifications();
+    }
   }
 
   refreshNotifications(): void {
+    this.notificationsError = '';
+    this.notificationsLoading = true;
     this.notificationsService.generate().subscribe({
       next: () => this.fetchNotifications(),
-      error: () => this.fetchNotifications()
+      error: () => {
+        this.notificationsError = 'Falha ao atualizar.';
+        this.fetchNotifications();
+      }
     });
   }
 
@@ -203,14 +213,20 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private fetchNotifications(): void {
+    this.notificationsLoading = true;
     this.notificationsService.list(false, 20).subscribe({
       next: (items) => {
         this.notifications = items || [];
         this.recalculateUnread();
+        this.notificationsError = '';
       },
       error: () => {
         this.notifications = [];
         this.unreadCount = 0;
+        this.notificationsError = 'Não foi possível carregar.';
+      },
+      complete: () => {
+        this.notificationsLoading = false;
       }
     });
   }

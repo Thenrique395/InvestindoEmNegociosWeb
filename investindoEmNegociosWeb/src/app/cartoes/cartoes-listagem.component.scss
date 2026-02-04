@@ -61,12 +61,12 @@
 
 .brand--mastercard .mc-logo::before {
   left: 0;
-  background: #eb001b;
+  background: var(--danger);
 }
 
 .brand--mastercard .mc-logo::after {
   right: 0;
-  background: #f79e1b;
+  background: var(--warning);
   mix-blend-mode: multiply;
 }
 

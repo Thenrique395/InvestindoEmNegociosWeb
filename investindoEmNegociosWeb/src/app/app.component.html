@@ -183,6 +183,8 @@
                   <button type="button" class="notif-refresh" (click)="refreshNotifications()">Atualizar</button>
                 </div>
                 <div class="notif-list">
+                  <div class="notif-empty" *ngIf="notificationsLoading">Carregando...</div>
+                  <div class="notif-empty error" *ngIf="notificationsError">{{ notificationsError }}</div>
                   <button
                     type="button"
                     class="notif-item"

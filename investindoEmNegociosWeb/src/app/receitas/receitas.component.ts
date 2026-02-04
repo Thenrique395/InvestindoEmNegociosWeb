@@ -551,6 +551,10 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     if (typeof window === 'undefined') return;
     const printWindow = window.open('', '_blank', 'width=900,height=700');
     if (!printWindow) return;
+    const rootStyles = window.getComputedStyle(document.documentElement);
+    const textColor = rootStyles.getPropertyValue('--text').trim();
+    const borderColor = rootStyles.getPropertyValue('--border').trim();
+    const headerBg = rootStyles.getPropertyValue('--surface-2').trim();
 
     const rows = this.rendasMes
       .map(
@@ -570,11 +574,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
         <head>
           <title>Receitas ${this.mesAtualLabel}</title>
           <style>
-            body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; color: #0f172a; }
+            body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; color: ${textColor}; }
             h1 { margin-bottom: 8px; }
             table { width: 100%; border-collapse: collapse; }
-            th, td { padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
-            th { background: #f1f5f9; }
+            th, td { padding: 8px; border-bottom: 1px solid ${borderColor}; text-align: left; }
+            th { background: ${headerBg}; }
           </style>
         </head>
         <body>

@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: ./investindoEmNegociosWeb
+      dockerfile: Dockerfile
+    container_name: investindo-frontend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      API_BASE_URL: http://44.222.150.223:5059/api/v1

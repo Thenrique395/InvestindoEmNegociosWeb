@@ -1,6 +1,7 @@
 // Configuração centralizada para base da API.
 const browserHost = typeof window !== 'undefined' ? window.location.hostname : '';
 const browserProtocol = typeof window !== 'undefined' ? window.location.protocol : 'http:';
+const isLocalhost = browserHost === 'localhost' || browserHost === '127.0.0.1';
 const runtimeEnv =
   typeof process !== 'undefined' && process.env && process.env['API_BASE_URL']
     ? process.env['API_BASE_URL']
@@ -9,5 +10,7 @@ const runtimeEnv =
 export const API_BASE_URL =
   runtimeEnv ||
   (browserHost
-    ? `${browserProtocol}//${browserHost}:5059/api/v1`
-    : 'http://localhost:5059/api/v1');
+    ? isLocalhost
+      ? 'http://44.222.150.223:5059/api/v1'
+      : `${browserProtocol}//${browserHost}:5059/api/v1`
+    : 'http://44.222.150.223:5059/api/v1');
