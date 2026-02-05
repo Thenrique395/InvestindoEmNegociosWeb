@@ -73,7 +73,7 @@
 
 .sidebar__label {
   padding: var(--space-1) var(--space-1) 0;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.12em;
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -295,7 +295,7 @@
   border-radius: 10px;
   padding: var(--space-1) var(--space-1);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
 .notif-list {
@@ -513,7 +513,7 @@
 .user-dropdown .section-title {
   margin: 0 0 0.25rem;
   font-size: 0.8rem;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.06em;
   color: var(--text-muted);
 }
@@ -864,9 +864,9 @@
 }
 
 .eyebrow {
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.08em;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   margin: 0 0 0.25rem 0;
 }

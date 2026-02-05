@@ -109,9 +109,9 @@
   padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   border: 1px solid var(--border);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.4px;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--text-secondary);
   background: var(--surface-2);
 }
