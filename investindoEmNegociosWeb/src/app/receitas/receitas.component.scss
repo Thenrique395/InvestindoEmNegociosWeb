@@ -133,7 +133,7 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   line-height: 1;
 }
 
@@ -151,7 +151,7 @@
 .total__meta {
   display: grid;
   gap: 0.15rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
@@ -185,7 +185,7 @@
   display: flex;
   justify-content: space-between;
   gap: 0.6rem;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .status-strip {
@@ -212,7 +212,7 @@
 
 .status-card .value {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
   font-weight: 800;
   color: var(--text);
 }

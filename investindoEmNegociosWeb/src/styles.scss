@@ -22,6 +22,13 @@
   --text-muted: #64748b;
   --text-xs: 12px;
   --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
   --primary: #2563eb;
   --on-primary: #f8fafc;
   --success: #22c55e;
@@ -36,8 +43,8 @@
   --space-6: 48px;
   --radius-lg: 16px;
   --radius-md: 12px;
-  --control-h: 46px;
-  --control-pad: 0.75rem 0.9rem;
+  --control-h: 48px;
+  --control-pad: var(--space-1) var(--space-2);
   --shadow-sm: 0 10px 20px rgba(15, 23, 42, 0.08);
   --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.12);
   --overlay: rgba(4, 20, 28, 0.7);
@@ -157,6 +164,7 @@ button:disabled {
   background: var(--primary);
   color: var(--on-primary);
   font-weight: 700;
+  min-height: var(--control-h);
   padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   box-shadow: 0 12px 30px color-mix(in srgb, var(--primary) 25%, transparent);
@@ -181,6 +189,7 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--danger) 60%, transparent);
   background: var(--danger-10);
   color: var(--text);
+  min-height: var(--control-h);
   padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   font-weight: 700;
@@ -207,7 +216,7 @@ button:disabled {
   background: var(--info-10);
   color: var(--text);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -226,12 +235,13 @@ button:disabled {
   border: 1px solid var(--border);
   color: var(--text);
   box-shadow: none;
+  min-height: var(--control-h);
   cursor: pointer;
 }
 
 .sm {
   padding: var(--space-1) var(--space-1);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 /* Alert padrão */

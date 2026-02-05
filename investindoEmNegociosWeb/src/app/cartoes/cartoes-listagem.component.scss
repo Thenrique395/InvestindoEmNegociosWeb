@@ -74,12 +74,12 @@
   padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   background: var(--surface-2);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .sm {
   padding: var(--space-1) var(--space-1);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .danger {
@@ -89,7 +89,7 @@
 }
 
 .card-item__number {
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
   letter-spacing: 1.5px;
   margin: 0;
 }

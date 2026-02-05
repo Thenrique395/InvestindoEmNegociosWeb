@@ -46,7 +46,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   align-items: start;
-  gap: 0.85rem;
+  gap: var(--space-2);
   background: var(--surface-2);
   padding: var(--space-2);
   border-radius: 12px;
@@ -64,7 +64,7 @@ label {
 input {
   padding: var(--space-2) var(--space-2);
   min-height: 48px;
-  font-size: 1rem;
+  font-size: var(--text-md);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -74,7 +74,7 @@ input {
 select {
   padding: var(--space-2) var(--space-2);
   min-height: 48px;
-  font-size: 1rem;
+  font-size: var(--text-md);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -98,7 +98,7 @@ select:focus {
   background: rgba(59, 130, 246, 0.08);
   border: 1px solid rgba(59, 130, 246, 0.25);
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
@@ -121,7 +121,7 @@ select:focus {
 }
 
 .resumo span {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   text-transform: none;
   letter-spacing: 0.5px;
   color: var(--primary);
@@ -159,7 +159,7 @@ select:focus {
 
 .switch-hint {
   display: block;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 

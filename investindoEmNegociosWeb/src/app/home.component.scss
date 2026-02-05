@@ -1,6 +1,6 @@
 .home-dashboard {
   display: grid;
-  gap: 1.25rem;
+  gap: var(--space-3);
   padding: 0;
 }
 
@@ -40,7 +40,7 @@
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  font-size: 1.4rem;
+  font-size: var(--text-2xl);
   line-height: 1;
   cursor: pointer;
 }
@@ -56,7 +56,7 @@
 
 .onboarding__step-count {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   margin: 0;
 }
 
@@ -71,7 +71,7 @@
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface-2);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
@@ -87,7 +87,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
@@ -160,7 +160,7 @@
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   line-height: 1;
   cursor: pointer;
 }
@@ -193,7 +193,7 @@
 }
 
 .hero .eyebrow {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.2;
@@ -201,14 +201,14 @@
 }
 
 .hero h1 {
-  font-size: clamp(1.2rem, 1.6vw, 1.55rem);
+  font-size: clamp(1.5rem, 1.6vw, 2rem);
   font-weight: 600;
   line-height: 1.2;
   margin-top: 0.1rem;
 }
 
 .hero .muted {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   line-height: 1.45;
   margin-top: var(--space-1);
 }
@@ -263,7 +263,7 @@
 
 .grid.is-loading .stat-card .label,
 .grid.is-loading .stat-card .muted {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
@@ -328,7 +328,7 @@
   border: 1px solid var(--border-strong);
   background: var(--surface-2);
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -362,7 +362,7 @@
   background: rgba(12, 22, 28, 0.95);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.25;
   min-width: 180px;
   text-align: left;
@@ -387,7 +387,7 @@
 .stat-card .label {
   text-transform: none;
   letter-spacing: 0.5px;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
   margin: 0 0 0.3rem;
 }
@@ -474,7 +474,7 @@
 }
 
 .chart__title .muted {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .chart__legend {
@@ -558,12 +558,12 @@
 
 .bar__label {
   text-align: center;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
 .chart__bars.dense .bar__label {
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
 }
 
 .bar-tooltip {
@@ -576,7 +576,7 @@
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
   opacity: 0;
   pointer-events: none;
@@ -588,7 +588,7 @@
 .bar-tooltip p {
   margin: 0 0 0.2rem;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
@@ -671,14 +671,14 @@
 .chart__months {
   display: grid;
   margin-top: 0.5rem;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   text-align: center;
 }
 
 .chart__months.dense {
   padding-bottom: var(--space-1);
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
 }
 
 .mini-bars {
@@ -697,7 +697,7 @@
 
 .mini-bars__label {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -726,7 +726,7 @@
 }
 
 .mini-bars__value {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   text-align: right;
   color: var(--text-muted);
 }
@@ -754,7 +754,7 @@
   border: 1px solid var(--border-strong);
   background: var(--surface-2);
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -788,7 +788,7 @@
   background: rgba(12, 22, 28, 0.95);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.25;
   min-width: 220px;
   text-align: left;
@@ -863,7 +863,7 @@
 }
 
 .recent__name {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   line-height: 1.1;
   word-break: break-word;
 }
@@ -873,7 +873,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1);
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   line-height: 1.2;
 }
@@ -885,7 +885,7 @@
 .recent__tag {
   padding: var(--space-1) var(--space-1);
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   border: 1px solid var(--border);
   background: var(--surface-3);
   color: var(--text-secondary);
@@ -893,7 +893,7 @@
 
 .recent__amount {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   white-space: nowrap;
 }
 
@@ -940,7 +940,7 @@
 .goal-chip {
   padding: var(--space-1) var(--space-1);
   border-radius: 10px;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1059,7 +1059,7 @@
   padding: var(--space-1) var(--space-1);
   border-radius: 10px;
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   min-width: 150px;
   text-align: center;
   pointer-events: none;

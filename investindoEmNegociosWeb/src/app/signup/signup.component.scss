@@ -13,7 +13,7 @@
 
 h3 {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: var(--text-2xl);
 }
 
 .muted {
@@ -58,7 +58,7 @@ input:focus {
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--text-muted);
 }
@@ -87,7 +87,7 @@ button.primary:disabled {
 .helper {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .error {

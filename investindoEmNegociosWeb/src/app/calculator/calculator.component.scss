@@ -5,7 +5,7 @@
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
-  gap: 1.25rem;
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -148,7 +148,7 @@ button[type='button'] {
   position: absolute;
   inset: auto 0 -20px 0;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 

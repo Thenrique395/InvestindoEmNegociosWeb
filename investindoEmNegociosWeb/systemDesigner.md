@@ -55,11 +55,14 @@ identidade, tokens, componentes e regras de uso para garantir consistencia.
   - --shadow-md (cards e dropdowns)
 - Espacamento:
   - --space-1 (8px), --space-2 (16px), --space-3 (24px), --space-4 (32px), --space-5 (40px), --space-6 (48px)
+- Tipografia:
+  - --text-xs (12px), --text-sm (14px), --text-md (16px), --text-lg (18px), --text-xl (20px), --text-2xl (24px), --text-3xl (30px), --text-4xl (36px), --text-5xl (48px)
 
 ## 5) Regras de ouro
 - Cards nao usam fundo verde/vermelho, exceto cards de status/resumo com tom suave.
 - Verde/vermelho geralmente em numeros, icones ou badges; fundo semantico apenas quando ajudar a leitura.
 - Espacamento sempre multiplo de 8px.
+- Min/max de clamp seguem base 8px.
 - Sidebar "silenciosa", sem cores gritantes.
 - Dashboard mostra pouco e importante.
 - Graficos sem poluicao visual.

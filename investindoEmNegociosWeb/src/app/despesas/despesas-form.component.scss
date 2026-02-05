@@ -80,7 +80,7 @@ select {
 }
 
 .resumo span {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   text-transform: none;
   letter-spacing: 0.5px;
   color: var(--primary);
@@ -100,7 +100,7 @@ select {
   border: 1px dashed var(--border);
   background: var(--surface-2);
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -37,7 +37,7 @@
   border: 1px solid var(--border);
   color: var(--text-muted);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .wizard__steps span.active {
@@ -53,14 +53,14 @@
 
 .wizard__label {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   margin: 0;
 }
 
 .eyebrow {
   text-transform: none;
   letter-spacing: 0.12em;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--success);
   margin-bottom: var(--space-1);
 }
@@ -118,7 +118,7 @@ input:focus {
 
 .error {
   color: var(--danger);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .actions {
@@ -204,7 +204,7 @@ input:focus {
 .focus-card p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .focus-card.active {

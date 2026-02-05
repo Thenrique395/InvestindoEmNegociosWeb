@@ -5,7 +5,7 @@
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
-  gap: 1.25rem;
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -72,7 +72,7 @@
 .eyebrow {
   text-transform: none;
   letter-spacing: 0.08em;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
   margin: 0;
 }

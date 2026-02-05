@@ -12,7 +12,7 @@
 
   h1 {
     margin: 0;
-    font-size: 1.6rem;
+    font-size: var(--text-2xl);
   }
 
   p {
@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
@@ -93,7 +93,7 @@
 
 .muted {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .tag {
@@ -141,7 +141,7 @@
 .modal__card label {
   display: grid;
   gap: 0.4rem;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
 }
 
