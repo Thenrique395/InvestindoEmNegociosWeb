@@ -1,13 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DecimalPipe, NgIf, NgClass, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
 import { ReceitasFormComponent } from './receitas-form.component';
-import { maskDateDDMMYYYY, maskMoneyInput, maskMonthYear } from '../utils/input-mask';
+import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { AuthService } from '../auth.service';
 import { GoalsService } from '../goals.service';
+import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
 import {
@@ -35,8 +37,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   novaRenda: StoredIncome = this.criaRenda();
   valorInput = '';
   recebimentoInput = '';
-  fixaInicioInput = '';
   erroData = '';
+  erroCategoria = '';
   editandoId: string | null = null;
   valorSugestao: number | null = null;
   saving = false;
@@ -50,21 +52,29 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   deleteInstallmentId: string | null = null;
   deleteFonte = '';
   deleteIsRecurring = false;
+  showEditReceivedModal = false;
+  editReceivedId: string | null = null;
+  editReceivedSource = '';
+  selectedIds = new Set<string>();
+  loadingRecebido = false;
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
   goalInput = '';
   goalValue: number | null = null;
+  categorias: CategoryDto[] = [];
 
   constructor(
     private db: ApiDataService,
     private authService: AuthService,
-    private goalsService: GoalsService
+    private goalsService: GoalsService,
+    private categoriesService: CategoriesService
   ) {}
 
   ngOnInit(): void {
     this.db.refreshIncomes(this.mesKey());
     this.loadGoal();
+    this.loadCategorias();
     this.sub = this.db.incomes$.subscribe((lista) => {
       this.rendasAll = [...lista];
       this.valorSugestao = this.getUltimoValorParaFonte(this.novaRenda.fonte);
@@ -85,6 +95,14 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
+  }
+
+  get selecionados(): string[] {
+    return Array.from(this.selectedIds);
+  }
+
+  get selecionadosRecebiveis(): StoredIncome[] {
+    return this.rendas.filter((r) => this.selectedIds.has(r.id) && r.status !== 'PAID' && r.status !== 'CANCELED');
   }
 
   get rendas(): StoredIncome[] {
@@ -108,8 +126,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     const valor = this.valorInput;
     const data = this.recebimentoInput || 'DD/MM/AAAA';
     if (this.novaRenda.fixa) {
-      const inicio = this.fixaInicioInput || 'MM/AAAA';
-      return `Recebimento de ${valor} todos os meses a partir de ${inicio}.`;
+      return `Recebimento de ${valor} todos os meses a partir de ${data}.`;
     }
     return `Recebimento de ${valor} em ${data}.`;
   }
@@ -136,8 +153,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     let pendentesValor = 0;
 
     for (const renda of this.rendasMes) {
-      const status = incomeStatusLabel(renda.recebimento);
-      if (status === 'Pago') {
+      const status = incomeStatusLabel(renda.status);
+      if (status === 'Recebido') {
         pagos += 1;
         pagosValor += renda.valor || 0;
       } else {
@@ -291,7 +308,13 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     const valor = this.parseValor(this.valorInput);
     if (!this.novaRenda.fonte || !valor) return;
 
-    if (this.recebimentoInput && !this.isDataValida(this.recebimentoInput)) {
+    if (!this.novaRenda.categoryId) {
+      this.erroCategoria = 'Selecione uma categoria.';
+      return;
+    }
+    this.erroCategoria = '';
+
+    if (!this.recebimentoInput || !this.isDataValida(this.recebimentoInput)) {
       this.erroData = 'Data inválida. Use o formato DD/MM/AAAA.';
       return;
     }
@@ -299,15 +322,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     const recebimentoNormalizado = this.recebimentoInput
       ? this.normalizaData(this.recebimentoInput)
       : this.formatDate(this.dataAtual);
-    const fixaInicio = this.novaRenda.fixa ? this.normalizaMes(this.fixaInicioInput) : undefined;
-
-    if (this.novaRenda.fixa) {
-      if (!fixaInicio || !this.isMesValido(fixaInicio)) {
-        this.erroData = 'Informe o mês de início no formato MM/AAAA para receita recorrente.';
-        return;
-      }
-      this.erroData = '';
-    }
 
     this.saving = true;
     let ok = false;
@@ -316,19 +330,19 @@ export class ReceitasComponent implements OnInit, OnDestroy {
         this.db.updateIncome(this.editandoId, {
           planId: this.editandoId,
           fonte: this.novaRenda.fonte,
+          categoryId: this.novaRenda.categoryId ?? null,
           valor,
           recebimento: recebimentoNormalizado,
-          fixa: this.novaRenda.fixa,
-          fixaInicio
+          fixa: this.novaRenda.fixa
         });
       } else {
         this.db.addIncome({
           planId: '',
           fonte: this.novaRenda.fonte,
+          categoryId: this.novaRenda.categoryId ?? null,
           valor,
           recebimento: recebimentoNormalizado,
-          fixa: this.novaRenda.fixa,
-          fixaInicio
+          fixa: this.novaRenda.fixa
         });
       }
 
@@ -348,7 +362,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.valorInput = formatNumberValue(renda.valor);
     this.recebimentoInput = renda.recebimento;
     this.valorSugestao = this.getUltimoValorParaFonte(renda.fonte);
-    this.fixaInicioInput = renda.fixaInicio || '';
     this.mostrarForm = true;
   }
 
@@ -366,6 +379,12 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   editarPorId(id: string): void {
     const renda = this.rendasAll.find((r) => r.id === id);
     if (renda) {
+      if (renda.status === 'PAID') {
+        this.editReceivedId = renda.id;
+        this.editReceivedSource = renda.fonte || 'Receita';
+        this.showEditReceivedModal = true;
+        return;
+      }
       this.editar(renda);
     }
   }
@@ -390,6 +409,62 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.deleteIsRecurring = false;
   }
 
+  confirmarEdicaoRecebida(): void {
+    if (!this.editReceivedId) return;
+    const renda = this.rendasAll.find((r) => r.id === this.editReceivedId);
+    if (!renda) {
+      this.cancelarEdicaoRecebida();
+      return;
+    }
+    this.db.setIncomeStatusLocal(this.editReceivedId, 'OPEN');
+    this.cancelarEdicaoRecebida();
+    this.editar(renda);
+  }
+
+  cancelarEdicaoRecebida(): void {
+    this.showEditReceivedModal = false;
+    this.editReceivedId = null;
+    this.editReceivedSource = '';
+  }
+
+  toggleSelecionar(id: string, checked: boolean): void {
+    if (checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+  }
+
+  toggleSelecionarTodos(checked: boolean): void {
+    if (checked) {
+      const ids = (this.rendas || []).map((r) => r.id).filter(Boolean) as string[];
+      this.selectedIds = new Set(ids);
+    } else {
+      this.selectedIds.clear();
+    }
+  }
+
+  marcarRecebidasSelecionadas(): void {
+    const selecionadas = this.selecionadosRecebiveis;
+    if (!selecionadas.length) {
+      this.setAlerta('Nenhuma receita selecionada para marcar como recebida.', 2000);
+      return;
+    }
+    const pedidos = selecionadas.map((r) => this.db.markIncomeReceived(r.id, r.valor));
+    this.loadingRecebido = true;
+    forkJoin(pedidos)
+      .pipe(finalize(() => (this.loadingRecebido = false)))
+      .subscribe({
+        next: () => {
+          this.selectedIds.clear();
+          this.setAlerta('Receitas marcadas como recebidas.', 2500, 'success');
+        },
+        error: () => {
+          this.setAlerta('Falha ao marcar receitas como recebidas.', 2500, 'error');
+        }
+      });
+  }
+
   onValorChange(raw: string): void {
     this.valorInput = maskMoneyInput(raw);
   }
@@ -406,10 +481,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.valorSugestao = this.getUltimoValorParaFonte(fonte);
   }
 
-  onFixaInicioChange(raw: string): void {
-    this.fixaInicioInput = maskMonthYear(raw);
-  }
-
   aplicarSugestao(): void {
     if (!this.valorSugestao) return;
     this.valorInput = formatNumberValue(this.valorSugestao);
@@ -419,9 +490,9 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.novaRenda = this.criaRenda();
     this.valorInput = '';
     this.recebimentoInput = '';
-    this.fixaInicioInput = '';
     this.editandoId = null;
     this.erroData = '';
+    this.erroCategoria = '';
     this.valorSugestao = null;
   }
 
@@ -433,7 +504,17 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private criaRenda(): StoredIncome {
-    return { id: '', planId: '', fonte: '', valor: 0, recebimento: '', fixa: false, fixaInicio: '' };
+    return {
+      id: '',
+      planId: '',
+      fonte: '',
+      categoria: '',
+      categoryId: null,
+      valor: 0,
+      recebimento: '',
+      fixa: false,
+      fixaInicio: ''
+    };
   }
 
   private normalizaData(value: string): string {
@@ -456,6 +537,39 @@ export class ReceitasComponent implements OnInit, OnDestroy {
         this.goalValue = null;
         this.goalInput = '';
         this.setAlerta('Falha ao carregar a meta de receita.', 2500, 'error');
+      }
+    });
+  }
+
+  private loadCategorias(): void {
+    const filtraReceitas = (items: CategoryDto[]) => {
+      const active = (items || []).filter((item) => item.isActive !== false);
+      return active.filter((item) => {
+        const applies = (item.appliesTo || '').toString().toLowerCase().trim();
+        return applies.includes('income') || applies.includes('receita') || applies.includes('renda');
+      });
+    };
+
+    this.categoriesService.list('Income').subscribe({
+      next: (items) => {
+        const filtradas = filtraReceitas(items || []);
+        if (filtradas.length) {
+          this.categorias = filtradas;
+          return;
+        }
+        this.categoriesService.list().subscribe({
+          next: (all) => {
+            this.categorias = filtraReceitas(all || []);
+          },
+          error: (err) => {
+            console.error('Falha ao carregar categorias de receita', err);
+            this.categorias = [];
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Falha ao carregar categorias de receita', err);
+        this.categorias = [];
       }
     });
   }
@@ -528,13 +642,14 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   exportCsv(): void {
     const rows = [
-      ['Fonte', 'Valor', 'Recebimento', 'Tipo', 'Status'],
+      ['Fonte', 'Categoria', 'Valor', 'Recebimento', 'Tipo', 'Status'],
       ...this.rendasMes.map((r) => [
         r.fonte || '',
+        r.categoria || '',
         r.valor.toFixed(2).replace('.', ','),
         r.recebimento || '',
         r.fixa ? 'Recorrente' : 'Avulsa',
-        incomeStatusLabel(r.recebimento)
+        incomeStatusLabel(r.status)
       ])
     ];
     const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
@@ -561,10 +676,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
         (r) => `
         <tr>
           <td>${r.fonte || '-'}</td>
+          <td>${r.categoria || '-'}</td>
           <td>R$ ${r.valor.toFixed(2).replace('.', ',')}</td>
           <td>${r.recebimento || '-'}</td>
           <td>${r.fixa ? 'Recorrente' : 'Avulsa'}</td>
-          <td>${incomeStatusLabel(r.recebimento)}</td>
+          <td>${incomeStatusLabel(r.status)}</td>
         </tr>`
       )
       .join('');
@@ -588,6 +704,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
             <thead>
               <tr>
                 <th>Fonte</th>
+                <th>Categoria</th>
                 <th>Valor</th>
                 <th>Recebimento</th>
                 <th>Tipo</th>
@@ -616,34 +733,10 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return monthKeyFromLocaleDate(recebimento);
   }
 
-  private mesKeyFromMes(mesAno?: string): string | null {
-    if (!mesAno) return null;
-    const digits = mesAno.replace(/[^\d]/g, '');
-    if (digits.length < 6) return null;
-    const mes = Number(digits.slice(0, 2));
-    const ano = Number(digits.slice(2, 6));
-    if (mes < 1 || mes > 12 || Number.isNaN(ano)) return null;
-    return `${ano}-${String(mes).padStart(2, '0')}`;
-  }
-
   private mesKeyBetween(target: string, inicio: string, fim: string | null): boolean {
     const t = target;
     if (t < inicio) return false;
     if (fim && t > fim) return false;
-    return true;
-  }
-
-  private normalizaMes(value: string): string {
-    return maskMonthYear(value);
-  }
-
-  private isMesValido(value: string): boolean {
-    const digits = value.replace(/[^\d]/g, '');
-    if (digits.length !== 6) return false;
-    const mes = Number(digits.slice(0, 2));
-    const ano = Number(digits.slice(2, 6));
-    if (mes < 1 || mes > 12) return false;
-    if (Number.isNaN(ano)) return false;
     return true;
   }
 
@@ -660,9 +753,9 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   private filtroStatusMatch(renda: StoredIncome): boolean {
     if (this.filtroStatus === 'all') return true;
-    const status = incomeStatusLabel(renda.recebimento);
-    if (this.filtroStatus === 'paid') return status === 'Pago';
-    return status !== 'Pago';
+    const status = incomeStatusLabel(renda.status);
+    if (this.filtroStatus === 'paid') return status === 'Recebido';
+    return status !== 'Recebido';
   }
 
   private countDuplicatedSources(): number {

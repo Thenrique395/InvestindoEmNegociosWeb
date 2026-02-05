@@ -116,6 +116,7 @@
     [valorParcelaLabel]="valorParcelaLabel"
     [vencimentoInput]="vencimentoInput"
     [erroData]="erroData"
+    [erroCategoria]="erroCategoria"
     [formaPagamento]="formaPagamento"
     [parcelar]="parcelar"
     [parcelasCount]="parcelasCount"
@@ -124,6 +125,7 @@
     [cartaoSelecionadoLabel]="cartaoSelecionadoLabel"
     [fixa]="fixa"
     [fixaMeses]="fixaMeses"
+    [isEdit]="!!editando"
     (valorChange)="onValorChange($event)"
     (vencimentoChange)="onVencimentoChange($event)"
     (formaPagamentoChange)="onFormaPagamentoChange($event)"
@@ -134,6 +136,33 @@
     (fixaMesesChange)="fixaMeses = $event"
     (submitForm)="adicionar()"
     (cancel)="fecharModal()" />
+
+  <div class="modal" *ngIf="confirmEdicao">
+    <div class="modal__backdrop" (click)="cancelarEdicao()"></div>
+    <div class="modal__content small">
+      <div class="modal__header">
+        <div>
+          <p class="eyebrow">Editar despesa</p>
+          <h3>Aplicar alterações</h3>
+        </div>
+        <button class="modal__close" type="button" (click)="cancelarEdicao()">✕</button>
+      </div>
+      <p class="muted" *ngIf="confirmEdicao && !confirmEdicao.isRecorrente">
+        Esta despesa está parcelada. Deseja alterar apenas esta parcela ou todas as parcelas da série?
+      </p>
+      <p class="muted" *ngIf="confirmEdicao && confirmEdicao.isRecorrente">
+        Esta despesa é recorrente. Deseja alterar somente este lançamento ou toda a recorrência?
+      </p>
+      <div class="modal__actions">
+        <button type="button" class="ghost" (click)="confirmarEdicao('single')">
+          {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Somente este mês' : 'Somente esta' }}
+        </button>
+        <button type="button" class="btn-primary" (click)="confirmarEdicao('all')">
+          {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Toda a recorrência' : 'Todas as parcelas' }}
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div class="modal" *ngIf="confirmRemocao">
     <div class="modal__backdrop" (click)="cancelarRemocao()"></div>

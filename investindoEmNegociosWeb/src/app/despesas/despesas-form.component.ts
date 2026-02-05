@@ -22,6 +22,7 @@ export class DespesasFormComponent {
   @Input() valorParcelaLabel = '';
   @Input() vencimentoInput = '';
   @Input() erroData = '';
+  @Input() erroCategoria = '';
   @Input() formaPagamento: 'avista' | 'cartao' = 'avista';
   @Input() parcelar = false;
   @Input() parcelasCount = 1;
@@ -30,6 +31,7 @@ export class DespesasFormComponent {
   @Input() saving = false;
   @Input() cartaoSelecionadoId: string | null = null;
   @Input() cartaoSelecionadoLabel = '';
+  @Input() isEdit = false;
 
   @Output() valorChange = new EventEmitter<string>();
   @Output() vencimentoChange = new EventEmitter<string>();

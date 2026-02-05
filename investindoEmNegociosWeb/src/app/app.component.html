@@ -320,6 +320,11 @@
     <button type="button" aria-label="Fechar alerta" (click)="signupAlert = ''">✕</button>
   </div>
 
+  <div class="global-alert global-alert--feedback" [class.success]="feedbackMessage.type === 'success'" [class.error]="feedbackMessage.type === 'error'" [class.info]="feedbackMessage.type === 'info'" *ngIf="feedbackMessage">
+    {{ feedbackMessage.text }}
+    <button type="button" aria-label="Fechar alerta" (click)="dismissFeedback()">✕</button>
+  </div>
+
   <div class="signup-modal" *ngIf="showSignupModal">
     <div class="signup-modal__backdrop" (click)="closeSignup()"></div>
     <div class="signup-modal__dialog">

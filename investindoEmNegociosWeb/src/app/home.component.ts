@@ -391,7 +391,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       date: i.recebimento || '—',
       amount: i.valor || 0,
       type: 'income' as const,
-      status: incomeStatusLabel(i.recebimento),
+      status: incomeStatusLabel(i.status),
       recurring: !!i.fixa,
       planId: i.planId
     }));

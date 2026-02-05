@@ -50,8 +50,8 @@
       <span>Total {{ mesAtualLabel }}</span>
       <strong>R$ {{ totalRendas | number:'1.2-2' }}</strong>
       <div class="total__meta" *ngIf="hasAccess('Basic')">
-        <span>Recorrentes: R$ {{ totalRecorrentes | number:'1.2-2' }}</span>
-        <span>Avulsas: R$ {{ totalAvulsas | number:'1.2-2' }}</span>
+        <span>Recorrentes: <strong>R$ {{ totalRecorrentes | number:'1.2-2' }}</strong></span>
+        <span>Avulsas: <strong>R$ {{ totalAvulsas | number:'1.2-2' }}</strong></span>
       </div>
       <div class="total__actions">
         <button type="button" class="btn-primary" (click)="abrirModal()">Adicionar receita</button>
@@ -85,6 +85,25 @@
       </select>
     </label>
   </div>
+
+  <div class="bulk-bar" *ngIf="selecionados.length">
+    <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
+    <div class="bulk-actions">
+      <button type="button" class="btn-primary sm" [disabled]="loadingRecebido" (click)="marcarRecebidasSelecionadas()">
+        <span *ngIf="loadingRecebido">Processando...</span>
+        <span *ngIf="!loadingRecebido">Marcar como recebida</span>
+      </button>
+    </div>
+  </div>
+
+  <app-receitas-lista
+    [rendas]="rendas"
+    [showStatus]="hasAccess('Basic')"
+    [selectedIds]="selecionados"
+    (editar)="editarPorId($event)"
+    (remover)="remover($event)"
+    (selecionar)="toggleSelecionar($event.id, $event.checked)"
+    (selecionarTodos)="toggleSelecionarTodos($event)"></app-receitas-lista>
 
   <div class="goals" *ngIf="hasAccess('Intermediate')">
     <div class="goal-card">
@@ -171,7 +190,6 @@
   <div class="admin-panel" *ngIf="hasAccess('Admin')">
     <div class="admin-header">
       <div>
-        <p class="eyebrow">Admin</p>
         <h3>Visão de qualidade dos dados</h3>
         <p class="muted">Acompanhe possíveis lacunas antes de liberar padrões globais.</p>
       </div>
@@ -184,19 +202,14 @@
     </div>
   </div>
 
-  <app-receitas-lista
-    [rendas]="rendas"
-    [showStatus]="hasAccess('Basic')"
-    (editar)="editarPorId($event)"
-    (remover)="remover($event)"></app-receitas-lista>
-
   <app-receitas-form
     [mostrarForm]="mostrarForm"
     [novaRenda]="novaRenda"
+    [categorias]="categorias"
     [valorInput]="valorInput"
     [recebimentoInput]="recebimentoInput"
-    [fixaInicioInput]="fixaInicioInput"
     [erroData]="erroData"
+    [erroCategoria]="erroCategoria"
     [valorSugestao]="valorSugestao"
     [editandoId]="editandoId"
     [resumoTexto]="resumoTexto"
@@ -205,11 +218,31 @@
     (recebimentoChange)="onRecebimentoChange($event)"
     (fonteChange)="onFonteChange($event)"
     (fixaChange)="novaRenda.fixa = $event"
-    (fixaInicioChange)="onFixaInicioChange($event)"
     (aplicarSugestao)="aplicarSugestao()"
     (salvarForm)="salvar()"
     (fechar)="fecharModal()" />
 </section>
+
+<!-- Modal de confirmação ao editar recebida -->
+<div class="modal" *ngIf="showEditReceivedModal">
+  <div class="modal__backdrop" (click)="cancelarEdicaoRecebida()"></div>
+  <div class="modal__content">
+    <div class="modal__header">
+      <div>
+        <p class="eyebrow">Editar receita recebida</p>
+        <p class="muted">
+          Ao editar esta receita <strong>{{ editReceivedSource }}</strong>, o status voltará para <strong>Pendente</strong> para que o ajuste seja feito.
+        </p>
+      </div>
+      <button class="modal__close" type="button" (click)="cancelarEdicaoRecebida()">✕</button>
+    </div>
+
+    <div class="modal__actions">
+      <button type="button" class="btn-danger ghost" (click)="cancelarEdicaoRecebida()">Não aceito</button>
+      <button type="button" class="btn-edit" (click)="confirmarEdicaoRecebida()">Aceitar e editar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal de confirmação de exclusão -->
 <div class="modal" *ngIf="showDeleteModal">

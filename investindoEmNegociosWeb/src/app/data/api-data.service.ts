@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, forkJoin, map } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, forkJoin, map, switchMap, tap } from 'rxjs';
 import { PlansService, Plan, CreatePlanPayload } from '../plans.service';
 import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
@@ -44,6 +44,8 @@ export interface StoredIncome {
   id: string;
   planId?: string;
   fonte: string;
+  categoria?: string;
+  categoryId?: string | null;
   valor: number;
   recebimento: string; // DD/MM/AAAA
   schedule?: ScheduleType;
@@ -51,6 +53,7 @@ export interface StoredIncome {
   fixa?: boolean;
   fixaInicio?: string; // MM/AAAA
   userId?: string;
+  status?: InstallmentStatus;
 }
 
 export interface IncomeSummaryState {
@@ -109,7 +112,56 @@ export class ApiDataService {
   }
 
   updateExpense(_id: string, _data: Partial<StoredExpense>): void {
-    console.warn('Update de despesa ainda não implementado no backend.');
+    const current = this.dbSubject.value;
+    const existing = current.expenses.find((e) => e.id === _id);
+    const planId = _data.planId || existing?.planId;
+    if (!planId) {
+      console.warn('Update de despesa ignorado: planId não encontrado.');
+      return;
+    }
+
+    const merged: Omit<StoredExpense, 'id'> = {
+      ...(existing || {
+        nome: '',
+        categoria: '',
+        valor: 0,
+        vencimento: ''
+      }),
+      ..._data,
+      planId
+    };
+
+    const payload = this.toPlanPayloadFromExpense(merged);
+    this.plans.update(planId, payload).subscribe({
+      next: () => this.refresh(),
+      error: (err) => console.error('Falha ao atualizar despesa', err)
+    });
+  }
+
+  updateExpenseInstallment(installmentId: string, data: Partial<StoredExpense>): void {
+    const current = this.dbSubject.value;
+    const existing = current.expenses.find((e) => e.id === installmentId);
+    const merged: Omit<StoredExpense, 'id'> = {
+      ...(existing || {
+        nome: '',
+        categoria: '',
+        valor: 0,
+        vencimento: ''
+      }),
+      ...data,
+      fixa: false,
+      parcelasTotal: 1,
+      serieId: undefined
+    };
+
+    const payload = this.toPlanPayloadFromExpense(merged);
+    this.installments
+      .delete(installmentId)
+      .pipe(switchMap(() => this.plans.create(payload)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (err) => console.error('Falha ao atualizar parcela de despesa', err)
+      });
   }
 
   removeExpense(_id: string): void {
@@ -211,6 +263,20 @@ export class ApiDataService {
     });
   }
 
+  markIncomeReceived(installmentId: string, amount: number) {
+    return this.installments.pay(installmentId, {
+      paidAmount: amount,
+      paidAt: new Date().toISOString(),
+      methodId: null,
+      note: null
+    }).pipe(
+      tap(() => {
+        this.setIncomeStatusLocal(installmentId, 'PAID');
+        this.refreshIncomes(this.lastIncomeMonth);
+      })
+    );
+  }
+
   refresh(): void {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
@@ -223,11 +289,35 @@ export class ApiDataService {
       incomeInstallments: this.installments.list({ type: 'Income' }),
       expenseInstallments: this.installments.list({ type: 'Expense' }),
       cards: this.cardsApi.list(),
-      expenseCategories: this.categoriesApi.list('Expense')
+      expenseCategories: this.categoriesApi.list('Expense'),
+      incomeCategories: this.categoriesApi.list()
     }).subscribe({
-      next: ({ incomePlans, expensePlans, incomeInstallments, expenseInstallments, cards, expenseCategories }) => {
-        const categoryMap = new Map(expenseCategories.map((c) => [c.id, c.name]));
-        const incomes = this.mapIncomes(incomePlans, incomeInstallments);
+      next: ({
+        incomePlans,
+        expensePlans,
+        incomeInstallments,
+        expenseInstallments,
+        cards,
+        expenseCategories,
+        incomeCategories
+      }) => {
+        const categoryMap = new Map(
+          expenseCategories
+            .filter((c) => {
+              const applies = (c.appliesTo || '').toString().toLowerCase();
+              return applies === 'expense' || applies === 'despesa' || applies === 'despesas';
+            })
+            .map((c) => [c.id, c.name])
+        );
+        const incomeCategoryMap = new Map(
+          incomeCategories
+            .filter((c) => {
+              const applies = (c.appliesTo || '').toString().toLowerCase();
+              return applies === 'income' || applies === 'receita' || applies === 'receitas';
+            })
+            .map((c) => [c.id, c.name])
+        );
+        const incomes = this.mapIncomes(incomePlans, incomeInstallments, incomeCategoryMap);
         const expenses = this.mapExpenses(expensePlans, expenseInstallments, categoryMap);
         const mappedCards = this.mapCards(cards);
         this.dbSubject.next({ incomes, expenses, cards: mappedCards });
@@ -244,22 +334,48 @@ export class ApiDataService {
     }
     this.lastIncomeMonth = month;
 
-    this.receitasSummary.getSummary(month).subscribe({
-      next: (summary) => {
-        const incomes: StoredIncome[] = summary.items.map((item) => ({
-          id: item.id,
-          planId: item.planId,
-          fonte: item.source,
-          valor: item.amount,
-          recebimento: item.receivedOn,
-          schedule: item.schedule,
-          startDateIso: item.startDateIso,
-          fixa: item.isRecurring,
-          fixaInicio: item.recurringStart || ''
-        }));
+    const current = this.dbSubject.value;
+    const statusMap = new Map(current.incomes.map((income) => [income.id, income.status]));
 
-        const current = this.dbSubject.value;
-        this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
+    forkJoin({
+      summary: this.receitasSummary.getSummary(month),
+      incomePlans: this.plans.list('Income'),
+      incomeCategories: this.categoriesApi.list()
+    }).subscribe({
+      next: ({ summary, incomePlans, incomeCategories }) => {
+        const planMap = new Map(incomePlans.map((p) => [p.id, p]));
+        const categoryMap = new Map(
+          incomeCategories
+            .filter((c) => {
+              const applies = (c.appliesTo || '').toString().toLowerCase();
+              return applies === 'income' || applies === 'receita' || applies === 'receitas';
+            })
+            .map((c) => [c.id, c.name])
+        );
+
+        const incomes: StoredIncome[] = summary.items.map((item) => {
+          const plan = planMap.get(item.planId);
+          const categoryId = plan?.categoryId ?? null;
+          return {
+            id: item.id,
+            planId: item.planId,
+            fonte: item.source,
+            categoria: categoryMap.get(categoryId || '') || 'Sem categoria',
+            categoryId,
+            valor: item.amount,
+            recebimento: item.receivedOn,
+            schedule: item.schedule,
+            startDateIso: item.startDateIso,
+            fixa: item.isRecurring,
+            fixaInicio: item.recurringStart || ''
+          };
+        });
+
+        const merged = incomes.map((income) => ({
+          ...income,
+          status: statusMap.get(income.id) || income.status || 'OPEN'
+        }));
+        this.dbSubject.next({ incomes: merged, expenses: current.expenses, cards: current.cards });
         this.incomeSummarySubject.next({
           month: summary.month,
           total: summary.total,
@@ -273,21 +389,37 @@ export class ApiDataService {
     });
   }
 
-  private mapIncomes(plans: Plan[], installments: Installment[]): StoredIncome[] {
+  setIncomeStatusLocal(installmentId: string, status: InstallmentStatus): void {
+    const current = this.dbSubject.value;
+    if (!current.incomes.length) return;
+    const incomes = current.incomes.map((income) =>
+      income.id === installmentId ? { ...income, status } : income
+    );
+    this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
+  }
+
+  private mapIncomes(plans: Plan[], installments: Installment[], categoryMap?: Map<string, string>): StoredIncome[] {
     const lookup = new Map(plans.map((p) => [p.id, p]));
     return installments.map((inst) => {
       const plan = lookup.get(inst.planId);
+      const categoryId = plan?.categoryId ?? null;
+      const categoria = categoryMap?.get(categoryId || '') || 'Sem categoria';
+      const rawStatus = (inst as any)?.status || '';
+      const status = (rawStatus || '').toString().toUpperCase() as InstallmentStatus;
       return {
         id: inst.id,
         planId: inst.planId,
         fonte: plan?.title || 'Receita',
+        categoria,
+        categoryId,
         valor: inst.amount,
         recebimento: this.formatDate(inst.dueDate),
         schedule: plan?.schedule,
         startDateIso: plan?.startDate,
         fixa: plan?.schedule === 'Recurring',
         fixaInicio: plan?.schedule === 'Recurring' ? this.formatMonth(plan.startDate) : '',
-        userId: plan?.userId
+        userId: plan?.userId,
+        status: status || 'OPEN'
       };
     });
   }
@@ -342,9 +474,7 @@ export class ApiDataService {
 
   private toPlanPayloadFromIncome(income: Omit<StoredIncome, 'id'>): CreatePlanPayload {
     const schedule: ScheduleType = income.fixa ? 'Recurring' : 'OneTime';
-    const startDate = income.fixa
-      ? this.firstDayIso(income.fixaInicio)
-      : this.toIsoDate(income.recebimento) || this.todayIso();
+    const startDate = this.toIsoDate(income.recebimento) || this.todayIso();
 
     return {
       type: 'Income',
@@ -352,6 +482,7 @@ export class ApiDataService {
       amount: income.valor,
       schedule,
       startDate,
+      categoryId: income.categoryId ?? null,
       frequency: schedule === 'Recurring' ? 'Monthly' : null,
       installmentsCount: schedule === 'OneTime' ? 1 : null,
       cardId: null
@@ -408,15 +539,6 @@ export class ApiDataService {
 
   private toIsoDate(ddmmyyyy: string): string | null {
     return toIsoDateFromLocale(ddmmyyyy);
-  }
-
-  private firstDayIso(mmYYYY?: string): string {
-    const digits = (mmYYYY || '').replace(/[^\d]/g, '');
-    if (digits.length < 6) return this.todayIso();
-    const mes = Number(digits.slice(0, 2));
-    const ano = Number(digits.slice(2, 6));
-    const date = new Date(Date.UTC(ano, mes - 1, 1));
-    return date.toISOString().slice(0, 10);
   }
 
   private todayIso(): string {

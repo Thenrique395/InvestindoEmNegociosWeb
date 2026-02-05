@@ -11,6 +11,7 @@ export interface CategoryDto {
   name: string;
   appliesTo: CategoryType | null;
   isDefault: boolean;
+  isActive?: boolean;
 }
 
 export interface CreateCategoryRequest {

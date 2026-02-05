@@ -1,24 +1,42 @@
 <div class="lista" [class.lista--status]="showStatus">
   <div class="lista__head">
-    <span>Fonte</span>
-    <span>Valor</span>
-    <span>Recebimento</span>
-    <span>Tipo</span>
-    <span *ngIf="showStatus">Status</span>
-    <span class="acoes-head">Ações</span>
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        [checked]="rendas.length && selectedIds.length === rendas.length"
+        [indeterminate]="selectedIds.length > 0 && selectedIds.length < rendas.length"
+        (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
+        aria-label="Selecionar todas" />
+    </label>
+    <span class="col-fonte">Fonte</span>
+    <span class="col-categoria">Categoria</span>
+    <span class="col-valor">Valor</span>
+    <span class="col-recebimento">Recebimento</span>
+    <span class="col-tipo">Tipo</span>
+    <span *ngIf="showStatus" class="col-status">Status</span>
+    <span class="col-acoes acoes-head">Ações</span>
   </div>
   <div class="lista__row lista__row--empty" *ngIf="!rendas.length">
     <span class="muted">Sem receitas no mês. Clique em “Adicionar receita” para começar.</span>
   </div>
   <div class="lista__row" *ngFor="let r of rendas">
-    <span>{{ r.fonte }}</span>
-    <span>R$ {{ r.valor | number:'1.2-2' }}</span>
-    <span>{{ r.recebimento || '—' }}</span>
-    <span>{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</span>
-    <span *ngIf="showStatus" class="status" [class.paid]="statusLabel(r) === 'Pago'">
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        [checked]="isSelecionado(r.id)"
+        [disabled]="r.status === 'PAID' || r.status === 'CANCELED'"
+        (change)="selecionar.emit({ id: r.id!, checked: $any($event.target)?.checked ?? false })"
+        aria-label="Selecionar receita" />
+    </label>
+    <span class="col-fonte">{{ r.fonte }}</span>
+    <span class="col-categoria">{{ r.categoria || 'Sem categoria' }}</span>
+    <span class="col-valor">R$ {{ r.valor | number:'1.2-2' }}</span>
+    <span class="col-recebimento">{{ r.recebimento || '—' }}</span>
+    <span class="col-tipo">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</span>
+    <span *ngIf="showStatus" class="col-status status" [class.paid]="statusLabel(r) === 'Recebido'">
       {{ statusLabel(r) }}
     </span>
-    <span class="acoes">
+    <span class="col-acoes acoes">
       <button type="button" class="btn-edit sm icon-action" (click)="onEditar(r.id!)" aria-label="Editar" title="Editar">✏️</button>
       <button type="button" class="btn-danger sm icon-action" (click)="onRemover(r.planId, r.id)" aria-label="Excluir" title="Excluir">🗑</button>
     </span>

@@ -614,6 +614,17 @@
 
   &.success {
     border-color: rgba(34, 197, 94, 0.45);
+    background: var(--success-10);
+  }
+
+  &.error {
+    border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+    background: var(--danger-10);
+  }
+
+  &.info {
+    border-color: color-mix(in srgb, var(--info) 45%, transparent);
+    background: var(--info-10);
   }
 
   button {
@@ -630,6 +641,10 @@
       transform: translateY(-1px);
     }
   }
+}
+
+.global-alert--feedback {
+  top: calc(var(--header-h) + 5.25rem);
 }
 
 .main {

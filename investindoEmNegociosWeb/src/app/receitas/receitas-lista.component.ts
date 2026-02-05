@@ -13,8 +13,11 @@ import { incomeStatusLabel } from '../utils/status';
 export class ReceitasListaComponent {
   @Input() rendas: StoredIncome[] = [];
   @Input() showStatus = false;
+  @Input() selectedIds: string[] = [];
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<{ planId?: string; installmentId: string }>();
+  @Output() selecionar = new EventEmitter<{ id: string; checked: boolean }>();
+  @Output() selecionarTodos = new EventEmitter<boolean>();
 
   onEditar(id: string): void {
     this.editar.emit(id);
@@ -26,6 +29,11 @@ export class ReceitasListaComponent {
   }
 
   statusLabel(renda: StoredIncome): string {
-    return incomeStatusLabel(renda.recebimento);
+    return incomeStatusLabel(renda.status);
+  }
+
+  isSelecionado(id?: string): boolean {
+    if (!id) return false;
+    return this.selectedIds.includes(id);
   }
 }

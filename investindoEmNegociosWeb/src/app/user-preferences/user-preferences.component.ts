@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
 import { getInitialLocale, persistLocaleSettings, setLocaleSettings } from '../utils/locale-settings';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-user-preferences',
@@ -25,7 +26,7 @@ export class UserPreferencesComponent implements OnInit {
   notifyInApp = true;
   notifyEmail = false;
 
-  constructor(private profileService: ProfileService) {}
+  constructor(private profileService: ProfileService, private uiFeedback: UiFeedbackService) {}
 
   ngOnInit(): void {
     this.profileService.getPreferences().subscribe((prefs) => {
@@ -64,14 +65,14 @@ export class UserPreferencesComponent implements OnInit {
         setLocaleSettings({ locale, currency });
         persistLocaleSettings(locale, currency);
         this.loading = false;
-        alert('Preferências salvas.');
+        this.uiFeedback.success('Preferências salvas.');
         if (locale !== previousLocale) {
-          window.location.reload();
+          setTimeout(() => window.location.reload(), 700);
         }
       },
       error: () => {
         this.loading = false;
-        alert('Falha ao salvar preferências.');
+        this.uiFeedback.error('Falha ao salvar preferências.');
       }
     });
   }

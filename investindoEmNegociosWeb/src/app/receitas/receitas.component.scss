@@ -84,6 +84,23 @@
   background: rgba(239, 68, 68, 0.12);
 }
 
+.bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .goals {
   display: grid;
   gap: 1rem;

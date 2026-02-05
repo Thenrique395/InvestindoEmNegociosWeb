@@ -9,6 +9,7 @@ import { hasAtLeastRole, UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 import { NotificationsService, NotificationItem } from './notifications.service';
+import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
 
 @Component({
   selector: 'app-root',
@@ -36,18 +37,21 @@ export class AppComponent implements OnInit, OnDestroy {
   notificationsLoading = false;
   notificationsError = '';
   profile: UserProfile | null = null;
+  feedbackMessage: UiFeedbackMessage | null = null;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
   private sub: Subscription;
   private profileSub?: Subscription;
+  private feedbackSub?: Subscription;
 
   constructor(
     private router: Router,
     private profileService: ProfileService,
     private authService: AuthService,
     private apiDataService: ApiDataService,
-    private notificationsService: NotificationsService
+    private notificationsService: NotificationsService,
+    private uiFeedback: UiFeedbackService
   ) {
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -98,11 +102,15 @@ export class AppComponent implements OnInit, OnDestroy {
       });
       this.refreshNotifications();
     }
+    this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
+      this.feedbackMessage = message;
+    });
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
     this.profileSub?.unsubscribe();
+    this.feedbackSub?.unsubscribe();
   }
 
   goToLogin(): void {
@@ -121,6 +129,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.showSignupModal = false;
     this.signupAlert = 'Conta criada com sucesso. Faça login para entrar.';
     setTimeout(() => (this.signupAlert = ''), 5000);
+  }
+
+  dismissFeedback(): void {
+    this.uiFeedback.clear();
   }
 
   logout(): void {

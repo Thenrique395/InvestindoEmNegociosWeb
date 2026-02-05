@@ -1,23 +1,26 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgIf, DecimalPipe } from '@angular/common';
+import { NgIf, NgFor, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { StoredIncome } from '../data/api-data.service';
+import { CategoryDto } from '../categories.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, NgIf, DecimalPipe, DigitOnlyDirective],
+  imports: [FormsModule, NgIf, NgFor, DecimalPipe, DigitOnlyDirective, RouterLink],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })
 export class ReceitasFormComponent {
   @Input() mostrarForm = false;
   @Input() novaRenda!: StoredIncome;
+  @Input() categorias: CategoryDto[] = [];
   @Input() valorInput = '';
   @Input() recebimentoInput = '';
-  @Input() fixaInicioInput = '';
   @Input() erroData = '';
+  @Input() erroCategoria = '';
   @Input() valorSugestao: number | null = null;
   @Input() editandoId: string | null = null;
   @Input() resumoTexto = '';
@@ -27,7 +30,6 @@ export class ReceitasFormComponent {
   @Output() recebimentoChange = new EventEmitter<string>();
   @Output() fonteChange = new EventEmitter<string>();
   @Output() fixaChange = new EventEmitter<boolean>();
-  @Output() fixaInicioChange = new EventEmitter<string>();
   @Output() aplicarSugestao = new EventEmitter<void>();
   @Output() salvarForm = new EventEmitter<void>();
   @Output() fechar = new EventEmitter<void>();
@@ -46,10 +48,6 @@ export class ReceitasFormComponent {
 
   onFixaChange(v: boolean): void {
     this.fixaChange.emit(v);
-  }
-
-  onFixaInicioChange(v: string): void {
-    this.fixaInicioChange.emit(v);
   }
 
   usarSugestao(): void {

@@ -12,6 +12,7 @@ import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 type FormMode = 'create' | 'movement';
 
@@ -59,7 +60,7 @@ export class InvestmentsComponent implements OnInit {
     { value: 'CRIPTO', label: 'Cripto' }
   ];
 
-  constructor(private investments: InvestmentsService, private lookups: LookupsService) {}
+  constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService) {}
 
   ngOnInit(): void {
     this.carregarMeta();
@@ -166,7 +167,7 @@ export class InvestmentsComponent implements OnInit {
         this.carregarPosicoes();
       },
       error: (err) => {
-        alert(err?.error?.detail || 'Falha ao registrar movimento.');
+        this.uiFeedback.error(err?.error?.detail || 'Falha ao registrar movimento.');
       }
     });
   }

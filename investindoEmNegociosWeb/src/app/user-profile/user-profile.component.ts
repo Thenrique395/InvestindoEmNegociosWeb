@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { ProfileService, UserProfile } from '../profile.service';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,7 +31,7 @@ export class UserProfileComponent implements OnInit {
 
   loading = false;
 
-  constructor(private profileService: ProfileService) {}
+  constructor(private profileService: ProfileService, private uiFeedback: UiFeedbackService) {}
 
   ngOnInit(): void {
     this.profileService.getProfile().subscribe((p) => {
@@ -95,27 +96,27 @@ export class UserProfileComponent implements OnInit {
     this.profileService.upsert(payload).subscribe({
       next: () => {
         this.loading = false;
-        alert('Perfil atualizado.');
+        this.uiFeedback.success('Perfil atualizado.');
       },
       error: () => {
         this.loading = false;
-        alert('Falha ao atualizar perfil.');
+        this.uiFeedback.error('Falha ao atualizar perfil.');
       }
     });
   }
 
   alterarSenha(): void {
     if (!this.novaSenha || this.novaSenha !== this.confirmaSenha) {
-      alert('Confirme a nova senha corretamente.');
+      this.uiFeedback.error('Confirme a nova senha corretamente.');
       return;
     }
     this.profileService.changePassword({ currentPassword: this.senhaAtual, newPassword: this.novaSenha }).subscribe({
       next: () => {
-        alert('Senha alterada.');
+        this.uiFeedback.success('Senha alterada.');
         this.senhaAtual = this.novaSenha = this.confirmaSenha = '';
       },
       error: () => {
-        alert('Falha ao alterar senha.');
+        this.uiFeedback.error('Falha ao alterar senha.');
       }
     });
   }

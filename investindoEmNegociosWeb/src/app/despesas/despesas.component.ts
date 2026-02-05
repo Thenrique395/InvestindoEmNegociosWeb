@@ -12,7 +12,6 @@ import { CategoriesService, CategoryDto } from '../categories.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import {
-  formatCurrencyValue,
   formatLocaleDate,
   formatMonthLabelFromKey,
   formatMonthYearLabel,
@@ -46,13 +45,15 @@ export class DespesasComponent implements OnInit, OnDestroy {
   valorInput = '';
   vencimentoInput = '';
   erroData = '';
+  erroCategoria = '';
   formaPagamento: 'avista' | 'cartao' = 'avista';
   parcelar = false;
   parcelasCount = 1;
   fixa = false;
   fixaMeses: number | null = null;
   cartaoSelecionadoId: string | null = null;
-  editando: { id: string; isParcela: boolean } | null = null;
+  editando: { id: string; planId?: string; isParcela: boolean; isRecorrente: boolean } | null = null;
+  confirmEdicao: { isRecorrente: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number; isRecurring?: boolean } | null = null;
   private sub?: Subscription;
   private categoriasSub?: Subscription;
@@ -83,11 +84,16 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
     this.categoriasSub = this.categoriesService.list('Expense').subscribe({
       next: (data) => {
-        this.categorias = data;
-        this.categoriaMap = new Map(data.map((c) => [c.id, c.name]));
-        if (!this.novaDespesa.categoryId && this.categorias.length) {
-          const first = this.categorias[0];
-          this.novaDespesa = { ...this.novaDespesa, categoryId: first.id, categoria: first.name };
+        const filtradas = (data || []).filter((item) => {
+          const applies = (item.appliesTo || '').toString().toLowerCase();
+          return applies === 'expense' || applies === 'despesa' || applies === 'despesas';
+        });
+        this.categorias = filtradas;
+        this.categoriaMap = new Map(filtradas.map((c) => [c.id, c.name]));
+        const resolvedId = this.resolveCategoriaId(this.novaDespesa);
+        if (resolvedId) {
+          const resolvedName = this.categoriaMap.get(resolvedId) || this.novaDespesa.categoria;
+          this.novaDespesa = { ...this.novaDespesa, categoryId: resolvedId, categoria: resolvedName };
         }
         this.rebuildDespesas();
       },
@@ -456,6 +462,12 @@ export class DespesasComponent implements OnInit, OnDestroy {
     const valor = this.parseValor(this.valorInput);
     if (!this.novaDespesa.nome || !valor) return;
 
+    if (!this.novaDespesa.categoryId) {
+      this.erroCategoria = 'Selecione uma categoria.';
+      return;
+    }
+    this.erroCategoria = '';
+
     if (!this.isDataValida(this.vencimentoInput)) {
       this.erroData = 'Data inválida. Use o formato DD/MM/AAAA.';
       return;
@@ -471,28 +483,22 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
     const serieId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
 
+    if (this.editando) {
+      if (this.editando.isParcela || this.editando.isRecorrente) {
+        this.confirmEdicao = { isRecorrente: this.editando.isRecorrente };
+        return;
+      }
+      this.aplicarEdicao('all', valor, vencimentoNormalizado);
+      return;
+    }
+
+    const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
+    const valorParcela = parcelas > 1 ? valor / parcelas : valor;
+    const fixaMeses = this.fixa ? this.fixaMeses || null : null;
+
     this.saving = true;
     let ok = false;
     try {
-      // EDITAR item existente (sem regenerar série)
-      if (this.editando) {
-        const { id } = this.editando;
-        this.db.updateExpense(id, {
-          nome: this.novaDespesa.nome,
-          categoria: this.resolveCategoriaNome(this.novaDespesa),
-          categoryId: this.novaDespesa.categoryId ?? null,
-          valor,
-          vencimento: vencimentoNormalizado,
-          cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined
-        });
-        ok = true;
-        return;
-      }
-
-      const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
-      const valorParcela = parcelas > 1 ? valor / parcelas : valor;
-      const fixaMeses = this.fixa ? this.fixaMeses || null : null;
-
       // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
       this.db.addExpense({
         nome: this.novaDespesa.nome,
@@ -584,7 +590,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
     if (this.saving) return;
     this.mostrarForm = false;
     this.erroData = '';
+    this.erroCategoria = '';
     this.editando = null;
+    this.confirmEdicao = null;
     this.fixa = false;
     this.fixaMeses = null;
     this.resetarFormulario();
@@ -593,11 +601,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
   editarDespesa(mesKey: string, index: number): void {
     const item = this.despesasPorMes[mesKey]?.[index];
     if (!item) return;
-    this.editando = { id: item.id!, isParcela: !!item.parcelasTotal };
+    const categoriaId = this.resolveCategoriaId(item);
+    const categoriaNome = this.resolveCategoriaNome({ categoryId: categoriaId, categoria: item.categoria });
+    this.editando = {
+      id: item.id!,
+      planId: item.planId,
+      isParcela: !!item.parcelasTotal,
+      isRecorrente: !!item.fixa
+    };
     this.novaDespesa = {
       nome: item.nome,
-      categoria: item.categoria,
-      categoryId: item.categoryId ?? null,
+      categoria: categoriaNome,
+      categoryId: categoriaId,
       valor: item.valor,
       vencimento: item.vencimento,
       id: item.id!,
@@ -606,7 +621,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
       parcelasTotal: item.parcelasTotal,
       serieId: item.serieId
     };
-    this.valorInput = this.formataMoeda(item.valor);
+    this.valorInput = formatNumberValue(item.valor);
     this.vencimentoInput = item.vencimento;
     this.formaPagamento = item.cartao ? 'cartao' : 'avista';
     this.cartaoSelecionadoId = item.cartao || this.cartoes[0]?.id || null;
@@ -616,6 +631,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.fixaMeses = item.fixaMeses ?? null;
     this.parcelar = !this.fixa && this.parcelasCount > 1;
     this.mostrarForm = true;
+  }
+
+  confirmarEdicao(escopo: 'single' | 'all'): void {
+    if (!this.editando) return;
+    const valor = this.parseValor(this.valorInput);
+    const vencimentoNormalizado = this.normalizaData(this.vencimentoInput);
+    this.confirmEdicao = null;
+    this.aplicarEdicao(escopo, valor, vencimentoNormalizado);
+  }
+
+  cancelarEdicao(): void {
+    this.confirmEdicao = null;
   }
 
   removerDespesa(mesKey: string, index: number): void {
@@ -751,11 +778,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return parseLocalizedNumber(value);
   }
 
-  private formataMoeda(value: string | number): string {
-    const num = this.parseValor(value);
-    return num ? formatCurrencyValue(num) : '';
-  }
-
   private somaPorStatus(statuses: string[]): number {
     return this.despesas
       .filter((d) => statuses.includes(d.status || 'OPEN'))
@@ -801,8 +823,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return {
       id: '',
       nome: '',
-      categoria: this.categorias[0]?.name ?? '',
-      categoryId: this.categorias[0]?.id ?? null,
+      categoria: '',
+      categoryId: null,
       valor: 0,
       vencimento: ''
     };
@@ -812,6 +834,52 @@ export class DespesasComponent implements OnInit, OnDestroy {
     const byId = expense.categoryId ? this.categoriaMap.get(expense.categoryId) : null;
     if (byId) return byId;
     return expense.categoria || 'Outros';
+  }
+
+  private resolveCategoriaId(expense: Pick<StoredExpense, 'categoryId' | 'categoria'>): string | null {
+    if (expense.categoryId) return expense.categoryId;
+    const nome = (expense.categoria || '').trim().toLowerCase();
+    if (!nome) return null;
+    const match = this.categorias.find((c) => c.name.trim().toLowerCase() === nome);
+    return match?.id ?? null;
+  }
+
+  private aplicarEdicao(
+    escopo: 'single' | 'all',
+    valor: number,
+    vencimentoNormalizado: string
+  ): void {
+    if (!this.editando) return;
+    if (escopo === 'all' && !this.editando.planId) {
+      this.setAlerta('Não foi possível editar esta despesa. Recarregue a página e tente novamente.', 3000, 'error');
+      return;
+    }
+    const payload = {
+      planId: this.editando.planId,
+      nome: this.novaDespesa.nome,
+      categoria: this.resolveCategoriaNome(this.novaDespesa),
+      categoryId: this.novaDespesa.categoryId ?? null,
+      valor,
+      vencimento: vencimentoNormalizado,
+      cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined
+    };
+
+    this.saving = true;
+    let ok = false;
+    try {
+      if (escopo === 'single') {
+        this.db.updateExpenseInstallment(this.editando.id, payload);
+      } else {
+        this.db.updateExpense(this.editando.id, payload);
+      }
+      ok = true;
+    } finally {
+      this.saving = false;
+      if (ok) {
+        this.setAlerta('Despesa atualizada com sucesso.', 2500, 'success');
+        this.fecharModal();
+      }
+    }
   }
 
   private rebuildDespesas(): void {
