@@ -8,13 +8,11 @@ import { ReceitasListaComponent } from './receitas-lista.component';
 import { ReceitasFormComponent } from './receitas-form.component';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { AuthService } from '../auth.service';
-import { GoalsService } from '../goals.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
 import {
   formatLocaleDate,
-  formatMonthLabelFromKey,
   formatMonthYearLabel,
   formatNumberValue,
   monthKeyFromLocaleDate,
@@ -60,20 +58,16 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
-  goalInput = '';
-  goalValue: number | null = null;
   categorias: CategoryDto[] = [];
 
   constructor(
     private db: ApiDataService,
     private authService: AuthService,
-    private goalsService: GoalsService,
     private categoriesService: CategoriesService
   ) {}
 
   ngOnInit(): void {
     this.db.refreshIncomes(this.mesKey());
-    this.loadGoal();
     this.loadCategorias();
     this.sub = this.db.incomes$.subscribe((lista) => {
       this.rendasAll = [...lista];
@@ -178,117 +172,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       .slice(0, 5);
   }
 
-  get historyData(): IncomeSummaryState['history'] {
-    return this.summary?.history ?? [];
-  }
-
-  get historyMax(): number {
-    return Math.max(...this.historyData.map((h) => h.total), 0);
-  }
-
-  get previousDelta(): { total: number; percent: number } | null {
-    if (!this.summary?.previousMonth) return null;
-    const prev = this.summary.previousMonth.total;
-    const current = this.summary.total;
-    if (!prev) return { total: current, percent: current ? 100 : 0 };
-    return { total: current - prev, percent: ((current - prev) / prev) * 100 };
-  }
-
-  get previousComparison(): {
-    month: string;
-    delta: number;
-    deltaAbs: number;
-    percent: number;
-    trend: 'up' | 'down' | 'flat';
-    isNew: boolean;
-  } | null {
-    if (!this.summary?.previousMonth) return null;
-    const prev = this.summary.previousMonth.total;
-    const current = this.summary.total;
-    const delta = current - prev;
-    const trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
-    const isNew = prev === 0 && current > 0;
-    const percent = prev === 0 ? (current ? 100 : 0) : (delta / prev) * 100;
-    return {
-      month: this.formatMonthLabel(this.summary.previousMonth.month),
-      delta,
-      deltaAbs: Math.abs(delta),
-      percent,
-      trend,
-      isNew
-    };
-  }
-
-  private formatMonthLabel(value: string): string {
-    return formatMonthLabelFromKey(value, 'long');
-  }
-
-  get adminInsights(): { label: string; value: number }[] {
-    const semData = this.rendasMes.filter((r) => !r.recebimento).length;
-    const semFonte = this.rendasMes.filter((r) => !r.fonte).length;
-    const recorrentes = this.rendasMes.filter((r) => r.fixa).length;
-    const fontesDuplicadas = this.countDuplicatedSources();
-    return [
-      { label: 'Receitas sem data', value: semData },
-      { label: 'Receitas sem fonte', value: semFonte },
-      { label: 'Recorrentes ativas', value: recorrentes },
-      { label: 'Fontes duplicadas', value: fontesDuplicadas }
-    ];
-  }
-
   get mesAtualLabel(): string {
     return formatMonthYearLabel(this.dataAtual);
-  }
-
-  get goalProgress(): number {
-    if (!this.goalValue) return 0;
-    return Math.min(100, (this.totalRendas / this.goalValue) * 100);
-  }
-
-  get goalRemaining(): number {
-    if (!this.goalValue) return 0;
-    return Math.max(0, this.goalValue - this.totalRendas);
-  }
-
-  get advancedAlerts(): { type: 'info' | 'warning' | 'success' | 'danger'; title: string; message: string }[] {
-    const alerts: { type: 'info' | 'warning' | 'success' | 'danger'; title: string; message: string }[] = [];
-    if (this.statusResumo.pendentes > 0) {
-      alerts.push({
-        type: 'info',
-        title: 'Receitas pendentes',
-        message: `Você tem ${this.statusResumo.pendentes} lançamento(s) pendente(s) neste mês.`
-      });
-    }
-    if (this.previousComparison && this.previousComparison.trend === 'down') {
-      alerts.push({
-        type: 'warning',
-        title: 'Receitas caíram',
-        message: `Queda de ${this.previousComparison.percent.toFixed(0)}% em relação a ${this.previousComparison.month}.`
-      });
-    }
-    if (this.goalValue) {
-      if (this.goalRemaining > 0) {
-        alerts.push({
-          type: 'warning',
-          title: 'Meta não atingida',
-          message: `Faltam R$ ${this.goalRemaining.toFixed(2).replace('.', ',')} para a meta do mês.`
-        });
-      } else {
-        alerts.push({
-          type: 'success',
-          title: 'Meta atingida',
-          message: 'Parabéns! Você já superou a meta de receita.'
-        });
-      }
-    }
-    if (this.totalRendas === 0) {
-      alerts.push({
-        type: 'danger',
-        title: 'Sem receitas no mês',
-        message: 'Nenhuma receita registrada. Cadastre ao menos uma fonte recorrente.'
-      });
-    }
-    return alerts.slice(0, 3);
   }
 
   abrirModal(): void {
@@ -521,26 +406,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return maskDateDDMMYYYY(value);
   }
 
-  private loadGoal(): void {
-    const year = this.dataAtual.getFullYear();
-    this.goalsService.getIncomeGoal(year).subscribe({
-      next: (goal) => {
-        if (!goal || !goal.expectedMonthly) {
-          this.goalValue = null;
-          this.goalInput = '';
-          return;
-        }
-        this.goalValue = goal.expectedMonthly;
-        this.goalInput = formatNumberValue(goal.expectedMonthly);
-      },
-      error: () => {
-        this.goalValue = null;
-        this.goalInput = '';
-        this.setAlerta('Falha ao carregar a meta de receita.', 2500, 'error');
-      }
-    });
-  }
-
   private loadCategorias(): void {
     const filtraReceitas = (items: CategoryDto[]) => {
       const active = (items || []).filter((item) => item.isActive !== false);
@@ -611,33 +476,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   mesAnterior(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
     this.db.refreshIncomes(this.mesKey());
-    this.loadGoal();
   }
 
   proximoMes(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() + 1, 1);
     this.db.refreshIncomes(this.mesKey());
-    this.loadGoal();
-  }
-
-  applyGoal(): void {
-    const value = this.parseValor(this.goalInput);
-    if (!value || value <= 0) {
-      this.setAlerta('Informe um valor mensal válido para a meta.', 2500, 'error');
-      return;
-    }
-    const year = this.dataAtual.getFullYear();
-    this.goalsService.upsertIncomeGoal(year, value).subscribe({
-      next: (goal) => {
-        this.goalValue = goal.expectedMonthly;
-        this.goalInput = formatNumberValue(goal.expectedMonthly);
-        this.setAlerta('Meta atualizada com sucesso.', 2500, 'success');
-      },
-      error: (err) => {
-        this.setAlerta('Falha ao salvar a meta. Tente novamente.', 2500, 'error');
-        console.error(err);
-      }
-    });
   }
 
   exportCsv(): void {

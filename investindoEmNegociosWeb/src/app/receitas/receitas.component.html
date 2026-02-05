@@ -27,20 +27,6 @@
       <p class="eyebrow">Receitas</p>
       <h2>Suas fontes de receita</h2>
       <p class="muted">Cadastre salários, PLR, freelas e demais recebimentos.</p>
-      <div class="chip-row" *ngIf="previousComparison">
-        <ng-container *ngIf="previousComparison as comparison">
-          <span class="chip muted">
-            Comparativo com {{ comparison.month }}:
-          <span class="delta" [ngClass]="comparison.trend">
-            <ng-container *ngIf="comparison.isNew; else diffValue">Novo</ng-container>
-            <ng-template #diffValue>
-              {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
-              ({{ comparison.percent | number:'1.0-0' }}%)
-            </ng-template>
-          </span>
-          </span>
-        </ng-container>
-      </div>
       <div class="nav">
         <button type="button" (click)="mesAnterior()">◀ Mês anterior</button>
         <button type="button" (click)="proximoMes()">Próximo mês ▶</button>
@@ -104,103 +90,6 @@
     (remover)="remover($event)"
     (selecionar)="toggleSelecionar($event.id, $event.checked)"
     (selecionarTodos)="toggleSelecionarTodos($event)"></app-receitas-lista>
-
-  <div class="goals" *ngIf="hasAccess('Intermediate')">
-    <div class="goal-card">
-      <div class="goal-header">
-        <p class="label">Meta de receita do mês</p>
-        <span class="muted">Defina sua meta para acompanhar a evolução.</span>
-      </div>
-      <div class="goal-input">
-        <input
-          type="text"
-          [(ngModel)]="goalInput"
-          placeholder="Ex.: 10.000,00"
-          aria-label="Meta de receita" />
-        <button type="button" class="btn-ghost sm" (click)="applyGoal()">Definir</button>
-      </div>
-      <div class="goal-progress" *ngIf="goalValue; else noGoal">
-        <div class="goal-bar">
-          <span class="goal-fill" [style.width.%]="goalProgress"></span>
-        </div>
-        <div class="goal-meta">
-          <span>Meta: R$ {{ goalValue | number:'1.2-2' }}</span>
-          <span *ngIf="goalRemaining > 0">Falta: R$ {{ goalRemaining | number:'1.2-2' }}</span>
-          <span *ngIf="goalRemaining <= 0">Meta atingida 🎉</span>
-        </div>
-        <div class="goal-chart">
-          <div class="goal-column">
-            <span class="goal-column__label">Atual</span>
-            <div class="goal-column__bar">
-              <span class="goal-column__fill actual" [style.height.%]="goalProgress"></span>
-            </div>
-            <span class="goal-column__value">R$ {{ totalRendas | number:'1.2-2' }}</span>
-          </div>
-          <div class="goal-column">
-            <span class="goal-column__label">Meta</span>
-            <div class="goal-column__bar">
-              <span class="goal-column__fill target"></span>
-            </div>
-            <span class="goal-column__value">R$ {{ goalValue | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
-      <ng-template #noGoal>
-        <p class="muted">Defina uma meta para ver o comparativo visual.</p>
-      </ng-template>
-    </div>
-  </div>
-
-  <div class="advanced" *ngIf="hasAccess('Advanced')">
-    <div class="advanced-card">
-      <p class="label">Comparativo mês anterior</p>
-      <strong *ngIf="previousDelta">
-        {{ previousDelta.total >= 0 ? '+' : '' }}R$ {{ previousDelta.total | number:'1.2-2' }}
-      </strong>
-      <span class="muted" *ngIf="previousDelta">
-        {{ previousDelta.percent >= 0 ? '+' : '' }}{{ previousDelta.percent | number:'1.0-0' }}%
-      </span>
-      <span class="muted" *ngIf="!previousDelta">Sem dados do mês anterior.</span>
-    </div>
-    <div class="advanced-card">
-      <p class="label">Tendência 12 meses</p>
-      <div class="trend">
-        <div class="trend-item" *ngFor="let item of historyData">
-          <div class="trend-bar">
-            <span class="trend-fill" [style.height.%]="historyMax ? (item.total / historyMax) * 100 : 0"></span>
-          </div>
-          <span class="trend-label">{{ item.month }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="advanced-alerts" *ngIf="hasAccess('Advanced')">
-    <div class="alert-card" *ngFor="let alert of advancedAlerts" [ngClass]="alert.type">
-      <p class="label">{{ alert.title }}</p>
-      <p class="muted">{{ alert.message }}</p>
-    </div>
-  </div>
-
-  <div class="export-actions" *ngIf="hasAccess('Advanced')">
-    <button type="button" class="btn-ghost" (click)="exportCsv()">Exportar CSV</button>
-    <button type="button" class="btn-ghost" (click)="exportPdf()">Exportar PDF</button>
-  </div>
-
-  <div class="admin-panel" *ngIf="hasAccess('Admin')">
-    <div class="admin-header">
-      <div>
-        <h3>Visão de qualidade dos dados</h3>
-        <p class="muted">Acompanhe possíveis lacunas antes de liberar padrões globais.</p>
-      </div>
-    </div>
-    <div class="admin-grid">
-      <div class="admin-card" *ngFor="let insight of adminInsights">
-        <span class="muted">{{ insight.label }}</span>
-        <strong>{{ insight.value }}</strong>
-      </div>
-    </div>
-  </div>
 
   <app-receitas-form
     [mostrarForm]="mostrarForm"
