@@ -83,14 +83,14 @@
 .form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
-  margin: 0.75rem 0;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: var(--space-1);
   color: var(--text);
   font-weight: 600;
 }
@@ -120,7 +120,7 @@ button[type='button'] {
 }
 
 .result {
-  margin: 0.35rem 0 0 0;
+  margin: var(--space-1) 0 0 0;
   color: var(--info);
   font-weight: 700;
 }
@@ -128,8 +128,8 @@ button[type='button'] {
 .chart {
   display: flex;
   align-items: flex-end;
-  gap: 0.35rem;
-  margin-top: 0.75rem;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -165,7 +165,7 @@ button[type='button'] {
 }
 
 .table {
-  margin-top: 0.75rem;
+  margin-top: var(--space-2);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;

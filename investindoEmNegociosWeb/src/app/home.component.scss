@@ -51,7 +51,7 @@
 
 .onboarding__header {
   display: grid;
-  gap: 0.35rem;
+  gap: var(--space-1);
 }
 
 .onboarding__step-count {
@@ -79,7 +79,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
@@ -147,7 +147,7 @@
   padding: 1.4rem;
   box-shadow: var(--shadow-md);
   display: grid;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .insight-dialog__close {
@@ -173,7 +173,7 @@
 }
 
 .insight-dialog__tips ul {
-  margin: 0.35rem 0 0;
+  margin: var(--space-1) 0 0;
   padding-left: 1.1rem;
   color: var(--text-muted);
 }
@@ -210,7 +210,7 @@
 .hero .muted {
   font-size: 0.95rem;
   line-height: 1.45;
-  margin-top: 0.35rem;
+  margin-top: var(--space-1);
 }
 
 .hero__filters {
@@ -227,7 +227,7 @@
   border: 0;
   background: transparent;
   color: var(--text-muted);
-  padding: 0.45rem 0.9rem;
+  padding: var(--space-1) 0.9rem;
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
@@ -357,7 +357,7 @@
   position: absolute;
   bottom: calc(100% + 12px);
   right: 0;
-  padding: 0.45rem 0.6rem;
+  padding: var(--space-1) 0.6rem;
   border-radius: 10px;
   background: rgba(12, 22, 28, 0.95);
   border: 1px solid var(--border);
@@ -454,7 +454,7 @@
   padding: 1.1rem 1.2rem;
   background: var(--surface-2);
   display: grid;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .chart__header {
@@ -479,7 +479,7 @@
 
 .chart__legend {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-2);
   align-items: center;
   color: var(--text-muted);
   margin-top: -0.25rem;
@@ -737,7 +737,7 @@
   padding: 1.1rem 1.2rem;
   background: var(--surface-2);
   display: grid;
-  gap: 0.75rem;
+  gap: var(--space-2);
   min-height: 100%;
 }
 
@@ -783,7 +783,7 @@
   position: absolute;
   bottom: calc(100% + 12px);
   right: 0;
-  padding: 0.45rem 0.6rem;
+  padding: var(--space-1) 0.6rem;
   border-radius: 10px;
   background: rgba(12, 22, 28, 0.95);
   border: 1px solid var(--border);
@@ -820,7 +820,7 @@
   grid-template-columns: 1fr auto;
   gap: 0.6rem;
   align-items: center;
-  padding: 0.45rem 0.6rem;
+  padding: var(--space-1) 0.6rem;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -872,7 +872,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
   font-size: 0.78rem;
   color: var(--text-muted);
   line-height: 1.2;
@@ -918,7 +918,7 @@
   padding: 1rem;
   background: var(--surface-2);
   display: grid;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .goals__header h3 {
@@ -938,13 +938,13 @@
 }
 
 .goal-chip {
-  padding: 0.45rem 0.65rem;
+  padding: var(--space-1) 0.65rem;
   border-radius: 10px;
   font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
   color: var(--text);
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -970,20 +970,20 @@
 .goal-inline {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  margin-top: 0.75rem;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
   color: var(--text-secondary);
 }
 
 .goal-views {
-  margin-top: 0.75rem;
+  margin-top: var(--space-2);
   display: grid;
   gap: 0.5rem;
 }
 
 .goal-views__buttons {
   display: inline-flex;
-  gap: 0.35rem;
+  gap: var(--space-1);
   flex-wrap: wrap;
 }
 
@@ -992,7 +992,7 @@
   background: var(--surface-2);
   color: var(--text);
   border-radius: 10px;
-  padding: 0.35rem 0.7rem;
+  padding: var(--space-1) 0.7rem;
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -1016,7 +1016,7 @@
   border-radius: 12px;
   background: var(--surface-3);
   overflow: hidden;
-  margin-bottom: 0.35rem;
+  margin-bottom: var(--space-1);
 }
 
 .mini-bar {
@@ -1030,7 +1030,7 @@
   border-radius: 12px;
   background: var(--surface-3);
   overflow: hidden;
-  margin-bottom: 0.35rem;
+  margin-bottom: var(--space-1);
 }
 
 .stacked__fill {
@@ -1056,7 +1056,7 @@
   transform: translate(-50%, -120%);
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid var(--border);
-  padding: 0.45rem 0.55rem;
+  padding: var(--space-1) 0.55rem;
   border-radius: 10px;
   color: var(--text);
   font-size: 0.85rem;

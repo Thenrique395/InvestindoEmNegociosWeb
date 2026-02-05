@@ -1,7 +1,7 @@
 .status-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-2);
   margin-bottom: 0.5rem;
 }
 
@@ -73,7 +73,7 @@
 }
 
 .total .add {
-  margin-top: 0.35rem;
+  margin-top: var(--space-1);
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
   cursor: pointer;
@@ -105,7 +105,7 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -121,7 +121,7 @@
 }
 
 .chip .delta {
-  margin-left: 0.35rem;
+  margin-left: var(--space-1);
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -173,19 +173,19 @@
 .filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-2);
   align-items: end;
 }
 
 .filters label {
   display: grid;
-  gap: 0.35rem;
+  gap: var(--space-1);
 }
 
 .form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-2);
   background: var(--surface-2);
   padding: 1rem;
   border-radius: 12px;
@@ -195,7 +195,7 @@
 label {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: var(--space-1);
   color: var(--text);
   font-weight: 600;
 }
@@ -281,7 +281,7 @@ button {
 .bulk-bar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-2);
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -368,7 +368,7 @@ button {
 .modal__actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: var(--space-2);
   grid-column: 1 / -1;
 }
 
@@ -433,9 +433,9 @@ button {
 .drawer__row {
   display: grid;
   grid-template-columns: 1.6fr 0.9fr 0.9fr 0.8fr;
-  gap: 0.35rem;
+  gap: var(--space-1);
   align-items: center;
-  padding: 0.45rem 0.35rem;
+  padding: var(--space-1) var(--space-1);
   border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
 }

@@ -55,7 +55,7 @@ h1 {
 label {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: var(--space-1);
   color: var(--text);
   font-weight: 600;
 }
@@ -90,13 +90,13 @@ input:focus {
 }
 
 .feedback {
-  margin-top: 0.75rem;
+  margin-top: var(--space-2);
   color: var(--primary);
   font-weight: 600;
 }
 
 .error {
-  margin-top: 0.75rem;
+  margin-top: var(--space-2);
   color: var(--danger);
   font-weight: 600;
 }

@@ -92,11 +92,11 @@ select {
 .btn-warning {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-1);
   border: 1px solid rgba(245, 158, 11, 0.35);
   background: rgba(245, 158, 11, 0.12);
   color: var(--warning);
-  padding: 0.45rem 0.75rem;
+  padding: var(--space-1) 0.75rem;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
@@ -116,8 +116,8 @@ select {
 .btn-danger {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.75rem;
+  gap: var(--space-1);
+  padding: var(--space-1) 0.75rem;
 }
 
 .icon {

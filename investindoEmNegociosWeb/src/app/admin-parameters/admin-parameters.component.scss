@@ -139,7 +139,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.35rem 0.6rem;
+  gap: var(--space-1) 0.6rem;
 }
 
 .muted {
@@ -162,7 +162,7 @@
 
 .empty-hint {
   display: block;
-  margin-top: 0.35rem;
+  margin-top: var(--space-1);
   font-size: 0.85rem;
   color: var(--text-muted);
 }

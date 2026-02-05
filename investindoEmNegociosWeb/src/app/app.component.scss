@@ -72,7 +72,7 @@
 }
 
 .sidebar__label {
-  padding: 0.35rem 0.7rem 0;
+  padding: var(--space-1) 0.7rem 0;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.7rem;
@@ -82,7 +82,7 @@
 .sidebar__nav {
   display: grid;
   gap: 0.25rem;
-  padding: 0.35rem 0.45rem 0;
+  padding: var(--space-1) var(--space-1) 0;
 }
 
 .sidebar__nav a {
@@ -150,7 +150,7 @@
 
 .sidebar__footer {
   margin-top: auto;
-  padding: 0.75rem 0.45rem 0.2rem;
+  padding: 0.75rem var(--space-1) 0.2rem;
   border-top: 1px solid var(--border);
 }
 
@@ -218,7 +218,7 @@
 .page--logged .topbar__actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .notifications {
@@ -383,7 +383,7 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .brand__logo {
@@ -494,14 +494,14 @@
   box-shadow: var(--shadow-md);
   padding: 0.75rem;
   display: grid;
-  gap: 0.35rem;
+  gap: var(--space-1);
   z-index: 30;
 }
 
 .user-dropdown .section {
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.35rem;
-  margin-bottom: 0.35rem;
+  padding-bottom: var(--space-1);
+  margin-bottom: var(--space-1);
 }
 
 .user-dropdown .section:last-child {
@@ -519,7 +519,7 @@
 }
 
 .user-dropdown .section-hint {
-  margin: 0 0 0.35rem;
+  margin: 0 0 var(--space-1);
   font-size: 0.8rem;
   color: var(--text-muted);
 }
@@ -530,7 +530,7 @@
   background: transparent;
   color: var(--text);
   border: none;
-  padding: 0.35rem 0.25rem;
+  padding: var(--space-1) 0.25rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
@@ -548,7 +548,7 @@
   color: var(--text);
   font-weight: 700;
   text-decoration: none;
-  padding: 0.35rem 0.6rem;
+  padding: var(--space-1) 0.6rem;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -568,7 +568,7 @@
   background: var(--primary);
   border: 1px solid rgba(37, 99, 235, 0.6);
   font-weight: 800;
-  padding: 0.35rem 0.8rem;
+  padding: var(--space-1) 0.8rem;
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -583,7 +583,7 @@
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  padding: 0.45rem 0.55rem;
+  padding: var(--space-1) 0.55rem;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -768,8 +768,8 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.75rem;
+  gap: var(--space-1);
+  padding: var(--space-1) 0.75rem;
   border-radius: 10px;
   font-weight: 700;
   font-size: 0.9rem;
@@ -784,7 +784,7 @@
 .panel__chart {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.45rem;
+  gap: var(--space-1);
   align-items: end;
   height: 160px;
 }
@@ -822,7 +822,7 @@
 
 .hero__actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
   margin-top: 1rem;
 }
@@ -847,7 +847,7 @@
 }
 
 .footer-card p {
-  margin: 0.35rem 0 0 0;
+  margin: var(--space-1) 0 0 0;
   color: var(--text-secondary);
 }
 
@@ -906,7 +906,7 @@
   color: var(--text);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 .signup-modal__left h2 {
@@ -969,7 +969,7 @@
 @media (max-width: 980px) {
   .topbar {
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--space-2);
   }
 
   .menu {

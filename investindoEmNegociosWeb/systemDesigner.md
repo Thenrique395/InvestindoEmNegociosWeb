@@ -55,8 +55,8 @@ identidade, tokens, componentes e regras de uso para garantir consistencia.
   - --shadow-md (cards e dropdowns)
 
 ## 5) Regras de ouro
-- Cards NUNCA usam fundo verde/vermelho.
-- Verde/vermelho apenas em numeros, icones ou badges.
+- Cards nao usam fundo verde/vermelho, exceto cards de status/resumo com tom suave.
+- Verde/vermelho geralmente em numeros, icones ou badges; fundo semantico apenas quando ajudar a leitura.
 - Espacamento sempre multiplo de 8px.
 - Sidebar "silenciosa", sem cores gritantes.
 - Dashboard mostra pouco e importante.
@@ -134,4 +134,3 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Deve parecer produto financeiro moderno.
 - Nao parecer "planilha bonita".
 - Nao parecer "sistema corporativo interno".
-
