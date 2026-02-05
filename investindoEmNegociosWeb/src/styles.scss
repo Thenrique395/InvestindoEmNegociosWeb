@@ -30,6 +30,8 @@
   --space-2: 16px;
   --space-3: 24px;
   --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
   --radius-lg: 16px;
   --radius-md: 12px;
   --control-h: 46px;
@@ -153,7 +155,7 @@ button:disabled {
   background: var(--primary);
   color: var(--on-primary);
   font-weight: 700;
-  padding: 0.65rem 1rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   box-shadow: 0 12px 30px color-mix(in srgb, var(--primary) 25%, transparent);
   cursor: pointer;
@@ -177,7 +179,7 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--danger) 60%, transparent);
   background: var(--danger-10);
   color: var(--text);
-  padding: 0.55rem 0.85rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
@@ -197,7 +199,7 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.4rem 0.7rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--info) 35%, transparent);
   background: var(--info-10);
@@ -226,7 +228,7 @@ button:disabled {
 }
 
 .sm {
-  padding: 0.4rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   font-size: 0.85rem;
 }
 
@@ -235,7 +237,7 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
   background: var(--danger-10);
   color: var(--text);
-  padding: 0.65rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   font-weight: 600;
 }

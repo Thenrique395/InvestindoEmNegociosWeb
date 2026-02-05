@@ -53,6 +53,8 @@ identidade, tokens, componentes e regras de uso para garantir consistencia.
   - --primary, --success, --danger, --info, --warning
 - Sombra:
   - --shadow-md (cards e dropdowns)
+- Espacamento:
+  - --space-1 (8px), --space-2 (16px), --space-3 (24px), --space-4 (32px), --space-5 (40px), --space-6 (48px)
 
 ## 5) Regras de ouro
 - Cards nao usam fundo verde/vermelho, exceto cards de status/resumo com tom suave.
@@ -107,6 +109,7 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Base 8px.
 - Cards com 12-16px de padding interno.
 - Gaps em listas: 8-12px.
+- Use tokens de espacamento (space-1..6) nos paddings e gaps.
 
 ## 10) Botoes
 - Primario: fundo --primary, texto claro.

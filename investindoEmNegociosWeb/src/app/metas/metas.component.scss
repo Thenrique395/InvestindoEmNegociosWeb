@@ -1,7 +1,7 @@
 .metas {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -19,7 +19,7 @@
 
 .inline-alert {
   margin: var(--space-2) 0 1rem;
-  padding: 0.65rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -62,7 +62,7 @@
 }
 
 .filters select {
-  padding: 0.7rem 0.9rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -83,7 +83,7 @@
 
 .btn-primary {
   border: none;
-  padding: 0.85rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   background: var(--primary);
   color: var(--on-primary);
@@ -95,7 +95,7 @@
 .placeholder {
   border: 1px dashed var(--border);
   border-radius: 12px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface-2);
   display: grid;
   gap: var(--space-1);
@@ -111,7 +111,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 1rem;
+  padding: var(--space-2);
   display: grid;
   gap: var(--space-2);
 }
@@ -125,7 +125,7 @@
 
 .goal-card__row.values {
   border-top: 1px solid var(--border);
-  padding-top: 0.5rem;
+  padding-top: var(--space-1);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--space-2);
@@ -257,7 +257,7 @@
 }
 
 .ghost.sm {
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   font-size: 14px;
 }
 
@@ -281,7 +281,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1.25rem;
+  padding: var(--space-3);
   width: min(600px, 92vw);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -321,7 +321,7 @@ label {
 
 input,
 textarea {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -339,7 +339,7 @@ textarea {
   border: 1px solid var(--border);
   color: var(--text);
   box-shadow: none;
-  padding: 0.75rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
 }
 

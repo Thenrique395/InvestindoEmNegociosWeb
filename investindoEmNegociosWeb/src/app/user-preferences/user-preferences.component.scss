@@ -1,7 +1,7 @@
 .panel {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -32,7 +32,7 @@
 .placeholder {
   border: 1px dashed var(--border);
   border-radius: 12px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface-2);
 }
 
@@ -67,7 +67,7 @@ label {
 
 select,
 input {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -90,7 +90,7 @@ input {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: var(--space-1) 0.5rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -115,7 +115,7 @@ input {
 }
 
 .btn-primary.sm {
-  padding: 0.5rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
   font-size: 0.9rem;
 }
 
@@ -134,7 +134,7 @@ input {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface-2);
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   display: grid;
   gap: 0.2rem;
 }
@@ -155,7 +155,7 @@ input {
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  padding: 0.65rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface-2);

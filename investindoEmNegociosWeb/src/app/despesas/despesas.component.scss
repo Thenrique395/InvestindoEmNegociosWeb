@@ -6,7 +6,7 @@
 }
 
 .status-card {
-  padding: 0.9rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -45,7 +45,7 @@
 .despesas {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -64,7 +64,7 @@
 .total {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  padding: 0.75rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 12px;
   display: grid;
   gap: 0.15rem;
@@ -74,7 +74,7 @@
 
 .total .add {
   margin-top: var(--space-1);
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -90,7 +90,7 @@
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -106,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 0.25rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   border: 1px solid var(--border);
   font-size: 0.75rem;
@@ -139,7 +139,7 @@
 }
 
 .inline-alert {
-  padding: 0.65rem 0.9rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   border: 1px solid transparent;
   font-weight: 600;
@@ -187,7 +187,7 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-2);
   background: var(--surface-2);
-  padding: 1rem;
+  padding: var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
 }
@@ -202,7 +202,7 @@ label {
 
 input,
 select {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -211,7 +211,7 @@ select {
 
 button {
   border: none;
-  padding: 0.85rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   background: var(--primary);
   color: var(--on-primary);
@@ -239,7 +239,7 @@ button {
 .lista__row {
   display: grid;
   grid-template-columns: 0.2fr 1.2fr 1fr 1fr 0.9fr 1fr 1fr 1.1fr;
-  padding: 0.65rem 0.85rem;
+  padding: var(--space-1) var(--space-2);
   align-items: center;
   gap: 0.4rem;
   min-width: 860px;
@@ -255,7 +255,7 @@ button {
   cursor: pointer;
   color: var(--text);
   font-weight: 700;
-  padding: 0.25rem 0.1rem;
+  padding: var(--space-1) var(--space-1);
 }
 
 .lista__row:nth-child(even) {
@@ -285,7 +285,7 @@ button {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
 }
 
 .bulk-actions {
@@ -313,7 +313,7 @@ button {
 }
 
 .sm {
-  padding: 0.4rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   font-size: 0.85rem;
 }
 
@@ -337,7 +337,7 @@ button {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1.25rem;
+  padding: var(--space-3);
   width: min(720px, 92vw);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -376,7 +376,7 @@ button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface-2);
@@ -384,7 +384,7 @@ button {
 
 .resumo {
   grid-column: 1 / -1;
-  padding: 0.8rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px dashed rgba(37, 99, 235, 0.4);
   background: rgba(37, 99, 235, 0.08);
@@ -411,7 +411,7 @@ button {
   background: var(--surface);
   border-left: 1px solid var(--border);
   box-shadow: -12px 0 30px rgba(0, 0, 0, 0.35);
-  padding: 1rem;
+  padding: var(--space-2);
   display: grid;
   gap: 1rem;
 }
@@ -425,7 +425,7 @@ button {
 .drawer__section {
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0.75rem;
+  padding: var(--space-2);
   display: grid;
   gap: 0.5rem;
 }

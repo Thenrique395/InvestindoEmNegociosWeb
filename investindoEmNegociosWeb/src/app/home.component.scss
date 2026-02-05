@@ -7,7 +7,7 @@
 .onboarding {
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface-2);
   display: grid;
   gap: 1rem;
@@ -21,7 +21,7 @@
   display: grid;
   place-items: center;
   z-index: 2000;
-  padding: 1.5rem;
+  padding: var(--space-3);
 }
 
 .onboarding--modal {
@@ -67,7 +67,7 @@
 }
 
 .onboarding__bullets span {
-  padding: 0.3rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -103,7 +103,7 @@
 .insight-card {
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface);
   display: flex;
   align-items: center;
@@ -135,7 +135,7 @@
   display: grid;
   place-items: center;
   z-index: 2100;
-  padding: 1.5rem;
+  padding: var(--space-3);
 }
 
 .insight-dialog {
@@ -144,7 +144,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1.4rem;
+  padding: var(--space-3);
   box-shadow: var(--shadow-md);
   display: grid;
   gap: var(--space-2);
@@ -169,12 +169,12 @@
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 0.8rem;
+  padding: var(--space-2);
 }
 
 .insight-dialog__tips ul {
   margin: var(--space-1) 0 0;
-  padding-left: 1.1rem;
+  padding-left: var(--space-2);
   color: var(--text-muted);
 }
 
@@ -217,7 +217,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.3rem;
+  padding: var(--space-1);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -227,7 +227,7 @@
   border: 0;
   background: transparent;
   color: var(--text-muted);
-  padding: var(--space-1) 0.9rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
@@ -251,7 +251,7 @@
 .stat-card {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
@@ -357,7 +357,7 @@
   position: absolute;
   bottom: calc(100% + 12px);
   right: 0;
-  padding: var(--space-1) 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 10px;
   background: rgba(12, 22, 28, 0.95);
   border: 1px solid var(--border);
@@ -445,13 +445,13 @@
 }
 
 .chart--compact {
-  padding: 1rem 1.1rem;
+  padding: var(--space-2) var(--space-2);
 }
 
 .chart {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.1rem 1.2rem;
+  padding: var(--space-2) var(--space-2);
   background: var(--surface-2);
   display: grid;
   gap: var(--space-2);
@@ -488,7 +488,7 @@
 .chart__empty {
   border: 1px dashed var(--border);
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: var(--space-3);
   text-align: center;
   color: var(--text-muted);
   background: var(--surface-2);
@@ -517,7 +517,7 @@
 }
 
 .chart__bars.dense {
-  padding-bottom: 0.3rem;
+  padding-bottom: var(--space-1);
 }
 
 .chart__bar {
@@ -571,7 +571,7 @@
   left: 50%;
   bottom: 100%;
   transform: translate(-50%, 8px);
-  padding: 0.5rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid var(--border);
@@ -619,7 +619,7 @@
   background: var(--surface-3);
   color: var(--text);
   border-radius: 10px;
-  padding: 0.4rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -677,7 +677,7 @@
 }
 
 .chart__months.dense {
-  padding-bottom: 0.25rem;
+  padding-bottom: var(--space-1);
   font-size: 0.7rem;
 }
 
@@ -734,7 +734,7 @@
 .recent {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.1rem 1.2rem;
+  padding: var(--space-2) var(--space-2);
   background: var(--surface-2);
   display: grid;
   gap: var(--space-2);
@@ -783,7 +783,7 @@
   position: absolute;
   bottom: calc(100% + 12px);
   right: 0;
-  padding: var(--space-1) 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 10px;
   background: rgba(12, 22, 28, 0.95);
   border: 1px solid var(--border);
@@ -820,7 +820,7 @@
   grid-template-columns: 1fr auto;
   gap: 0.6rem;
   align-items: center;
-  padding: var(--space-1) 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -883,7 +883,7 @@
 }
 
 .recent__tag {
-  padding: 0.15rem 0.5rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   font-size: 0.72rem;
   border: 1px solid var(--border);
@@ -915,7 +915,7 @@
 .goals {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface-2);
   display: grid;
   gap: var(--space-2);
@@ -938,7 +938,7 @@
 }
 
 .goal-chip {
-  padding: var(--space-1) 0.65rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 10px;
   font-size: 0.95rem;
   display: inline-flex;
@@ -992,7 +992,7 @@
   background: var(--surface-2);
   color: var(--text);
   border-radius: 10px;
-  padding: var(--space-1) 0.7rem;
+  padding: var(--space-1) var(--space-1);
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -1006,7 +1006,7 @@
 .goal-views__chart {
   border: 1px dashed var(--border);
   border-radius: 12px;
-  padding: 0.75rem;
+  padding: var(--space-2);
   background: var(--surface-2);
 }
 
@@ -1056,7 +1056,7 @@
   transform: translate(-50%, -120%);
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid var(--border);
-  padding: var(--space-1) 0.55rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 10px;
   color: var(--text);
   font-size: 0.85rem;

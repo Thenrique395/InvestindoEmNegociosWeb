@@ -1,7 +1,7 @@
 .panel {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -32,7 +32,7 @@
 .placeholder {
   border: 1px dashed var(--border);
   border-radius: 12px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface-2);
 }
 
@@ -48,7 +48,7 @@
   grid-template-columns: 120px 1fr;
   gap: 1rem;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: var(--space-1) 0;
 }
 
 .avatar-preview {
@@ -84,7 +84,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 0.85rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -118,7 +118,7 @@ label {
 
 input,
 select {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -136,6 +136,6 @@ select {
   border: 1px solid var(--border);
   color: var(--text);
   box-shadow: none;
-  padding: 0.75rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
 }

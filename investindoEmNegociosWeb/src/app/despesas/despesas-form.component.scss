@@ -18,7 +18,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1.25rem;
+  padding: var(--space-3);
   width: min(720px, 92vw);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -47,7 +47,7 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-2);
   background: var(--surface-2);
-  padding: 1rem;
+  padding: var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
 }
@@ -62,7 +62,7 @@ label {
 
 input,
 select {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -74,7 +74,7 @@ select {
   background: rgba(37, 99, 235, 0.08);
   border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 12px;
-  padding: 0.75rem;
+  padding: var(--space-2);
   display: grid;
   gap: var(--space-1);
 }
@@ -95,7 +95,7 @@ select {
 
 .alert-inline {
   grid-column: 1 / -1;
-  padding: 0.6rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   border: 1px dashed var(--border);
   background: var(--surface-2);
@@ -122,7 +122,7 @@ select {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface-2);

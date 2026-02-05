@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   min-height: 70vh;
-  padding: 1.5rem;
+  padding: var(--space-3);
 }
 
 .login__layout {
@@ -26,7 +26,7 @@
 }
 
 .login__card {
-  padding: 1.75rem;
+  padding: var(--space-4);
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -61,7 +61,7 @@ label {
 }
 
 input {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);

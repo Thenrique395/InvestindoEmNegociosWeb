@@ -6,7 +6,7 @@
 .rendas {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -33,7 +33,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 0.25rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   border: 1px solid var(--border);
   font-size: 0.75rem;
@@ -67,7 +67,7 @@
 
 .inline-alert {
   margin: var(--space-2) 0 1rem;
-  padding: 0.65rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -96,7 +96,7 @@
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   color: var(--text-muted);
 }
 
@@ -117,7 +117,7 @@
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -140,7 +140,7 @@
 .total {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  padding: 0.75rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 12px;
   display: grid;
   gap: 0.15rem;
@@ -169,7 +169,7 @@
 
 .filters input,
 .filters select {
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -196,7 +196,7 @@
 }
 
 .status-card {
-  padding: 0.9rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface-2);
@@ -251,7 +251,7 @@
   border: 1px solid var(--border);
   border-radius: 18px;
   box-shadow: var(--shadow-md);
-  padding: 1.4rem;
+  padding: var(--space-3);
   display: grid;
   gap: 0.8rem;
 }

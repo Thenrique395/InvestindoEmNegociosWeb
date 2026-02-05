@@ -39,7 +39,7 @@
   border: none;
   background: var(--primary);
   color: var(--on-primary);
-  padding: 0.6rem 1rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -48,13 +48,13 @@
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  padding: 0.4rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 8px;
   cursor: pointer;
 }
 
 .status {
-  padding: 0.8rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   background: var(--surface-2);
   color: var(--text-muted);
@@ -79,7 +79,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -99,7 +99,7 @@
 .tag {
   background: rgba(34, 197, 94, 0.12);
   color: var(--success);
-  padding: 0.2rem 0.5rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   font-size: 0.75rem;
 }
@@ -132,7 +132,7 @@
   position: relative;
   background: var(--surface);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: var(--space-3);
   width: min(420px, 90vw);
   display: grid;
   gap: 1rem;
@@ -148,7 +148,7 @@
 .modal__card input,
 .modal__card select {
   border: 1px solid var(--border);
-  padding: 0.5rem 0.6rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 8px;
 }
 

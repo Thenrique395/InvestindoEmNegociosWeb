@@ -1,7 +1,7 @@
 .calculator {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: var(--space-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -40,7 +40,7 @@
 .calc__selector button {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 0.85rem 1rem;
+  padding: var(--space-2) var(--space-2);
   background: var(--surface-2);
   color: var(--text);
   font-weight: 700;
@@ -69,7 +69,7 @@
 .calc__panel {
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 1rem;
+  padding: var(--space-2);
   background: var(--surface-2);
   display: grid;
   gap: 0.6rem;
@@ -96,7 +96,7 @@ label {
 }
 
 input {
-  padding: 0.7rem 0.85rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -110,7 +110,7 @@ input:focus {
 
 button[type='button'] {
   border: none;
-  padding: 0.75rem 1rem;
+  padding: var(--space-2) var(--space-2);
   border-radius: 10px;
   background: var(--primary);
   color: var(--on-primary);
@@ -130,7 +130,7 @@ button[type='button'] {
   align-items: flex-end;
   gap: var(--space-1);
   margin-top: var(--space-2);
-  padding: 0.5rem;
+  padding: var(--space-1);
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface-2);
@@ -179,7 +179,7 @@ button[type='button'] {
 .table__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 0.6rem 0.8rem;
+  padding: var(--space-1) var(--space-2);
 }
 
 .table--wide .table__head,

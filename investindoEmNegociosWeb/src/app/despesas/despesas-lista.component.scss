@@ -10,7 +10,7 @@
 .lista__row {
   display: grid;
   grid-template-columns: 0.2fr 1.2fr 1fr 1fr 0.9fr 1fr 1fr 1.1fr;
-  padding: 0.65rem 0.85rem;
+  padding: var(--space-1) var(--space-2);
   align-items: center;
   gap: 0.4rem;
   min-width: 860px;
@@ -26,7 +26,7 @@
   cursor: pointer;
   color: var(--text);
   font-weight: 700;
-  padding: 0.25rem 0.1rem;
+  padding: var(--space-1) var(--space-1);
 }
 
 .lista__row:nth-child(even) {
@@ -65,7 +65,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-1) var(--space-1);
   border-radius: 999px;
   font-weight: 600;
   background: var(--surface-2);
