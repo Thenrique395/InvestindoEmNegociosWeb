@@ -1,4 +1,5 @@
 # Schema do banco de dados
+Ultima atualizacao: 2026-02-06
 
 Este documento descreve as tabelas persistidas pelo `InvestDbContext` e o relacionamento entre elas. O diagrama visual correspondente esta em `schema.svg`.
 
