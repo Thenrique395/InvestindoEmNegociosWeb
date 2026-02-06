@@ -11,6 +11,6 @@ export const API_BASE_URL =
   runtimeEnv ||
   (browserHost
     ? isLocalhost
-      ? 'http://44.222.150.223:5059/api/v1'
+      ? 'http://35.174.50.187:5059/api/v1'
       : `${browserProtocol}//${browserHost}:5059/api/v1`
-    : 'http://44.222.150.223:5059/api/v1');
+    : 'http://35.174.50.187:5059/api/v1');

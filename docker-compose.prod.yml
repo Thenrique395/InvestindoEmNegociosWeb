@@ -1,8 +1,6 @@
 services:
   backend:
-    build:
-      context: ../InvestindoEmNegocio
-      dockerfile: Dockerfile
+    image: ghcr.io/thenrique395/investindoemnegociosapi:latest
     ports:
       - "5059:5059"
     environment:
@@ -23,9 +21,7 @@ services:
       retries: 10
 
   frontend:
-    build:
-      context: ./investindoEmNegociosWeb
-      dockerfile: Dockerfile
+    image: ghcr.io/thenrique395/investindoemnegociosweb:latest
     ports:
       - "4200:4000"
     environment:
