@@ -33,6 +33,15 @@ jobs:
           push: true
           tags: ghcr.io/thenrique395/investindoemnegociosweb:latest
 
+      - name: Upload compose to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/ubuntu/InvestindoEmNegociosWeb"
+
       - name: Deploy frontend on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -41,6 +50,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -euo pipefail
+            mkdir -p /home/ubuntu/InvestindoEmNegociosWeb
             cd /home/ubuntu/InvestindoEmNegociosWeb
+            docker login ghcr.io -u ${{ secrets.GHCR_USER }} -p ${{ secrets.GHCR_TOKEN }}
             docker compose pull
             docker compose up -d --no-build
