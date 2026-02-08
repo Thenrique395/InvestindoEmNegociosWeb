@@ -82,6 +82,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     remaining: number;
     progress: number;
     status: GoalStatus;
+    statusLabel: string;
+    targetDateLabel: string | null;
+    expectedMonthly: number;
   }[] = [];
   metasVisao: 'progresso' | 'aporte' = 'progresso';
   insight = {
@@ -687,21 +690,47 @@ export class HomeComponent implements OnInit, OnDestroy {
       faltanteTotal,
       progressoMedio
     };
-    this.metasDetalhe = metasAtivas.map((g) => {
+    const statusLabel = (status: GoalStatus): string => {
+      switch (status) {
+        case 'Planned':
+          return 'Planejada';
+        case 'InProgress':
+          return 'Em andamento';
+        case 'Completed':
+          return 'Concluída';
+        case 'Canceled':
+          return 'Cancelada';
+        default:
+          return 'Meta';
+      }
+    };
+    const formatTargetDate = (value?: string | null): string | null => {
+      if (!value) return null;
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return null;
+      return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+    };
+
+    this.metasDetalhe = metasAtivas
+      .map((g) => {
       const target = g.targetAmount || 0;
       const current = g.currentAmount || 0;
       const remaining = Math.max(target - current, 0);
       const progress = target ? Math.min((current / target) * 100, 100) : 0;
-      return {
-        id: g.id,
-        title: g.title,
-        target,
-        current,
-        remaining,
-        progress,
-        status: g.status
-      };
-    });
+        return {
+          id: g.id,
+          title: g.title,
+          target,
+          current,
+          remaining,
+          progress,
+          status: g.status,
+          statusLabel: statusLabel(g.status),
+          targetDateLabel: formatTargetDate(g.targetDate),
+          expectedMonthly: g.expectedMonthly || 0
+        };
+      })
+      .sort((a, b) => a.progress - b.progress);
   }
 
   private updateInsight(): void {
