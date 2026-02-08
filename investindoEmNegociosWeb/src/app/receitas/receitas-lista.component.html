@@ -28,15 +28,15 @@
         (change)="selecionar.emit({ id: r.id!, checked: $any($event.target)?.checked ?? false })"
         aria-label="Selecionar receita" />
     </label>
-    <span class="col-fonte">{{ r.fonte }}</span>
-    <span class="col-categoria">{{ r.categoria || 'Sem categoria' }}</span>
-    <span class="col-valor">R$ {{ r.valor | number:'1.2-2' }}</span>
-    <span class="col-recebimento">{{ r.recebimento || '—' }}</span>
-    <span class="col-tipo">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</span>
-    <span *ngIf="showStatus" class="col-status status" [class.paid]="statusLabel(r) === 'Recebido'">
+    <span class="col-fonte" data-label="Fonte">{{ r.fonte }}</span>
+    <span class="col-categoria" data-label="Categoria">{{ r.categoria || 'Sem categoria' }}</span>
+    <span class="col-valor" data-label="Valor">R$ {{ r.valor | number:'1.2-2' }}</span>
+    <span class="col-recebimento" data-label="Recebimento">{{ r.recebimento || '—' }}</span>
+    <span class="col-tipo" data-label="Tipo">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</span>
+    <span *ngIf="showStatus" class="col-status status" data-label="Status" [class.paid]="statusLabel(r) === 'Recebido'">
       {{ statusLabel(r) }}
     </span>
-    <span class="col-acoes acoes">
+    <span class="col-acoes acoes" data-label="Ações">
       <button type="button" class="icon-action icon-action--edit" (click)="onEditar(r.id!)" aria-label="Editar" title="Editar">✏️</button>
       <button type="button" class="icon-action icon-action--danger" (click)="onRemover(r.planId, r.id)" aria-label="Excluir" title="Excluir">🗑</button>
     </span>

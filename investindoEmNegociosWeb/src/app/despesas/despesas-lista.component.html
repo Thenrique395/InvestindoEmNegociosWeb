@@ -8,13 +8,13 @@
         (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
         aria-label="Selecionar todas" />
     </label>
-    <button type="button" class="linkish" (click)="ordenarPor('nome')">Nome</button>
-    <button type="button" class="linkish" (click)="ordenarPor('categoria')">Categoria</button>
-    <button type="button" class="linkish" (click)="ordenarPor('pagamento')">Pagamento</button>
-    <span>Status</span>
-    <button type="button" class="linkish" (click)="ordenarPor('vencimento')">Vencimento</button>
-    <button type="button" class="linkish" (click)="ordenarPor('valor')">Valor</button>
-    <span>Ações</span>
+    <button type="button" class="linkish col-nome" (click)="ordenarPor('nome')">Nome</button>
+    <button type="button" class="linkish col-categoria" (click)="ordenarPor('categoria')">Categoria</button>
+    <button type="button" class="linkish col-pagamento" (click)="ordenarPor('pagamento')">Pagamento</button>
+    <span class="col-status">Status</span>
+    <button type="button" class="linkish col-vencimento" (click)="ordenarPor('vencimento')">Vencimento</button>
+    <button type="button" class="linkish col-valor" (click)="ordenarPor('valor')">Valor</button>
+    <span class="col-acoes acoes-head">Ações</span>
   </div>
   <div class="lista__row lista__row--empty" *ngIf="!despesas.length">
     <span class="muted">Sem despesas neste mês. Clique em “Adicionar despesa” para lançar a primeira.</span>
@@ -28,10 +28,10 @@
         (change)="selecionar.emit({ id: d.id!, checked: $any($event.target)?.checked ?? false })"
         aria-label="Selecionar despesa" />
     </label>
-    <span>{{ d.nome }}</span>
-    <span>{{ d.categoria || 'Sem categoria' }}</span>
-    <span>{{ pagamentoLabel(d) }}</span>
-    <span class="status-pill"
+    <span class="col-nome" data-label="Nome">{{ d.nome }}</span>
+    <span class="col-categoria" data-label="Categoria">{{ d.categoria || 'Sem categoria' }}</span>
+    <span class="col-pagamento" data-label="Pagamento">{{ pagamentoLabel(d) }}</span>
+    <span class="status-pill col-status" data-label="Status"
       [ngClass]="{
         'status-paid': d.status === 'PAID',
         'status-partial': d.status === 'PARTIALLY_PAID',
@@ -50,12 +50,12 @@
       </span>
       <span>{{ statusLabel(d.status) }}</span>
     </span>
-    <span>{{ d.vencimento || '—' }}</span>
-    <span>
+    <span class="col-vencimento" data-label="Vencimento">{{ d.vencimento || '—' }}</span>
+    <span class="col-valor" data-label="Valor">
       R$ {{ d.valor | number:'1.2-2' }}
       <small *ngIf="d.parcelasTotal"> ({{ d.parcelaNumero }}/{{ d.parcelasTotal }})</small>
     </span>
-    <span class="acoes">
+    <span class="acoes col-acoes" data-label="Ações">
       <button type="button" class="icon-action icon-action--info" (click)="historico.emit(d.id!)" aria-label="Histórico" title="Histórico">ℹ️</button>
       <button type="button" class="icon-action icon-action--edit" (click)="editar.emit(d.id!)" aria-label="Editar" title="Editar">✏️</button>
     </span>

@@ -9,16 +9,45 @@
 .lista__head,
 .lista__row {
   display: grid;
-  grid-template-columns: 0.2fr 1.2fr 1fr 1fr 0.9fr 1fr 1fr 1.1fr;
+  grid-template-columns: 36px 1.4fr 1.1fr 1fr 0.9fr 0.9fr 0.8fr 0.7fr;
   padding: var(--space-1) var(--space-2);
   align-items: center;
-  gap: 0.4rem;
-  min-width: 860px;
+  gap: 0.6rem;
+  min-width: 900px;
+}
+
+.lista__row {
+  min-height: 64px;
+}
+
+.lista__row > span {
+  align-self: center;
 }
 
 .lista__head {
   background: var(--surface-2);
   font-weight: 700;
+}
+
+.lista__head > span,
+.lista__head > button {
+  align-self: center;
+}
+
+.acoes-head,
+.col-acoes {
+  justify-self: end;
+  text-align: right;
+}
+
+.col-valor {
+  justify-self: end;
+  text-align: right;
+}
+
+.col-vencimento {
+  justify-self: start;
+  text-align: left;
 }
 
 .lista__head .linkish {
@@ -47,6 +76,7 @@
   gap: 0.4rem;
   align-items: center;
   justify-content: flex-end;
+  align-self: center;
 }
 
 /* icon-action styles come from global tokens */
@@ -71,6 +101,7 @@
   border-radius: 999px;
   font-weight: 600;
   background: var(--surface-2);
+  justify-self: start;
 }
 
 .status-icon {
@@ -122,4 +153,59 @@
 
 .status-open .status-icon {
   background: rgba(37, 99, 235, 0.15);
+}
+
+@media (max-width: 900px) {
+  .lista {
+    border: none;
+    overflow: visible;
+  }
+
+  .lista__head {
+    display: none;
+  }
+
+  .lista__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+    gap: 0.75rem;
+    margin: var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+
+  .lista__row--empty {
+    margin: 0;
+    border: none;
+    background: transparent;
+  }
+
+  .lista__row--empty span {
+    text-align: left;
+  }
+
+  .lista__row > .checkbox {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .lista__row > [data-label] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .lista__row > [data-label]::before {
+    content: attr(data-label);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .acoes {
+    justify-content: flex-start;
+  }
 }
