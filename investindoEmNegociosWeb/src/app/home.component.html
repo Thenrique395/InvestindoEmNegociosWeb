@@ -83,7 +83,7 @@
           <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo total">
             i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Representa a diferença entre todas as receitas e despesas do mês atual. Um saldo positivo indica que você ganhou mais do que gastou; um saldo negativo indica déficit financeiro no período.
+            Saldo total do mês: diferença entre receitas e despesas. Saldo positivo indica sobra; saldo negativo indica déficit no mês.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
           </button>
@@ -103,7 +103,7 @@
         <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
           i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Soma de todas as entradas de dinheiro, incluindo receitas fixas (salário, pensão) e receitas avulsas registradas no mês selecionado.
+            Total de receitas do mês: soma de salários, pensões e receitas avulsas registradas no período selecionado.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
@@ -123,7 +123,7 @@
         <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
           i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Valor total de gastos com vencimento no mês atual, incluindo despesas fixas, variáveis e compromissos financeiros registrados.
+            Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
@@ -143,7 +143,7 @@
         <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
           i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Soma de todas as despesas vinculadas a cartões de crédito, incluindo parcelas futuras ainda não pagas.
+            Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
@@ -251,7 +251,7 @@
           aria-label="Como ler o resumo de metas">
           i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Mostra o status atual das metas cadastradas. As contagens indicam quantas metas estão planejadas, em andamento, concluídas ou canceladas.
+            Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
@@ -352,7 +352,7 @@
           aria-label="Como ler o gráfico de resultado do mês">
           i
           <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Mostra a relação entre receitas e despesas do período. A barra verde indica a fatia de receitas e a vermelha as despesas. O saldo acima é a diferença entre elas.
+            Comparativo de receitas e despesas no período: verde = receitas, cinza = despesas. O saldo acima é a diferença entre elas.
           </span>
           <span class="pointer-events-none absolute right-3 top-full z-10 mt-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
@@ -409,7 +409,7 @@
         <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
           i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Mostra os lançamentos mais recentes com data e status (pago/pendente).
+            Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
@@ -417,21 +417,34 @@
       <div class="grid gap-2" *ngIf="recentTransactions.length; else semMovimentos">
         <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]" *ngFor="let item of recentTransactions">
           <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
-            <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full font-semibold text-[var(--text)]" [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.8)]' : 'bg-[rgba(239,68,68,0.8)]'">
+            <span
+              class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[12px] font-semibold text-[var(--text)]"
+              [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.2)] text-[var(--success)]' : 'bg-[rgba(239,68,68,0.2)] text-[var(--danger)]'">
               {{ item.type === 'income' ? '↑' : '↓' }}
             </span>
             <div class="min-w-0">
-              <strong class="block text-[12px]">{{ item.title }}</strong>
+              <div class="flex items-center justify-between gap-2">
+                <strong class="block truncate text-[12px]">{{ item.title }}</strong>
+              </div>
               <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
-                <span>Criado: {{ item.date }}</span>
+                <span>{{ item.date }}</span>
                 <span class="opacity-70">•</span>
-                <span>Status: {{ item.status }}</span>
-                <span *ngIf="item.recurring" class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[var(--space-1)] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
+                <span
+                  class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]"
+                  [ngClass]="item.status === 'Pago' ? 'text-[var(--success)]' : item.status === 'Pendente' ? 'text-[var(--warning)]' : 'text-[var(--text-secondary)]'">
+                  {{ item.status }}
+                </span>
+                <span *ngIf="item.recurring" class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
               </div>
             </div>
           </div>
-          <div class="text-[12px] font-bold" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-            {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+          <div class="flex items-center gap-2">
+            <div class="text-[12px] font-bold" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+            </div>
+            <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
+              ↗
+            </a>
           </div>
         </div>
       </div>
