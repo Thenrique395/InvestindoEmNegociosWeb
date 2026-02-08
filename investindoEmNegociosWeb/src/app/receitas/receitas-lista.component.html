@@ -37,8 +37,8 @@
       {{ statusLabel(r) }}
     </span>
     <span class="col-acoes acoes">
-      <button type="button" class="btn-edit sm icon-action" (click)="onEditar(r.id!)" aria-label="Editar" title="Editar">✏️</button>
-      <button type="button" class="btn-danger sm icon-action" (click)="onRemover(r.planId, r.id)" aria-label="Excluir" title="Excluir">🗑</button>
+      <button type="button" class="icon-action icon-action--edit" (click)="onEditar(r.id!)" aria-label="Editar" title="Editar">✏️</button>
+      <button type="button" class="icon-action icon-action--danger" (click)="onRemover(r.planId, r.id)" aria-label="Excluir" title="Excluir">🗑</button>
     </span>
   </div>
 </div>

@@ -78,6 +78,10 @@ export class ApiDataService {
   private readonly incomeSummarySubject = new BehaviorSubject<IncomeSummaryState | null>(null);
   readonly incomeSummary$ = this.incomeSummarySubject.asObservable();
   private lastIncomeMonth?: string;
+  private refreshInFlight = false;
+  private refreshIncomesInFlight = false;
+  private lastRefreshAt = 0;
+  private lastRefreshIncomesAt = 0;
 
   readonly expenses$ = this.db$.pipe(
     map((state) => state.expenses),
@@ -277,12 +281,18 @@ export class ApiDataService {
     );
   }
 
-  refresh(): void {
+  refresh(force = false): void {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
       this.incomeSummarySubject.next(null);
       return;
     }
+    const now = Date.now();
+    if (!force && (this.refreshInFlight || now - this.lastRefreshAt < 1500)) {
+      return;
+    }
+    this.refreshInFlight = true;
+    this.lastRefreshAt = now;
     forkJoin({
       incomePlans: this.plans.list('Income'),
       expensePlans: this.plans.list('Expense'),
@@ -322,17 +332,26 @@ export class ApiDataService {
         const mappedCards = this.mapCards(cards);
         this.dbSubject.next({ incomes, expenses, cards: mappedCards });
       },
-      error: (err) => console.error('Falha ao carregar dados do backend', err)
+      error: (err) => console.error('Falha ao carregar dados do backend', err),
+      complete: () => {
+        this.refreshInFlight = false;
+      }
     });
   }
 
-  refreshIncomes(month?: string): void {
+  refreshIncomes(month?: string, force = false): void {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
       this.incomeSummarySubject.next(null);
       return;
     }
     this.lastIncomeMonth = month;
+    const now = Date.now();
+    if (!force && (this.refreshIncomesInFlight || now - this.lastRefreshIncomesAt < 1500)) {
+      return;
+    }
+    this.refreshIncomesInFlight = true;
+    this.lastRefreshIncomesAt = now;
 
     const current = this.dbSubject.value;
     const statusMap = new Map(current.incomes.map((income) => [income.id, income.status]));
@@ -385,7 +404,10 @@ export class ApiDataService {
           history: summary.history ?? []
         });
       },
-      error: (err) => console.error('Falha ao carregar receitas do backend', err)
+      error: (err) => console.error('Falha ao carregar receitas do backend', err),
+      complete: () => {
+        this.refreshIncomesInFlight = false;
+      }
     });
   }
 

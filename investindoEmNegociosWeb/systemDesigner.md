@@ -119,6 +119,14 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Ghost: fundo transparente, borda sutil.
 - Hover com leve realce.
 
+### Botoes de acao em listas
+- Padrao icon-only, igual ao estilo dos icones do menu.
+- Tamanho 42x42, raio 14px, borda sutil e fundo leve.
+- Editar (primary) e Excluir (danger) com fundo semantico suave.
+- Historico/Info usa tom --info.
+- Hover: leve elevacao (shadow) e contraste discreto.
+- Nunca usar botao retangular com texto em listas densas.
+
 ## 11) Inputs e forms
 - Bordas suaves, foco com cor de acao.
 - Placeholder em texto muted.
