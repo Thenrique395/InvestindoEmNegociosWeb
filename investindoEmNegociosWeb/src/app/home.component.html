@@ -284,7 +284,7 @@
             class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
             [ngClass]="metasVisao === 'aporte' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
             (click)="metasVisao = 'aporte'">
-            Aporte x Falta
+            Por meta
           </button>
         </div>
         <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'progresso'">
@@ -293,14 +293,27 @@
           </div>
           <p class="text-[11px] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
         </div>
-        <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'aporte'">
-          <div class="mb-2 h-[12px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-            <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--success))]" [style.width.%]="metasResumo.targetTotal ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100 : 0"></div>
+        <div class="grid gap-2 rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'aporte'">
+          <div class="grid gap-2" *ngIf="metasDetalhe.length; else semMetasDetalhe">
+            <div class="grid gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-2" *ngFor="let meta of metasDetalhe">
+              <div class="flex items-center justify-between gap-2">
+                <strong class="text-[12px] text-[var(--text)]">{{ meta.title }}</strong>
+                <span class="text-[11px] text-[var(--text-muted)]">{{ meta.progress | number:'1.0-0' }}%</span>
+              </div>
+              <div class="flex h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+                <div class="h-full bg-[linear-gradient(90deg,var(--success),rgba(34,197,94,0.35))]" [style.width.%]="meta.progress"></div>
+                <div class="h-full bg-[linear-gradient(90deg,rgba(148,163,184,0.45),rgba(148,163,184,0.2))]" [style.width.%]="100 - meta.progress"></div>
+              </div>
+              <div class="flex flex-wrap justify-between gap-2 text-[11px] text-[var(--text-muted)]">
+                <span>Aportado: <strong>{{ meta.current | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                <span>Falta: <strong>{{ meta.remaining | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                <span>Alvo: <strong>{{ meta.target | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+              </div>
+            </div>
           </div>
-          <p class="text-[11px] text-[var(--text-muted)]">
-            Aportado: {{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }} ·
-            Falta: {{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}
-          </p>
+          <ng-template #semMetasDetalhe>
+            <p class="text-[11px] text-[var(--text-muted)]">Nenhuma meta ativa com valor de alvo definido.</p>
+          </ng-template>
         </div>
       </div>
     </div>

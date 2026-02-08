@@ -3,7 +3,7 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
 import { CardsService } from './cards.service';
-import { GoalsService, Goal } from './goals.service';
+import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
@@ -74,6 +74,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     faltanteTotal: 0,
     progressoMedio: 0
   };
+  metasDetalhe: {
+    id: string;
+    title: string;
+    target: number;
+    current: number;
+    remaining: number;
+    progress: number;
+    status: GoalStatus;
+  }[] = [];
   metasVisao: 'progresso' | 'aporte' = 'progresso';
   insight = {
     title: 'Tudo certo por aqui',
@@ -678,6 +687,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       faltanteTotal,
       progressoMedio
     };
+    this.metasDetalhe = metasAtivas.map((g) => {
+      const target = g.targetAmount || 0;
+      const current = g.currentAmount || 0;
+      const remaining = Math.max(target - current, 0);
+      const progress = target ? Math.min((current / target) * 100, 100) : 0;
+      return {
+        id: g.id,
+        title: g.title,
+        target,
+        current,
+        remaining,
+        progress,
+        status: g.status
+      };
+    });
   }
 
   private updateInsight(): void {
