@@ -1,10 +1,23 @@
 :host {
-  --header-h: 92px;
+  --header-h: 72px;
 
   display: block;
   color: var(--text);
   background: var(--bg);
   min-height: 100vh;
+}
+
+.topbar {
+  height: var(--header-h);
+  min-height: var(--header-h);
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: 0 var(--space-2);
+}
+
+.topbar__actions {
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .page {
