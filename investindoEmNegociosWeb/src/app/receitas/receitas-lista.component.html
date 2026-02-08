@@ -12,12 +12,72 @@
               (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
               aria-label="Selecionar todas" />
           </th>
-          <th class="px-5 py-4 font-semibold">Fonte</th>
-          <th class="px-5 py-4 font-semibold">Categoria</th>
-          <th class="px-5 py-4 font-semibold text-center">Valor</th>
-          <th class="px-5 py-4 font-semibold">Recebimento</th>
-          <th class="px-5 py-4 font-semibold">Tipo</th>
-          <th *ngIf="showStatus" class="px-5 py-4 font-semibold">Status</th>
+          <th class="px-5 py-4 font-semibold">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              (click)="ordenarPor('fonte')">
+              Fonte
+              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'fonte'">
+                {{ sortDir === 1 ? '↑' : '↓' }}
+              </span>
+            </button>
+          </th>
+          <th class="px-5 py-4 font-semibold">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              (click)="ordenarPor('categoria')">
+              Categoria
+              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'categoria'">
+                {{ sortDir === 1 ? '↑' : '↓' }}
+              </span>
+            </button>
+          </th>
+          <th class="px-5 py-4 font-semibold text-center">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              (click)="ordenarPor('valor')">
+              Valor
+              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'valor'">
+                {{ sortDir === 1 ? '↑' : '↓' }}
+              </span>
+            </button>
+          </th>
+          <th class="px-5 py-4 font-semibold">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              (click)="ordenarPor('recebimento')">
+              Recebimento
+              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'recebimento'">
+                {{ sortDir === 1 ? '↑' : '↓' }}
+              </span>
+            </button>
+          </th>
+          <th class="px-5 py-4 font-semibold">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              (click)="ordenarPor('tipo')">
+              Tipo
+              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'tipo'">
+                {{ sortDir === 1 ? '↑' : '↓' }}
+              </span>
+            </button>
+          </th>
+          <th *ngIf="showStatus" class="px-5 py-4 font-semibold">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              (click)="ordenarPor('status')">
+              Status
+              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'status'">
+                {{ sortDir === 1 ? '↑' : '↓' }}
+              </span>
+            </button>
+          </th>
           <th class="px-5 py-4 text-center font-semibold">Ações</th>
         </tr>
       </thead>
