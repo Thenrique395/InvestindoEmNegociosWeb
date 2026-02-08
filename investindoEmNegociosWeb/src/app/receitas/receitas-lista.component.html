@@ -44,8 +44,9 @@
           <td class="px-5 py-4 text-[var(--text-muted)]">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>
           <td *ngIf="showStatus" class="px-5 py-4">
             <span
-              class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+              class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
               [ngClass]="statusLabel(r) === 'Recebido' ? 'bg-emerald-500/10 text-emerald-300' : 'bg-amber-500/10 text-amber-300'">
+              <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
               {{ statusLabel(r) }}
             </span>
           </td>

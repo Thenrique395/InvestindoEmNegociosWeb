@@ -1,17 +1,32 @@
 <div class="grid gap-4" *ngIf="hasAccess('Basic')">
   <div class="grid gap-3 md:grid-cols-3">
-    <div class="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-emerald-100">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em]">Recebidas</p>
-      <p class="mt-2 text-2xl font-semibold">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</p>
-      <span class="text-sm text-emerald-100/70">{{ statusResumo.pagos }} lançamentos</span>
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <div class="mb-2 flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(34,197,94,0.18)] text-[var(--success)]">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Recebidas</p>
+      </div>
+      <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</p>
+      <span class="text-[11px] text-[var(--text-muted)]">{{ statusResumo.pagos }} lançamentos</span>
     </div>
-    <div class="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em]">Pendentes</p>
-      <p class="mt-2 text-2xl font-semibold">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</p>
-      <span class="text-sm text-amber-100/70">{{ statusResumo.pendentes }} lançamentos</span>
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <div class="mb-2 flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(251,191,36,0.18)] text-[var(--warning)]">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+          </svg>
+        </span>
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pendentes</p>
+      </div>
+      <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</p>
+      <span class="text-[11px] text-[var(--text-muted)]">{{ statusResumo.pendentes }} lançamentos</span>
     </div>
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Top fontes</p>
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Top fontes</p>
       <div class="mt-3 grid gap-2 text-sm text-[var(--text)]">
         <div class="flex items-center justify-between" *ngFor="let item of topFontes">
           <span>{{ item.fonte }}</span>
@@ -23,38 +38,38 @@
   </div>
 </div>
 
-<section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-md)]">
+<section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
   <div class="flex flex-wrap items-start justify-between gap-6">
     <div class="space-y-2">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Receitas</p>
-      <h2 class="text-2xl font-semibold text-[var(--text)]">Suas fontes de receita</h2>
-      <p class="text-sm text-[var(--text-muted)]">Cadastre salários, PLR, freelas e demais recebimentos.</p>
+      <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Receitas</p>
+      <h2 class="text-xl font-semibold text-[var(--text)]">Suas fontes de receita</h2>
+      <p class="text-[12px] text-[var(--text-muted)]">Cadastre salários, PLR, freelas e demais recebimentos.</p>
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
-          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
           (click)="mesAnterior()">
           ◀ Mês anterior
         </button>
         <button
           type="button"
-          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
           (click)="proximoMes()">
           Próximo mês ▶
         </button>
       </div>
     </div>
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-right">
-      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total {{ mesAtualLabel }}</span>
-      <strong class="mt-2 block text-2xl font-semibold text-[var(--text)]">R$ {{ totalRendas | number:'1.2-2' }}</strong>
-      <div class="mt-2 grid gap-1 text-sm text-[var(--text-muted)]" *ngIf="hasAccess('Basic')">
+      <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total {{ mesAtualLabel }}</span>
+      <strong class="mt-2 block text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">R$ {{ totalRendas | number:'1.2-2' }}</strong>
+      <div class="mt-2 grid gap-1 text-[12px] text-[var(--text-muted)]" *ngIf="hasAccess('Basic')">
         <span>Recorrentes: <strong class="text-[var(--text)]">R$ {{ totalRecorrentes | number:'1.2-2' }}</strong></span>
         <span>Avulsas: <strong class="text-[var(--text)]">R$ {{ totalAvulsas | number:'1.2-2' }}</strong></span>
       </div>
       <div class="mt-3">
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110"
+          class="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110"
           (click)="abrirModal()">
           <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
@@ -79,28 +94,28 @@
   </div>
 
   <div class="mt-5 grid gap-4 md:grid-cols-3" *ngIf="hasAccess('Basic')">
-    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
+    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
       Busca por fonte
       <input
-        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
         type="text"
         [(ngModel)]="filtroTexto"
         placeholder="Ex.: Salário" />
     </label>
-    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
+    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
       Tipo
       <select
-        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
         [(ngModel)]="filtroTipo">
         <option value="all">Todos</option>
         <option value="recurring">Recorrente</option>
         <option value="oneTime">Avulsa</option>
       </select>
     </label>
-    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
+    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
       Status
       <select
-        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
         [(ngModel)]="filtroStatus">
         <option value="all">Todos</option>
         <option value="paid">Recebida</option>
@@ -109,11 +124,11 @@
     </label>
   </div>
 
-  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="selecionados.length">
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-[12px] text-[var(--text-muted)]" *ngIf="selecionados.length">
     <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
     <button
       type="button"
-      class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+      class="rounded-xl bg-[var(--primary)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
       [disabled]="loadingRecebido"
       (click)="marcarRecebidasSelecionadas()">
       <span *ngIf="loadingRecebido">Processando...</span>

@@ -66,8 +66,8 @@
         <span class="text-sm font-semibold text-[var(--text)]">Parcelar?</span>
         <label class="relative inline-flex items-center">
           <input class="peer sr-only" type="checkbox" [(ngModel)]="parcelar" name="parcelar" (ngModelChange)="onParcelarToggle($event)" />
-          <span class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:bg-[var(--primary)]/70"></span>
-          <span class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5"></span>
+          <span class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:border-[var(--primary)]/40 peer-checked:bg-[var(--primary)]"></span>
+          <span class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5 peer-checked:shadow-[0_0_0_3px_rgba(37,99,235,0.18)]"></span>
         </label>
       </label>
 
@@ -91,9 +91,15 @@
       <label *ngIf="formaPagamento !== 'cartao'" class="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
         <span class="text-sm font-semibold text-[var(--text)]">Despesa fixa mensal?</span>
         <label class="relative inline-flex items-center">
-          <input class="peer sr-only" type="checkbox" [(ngModel)]="fixa" name="fixa" (ngModelChange)="fixaChange.emit($event)" />
-          <span class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:bg-[var(--primary)]/70"></span>
-          <span class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5"></span>
+          <input class="sr-only" type="checkbox" [(ngModel)]="fixa" name="fixa" (ngModelChange)="fixaChange.emit($event)" />
+          <span
+            [class]="fixa
+              ? 'h-6 w-11 rounded-full border border-[var(--primary)]/40 bg-[var(--primary)] transition'
+              : 'h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition'"></span>
+          <span
+            [class]="fixa
+              ? 'pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition translate-x-5 shadow-[0_0_0_3px_rgba(37,99,235,0.18)]'
+              : 'pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition'"></span>
         </label>
       </label>
 
