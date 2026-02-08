@@ -36,7 +36,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   private expensesCache: StoredExpense[] = [];
   cartoes: StoredCard[] = [];
   despesasPorMes: Record<string, StoredExpense[]> = {};
-  sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | null = null;
+  sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
   mostrarForm = false;
   alerta = '';
@@ -223,6 +223,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
           return this.compareDate(a.vencimento, b.vencimento);
         case 'valor':
           return (a.valor || 0) - (b.valor || 0);
+        case 'status':
+          return this.collate(this.statusLabel(a.status), this.statusLabel(b.status));
         default:
           return 0;
       }
@@ -757,7 +759,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.cartaoSelecionadoId = this.cartoes[0]?.id || null;
   }
 
-  ordenarPor(campo: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor'): void {
+  ordenarPor(campo: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status'): void {
     if (this.sortBy === campo) {
       this.sortDir = this.sortDir === 1 ? -1 : 1;
     } else {

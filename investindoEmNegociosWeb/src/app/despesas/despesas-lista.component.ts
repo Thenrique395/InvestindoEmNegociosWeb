@@ -12,13 +12,13 @@ import { expenseStatusLabel } from '../utils/status';
 })
 export class DespesasListaComponent {
   @Input() despesas: StoredExpense[] = [];
-  @Input() sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | null = null;
+  @Input() sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status' | null = null;
   @Input() sortDir: 1 | -1 = 1;
   @Input() pagamentoLabelFn?: (d: StoredExpense) => string;
   @Input() cardLabelFn?: (id?: string) => string;
    @Input() selectedIds: string[] = [];
 
-  @Output() ordenar = new EventEmitter<'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor'>();
+  @Output() ordenar = new EventEmitter<'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status'>();
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<string>();
   @Output() pagar = new EventEmitter<string>();
@@ -26,7 +26,7 @@ export class DespesasListaComponent {
   @Output() selecionar = new EventEmitter<{ id: string; checked: boolean }>();
   @Output() selecionarTodos = new EventEmitter<boolean>();
 
-  ordenarPor(campo: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor'): void {
+  ordenarPor(campo: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status'): void {
     this.ordenar.emit(campo);
   }
 
