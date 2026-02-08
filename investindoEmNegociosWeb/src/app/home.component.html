@@ -12,24 +12,24 @@
     <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
       <button
         type="button"
-        class="rounded-full px-[var(--space-2)] py-[var(--space-1)] text-sm font-semibold transition"
-        [ngClass]="periodo === 'month' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+        class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+        [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
         (click)="setPeriodo('month')"
       >
         Mensal
       </button>
       <button
         type="button"
-        class="rounded-full px-[var(--space-2)] py-[var(--space-1)] text-sm font-semibold transition"
-        [ngClass]="periodo === 'quarter' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+        class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+        [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
         (click)="setPeriodo('quarter')"
       >
         Trimestral
       </button>
       <button
         type="button"
-        class="rounded-full px-[var(--space-2)] py-[var(--space-1)] text-sm font-semibold transition"
-        [ngClass]="periodo === 'year' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+        class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+        [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
         (click)="setPeriodo('year')"
       >
         Anual
@@ -175,7 +175,7 @@
   </ng-template>
 
   <section
-    class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] px-[var(--space-1)] py-2 pl-4 shadow-[var(--shadow-sm)]"
+    class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]"
     *ngIf="!isLoadingDashboard"
     [ngClass]="insight.tone === 'warn'
       ? 'border-amber-400/40 border-l-amber-400 bg-amber-500/10'
@@ -186,14 +186,14 @@
           : ''"
   >
     <div class="flex items-start gap-3">
-      <div class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
+      <div class="grid h-8 w-8 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
         <svg viewBox="0 0 24 24" class="h-4 w-4" role="presentation" focusable="false">
           <path d="M12 9v4m0 4h.01M10.3 4.8l-7 12.2A2 2 0 0 0 5 20h14a2 2 0 0 0 1.7-3l-7-12.2a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div>
         <p class="text-[10px] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
-        <h3 class="m-0 text-[var(--text-md)] font-semibold">{{ insight.title }}</h3>
+        <h3 class="m-0 text-[var(--text-sm)] font-semibold">{{ insight.title }}</h3>
         <p class="mt-1 text-[11px] text-[var(--text-muted)]">{{ insight.message }}</p>
       </div>
     </div>
@@ -381,15 +381,15 @@
               class="h-full bg-[linear-gradient(90deg,var(--danger),rgba(239,68,68,0.35))]"
               [style.width.%]="(totalRendas + totalDespesas) ? (totalDespesas / (totalRendas + totalDespesas)) * 100 : 0"></div>
           </div>
-          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--text-muted)]">
-            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-2 py-[2px]">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--text-muted)]">
+            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.08)] px-2 py-[2px]">
               <span class="inline-block h-2 w-2 rounded-full bg-[rgba(34,197,94,0.9)]"></span>
               Receitas
               <strong class="text-[var(--text)]">
                 {{ (totalRendas + totalDespesas) ? ((totalRendas / (totalRendas + totalDespesas)) * 100 | number:'1.0-0') : 0 }}%
               </strong>
             </span>
-            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-2 py-[2px]">
+            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)] px-2 py-[2px]">
               <span class="inline-block h-2 w-2 rounded-full bg-[rgba(239,68,68,0.9)]"></span>
               Despesas
               <strong class="text-[var(--text)]">
@@ -444,7 +444,7 @@
         </button>
       </div>
       <div class="grid gap-2" *ngIf="recentTransactions.length; else semMovimentos">
-        <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]" *ngFor="let item of recentTransactions">
+        <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]" *ngFor="let item of recentTransactions">
           <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
             <span
               class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[12px] font-semibold text-[var(--text)]"
@@ -459,7 +459,7 @@
                 <span>{{ item.date }}</span>
                 <span class="opacity-70">•</span>
                 <span
-                  class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]"
+                  class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-medium"
                   [ngClass]="item.status === 'Pago' ? 'text-[var(--success)]' : item.status === 'Pendente' ? 'text-[var(--warning)]' : 'text-[var(--text-secondary)]'">
                   {{ item.status }}
                 </span>
@@ -469,7 +469,7 @@
           </div>
           <div class="flex flex-col items-end gap-2">
             <div class="flex items-center gap-2">
-              <div class="text-[12px] font-bold" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              <div class="text-[13px] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
                 {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
               </div>
               <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">

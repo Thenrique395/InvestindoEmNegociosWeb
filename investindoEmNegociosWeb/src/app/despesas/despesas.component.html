@@ -41,13 +41,13 @@
   </div>
 </div>
 
-<section class="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-md)]">
+<section class="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
   <div class="flex flex-wrap items-start justify-between gap-6">
     <div class="space-y-2">
-      <h2 class="text-2xl font-semibold text-[var(--text)]"> Despesas {{ mesAtualLabel | titlecase }}</h2>
-      <p class="text-sm text-[var(--text-muted)]">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
+      <h2 class="text-xl font-semibold text-[var(--text)]">Despesas {{ mesAtualLabel | titlecase }}</h2>
+      <p class="text-[12px] text-[var(--text-muted)]">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
       <div class="flex flex-wrap gap-2" *ngIf="previousComparison as comparison">
-        <span class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
+        <span class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] font-semibold text-[var(--text-muted)]">
           Comparativo com {{ comparison.month }}:
           <span
             class="font-semibold"
@@ -67,24 +67,24 @@
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
-          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
           (click)="mesAnterior()">
           ◀ Mês anterior
         </button>
         <button
           type="button"
-          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
           (click)="proximoMes()">
           Próximo mês ▶
         </button>
       </div>
     </div>
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-right">
-      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total do mês</span>
-      <strong class="mt-2 block text-2xl font-semibold text-[var(--text)]">R$ {{ totalMes() | number:'1.2-2' }}</strong>
+      <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total do mês</span>
+      <strong class="mt-2 block text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">R$ {{ totalMes() | number:'1.2-2' }}</strong>
       <button
         type="button"
-        class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110"
+        class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110"
         (click)="abrirModal()">
         <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
           <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
@@ -107,12 +107,12 @@
     {{ alerta }}
   </div>
 
-  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="selecionados.length">
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-[12px] text-[var(--text-muted)]" *ngIf="selecionados.length">
     <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
     <div class="flex flex-wrap items-center gap-2">
       <button
         type="button"
-        class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+        class="rounded-xl bg-[var(--primary)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
         [disabled]="loadingPagar"
         (click)="pagarSelecionadas()">
         <span *ngIf="loadingPagar">Processando...</span>
@@ -120,21 +120,21 @@
       </button>
       <button
         type="button"
-        class="rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40 disabled:opacity-60"
+        class="rounded-xl border border-[var(--border)] px-4 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40 disabled:opacity-60"
         [disabled]="loadingAntecipar"
         (click)="anteciparSelecionadas()">
         <span *ngIf="loadingAntecipar">Antecipando...</span>
         <span *ngIf="!loadingAntecipar">Solicitar antecipação</span>
       </button>
-      <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" (click)="excluirSelecionadas()">Excluir</button>
+      <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-[12px] font-semibold text-rose-200" (click)="excluirSelecionadas()">Excluir</button>
     </div>
   </div>
 
   <div class="mt-5 grid gap-4 md:grid-cols-3">
-    <label class="grid gap-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
+    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
       Status
       <select
-        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
         [(ngModel)]="filtroStatus">
         <option value="ALL">Todos</option>
         <option value="OPEN">{{ statusLabel('OPEN') }}</option>
@@ -144,20 +144,20 @@
         <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
       </select>
     </label>
-    <label class="grid gap-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
+    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
       Categoria
       <select
-        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
         [(ngModel)]="filtroCategoria">
         <option value="ALL">Todas</option>
         <option *ngIf="!categorias.length" value="" disabled>Sem categorias cadastradas</option>
         <option *ngFor="let c of categorias" [value]="c.id">{{ c.name }}</option>
       </select>
     </label>
-    <label class="grid gap-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
+    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
       Buscar
       <input
-        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
         type="text"
         [(ngModel)]="filtroNome"
         placeholder="Nome da despesa" />
