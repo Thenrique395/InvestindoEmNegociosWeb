@@ -210,18 +210,7 @@
   flex-wrap: wrap;
 }
 
-.btn-ghost {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-secondary);
-  padding: var(--space-1) var(--space-1);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.btn-ghost.sm {
-  font-size: var(--text-sm);
-}
+/* button styles now come from global tokens */
 
 .modal {
   position: fixed;

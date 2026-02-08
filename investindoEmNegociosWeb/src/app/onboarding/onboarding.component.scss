@@ -167,18 +167,7 @@ input:focus {
   color: var(--danger);
 }
 
-.ghost {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: var(--space-2) var(--space-2);
-  cursor: pointer;
-}
-
-.ghost:hover {
-  border-color: var(--border-strong);
-}
+/* button styles now come from global tokens */
 
 .focus-grid {
   display: grid;

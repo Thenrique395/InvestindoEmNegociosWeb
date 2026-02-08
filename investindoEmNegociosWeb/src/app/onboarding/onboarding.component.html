@@ -61,7 +61,7 @@
         </label>
 
         <div class="actions">
-          <button class="primary" type="submit" [disabled]="loading">
+          <button class="btn-primary" type="submit" [disabled]="loading">
             {{ loading ? 'Salvando...' : 'Salvar e continuar' }}
           </button>
         </div>
@@ -91,7 +91,7 @@
 
       <div class="actions actions--split">
         <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
-        <button class="primary" type="button" (click)="continueFromFocus()">Continuar</button>
+        <button class="btn-primary" type="button" (click)="continueFromFocus()">Continuar</button>
       </div>
     </div>
 
@@ -117,7 +117,7 @@
 
       <div class="actions actions--split">
         <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
-        <button class="primary" type="button" (click)="finishOnboarding()">Ir para o dashboard</button>
+        <button class="btn-primary" type="button" (click)="finishOnboarding()">Ir para o dashboard</button>
       </div>
       <button class="link" type="button" (click)="skipOnboarding()">Fazer depois</button>
     </div>

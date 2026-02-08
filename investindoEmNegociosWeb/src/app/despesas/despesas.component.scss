@@ -72,11 +72,8 @@
   align-items: center;
 }
 
-.total .add {
+.total .btn-primary {
   margin-top: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border-radius: 8px;
-  cursor: pointer;
 }
 
 .nav {
@@ -207,17 +204,6 @@ select {
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-}
-
-button {
-  border: none;
-  padding: var(--space-2) var(--space-2);
-  border-radius: 10px;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
 }
 
 .ghost {

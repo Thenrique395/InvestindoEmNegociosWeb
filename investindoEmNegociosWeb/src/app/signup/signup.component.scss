@@ -63,26 +63,7 @@ input:focus {
   color: var(--text-muted);
 }
 
-button.primary {
-  border: none;
-  border-radius: 10px;
-  padding: var(--space-2) var(--space-2);
-  background: var(--primary);
-  color: var(--on-primary);
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
-}
-
-button.primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-}
-
-button.primary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+/* button styles now come from global tokens */
 
 .helper {
   margin: 0;

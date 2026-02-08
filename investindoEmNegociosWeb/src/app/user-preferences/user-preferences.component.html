@@ -38,7 +38,14 @@
       </label>
       <div class="inline">
         <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: pt-BR ou en-US" />
-        <button type="button" class="btn-primary sm" (click)="adicionarLocalizacao()">Adicionar</button>
+        <button type="button" class="btn-primary sm" (click)="adicionarLocalizacao()">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          Adicionar
+        </button>
       </div>
     </div>
     <div class="full preview">

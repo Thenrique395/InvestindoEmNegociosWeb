@@ -211,51 +211,15 @@ select:focus {
   gap: 0.5rem;
 }
 
-.actions button {
-  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
-}
+/* action buttons use shared icon-action styles */
 
-.actions button:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.02);
-}
-
-.actions button:active {
-  transform: translateY(0);
-}
-
-.add {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: var(--space-2) var(--space-2);
+.btn-primary {
   align-self: flex-start;
   margin-top: 0.5rem;
-  border-radius: 12px;
   letter-spacing: 0.2px;
-  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
 }
 
-.add__icon {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--surface-2);
-  font-size: var(--text-lg);
-}
-
-.add:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.25);
-  filter: brightness(1.02);
-}
-
-.add:active {
-  transform: translateY(0);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
-}
+/* removed icon styling to keep button consistent */
 
 .modal {
   position: fixed;

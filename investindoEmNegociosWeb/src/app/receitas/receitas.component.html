@@ -40,7 +40,14 @@
         <span>Avulsas: <strong>R$ {{ totalAvulsas | number:'1.2-2' }}</strong></span>
       </div>
       <div class="total__actions">
-        <button type="button" class="btn-primary" (click)="abrirModal()">Adicionar receita</button>
+        <button type="button" class="btn-primary" (click)="abrirModal()">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          Adicionar receita
+        </button>
       </div>
     </div>
   </div>

@@ -89,36 +89,7 @@ select {
   white-space: nowrap;
 }
 
-.btn-warning {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--warning);
-  padding: var(--space-1) var(--space-2);
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 120ms ease;
-}
-
-.btn-warning:hover:not(:disabled) {
-  background: rgba(245, 158, 11, 0.18);
-  border-color: rgba(245, 158, 11, 0.5);
-}
-
-.btn-warning:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-}
+/* button styles now come from global tokens */
 
 .icon {
   display: inline-flex;

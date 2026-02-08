@@ -32,7 +32,7 @@
     </label>
     <small class="error" *ngIf="hasError('aceitarTermos', 'required')">Aceite os termos para continuar.</small>
 
-    <button class="primary" type="submit" [disabled]="loading">
+    <button class="btn-primary" type="submit" [disabled]="loading">
       {{ loading ? 'Criando conta...' : 'Criar conta e entrar' }}
     </button>
 

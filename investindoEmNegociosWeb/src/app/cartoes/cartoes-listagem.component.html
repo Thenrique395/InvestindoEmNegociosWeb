@@ -7,8 +7,8 @@
           <span *ngIf="!isMastercard(brandCode(c))" class="pill">{{ brandName(c) | uppercase }}</span>
         </div>
         <div class="actions">
-          <button type="button" class="btn-edit sm" (click)="onEditar(c)">✏️ Editar</button>
-          <button type="button" class="btn-danger sm" (click)="onRemover(c.id)">🗑 Remover</button>
+          <button type="button" class="icon-action icon-action--edit" (click)="onEditar(c)" aria-label="Editar" title="Editar">✏️</button>
+          <button type="button" class="icon-action icon-action--danger" (click)="onRemover(c.id)" aria-label="Remover" title="Remover">🗑</button>
         </div>
       </header>
 

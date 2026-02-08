@@ -4,9 +4,13 @@
       <h2>Meus cartões</h2>
       <p class="muted">Cartões salvos para o usuário atual.</p>
     </div>
-    <button class="add btn-primary" type="button" (click)="abrirModal()">
-      <span class="add__icon">+</span>
-      <span>Cadastrar novo cartão</span>
+    <button class="btn-primary" type="button" (click)="abrirModal()">
+      <span class="btn-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      Adicionar cartão
     </button>
   </div>
 

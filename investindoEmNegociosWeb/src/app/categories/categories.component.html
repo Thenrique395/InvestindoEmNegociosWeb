@@ -37,6 +37,11 @@
         </select>
       </label>
       <button class="btn-primary" type="button" [disabled]="saving" (click)="adicionar()">
+        <span class="btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
         {{ saving ? 'Salvando...' : 'Adicionar' }}
       </button>
     </div>
@@ -137,6 +142,11 @@
       <div class="modal__actions">
         <button type="button" class="btn-ghost" (click)="closeAdminModal()">Cancelar</button>
         <button type="button" class="btn-primary" (click)="saveAdmin()" [disabled]="adminSaving">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
           {{ adminSaving ? 'Salvando...' : 'Salvar' }}
         </button>
       </div>
