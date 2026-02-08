@@ -45,10 +45,10 @@
               class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
               [ngClass]="{
                 'bg-emerald-500/10 text-emerald-300': d.status === 'PAID',
-                'bg-amber-500/10 text-amber-300': d.status === 'PARTIALLY_PAID',
+                'bg-orange-500/10 text-orange-300': d.status === 'PARTIALLY_PAID',
                 'bg-rose-500/10 text-rose-300': d.status === 'CANCELED',
                 'bg-sky-500/10 text-sky-300': d.status === 'ANTICIPATED',
-                'bg-blue-500/10 text-blue-300': !d.status || d.status === 'OPEN'
+                'bg-amber-500/10 text-amber-300': !d.status || d.status === 'OPEN'
               }">
               <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
               {{ statusLabel(d.status) }}
