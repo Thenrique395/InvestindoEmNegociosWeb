@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DecimalPipe, NgIf, NgClass, NgFor } from '@angular/common';
+import { DecimalPipe, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -23,7 +23,7 @@ import {
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf, NgClass, NgFor, FormsModule],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf, NgClass, FormsModule],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })
@@ -58,6 +58,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
+  sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
+  sortDir: 1 | -1 = 1;
   categorias: CategoryDto[] = [];
 
   constructor(
@@ -106,7 +108,28 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       .filter((r) => this.filtroTextoMatch(r))
       .filter((r) => this.filtroTipoMatch(r))
       .filter((r) => this.filtroStatusMatch(r));
-    return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
+    if (!this.sortBy) {
+      return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
+    }
+    const compare = (a: StoredIncome, b: StoredIncome) => {
+      switch (this.sortBy) {
+        case 'fonte':
+          return this.collate(a.fonte, b.fonte);
+        case 'categoria':
+          return this.collate(a.categoria, b.categoria);
+        case 'valor':
+          return (a.valor || 0) - (b.valor || 0);
+        case 'recebimento':
+          return this.compareDate(a.recebimento, b.recebimento);
+        case 'tipo':
+          return this.collate(a.fixa ? 'Recorrente' : 'Avulsa', b.fixa ? 'Recorrente' : 'Avulsa');
+        case 'status':
+          return this.collate(incomeStatusLabel(a.status), incomeStatusLabel(b.status));
+        default:
+          return 0;
+      }
+    };
+    return filtradas.sort((a, b) => compare(a, b) * this.sortDir);
   }
 
   get rendasMes(): StoredIncome[] {
@@ -170,6 +193,25 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       .map(([fonte, total]) => ({ fonte, total }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
+  }
+
+  get previousComparison(): { month: string; delta: number; deltaAbs: number; percent: number; trend: 'up' | 'down' | 'flat'; isNew: boolean } {
+    const prevDate = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
+    const summaryPrev = this.summary?.previousMonth;
+    const prevTotal = summaryPrev ? summaryPrev.total : 0;
+    const currentTotal = this.summary ? this.summary.total : this.totalRendas;
+    const delta = currentTotal - prevTotal;
+    const isNew = prevTotal === 0 && currentTotal > 0;
+    const percent = prevTotal > 0 ? (delta / prevTotal) * 100 : 0;
+    const trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    return {
+      month: summaryPrev ? summaryPrev.month : formatMonthYearLabel(prevDate),
+      delta,
+      deltaAbs: Math.abs(delta),
+      percent: Math.abs(percent),
+      trend,
+      isNew
+    };
   }
 
   get mesAtualLabel(): string {
@@ -456,6 +498,21 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return db.getTime() - da.getTime();
   }
 
+  private compareDate(a: string, b: string): number {
+    const da = this.parseData(a);
+    const db = this.parseData(b);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return da.getTime() - db.getTime();
+  }
+
+  private collate(a?: string | null, b?: string | null): number {
+    const aa = (a || '').toString().toLowerCase();
+    const bb = (b || '').toString().toLowerCase();
+    return aa.localeCompare(bb, 'pt-BR');
+  }
+
   private parseData(value: string): Date | null {
     return parseLocaleDate(value);
   }
@@ -566,9 +623,24 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     printWindow.print();
   }
 
+  ordenarPor(campo: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'): void {
+    if (this.sortBy === campo) {
+      this.sortDir = this.sortDir === 1 ? -1 : 1;
+      return;
+    }
+    this.sortBy = campo;
+    this.sortDir = 1;
+  }
+
   private mesKey(): string {
     const y = this.dataAtual.getFullYear();
     const m = this.dataAtual.getMonth() + 1;
+    return `${y}-${String(m).padStart(2, '0')}`;
+  }
+
+  private mesKeyFromDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
     return `${y}-${String(m).padStart(2, '0')}`;
   }
 

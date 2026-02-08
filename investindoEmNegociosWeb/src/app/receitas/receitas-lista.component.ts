@@ -13,11 +13,18 @@ import { incomeStatusLabel } from '../utils/status';
 export class ReceitasListaComponent {
   @Input() rendas: StoredIncome[] = [];
   @Input() showStatus = false;
+  @Input() sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
+  @Input() sortDir: 1 | -1 = 1;
   @Input() selectedIds: string[] = [];
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<{ planId?: string; installmentId: string }>();
   @Output() selecionar = new EventEmitter<{ id: string; checked: boolean }>();
   @Output() selecionarTodos = new EventEmitter<boolean>();
+  @Output() ordenar = new EventEmitter<'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'>();
+
+  ordenarPor(campo: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'): void {
+    this.ordenar.emit(campo);
+  }
 
   onEditar(id: string): void {
     this.editar.emit(id);

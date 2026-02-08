@@ -8,6 +8,16 @@
         </svg>
       </span>
       <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pendentes</p>
+      <button
+        type="button"
+        class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+        aria-label="Mais informacoes sobre despesas pendentes">
+        i
+        <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+          Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas.
+        </span>
+        <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+      </button>
     </div>
     <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">
       R$ {{ totalPendentes | number:'1.2-2' }}
@@ -21,6 +31,16 @@
         </svg>
       </span>
       <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Antecipadas</p>
+      <button
+        type="button"
+        class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+        aria-label="Mais informacoes sobre despesas antecipadas">
+        i
+        <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+          Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período.
+        </span>
+        <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+      </button>
     </div>
     <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">
       R$ {{ totalAntecipadas | number:'1.2-2' }}
@@ -34,6 +54,16 @@
         </svg>
       </span>
       <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pagas</p>
+      <button
+        type="button"
+        class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+        aria-label="Mais informacoes sobre despesas pagas">
+        i
+        <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+          Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações.
+        </span>
+        <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+      </button>
     </div>
     <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">
       R$ {{ totalPagas | number:'1.2-2' }}
@@ -47,8 +77,18 @@
       <h2 class="text-xl font-semibold text-[var(--text)]">Despesas {{ mesAtualLabel | titlecase }}</h2>
       <p class="text-[12px] text-[var(--text-muted)]">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
       <div class="flex flex-wrap gap-2" *ngIf="previousComparison as comparison">
-        <span class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] font-semibold text-[var(--text-muted)]">
+        <span class="relative inline-flex items-center gap-2 overflow-visible rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] font-semibold text-[var(--text-muted)]">
           Comparativo com {{ comparison.month }}:
+          <button
+            type="button"
+            class="group relative inline-flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[10px] text-[var(--text-secondary)]"
+            aria-label="Mais informacoes sobre comparativo de despesas">
+            i
+            <span class="pointer-events-none absolute bottom-full right-0 z-50 mb-2 hidden min-w-[220px] rounded-[10px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[10px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+              Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução.
+            </span>
+            <span class="pointer-events-none absolute bottom-full right-2 z-50 mb-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+          </button>
           <span
             class="font-semibold"
             [ngClass]="comparison.trend === 'up'
