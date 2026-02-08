@@ -80,13 +80,13 @@
           </svg>
         </span>
         <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Total</p>
-        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo total">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+          <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo total">
+            i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
             Representa a diferença entre todas as receitas e despesas do mês atual. Um saldo positivo indica que você ganhou mais do que gastou; um saldo negativo indica déficit financeiro no período.
           </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
-        </button>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+          </button>
       </div>
       <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldo | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="mt-1 text-[11px] text-[var(--text-muted)]">Receitas menos despesas do mês.</p>
@@ -102,10 +102,10 @@
         <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
         <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
           i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
             Soma de todas as entradas de dinheiro, incluindo receitas fixas (salário, pensão) e receitas avulsas registradas no mês selecionado.
           </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
       </div>
       <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
@@ -122,10 +122,10 @@
         <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
         <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
           i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
             Valor total de gastos com vencimento no mês atual, incluindo despesas fixas, variáveis e compromissos financeiros registrados.
           </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
       </div>
       <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
@@ -142,10 +142,10 @@
         <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
         <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
           i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
             Soma de todas as despesas vinculadas a cartões de crédito, incluindo parcelas futuras ainda não pagas.
           </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
       </div>
       <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
@@ -222,32 +222,52 @@
   </div>
 
   <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]" *ngIf="metasResumo.total">
-    <div>
-      <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
-      <p class="text-[11px] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
+        <p class="text-[11px] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
+      </div>
+      <div class="flex flex-wrap gap-2 text-[11px] text-[var(--text-secondary)]">
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+          Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        </span>
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+          Acumulado: <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        </span>
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+          Falta: <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        </span>
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+          Progresso médio: <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong>
+        </span>
+      </div>
     </div>
     <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <p class="text-[var(--text-sm)] font-semibold text-[var(--text-muted)]">Metas ativas</p>
-        <div class="flex flex-wrap gap-3 text-[11px] text-[var(--text-secondary)]">
-          <span>Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-          <span>Acumulado: <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-          <span>Falta: <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-          <span>Progresso médio: <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong></span>
-        </div>
+        <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">Metas ativas</p>
+        <button
+          type="button"
+          class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+          aria-label="Como ler o resumo de metas">
+          i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+            Mostra o status atual das metas cadastradas. As contagens indicam quantas metas estão planejadas, em andamento, concluídas ou canceladas.
+          </span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+        </button>
       </div>
       <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
-        <div class="rounded-[12px] border border-[rgba(111,117,136,0.45)] bg-[rgba(111,117,136,0.18)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
-          Planejadas {{ metasResumo.planned }}
+        <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          Planejadas <strong>{{ metasResumo.planned }}</strong>
         </div>
-        <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
-          Em andamento {{ metasResumo.inProgress }}
+        <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          Em andamento <strong>{{ metasResumo.inProgress }}</strong>
         </div>
-        <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(45,179,122,0.18)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
-          Concluídas {{ metasResumo.completed }}
+        <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          Concluídas <strong>{{ metasResumo.completed }}</strong>
         </div>
-        <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(255,92,92,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
-          Canceladas {{ metasResumo.canceled }}
+        <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          Canceladas <strong>{{ metasResumo.canceled }}</strong>
         </div>
       </div>
       <div class="grid gap-2">
@@ -255,14 +275,14 @@
           <button
             type="button"
             class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
-            [ngClass]="metasVisao === 'progresso' ? 'bg-sky-500/15 text-[var(--text)] shadow-sm' : ''"
+            [ngClass]="metasVisao === 'progresso' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
             (click)="metasVisao = 'progresso'">
             Progresso
           </button>
           <button
             type="button"
             class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
-            [ngClass]="metasVisao === 'aporte' ? 'bg-sky-500/15 text-[var(--text)] shadow-sm' : ''"
+            [ngClass]="metasVisao === 'aporte' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
             (click)="metasVisao = 'aporte'">
             Aporte x Falta
           </button>
@@ -290,71 +310,61 @@
     <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
       <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
         <div class="grid gap-1">
-          <p class="m-0 text-[12px] text-[var(--text-muted)]">{{ chartTitle }}</p>
-          <span class="text-[11px] text-[var(--text-muted)]">{{ chartSubtitle }}</span>
+          <p class="m-0 text-[12px] text-[var(--text-muted)]">Resultado do mês</p>
+          <span class="text-[11px] text-[var(--text-muted)]">Receitas x Despesas</span>
         </div>
-        <div class="inline-flex gap-2">
-          <button
-            type="button"
-            class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[var(--space-1)] text-[11px] text-[var(--text)] transition"
-            [ngClass]="chartType === 'bar' ? 'border-emerald-400/40 bg-emerald-500/10 text-[var(--text)]' : ''"
-            (click)="trocarTipo('bar')">
-            Barras
-          </button>
-          <button
-            type="button"
-            class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[var(--space-1)] text-[11px] text-[var(--text)] transition"
-            [ngClass]="chartType === 'line' ? 'border-emerald-400/40 bg-emerald-500/10 text-[var(--text)]' : ''"
-            (click)="trocarTipo('line')">
-            Linha
-          </button>
-        </div>
+        <button
+          type="button"
+          class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+          aria-label="Como ler o gráfico de resultado do mês">
+          i
+          <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+            Mostra a relação entre receitas e despesas do período. A barra verde indica a fatia de receitas e a vermelha as despesas. O saldo acima é a diferença entre elas.
+          </span>
+          <span class="pointer-events-none absolute right-3 top-full z-10 mt-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+        </button>
       </div>
 
-      <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-center text-[11px] text-[var(--text-muted)]" *ngIf="!hasChartData">
-        {{ chartEmptyMessage }}
-      </div>
-
-      <ng-container *ngIf="hasChartData">
-        <div class="flex items-center gap-4 text-[11px] text-[var(--text-muted)]">
-          <span class="inline-block h-[14px] w-[14px] rounded-[3px] bg-[rgba(34,197,94,0.8)]"></span> Receitas
-          <span class="inline-block h-[14px] w-[14px] rounded-[3px] bg-[rgba(239,68,68,0.8)]"></span> Despesas
-        </div>
-        <div class="grid min-h-[170px] items-end gap-2" [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(0, 1fr))'" *ngIf="chartType === 'bar'">
-          <div class="flex h-[150px] flex-col items-center justify-end gap-1" *ngFor="let m of monthlyData">
-            <div class="relative flex h-[120px] w-full items-end justify-center gap-1">
-              <div class="h-full w-[12px] max-w-[18px] rounded-t-[6px] bg-[linear-gradient(180deg,rgba(34,197,94,0.8),rgba(34,197,94,0.35))]" [style.height.%]="maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0"></div>
-              <div class="h-full w-[12px] max-w-[18px] rounded-t-[6px] bg-[linear-gradient(180deg,rgba(239,68,68,0.9),rgba(239,68,68,0.5))]" [style.height.%]="maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0"></div>
-            </div>
-            <span class="text-[10px] text-[var(--text-muted)]">{{ m.label }}</span>
-          </div>
-        </div>
-
-        <div class="relative" *ngIf="chartType === 'line'">
-          <svg viewBox="0 0 1100 220" preserveAspectRatio="none" class="h-[180px] w-full">
-            <polyline [attr.points]="incomesPolyline" class="fill-none stroke-[3] stroke-[var(--success)]"></polyline>
-            <polyline [attr.points]="expensesPolyline" class="fill-none stroke-[3] stroke-[var(--danger)]"></polyline>
-            <ng-container *ngFor="let p of incomesPoints">
-              <circle class="cursor-pointer fill-[var(--success)] stroke-[var(--surface)] stroke-[2]" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
-                (mouseenter)="showLineTooltip(p, 'income')" (mouseleave)="hideLineTooltip()"></circle>
-            </ng-container>
-            <ng-container *ngFor="let p of expensesPoints">
-              <circle class="cursor-pointer fill-[var(--danger)] stroke-[var(--surface)] stroke-[2]" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
-                (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
-            </ng-container>
-          </svg>
-          <div class="absolute rounded-[10px] border border-[var(--border)] bg-[rgba(0,0,0,0.7)] p-[var(--space-1)] text-center text-[11px] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.22)]" *ngIf="lineTooltip" [style.left.%]="lineTooltip.left" [style.top.%]="lineTooltip.top">
-            <p class="m-0 text-[11px] font-semibold text-[var(--text-muted)]">{{ lineTooltip.label | uppercase }}</p>
-            <span>
-              {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
-              <strong>{{ lineTooltip.value | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+      <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
+        <div class="grid gap-1">
+          <span class="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo do mês</span>
+          <div class="flex items-center gap-2">
+            <span class="text-[20px] font-semibold text-[var(--text)]">
+              {{ saldo | currency: 'BRL':'symbol':'1.2-2' }}
+            </span>
+            <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] text-[var(--text-muted)]">
+              {{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }} receitas • {{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }} despesas
             </span>
           </div>
-          <div class="mt-2 grid text-center text-[10px] text-[var(--text-muted)]" [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(0, 1fr))'">
-            <span *ngFor="let m of monthlyData">{{ m.label }}</span>
+        </div>
+
+        <div class="mt-3 grid gap-2">
+          <div class="flex h-[12px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+            <div
+              class="h-full bg-[linear-gradient(90deg,var(--success),rgba(34,197,94,0.35))]"
+              [style.width.%]="(totalRendas + totalDespesas) ? (totalRendas / (totalRendas + totalDespesas)) * 100 : 0"></div>
+            <div
+              class="h-full bg-[linear-gradient(90deg,var(--danger),rgba(239,68,68,0.35))]"
+              [style.width.%]="(totalRendas + totalDespesas) ? (totalDespesas / (totalRendas + totalDespesas)) * 100 : 0"></div>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--text-muted)]">
+            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-2 py-[2px]">
+              <span class="inline-block h-2 w-2 rounded-full bg-[rgba(34,197,94,0.9)]"></span>
+              Receitas
+              <strong class="text-[var(--text)]">
+                {{ (totalRendas + totalDespesas) ? ((totalRendas / (totalRendas + totalDespesas)) * 100 | number:'1.0-0') : 0 }}%
+              </strong>
+            </span>
+            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-2 py-[2px]">
+              <span class="inline-block h-2 w-2 rounded-full bg-[rgba(239,68,68,0.9)]"></span>
+              Despesas
+              <strong class="text-[var(--text)]">
+                {{ (totalRendas + totalDespesas) ? ((totalDespesas / (totalRendas + totalDespesas)) * 100 | number:'1.0-0') : 0 }}%
+              </strong>
+            </span>
           </div>
         </div>
-      </ng-container>
+      </div>
     </div>
 
     <aside class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
@@ -363,12 +373,12 @@
           <p class="m-0 text-[12px] text-[var(--text-muted)]">Movimentos recentes</p>
           <span class="text-[11px] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
         </div>
-        <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[10px] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
+        <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
           i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
             Mostra os lançamentos mais recentes com data e status (pago/pendente).
           </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
       </div>
       <div class="grid gap-2" *ngIf="recentTransactions.length; else semMovimentos">

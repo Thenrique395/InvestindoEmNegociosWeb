@@ -72,6 +72,7 @@ identidade, tokens, componentes e regras de uso para garantir consistencia.
 - Fundo neutro.
 - Icone pequeno com fundo leve.
 - Valor grande e descricao curta.
+- Tooltip com icone "i" padrao (ver Tooltips).
 
 ### Sidebar
 - Largura ~240px.
@@ -88,6 +89,11 @@ identidade, tokens, componentes e regras de uso para garantir consistencia.
 - Primeira dobra: visao geral.
 - Segunda dobra: analise.
 - Estados vazios elegantes (educam o usuario).
+- Card "Resultado do mes" como bloco principal:
+  - Exibe saldo do mes em destaque.
+  - Badge discreto "Receitas x Despesas".
+  - Barra proporcional com verde (receitas) e vermelho (despesas).
+  - Percentuais visiveis por chip (Receitas/Despesas).
 
 ## 7) Icones
 - Icones default: cinza/azul neutro.
@@ -127,6 +133,13 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Hover: leve elevacao (shadow) e contraste discreto.
 - Nunca usar botao retangular com texto em listas densas.
 
+## 10.1) Tooltips (padrao)
+- Icone: botao circular "i" igual ao dos cards (26x26, borda sutil, bg surface-2).
+- Tooltip: caixa 12px de radius, borda forte (--border-strong), fundo surface, shadow-lg.
+- Seta (quadrado 8px rotacionado) com mesma borda e fundo do tooltip.
+- Texto objetivo (1-2 frases).
+- Sempre alinhado a direita quando estiver no topo de cards.
+
 ## 11) Inputs e forms
 - Bordas suaves, foco com cor de acao.
 - Placeholder em texto muted.
@@ -136,8 +149,10 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Sem ilustrações pesadas.
 
 ## 13) Graficos
-- Linha fina, cores semanticas.
-- Grade leve e discreta.
+- Evitar excesso de visualizacao simultanea.
+- Preferir "Resultado do mes" (barra proporcional) para leitura rapida.
+- Verde para receitas, vermelho para despesas.
+- Se houver grafico, usar grade leve e linhas finas sem poluicao.
 
 ## 14) Acessibilidade
 - Contraste minimo recomendado.
