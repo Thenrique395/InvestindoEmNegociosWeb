@@ -63,6 +63,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     status?: string;
     recurring?: boolean;
   }[] = [];
+  maxRecentAmount = 0;
+  Math = Math;
   metasResumo = {
     total: 0,
     planned: 0,
@@ -378,7 +380,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
 
     const expenseData = cap(groupByLabel(expenses, (d) => d.categoria || 'Sem categoria'));
-    const incomeData = cap(groupByLabel(incomes, (r) => r.fonte || 'Sem fonte'));
+    const incomeData = cap(groupByLabel(incomes, (r) => r.categoria || 'Sem categoria'));
 
     this.expenseCategoryData = expenseData;
     this.incomeSourceData = incomeData;
@@ -436,7 +438,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       const db = parseLocaleDate(b.date)?.getTime() || 0;
       return db - da;
     });
-    this.recentTransactions = all.slice(0, 6);
+    const slice = all.slice(0, 6);
+    this.recentTransactions = slice;
+    this.maxRecentAmount = Math.max(...slice.map((item) => Math.abs(item.amount)), 0);
   }
 
   nextOnboarding(): void {

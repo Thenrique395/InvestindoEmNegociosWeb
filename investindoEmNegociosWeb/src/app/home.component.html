@@ -340,7 +340,8 @@
   </div>
 
   <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1" *ngIf="!isLoadingDashboard">
-    <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+    <div class="grid gap-3">
+      <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
       <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
         <div class="grid gap-1">
           <p class="m-0 text-[12px] text-[var(--text-muted)]">Resultado do mês</p>
@@ -400,6 +401,34 @@
       </div>
     </div>
 
+    <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1">
+      <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
+        <div class="grid gap-2" *ngIf="expenseCategoryData.length; else despesasVazio5">
+          <div class="flex items-center justify-between text-[12px]" *ngFor="let item of expenseCategoryData | slice:0:4">
+            <span class="truncate font-semibold">{{ item.label }}</span>
+            <span class="font-semibold text-[var(--text)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+        <ng-template #despesasVazio5>
+          <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem despesas.</div>
+        </ng-template>
+      </div>
+      <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por categoria</p>
+        <div class="grid gap-2" *ngIf="incomeSourceData.length; else receitasVazio5">
+          <div class="flex items-center justify-between text-[12px]" *ngFor="let item of incomeSourceData | slice:0:4">
+            <span class="truncate font-semibold">{{ item.label }}</span>
+            <span class="font-semibold text-[var(--text)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+        <ng-template #receitasVazio5>
+          <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem receitas por categoria.</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
     <aside class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
       <div class="flex items-center justify-between">
         <div>
@@ -438,13 +467,21 @@
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="text-[12px] font-bold" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-              {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+          <div class="flex flex-col items-end gap-2">
+            <div class="flex items-center gap-2">
+              <div class="text-[12px] font-bold" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+              </div>
+              <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
+                ↗
+              </a>
             </div>
-            <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
-              ↗
-            </a>
+            <div class="h-[4px] w-[120px] overflow-hidden rounded-full bg-[var(--surface-3)]">
+              <div
+                class="h-full"
+                [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.8)]' : 'bg-[rgba(239,68,68,0.7)]'"
+                [style.width.%]="maxRecentAmount ? (Math.abs(item.amount) / maxRecentAmount) * 100 : 0"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -454,43 +491,4 @@
     </aside>
   </div>
 
-  <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1" *ngIf="!isLoadingDashboard">
-    <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-      <div>
-        <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
-        <span class="text-[11px] text-[var(--text-muted)]">Top categorias no período selecionado.</span>
-      </div>
-      <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-center text-[11px] text-[var(--text-muted)]" *ngIf="!expenseCategoryData.length">
-        Cadastre uma despesa para ver as categorias em destaque.
-      </div>
-      <div class="grid gap-3" *ngIf="expenseCategoryData.length">
-        <div class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,2.2fr)_minmax(64px,auto)] items-center gap-2 text-[var(--text-secondary)]" *ngFor="let item of expenseCategoryData">
-          <span class="truncate text-[12px] font-semibold">{{ item.label }}</span>
-          <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
-            <div class="h-full bg-[linear-gradient(90deg,rgba(255,92,92,0.85),rgba(239,68,68,0.35))]" [style.width.%]="maxExpenseCategory ? (item.total / maxExpenseCategory) * 100 : 0"></div>
-          </div>
-          <span class="text-right text-[11px] text-[var(--text-muted)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-      <div>
-        <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por fonte</p>
-        <span class="text-[11px] text-[var(--text-muted)]">Fontes com maior impacto no período.</span>
-      </div>
-      <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-center text-[11px] text-[var(--text-muted)]" *ngIf="!incomeSourceData.length">
-        Cadastre uma receita para ver as principais fontes.
-      </div>
-      <div class="grid gap-3" *ngIf="incomeSourceData.length">
-        <div class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,2.2fr)_minmax(64px,auto)] items-center gap-2 text-[var(--text-secondary)]" *ngFor="let item of incomeSourceData">
-          <span class="truncate text-[12px] font-semibold">{{ item.label }}</span>
-          <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
-            <div class="h-full bg-[linear-gradient(90deg,rgba(34,197,94,0.85),rgba(34,197,94,0.45))]" [style.width.%]="maxIncomeSource ? (item.total / maxIncomeSource) * 100 : 0"></div>
-          </div>
-          <span class="text-right text-[11px] text-[var(--text-muted)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
