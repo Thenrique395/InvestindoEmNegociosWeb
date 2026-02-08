@@ -203,6 +203,29 @@
   background: var(--surface);
 }
 
+.sidebar-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.sidebar-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 999px;
+}
+
 .topbar__slogan {
   font-size: var(--text-sm);
   color: var(--text-muted);
@@ -337,14 +360,112 @@
   color: var(--danger);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 768px) {
   .shell {
+    position: relative;
     grid-template-columns: 1fr;
   }
 
   .sidebar {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(78vw, 320px);
+    transform: translateX(-100%);
+    transition: transform 160ms ease;
+    z-index: 40;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--sidebar);
+    box-shadow: var(--shadow-md);
+    padding-top: calc(var(--space-2) + env(safe-area-inset-top));
+  }
+
+  .shell--sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 30;
+  }
+
+  .sidebar__nav {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .sidebar {
+    min-height: auto;
+    padding: var(--space-2);
+    gap: 0.6rem;
+  }
+
+  .sidebar__brand {
+    padding: 0 0 var(--space-1);
+    gap: 0.5rem;
+  }
+
+  .sidebar__logo {
+    max-height: 28px;
+  }
+
+  .sidebar__title {
+    font-size: var(--text-md);
+  }
+
+  .sidebar__label {
+    padding: 0;
+  }
+
+  .sidebar__nav {
+    padding: 0;
+  }
+
+  .sidebar__nav a {
+    padding: var(--space-1) var(--space-2);
+    min-height: 44px;
+  }
+
+  .nav-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .nav-text {
+    font-size: var(--text-xs);
+  }
+
+  .sidebar__footer {
+    margin-top: 0;
+    padding: var(--space-1) 0 0;
+  }
+
+  .topbar {
+    height: auto;
+    min-height: 56px;
+    padding: var(--space-2);
+  }
+
+  .user-trigger .user-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .user-trigger .user-name {
+    max-width: 90px;
   }
 }
 

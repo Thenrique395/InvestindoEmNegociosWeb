@@ -36,6 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   unreadCount = 0;
   notificationsLoading = false;
   notificationsError = '';
+  sidebarOpen = false;
   profile: UserProfile | null = null;
   feedbackMessage: UiFeedbackMessage | null = null;
   @HostBinding('class.light') get lightClass(): boolean {
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
         this.userMenuOpen = false;
         this.notificationsOpen = false;
+        this.sidebarOpen = false;
         if (this.isLogged) {
           if (!event.urlAfterRedirects.startsWith('/receitas')) {
             this.apiDataService.refresh();
@@ -195,6 +197,14 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.notificationsOpen && !this.notifications.length) {
       this.fetchNotifications();
     }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
   }
 
   refreshNotifications(): void {

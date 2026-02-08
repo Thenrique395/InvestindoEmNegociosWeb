@@ -24,7 +24,8 @@
   </header>
 
   <ng-container *ngIf="isLogged">
-    <div class="shell">
+    <div class="shell" [class.shell--sidebar-open]="sidebarOpen">
+      <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
       <aside class="sidebar">
         <div class="sidebar__brand">
           <img
@@ -35,7 +36,7 @@
           <span class="sidebar__title">{{ brandName }}</span>
         </div>
         <div class="sidebar__label">Menu</div>
-        <nav class="sidebar__nav">
+        <nav class="sidebar__nav" (click)="closeSidebar()">
           <a routerLink="/dashboard" routerLinkActive="active" *ngIf="hasAccess('Basic')" (click)="reloadIfSame('/dashboard', $event)">
             <span class="nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -164,6 +165,11 @@
 
       <div class="content" [class.content--compact]="isReceitasRoute">
         <header class="topbar">
+          <button class="sidebar-toggle" type="button" (click)="toggleSidebar()" aria-label="Abrir menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <div class="topbar__slogan">{{ brandSlogan }}</div>
           <div class="topbar__actions">
             <div class="notifications" [class.open]="notificationsOpen">
