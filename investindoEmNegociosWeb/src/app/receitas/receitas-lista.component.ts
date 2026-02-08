@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { NgFor, NgIf, DecimalPipe, NgClass } from '@angular/common';
 import { StoredIncome } from '../data/api-data.service';
 import { incomeStatusLabel } from '../utils/status';
 
 @Component({
   selector: 'app-receitas-lista',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe],
+  imports: [NgFor, NgIf, DecimalPipe, NgClass],
   templateUrl: './receitas-lista.component.html',
   styleUrls: ['./receitas-lista.component.scss']
 })

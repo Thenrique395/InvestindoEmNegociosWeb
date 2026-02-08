@@ -1,29 +1,56 @@
-<div class="modal" *ngIf="mostrarForm">
-  <div class="modal__backdrop" (click)="fechar()"></div>
-  <div class="modal__content">
-    <div class="modal__header">
-      <div>
-        <p class="eyebrow">{{ isEdit ? 'Editar despesa' : 'Nova despesa' }}</p>
-        <h3>{{ isEdit ? 'Editar lançamento' : 'Adicionar lançamento' }}</h3>
+<div *ngIf="mostrarForm" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+  <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fechar()"></div>
+  <div class="relative w-full max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]">
+    <div class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-6 py-5">
+      <div class="space-y-1">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+          {{ isEdit ? 'Editar despesa' : 'Nova despesa' }}
+        </p>
+        <h3 class="text-xl font-semibold text-[var(--text)]">
+          {{ isEdit ? 'Editar lançamento' : 'Adicionar lançamento' }}
+        </h3>
       </div>
-      <button class="modal__close" type="button" (click)="fechar()">✕</button>
+      <button
+        class="grid h-10 w-10 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition hover:text-[var(--text)]"
+        type="button"
+        (click)="fechar()"
+        aria-label="Fechar modal">
+        ✕
+      </button>
     </div>
 
-    <form class="form" (ngSubmit)="salvar()" autocomplete="off">
-      <label>
+    <form class="grid gap-4 px-6 py-6" (ngSubmit)="salvar()" autocomplete="off">
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Nome da despesa
-        <input type="text" [(ngModel)]="novaDespesa.nome" name="nome" placeholder="Ex: aluguel, mercado..." required />
+        <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+          type="text"
+          [(ngModel)]="novaDespesa.nome"
+          name="nome"
+          placeholder="Ex: aluguel, mercado..."
+          required />
       </label>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Forma de pagamento
-        <select [(ngModel)]="formaPagamento" name="formaPagamento" (ngModelChange)="onFormaPagamentoChange($event)">
+        <select
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+          [(ngModel)]="formaPagamento"
+          name="formaPagamento"
+          (ngModelChange)="onFormaPagamentoChange($event)">
           <option value="avista">À vista</option>
           <option value="cartao">Cartão de crédito</option>
         </select>
       </label>
-      <label *ngIf="formaPagamento === 'cartao'">
+
+      <label *ngIf="formaPagamento === 'cartao'" class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Cartão
-        <select [(ngModel)]="cartaoSelecionadoId" name="cartao" [disabled]="!cartoes.length" (ngModelChange)="onCartaoChange($event)">
+        <select
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 disabled:opacity-60"
+          [(ngModel)]="cartaoSelecionadoId"
+          name="cartao"
+          [disabled]="!cartoes.length"
+          (ngModelChange)="onCartaoChange($event)">
           <option *ngIf="!cartoes.length" [ngValue]="null" disabled>Nenhum cartão cadastrado</option>
           <ng-container *ngIf="cartoes.length">
             <option *ngFor="let c of cartoes" [ngValue]="c.id">
@@ -31,19 +58,23 @@
             </option>
           </ng-container>
         </select>
-        <small class="muted" *ngIf="cartoes.length">Selecionado: {{ cartaoSelecionadoLabel }}</small>
-        <small class="muted" *ngIf="!cartoes.length">Cadastre um cartão para usar aqui.</small>
+        <small class="text-xs text-[var(--text-muted)]" *ngIf="cartoes.length">Selecionado: {{ cartaoSelecionadoLabel }}</small>
+        <small class="text-xs text-[var(--text-muted)]" *ngIf="!cartoes.length">Cadastre um cartão para usar aqui.</small>
       </label>
-      <label *ngIf="formaPagamento === 'cartao'">
-        Parcelar?
-        <div class="toggle-row">
-          <input type="checkbox" [(ngModel)]="parcelar" name="parcelar" (ngModelChange)="onParcelarToggle($event)" />
-          <span>{{ parcelar ? 'Sim, parcelar' : 'Não, à vista' }}</span>
-        </div>
+
+      <label *ngIf="formaPagamento === 'cartao'" class="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+        <span class="text-sm font-semibold text-[var(--text)]">Parcelar?</span>
+        <label class="relative inline-flex items-center">
+          <input class="peer sr-only" type="checkbox" [(ngModel)]="parcelar" name="parcelar" (ngModelChange)="onParcelarToggle($event)" />
+          <span class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:bg-[var(--primary)]/70"></span>
+          <span class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5"></span>
+        </label>
       </label>
-      <label *ngIf="formaPagamento === 'cartao' && parcelar">
+
+      <label *ngIf="formaPagamento === 'cartao' && parcelar" class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Número de parcelas
         <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
           type="text"
           inputmode="numeric"
           pattern="[0-9]*"
@@ -56,16 +87,20 @@
           placeholder="Ex: 10"
           required />
       </label>
-      <label *ngIf="formaPagamento !== 'cartao'">
-        Despesa fixa mensal?
-        <div class="toggle-row">
-          <input type="checkbox" [(ngModel)]="fixa" name="fixa" (ngModelChange)="fixaChange.emit($event)" />
-          <span>{{ fixa ? 'Sim, repetir mensalmente' : 'Não' }}</span>
-        </div>
+
+      <label *ngIf="formaPagamento !== 'cartao'" class="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+        <span class="text-sm font-semibold text-[var(--text)]">Despesa fixa mensal?</span>
+        <label class="relative inline-flex items-center">
+          <input class="peer sr-only" type="checkbox" [(ngModel)]="fixa" name="fixa" (ngModelChange)="fixaChange.emit($event)" />
+          <span class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:bg-[var(--primary)]/70"></span>
+          <span class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5"></span>
+        </label>
       </label>
-      <label *ngIf="fixa && formaPagamento !== 'cartao'">
+
+      <label *ngIf="fixa && formaPagamento !== 'cartao'" class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Duração (meses, opcional — deixe em branco para repetir indefinidamente)
         <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
           type="number"
           min="1"
           max="120"
@@ -74,22 +109,29 @@
           (ngModelChange)="fixaMesesChange.emit($event)"
           placeholder="Ex: 12" />
       </label>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Categoria
-        <select [(ngModel)]="novaDespesa.categoryId" name="categoria">
+        <select
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+          [(ngModel)]="novaDespesa.categoryId"
+          name="categoria">
           <option [ngValue]="null" disabled>Selecione</option>
           <option *ngIf="!categorias.length" [ngValue]="null" disabled>Sem categorias cadastradas</option>
           <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.name }}</option>
         </select>
-        <div *ngIf="erroCategoria" class="mt-1 text-sm text-red-500" aria-live="polite">{{ erroCategoria }}</div>
+        <div *ngIf="erroCategoria" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroCategoria }}</div>
       </label>
-      <div class="alert-inline" *ngIf="!categorias.length">
+
+      <div class="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200" *ngIf="!categorias.length">
         Crie uma categoria primeiro para continuar.
-        <a class="alert-link" routerLink="/categorias" (click)="fechar()">Abrir categorias</a>
+        <a class="font-semibold text-amber-100 underline underline-offset-2" routerLink="/categorias" (click)="fechar()">Abrir categorias</a>
       </div>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Valor (R$)
         <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
           type="text"
           inputmode="decimal"
           placeholder="R$ 0,00"
@@ -99,9 +141,11 @@
           name="valor"
           required />
       </label>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Primeiro vencimento (DD/MM/AAAA)
         <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
           type="text"
           inputmode="numeric"
           placeholder="15/08/2026"
@@ -111,26 +155,37 @@
           (ngModelChange)="onVencimentoChange($event)"
           name="vencimento"
           required />
-        <div *ngIf="erroData" class="mt-1 text-sm text-red-500" aria-live="polite">{{ erroData }}</div>
+        <div *ngIf="erroData" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroData }}</div>
       </label>
-      <div class="resumo" *ngIf="valorInput">
-        <span>Resumo</span>
-        <p *ngIf="fixa">
+
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm" *ngIf="valorInput">
+        <span class="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Resumo</span>
+        <p class="mt-1 text-[var(--text)]" *ngIf="fixa">
           Despesa fixa mensal de <strong>{{ valorInput }}</strong>
           <ng-container *ngIf="fixaMeses"> por {{ fixaMeses }} meses</ng-container>.
         </p>
-        <p *ngIf="!fixa && formaPagamento === 'cartao' && parcelar && parcelasCount > 1">
+        <p class="mt-1 text-[var(--text)]" *ngIf="!fixa && formaPagamento === 'cartao' && parcelar && parcelasCount > 1">
           Serão {{ parcelasCount }}x de
           <strong>{{ valorParcelaLabel }}</strong>
           no cartão {{ cartaoSelecionadoLabel }}.
         </p>
-        <p *ngIf="!fixa && !(formaPagamento === 'cartao' && parcelar && parcelasCount > 1)">
+        <p class="mt-1 text-[var(--text)]" *ngIf="!fixa && !(formaPagamento === 'cartao' && parcelar && parcelasCount > 1)">
           Pagamento único de <strong>{{ valorInput }}</strong>.
         </p>
       </div>
-      <div class="modal__actions">
-        <button type="button" class="btn-danger ghost" [disabled]="saving" (click)="fechar()">↩ Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="saving || !novaDespesa.categoryId">
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button
+          type="button"
+          class="inline-flex items-center rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200 transition hover:border-rose-400/60"
+          [disabled]="saving"
+          (click)="fechar()">
+          ↩ Cancelar
+        </button>
+        <button
+          type="submit"
+          class="inline-flex items-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="saving || !novaDespesa.categoryId">
           {{ saving ? (isEdit ? 'Atualizando...' : 'Salvando...') : (isEdit ? 'Editar despesa' : 'Salvar despesa') }}
         </button>
       </div>

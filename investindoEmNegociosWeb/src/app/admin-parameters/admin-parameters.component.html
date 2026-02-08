@@ -1,8 +1,8 @@
-<section class="admin-params">
-  <header class="admin-params__header">
+<section class="admin-params space-y-6 text-[var(--text)]">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
     <div>
-      <h1>Parâmetros do sistema</h1>
-      <p>Controle bandeiras de cartão e formas de pagamento disponíveis.</p>
+      <h1 class="text-2xl font-semibold tracking-tight">Parâmetros do sistema</h1>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">Controle bandeiras de cartão e formas de pagamento disponíveis.</p>
     </div>
     <button type="button" class="ghost sm" (click)="loadAll()" [disabled]="loading" [attr.aria-busy]="loading">
       <span *ngIf="!loading">Atualizar</span>
@@ -10,22 +10,26 @@
     </button>
   </header>
 
-  <div class="status" *ngIf="loading">Carregando parâmetros...</div>
-  <div class="status error" *ngIf="error">{{ error }}</div>
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
+    Carregando parâmetros...
+  </div>
+  <div class="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-300" *ngIf="error">
+    {{ error }}
+  </div>
 
-  <div class="grid" *ngIf="!loading">
-    <div class="card">
-      <div class="card__title">Bandeiras de cartão</div>
-      <div class="create-row">
+  <div class="grid gap-6 lg:grid-cols-2" *ngIf="!loading">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="text-sm font-semibold text-[var(--text)]">Bandeiras de cartão</div>
+      <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <input
           type="text"
-          class="create-input"
+          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Nome da bandeira"
           [(ngModel)]="newBrandName"
           name="newBrandName" />
         <input
           type="text"
-          class="create-input"
+          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Código (ex: visa)"
           [(ngModel)]="newBrandCode"
           name="newBrandCode" />
@@ -42,26 +46,26 @@
           {{ savingCreateBrand ? 'Salvando...' : 'Cadastrar' }}
         </button>
       </div>
-      <div class="status error" *ngIf="createBrandError">{{ createBrandError }}</div>
-      <div class="card__toolbar">
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="createBrandError">{{ createBrandError }}</div>
+      <div class="mt-4 flex items-center gap-3">
         <input
           type="text"
-          class="search"
+          class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Buscar por nome ou codigo"
           [(ngModel)]="brandFilter" />
-        <span class="count" *ngIf="brandFilter">
+        <span class="text-sm text-[var(--text-muted)]" *ngIf="brandFilter">
           {{ filteredCardBrands.length }} de {{ cardBrands.length }}
         </span>
       </div>
-      <div class="status error" *ngIf="errorCardBrands">{{ errorCardBrands }}</div>
-      <div class="list">
-        <div class="list__item" *ngFor="let brand of filteredCardBrands">
-          <div class="item-info">
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="errorCardBrands">{{ errorCardBrands }}</div>
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let brand of filteredCardBrands">
+          <div class="flex flex-wrap items-center gap-2 text-sm">
             <strong>{{ brand.name }}</strong>
-            <span class="muted">{{ brand.code }}</span>
-            <span class="item-meta">{{ brand.isActive ? 'Ativo' : 'Desativado' }}</span>
-            <span class="item-meta" *ngIf="brandUpdatedLabel(brand)">{{ brandUpdatedLabel(brand) }}</span>
-            <span class="item-meta saving" *ngIf="isSavingBrand(brand)">Salvando...</span>
+            <span class="text-[var(--text-muted)]">{{ brand.code }}</span>
+            <span class="text-[var(--text-muted)]">{{ brand.isActive ? 'Ativo' : 'Desativado' }}</span>
+            <span class="text-[var(--text-muted)]" *ngIf="brandUpdatedLabel(brand)">{{ brandUpdatedLabel(brand) }}</span>
+            <span class="text-amber-300" *ngIf="isSavingBrand(brand)">Salvando...</span>
           </div>
           <label class="switch">
             <input
@@ -72,19 +76,19 @@
             <span class="slider"></span>
           </label>
         </div>
-        <div class="empty" *ngIf="!filteredCardBrands.length">
+        <div class="text-sm text-[var(--text-muted)]" *ngIf="!filteredCardBrands.length">
           {{ brandFilter ? 'Nenhuma bandeira encontrada.' : 'Nenhuma bandeira cadastrada.' }}
-          <span class="empty-hint" *ngIf="!brandFilter">Use o cadastro acima para adicionar a primeira.</span>
+          <span class="mt-1 block text-sm text-[var(--text-muted)]" *ngIf="!brandFilter">Use o cadastro acima para adicionar a primeira.</span>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card__title">Formas de pagamento</div>
-      <div class="create-row">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="text-sm font-semibold text-[var(--text)]">Formas de pagamento</div>
+      <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <input
           type="text"
-          class="create-input"
+          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Nome da forma de pagamento"
           [(ngModel)]="newMethodName"
           name="newMethodName" />
@@ -101,25 +105,25 @@
           {{ savingCreateMethod ? 'Salvando...' : 'Cadastrar' }}
         </button>
       </div>
-      <div class="status error" *ngIf="createMethodError">{{ createMethodError }}</div>
-      <div class="card__toolbar">
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="createMethodError">{{ createMethodError }}</div>
+      <div class="mt-4 flex items-center gap-3">
         <input
           type="text"
-          class="search"
+          class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Buscar por nome"
           [(ngModel)]="methodFilter" />
-        <span class="count" *ngIf="methodFilter">
+        <span class="text-sm text-[var(--text-muted)]" *ngIf="methodFilter">
           {{ filteredPaymentMethods.length }} de {{ paymentMethods.length }}
         </span>
       </div>
-      <div class="status error" *ngIf="errorPaymentMethods">{{ errorPaymentMethods }}</div>
-      <div class="list">
-        <div class="list__item" *ngFor="let method of filteredPaymentMethods">
-          <div class="item-info">
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="errorPaymentMethods">{{ errorPaymentMethods }}</div>
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let method of filteredPaymentMethods">
+          <div class="flex flex-wrap items-center gap-2 text-sm">
             <strong>{{ method.name }}</strong>
-            <span class="item-meta">{{ method.isActive ? 'Ativo' : 'Desativado' }}</span>
-            <span class="item-meta" *ngIf="methodUpdatedLabel(method)">{{ methodUpdatedLabel(method) }}</span>
-            <span class="item-meta saving" *ngIf="isSavingMethod(method)">Salvando...</span>
+            <span class="text-[var(--text-muted)]">{{ method.isActive ? 'Ativo' : 'Desativado' }}</span>
+            <span class="text-[var(--text-muted)]" *ngIf="methodUpdatedLabel(method)">{{ methodUpdatedLabel(method) }}</span>
+            <span class="text-amber-300" *ngIf="isSavingMethod(method)">Salvando...</span>
           </div>
           <label class="switch">
             <input
@@ -130,24 +134,24 @@
             <span class="slider"></span>
           </label>
         </div>
-        <div class="empty" *ngIf="!filteredPaymentMethods.length">
+        <div class="text-sm text-[var(--text-muted)]" *ngIf="!filteredPaymentMethods.length">
           {{ methodFilter ? 'Nenhuma forma encontrada.' : 'Nenhuma forma de pagamento cadastrada.' }}
-          <span class="empty-hint" *ngIf="!methodFilter">Use o cadastro acima para adicionar a primeira.</span>
+          <span class="mt-1 block text-sm text-[var(--text-muted)]" *ngIf="!methodFilter">Use o cadastro acima para adicionar a primeira.</span>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card__title">Bancos e corretoras</div>
-      <div class="create-row">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="text-sm font-semibold text-[var(--text)]">Bancos e corretoras</div>
+      <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <input
           type="text"
-          class="create-input"
+          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Nome da instituição"
           [(ngModel)]="newInstitutionName"
           name="newInstitutionName" />
         <select
-          class="create-select"
+          class="h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           [(ngModel)]="newInstitutionType"
           name="newInstitutionType">
           <option value="Bank">Banco</option>
@@ -166,26 +170,26 @@
           {{ savingCreateInstitution ? 'Salvando...' : 'Cadastrar' }}
         </button>
       </div>
-      <div class="status error" *ngIf="createInstitutionError">{{ createInstitutionError }}</div>
-      <div class="card__toolbar">
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="createInstitutionError">{{ createInstitutionError }}</div>
+      <div class="mt-4 flex items-center gap-3">
         <input
           type="text"
-          class="search"
+          class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
           placeholder="Buscar por nome"
           [(ngModel)]="institutionFilter" />
-        <span class="count" *ngIf="institutionFilter">
+        <span class="text-sm text-[var(--text-muted)]" *ngIf="institutionFilter">
           {{ filteredInstitutions.length }} de {{ institutions.length }}
         </span>
       </div>
-      <div class="status error" *ngIf="errorInstitutions">{{ errorInstitutions }}</div>
-      <div class="list">
-        <div class="list__item" *ngFor="let inst of filteredInstitutions">
-          <div class="item-info">
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="errorInstitutions">{{ errorInstitutions }}</div>
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let inst of filteredInstitutions">
+          <div class="flex flex-wrap items-center gap-2 text-sm">
             <strong>{{ inst.name }}</strong>
-            <span class="item-meta">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
-            <span class="item-meta">{{ inst.isActive ? 'Ativo' : 'Desativado' }}</span>
-            <span class="item-meta" *ngIf="institutionUpdatedLabel(inst)">{{ institutionUpdatedLabel(inst) }}</span>
-            <span class="item-meta saving" *ngIf="isSavingInstitution(inst)">Salvando...</span>
+            <span class="text-[var(--text-muted)]">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
+            <span class="text-[var(--text-muted)]">{{ inst.isActive ? 'Ativo' : 'Desativado' }}</span>
+            <span class="text-[var(--text-muted)]" *ngIf="institutionUpdatedLabel(inst)">{{ institutionUpdatedLabel(inst) }}</span>
+            <span class="text-amber-300" *ngIf="isSavingInstitution(inst)">Salvando...</span>
           </div>
           <label class="switch">
             <input
@@ -196,41 +200,41 @@
             <span class="slider"></span>
           </label>
         </div>
-        <div class="empty" *ngIf="!filteredInstitutions.length">
+        <div class="text-sm text-[var(--text-muted)]" *ngIf="!filteredInstitutions.length">
           {{ institutionFilter ? 'Nenhuma instituição encontrada.' : 'Nenhuma instituição cadastrada.' }}
-          <span class="empty-hint" *ngIf="!institutionFilter">Use o cadastro acima para adicionar a primeira.</span>
+          <span class="mt-1 block text-sm text-[var(--text-muted)]" *ngIf="!institutionFilter">Use o cadastro acima para adicionar a primeira.</span>
         </div>
       </div>
     </div>
 
-    <div class="card notification-card">
-      <div class="card__title">Notificações globais</div>
-      <p class="muted">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
-      <div class="status error" *ngIf="errorNotifications">{{ errorNotifications }}</div>
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="text-sm font-semibold text-[var(--text)]">Notificações globais</div>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
+      <div class="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" *ngIf="errorNotifications">{{ errorNotifications }}</div>
 
-      <div class="settings-grid">
-        <div class="settings-block">
-          <strong>Receitas</strong>
-          <label class="toggle-row">
+      <div class="mt-4 grid gap-4 md:grid-cols-2">
+        <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <strong class="text-sm text-[var(--text)]">Receitas</strong>
+          <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
             <span>Ativar lembretes</span>
             <input type="checkbox" [(ngModel)]="notificationSettings.incomeUpcomingEnabled" />
           </label>
-          <label class="field-row">
+          <label class="field-row flex items-center justify-between gap-3 text-sm text-[var(--text)]">
             <span>Receber em</span>
-            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.incomeDaysBefore" />
+            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.incomeDaysBefore" class="h-9 w-20 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
             <span>dias</span>
           </label>
         </div>
 
-        <div class="settings-block">
-          <strong>Despesas</strong>
-          <label class="toggle-row">
+        <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <strong class="text-sm text-[var(--text)]">Despesas</strong>
+          <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
             <span>Vencimento próximo</span>
             <input type="checkbox" [(ngModel)]="notificationSettings.expenseUpcomingEnabled" />
           </label>
-          <label class="field-row">
+          <label class="field-row flex items-center justify-between gap-3 text-sm text-[var(--text)]">
             <span>Vence em</span>
-            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.expenseDaysBefore" />
+            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.expenseDaysBefore" class="h-9 w-20 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
             <span>dias</span>
           </label>
           <label class="toggle-row">

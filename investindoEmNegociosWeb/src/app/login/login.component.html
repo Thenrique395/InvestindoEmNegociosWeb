@@ -1,25 +1,42 @@
-<section class="login">
-  <div class="login__layout">
-    <div class="login__visual" aria-hidden="true"></div>
-    <div class="login__card">
-      <h1>Entrar</h1>
-      <p class="muted">Acesse para acompanhar seu plano, carteira e alertas.</p>
-      <form class="login__form" (ngSubmit)="onSubmit()">
-        <label>
+<section class="flex min-h-[70vh] items-center justify-center p-[var(--space-3)]">
+  <div
+    class="grid w-full max-w-[980px] grid-cols-1 gap-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] md:grid-cols-2">
+    <div
+      class="min-h-[220px] bg-[radial-gradient(circle_at_20%_20%,rgba(37,99,235,0.12),transparent_45%),linear-gradient(160deg,var(--surface-2),var(--surface))] md:min-h-full"
+      aria-hidden="true"></div>
+    <div class="flex flex-col gap-2 p-[var(--space-4)]">
+      <h1 class="m-0 text-[var(--text-3xl)] text-[var(--text)]">Entrar</h1>
+      <p class="m-0 text-[var(--text-muted)]">
+        Acesse para acompanhar seu plano, carteira e alertas.
+      </p>
+      <form class="mt-4 flex flex-col gap-4" (ngSubmit)="onSubmit()">
+        <label class="flex flex-col gap-2 text-[var(--text)] font-semibold">
           Email
-          <input [(ngModel)]="email" name="email" type="email" placeholder="E-mail" required />
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
+            [(ngModel)]="email"
+            name="email"
+            type="email"
+            placeholder="E-mail"
+            required />
         </label>
-        <label>
+        <label class="flex flex-col gap-2 text-[var(--text)] font-semibold">
           Senha
-          <input [(ngModel)]="password" name="password" type="password" placeholder="••••••••" required />
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
+            [(ngModel)]="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            required />
         </label>
-        <button type="submit" class="btn-primary" [disabled]="loading">
+        <button type="submit" class="btn-primary w-full" [disabled]="loading">
           {{ loading ? 'Autenticando...' : 'Entrar' }}
         </button>
-        <a class="helper" href="#">Esqueci minha senha</a>
+        <a class="text-[var(--primary)] font-semibold hover:underline" href="#">Esqueci minha senha</a>
       </form>
-      <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
-      <p class="error" *ngIf="error">{{ error }}</p>
+      <p class="mt-3 text-[var(--primary)] font-semibold" *ngIf="feedback">{{ feedback }}</p>
+      <p class="mt-3 text-[var(--danger)] font-semibold" *ngIf="error">{{ error }}</p>
     </div>
   </div>
 </section>

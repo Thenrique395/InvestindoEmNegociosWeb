@@ -45,28 +45,35 @@
       <small>Clique em “Adicionar meta” para criar sua primeira meta anual.</small>
     </div>
 
-    <div class="cards" *ngIf="!loading && metas.length">
-      <article class="goal-card" *ngFor="let meta of metas">
-        <div class="goal-card__row">
+    <div class="grid gap-4 md:grid-cols-2" *ngIf="!loading && metas.length">
+      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]" *ngFor="let meta of metas">
+        <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="chip ghost">{{ meta.year }}</p>
-            <h3>{{ meta.title }}</h3>
-            <p class="muted" *ngIf="meta.description">{{ meta.description }}</p>
+            <p class="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-1 text-xs font-semibold text-[var(--text-muted)]">{{ meta.year }}</p>
+            <h3 class="mt-2 text-lg font-semibold text-[var(--text)]">{{ meta.title }}</h3>
+            <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="meta.description">{{ meta.description }}</p>
           </div>
-          <span class="chip status" [ngClass]="statusClass(meta.status)">
-            <span class="dot"></span>
+          <span
+            class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
+            [ngClass]="{
+              'bg-emerald-500/10 text-emerald-300': statusClass(meta.status) === 'ok',
+              'bg-amber-500/10 text-amber-300': statusClass(meta.status) === 'warn',
+              'bg-rose-500/10 text-rose-300': statusClass(meta.status) === 'danger',
+              'bg-slate-500/15 text-[var(--text-muted)]': statusClass(meta.status) === 'neutral'
+            }">
+            <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
             {{ statusLabel(meta.status) }}
           </span>
         </div>
-        <div class="progress">
-          <div class="progress__bar">
-            <span class="progress__fill" [style.width.%]="progresso(meta)"></span>
+        <div class="mt-4">
+          <div class="h-2 w-full rounded-full bg-[var(--surface-2)]">
+            <span class="block h-2 rounded-full bg-[var(--primary)]" [style.width.%]="progresso(meta)"></span>
           </div>
-        <div class="progress__info">
+        <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
           <span>{{ progresso(meta) }}% concluída</span>
           <span>Falta R$ {{ (meta.targetAmount - meta.currentAmount) | number : '1.2-2' }}</span>
           <span
-            class="muted badge-tip"
+            class="text-[var(--text-muted)]"
             *ngIf="contribResumo[meta.id]"
             [attr.title]="aporteTooltip(meta.id)"
             (click)="abrirHistorico(meta)"
@@ -77,21 +84,21 @@
           </span>
         </div>
         </div>
-        <div class="goal-card__row values">
+        <div class="mt-4 grid gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-3">
           <div>
-            <p class="label">Valor da meta</p>
-            <p class="value">R$ {{ meta.targetAmount | number : '1.2-2' }}</p>
+            <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Valor da meta</p>
+            <p class="text-sm font-semibold text-[var(--text)]">R$ {{ meta.targetAmount | number : '1.2-2' }}</p>
           </div>
           <div>
-            <p class="label">Acumulado</p>
-            <p class="value">R$ {{ meta.currentAmount | number : '1.2-2' }}</p>
+            <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Acumulado</p>
+            <p class="text-sm font-semibold text-[var(--text)]">R$ {{ meta.currentAmount | number : '1.2-2' }}</p>
           </div>
           <div *ngIf="meta.expectedMonthly">
-            <p class="label">Aporte previsto/mês</p>
-            <p class="value">R$ {{ meta.expectedMonthly | number : '1.2-2' }}</p>
+            <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Aporte previsto/mês</p>
+            <p class="text-sm font-semibold text-[var(--text)]">R$ {{ meta.expectedMonthly | number : '1.2-2' }}</p>
           </div>
         </div>
-        <div class="goal-card__row actions">
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
           <button type="button" class="ghost sm" (click)="abrirModalEditar(meta)">Editar</button>
           <button type="button" class="ghost sm" *ngIf="!isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
           <button

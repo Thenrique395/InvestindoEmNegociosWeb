@@ -1,125 +1,135 @@
-<div class="onboarding">
-  <div class="card">
-    <div class="wizard">
-      <div class="wizard__steps">
-        <span [class.active]="step === 0" [class.done]="step > 0">1</span>
-        <span [class.active]="step === 1" [class.done]="step > 1">2</span>
-        <span [class.active]="step === 2">3</span>
+<div class="grid min-h-[70vh] place-items-center px-[var(--space-3)] py-[var(--space-4)]">
+  <div class="w-full max-w-[720px] min-w-0 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-[clamp(1.5rem,2.5vw,2rem)] shadow-[var(--shadow-md)]">
+    <div class="mb-4 flex items-center justify-between">
+      <div class="flex gap-2">
+        <span class="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-sm)] font-bold text-[var(--text-muted)]"
+          [ngClass]="step === 0 ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)] text-[var(--text)]' : step > 0 ? 'border-[rgba(37,99,235,0.35)] text-[var(--primary)]' : ''">1</span>
+        <span class="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-sm)] font-bold text-[var(--text-muted)]"
+          [ngClass]="step === 1 ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)] text-[var(--text)]' : step > 1 ? 'border-[rgba(37,99,235,0.35)] text-[var(--primary)]' : ''">2</span>
+        <span class="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-sm)] font-bold text-[var(--text-muted)]"
+          [ngClass]="step === 2 ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)] text-[var(--text)]' : ''">3</span>
       </div>
-      <p class="wizard__label">Passo {{ step + 1 }} de 3</p>
+      <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">Passo {{ step + 1 }} de 3</p>
     </div>
 
     <div *ngIf="step === 0">
-      <p class="eyebrow">Primeiro acesso</p>
-      <h2>Complete seus dados</h2>
-      <p class="muted">Usamos essas informações para personalizar sua experiência e manter sua conta segura.</p>
+      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Primeiro acesso</p>
+      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Complete seus dados</h2>
+      <p class="mt-2 text-[var(--text-muted)]">Usamos essas informações para personalizar sua experiência e manter sua conta segura.</p>
 
-      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
-        <label class="full">
+      <form class="mt-4 grid gap-4 sm:grid-cols-2" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="sm:col-span-2 grid gap-2 font-semibold text-[var(--text)]">
           <span>Nome completo</span>
-          <input type="text" formControlName="fullName" placeholder="Seu nome completo" />
-          <small class="error" *ngIf="hasError('fullName', 'required')">Informe seu nome.</small>
-          <small class="error" *ngIf="hasError('fullName', 'minlength')">Mínimo de 3 caracteres.</small>
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text" formControlName="fullName" placeholder="Seu nome completo" />
+          <small class="text-[var(--danger)]" *ngIf="hasError('fullName', 'required')">Informe seu nome.</small>
+          <small class="text-[var(--danger)]" *ngIf="hasError('fullName', 'minlength')">Mínimo de 3 caracteres.</small>
         </label>
 
-        <label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
           <span>CPF</span>
-          <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
-          <small class="error" *ngIf="hasError('document', 'required')">Informe o documento.</small>
-          <small class="error" *ngIf="hasError('document', 'cpf')">CPF deve ter exatamente 11 dígitos.</small>
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
+          <small class="text-[var(--danger)]" *ngIf="hasError('document', 'required')">Informe o documento.</small>
+          <small class="text-[var(--danger)]" *ngIf="hasError('document', 'cpf')">CPF deve ter exatamente 11 dígitos.</small>
         </label>
 
-        <label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
           <span>Telefone</span>
-          <input type="tel" formControlName="phone" placeholder="+55 81 999999999" (input)="onPhoneInput($event)" />
-          <small class="error" *ngIf="hasError('phone', 'required')">Informe o telefone.</small>
-          <small class="error" *ngIf="hasError('phone', 'phone')">Use o formato +55 81 999999999.</small>
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="tel" formControlName="phone" placeholder="+55 81 999999999" (input)="onPhoneInput($event)" />
+          <small class="text-[var(--danger)]" *ngIf="hasError('phone', 'required')">Informe o telefone.</small>
+          <small class="text-[var(--danger)]" *ngIf="hasError('phone', 'phone')">Use o formato +55 81 999999999.</small>
         </label>
 
-        <label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
           <span>Data de nascimento</span>
-          <input type="date" formControlName="birthDate" />
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="date" formControlName="birthDate" />
         </label>
 
-        <label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
           <span>Cidade</span>
-          <input type="text" formControlName="city" placeholder="Ex.: Recife" />
-          <small class="error" *ngIf="hasError('city', 'required')">Informe sua cidade.</small>
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text" formControlName="city" placeholder="Ex.: Recife" />
+          <small class="text-[var(--danger)]" *ngIf="hasError('city', 'required')">Informe sua cidade.</small>
         </label>
 
-        <label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
           <span>Estado (UF)</span>
-          <input type="text" formControlName="state" placeholder="Ex.: PE" maxlength="2" />
-          <small class="error" *ngIf="hasError('state', 'required')">Informe seu estado.</small>
-          <small class="error" *ngIf="hasError('state', 'minlength')">Use 2 letras.</small>
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text" formControlName="state" placeholder="Ex.: PE" maxlength="2" />
+          <small class="text-[var(--danger)]" *ngIf="hasError('state', 'required')">Informe seu estado.</small>
+          <small class="text-[var(--danger)]" *ngIf="hasError('state', 'minlength')">Use 2 letras.</small>
         </label>
 
-        <label class="full">
+        <label class="sm:col-span-2 grid gap-2 font-semibold text-[var(--text)]">
           <span>País</span>
-          <input type="text" formControlName="country" placeholder="Ex.: Brasil" />
-          <small class="error" *ngIf="hasError('country', 'required')">Informe seu país.</small>
+          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text" formControlName="country" placeholder="Ex.: Brasil" />
+          <small class="text-[var(--danger)]" *ngIf="hasError('country', 'required')">Informe seu país.</small>
         </label>
 
-        <div class="actions">
-          <button class="btn-primary" type="submit" [disabled]="loading">
+        <div class="sm:col-span-2">
+          <button class="btn-primary w-full" type="submit" [disabled]="loading">
             {{ loading ? 'Salvando...' : 'Salvar e continuar' }}
           </button>
         </div>
 
-        <p class="feedback success" *ngIf="feedback">{{ feedback }}</p>
-        <p class="feedback error" *ngIf="error">{{ error }}</p>
+        <p class="sm:col-span-2 font-semibold text-[var(--success)]" *ngIf="feedback">{{ feedback }}</p>
+        <p class="sm:col-span-2 font-semibold text-[var(--danger)]" *ngIf="error">{{ error }}</p>
       </form>
     </div>
 
-    <div *ngIf="step === 1" class="step">
-      <p class="eyebrow">Seu foco inicial</p>
-      <h2>Onde voce quer comecar?</h2>
-      <p class="muted">Escolha o que deseja organizar primeiro. Voce pode mudar depois.</p>
+    <div *ngIf="step === 1" class="grid gap-4">
+      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Seu foco inicial</p>
+      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Onde voce quer comecar?</h2>
+      <p class="text-[var(--text-muted)]">Escolha o que deseja organizar primeiro. Voce pode mudar depois.</p>
 
-      <div class="focus-grid">
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
         <button
           type="button"
-          class="focus-card"
+          class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-left text-[var(--text)] transition hover:border-[rgba(37,99,235,0.45)]"
           *ngFor="let item of focusOptions"
-          [class.active]="focus === item.id"
+          [ngClass]="focus === item.id ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)]' : ''"
           (click)="selectFocus(item.id)"
         >
-          <h4>{{ item.title }}</h4>
-          <p>{{ item.description }}</p>
+          <h4 class="m-0 text-[var(--text-lg)] font-semibold">{{ item.title }}</h4>
+          <p class="mt-2 text-[var(--text-sm)] text-[var(--text-muted)]">{{ item.description }}</p>
         </button>
       </div>
 
-      <div class="actions actions--split">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
         <button class="btn-primary" type="button" (click)="continueFromFocus()">Continuar</button>
       </div>
     </div>
 
-    <div *ngIf="step === 2" class="step">
-      <p class="eyebrow">Pronto para comecar</p>
-      <h2>Dashboard preparado</h2>
-      <p class="muted">
+    <div *ngIf="step === 2" class="grid gap-4">
+      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Pronto para comecar</p>
+      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Dashboard preparado</h2>
+      <p class="text-[var(--text-muted)]">
         Seu ambiente esta configurado. Vamos para o painel e comece a registrar seus movimentos.
       </p>
 
-      <div class="summary">
+      <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
         <div>
-          <h5>Proximo passo</h5>
-          <p>
+          <h5 class="m-0 text-[var(--text-sm)] font-semibold text-[var(--text)]">Proximo passo</h5>
+          <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">
             {{ focus === 'receitas' ? 'Cadastre suas receitas' : focus === 'despesas' ? 'Registre suas despesas' : 'Crie sua meta anual' }}.
           </p>
         </div>
         <div>
-          <h5>O que voce ganha</h5>
-          <p>Alertas inteligentes, metas claras e controle do saldo em tempo real.</p>
+          <h5 class="m-0 text-[var(--text-sm)] font-semibold text-[var(--text)]">O que voce ganha</h5>
+          <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">Alertas inteligentes, metas claras e controle do saldo em tempo real.</p>
         </div>
       </div>
 
-      <div class="actions actions--split">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
         <button class="btn-primary" type="button" (click)="finishOnboarding()">Ir para o dashboard</button>
       </div>
-      <button class="link" type="button" (click)="skipOnboarding()">Fazer depois</button>
+      <button class="text-[var(--primary)]" type="button" (click)="skipOnboarding()">Fazer depois</button>
     </div>
   </div>
 </div>

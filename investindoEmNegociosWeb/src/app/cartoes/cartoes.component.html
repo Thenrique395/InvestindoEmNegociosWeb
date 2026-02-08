@@ -1,12 +1,15 @@
-<section class="card-form">
-  <div class="card-form__header">
+<section class="grid gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-md)]">
+  <div class="flex flex-wrap items-center justify-between gap-4">
     <div>
-      <h2>Meus cartões</h2>
-      <p class="muted">Cartões salvos para o usuário atual.</p>
+      <h2 class="text-2xl font-semibold text-[var(--text)]">Meus cartões</h2>
+      <p class="text-sm text-[var(--text-muted)]">Cartões salvos para o usuário atual.</p>
     </div>
-    <button class="btn-primary" type="button" (click)="abrirModal()">
-      <span class="btn-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+    <button
+      class="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110"
+      type="button"
+      (click)="abrirModal()">
+      <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
           <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </span>
@@ -14,79 +17,92 @@
     </button>
   </div>
 
-  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
+  <div
+    *ngIf="alerta"
+    class="rounded-xl border px-4 py-3 text-sm text-[var(--text)]"
+    [ngClass]="alertaTipo === 'success'
+      ? 'border-emerald-400/30 bg-emerald-500/10'
+      : alertaTipo === 'error'
+        ? 'border-rose-400/30 bg-rose-500/10'
+        : 'border-sky-400/30 bg-sky-500/10'">
     {{ alerta }}
   </div>
 
   <app-cartoes-listagem [cards]="cards" [brands]="brands" (remover)="remover($event)" (editar)="editar($event)"></app-cartoes-listagem>
 
-  <div class="modal" *ngIf="mostrarModal">
-    <div class="modal__backdrop" (click)="fecharModal()"></div>
-    <div class="modal__content wide">
-      <div class="modal__header">
+  <div *ngIf="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharModal()"></div>
+    <div class="relative w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+      <div class="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
         <div>
-          <p class="eyebrow">Incluir cartão</p>
-          <h3>Cadastre e visualize em tempo real</h3>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Incluir cartão</p>
+          <h3 class="text-xl font-semibold text-[var(--text)]">Cadastre e visualize em tempo real</h3>
         </div>
-        <button class="modal__close" type="button" (click)="fecharModal()">✕</button>
+        <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="fecharModal()">✕</button>
       </div>
-      <div class="card-form__layout">
-        <form class="form" (ngSubmit)="salvar()">
-          <label>
+
+      <div class="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <form class="grid gap-4" (ngSubmit)="salvar()">
+          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
             Bandeira
-            <select [(ngModel)]="bandeira" name="bandeira">
+            <select class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="bandeira" name="bandeira">
               <option *ngFor="let b of brands" [ngValue]="b.id.toString()">{{ b.name }}</option>
             </select>
           </label>
 
-          <label>
+          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
             Número do cartão
-            <div class="input-wrap">
+            <div class="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
               <input
+                class="flex-1 bg-transparent text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none"
                 type="{{ mostrarNumero ? 'text' : 'password' }}"
                 [(ngModel)]="numero"
                 name="numero"
                 maxlength="19"
                 inputmode="numeric"
-                pattern="\d*"
+                pattern="\\d*"
                 (input)="onNumeroInput($event)"
                 placeholder="**** **** **** ****"
-                required
-              />
-              <button type="button" (click)="toggleNumero()" aria-label="Mostrar número">
+                required />
+              <button
+                type="button"
+                class="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--text)]"
+                (click)="toggleNumero()"
+                aria-label="Mostrar número">
                 {{ mostrarNumero ? '🙈' : '👁️' }}
               </button>
             </div>
           </label>
 
-          <label>
+          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
             Nome impresso no cartão
-            <input [(ngModel)]="nome" name="nome" placeholder="FULANO DA SILVA" required />
+            <input class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="nome" name="nome" placeholder="FULANO DA SILVA" required />
           </label>
 
-          <label>
+          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
             Banco (opcional)
-            <input [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
+            <input class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
             <datalist id="bankOptions">
               <option *ngFor="let inst of institutions" [value]="inst.name"></option>
             </datalist>
           </label>
 
-          <div class="row">
-            <label>
+          <div class="grid gap-4 md:grid-cols-3">
+            <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
               Limite de crédito
               <input
+                class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
                 type="text"
                 inputmode="decimal"
                 [(ngModel)]="limiteCreditoInput"
                 digitOnly
                 (ngModelChange)="onLimiteChange($event)"
-                name="limiteCredito"
-              />
+                name="limiteCredito" />
             </label>
-            <label>
+            <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
               Dia do fechamento
               <input
+                class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
                 type="text"
                 inputmode="numeric"
                 pattern="[0-9]*"
@@ -94,12 +110,12 @@
                 [ngModel]="diaFechamento"
                 (ngModelChange)="onDiaChange($event, 'fechamento')"
                 (input)="onDiaInput($event, 'fechamento')"
-                name="diaFechamento"
-              />
+                name="diaFechamento" />
             </label>
-            <label>
+            <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
               Dia do vencimento
               <input
+                class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
                 type="text"
                 inputmode="numeric"
                 pattern="[0-9]*"
@@ -107,48 +123,41 @@
                 [ngModel]="diaVencimento"
                 (ngModelChange)="onDiaChange($event, 'vencimento')"
                 (input)="onDiaInput($event, 'vencimento')"
-                name="diaVencimento"
-              />
+                name="diaVencimento" />
             </label>
           </div>
 
-          <div class="actions">
-            <button type="button" class="btn-danger ghost" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
-            <button type="submit" class="btn-primary" [disabled]="saving">
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
+            <button type="submit" class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm" [disabled]="saving">
               {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar cartão') }}
             </button>
           </div>
         </form>
 
-        <div class="preview">
-          <div
-            class="credit-card"
-            [class.mastercard]="bandeiraCode === 'mastercard'"
-            [class.visa]="bandeiraCode === 'visa'"
-            [class.elo]="bandeiraCode === 'elo'"
-            [class.amex]="bandeiraCode === 'amex'"
-            [class.hipercard]="bandeiraCode === 'hipercard'">
-            <div class="card__chip"></div>
-            <div class="card__logo" [ngSwitch]="bandeiraCode">
-              <div *ngSwitchCase="'mastercard'" class="logo-mc" aria-label="Mastercard">
-                <span class="mc-circle mc-circle--left"></span>
-                <span class="mc-circle mc-circle--right"></span>
+        <div class="flex items-center justify-center">
+          <div class="grid h-[200px] w-[320px] grid-rows-[auto_auto_1fr_auto] gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-[var(--text)] shadow-[var(--shadow-md)]">
+            <div class="h-8 w-12 rounded-md bg-gradient-to-br from-[var(--surface-3)] to-[var(--border-strong)]"></div>
+            <div class="flex items-center justify-end gap-2" [ngSwitch]="bandeiraCode">
+              <div *ngSwitchCase="'mastercard'" class="relative h-8 w-14" aria-label="Mastercard">
+                <span class="absolute left-0 top-0 h-8 w-8 rounded-full bg-rose-400/80"></span>
+                <span class="absolute right-0 top-0 h-8 w-8 rounded-full bg-amber-300/80 mix-blend-multiply"></span>
               </div>
-              <span *ngSwitchCase="'visa'" class="logo-text">VISA</span>
-              <span *ngSwitchCase="'elo'" class="logo-text">ELO</span>
-              <span *ngSwitchCase="'amex'" class="logo-text">AMEX</span>
-              <span *ngSwitchCase="'hipercard'" class="logo-text">HIPER</span>
-              <span *ngSwitchDefault class="logo-text">{{ bandeiraNome || 'BANDEIRA' | uppercase }}</span>
+              <span *ngSwitchCase="'visa'" class="text-sm font-extrabold tracking-widest">VISA</span>
+              <span *ngSwitchCase="'elo'" class="text-sm font-extrabold tracking-widest">ELO</span>
+              <span *ngSwitchCase="'amex'" class="text-sm font-extrabold tracking-widest">AMEX</span>
+              <span *ngSwitchCase="'hipercard'" class="text-sm font-extrabold tracking-widest">HIPER</span>
+              <span *ngSwitchDefault class="text-sm font-extrabold tracking-widest">{{ bandeiraNome || 'BANDEIRA' | uppercase }}</span>
             </div>
-            <p class="card__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</p>
-            <div class="card__footer">
+            <p class="text-lg tracking-[0.2em]">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</p>
+            <div class="flex items-center justify-between text-xs text-[var(--text-muted)]">
               <div>
-                <span class="label">Nome</span>
-                <p>{{ nome || 'SEU NOME' }}</p>
+                <span class="block font-semibold uppercase tracking-[0.2em]">Nome</span>
+                <p class="text-sm font-semibold text-[var(--text)]">{{ nome || 'SEU NOME' }}</p>
               </div>
-              <div>
-                <span class="label">Bandeira</span>
-                <p>{{ bandeiraNome || 'BANDEIRA' }}</p>
+              <div class="text-right">
+                <span class="block font-semibold uppercase tracking-[0.2em]">Bandeira</span>
+                <p class="text-sm font-semibold text-[var(--text)]">{{ bandeiraNome || 'BANDEIRA' }}</p>
               </div>
             </div>
           </div>

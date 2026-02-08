@@ -1,46 +1,61 @@
-<div class="signup-card">
+<div
+  class="flex min-w-0 flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] text-[var(--text)] shadow-[var(--shadow-md)]">
   <p class="eyebrow">Cadastro rápido</p>
-  <h3>Crie sua conta gratuita</h3>
-  <p class="muted">Comece com o módulo de Despesas e Receitas, e evolua para Cartões e Investimentos.</p>
+  <h3 class="m-0 text-[var(--text-2xl)]">Crie sua conta gratuita</h3>
+  <p class="m-0 text-[var(--text-muted)]">
+    Comece com o módulo de Despesas e Receitas, e evolua para Cartões e Investimentos.
+  </p>
 
-  <form (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
-    <label>
+  <form class="mt-2 flex flex-col gap-4" (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
+    <label class="flex flex-col gap-1 font-semibold text-[var(--text)]">
       <span>Nome completo</span>
-      <input type="text" formControlName="nome" placeholder="Ex.: Ana Souza" />
-      <small class="error" *ngIf="hasError('nome', 'required')">Informe seu nome.</small>
-      <small class="error" *ngIf="hasError('nome', 'minlength')">Use ao menos 2 caracteres.</small>
+      <input
+        class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:bg-[var(--surface-2)] focus:ring-1 focus:ring-[var(--primary)]"
+        type="text"
+        formControlName="nome"
+        placeholder="Ex.: Ana Souza" />
+      <small class="text-[var(--danger)]" *ngIf="hasError('nome', 'required')">Informe seu nome.</small>
+      <small class="text-[var(--danger)]" *ngIf="hasError('nome', 'minlength')">Use ao menos 2 caracteres.</small>
     </label>
 
-    <label>
+    <label class="flex flex-col gap-1 font-semibold text-[var(--text)]">
       <span>E-mail</span>
-      <input type="email" formControlName="email" placeholder="voce@email.com" />
-      <small class="error" *ngIf="hasError('email', 'required')">Informe um e-mail.</small>
-      <small class="error" *ngIf="hasError('email', 'email')">Digite um e-mail válido.</small>
-      <small class="error" *ngIf="hasError('email', 'emailInUse')">E-mail já está em uso.</small>
+      <input
+        class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:bg-[var(--surface-2)] focus:ring-1 focus:ring-[var(--primary)]"
+        type="email"
+        formControlName="email"
+        placeholder="voce@email.com" />
+      <small class="text-[var(--danger)]" *ngIf="hasError('email', 'required')">Informe um e-mail.</small>
+      <small class="text-[var(--danger)]" *ngIf="hasError('email', 'email')">Digite um e-mail válido.</small>
+      <small class="text-[var(--danger)]" *ngIf="hasError('email', 'emailInUse')">E-mail já está em uso.</small>
     </label>
 
-    <label>
+    <label class="flex flex-col gap-1 font-semibold text-[var(--text)]">
       <span>Senha</span>
-      <input type="password" formControlName="senha" placeholder="Mínimo 6 caracteres" />
-      <small class="error" *ngIf="hasError('senha', 'required')">Informe uma senha.</small>
-      <small class="error" *ngIf="hasError('senha', 'minlength')">Use ao menos 6 caracteres.</small>
+      <input
+        class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:bg-[var(--surface-2)] focus:ring-1 focus:ring-[var(--primary)]"
+        type="password"
+        formControlName="senha"
+        placeholder="Mínimo 6 caracteres" />
+      <small class="text-[var(--danger)]" *ngIf="hasError('senha', 'required')">Informe uma senha.</small>
+      <small class="text-[var(--danger)]" *ngIf="hasError('senha', 'minlength')">Use ao menos 6 caracteres.</small>
     </label>
 
-    <label class="checkbox">
+    <label class="flex items-center gap-2 text-[var(--text-sm)] font-medium text-[var(--text-muted)]">
       <input type="checkbox" formControlName="aceitarTermos" />
       <span>Li e aceito os termos de uso e a política de privacidade.</span>
     </label>
-    <small class="error" *ngIf="hasError('aceitarTermos', 'required')">Aceite os termos para continuar.</small>
+    <small class="text-[var(--danger)]" *ngIf="hasError('aceitarTermos', 'required')">Aceite os termos para continuar.</small>
 
     <button class="btn-primary" type="submit" [disabled]="loading">
       {{ loading ? 'Criando conta...' : 'Criar conta e entrar' }}
     </button>
 
-    <p class="helper">
+    <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">
       Já possui acesso? Use o botão de login no topo ou a área de “Login”.
     </p>
 
-    <p class="feedback success" *ngIf="feedback">{{ feedback }}</p>
-    <p class="feedback error" *ngIf="error">{{ error }}</p>
+    <p class="m-0 font-semibold text-[var(--success)]" *ngIf="feedback">{{ feedback }}</p>
+    <p class="m-0 font-semibold text-[var(--danger)]" *ngIf="error">{{ error }}</p>
   </form>
 </div>

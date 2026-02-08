@@ -1,52 +1,54 @@
-<div class="cards-list">
-  <div *ngIf="cards.length; else emptyCards" class="cards-grid">
-    <article class="card-item" *ngFor="let c of cards">
-      <header class="card-item__top">
-        <div class="brand" [class.brand--mastercard]="isMastercard(brandCode(c))">
-          <div *ngIf="isMastercard(brandCode(c))" class="mc-logo" aria-label="Mastercard"></div>
-          <span *ngIf="!isMastercard(brandCode(c))" class="pill">{{ brandName(c) | uppercase }}</span>
+<div class="space-y-4">
+  <div *ngIf="cards.length; else emptyCards" class="grid gap-4 md:grid-cols-2">
+    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]" *ngFor="let c of cards">
+      <header class="flex items-center justify-between">
+        <div class="inline-flex items-center gap-2">
+          <span *ngIf="!isMastercard(brandCode(c))" class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1 text-xs font-semibold tracking-wide text-[var(--text)]">
+            {{ brandName(c) | uppercase }}
+          </span>
+          <div *ngIf="isMastercard(brandCode(c))" class="h-7 w-12 rounded-full border border-[var(--border)] bg-[var(--surface-2)]"></div>
         </div>
-        <div class="actions">
+        <div class="flex items-center gap-2">
           <button type="button" class="icon-action icon-action--edit" (click)="onEditar(c)" aria-label="Editar" title="Editar">✏️</button>
           <button type="button" class="icon-action icon-action--danger" (click)="onRemover(c.id)" aria-label="Remover" title="Remover">🗑</button>
         </div>
       </header>
 
-      <p class="card-item__number">{{ numeroProtegido(c.numero) }}</p>
+      <p class="mt-4 text-lg font-semibold tracking-widest text-[var(--text)]">{{ numeroProtegido(c.numero) }}</p>
 
-      <div class="card-item__meta">
+      <div class="mt-4 grid gap-3 text-sm text-[var(--text-muted)] sm:grid-cols-2">
         <div>
-          <span class="label">Nome</span>
-          <p>{{ c.nome }}</p>
+          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Nome</span>
+          <p class="text-[var(--text)]">{{ c.nome }}</p>
         </div>
         <div>
-          <span class="label">Final</span>
-          <p>•••• {{ finalCartao(c.numero) }}</p>
+          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Final</span>
+          <p class="text-[var(--text)]">•••• {{ finalCartao(c.numero) }}</p>
         </div>
         <div>
-          <span class="label">Banco</span>
-          <p>{{ c.banco || '-' }}</p>
+          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Banco</span>
+          <p class="text-[var(--text)]">{{ c.banco || '-' }}</p>
         </div>
         <div>
-          <span class="label">Limite</span>
-          <p>R$ {{ c.limiteCredito | number:'1.2-2' }}</p>
+          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Limite</span>
+          <p class="text-[var(--text)]">R$ {{ c.limiteCredito | number:'1.2-2' }}</p>
         </div>
         <div>
-          <span class="label">Fechamento</span>
-          <p>Dia {{ c.diaFechamento }}</p>
+          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Fechamento</span>
+          <p class="text-[var(--text)]">Dia {{ c.diaFechamento }}</p>
         </div>
         <div>
-          <span class="label">Vencimento</span>
-          <p>Dia {{ c.diaVencimento }}</p>
+          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Vencimento</span>
+          <p class="text-[var(--text)]">Dia {{ c.diaVencimento }}</p>
         </div>
       </div>
     </article>
   </div>
 
   <ng-template #emptyCards>
-    <div class="empty-state">
-      <p class="muted">Sem cartões cadastrados.</p>
-      <p class="muted">Clique em “Cadastrar novo cartão” para adicionar o primeiro.</p>
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-6 text-center text-sm text-[var(--text-muted)]">
+      <p>Sem cartões cadastrados.</p>
+      <p>Clique em “Cadastrar novo cartão” para adicionar o primeiro.</p>
     </div>
   </ng-template>
 </div>

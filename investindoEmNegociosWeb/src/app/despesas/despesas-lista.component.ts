@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgFor, NgIf, DecimalPipe, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { NgFor, NgIf, DecimalPipe, NgClass } from '@angular/common';
 import { StoredExpense } from '../data/api-data.service';
 import { expenseStatusLabel } from '../utils/status';
 
 @Component({
   selector: 'app-despesas-lista',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault],
+  imports: [NgFor, NgIf, DecimalPipe, NgClass],
   templateUrl: './despesas-lista.component.html',
   styleUrls: ['./despesas-lista.component.scss']
 })

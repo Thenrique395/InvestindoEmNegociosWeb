@@ -1,59 +1,67 @@
-<section class="home-dashboard" *ngIf="isLogged">
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Resumo financeiro</p>
-      <h1>Visão geral de {{ mesAtualLabel }}</h1>
-      <p class="muted">
+<section class="grid gap-4" *ngIf="isLogged">
+  <header class="flex flex-wrap items-start justify-between gap-3">
+    <div class="max-w-[560px]">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
+      <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
+        Visão geral de {{ mesAtualLabel }}
+      </h1>
+      <p class="mt-1 text-[12px] text-[var(--text-muted)]">
         Combine receitas, despesas e cartões para saber o quanto pode gastar.
       </p>
     </div>
-    <div class="hero__filters">
-      <button type="button" [class.active]="periodo === 'month'" (click)="setPeriodo('month')">
+    <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
+      <button
+        type="button"
+        class="rounded-full px-[var(--space-2)] py-[var(--space-1)] text-sm font-semibold transition"
+        [ngClass]="periodo === 'month' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+        (click)="setPeriodo('month')"
+      >
         Mensal
       </button>
-      <button type="button" [class.active]="periodo === 'quarter'" (click)="setPeriodo('quarter')">
+      <button
+        type="button"
+        class="rounded-full px-[var(--space-2)] py-[var(--space-1)] text-sm font-semibold transition"
+        [ngClass]="periodo === 'quarter' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+        (click)="setPeriodo('quarter')"
+      >
         Trimestral
       </button>
-      <button type="button" [class.active]="periodo === 'year'" (click)="setPeriodo('year')">
+      <button
+        type="button"
+        class="rounded-full px-[var(--space-2)] py-[var(--space-1)] text-sm font-semibold transition"
+        [ngClass]="periodo === 'year' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+        (click)="setPeriodo('year')"
+      >
         Anual
       </button>
     </div>
   </header>
 
-  <div class="onboarding-overlay" *ngIf="showOnboarding">
-    <section class="onboarding onboarding--modal">
-      <button type="button" class="onboarding__close" (click)="dismissOnboarding()" aria-label="Fechar onboarding">
+  <div class="fixed inset-0 z-[2000] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]" *ngIf="showOnboarding">
+    <section class="relative grid w-full max-w-[880px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+      <button type="button" class="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2xl)] text-[var(--text)] hover:bg-[var(--surface-3)]" (click)="dismissOnboarding()" aria-label="Fechar onboarding">
         ×
       </button>
-      <div class="onboarding__header">
-        <p class="eyebrow">Onboarding rápido</p>
-        <p class="onboarding__step-count">Passo {{ onboardingStep + 1 }} de {{ onboardingTotal }}</p>
-        <h3>{{ onboardingCurrent.title }}</h3>
-        <p class="muted">{{ onboardingCurrent.description }}</p>
+      <div class="grid gap-2">
+        <p class="text-[var(--text-xs)] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Onboarding rápido</p>
+        <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">Passo {{ onboardingStep + 1 }} de {{ onboardingTotal }}</p>
+        <h3 class="m-0 text-[var(--text-lg)] font-semibold text-[var(--text)]">{{ onboardingCurrent.title }}</h3>
+        <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">{{ onboardingCurrent.description }}</p>
       </div>
-      <div class="onboarding__bullets">
-        <span *ngFor="let item of onboardingCurrent.bullets">{{ item }}</span>
+      <div class="flex flex-wrap gap-2">
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-1)] py-[var(--space-1)] text-[var(--text-sm)] text-[var(--text-muted)]" *ngFor="let item of onboardingCurrent.bullets">
+          {{ item }}
+        </span>
       </div>
-      <div class="onboarding__cta">
+      <div class="flex flex-wrap items-center justify-between gap-4">
         <a [routerLink]="onboardingCurrent.ctaLink" class="btn-primary sm">{{ onboardingCurrent.ctaLabel }}</a>
-        <label class="onboarding__hide">
-          <input
-            type="checkbox"
-            [checked]="hideOnboarding"
-            (change)="toggleHideOnboarding($any($event.target).checked)"
-          />
-          Nao mostrar novamente
+        <label class="inline-flex items-center gap-2 text-[var(--text-sm)] text-[var(--text-muted)]">
+          <input type="checkbox" [checked]="hideOnboarding" (change)="toggleHideOnboarding($any($event.target).checked)" />
+          Não mostrar novamente
         </label>
-        <div class="onboarding__actions">
+        <div class="flex flex-wrap gap-2">
           <button type="button" class="ghost sm" (click)="skipOnboarding()">Pular</button>
-          <button
-            type="button"
-            class="ghost sm"
-            [disabled]="onboardingStep === 0"
-            (click)="prevOnboarding()"
-          >
-            Voltar
-          </button>
+          <button type="button" class="ghost sm" [disabled]="onboardingStep === 0" (click)="prevOnboarding()">Voltar</button>
           <button type="button" class="btn-primary sm" (click)="nextOnboarding()">
             {{ onboardingStep < onboardingTotal - 1 ? 'Próximo passo' : 'Concluir' }}
           </button>
@@ -62,190 +70,214 @@
     </section>
   </div>
 
-  <div class="grid" *ngIf="!isLoadingDashboard; else loadingSummary">
-    <div class="stat-card balance">
-      <div class="stat-card__header">
-        <span class="stat-card__icon stat-card__icon--balance" aria-hidden="true">
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3" *ngIf="!isLoadingDashboard; else loadingSummary">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <div class="mb-2 flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(37,99,235,0.16)] text-[var(--primary)]" aria-hidden="true">
           <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path
-              d="M4 6h16a2 2 0 0 1 2 2v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V8a2 2 0 0 1 2-2zm0 4h18"
-              fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-              stroke-linejoin="round" />
+            <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <p class="label">Saldo Total</p>
-        <button class="stat-card__info" type="button" data-tooltip="Representa a diferença entre todas as receitas e despesas do mês atual.
-Um saldo positivo indica que você ganhou mais do que gastou; um saldo negativo indica déficit financeiro no período."
-          aria-label="Mais informacoes sobre saldo total">
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Total</p>
+        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo total">
           i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+            Representa a diferença entre todas as receitas e despesas do mês atual. Um saldo positivo indica que você ganhou mais do que gastou; um saldo negativo indica déficit financeiro no período.
+          </span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
         </button>
       </div>
-      <h2>{{ saldo | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="muted">Receitas menos despesas do mês.</p>
+      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldo | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Receitas menos despesas do mês.</p>
     </div>
-    <div class="stat-card income">
-      <div class="stat-card__header">
-        <span class="stat-card__icon stat-card__icon--income" aria-hidden="true">
+
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <div class="mb-2 flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(34,197,94,0.18)] text-[var(--success)]" aria-hidden="true">
           <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <p class="label">Total Receitas</p>
-        <button class="stat-card__info" type="button" data-tooltip="Soma de todas as entradas de dinheiro, incluindo receitas fixas (salário, pensão) e receitas avulsas registradas no mês selecionado."
-          aria-label="Mais informacoes sobre total de receitas">
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
+        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
           i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+            Soma de todas as entradas de dinheiro, incluindo receitas fixas (salário, pensão) e receitas avulsas registradas no mês selecionado.
+          </span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
         </button>
       </div>
-      <h2>{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="muted">Inclui receitas fixas e avulsas do mês.</p>
+      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Inclui receitas fixas e avulsas do mês.</p>
     </div>
-    <div class="stat-card expense">
-      <div class="stat-card__header">
-        <span class="stat-card__icon stat-card__icon--expense" aria-hidden="true">
+
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <div class="mb-2 flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(239,68,68,0.18)] text-[var(--danger)]" aria-hidden="true">
           <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <p class="label">Total de despesas</p>
-        <button class="stat-card__info" type="button" data-tooltip="Valor total de gastos com vencimento no mês atual, incluindo despesas fixas, variáveis e compromissos financeiros registrados."
-          aria-label="Mais informacoes sobre total de despesas">
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
+        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
           i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+            Valor total de gastos com vencimento no mês atual, incluindo despesas fixas, variáveis e compromissos financeiros registrados.
+          </span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
         </button>
       </div>
-      <h2>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="muted">Somente despesas com vencimento neste mês.</p>
+      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
     </div>
-    <div class="stat-card cards">
-      <div class="stat-card__header">
-        <span class="stat-card__icon stat-card__icon--cards" aria-hidden="true">
+
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+      <div class="mb-2 flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(100,116,139,0.2)] text-[var(--text-muted)]" aria-hidden="true">
           <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path
-              d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20"
-              fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-              stroke-linejoin="round" />
+            <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <p class="label">Divida total nos cartoes</p>
-        <button class="stat-card__info" type="button" data-tooltip="Soma de todas as despesas vinculadas a cartões de crédito, incluindo parcelas futuras ainda não pagas."
-          aria-label="Mais informacoes sobre divida nos cartoes">
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
+        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
           i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+            Soma de todas as despesas vinculadas a cartões de crédito, incluindo parcelas futuras ainda não pagas.
+          </span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
         </button>
       </div>
-      <h2>{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="muted">Somatório de despesas vinculadas a cartões.</p>
+      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
     </div>
   </div>
+
   <ng-template #loadingSummary>
-    <div class="grid is-loading">
-      <div class="stat-card balance">
-        <p class="label">Carregando resumo...</p>
-        <p class="muted">Aguarde um instante.</p>
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
       </div>
-      <div class="stat-card income">
-        <p class="label">Carregando receitas...</p>
-        <p class="muted">Aguarde um instante.</p>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
       </div>
-      <div class="stat-card expense">
-        <p class="label">Carregando despesas...</p>
-        <p class="muted">Aguarde um instante.</p>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
       </div>
-      <div class="stat-card cards">
-        <p class="label">Carregando cartões...</p>
-        <p class="muted">Calculando dívidas.</p>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
       </div>
     </div>
   </ng-template>
 
-  <section class="insight-card" *ngIf="!isLoadingDashboard" [class.warn]="insight.tone === 'warn'"
-    [class.danger]="insight.tone === 'danger'" [class.info]="insight.tone === 'info'">
-    <div>
-      <p class="eyebrow">Insight automático</p>
-      <h3>{{ insight.title }}</h3>
-      <p class="muted">{{ insight.message }}</p>
+  <section
+    class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] px-[var(--space-1)] py-2 pl-4 shadow-[var(--shadow-sm)]"
+    *ngIf="!isLoadingDashboard"
+    [ngClass]="insight.tone === 'warn'
+      ? 'border-amber-400/40 border-l-amber-400 bg-amber-500/10'
+      : insight.tone === 'danger'
+        ? 'border-rose-400/40 border-l-rose-400 bg-rose-500/10'
+        : insight.tone === 'info'
+          ? 'border-sky-400/40 border-l-sky-400 bg-sky-500/10'
+          : ''"
+  >
+    <div class="flex items-start gap-3">
+      <div class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
+        <svg viewBox="0 0 24 24" class="h-4 w-4" role="presentation" focusable="false">
+          <path d="M12 9v4m0 4h.01M10.3 4.8l-7 12.2A2 2 0 0 0 5 20h14a2 2 0 0 0 1.7-3l-7-12.2a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+        <h3 class="m-0 text-[var(--text-md)] font-semibold">{{ insight.title }}</h3>
+        <p class="mt-1 text-[11px] text-[var(--text-muted)]">{{ insight.message }}</p>
+      </div>
     </div>
-    <button class="ghost sm" type="button" (click)="openInsightDetails()">Ver detalhes</button>
+    <button class="ghost sm" type="button" (click)="openInsightDetails()">Detalhes</button>
   </section>
 
-  <div class="insight-overlay" *ngIf="showInsightDetails">
-    <div class="insight-dialog">
-      <button class="insight-dialog__close" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
+  <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]" *ngIf="showInsightDetails">
+    <div class="relative grid w-full max-w-[560px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)]">
+      <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
         ×
       </button>
-      <p class="eyebrow">Insight automático</p>
-      <h3>{{ insight.title }}</h3>
-      <p class="muted">{{ insight.message }}</p>
-      <div class="insight-dialog__tips">
-        <p class="label">Sugestoes rapidas</p>
-        <ul>
+      <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+      <h3 class="m-0 text-[var(--text-lg)] font-semibold">{{ insight.title }}</h3>
+      <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">{{ insight.message }}</p>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
+        <ul class="mt-2 list-disc pl-[var(--space-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
           <li *ngFor="let tip of insightTips">{{ tip }}</li>
         </ul>
       </div>
-      <div class="insight-dialog__actions">
+      <div class="flex justify-end gap-2">
         <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
         <a class="btn-primary sm" routerLink="/despesas">Ver despesas</a>
       </div>
     </div>
   </div>
 
-  <div class="goals" *ngIf="metasResumo.total">
-    <div class="goals__header">
-      <div>
-        <p class="eyebrow">Metas</p>
-        <p class="muted">Resumo rápido das metas anuais cadastradas.</p>
-      </div>
+  <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]" *ngIf="metasResumo.total">
+    <div>
+      <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
+      <p class="text-[11px] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
     </div>
-    <div class="stat-card goal compact">
-      <div>
-        <p class="label">Metas ativas</p>
+    <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="text-[var(--text-sm)] font-semibold text-[var(--text-muted)]">Metas ativas</p>
+        <div class="flex flex-wrap gap-3 text-[11px] text-[var(--text-secondary)]">
+          <span>Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+          <span>Acumulado: <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+          <span>Falta: <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+          <span>Progresso médio: <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong></span>
+        </div>
       </div>
-      <div class="goal-nums">
-        <div class="goal-chip planned">
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
+        <div class="rounded-[12px] border border-[rgba(111,117,136,0.45)] bg-[rgba(111,117,136,0.18)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
           Planejadas {{ metasResumo.planned }}
         </div>
-        <div class="goal-chip progress">
+        <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
           Em andamento {{ metasResumo.inProgress }}
         </div>
-        <div class="goal-chip completed">
+        <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(45,179,122,0.18)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
           Concluídas {{ metasResumo.completed }}
         </div>
-        <div class="goal-chip canceled">
+        <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(255,92,92,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px]">
           Canceladas {{ metasResumo.canceled }}
         </div>
       </div>
-      <div class="goal-inline">
-        <span>Alvo:
-          <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-        <span>Acumulado:
-          <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-        <span>Falta:
-          <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-        <span>Progresso médio das metas:
-          <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong></span>
-      </div>
-      <div class="goal-views">
-        <div class="goal-views__buttons">
-          <button type="button" [class.active]="metasVisao === 'progresso'" (click)="metasVisao = 'progresso'">
+      <div class="grid gap-2">
+        <div class="inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] p-1">
+          <button
+            type="button"
+            class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
+            [ngClass]="metasVisao === 'progresso' ? 'bg-sky-500/15 text-[var(--text)] shadow-sm' : ''"
+            (click)="metasVisao = 'progresso'">
             Progresso
           </button>
-          <button type="button" [class.active]="metasVisao === 'aporte'" (click)="metasVisao = 'aporte'">
+          <button
+            type="button"
+            class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
+            [ngClass]="metasVisao === 'aporte' ? 'bg-sky-500/15 text-[var(--text)] shadow-sm' : ''"
+            (click)="metasVisao = 'aporte'">
             Aporte x Falta
           </button>
         </div>
-        <div class="goal-views__chart" *ngIf="metasVisao === 'progresso'">
-          <div class="mini-progress">
-            <div class="mini-bar" [style.width.%]="metasResumo.progressoMedio"></div>
+        <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'progresso'">
+          <div class="mb-2 h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+            <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--info))]" [style.width.%]="metasResumo.progressoMedio"></div>
           </div>
-          <p class="muted">Progresso médio das metas do ano.</p>
+          <p class="text-[11px] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
         </div>
-        <div class="goal-views__chart" *ngIf="metasVisao === 'aporte'">
-          <div class="stacked">
-            <div class="stacked__fill"
-            [style.width.%]=" metasResumo.targetTotal ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100 : 0">
-            </div>
+        <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'aporte'">
+          <div class="mb-2 h-[12px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+            <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--success))]" [style.width.%]="metasResumo.targetTotal ? (metasResumo.acumuladoTotal / metasResumo.targetTotal) * 100 : 0"></div>
           </div>
-          <p class="muted">
+          <p class="text-[11px] text-[var(--text-muted)]">
             Aportado: {{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }} ·
             Falta: {{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}
           </p>
@@ -254,174 +286,153 @@ Um saldo positivo indica que você ganhou mais do que gastou; um saldo negativo 
     </div>
   </div>
 
-  <div class="dashboard-row" *ngIf="!isLoadingDashboard">
-    <div class="chart">
-      <div class="chart__header">
-        <div class="chart__title">
-          <p class="label">{{ chartTitle }}</p>
-          <span class="muted">{{ chartSubtitle }}</span>
+  <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1" *ngIf="!isLoadingDashboard">
+    <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+      <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+        <div class="grid gap-1">
+          <p class="m-0 text-[12px] text-[var(--text-muted)]">{{ chartTitle }}</p>
+          <span class="text-[11px] text-[var(--text-muted)]">{{ chartSubtitle }}</span>
         </div>
-        <div class="chart__controls">
-          <button type="button" [class.active]="chartType === 'bar'" (click)="trocarTipo('bar')">
+        <div class="inline-flex gap-2">
+          <button
+            type="button"
+            class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[var(--space-1)] text-[11px] text-[var(--text)] transition"
+            [ngClass]="chartType === 'bar' ? 'border-emerald-400/40 bg-emerald-500/10 text-[var(--text)]' : ''"
+            (click)="trocarTipo('bar')">
             Barras
           </button>
-          <button type="button" [class.active]="chartType === 'line'" (click)="trocarTipo('line')">
+          <button
+            type="button"
+            class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[var(--space-1)] text-[11px] text-[var(--text)] transition"
+            [ngClass]="chartType === 'line' ? 'border-emerald-400/40 bg-emerald-500/10 text-[var(--text)]' : ''"
+            (click)="trocarTipo('line')">
             Linha
           </button>
         </div>
       </div>
-      <div class="chart__empty" *ngIf="!hasChartData">
-        <p class="muted">{{ chartEmptyMessage }}</p>
+
+      <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-center text-[11px] text-[var(--text-muted)]" *ngIf="!hasChartData">
+        {{ chartEmptyMessage }}
       </div>
+
       <ng-container *ngIf="hasChartData">
-        <div class="chart__legend">
-          <span class="legend income"></span> Receitas
-          <span class="legend expense"></span> Despesas
+        <div class="flex items-center gap-4 text-[11px] text-[var(--text-muted)]">
+          <span class="inline-block h-[14px] w-[14px] rounded-[3px] bg-[rgba(34,197,94,0.8)]"></span> Receitas
+          <span class="inline-block h-[14px] w-[14px] rounded-[3px] bg-[rgba(239,68,68,0.8)]"></span> Despesas
         </div>
-        <div
-          class="chart__bars"
-          [class.dense]="periodo === 'month'"
-          [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(0, 1fr))'"
-          *ngIf="chartType === 'bar'"
-        >
-          <div class="chart__bar" *ngFor="let m of monthlyData">
-            <div class="bars-wrap">
-              <div class="bar income" [style.height.%]="
-                  maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0
-                "></div>
-              <div class="bar expense" [style.height.%]="
-                  maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0
-                "></div>
-              <div class="bar-tooltip">
-                <p>{{ m.label | uppercase }}</p>
-                <span>Receitas:
-                  <strong>{{ m.incomes | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-                <span>Despesas:
-                  <strong>{{ m.expenses | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-              </div>
+        <div class="grid min-h-[170px] items-end gap-2" [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(0, 1fr))'" *ngIf="chartType === 'bar'">
+          <div class="flex h-[150px] flex-col items-center justify-end gap-1" *ngFor="let m of monthlyData">
+            <div class="relative flex h-[120px] w-full items-end justify-center gap-1">
+              <div class="h-full w-[12px] max-w-[18px] rounded-t-[6px] bg-[linear-gradient(180deg,rgba(34,197,94,0.8),rgba(34,197,94,0.35))]" [style.height.%]="maxMonthlyValue ? (m.incomes / maxMonthlyValue) * 100 : 0"></div>
+              <div class="h-full w-[12px] max-w-[18px] rounded-t-[6px] bg-[linear-gradient(180deg,rgba(239,68,68,0.9),rgba(239,68,68,0.5))]" [style.height.%]="maxMonthlyValue ? (m.expenses / maxMonthlyValue) * 100 : 0"></div>
             </div>
-            <span class="bar__label">{{ m.label }}</span>
+            <span class="text-[10px] text-[var(--text-muted)]">{{ m.label }}</span>
           </div>
         </div>
 
-        <div class="chart__line" *ngIf="chartType === 'line'">
-          <div class="line-wrap">
-            <svg viewBox="0 0 1100 220" preserveAspectRatio="none">
-              <polyline [attr.points]="incomesPolyline" class="line income"></polyline>
-              <polyline [attr.points]="expensesPolyline" class="line expense"></polyline>
-              <ng-container *ngFor="let p of incomesPoints">
-                <circle class="dot income" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
-                  (mouseenter)="showLineTooltip(p, 'income')" (mouseleave)="hideLineTooltip()"></circle>
-              </ng-container>
-              <ng-container *ngFor="let p of expensesPoints">
-                <circle class="dot expense" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
-                  (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
-              </ng-container>
-            </svg>
-            <div class="line-tooltip" *ngIf="lineTooltip" [style.left.%]="lineTooltip.left"
-              [style.top.%]="lineTooltip.top">
-              <p>{{ lineTooltip.label | uppercase }}</p>
-              <span>
-                {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
-                <strong>{{ lineTooltip.value | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-              </span>
-            </div>
+        <div class="relative" *ngIf="chartType === 'line'">
+          <svg viewBox="0 0 1100 220" preserveAspectRatio="none" class="h-[180px] w-full">
+            <polyline [attr.points]="incomesPolyline" class="fill-none stroke-[3] stroke-[var(--success)]"></polyline>
+            <polyline [attr.points]="expensesPolyline" class="fill-none stroke-[3] stroke-[var(--danger)]"></polyline>
+            <ng-container *ngFor="let p of incomesPoints">
+              <circle class="cursor-pointer fill-[var(--success)] stroke-[var(--surface)] stroke-[2]" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
+                (mouseenter)="showLineTooltip(p, 'income')" (mouseleave)="hideLineTooltip()"></circle>
+            </ng-container>
+            <ng-container *ngFor="let p of expensesPoints">
+              <circle class="cursor-pointer fill-[var(--danger)] stroke-[var(--surface)] stroke-[2]" [attr.cx]="p.x" [attr.cy]="p.y" r="6"
+                (mouseenter)="showLineTooltip(p, 'expense')" (mouseleave)="hideLineTooltip()"></circle>
+            </ng-container>
+          </svg>
+          <div class="absolute rounded-[10px] border border-[var(--border)] bg-[rgba(0,0,0,0.7)] p-[var(--space-1)] text-center text-[11px] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.22)]" *ngIf="lineTooltip" [style.left.%]="lineTooltip.left" [style.top.%]="lineTooltip.top">
+            <p class="m-0 text-[11px] font-semibold text-[var(--text-muted)]">{{ lineTooltip.label | uppercase }}</p>
+            <span>
+              {{ lineTooltip.type === "income" ? "Receitas" : "Despesas" }}:
+              <strong>{{ lineTooltip.value | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+            </span>
           </div>
-          <div
-            class="chart__months"
-            [class.dense]="periodo === 'month'"
-            [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(0, 1fr))'"
-          >
+          <div class="mt-2 grid text-center text-[10px] text-[var(--text-muted)]" [style.gridTemplateColumns]="'repeat(' + monthlyData.length + ', minmax(0, 1fr))'">
             <span *ngFor="let m of monthlyData">{{ m.label }}</span>
           </div>
         </div>
       </ng-container>
     </div>
 
-    <aside class="recent">
-      <div class="recent__header">
+    <aside class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+      <div class="flex items-center justify-between">
         <div>
-          <p class="label">Movimentos recentes</p>
-          <span class="muted">Últimos lançamentos de receitas e despesas.</span>
+          <p class="m-0 text-[12px] text-[var(--text-muted)]">Movimentos recentes</p>
+          <span class="text-[11px] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
         </div>
-        <button
-          class="recent__info-btn"
-          type="button"
-          data-tooltip="Mostra os lançamentos mais recentes com data e status (pago/pendente)."
-          aria-label="Informações sobre movimentos recentes">
+        <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[10px] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
           i
+          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[10px] border border-[var(--border)] bg-[rgba(12,22,28,0.95)] p-2 text-left text-[var(--text-sm)] text-[var(--text)] shadow-[0_12px_24px_rgba(0,0,0,0.25)] group-hover:block">
+            Mostra os lançamentos mais recentes com data e status (pago/pendente).
+          </span>
+          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border)] bg-[rgba(12,22,28,0.95)] group-hover:block"></span>
         </button>
       </div>
-      <div class="recent__list" *ngIf="recentTransactions.length; else semMovimentos">
-        <div class="recent__item" *ngFor="let item of recentTransactions">
-          <div class="recent__left">
-            <span class="recent__icon" [class.income]="item.type === 'income'" [class.expense]="item.type === 'expense'">
+      <div class="grid gap-2" *ngIf="recentTransactions.length; else semMovimentos">
+        <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]" *ngFor="let item of recentTransactions">
+          <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
+            <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full font-semibold text-[var(--text)]" [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.8)]' : 'bg-[rgba(239,68,68,0.8)]'">
               {{ item.type === 'income' ? '↑' : '↓' }}
             </span>
-            <div class="recent__content">
-              <strong class="recent__name">{{ item.title }}</strong>
-              <div class="recent__meta">
+            <div class="min-w-0">
+              <strong class="block text-[12px]">{{ item.title }}</strong>
+              <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
                 <span>Criado: {{ item.date }}</span>
-                <span class="dot">•</span>
+                <span class="opacity-70">•</span>
                 <span>Status: {{ item.status }}</span>
-                <span *ngIf="item.recurring" class="recent__tag">Recorrente</span>
+                <span *ngIf="item.recurring" class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[var(--space-1)] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
               </div>
             </div>
           </div>
-          <div class="recent__amount" [class.income]="item.type === 'income'" [class.expense]="item.type === 'expense'">
+          <div class="text-[12px] font-bold" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
             {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
           </div>
         </div>
       </div>
       <ng-template #semMovimentos>
-        <p class="muted">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
+        <p class="text-[11px] text-[var(--text-muted)]">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
       </ng-template>
     </aside>
   </div>
 
-  <div class="dashboard-row dashboard-row--split" *ngIf="!isLoadingDashboard">
-    <div class="chart chart--compact">
-      <div class="chart__header">
-        <div>
-          <p class="label">Despesas por categoria</p>
-          <span class="muted">Top categorias no período selecionado.</span>
-        </div>
+  <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1" *ngIf="!isLoadingDashboard">
+    <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+      <div>
+        <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
+        <span class="text-[11px] text-[var(--text-muted)]">Top categorias no período selecionado.</span>
       </div>
-      <div class="chart__empty" *ngIf="!expenseCategoryData.length">
-        <p class="muted">Cadastre uma despesa para ver as categorias em destaque.</p>
+      <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-center text-[11px] text-[var(--text-muted)]" *ngIf="!expenseCategoryData.length">
+        Cadastre uma despesa para ver as categorias em destaque.
       </div>
-      <div class="mini-bars" *ngIf="expenseCategoryData.length">
-        <div class="mini-bars__item" *ngFor="let item of expenseCategoryData">
-          <span class="mini-bars__label">{{ item.label }}</span>
-          <div class="mini-bars__track">
-            <div class="mini-bars__fill expense" [style.width.%]="
-              maxExpenseCategory ? (item.total / maxExpenseCategory) * 100 : 0
-            "></div>
+      <div class="grid gap-3" *ngIf="expenseCategoryData.length">
+        <div class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,2.2fr)_minmax(64px,auto)] items-center gap-2 text-[var(--text-secondary)]" *ngFor="let item of expenseCategoryData">
+          <span class="truncate text-[12px] font-semibold">{{ item.label }}</span>
+          <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
+            <div class="h-full bg-[linear-gradient(90deg,rgba(255,92,92,0.85),rgba(239,68,68,0.35))]" [style.width.%]="maxExpenseCategory ? (item.total / maxExpenseCategory) * 100 : 0"></div>
           </div>
-          <span class="mini-bars__value">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
+          <span class="text-right text-[11px] text-[var(--text-muted)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
         </div>
       </div>
     </div>
 
-    <div class="chart chart--compact">
-      <div class="chart__header">
-        <div>
-          <p class="label">Receitas por fonte</p>
-          <span class="muted">Fontes com maior impacto no período.</span>
-        </div>
+    <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+      <div>
+        <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por fonte</p>
+        <span class="text-[11px] text-[var(--text-muted)]">Fontes com maior impacto no período.</span>
       </div>
-      <div class="chart__empty" *ngIf="!incomeSourceData.length">
-        <p class="muted">Cadastre uma receita para ver as principais fontes.</p>
+      <div class="rounded-[12px] border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-center text-[11px] text-[var(--text-muted)]" *ngIf="!incomeSourceData.length">
+        Cadastre uma receita para ver as principais fontes.
       </div>
-      <div class="mini-bars" *ngIf="incomeSourceData.length">
-        <div class="mini-bars__item" *ngFor="let item of incomeSourceData">
-          <span class="mini-bars__label">{{ item.label }}</span>
-          <div class="mini-bars__track">
-            <div class="mini-bars__fill income" [style.width.%]="
-              maxIncomeSource ? (item.total / maxIncomeSource) * 100 : 0
-            "></div>
+      <div class="grid gap-3" *ngIf="incomeSourceData.length">
+        <div class="grid grid-cols-[minmax(0,1.2fr)_minmax(0,2.2fr)_minmax(64px,auto)] items-center gap-2 text-[var(--text-secondary)]" *ngFor="let item of incomeSourceData">
+          <span class="truncate text-[12px] font-semibold">{{ item.label }}</span>
+          <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
+            <div class="h-full bg-[linear-gradient(90deg,rgba(34,197,94,0.85),rgba(34,197,94,0.45))]" [style.width.%]="maxIncomeSource ? (item.total / maxIncomeSource) * 100 : 0"></div>
           </div>
-          <span class="mini-bars__value">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
+          <span class="text-right text-[11px] text-[var(--text-muted)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
         </div>
       </div>
     </div>

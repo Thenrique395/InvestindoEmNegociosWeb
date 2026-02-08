@@ -1,12 +1,12 @@
-<section class="admin-users">
-  <header class="admin-users__header">
+<section class="admin-users space-y-6 text-[var(--text)]">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
     <div>
-      <h1>Controle de acessos</h1>
-      <p>Defina o nível de acesso de cada usuário.</p>
+      <h1 class="text-2xl font-semibold tracking-tight">Controle de acessos</h1>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">Defina o nível de acesso de cada usuário.</p>
     </div>
     <button type="button" class="btn-primary sm" (click)="load()" [disabled]="loading">
-      <span class="icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false">
+      <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
           <path
             d="M20 12a8 8 0 0 1-13.66 5.66M4 12A8 8 0 0 1 17.66 6.34"
             fill="none"
@@ -26,108 +26,129 @@
     </button>
   </header>
 
-  <div class="status" *ngIf="loading">Carregando usuários...</div>
-  <div class="status error" *ngIf="error">{{ error }}</div>
-
-  <div class="table-wrap" *ngIf="!loading && users.length">
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>E-mail</th>
-          <th>Status</th>
-          <th>Criado em</th>
-          <th>Nível</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users">
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            <span [class.inactive]="!user.isActive">{{ user.isActive ? 'Ativo' : 'Inativo' }}</span>
-          </td>
-          <td>{{ user.createdAt | date: 'short' }}</td>
-          <td>
-            <select
-              [(ngModel)]="user.pendingRole"
-              (ngModelChange)="updateRole(user, $event)"
-              [disabled]="savingId === user.id || deletingId === user.id">
-              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
-            </select>
-          </td>
-          <td>
-            <div class="actions">
-              <button
-                type="button"
-                class="btn-warning sm"
-                (click)="toggleStatus(user)"
-                [disabled]="savingId === user.id || deletingId === user.id">
-                <span class="icon" aria-hidden="true">
-                  <svg *ngIf="user.isActive" viewBox="0 0 24 24" focusable="false">
-                    <path
-                      d="M7 11V8a5 5 0 0 1 10 0v3"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round" />
-                    <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
-                  </svg>
-                  <svg *ngIf="!user.isActive" viewBox="0 0 24 24" focusable="false">
-                    <path
-                      d="M17 11V8a5 5 0 0 0-9.9-1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round" />
-                    <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
-                  </svg>
-                </span>
-                {{ user.pendingActive ? 'Bloquear' : 'Desbloquear' }}
-              </button>
-              <button
-                type="button"
-                class="btn-primary sm"
-                (click)="saveChanges(user)"
-                [disabled]="!user.dirty || savingId === user.id || deletingId === user.id">
-                <span class="icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path
-                      d="M5 12l4 4 10-10"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round" />
-                  </svg>
-                </span>
-                Salvar
-              </button>
-              <button
-                type="button"
-                class="btn-danger sm"
-                (click)="removeUser(user)"
-                [disabled]="savingId === user.id || deletingId === user.id">
-                <span class="icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path
-                      d="M4 7h16M9 7V5h6v2M8 7l1 12h6l1-12"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round" />
-                  </svg>
-                </span>
-                Excluir
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
+    Carregando usuários...
+  </div>
+  <div class="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-300" *ngIf="error">
+    {{ error }}
   </div>
 
-  <div class="status empty" *ngIf="!loading && !users.length">Nenhum usuário encontrado.</div>
+  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]" *ngIf="!loading && users.length">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
+          <tr class="border-b border-[var(--border)]">
+            <th class="px-6 py-4 font-semibold">Nome</th>
+            <th class="px-6 py-4 font-semibold">Status</th>
+            <th class="px-6 py-4 font-semibold">Criado em</th>
+            <th class="px-6 py-4 font-semibold">Nível</th>
+            <th class="px-6 py-4 font-semibold text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border)]">
+          <tr *ngFor="let user of users" class="hover:bg-[var(--surface-2)]">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
+                  {{ (user.name || user.email || '?').charAt(0) }}
+                </span>
+                <div>
+                  <div class="font-semibold text-[var(--text)]">{{ user.name || 'Sem nome' }}</div>
+                  <div class="text-xs text-[var(--text-muted)]">{{ user.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span
+                class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                [ngClass]="user.isActive ? 'bg-emerald-500/10 text-emerald-300' : 'bg-slate-500/15 text-[var(--text-muted)]'">
+                {{ user.isActive ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-[var(--text-muted)]">{{ user.createdAt | date: 'short' }}</td>
+            <td class="px-6 py-4">
+              <select
+                class="h-10 w-full min-w-[160px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+                [(ngModel)]="user.pendingRole"
+                (ngModelChange)="updateRole(user, $event)"
+                [disabled]="savingId === user.id || deletingId === user.id">
+                <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+              </select>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <button
+                  type="button"
+                  class="btn-warning sm"
+                  (click)="toggleStatus(user)"
+                  [disabled]="savingId === user.id || deletingId === user.id">
+                  <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                    <svg *ngIf="user.isActive" viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                      <path
+                        d="M7 11V8a5 5 0 0 1 10 0v3"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round" />
+                      <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <svg *ngIf="!user.isActive" viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                      <path
+                        d="M17 11V8a5 5 0 0 0-9.9-1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round" />
+                      <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                  </span>
+                  {{ user.pendingActive ? 'Bloquear' : 'Desbloquear' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-primary sm"
+                  (click)="saveChanges(user)"
+                  [disabled]="!user.dirty || savingId === user.id || deletingId === user.id">
+                  <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                      <path
+                        d="M5 12l4 4 10-10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  Salvar
+                </button>
+                <button
+                  type="button"
+                  class="btn-danger sm"
+                  (click)="removeUser(user)"
+                  [disabled]="savingId === user.id || deletingId === user.id">
+                  <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                      <path
+                        d="M4 7h16M9 7V5h6v2M8 7l1 12h6l1-12"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  Excluir
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]" *ngIf="!loading && !users.length">
+    Nenhum usuário encontrado.
+  </div>
 </section>

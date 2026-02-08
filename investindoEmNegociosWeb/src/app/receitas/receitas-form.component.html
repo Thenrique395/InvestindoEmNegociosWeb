@@ -1,46 +1,83 @@
-<div class="modal" *ngIf="mostrarForm">
-  <div class="modal__backdrop" (click)="fecharModal()"></div>
-  <div class="modal__content">
-    <div class="modal__header">
-      <div>
-        <p class="eyebrow">Nova receita</p>
-        <h3>{{ editandoId ? 'Editar receita' : 'Adicionar receita' }}</h3>
-        <p class="muted">Cadastre o valor e a recorrência deste recebimento.</p>
+<div *ngIf="mostrarForm" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+  <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharModal()"></div>
+  <div class="relative w-full max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]">
+    <div class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-6 py-5">
+      <div class="space-y-1">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Nova receita</p>
+        <h3 class="text-xl font-semibold text-[var(--text)]">
+          {{ editandoId ? 'Editar receita' : 'Adicionar receita' }}
+        </h3>
+        <p class="text-sm text-[var(--text-muted)]">Cadastre o valor e a recorrência deste recebimento.</p>
       </div>
-      <button class="modal__close" type="button" (click)="fecharModal()">✕</button>
+      <button
+        class="grid h-10 w-10 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition hover:text-[var(--text)]"
+        type="button"
+        (click)="fecharModal()"
+        aria-label="Fechar modal">
+        ✕
+      </button>
     </div>
 
-    <form class="form" (ngSubmit)="salvar()" autocomplete="off">
-      <label>
+    <form class="grid gap-4 px-6 py-6" (ngSubmit)="salvar()" autocomplete="off">
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Fonte
-        <input type="text" [(ngModel)]="novaRenda.fonte" name="fonte" (ngModelChange)="onFonteChange($event)" placeholder="Ex: Salário, PLR, Freela" required />
+        <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+          type="text"
+          [(ngModel)]="novaRenda.fonte"
+          name="fonte"
+          (ngModelChange)="onFonteChange($event)"
+          placeholder="Ex: Salário, PLR, Freela"
+          required />
       </label>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Categoria
-        <select [(ngModel)]="novaRenda.categoryId" name="categoria">
+        <select
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+          [(ngModel)]="novaRenda.categoryId"
+          name="categoria">
           <option [ngValue]="null" disabled>Selecione</option>
           <option *ngIf="!categorias.length" [ngValue]="null" disabled>Sem categorias cadastradas</option>
           <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.name }}</option>
         </select>
-        <div *ngIf="erroCategoria" class="mt-1 text-sm text-red-500" aria-live="polite">{{ erroCategoria }}</div>
+        <div *ngIf="erroCategoria" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroCategoria }}</div>
       </label>
-      <div class="alert-inline" *ngIf="!categorias.length">
+
+      <div
+        class="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200"
+        *ngIf="!categorias.length">
         Nenhuma categoria de receita ativa encontrada.
-        <a class="alert-link" routerLink="/categorias" (click)="fecharModal()">Cadastrar categorias</a>
+        <a class="font-semibold text-amber-100 underline underline-offset-2" routerLink="/categorias" (click)="fecharModal()">
+          Cadastrar categorias
+        </a>
       </div>
-      <div class="switch-row">
+
+      <div class="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
         <div>
-          <span class="switch-title">Recorrência</span>
-          <span class="switch-hint">Repete todo mês automaticamente.</span>
+          <p class="text-sm font-semibold text-[var(--text)]">Recorrência</p>
+          <p class="text-xs text-[var(--text-muted)]">Repete todo mês automaticamente.</p>
         </div>
-        <label class="switch" aria-label="Receita recorrente mensal">
-          <input type="checkbox" [(ngModel)]="novaRenda.fixa" name="fixa" (ngModelChange)="onFixaChange($event)" />
-          <span class="switch__track"><span class="switch__thumb"></span></span>
+        <label class="relative inline-flex items-center" aria-label="Receita recorrente mensal">
+          <input
+            class="peer sr-only"
+            type="checkbox"
+            [(ngModel)]="novaRenda.fixa"
+            name="fixa"
+            (ngModelChange)="onFixaChange($event)" />
+          <span
+            class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:bg-[var(--primary)]/70">
+          </span>
+          <span
+            class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5">
+          </span>
         </label>
       </div>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Valor (R$)
         <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
           type="text"
           inputmode="decimal"
           placeholder="R$ 0,00"
@@ -50,9 +87,11 @@
           name="valor"
           required />
       </label>
-      <label>
+
+      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
         Data de recebimento (DD/MM/AAAA)
         <input
+          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
           type="text"
           inputmode="numeric"
           placeholder="05/09/2024"
@@ -62,22 +101,37 @@
           (ngModelChange)="onRecebimentoChange($event)"
           name="recebimento"
           required />
-        <div *ngIf="erroData" class="mt-1 text-sm text-red-500" aria-live="polite">{{ erroData }}</div>
+        <div *ngIf="erroData" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroData }}</div>
       </label>
 
-      <div class="sugestao" *ngIf="valorSugestao">
-        Valor anterior para esta fonte: <strong>R$ {{ valorSugestao | number:'1.2-2' }}</strong>
-        <button type="button" class="btn-edit sm" (click)="usarSugestao()">Usar valor fixo</button>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="valorSugestao">
+        Valor anterior para esta fonte:
+        <strong class="text-[var(--text)]">R$ {{ valorSugestao | number:'1.2-2' }}</strong>
+        <button
+          type="button"
+          class="ml-3 inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          (click)="usarSugestao()">
+          Usar valor fixo
+        </button>
       </div>
 
-      <div class="resumo" *ngIf="resumoTexto">
-        <span>Resumo</span>
-        <p>{{ resumoTexto }}</p>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm" *ngIf="resumoTexto">
+        <span class="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Resumo</span>
+        <p class="mt-1 text-[var(--text)]">{{ resumoTexto }}</p>
       </div>
 
-      <div class="modal__actions">
-        <button type="button" class="btn-danger ghost" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="saving || !novaRenda.categoryId">
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button
+          type="button"
+          class="inline-flex items-center rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200 transition hover:border-rose-400/60"
+          [disabled]="saving"
+          (click)="fecharModal()">
+          ↩ Cancelar
+        </button>
+        <button
+          type="submit"
+          class="inline-flex items-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="saving || !novaRenda.categoryId">
           {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar receita') }}
         </button>
       </div>

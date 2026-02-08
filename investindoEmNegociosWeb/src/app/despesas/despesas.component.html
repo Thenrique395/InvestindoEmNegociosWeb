@@ -1,28 +1,34 @@
-<div class="status-strip">
-  <div class="status-card pending">
-    <p class="label">Pendentes</p>
-    <p class="value">R$ {{ totalPendentes | number:'1.2-2' }}</p>
+<div class="grid gap-3 md:grid-cols-3">
+  <div class="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em]">Pendentes</p>
+    <p class="mt-2 text-2xl font-semibold">R$ {{ totalPendentes | number:'1.2-2' }}</p>
   </div>
-  <div class="status-card anticipated">
-    <p class="label">Antecipadas</p>
-    <p class="value">R$ {{ totalAntecipadas | number:'1.2-2' }}</p>
+  <div class="rounded-2xl border border-sky-400/30 bg-sky-500/10 p-4 text-sky-100">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em]">Antecipadas</p>
+    <p class="mt-2 text-2xl font-semibold">R$ {{ totalAntecipadas | number:'1.2-2' }}</p>
   </div>
-  <div class="status-card paid">
-    <p class="label">Pagas</p>
-    <p class="value">R$ {{ totalPagas | number:'1.2-2' }}</p>
+  <div class="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-emerald-100">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em]">Pagas</p>
+    <p class="mt-2 text-2xl font-semibold">R$ {{ totalPagas | number:'1.2-2' }}</p>
   </div>
 </div>
 
-<section class="despesas">
-  <div class="header">
-    <div>
-      <p class="eyebrow">Despesas</p>
-      <h2>{{ mesAtualLabel | titlecase }}</h2>
-      <p class="muted">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
-      <div class="chip-row" *ngIf="previousComparison as comparison">
-        <span class="chip muted">
+<section class="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-md)]">
+  <div class="flex flex-wrap items-start justify-between gap-6">
+    <div class="space-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Despesas</p>
+      <h2 class="text-2xl font-semibold text-[var(--text)]">{{ mesAtualLabel | titlecase }}</h2>
+      <p class="text-sm text-[var(--text-muted)]">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
+      <div class="flex flex-wrap gap-2" *ngIf="previousComparison as comparison">
+        <span class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
           Comparativo com {{ comparison.month }}:
-          <span class="delta" [ngClass]="comparison.trend">
+          <span
+            class="font-semibold"
+            [ngClass]="comparison.trend === 'up'
+              ? 'text-[var(--danger)]'
+              : comparison.trend === 'down'
+                ? 'text-[var(--success)]'
+                : 'text-[var(--text-muted)]'">
             <ng-container *ngIf="comparison.isNew; else diffValue">Novo</ng-container>
             <ng-template #diffValue>
               {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
@@ -31,17 +37,30 @@
           </span>
         </span>
       </div>
-      <div class="nav">
-        <button type="button" (click)="mesAnterior()">◀ Mês anterior</button>
-        <button type="button" (click)="proximoMes()">Próximo mês ▶</button>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          (click)="mesAnterior()">
+          ◀ Mês anterior
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
+          (click)="proximoMes()">
+          Próximo mês ▶
+        </button>
       </div>
     </div>
-    <div class="total">
-      <span>Total do mês</span>
-      <strong>R$ {{ totalMes() | number:'1.2-2' }}</strong>
-      <button type="button" class="btn-primary" (click)="abrirModal()">
-        <span class="btn-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-right">
+      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total do mês</span>
+      <strong class="mt-2 block text-2xl font-semibold text-[var(--text)]">R$ {{ totalMes() | number:'1.2-2' }}</strong>
+      <button
+        type="button"
+        class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110"
+        (click)="abrirModal()">
+        <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
             <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
@@ -50,29 +69,46 @@
     </div>
   </div>
 
-  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
+  <div
+    *ngIf="alerta"
+    class="mt-4 rounded-xl border px-4 py-3 text-sm text-[var(--text)]"
+    [ngClass]="alertaTipo === 'success'
+      ? 'border-emerald-400/30 bg-emerald-500/10'
+      : alertaTipo === 'error'
+        ? 'border-rose-400/30 bg-rose-500/10'
+        : 'border-sky-400/30 bg-sky-500/10'">
     {{ alerta }}
   </div>
 
-  <div class="bulk-bar" *ngIf="selecionados.length">
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="selecionados.length">
     <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
-    <div class="bulk-actions">
-      <button type="button" class="btn-primary sm" [disabled]="loadingPagar" (click)="pagarSelecionadas()">
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+        [disabled]="loadingPagar"
+        (click)="pagarSelecionadas()">
         <span *ngIf="loadingPagar">Processando...</span>
         <span *ngIf="!loadingPagar">Marcar como pago</span>
       </button>
-      <button type="button" class="ghost sm" [disabled]="loadingAntecipar" (click)="anteciparSelecionadas()">
+      <button
+        type="button"
+        class="rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40 disabled:opacity-60"
+        [disabled]="loadingAntecipar"
+        (click)="anteciparSelecionadas()">
         <span *ngIf="loadingAntecipar">Antecipando...</span>
         <span *ngIf="!loadingAntecipar">Solicitar antecipação</span>
       </button>
-      <button type="button" class="btn-danger sm" (click)="excluirSelecionadas()">Excluir</button>
+      <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" (click)="excluirSelecionadas()">Excluir</button>
     </div>
   </div>
 
-  <div class="filters">
-    <label>
+  <div class="mt-5 grid gap-4 md:grid-cols-3">
+    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
       Status
-      <select [(ngModel)]="filtroStatus">
+      <select
+        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        [(ngModel)]="filtroStatus">
         <option value="ALL">Todos</option>
         <option value="OPEN">{{ statusLabel('OPEN') }}</option>
         <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
@@ -81,21 +117,27 @@
         <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
       </select>
     </label>
-    <label>
+    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
       Categoria
-      <select [(ngModel)]="filtroCategoria">
+      <select
+        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        [(ngModel)]="filtroCategoria">
         <option value="ALL">Todas</option>
         <option *ngIf="!categorias.length" value="" disabled>Sem categorias cadastradas</option>
         <option *ngFor="let c of categorias" [value]="c.id">{{ c.name }}</option>
       </select>
     </label>
-    <label>
+    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
       Buscar
-      <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
+      <input
+        class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
+        type="text"
+        [(ngModel)]="filtroNome"
+        placeholder="Nome da despesa" />
     </label>
   </div>
 
-  <div class="layout">
+  <div class="mt-4">
     <app-despesas-lista
       [despesas]="despesasFiltradas"
       [sortBy]="sortBy"
@@ -142,107 +184,107 @@
     (submitForm)="adicionar()"
     (cancel)="fecharModal()" />
 
-  <div class="modal" *ngIf="confirmEdicao">
-    <div class="modal__backdrop" (click)="cancelarEdicao()"></div>
-    <div class="modal__content small">
-      <div class="modal__header">
-        <div>
-          <p class="eyebrow">Editar despesa</p>
-          <h3>Aplicar alterações</h3>
+  <div *ngIf="confirmEdicao" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarEdicao()"></div>
+    <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+      <div class="flex items-start justify-between gap-4">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Editar despesa</p>
+          <h3 class="text-xl font-semibold text-[var(--text)]">Aplicar alterações</h3>
         </div>
-        <button class="modal__close" type="button" (click)="cancelarEdicao()">✕</button>
+        <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarEdicao()">✕</button>
       </div>
-      <p class="muted" *ngIf="confirmEdicao && !confirmEdicao.isRecorrente">
+      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmEdicao && !confirmEdicao.isRecorrente">
         Esta despesa está parcelada. Deseja alterar apenas esta parcela ou todas as parcelas da série?
       </p>
-      <p class="muted" *ngIf="confirmEdicao && confirmEdicao.isRecorrente">
+      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmEdicao && confirmEdicao.isRecorrente">
         Esta despesa é recorrente. Deseja alterar somente este lançamento ou toda a recorrência?
       </p>
-      <div class="modal__actions">
-        <button type="button" class="ghost" (click)="confirmarEdicao('single')">
+      <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
+        <button type="button" class="rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)]" (click)="confirmarEdicao('single')">
           {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Somente este mês' : 'Somente esta' }}
         </button>
-        <button type="button" class="btn-primary" (click)="confirmarEdicao('all')">
+        <button type="button" class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" (click)="confirmarEdicao('all')">
           {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Toda a recorrência' : 'Todas as parcelas' }}
         </button>
       </div>
     </div>
   </div>
 
-  <div class="modal" *ngIf="confirmRemocao">
-    <div class="modal__backdrop" (click)="cancelarRemocao()"></div>
-    <div class="modal__content small">
-      <div class="modal__header">
-        <div>
-          <p class="eyebrow">Excluir despesa</p>
-          <h3>Confirmar remoção</h3>
+  <div *ngIf="confirmRemocao" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarRemocao()"></div>
+    <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+      <div class="flex items-start justify-between gap-4">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Excluir despesa</p>
+          <h3 class="text-xl font-semibold text-[var(--text)]">Confirmar remoção</h3>
         </div>
-        <button class="modal__close" type="button" (click)="cancelarRemocao()">✕</button>
+        <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarRemocao()">✕</button>
       </div>
-      <p class="muted" *ngIf="confirmRemocao && !confirmRemocao.isRecurring">
+      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmRemocao && !confirmRemocao.isRecurring">
         Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?
       </p>
-      <p class="muted" *ngIf="confirmRemocao && confirmRemocao.isRecurring">
+      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmRemocao && confirmRemocao.isRecurring">
         Esta despesa é recorrente. Deseja excluir apenas este mês ou encerrar a recorrência?
       </p>
-      <div class="modal__actions">
-        <button type="button" class="ghost" (click)="confirmarRemocao(false)">
+      <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
+        <button type="button" class="rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)]" (click)="confirmarRemocao(false)">
           {{ confirmRemocao && confirmRemocao.isRecurring ? 'Somente este mês' : 'Somente esta' }}
         </button>
-        <button type="button" class="btn-danger" (click)="confirmarRemocao(true)">
+        <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" (click)="confirmarRemocao(true)">
           {{ confirmRemocao && confirmRemocao.isRecurring ? 'Encerrar recorrência' : 'Todas as parcelas' }}
         </button>
       </div>
     </div>
   </div>
 
-  <div class="drawer" *ngIf="historicoAberto">
-    <div class="drawer__backdrop" (click)="fecharHistorico()"></div>
-    <div class="drawer__panel">
-      <div class="drawer__header">
-        <div>
-          <p class="eyebrow">Histórico</p>
-          <h3>{{ historicoTitulo }}</h3>
+  <div *ngIf="historicoAberto" class="fixed inset-0 z-50 flex items-center justify-end">
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharHistorico()"></div>
+    <div class="relative h-full w-full max-w-xl overflow-y-auto border-l border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+      <div class="flex items-start justify-between gap-4">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Histórico</p>
+          <h3 class="text-xl font-semibold text-[var(--text)]">{{ historicoTitulo }}</h3>
         </div>
-        <button type="button" class="ghost sm" (click)="fecharHistorico()">✕</button>
+        <button type="button" class="rounded-xl border border-[var(--border)] px-3 py-2 text-sm font-semibold text-[var(--text)]" (click)="fecharHistorico()">✕</button>
       </div>
 
-      <div class="drawer__section">
-        <h4>Pagas</h4>
-        <div *ngIf="historicoPagas.length; else semPagas">
-          <div class="drawer__row" *ngFor="let h of historicoPagas">
-            <div class="nome">
-              <div>{{ h.nome }}</div>
-              <small *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
+      <div class="mt-6 space-y-3">
+        <h4 class="text-sm font-semibold text-[var(--text)]">Pagas</h4>
+        <div *ngIf="historicoPagas.length; else semPagas" class="space-y-3">
+          <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm" *ngFor="let h of historicoPagas">
+            <div>
+              <div class="font-semibold text-[var(--text)]">{{ h.nome }}</div>
+              <small class="text-[var(--text-muted)]" *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
             </div>
-            <div class="muted">Venc.: {{ h.vencimento }}</div>
-            <div class="status-pill status-paid">{{ statusLabel('PAID') }}</div>
-            <div>R$ {{ h.valor | number:'1.2-2' }}</div>
+            <div class="text-[var(--text-muted)]">Venc.: {{ h.vencimento }}</div>
+            <div class="inline-flex w-fit rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
+              {{ statusLabel('PAID') }}
+            </div>
+            <div class="font-semibold text-[var(--text)]">R$ {{ h.valor | number:'1.2-2' }}</div>
           </div>
         </div>
-        <ng-template #semPagas><p class="muted">Nenhuma parcela paga.</p></ng-template>
+        <ng-template #semPagas><p class="text-sm text-[var(--text-muted)]">Nenhuma parcela paga.</p></ng-template>
       </div>
 
-      <div class="drawer__section">
-        <h4>Pendentes / Antecipadas</h4>
-        <div *ngIf="historicoPendentes.length; else semPendentes">
-          <div class="drawer__row" *ngFor="let h of historicoPendentes">
-            <div class="nome">
-              <div>{{ h.nome }}</div>
-              <small *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
+      <div class="mt-6 space-y-3">
+        <h4 class="text-sm font-semibold text-[var(--text)]">Pendentes / Antecipadas</h4>
+        <div *ngIf="historicoPendentes.length; else semPendentes" class="space-y-3">
+          <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm" *ngFor="let h of historicoPendentes">
+            <div>
+              <div class="font-semibold text-[var(--text)]">{{ h.nome }}</div>
+              <small class="text-[var(--text-muted)]" *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
             </div>
-            <div class="muted">Venc.: {{ h.vencimento }}</div>
-            <div class="status-pill"
-              [ngClass]="{
-                'status-anticipated': h.status === 'ANTICIPATED',
-                'status-open': h.status !== 'ANTICIPATED'
-              }">
+            <div class="text-[var(--text-muted)]">Venc.: {{ h.vencimento }}</div>
+            <div
+              class="inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold"
+              [ngClass]="h.status === 'ANTICIPATED' ? 'border border-sky-400/30 bg-sky-500/10 text-sky-200' : 'border border-amber-400/30 bg-amber-500/10 text-amber-200'">
               {{ statusLabel(h.status) }}
             </div>
-            <div>R$ {{ h.valor | number:'1.2-2' }}</div>
+            <div class="font-semibold text-[var(--text)]">R$ {{ h.valor | number:'1.2-2' }}</div>
           </div>
         </div>
-        <ng-template #semPendentes><p class="muted">Nenhuma parcela pendente.</p></ng-template>
+        <ng-template #semPendentes><p class="text-sm text-[var(--text-muted)]">Nenhuma parcela pendente.</p></ng-template>
       </div>
     </div>
   </div>

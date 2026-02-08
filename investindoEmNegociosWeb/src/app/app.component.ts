@@ -1,6 +1,6 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, NgClass } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
@@ -14,7 +14,7 @@ import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgIf, NgFor, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
+  imports: [NgIf, NgFor, NgClass, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
