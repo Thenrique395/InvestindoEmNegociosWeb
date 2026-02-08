@@ -195,7 +195,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       .slice(0, 5);
   }
 
-  get previousComparison(): { month: string; delta: number; deltaAbs: number; percent: number; trend: 'up' | 'down' | 'flat'; isNew: boolean } {
+  get previousComparison(): { month: string; monthLabel: string; delta: number; deltaAbs: number; percent: number; trend: 'up' | 'down' | 'flat'; isNew: boolean } {
     const prevDate = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
     const summaryPrev = this.summary?.previousMonth;
     const prevTotal = summaryPrev ? summaryPrev.total : 0;
@@ -206,6 +206,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     const trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
     return {
       month: summaryPrev ? summaryPrev.month : formatMonthYearLabel(prevDate),
+      monthLabel: summaryPrev ? this.formatMonthLabel(summaryPrev.month) : formatMonthYearLabel(prevDate),
       delta,
       deltaAbs: Math.abs(delta),
       percent: Math.abs(percent),
@@ -642,6 +643,12 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     const y = date.getFullYear();
     const m = date.getMonth() + 1;
     return `${y}-${String(m).padStart(2, '0')}`;
+  }
+
+  private formatMonthLabel(monthKey: string): string {
+    const [y, m] = monthKey.split('-').map((v) => Number(v));
+    if (!y || !m) return monthKey;
+    return formatMonthYearLabel(new Date(y, m - 1, 1));
   }
 
   private mesKeyFromRecebimento(recebimento: string): string | null {
