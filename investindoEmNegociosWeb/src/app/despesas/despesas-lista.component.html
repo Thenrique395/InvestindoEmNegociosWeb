@@ -104,11 +104,11 @@
             <span
               class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
               [ngClass]="{
-                'bg-emerald-500/10 text-emerald-300': d.status === 'PAID',
-                'bg-orange-500/10 text-orange-300': d.status === 'PARTIALLY_PAID',
-                'bg-rose-500/10 text-rose-300': d.status === 'CANCELED',
-                'bg-sky-500/10 text-sky-300': d.status === 'ANTICIPATED',
-                'bg-amber-500/10 text-amber-300': !d.status || d.status === 'OPEN'
+                'border border-emerald-200 bg-emerald-100 text-emerald-700': d.status === 'PAID',
+                'border border-orange-200 bg-orange-100 text-orange-700': d.status === 'PARTIALLY_PAID',
+                'border border-rose-200 bg-rose-100 text-rose-700': d.status === 'CANCELED',
+                'border border-sky-200 bg-sky-100 text-sky-700': d.status === 'ANTICIPATED',
+                'border border-amber-200 bg-amber-100 text-amber-700': !d.status || d.status === 'OPEN'
               }">
               <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
               {{ statusLabel(d.status) }}

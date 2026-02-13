@@ -5,6 +5,7 @@ import { CategoriesService, CategoryDto, CategoryType } from '../categories.serv
 import { AdminCategoriesService, AdminCategory } from '../admin-categories.service';
 import { AuthService } from '../auth.service';
 import { hasAtLeastRole } from '../roles';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-categories',
@@ -34,6 +35,8 @@ export class CategoriesComponent implements OnInit {
   adminEditing: AdminCategory | null = null;
   adminName = '';
   adminAppliesTo: '' | CategoryType = '';
+  showDeleteModal = false;
+  deleteTarget: CategoryDto | null = null;
 
   tipos = [
     { id: 'Expense' as CategoryType, label: 'Despesa' },
@@ -43,7 +46,8 @@ export class CategoriesComponent implements OnInit {
   constructor(
     private categoriesService: CategoriesService,
     private adminCategoriesService: AdminCategoriesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private uiFeedback: UiFeedbackService
   ) {}
 
   ngOnInit(): void {
@@ -146,6 +150,7 @@ export class CategoriesComponent implements OnInit {
             this.escopo = 'user';
             this.loadAdmin();
             this.carregar();
+            this.uiFeedback.success('Categoria padrão adicionada com sucesso.');
           },
           error: () => (this.erro = 'Erro ao adicionar categoria padrão.'),
           complete: () => (this.saving = false)
@@ -158,6 +163,7 @@ export class CategoriesComponent implements OnInit {
         this.categorias = [...this.categorias, cat];
         this.nome = '';
         this.showModal = false;
+        this.uiFeedback.success('Categoria adicionada com sucesso.');
       },
       error: (err) => (this.erro = err?.error ?? 'Erro ao adicionar categoria.'),
       complete: () => (this.saving = false)
@@ -166,11 +172,26 @@ export class CategoriesComponent implements OnInit {
 
   remover(cat: CategoryDto): void {
     if (cat.isDefault) return;
-    const ok = confirm(`Remover a categoria "${cat.name}"?`);
-    if (!ok) return;
+    this.deleteTarget = cat;
+    this.showDeleteModal = true;
+  }
+
+  fecharDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.deleteTarget = null;
+  }
+
+  confirmarRemocao(): void {
+    if (!this.deleteTarget) return;
+    const cat = this.deleteTarget;
+    this.showDeleteModal = false;
+    this.deleteTarget = null;
 
     this.categoriesService.delete(cat.id).subscribe({
-      next: () => (this.categorias = this.categorias.filter((c) => c.id !== cat.id)),
+      next: () => {
+        this.categorias = this.categorias.filter((c) => c.id !== cat.id);
+        this.uiFeedback.success('Categoria removida com sucesso.');
+      },
       error: (err) => (this.erro = err?.error ?? 'Não foi possível remover a categoria.')
     });
   }

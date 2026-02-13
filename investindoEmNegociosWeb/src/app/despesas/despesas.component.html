@@ -345,7 +345,7 @@
             <div class="text-[var(--text-muted)]">Venc.: {{ h.vencimento }}</div>
             <div
               class="inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold"
-              [ngClass]="h.status === 'ANTICIPATED' ? 'border border-sky-400/30 bg-sky-500/10 text-sky-200' : 'border border-amber-400/30 bg-amber-500/10 text-amber-200'">
+              [ngClass]="h.status === 'ANTICIPATED' ? 'border border-sky-200 bg-sky-100 text-sky-700' : 'border border-amber-200 bg-amber-100 text-amber-700'">
               {{ statusLabel(h.status) }}
             </div>
             <div class="font-semibold text-[var(--text)]">R$ {{ h.valor | number:'1.2-2' }}</div>

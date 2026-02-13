@@ -65,7 +65,7 @@
             <div class="font-semibold text-[var(--text)]">{{ c.name }}</div>
             <div class="text-sm text-[var(--text-muted)]">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
           </div>
-          <span class="inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">Receita</span>
+          <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Receita</span>
           <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
         </div>
         <div *ngIf="categoriasPorTipo('Income').length === 0" class="text-sm text-[var(--text-muted)]">Sem categorias de receita. Crie uma nova acima.</div>
@@ -86,7 +86,7 @@
             <div class="font-semibold text-[var(--text)]">{{ c.name }}</div>
             <div class="text-sm text-[var(--text-muted)]">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
           </div>
-          <span class="inline-flex items-center rounded-full border border-rose-400/30 bg-rose-500/10 px-2.5 py-1 text-xs font-semibold text-rose-300">Despesa</span>
+          <span class="inline-flex items-center rounded-full border border-rose-200 bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-700">Despesa</span>
           <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
         </div>
         <div *ngIf="categoriasPorTipo('Expense').length === 0" class="text-sm text-[var(--text-muted)]">Sem categorias de despesa. Crie uma nova acima.</div>
@@ -109,15 +109,32 @@
     <div class="status" *ngIf="adminLoading">Carregando categorias padrão...</div>
     <div class="status error" *ngIf="adminError">{{ adminError }}</div>
 
-    <div class="category-list admin-list" *ngIf="!adminLoading && adminCategories.length">
-      <div class="category-item" *ngFor="let c of adminCategories">
-        <div class="category-icon" aria-hidden="true">{{ iconForAdminCategory(c) }}</div>
-        <div class="category-info">
-          <div class="category-name">{{ c.name }}</div>
-          <div class="category-sub">{{ c.appliesTo || 'Todos' }}</div>
+    <div class="grid gap-3" *ngIf="!adminLoading && adminCategories.length">
+      <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 md:grid-cols-[auto_1fr_auto] md:items-center" *ngFor="let c of adminCategories">
+        <div class="grid h-10 w-10 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
+          {{ iconForAdminCategory(c) }}
         </div>
-        <span class="tag" [class.off]="!c.isActive">{{ c.isActive ? 'Ativa' : 'Inativa' }}</span>
-        <div class="admin-actions">
+        <div class="space-y-1">
+          <div class="font-semibold text-[var(--text)]">{{ c.name }}</div>
+          <div class="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
+            <span>Aplica em</span>
+            <span
+              class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
+              [ngClass]="c.appliesTo === 'Income'
+                ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
+                : c.appliesTo === 'Expense'
+                  ? 'border-rose-200 bg-rose-100 text-rose-700'
+                  : 'border-slate-200 bg-slate-100 text-slate-600'">
+              {{ c.appliesTo || 'Todos' }}
+            </span>
+            <span
+              class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
+              [ngClass]="c.isActive ? 'border-emerald-200 bg-emerald-100 text-emerald-700' : 'border-slate-200 bg-slate-100 text-slate-600'">
+              {{ c.isActive ? 'Ativa' : 'Inativa' }}
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-start gap-2 md:justify-end">
           <button type="button" class="btn-ghost sm" (click)="openAdminEdit(c)">Editar</button>
           <button type="button" class="btn-ghost sm" (click)="toggleDefaultStatus(c)">
             {{ c.isActive ? 'Desativar' : 'Ativar' }}
@@ -157,6 +174,21 @@
         </button>
       </div>
       <p class="error" *ngIf="adminError">{{ adminError }}</p>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="showDeleteModal">
+    <div class="modal__backdrop" (click)="fecharDeleteModal()"></div>
+    <div class="modal__card">
+      <h2>Remover categoria</h2>
+      <p class="muted">Tem certeza que deseja remover a categoria abaixo?</p>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text)]">
+        {{ deleteTarget?.name || 'Categoria' }}
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn-cancel" (click)="fecharDeleteModal()">Cancelar</button>
+        <button type="button" class="btn-danger" (click)="confirmarRemocao()">Remover</button>
+      </div>
     </div>
   </div>
 
