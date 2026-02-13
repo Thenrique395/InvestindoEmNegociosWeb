@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DecimalPipe, NgFor, NgIf, UpperCasePipe } from '@angular/common';
+import { DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgFor, NgIf, UpperCasePipe, DecimalPipe],
+  imports: [NgFor, NgIf, DecimalPipe],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })

@@ -1,42 +1,76 @@
 <section class="flex min-h-[70vh] items-center justify-center p-[var(--space-3)]">
   <div
-    class="grid w-full max-w-[980px] grid-cols-1 gap-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] md:grid-cols-2">
+    class="grid w-full max-w-[1040px] grid-cols-1 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)] md:grid-cols-[1.05fr_0.95fr]">
     <div
-      class="min-h-[220px] bg-[radial-gradient(circle_at_20%_20%,rgba(37,99,235,0.12),transparent_45%),linear-gradient(160deg,var(--surface-2),var(--surface))] md:min-h-full"
-      aria-hidden="true"></div>
-    <div class="flex flex-col gap-2 p-[var(--space-4)]">
-      <h1 class="m-0 text-[var(--text-3xl)] text-[var(--text)]">Entrar</h1>
-      <p class="m-0 text-[var(--text-muted)]">
-        Acesse para acompanhar seu plano, carteira e alertas.
-      </p>
-      <form class="mt-4 flex flex-col gap-4" (ngSubmit)="onSubmit()">
+      class="hidden min-h-full flex-col justify-between gap-6 bg-[radial-gradient(circle_at_15%_20%,rgba(37,99,235,0.14),transparent_45%),linear-gradient(160deg,var(--surface-2),var(--surface))] p-[var(--space-5)] md:flex">
+      <div class="space-y-4">
+        <span class="text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--text-muted)]">Investindo em Negócios</span>
+        <h2 class="text-[28px] font-semibold text-[var(--text)]">Controle financeiro com clareza diária.</h2>
+        <p class="text-[var(--text-muted)]">
+          Tenha visão de receitas, despesas e metas em um painel simples, pensado para decisões rápidas.
+        </p>
+      </div>
+      <div class="grid gap-3 text-[13px] text-[var(--text-muted)]">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-[var(--success)]"></span>
+          Resumo do mês e alertas inteligentes
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-[var(--primary)]"></span>
+          Metas e progresso por meta
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-[var(--warning)]"></span>
+          Comparativo com mês anterior
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 p-[var(--space-5)]">
+      <div class="space-y-2">
+        <span class="text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--text-muted)]">Entrar</span>
+        <h1 class="m-0 text-[26px] font-semibold text-[var(--text)]">Bem-vindo de volta</h1>
+        <p class="m-0 text-[var(--text-muted)]">
+          Acesse sua conta para acompanhar o mês, metas e alertas.
+        </p>
+      </div>
+
+      <form class="mt-2 flex flex-col gap-4" (ngSubmit)="onSubmit()">
         <label class="flex flex-col gap-2 text-[var(--text)] font-semibold">
           Email
           <input
-            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
+            class="w-full rounded-[12px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
             [(ngModel)]="email"
             name="email"
             type="email"
-            placeholder="E-mail"
+            placeholder="seuemail@exemplo.com"
             required />
         </label>
         <label class="flex flex-col gap-2 text-[var(--text)] font-semibold">
           Senha
           <input
-            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
+            class="w-full rounded-[12px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
             [(ngModel)]="password"
             name="password"
             type="password"
             placeholder="••••••••"
             required />
         </label>
+        <div class="flex items-center justify-between text-[12px] text-[var(--text-muted)]">
+          <span>Use seu email cadastrado.</span>
+          <a class="text-[var(--primary)] font-semibold hover:underline" href="#">Esqueci minha senha</a>
+        </div>
         <button type="submit" class="btn-primary w-full" [disabled]="loading">
           {{ loading ? 'Autenticando...' : 'Entrar' }}
         </button>
-        <a class="text-[var(--primary)] font-semibold hover:underline" href="#">Esqueci minha senha</a>
       </form>
-      <p class="mt-3 text-[var(--primary)] font-semibold" *ngIf="feedback">{{ feedback }}</p>
-      <p class="mt-3 text-[var(--danger)] font-semibold" *ngIf="error">{{ error }}</p>
+
+      <div class="mt-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-2)] py-[var(--space-2)] text-[12px] text-[var(--text-muted)]">
+        Ainda não tem conta? <span class="text-[var(--primary)] font-semibold">Crie sua conta no topo.</span>
+      </div>
+
+      <p class="mt-2 text-[var(--primary)] font-semibold" *ngIf="feedback">{{ feedback }}</p>
+      <p class="mt-2 text-[var(--danger)] font-semibold" *ngIf="error">{{ error }}</p>
     </div>
   </div>
 </section>
