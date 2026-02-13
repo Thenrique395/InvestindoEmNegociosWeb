@@ -184,7 +184,7 @@
         <button type="button" class="btn-cancel sm" [disabled]="saving" (click)="fechar()">↩ Cancelar</button>
         <button
           type="submit"
-          class="inline-flex items-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+          class="btn-primary sm"
           [disabled]="saving || !novaDespesa.categoryId">
           {{ saving ? (isEdit ? 'Atualizando...' : 'Salvando...') : (isEdit ? 'Editar despesa' : 'Salvar despesa') }}
         </button>

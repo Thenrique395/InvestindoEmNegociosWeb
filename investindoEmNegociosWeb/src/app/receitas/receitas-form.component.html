@@ -126,7 +126,7 @@
         </button>
         <button
           type="submit"
-          class="inline-flex items-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+          class="btn-primary sm"
           [disabled]="saving || !novaRenda.categoryId">
           {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar receita') }}
         </button>

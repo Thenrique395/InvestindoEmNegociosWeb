@@ -116,7 +116,7 @@
       <div class="mt-3">
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110"
+          class="btn-primary sm"
           (click)="abrirModal()">
           <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
@@ -175,7 +175,7 @@
     <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
     <button
       type="button"
-      class="rounded-xl bg-[var(--primary)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+      class="btn-primary sm"
       [disabled]="loadingRecebido"
       (click)="marcarRecebidasSelecionadas()">
       <span *ngIf="loadingRecebido">Processando...</span>
@@ -240,7 +240,7 @@
       <button type="button" class="btn-cancel sm" (click)="cancelarEdicaoRecebida()">
         Não aceito
       </button>
-      <button type="button" class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" (click)="confirmarEdicaoRecebida()">
+      <button type="button" class="btn-primary sm" (click)="confirmarEdicaoRecebida()">
         Aceitar e editar
       </button>
     </div>
@@ -273,11 +273,11 @@
       <button
         *ngIf="deleteIsRecurring"
         type="button"
-        class="rounded-xl border border-amber-500/40 px-4 py-2 text-sm font-semibold text-amber-200"
+        class="btn-warning sm"
         (click)="confirmarExcluirSomenteEsta()">
         Excluir só este mês
       </button>
-      <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" (click)="confirmarExcluirRecorrencia()">Excluir recorrência</button>
+      <button type="button" class="btn-danger sm" (click)="confirmarExcluirRecorrencia()">Excluir recorrência</button>
     </div>
   </div>
 </div>

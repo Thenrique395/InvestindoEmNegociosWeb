@@ -88,7 +88,7 @@
               Meses
               <input type="number" [(ngModel)]="meses" name="meses" />
             </label>
-            <button type="button" (click)="calcularJuros()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularJuros()">Calcular</button>
           </form>
           <p class="result" *ngIf="jurosResultado">
             Valor futuro:
@@ -158,7 +158,7 @@
               Rendimento esperado (% ao mês)
               <input type="number" step="0.1" [(ngModel)]="rendimentoReserva" name="rendimentoReserva" />
             </label>
-            <button type="button" (click)="calcularReserva()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularReserva()">Calcular</button>
           </form>
           <div class="result" *ngIf="valorObjetivoReserva">
             <p>Valor alvo: <strong>R$ {{ valorObjetivoReserva | number : '1.2-2' }}</strong></p>
@@ -192,7 +192,7 @@
               Rentabilidade mensal (%)
               <input type="number" step="0.1" [(ngModel)]="taxaAposentadoria" name="taxaAposentadoria" />
             </label>
-            <button type="button" (click)="calcularAposentadoria()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularAposentadoria()">Calcular</button>
           </form>
           <div class="result" *ngIf="patrimonioAposentadoria">
             Patrimônio estimado:
@@ -231,7 +231,7 @@
                 name="mesesSimples"
               />
             </label>
-            <button type="button" (click)="calcularJurosSimples()">
+            <button type="button" class="btn-primary sm" (click)="calcularJurosSimples()">
               Calcular
             </button>
           </form>
@@ -272,7 +272,7 @@
                 step="0.1"
               />
             </label>
-            <button type="button" (click)="calcularRenda()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularRenda()">Calcular</button>
           </form>
           <p class="result" *ngIf="rendaResultado">
             Receita mensal estimada:
@@ -336,7 +336,7 @@
                 step="0.1"
               />
             </label>
-            <button type="button" (click)="calcularMilhao()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularMilhao()">Calcular</button>
           </form>
           <p class="result" *ngIf="mesesMilhao">
             Você alcança R$ 1.000.000 em
@@ -396,7 +396,7 @@
               Reajuste aluguel (% ao ano)
               <input type="number" step="0.1" [(ngModel)]="reajusteAnualAluguel" name="reajusteAnualAluguel" />
             </label>
-            <button type="button" (click)="calcularAlugarOuFinanciar()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularAlugarOuFinanciar()">Calcular</button>
           </form>
           <div class="result" *ngIf="custoFinanciamentoTotal">
             <p>Financiamento: <strong>R$ {{ custoFinanciamentoTotal | number : "1.2-2" }}</strong></p>
@@ -431,7 +431,7 @@
               Meses
               <input type="number" [(ngModel)]="mesesPoupanca" name="mesesPoupanca" />
             </label>
-            <button type="button" (click)="calcularPoupancaSelic()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularPoupancaSelic()">Calcular</button>
           </form>
           <div class="result" *ngIf="resultadoPoupanca">
             <p>Poupança: <strong>R$ {{ resultadoPoupanca | number : "1.2-2" }}</strong></p>
@@ -457,7 +457,7 @@
               Valor da parcela (R$)
               <input type="number" [(ngModel)]="valorParcela" name="valorParcela" />
             </label>
-            <button type="button" (click)="calcularVistaPrazo()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularVistaPrazo()">Calcular</button>
           </form>
           <div class="result" *ngIf="totalPrazo">
             <p>Total a prazo: <strong>R$ {{ totalPrazo | number : "1.2-2" }}</strong></p>
@@ -495,7 +495,7 @@
               IPCA + spread (% ao mês)
               <input type="number" step="0.1" [(ngModel)]="taxaIpcaSpread" name="taxaIpcaSpread" />
             </label>
-            <button type="button" (click)="calcularComparadorRendaFixa()">Calcular</button>
+            <button type="button" class="btn-primary sm" (click)="calcularComparadorRendaFixa()">Calcular</button>
           </form>
           <div class="result" *ngIf="resultadoCdi">
             <p>CDI: <strong>R$ {{ resultadoCdi | number : "1.2-2" }}</strong></p>
