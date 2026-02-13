@@ -62,12 +62,12 @@ export class CalculatorComponent implements OnDestroy {
   sub: Subscription;
 
   calculators: CalcItem[] = [
-    { id: 'aposentadoria', title: 'Aposentadoria', subtitle: 'Planeje quanto poupar até aposentar', category: 'financeiras', implemented: false, icon: 'home' },
-    { id: 'alugarOuFinanciar', title: 'Alugar x Financiar', subtitle: 'Compare o custo efetivo do imóvel', category: 'financeiras', implemented: false, icon: 'attach_money' },
-    { id: 'poupancaSelic', title: 'Poupança x Selic', subtitle: 'Compare rentabilidade', category: 'financeiras', implemented: false, icon: 'trending_up' },
-    { id: 'vistaPrazo', title: 'À vista ou a prazo', subtitle: 'Custo efetivo de pagamentos', category: 'financeiras', implemented: false, icon: 'payments' },
+    { id: 'aposentadoria', title: 'Aposentadoria', subtitle: 'Planeje quanto poupar até aposentar', category: 'financeiras', implemented: true, icon: 'home' },
+    { id: 'alugarOuFinanciar', title: 'Alugar x Financiar', subtitle: 'Compare o custo efetivo do imóvel', category: 'financeiras', implemented: true, icon: 'attach_money' },
+    { id: 'poupancaSelic', title: 'Poupança x Selic', subtitle: 'Compare rentabilidade', category: 'financeiras', implemented: true, icon: 'trending_up' },
+    { id: 'vistaPrazo', title: 'À vista ou a prazo', subtitle: 'Custo efetivo de pagamentos', category: 'financeiras', implemented: true, icon: 'payments' },
     { id: 'reservaEmergencia', title: 'Reserva de emergência', subtitle: 'Calcule o valor ideal e prazo', category: 'financeiras', implemented: true, icon: 'shield' },
-    { id: 'comparadorRendaFixa', title: 'Comparador de Renda Fixa', subtitle: 'CDI x prefixado x IPCA', category: 'financeiras', implemented: false, icon: 'leaderboard' },
+    { id: 'comparadorRendaFixa', title: 'Comparador de Renda Fixa', subtitle: 'CDI x prefixado x IPCA', category: 'financeiras', implemented: true, icon: 'leaderboard' },
     { id: 'jurosSimples', title: 'Juros Simples', subtitle: 'Rendimento linear para curto prazo', category: 'financeiras', implemented: true, icon: 'percent' },
     { id: 'jurosCompostos', title: 'Juros Compostos', subtitle: 'Poder dos juros ao longo do tempo', category: 'financeiras', implemented: true, icon: 'calculate' },
     { id: 'renda', title: 'Calculadora de Receitas', subtitle: 'Receita mensal sobre patrimônio', category: 'financeiras', implemented: true, icon: 'savings' },
@@ -120,6 +120,52 @@ export class CalculatorComponent implements OnDestroy {
   valorObjetivoReserva = 0;
   mesesParaAtingir = 0;
 
+  // Aposentadoria
+  idadeAtual = 30;
+  idadeAposentadoria = 60;
+  patrimonioAtual = 50000;
+  aporteMensalAposentadoria = 800;
+  taxaAposentadoria = 0.7; // % ao mês
+  patrimonioAposentadoria = 0;
+
+  // Alugar x Financiar
+  valorImovel = 500000;
+  entradaImovel = 100000;
+  taxaFinanciamento = 0.9; // % ao mês
+  prazoFinanciamento = 360;
+  aluguelMensal = 2500;
+  reajusteAnualAluguel = 6; // % ao ano
+  custoFinanciamentoTotal = 0;
+  custoAluguelTotal = 0;
+  pontoEquilibrioMeses = 0;
+
+  // Poupança x Selic
+  aporteInicialPoupanca = 10000;
+  aporteMensalPoupanca = 300;
+  taxaPoupanca = 0.6; // % ao mês
+  taxaSelic = 0.9; // % ao mês
+  mesesPoupanca = 24;
+  resultadoPoupanca = 0;
+  resultadoSelic = 0;
+
+  // À vista ou a prazo
+  precoVista = 4000;
+  parcelas = 12;
+  valorParcela = 380;
+  totalPrazo = 0;
+  taxaEfetivaPrazo = 0;
+
+  // Comparador de renda fixa
+  valorAplicado = 20000;
+  mesesRendaFixa = 24;
+  taxaCdi = 0.9; // % ao mês
+  taxaPrefixado = 0.95; // % ao mês
+  taxaIpca = 0.4; // % ao mês
+  taxaIpcaSpread = 0.5; // % ao mês
+  resultadoCdi = 0;
+  resultadoPrefixado = 0;
+  resultadoIpca = 0;
+
   constructor(private route: ActivatedRoute, private router: Router) {
     this.sub = this.route.paramMap.subscribe((params) => {
       const id = params.get('id') as CalculatorType | null;
@@ -148,6 +194,74 @@ export class CalculatorComponent implements OnDestroy {
     this.mesesParaAtingir = Math.max(1, Math.ceil(n));
   }
 
+  calcularAposentadoria(): void {
+    const meses = Math.max(0, (this.idadeAposentadoria - this.idadeAtual) * 12);
+    const i = Math.max(0, this.taxaAposentadoria / 100);
+    if (meses === 0) {
+      this.patrimonioAposentadoria = this.patrimonioAtual;
+      return;
+    }
+    const fv =
+      i === 0
+        ? this.patrimonioAtual + this.aporteMensalAposentadoria * meses
+        : this.patrimonioAtual * Math.pow(1 + i, meses) +
+          this.aporteMensalAposentadoria * ((Math.pow(1 + i, meses) - 1) / i);
+    this.patrimonioAposentadoria = fv;
+  }
+
+  calcularAlugarOuFinanciar(): void {
+    const principal = Math.max(0, this.valorImovel - this.entradaImovel);
+    const i = Math.max(0, this.taxaFinanciamento / 100);
+    const n = Math.max(1, this.prazoFinanciamento);
+    const pmt = i === 0 ? principal / n : (principal * i) / (1 - Math.pow(1 + i, -n));
+    this.custoFinanciamentoTotal = this.entradaImovel + pmt * n;
+
+    const reajuste = Math.max(0, this.reajusteAnualAluguel / 100);
+    let totalAluguel = 0;
+    let aluguelAtual = Math.max(0, this.aluguelMensal);
+    for (let mes = 1; mes <= n; mes++) {
+      totalAluguel += aluguelAtual;
+      if (mes % 12 === 0) {
+        aluguelAtual *= 1 + reajuste;
+      }
+    }
+    this.custoAluguelTotal = totalAluguel;
+
+    let acumulado = 0;
+    aluguelAtual = Math.max(0, this.aluguelMensal);
+    this.pontoEquilibrioMeses = 0;
+    for (let mes = 1; mes <= n; mes++) {
+      acumulado += aluguelAtual;
+      if (this.pontoEquilibrioMeses === 0 && acumulado >= this.custoFinanciamentoTotal) {
+        this.pontoEquilibrioMeses = mes;
+      }
+      if (mes % 12 === 0) {
+        aluguelAtual *= 1 + reajuste;
+      }
+    }
+  }
+
+  calcularPoupancaSelic(): void {
+    const n = Math.max(1, this.mesesPoupanca);
+    this.resultadoPoupanca = this.calculaSerie(this.aporteInicialPoupanca, this.aporteMensalPoupanca, this.taxaPoupanca, n);
+    this.resultadoSelic = this.calculaSerie(this.aporteInicialPoupanca, this.aporteMensalPoupanca, this.taxaSelic, n);
+  }
+
+  calcularVistaPrazo(): void {
+    const n = Math.max(1, this.parcelas);
+    this.totalPrazo = Math.max(0, this.valorParcela) * n;
+    const delta = this.totalPrazo - Math.max(0, this.precoVista);
+    this.taxaEfetivaPrazo = this.precoVista > 0 ? (delta / this.precoVista) / n * 100 : 0;
+  }
+
+  calcularComparadorRendaFixa(): void {
+    const n = Math.max(1, this.mesesRendaFixa);
+    this.resultadoCdi = this.calculaSerie(this.valorAplicado, 0, this.taxaCdi, n);
+    this.resultadoPrefixado = this.calculaSerie(this.valorAplicado, 0, this.taxaPrefixado, n);
+    const taxaIpcaTotal = this.taxaIpca + this.taxaIpcaSpread;
+    this.resultadoIpca = this.calculaSerie(this.valorAplicado, 0, taxaIpcaTotal, n);
+  }
+
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
@@ -160,11 +274,40 @@ export class CalculatorComponent implements OnDestroy {
     this.router.navigate(['/calculadora']);
   }
 
+  iconFor(id: CalculatorType): string {
+    const icons: Record<CalculatorType, string> = {
+      jurosCompostos: '📈',
+      jurosSimples: '📉',
+      renda: '💵',
+      milhao: '🏆',
+      aposentadoria: '🏡',
+      alugarOuFinanciar: '🏠',
+      poupancaSelic: '💰',
+      vistaPrazo: '🧾',
+      reservaEmergencia: '🛟',
+      comparadorRendaFixa: '📊',
+      rescisao: '⚖️',
+      irIsencao: '🧾',
+      salarioRealidade: '🌎',
+      seguroDesemprego: '🧰',
+      horasExtras: '⏱️',
+      fgts: '🏦',
+      inss: '🧾',
+      feriasProporcionais: '🏝️',
+      decimoTerceiro: '🎁',
+      custoClt: '👔',
+      ferias: '🧳'
+    };
+    return icons[id] || '🧮';
+  }
+
   calcularJuros(): void {
     const i = this.taxa / 100;
     const fv =
-      this.aporteInicial * Math.pow(1 + i, this.meses) +
-      this.aporteMensal * ((Math.pow(1 + i, this.meses) - 1) / i);
+      i === 0
+        ? this.aporteInicial + this.aporteMensal * this.meses
+        : this.aporteInicial * Math.pow(1 + i, this.meses) +
+          this.aporteMensal * ((Math.pow(1 + i, this.meses) - 1) / i);
     this.jurosResultado = fv;
     this.jurosSeries = this.geraSerieJuros();
     this.jurosAnual = this.geraSerieAnual();
@@ -184,9 +327,17 @@ export class CalculatorComponent implements OnDestroy {
     const i = this.taxaMilhao / 100;
     const PMT = this.aporteMilhao;
     const FV = 1_000_000;
-    const n = Math.log((FV * i) / PMT + 1) / Math.log(1 + i);
+    const n = i === 0 ? FV / Math.max(PMT, 1) : Math.log((FV * i) / PMT + 1) / Math.log(1 + i);
     this.mesesMilhao = Math.ceil(n);
     this.milhaoSeries = this.geraSerieMilhao();
+  }
+
+  private calculaSerie(aporteInicial: number, aporteMensal: number, taxaMensalPercent: number, meses: number): number {
+    const i = Math.max(0, taxaMensalPercent / 100);
+    if (i === 0) {
+      return aporteInicial + aporteMensal * meses;
+    }
+    return aporteInicial * Math.pow(1 + i, meses) + aporteMensal * ((Math.pow(1 + i, meses) - 1) / i);
   }
 
   private geraSerieJuros(): SeriePonto[] {
@@ -195,8 +346,10 @@ export class CalculatorComponent implements OnDestroy {
     return pontos.map((p) => {
       const m = Math.max(1, Math.round(this.meses * p));
       const valor =
-        this.aporteInicial * Math.pow(1 + i, m) +
-        this.aporteMensal * ((Math.pow(1 + i, m) - 1) / i);
+        i === 0
+          ? this.aporteInicial + this.aporteMensal * m
+          : this.aporteInicial * Math.pow(1 + i, m) +
+            this.aporteMensal * ((Math.pow(1 + i, m) - 1) / i);
       return { mes: m, valor };
     });
   }
@@ -208,7 +361,7 @@ export class CalculatorComponent implements OnDestroy {
     return pontos
       .filter((m, idx, arr) => m > 0 && arr.indexOf(m) === idx)
       .map((mes) => {
-        const valor = PMT * ((Math.pow(1 + i, mes) - 1) / i);
+        const valor = i === 0 ? PMT * mes : PMT * ((Math.pow(1 + i, mes) - 1) / i);
         return { mes, valor };
       })
       .sort((a, b) => a.mes - b.mes);
@@ -225,12 +378,16 @@ export class CalculatorComponent implements OnDestroy {
       const mesesAnterior = (ano - 1) * 12;
 
       const vfAnterior =
-        this.aporteInicial * Math.pow(1 + i, mesesAnterior) +
-        this.aporteMensal * ((Math.pow(1 + i, mesesAnterior) - 1) / i);
+        i === 0
+          ? this.aporteInicial + this.aporteMensal * mesesAnterior
+          : this.aporteInicial * Math.pow(1 + i, mesesAnterior) +
+            this.aporteMensal * ((Math.pow(1 + i, mesesAnterior) - 1) / i);
 
       const vfAtual =
-        this.aporteInicial * Math.pow(1 + i, mesesCorrentes) +
-        this.aporteMensal * ((Math.pow(1 + i, mesesCorrentes) - 1) / i);
+        i === 0
+          ? this.aporteInicial + this.aporteMensal * mesesCorrentes
+          : this.aporteInicial * Math.pow(1 + i, mesesCorrentes) +
+            this.aporteMensal * ((Math.pow(1 + i, mesesCorrentes) - 1) / i);
 
       const aporteAno = this.aporteMensal * (mesesCorrentes - mesesAnterior);
       const jurosAno = vfAtual - vfAnterior - aporteAno;

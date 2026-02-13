@@ -129,7 +129,7 @@
           </div>
 
           <div class="flex items-center justify-end gap-3 pt-2">
-            <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
+            <button type="button" class="btn-cancel sm" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
             <button type="submit" class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm" [disabled]="saving">
               {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar cartão') }}
             </button>

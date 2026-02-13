@@ -181,13 +181,7 @@
       </div>
 
       <div class="flex items-center justify-end gap-3 pt-2">
-        <button
-          type="button"
-          class="inline-flex items-center rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200 transition hover:border-rose-400/60"
-          [disabled]="saving"
-          (click)="fechar()">
-          ↩ Cancelar
-        </button>
+        <button type="button" class="btn-cancel sm" [disabled]="saving" (click)="fechar()">↩ Cancelar</button>
         <button
           type="submit"
           class="inline-flex items-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"

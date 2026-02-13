@@ -2,12 +2,10 @@
   <div class="calc__header">
     <div>
       <p class="eyebrow brand-green">Calculadoras</p>
-      <h2>Escolha o simulador e veja detalhes e tabelas.</h2>
-      <p>Simulações financeiras e trabalhistas em um só painel.</p>
+      <h2>Simuladores financeiros e trabalhistas.</h2>
+      <p>Escolha um modelo, preencha os dados e veja resultados claros.</p>
     </div>
-    <a class="back-link" *ngIf="selected" (click)="backToCatalog()"
-      >Voltar para catálogo</a
-    >
+    <a class="back-link" *ngIf="selected" (click)="backToCatalog()">Voltar para catálogo</a>
   </div>
 
   <ng-container *ngIf="!selected">
@@ -18,12 +16,15 @@
           <button
             *ngFor="let item of financeiras"
             [routerLink]="['/calculadora', item.id]"
+            [class.selector__item--disabled]="!item.implemented"
           >
-            <span class="icon">{{ item.icon }}</span>
-            <div>
+            <span class="icon" aria-hidden="true">{{ iconFor(item.id) }}</span>
+            <div class="selector__copy">
               <span>{{ item.title }}</span>
               <small>{{ item.subtitle }}</small>
             </div>
+            <span class="chip" *ngIf="item.implemented">Ativo</span>
+            <span class="chip chip--muted" *ngIf="!item.implemented">Em breve</span>
           </button>
         </div>
       </div>
@@ -31,20 +32,21 @@
 
     <div class="calc__selector">
       <div>
-        <div>
-          <p class="section-title">Trabalhistas</p>
-          <div class="selector__grid">
-            <button
-              *ngFor="let item of trabalhistas"
-              [routerLink]="['/calculadora', item.id]"
-            >
-              <span class="icon">{{ item.icon }}</span>
-              <div>
-                <span>{{ item.title }}</span>
-                <small>{{ item.subtitle }}</small>
-              </div>
-            </button>
-          </div>
+        <p class="section-title">Trabalhistas</p>
+        <div class="selector__grid">
+          <button
+            *ngFor="let item of trabalhistas"
+            [routerLink]="['/calculadora', item.id]"
+            [class.selector__item--disabled]="!item.implemented"
+          >
+            <span class="icon" aria-hidden="true">{{ iconFor(item.id) }}</span>
+            <div class="selector__copy">
+              <span>{{ item.title }}</span>
+              <small>{{ item.subtitle }}</small>
+            </div>
+            <span class="chip" *ngIf="item.implemented">Ativo</span>
+            <span class="chip chip--muted" *ngIf="!item.implemented">Em breve</span>
+          </button>
         </div>
       </div>
     </div>
@@ -161,6 +163,40 @@
           <div class="result" *ngIf="valorObjetivoReserva">
             <p>Valor alvo: <strong>R$ {{ valorObjetivoReserva | number : '1.2-2' }}</strong></p>
             <p *ngIf="mesesParaAtingir">Tempo estimado: <strong>{{ mesesParaAtingir }} meses</strong></p>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'aposentadoria'">
+          <div class="panel__title">
+            <h3>Aposentadoria</h3>
+            <p class="muted">Projeção de patrimônio até a idade desejada.</p>
+          </div>
+          <form class="form">
+            <label>
+              Idade atual
+              <input type="number" [(ngModel)]="idadeAtual" name="idadeAtual" />
+            </label>
+            <label>
+              Idade de aposentadoria
+              <input type="number" [(ngModel)]="idadeAposentadoria" name="idadeAposentadoria" />
+            </label>
+            <label>
+              Patrimônio atual (R$)
+              <input type="number" [(ngModel)]="patrimonioAtual" name="patrimonioAtual" />
+            </label>
+            <label>
+              Aporte mensal (R$)
+              <input type="number" [(ngModel)]="aporteMensalAposentadoria" name="aporteMensalAposentadoria" />
+            </label>
+            <label>
+              Rentabilidade mensal (%)
+              <input type="number" step="0.1" [(ngModel)]="taxaAposentadoria" name="taxaAposentadoria" />
+            </label>
+            <button type="button" (click)="calcularAposentadoria()">Calcular</button>
+          </form>
+          <div class="result" *ngIf="patrimonioAposentadoria">
+            Patrimônio estimado:
+            <strong>R$ {{ patrimonioAposentadoria | number : "1.2-2" }}</strong>
           </div>
         </ng-container>
 
@@ -327,6 +363,144 @@
               <span>{{ item.mes }}</span>
               <span>R$ {{ item.valor | number : "1.2-2" }}</span>
             </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'alugarOuFinanciar'">
+          <div class="panel__title">
+            <h3>Alugar x Financiar</h3>
+            <p class="muted">Compare o custo total de alugar ou financiar.</p>
+          </div>
+          <form class="form">
+            <label>
+              Valor do imóvel (R$)
+              <input type="number" [(ngModel)]="valorImovel" name="valorImovel" />
+            </label>
+            <label>
+              Entrada (R$)
+              <input type="number" [(ngModel)]="entradaImovel" name="entradaImovel" />
+            </label>
+            <label>
+              Taxa financiamento (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaFinanciamento" name="taxaFinanciamento" />
+            </label>
+            <label>
+              Prazo (meses)
+              <input type="number" [(ngModel)]="prazoFinanciamento" name="prazoFinanciamento" />
+            </label>
+            <label>
+              Aluguel mensal (R$)
+              <input type="number" [(ngModel)]="aluguelMensal" name="aluguelMensal" />
+            </label>
+            <label>
+              Reajuste aluguel (% ao ano)
+              <input type="number" step="0.1" [(ngModel)]="reajusteAnualAluguel" name="reajusteAnualAluguel" />
+            </label>
+            <button type="button" (click)="calcularAlugarOuFinanciar()">Calcular</button>
+          </form>
+          <div class="result" *ngIf="custoFinanciamentoTotal">
+            <p>Financiamento: <strong>R$ {{ custoFinanciamentoTotal | number : "1.2-2" }}</strong></p>
+            <p>Aluguel total: <strong>R$ {{ custoAluguelTotal | number : "1.2-2" }}</strong></p>
+            <p *ngIf="pontoEquilibrioMeses">Ponto de equilíbrio: <strong>{{ pontoEquilibrioMeses }} meses</strong></p>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'poupancaSelic'">
+          <div class="panel__title">
+            <h3>Poupança x Selic</h3>
+            <p class="muted">Compare resultados com aportes mensais.</p>
+          </div>
+          <form class="form">
+            <label>
+              Aporte inicial (R$)
+              <input type="number" [(ngModel)]="aporteInicialPoupanca" name="aporteInicialPoupanca" />
+            </label>
+            <label>
+              Aporte mensal (R$)
+              <input type="number" [(ngModel)]="aporteMensalPoupanca" name="aporteMensalPoupanca" />
+            </label>
+            <label>
+              Taxa poupança (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaPoupanca" name="taxaPoupanca" />
+            </label>
+            <label>
+              Taxa Selic (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaSelic" name="taxaSelic" />
+            </label>
+            <label>
+              Meses
+              <input type="number" [(ngModel)]="mesesPoupanca" name="mesesPoupanca" />
+            </label>
+            <button type="button" (click)="calcularPoupancaSelic()">Calcular</button>
+          </form>
+          <div class="result" *ngIf="resultadoPoupanca">
+            <p>Poupança: <strong>R$ {{ resultadoPoupanca | number : "1.2-2" }}</strong></p>
+            <p>Selic: <strong>R$ {{ resultadoSelic | number : "1.2-2" }}</strong></p>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'vistaPrazo'">
+          <div class="panel__title">
+            <h3>À vista ou a prazo</h3>
+            <p class="muted">Calcule o custo total e a taxa implícita.</p>
+          </div>
+          <form class="form">
+            <label>
+              Preço à vista (R$)
+              <input type="number" [(ngModel)]="precoVista" name="precoVista" />
+            </label>
+            <label>
+              Nº de parcelas
+              <input type="number" [(ngModel)]="parcelas" name="parcelas" />
+            </label>
+            <label>
+              Valor da parcela (R$)
+              <input type="number" [(ngModel)]="valorParcela" name="valorParcela" />
+            </label>
+            <button type="button" (click)="calcularVistaPrazo()">Calcular</button>
+          </form>
+          <div class="result" *ngIf="totalPrazo">
+            <p>Total a prazo: <strong>R$ {{ totalPrazo | number : "1.2-2" }}</strong></p>
+            <p>Taxa implícita: <strong>{{ taxaEfetivaPrazo | number : "1.2-2" }}% ao mês</strong></p>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'comparadorRendaFixa'">
+          <div class="panel__title">
+            <h3>Comparador de Renda Fixa</h3>
+            <p class="muted">Compare CDI, prefixado e IPCA+.</p>
+          </div>
+          <form class="form">
+            <label>
+              Valor aplicado (R$)
+              <input type="number" [(ngModel)]="valorAplicado" name="valorAplicado" />
+            </label>
+            <label>
+              Prazo (meses)
+              <input type="number" [(ngModel)]="mesesRendaFixa" name="mesesRendaFixa" />
+            </label>
+            <label>
+              CDI (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaCdi" name="taxaCdi" />
+            </label>
+            <label>
+              Prefixado (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaPrefixado" name="taxaPrefixado" />
+            </label>
+            <label>
+              IPCA (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaIpca" name="taxaIpca" />
+            </label>
+            <label>
+              IPCA + spread (% ao mês)
+              <input type="number" step="0.1" [(ngModel)]="taxaIpcaSpread" name="taxaIpcaSpread" />
+            </label>
+            <button type="button" (click)="calcularComparadorRendaFixa()">Calcular</button>
+          </form>
+          <div class="result" *ngIf="resultadoCdi">
+            <p>CDI: <strong>R$ {{ resultadoCdi | number : "1.2-2" }}</strong></p>
+            <p>Prefixado: <strong>R$ {{ resultadoPrefixado | number : "1.2-2" }}</strong></p>
+            <p>IPCA+: <strong>R$ {{ resultadoIpca | number : "1.2-2" }}</strong></p>
           </div>
         </ng-container>
       </ng-container>

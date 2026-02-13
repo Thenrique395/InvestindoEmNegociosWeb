@@ -103,7 +103,7 @@
           <button type="button" class="ghost sm" *ngIf="!isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
           <button
             type="button"
-            class="ghost sm danger"
+            class="btn-cancel sm"
             *ngIf="!isCanceled(meta)"
             (click)="cancelarMeta(meta)"
           >
@@ -166,7 +166,7 @@
       </div>
 
       <div class="modal__actions">
-        <button type="button" class="ghost" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
+        <button type="button" class="btn-cancel" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
         <button type="button" class="btn-primary" [disabled]="saving" (click)="salvar()">
           {{ saving ? 'Salvando...' : 'Salvar meta' }}
         </button>
@@ -203,7 +203,7 @@
       </div>
 
       <div class="modal__actions">
-        <button type="button" class="ghost" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
+        <button type="button" class="btn-cancel" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
         <button type="button" class="btn-primary" [disabled]="saving" (click)="salvarAporte()">
           {{ saving ? 'Salvando...' : 'Salvar aporte' }}
         </button>

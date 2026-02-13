@@ -237,7 +237,7 @@
       </button>
     </div>
     <div class="mt-6 flex items-center justify-end gap-3">
-      <button type="button" class="rounded-xl border border-rose-500/40 px-4 py-2 text-sm font-semibold text-rose-200" (click)="cancelarEdicaoRecebida()">
+      <button type="button" class="btn-cancel sm" (click)="cancelarEdicaoRecebida()">
         Não aceito
       </button>
       <button type="button" class="rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" (click)="confirmarEdicaoRecebida()">
@@ -269,7 +269,7 @@
     </div>
 
     <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
-      <button type="button" class="rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--text)]" (click)="fecharModalExcluir()">Cancelar</button>
+      <button type="button" class="btn-cancel sm" (click)="fecharModalExcluir()">Cancelar</button>
       <button
         *ngIf="deleteIsRecurring"
         type="button"
