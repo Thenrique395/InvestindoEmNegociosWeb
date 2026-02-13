@@ -442,15 +442,16 @@
   width: min(1080px, 94vw);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  box-shadow: var(--shadow-md);
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
 }
 
 .signup-modal__left {
-  background: var(--surface-2);
+  background: radial-gradient(circle at 15% 20%, rgba(37, 99, 235, 0.12), transparent 45%),
+    linear-gradient(160deg, var(--surface-2), var(--surface));
   padding: clamp(var(--space-3), 3vw, var(--space-4));
   color: var(--text);
   display: flex;
@@ -465,34 +466,74 @@
 
 .signup-modal__left ul {
   margin: 0.25rem 0 0 0;
-  padding-left: var(--space-2);
+  padding-left: 0;
   color: var(--text-muted);
   display: grid;
   gap: 0.3rem;
+  list-style: none;
+}
+
+.signup-modal__benefits li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+}
+
+.signup-modal__benefits .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.signup-modal__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .signup-modal__right {
   position: relative;
   padding: clamp(var(--space-2), 2.8vw, var(--space-4));
   background: var(--surface);
+  display: grid;
+  gap: var(--space-2);
 }
 
 .signup-modal__right .close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  border: none;
+  top: 14px;
+  right: 14px;
+  border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .signup-modal__right .close:hover {
   background: var(--surface-3);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.signup-modal__right-header {
+  padding-right: 42px;
+}
+
+.signup-modal__right-header h3 {
+  margin: 0.25rem 0 0.25rem 0;
+  font-size: var(--text-xl);
+}
+
+.signup-modal__right-header .muted {
+  margin-bottom: var(--space-1);
 }
 
 @media (max-width: 1024px) {

@@ -473,14 +473,24 @@
         <p class="eyebrow brand-green">Crie sua conta grátis</p>
         <h2>Teste completo por 14 dias, sem cartão.</h2>
         <p class="lead">Desbloqueie Despesas e Receitas agora, Cartões e Investimentos quando estiver pronto.</p>
-        <ul>
-          <li>Dashboard em tempo real</li>
-          <li>Alertas inteligentes</li>
-          <li>Dados locais e seguros</li>
+        <ul class="signup-modal__benefits">
+          <li><span class="dot"></span>Dashboard em tempo real</li>
+          <li><span class="dot"></span>Alertas inteligentes</li>
+          <li><span class="dot"></span>Dados locais e seguros</li>
         </ul>
+        <div class="signup-modal__trust">
+          <span class="pill">Sem cartão</span>
+          <span class="pill">Cancelamento fácil</span>
+          <span class="pill">Suporte humano</span>
+        </div>
       </div>
       <div class="signup-modal__right">
         <button class="close" type="button" aria-label="Fechar cadastro" (click)="closeSignup()">✕</button>
+        <div class="signup-modal__right-header">
+          <p class="eyebrow">Criar conta</p>
+          <h3>Comece agora</h3>
+          <p class="muted">Acompanhe metas, receitas e despesas em um painel simples.</p>
+        </div>
         <app-signup (signedUp)="handleSignupDone()"></app-signup>
       </div>
     </div>
