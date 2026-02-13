@@ -211,6 +211,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
     return digits.match(/.{1,4}/g)?.join(' ') || digits;
   }
 
+  finalCartao(numero: string): string {
+    const digits = (numero || '').replace(/\D/g, '').slice(-4);
+    return digits.padStart(4, '•');
+  }
+
   onLimiteChange(value: string): void {
     const digits = (value || '').replace(/[^\d]/g, '');
     const number = Number(digits) / 100;

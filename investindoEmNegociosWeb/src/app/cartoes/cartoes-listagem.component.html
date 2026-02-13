@@ -1,45 +1,43 @@
 <div class="space-y-4">
-  <div *ngIf="cards.length; else emptyCards" class="grid gap-4 md:grid-cols-2">
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]" *ngFor="let c of cards">
-      <header class="flex items-center justify-between">
-        <div class="inline-flex items-center gap-2">
-          <span *ngIf="!isMastercard(brandCode(c))" class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1 text-xs font-semibold tracking-wide text-[var(--text)]">
-            {{ brandName(c) | uppercase }}
-          </span>
-          <div *ngIf="isMastercard(brandCode(c))" class="h-7 w-12 rounded-full border border-[var(--border)] bg-[var(--surface-2)]"></div>
+  <div *ngIf="cards.length; else emptyCards" class="grid gap-3 md:grid-cols-2">
+    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]" *ngFor="let c of cards">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex min-w-0 items-start gap-3">
+          <div class="flex h-10 w-14 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text)]">
+            <ng-container *ngIf="!isMastercard(brandCode(c)); else mcBadge">
+              {{ brandName(c) }}
+            </ng-container>
+            <ng-template #mcBadge>
+              <span class="inline-flex h-5 w-9 rounded-full border border-[var(--border)] bg-[var(--surface-2)]"></span>
+            </ng-template>
+          </div>
+
+          <div class="min-w-0">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Cartão</p>
+            <p class="text-[13px] font-semibold tracking-[0.18em] text-[var(--text)]">{{ numeroProtegido(c.numero) }}</p>
+            <p class="mt-1 truncate text-[12px] text-[var(--text)]">{{ c.nome }}</p>
+            <p class="text-[11px] text-[var(--text-muted)]">{{ c.banco || '-' }}</p>
+          </div>
         </div>
+
         <div class="flex items-center gap-2">
           <button type="button" class="icon-action icon-action--edit" (click)="onEditar(c)" aria-label="Editar" title="Editar">✏️</button>
           <button type="button" class="icon-action icon-action--danger" (click)="onRemover(c.id)" aria-label="Remover" title="Remover">🗑</button>
         </div>
-      </header>
+      </div>
 
-      <p class="mt-4 text-lg font-semibold tracking-widest text-[var(--text)]">{{ numeroProtegido(c.numero) }}</p>
-
-      <div class="mt-4 grid gap-3 text-sm text-[var(--text-muted)] sm:grid-cols-2">
-        <div>
-          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Nome</span>
-          <p class="text-[var(--text)]">{{ c.nome }}</p>
-        </div>
-        <div>
-          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Final</span>
+      <div class="mt-3 grid gap-2 text-[11px] text-[var(--text-muted)] sm:grid-cols-3">
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2">
+          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Final</span>
           <p class="text-[var(--text)]">•••• {{ finalCartao(c.numero) }}</p>
         </div>
-        <div>
-          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Banco</span>
-          <p class="text-[var(--text)]">{{ c.banco || '-' }}</p>
-        </div>
-        <div>
-          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Limite</span>
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2">
+          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Limite</span>
           <p class="text-[var(--text)]">R$ {{ c.limiteCredito | number:'1.2-2' }}</p>
         </div>
-        <div>
-          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Fechamento</span>
-          <p class="text-[var(--text)]">Dia {{ c.diaFechamento }}</p>
-        </div>
-        <div>
-          <span class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Vencimento</span>
-          <p class="text-[var(--text)]">Dia {{ c.diaVencimento }}</p>
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2">
+          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Fechamento</span>
+          <p class="text-[var(--text)]">Dia {{ c.diaFechamento }} · Vence {{ c.diaVencimento }}</p>
         </div>
       </div>
     </article>
@@ -48,7 +46,7 @@
   <ng-template #emptyCards>
     <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-6 text-center text-sm text-[var(--text-muted)]">
       <p>Sem cartões cadastrados.</p>
-      <p>Clique em “Cadastrar novo cartão” para adicionar o primeiro.</p>
+      <p>Clique em “Adicionar cartão” para incluir o primeiro.</p>
     </div>
   </ng-template>
 </div>
