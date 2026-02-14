@@ -12,7 +12,8 @@
   min-height: var(--header-h);
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 var(--space-2);
+  padding: 0 clamp(var(--space-3), 2.5vw, var(--space-6));
+  box-shadow: var(--shadow-sm);
 }
 
 .topbar__actions {
