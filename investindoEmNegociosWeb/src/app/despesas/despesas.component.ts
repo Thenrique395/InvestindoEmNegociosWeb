@@ -12,6 +12,7 @@ import { CategoriesService, CategoryDto } from '../categories.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
 import {
   formatLocaleDate,
   formatMonthLabelFromKey,
@@ -26,7 +27,17 @@ import {
 @Component({
   selector: 'app-despesas',
   standalone: true,
-  imports: [TitleCasePipe, NgIf, NgFor, NgClass, DecimalPipe, FormsModule, DespesasListaComponent, DespesasFormComponent],
+  imports: [
+    TitleCasePipe,
+    NgIf,
+    NgFor,
+    NgClass,
+    DecimalPipe,
+    FormsModule,
+    DespesasListaComponent,
+    DespesasFormComponent,
+    InvoiceImportComponent
+  ],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss']
 })
@@ -66,6 +77,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   historicoAberto = false;
   historicoTitulo = '';
   historicoItens: StoredExpense[] = [];
+  mostrarImportFatura = false;
 
   novaDespesa: StoredExpense = this.criaDespesa();
 
@@ -586,6 +598,14 @@ export class DespesasComponent implements OnInit, OnDestroy {
     if (this.saving) return;
     this.resetarFormulario();
     this.mostrarForm = true;
+  }
+
+  abrirImportFatura(): void {
+    this.mostrarImportFatura = true;
+  }
+
+  fecharImportFatura(): void {
+    this.mostrarImportFatura = false;
   }
 
   fecharModal(): void {
