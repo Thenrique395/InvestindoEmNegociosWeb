@@ -111,7 +111,8 @@ const parseIsoDate = (iso: string): Date | null => {
   if (!iso) return null;
   const [year, month, day] = iso.split('T')[0].split('-').map(Number);
   if (!year || !month || !day) return null;
-  const date = new Date(Date.UTC(year, month - 1, day));
+  // Use local date to avoid shifting a YYYY-MM-DD across timezones.
+  const date = new Date(year, month - 1, day);
   if (Number.isNaN(date.getTime())) return null;
   return date;
 };
