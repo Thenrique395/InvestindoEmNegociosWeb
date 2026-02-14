@@ -121,9 +121,15 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Use tokens de espacamento (space-1..6) nos paddings e gaps.
 
 ## 10) Botoes
-- Primario: fundo --primary, texto claro.
+- **Padrao (Tailwind + tokens)**: usar classes globais `btn-primary`, `btn-danger`, `btn-warning`, `btn-ghost`, `btn-cancel`.
+- Primario: fundo --primary, texto claro, sombra suave.
 - Ghost: fundo transparente, borda sutil.
+- Cancelar: borda forte e texto muted (nao usar vermelho).
 - Hover com leve realce.
+
+### Tamanhos
+- Default: altura `--control-h` (40px).
+- Pequeno: adicionar `sm` (altura 40px, padding menor).
 
 ### Botoes de acao em listas
 - Padrao icon-only, igual ao estilo dos icones do menu.
@@ -132,6 +138,11 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Historico/Info usa tom --info.
 - Hover: leve elevacao (shadow) e contraste discreto.
 - Nunca usar botao retangular com texto em listas densas.
+
+## 10.2) Badges / Status
+- Status devem ser **legiveis** (evitar texto claro em fundo claro).
+- Padrao: `border` + `bg-100` + `text-700`.
+- Ex.: Pendente (amber), Pago (emerald), Cancelado (rose), Antecipado (sky), Parcial (orange).
 
 ## 10.1) Tooltips (padrao)
 - Icone: botao circular "i" igual ao dos cards (26x26, borda sutil, bg surface-2).
@@ -143,6 +154,7 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 ## 11) Inputs e forms
 - Bordas suaves, foco com cor de acao.
 - Placeholder em texto muted.
+- Form actions: `btn-primary sm` e `btn-cancel sm`.
 
 ## 12) Estados vazios
 - Mensagem objetiva + CTA.
@@ -159,7 +171,17 @@ Combine receitas, despesas e cartoes para saber o quanto pode gastar.
 - Alvos clicaveis >= 40px de altura.
 - Estados de foco visiveis.
 
-## 15) Tom visual
+## 15) Modais e confirmações
+- Evitar `window.confirm`. Usar modal do sistema com:
+  - Titulo, descricao curta e acao primaria/perigosa.
+  - Botao `btn-cancel` para fechar.
+  - `btn-danger` para exclusoes.
+
+## 16) Datas (locale)
+- Datas exibidas devem ser `DD/MM/AAAA` (pt-BR).
+- Parse de ISO deve **preservar dia local** (sem deslocamento por timezone).
+
+## 17) Tom visual
 - Deve parecer produto financeiro moderno.
 - Nao parecer "planilha bonita".
 - Nao parecer "sistema corporativo interno".

@@ -2,6 +2,16 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.19.
 
+## Design system (padrao do projeto)
+Para manter consistencia visual, use os padroes descritos em `systemDesigner.md`.
+
+Resumo pratico:
+- **Botoes**: `btn-primary`, `btn-danger`, `btn-warning`, `btn-ghost`, `btn-cancel` (com `sm` quando for compacto).
+- **Badges/Status**: preferir `border + bg-100 + text-700` (legibilidade alta).
+- **Tooltips**: icone circular "i" com borda sutil e tooltip com `border-strong` e `shadow-lg`.
+- **Modais**: evitar `window.confirm` e usar modal do sistema.
+- **Datas**: usar `DD/MM/AAAA` e parse sem deslocamento de fuso.
+
 ## Development server
 
 To start a local development server, run:

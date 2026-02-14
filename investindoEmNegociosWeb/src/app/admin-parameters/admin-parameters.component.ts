@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
 import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin } from '../admin-parameters.service';
+import { UiFeedbackService } from '../ui-feedback.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-parameters',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './admin-parameters.component.html',
   styleUrls: ['./admin-parameters.component.scss']
 })
@@ -57,8 +59,21 @@ export class AdminParametersComponent implements OnInit {
   private lastUpdatedBrands: Record<number, Date> = {};
   private lastUpdatedMethods: Record<number, Date> = {};
   private lastUpdatedInstitutions: Record<number, Date> = {};
+  confirmOpen = false;
+  confirmTitle = 'Confirmar ação';
+  confirmMessage = '';
+  confirmLabel = 'Confirmar';
+  confirmVariant: 'warning' | 'danger' | 'primary' = 'warning';
+  private pendingAction:
+    | { kind: 'brand'; item: CardBrandAdmin; nextActive: boolean }
+    | { kind: 'method'; item: PaymentMethodAdmin; nextActive: boolean }
+    | { kind: 'institution'; item: InstitutionAdmin; nextActive: boolean }
+    | null = null;
 
-  constructor(private adminParameters: AdminParametersService) {}
+  constructor(
+    private adminParameters: AdminParametersService,
+    private uiFeedback: UiFeedbackService
+  ) {}
 
   ngOnInit(): void {
     this.loadAll();
@@ -118,27 +133,18 @@ export class AdminParametersComponent implements OnInit {
   }
 
   toggleCardBrand(brand: CardBrandAdmin): void {
-    const key = this.brandKey(brand.id);
     if (this.savingKey) return;
     const next = !brand.isActive;
-    if (!next && !window.confirm('Desativar esta bandeira pode impactar novos cadastros. Deseja continuar?')) {
+    if (!next) {
+      this.openConfirm({
+        title: 'Desativar bandeira',
+        message: 'Desativar esta bandeira pode impactar novos cadastros. Deseja continuar?',
+        confirmLabel: 'Desativar',
+        variant: 'warning'
+      }, { kind: 'brand', item: brand, nextActive: next });
       return;
     }
-    this.savingKey = key;
-    brand.isActive = next;
-
-    this.adminParameters.updateCardBrandStatus(brand.id, next).subscribe({
-      next: (updated) => {
-        brand.isActive = updated.isActive;
-        this.lastUpdatedBrands[brand.id] = new Date();
-      },
-      error: () => {
-        brand.isActive = !next;
-        this.errorCardBrands = 'Erro ao atualizar a bandeira.';
-        this.savingKey = '';
-      },
-      complete: () => (this.savingKey = '')
-    });
+    this.applyToggleCardBrand(brand, next);
   }
 
   createCardBrand(): void {
@@ -159,9 +165,11 @@ export class AdminParametersComponent implements OnInit {
         this.newBrandName = '';
         this.newBrandCode = '';
         this.createBrandError = '';
+        this.uiFeedback.success('Bandeira cadastrada com sucesso.');
       },
       error: (err) => {
         this.createBrandError = this.resolveErrorMessage(err, 'Erro ao cadastrar a bandeira.');
+        this.uiFeedback.error(this.createBrandError);
       },
       complete: () => {
         this.savingCreateBrand = false;
@@ -170,51 +178,33 @@ export class AdminParametersComponent implements OnInit {
   }
 
   togglePaymentMethod(method: PaymentMethodAdmin): void {
-    const key = this.methodKey(method.id);
     if (this.savingKey) return;
     const next = !method.isActive;
-    if (!next && !window.confirm('Desativar esta forma de pagamento pode impactar novos cadastros. Deseja continuar?')) {
+    if (!next) {
+      this.openConfirm({
+        title: 'Desativar forma de pagamento',
+        message: 'Desativar esta forma de pagamento pode impactar novos cadastros. Deseja continuar?',
+        confirmLabel: 'Desativar',
+        variant: 'warning'
+      }, { kind: 'method', item: method, nextActive: next });
       return;
     }
-    this.savingKey = key;
-    method.isActive = next;
-
-    this.adminParameters.updatePaymentMethodStatus(method.id, next).subscribe({
-      next: (updated) => {
-        method.isActive = updated.isActive;
-        this.lastUpdatedMethods[method.id] = new Date();
-      },
-      error: () => {
-        method.isActive = !next;
-        this.errorPaymentMethods = 'Erro ao atualizar a forma de pagamento.';
-        this.savingKey = '';
-      },
-      complete: () => (this.savingKey = '')
-    });
+    this.applyTogglePaymentMethod(method, next);
   }
 
   toggleInstitution(institution: InstitutionAdmin): void {
-    const key = `institution-${institution.id}`;
     if (this.savingKey) return;
     const next = !institution.isActive;
-    if (!next && !window.confirm('Desativar esta instituição pode impactar novos cadastros. Deseja continuar?')) {
+    if (!next) {
+      this.openConfirm({
+        title: 'Desativar instituição',
+        message: 'Desativar esta instituição pode impactar novos cadastros. Deseja continuar?',
+        confirmLabel: 'Desativar',
+        variant: 'warning'
+      }, { kind: 'institution', item: institution, nextActive: next });
       return;
     }
-    this.savingKey = key;
-    institution.isActive = next;
-
-    this.adminParameters.updateInstitutionStatus(institution.id, next).subscribe({
-      next: (updated) => {
-        institution.isActive = updated.isActive;
-        this.lastUpdatedInstitutions[institution.id] = new Date();
-      },
-      error: () => {
-        institution.isActive = !next;
-        this.errorInstitutions = 'Erro ao atualizar a instituição.';
-        this.savingKey = '';
-      },
-      complete: () => (this.savingKey = '')
-    });
+    this.applyToggleInstitution(institution, next);
   }
 
   createPaymentMethod(): void {
@@ -233,9 +223,11 @@ export class AdminParametersComponent implements OnInit {
         this.lastUpdatedMethods[created.id] = new Date();
         this.newMethodName = '';
         this.createMethodError = '';
+        this.uiFeedback.success('Forma de pagamento cadastrada com sucesso.');
       },
       error: (err) => {
         this.createMethodError = this.resolveErrorMessage(err, 'Erro ao cadastrar a forma de pagamento.');
+        this.uiFeedback.error(this.createMethodError);
       },
       complete: () => {
         this.savingCreateMethod = false;
@@ -258,9 +250,11 @@ export class AdminParametersComponent implements OnInit {
         this.institutions = [...this.institutions, created].sort((a, b) => a.name.localeCompare(b.name));
         this.lastUpdatedInstitutions[created.id] = new Date();
         this.newInstitutionName = '';
+        this.uiFeedback.success('Instituição cadastrada com sucesso.');
       },
       error: (err) => {
         this.createInstitutionError = this.resolveErrorMessage(err, 'Erro ao cadastrar a instituição.');
+        this.uiFeedback.error(this.createInstitutionError);
       },
       complete: () => {
         this.savingCreateInstitution = false;
@@ -276,9 +270,11 @@ export class AdminParametersComponent implements OnInit {
       next: (updated) => {
         this.notificationSettings = updated;
         this.notificationsUpdatedAt = new Date();
+        this.uiFeedback.success('Notificações globais atualizadas com sucesso.');
       },
       error: (err) => {
         this.errorNotifications = this.resolveErrorMessage(err, 'Erro ao salvar notificações.');
+        this.uiFeedback.error(this.errorNotifications);
       },
       complete: () => {
         this.savingNotificationSettings = false;
@@ -346,6 +342,102 @@ export class AdminParametersComponent implements OnInit {
     if (diff < 60_000) return 'Atualizado agora';
     const time = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     return `Atualizado às ${time}`;
+  }
+
+  confirmAction(): void {
+    if (!this.pendingAction) {
+      this.confirmOpen = false;
+      return;
+    }
+    const { kind, item, nextActive } = this.pendingAction;
+    this.confirmOpen = false;
+    this.pendingAction = null;
+    if (kind === 'brand') this.applyToggleCardBrand(item, nextActive);
+    if (kind === 'method') this.applyTogglePaymentMethod(item, nextActive);
+    if (kind === 'institution') this.applyToggleInstitution(item, nextActive);
+  }
+
+  cancelConfirm(): void {
+    this.confirmOpen = false;
+    this.pendingAction = null;
+  }
+
+  private openConfirm(
+    data: { title: string; message: string; confirmLabel?: string; variant?: 'warning' | 'danger' | 'primary' },
+    pending:
+      | { kind: 'brand'; item: CardBrandAdmin; nextActive: boolean }
+      | { kind: 'method'; item: PaymentMethodAdmin; nextActive: boolean }
+      | { kind: 'institution'; item: InstitutionAdmin; nextActive: boolean }
+  ): void {
+    this.confirmTitle = data.title;
+    this.confirmMessage = data.message;
+    this.confirmLabel = data.confirmLabel || 'Confirmar';
+    this.confirmVariant = data.variant || 'warning';
+    this.pendingAction = pending;
+    this.confirmOpen = true;
+  }
+
+  private applyToggleCardBrand(brand: CardBrandAdmin, next: boolean): void {
+    const key = this.brandKey(brand.id);
+    this.savingKey = key;
+    brand.isActive = next;
+
+    this.adminParameters.updateCardBrandStatus(brand.id, next).subscribe({
+      next: (updated) => {
+        brand.isActive = updated.isActive;
+        this.lastUpdatedBrands[brand.id] = new Date();
+        this.uiFeedback.success(`Bandeira ${updated.isActive ? 'ativada' : 'desativada'} com sucesso.`);
+      },
+      error: () => {
+        brand.isActive = !next;
+        this.errorCardBrands = 'Erro ao atualizar a bandeira.';
+        this.uiFeedback.error('Erro ao atualizar a bandeira.');
+        this.savingKey = '';
+      },
+      complete: () => (this.savingKey = '')
+    });
+  }
+
+  private applyTogglePaymentMethod(method: PaymentMethodAdmin, next: boolean): void {
+    const key = this.methodKey(method.id);
+    this.savingKey = key;
+    method.isActive = next;
+
+    this.adminParameters.updatePaymentMethodStatus(method.id, next).subscribe({
+      next: (updated) => {
+        method.isActive = updated.isActive;
+        this.lastUpdatedMethods[method.id] = new Date();
+        this.uiFeedback.success(`Forma de pagamento ${updated.isActive ? 'ativada' : 'desativada'} com sucesso.`);
+      },
+      error: () => {
+        method.isActive = !next;
+        this.errorPaymentMethods = 'Erro ao atualizar a forma de pagamento.';
+        this.uiFeedback.error('Erro ao atualizar a forma de pagamento.');
+        this.savingKey = '';
+      },
+      complete: () => (this.savingKey = '')
+    });
+  }
+
+  private applyToggleInstitution(institution: InstitutionAdmin, next: boolean): void {
+    const key = `institution-${institution.id}`;
+    this.savingKey = key;
+    institution.isActive = next;
+
+    this.adminParameters.updateInstitutionStatus(institution.id, next).subscribe({
+      next: (updated) => {
+        institution.isActive = updated.isActive;
+        this.lastUpdatedInstitutions[institution.id] = new Date();
+        this.uiFeedback.success(`Instituição ${updated.isActive ? 'ativada' : 'desativada'} com sucesso.`);
+      },
+      error: () => {
+        institution.isActive = !next;
+        this.errorInstitutions = 'Erro ao atualizar a instituição.';
+        this.uiFeedback.error('Erro ao atualizar a instituição.');
+        this.savingKey = '';
+      },
+      complete: () => (this.savingKey = '')
+    });
   }
 
   private resolveErrorMessage(err: any, fallback: string): string {

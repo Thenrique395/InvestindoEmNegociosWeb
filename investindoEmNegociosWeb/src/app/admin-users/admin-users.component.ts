@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { AdminUsersService, AdminUserSummary } from '../admin-users.service';
 import { UserRole } from '../roles';
 import { forkJoin, of } from 'rxjs';
+import { UiFeedbackService } from '../ui-feedback.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 type AdminUserRow = AdminUserSummary & {
   pendingRole: UserRole;
@@ -14,7 +16,7 @@ type AdminUserRow = AdminUserSummary & {
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.scss']
 })
@@ -24,10 +26,19 @@ export class AdminUsersComponent implements OnInit {
   error = '';
   savingId: string | null = null;
   deletingId: string | null = null;
+  confirmOpen = false;
+  confirmTitle = 'Confirmar ação';
+  confirmMessage = '';
+  confirmLabel = 'Confirmar';
+  confirmVariant: 'warning' | 'danger' | 'primary' = 'warning';
+  private pendingAction: { kind: 'toggle'; user: AdminUserRow; nextActive: boolean } | { kind: 'delete'; user: AdminUserRow } | null = null;
 
   roles: UserRole[] = ['Basic', 'Intermediate', 'Advanced', 'Admin'];
 
-  constructor(private adminUsers: AdminUsersService) {}
+  constructor(
+    private adminUsers: AdminUsersService,
+    private uiFeedback: UiFeedbackService
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -60,9 +71,12 @@ export class AdminUsersComponent implements OnInit {
     if (this.savingId || this.deletingId) return;
     const next = !user.pendingActive;
     const label = next ? 'desbloquear' : 'bloquear';
-    if (!window.confirm(`Tem certeza que deseja ${label} este usuário?`)) return;
-    user.pendingActive = next;
-    this.syncDirty(user);
+    this.openConfirm({
+      title: next ? 'Desbloquear usuário' : 'Bloquear usuário',
+      message: `Tem certeza que deseja ${label} este usuário?`,
+      confirmLabel: next ? 'Desbloquear' : 'Bloquear',
+      variant: 'warning'
+    }, { kind: 'toggle', user, nextActive: next });
   }
 
   saveChanges(user: AdminUserRow): void {
@@ -91,9 +105,11 @@ export class AdminUsersComponent implements OnInit {
         user.role = user.pendingRole = last.role;
         user.isActive = user.pendingActive = last.isActive;
         user.dirty = false;
+        this.uiFeedback.success('Alterações salvas com sucesso.');
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Não foi possível salvar as alterações.';
+        this.uiFeedback.error(this.error);
       },
       complete: () => {
         this.savingId = null;
@@ -103,21 +119,69 @@ export class AdminUsersComponent implements OnInit {
 
   removeUser(user: AdminUserRow): void {
     if (this.deletingId || this.savingId) return;
-    if (!window.confirm('Tem certeza que deseja excluir este usuário? Esta ação é irreversível.')) return;
+    this.openConfirm({
+      title: 'Excluir usuário',
+      message: 'Tem certeza que deseja excluir este usuário? Esta ação é irreversível.',
+      confirmLabel: 'Excluir',
+      variant: 'danger'
+    }, { kind: 'delete', user });
+  }
 
+  confirmAction(): void {
+    if (!this.pendingAction) {
+      this.confirmOpen = false;
+      return;
+    }
+    const action = this.pendingAction;
+    this.confirmOpen = false;
+    this.pendingAction = null;
+    if (action.kind === 'toggle') {
+      this.applyToggleStatus(action.user, action.nextActive);
+      return;
+    }
+    if (action.kind === 'delete') {
+      this.applyDeleteUser(action.user);
+    }
+  }
+
+  cancelConfirm(): void {
+    this.confirmOpen = false;
+    this.pendingAction = null;
+  }
+
+  private applyToggleStatus(user: AdminUserRow, next: boolean): void {
+    user.pendingActive = next;
+    this.syncDirty(user);
+  }
+
+  private applyDeleteUser(user: AdminUserRow): void {
     this.deletingId = user.id;
     this.error = '';
     this.adminUsers.remove(user.id).subscribe({
       next: () => {
         this.users = this.users.filter((u) => u.id !== user.id);
+        this.uiFeedback.success('Usuário removido com sucesso.');
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Não foi possível excluir o usuário.';
+        this.uiFeedback.error(this.error);
       },
       complete: () => {
         this.deletingId = null;
       }
     });
+  }
+
+  private openConfirm(
+    data: { title: string; message: string; confirmLabel?: string; variant?: 'warning' | 'danger' | 'primary' },
+    pending: { kind: 'toggle'; user: AdminUserRow; nextActive: boolean } | { kind: 'delete'; user: AdminUserRow }
+  ): void {
+    this.confirmTitle = data.title;
+    this.confirmMessage = data.message;
+    this.confirmLabel = data.confirmLabel || 'Confirmar';
+    this.confirmVariant = data.variant || 'warning';
+    this.pendingAction = pending;
+    this.confirmOpen = true;
   }
 
   private syncDirty(user: AdminUserRow): void {

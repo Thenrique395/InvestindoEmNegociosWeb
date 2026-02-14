@@ -151,4 +151,14 @@
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]" *ngIf="!loading && !users.length">
     Nenhum usuário encontrado.
   </div>
+
+  <app-confirm-dialog
+    *ngIf="confirmOpen"
+    [title]="confirmTitle"
+    [message]="confirmMessage"
+    [confirmLabel]="confirmLabel"
+    [variant]="confirmVariant"
+    (confirmed)="confirmAction()"
+    (cancelled)="cancelConfirm()"
+  ></app-confirm-dialog>
 </section>
