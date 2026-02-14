@@ -98,6 +98,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   onboardingDone = false;
   hideOnboarding = false;
   onboardingDismissed = false;
+  onboardingLoaded = false;
   onboardingScreens = [
     {
       title: 'Cadastre sua primeira receita',
@@ -137,11 +138,13 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.onboardingStep = Math.min(Math.max(status.step || 0, 0), 2);
           this.onboardingDone = !!status.completed;
           this.hideOnboarding = this.onboardingDone;
+          this.onboardingLoaded = true;
         },
         error: () => {
           this.onboardingStep = 0;
           this.onboardingDone = false;
           this.hideOnboarding = false;
+          this.onboardingLoaded = true;
         }
       });
     }
@@ -222,7 +225,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get showOnboarding(): boolean {
-    return this.isLogged && !this.onboardingDone && !this.onboardingDismissed;
+    return this.onboardingLoaded && this.isLogged && !this.onboardingDone && !this.onboardingDismissed;
   }
 
   get onboardingCurrent() {
