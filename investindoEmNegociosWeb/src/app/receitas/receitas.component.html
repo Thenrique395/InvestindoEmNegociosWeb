@@ -176,6 +176,9 @@
     <app-receitas-lista
       [rendas]="rendas"
       [showStatus]="hasAccess('Basic')"
+      emptyTitle="Sem receitas no período"
+      emptyDescription="Cadastre sua primeira receita para visualizar o comparativo."
+      emptyCtaLabel="Adicionar receita"
       [sortBy]="sortBy"
       [sortDir]="sortDir"
       [selectedIds]="selecionados"
@@ -183,7 +186,8 @@
       (editar)="editarPorId($event)"
       (remover)="remover($event)"
       (selecionar)="toggleSelecionar($event.id, $event.checked)"
-      (selecionarTodos)="toggleSelecionarTodos($event)"></app-receitas-lista>
+      (selecionarTodos)="toggleSelecionarTodos($event)"
+      (emptyAction)="abrirModal()"></app-receitas-lista>
   </div>
 
   <app-receitas-form

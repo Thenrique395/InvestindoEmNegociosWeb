@@ -83,8 +83,13 @@
       </thead>
       <tbody class="divide-y divide-[var(--border)]">
         <tr *ngIf="!despesas.length">
-          <td class="px-5 py-6 text-sm text-[var(--text-muted)]" colspan="8">
-            Sem despesas neste mês. Clique em “Adicionar despesa” para lançar a primeira.
+          <td class="px-5 py-6" colspan="8">
+            <app-empty-state
+              [title]="emptyTitle"
+              [description]="emptyDescription"
+              [ctaLabel]="emptyCtaLabel"
+              icon="🧾"
+              (action)="emptyAction.emit()"></app-empty-state>
           </td>
         </tr>
         <tr *ngFor="let d of despesas" class="hover:bg-[var(--surface-2)]">
@@ -101,18 +106,7 @@
           <td class="px-5 py-4 text-[var(--text-muted)]">{{ d.categoria || 'Sem categoria' }}</td>
           <td class="px-5 py-4 text-[var(--text-muted)]">{{ pagamentoLabel(d) }}</td>
           <td class="px-5 py-4">
-            <span
-              class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
-              [ngClass]="{
-                'border border-emerald-200 bg-emerald-100 text-emerald-700': d.status === 'PAID',
-                'border border-orange-200 bg-orange-100 text-orange-700': d.status === 'PARTIALLY_PAID',
-                'border border-rose-200 bg-rose-100 text-rose-700': d.status === 'CANCELED',
-                'border border-sky-200 bg-sky-100 text-sky-700': d.status === 'ANTICIPATED',
-                'border border-amber-200 bg-amber-100 text-amber-700': !d.status || d.status === 'OPEN'
-              }">
-              <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
-              {{ statusLabel(d.status) }}
-            </span>
+            <app-status-badge [status]="d.status" [label]="statusLabel(d.status)"></app-status-badge>
           </td>
           <td class="px-5 py-4 text-[var(--text-muted)]">{{ d.vencimento || '—' }}</td>
           <td class="px-5 py-4 text-right font-semibold">

@@ -44,9 +44,11 @@
   </div>
 
   <ng-template #emptyCards>
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-6 text-center text-sm text-[var(--text-muted)]">
-      <p>Sem cartões cadastrados.</p>
-      <p>Clique em “Adicionar cartão” para incluir o primeiro.</p>
-    </div>
+    <app-empty-state
+      [title]="emptyTitle"
+      [description]="emptyDescription"
+      [ctaLabel]="emptyCtaLabel"
+      icon="💳"
+      (action)="emptyAction.emit()"></app-empty-state>
   </ng-template>
 </div>

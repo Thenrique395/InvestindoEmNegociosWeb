@@ -6,11 +6,12 @@ import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/in
 import { formatLocaleDateFromIso, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, FormsModule, DigitOnlyDirective],
+  imports: [CommonModule, NgIf, NgFor, FormsModule, DigitOnlyDirective, EmptyStateComponent],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })

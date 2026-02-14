@@ -196,6 +196,9 @@
   <div class="mt-4">
     <app-despesas-lista
       [despesas]="despesasFiltradas"
+      emptyTitle="Sem despesas no período"
+      emptyDescription="Adicione sua primeira despesa para acompanhar os vencimentos."
+      emptyCtaLabel="Adicionar despesa"
       [sortBy]="sortBy"
       [sortDir]="sortDir"
       [pagamentoLabelFn]="pagamentoLabel.bind(this)"
@@ -207,7 +210,8 @@
       (pagar)="pagarDespesaPorId($event)"
       (historico)="abrirHistorico($event)"
       (selecionar)="toggleSelecionar($event.id, $event.checked)"
-      (selecionarTodos)="toggleSelecionarTodos($event)" />
+      (selecionarTodos)="toggleSelecionarTodos($event)"
+      (emptyAction)="abrirModal()" />
   </div>
 
   <app-despesas-form

@@ -18,7 +18,15 @@
     </button>
   </div>
 
-  <app-cartoes-listagem [cards]="cards" [brands]="brands" (remover)="remover($event)" (editar)="editar($event)"></app-cartoes-listagem>
+  <app-cartoes-listagem
+    [cards]="cards"
+    [brands]="brands"
+    emptyTitle="Sem cartões cadastrados"
+    emptyDescription="Cadastre seu primeiro cartão para acompanhar limites e vencimentos."
+    emptyCtaLabel="Adicionar cartão"
+    (remover)="remover($event)"
+    (editar)="editar($event)"
+    (emptyAction)="abrirModal()"></app-cartoes-listagem>
 
   <div *ngIf="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
     <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharModal()"></div>

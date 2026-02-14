@@ -83,8 +83,13 @@
       </thead>
       <tbody class="divide-y divide-[var(--border)]">
         <tr *ngIf="!rendas.length">
-          <td class="px-5 py-6 text-sm text-[var(--text-muted)]" [attr.colspan]="showStatus ? 8 : 7">
-            Sem receitas no mês. Clique em “Adicionar receita” para começar.
+          <td class="px-5 py-6" [attr.colspan]="showStatus ? 8 : 7">
+            <app-empty-state
+              [title]="emptyTitle"
+              [description]="emptyDescription"
+              [ctaLabel]="emptyCtaLabel"
+              icon="💰"
+              (action)="emptyAction.emit()"></app-empty-state>
           </td>
         </tr>
         <tr *ngFor="let r of rendas" class="hover:bg-[var(--surface-2)]">
@@ -103,12 +108,7 @@
           <td class="px-5 py-4 text-[var(--text-muted)]">{{ r.recebimento || '—' }}</td>
           <td class="px-5 py-4 text-[var(--text-muted)]">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>
           <td *ngIf="showStatus" class="px-5 py-4">
-            <span
-              class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
-              [ngClass]="statusLabel(r) === 'Recebido' ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-amber-200 bg-amber-100 text-amber-700'">
-              <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
-              {{ statusLabel(r) }}
-            </span>
+            <app-status-badge [status]="r.status" [label]="statusLabel(r)"></app-status-badge>
           </td>
           <td class="px-5 py-4">
             <div class="flex items-center justify-end gap-2">

@@ -2,19 +2,24 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe],
+  imports: [NgFor, NgIf, DecimalPipe, EmptyStateComponent],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })
 export class CartoesListagemComponent {
   @Input() cards: StoredCard[] = [];
   @Input() brands: CardBrandLookup[] = [];
+  @Input() emptyTitle = 'Sem cartões cadastrados';
+  @Input() emptyDescription = 'Adicione seu primeiro cartão para acompanhar limites e vencimentos.';
+  @Input() emptyCtaLabel = 'Adicionar cartão';
   @Output() remover = new EventEmitter<string>();
   @Output() editar = new EventEmitter<StoredCard>();
+  @Output() emptyAction = new EventEmitter<void>();
 
   private brandLookup(value: string): CardBrandLookup | undefined {
     const normalized = (value || '').toString();

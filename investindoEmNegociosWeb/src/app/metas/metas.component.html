@@ -36,9 +36,13 @@
     <div *ngIf="loading" class="placeholder">
       <p class="muted">Carregando metas...</p>
     </div>
-    <div *ngIf="!loading && metas.length === 0" class="placeholder">
-      <p class="muted">Sem metas cadastradas.</p>
-      <small>Clique em “Adicionar meta” para criar sua primeira meta anual.</small>
+    <div *ngIf="!loading && metas.length === 0">
+      <app-empty-state
+        title="Sem metas cadastradas"
+        description="Crie sua primeira meta anual para acompanhar o progresso."
+        ctaLabel="Adicionar meta"
+        icon="🎯"
+        (action)="abrirModal()"></app-empty-state>
     </div>
 
     <div class="grid gap-4 md:grid-cols-2" *ngIf="!loading && metas.length">
