@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, RegisterPayload } from '../auth.service';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-signup',
@@ -14,13 +15,16 @@ import { AuthService, RegisterPayload } from '../auth.service';
 export class SignupComponent {
   @Output() signedUp = new EventEmitter<void>();
 
-  feedback = '';
-  error = '';
   loading = false;
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router,
+    private uiFeedback: UiFeedbackService
+  ) {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
@@ -31,12 +35,10 @@ export class SignupComponent {
 
   onSubmit(): void {
     if (this.loading) return;
-    this.feedback = '';
-    this.error = '';
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error = 'Revise os campos destacados.';
+      this.uiFeedback.warning('Revise os campos destacados.');
       return;
     }
 
@@ -45,7 +47,7 @@ export class SignupComponent {
 
     this.auth.register(payload).subscribe({
       next: () => {
-        this.feedback = 'Conta criada com sucesso. Faça login para entrar.';
+        this.uiFeedback.success('Conta criada com sucesso. Faça login para entrar.');
         this.loading = false;
         this.signedUp.emit();
       },
@@ -55,7 +57,7 @@ export class SignupComponent {
         if (err && typeof err === 'object' && 'code' in err && (err as { code?: string }).code === 'emailInUse') {
           this.form.get('email')?.setErrors({ emailInUse: true });
         }
-        this.error = err instanceof Error ? err.message : 'Erro ao cadastrar. Tente novamente.';
+        this.uiFeedback.error(err instanceof Error ? err.message : 'Erro ao cadastrar. Tente novamente.');
         this.loading = false;
       }
     });

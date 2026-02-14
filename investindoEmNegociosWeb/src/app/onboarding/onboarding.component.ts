@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
 import { FocusArea } from './onboarding.types';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-onboarding',
@@ -16,8 +17,6 @@ import { FocusArea } from './onboarding.types';
 export class OnboardingComponent implements OnInit {
   form: FormGroup;
   loading = false;
-  feedback = '';
-  error = '';
   step = 0;
   focus: FocusArea | null = null;
   focusOptions: { id: FocusArea; title: string; description: string }[] = [
@@ -42,7 +41,8 @@ export class OnboardingComponent implements OnInit {
     private fb: FormBuilder,
     private profile: ProfileService,
     private router: Router,
-    private onboarding: OnboardingService
+    private onboarding: OnboardingService,
+    private uiFeedback: UiFeedbackService
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -93,12 +93,10 @@ export class OnboardingComponent implements OnInit {
 
   submit(): void {
     if (this.loading) return;
-    this.feedback = '';
-    this.error = '';
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error = 'Revise os campos.';
+      this.uiFeedback.warning('Revise os campos.');
       return;
     }
 
@@ -107,15 +105,15 @@ export class OnboardingComponent implements OnInit {
     this.profile.upsert(payload).subscribe({
       next: () => {
         this.loading = false;
-        this.feedback = 'Dados salvos! Vamos para o proximo passo.';
+        this.uiFeedback.success('Dados salvos! Vamos para o proximo passo.');
         this.nextStep();
       },
       error: (err) => {
         if (err?.status === 401) {
-          this.error = 'Sessão expirada. Faça login novamente.';
+          this.uiFeedback.error('Sessão expirada. Faça login novamente.');
           this.router.navigateByUrl('/login');
         } else {
-          this.error = err instanceof Error ? err.message : 'Erro ao salvar dados.';
+          this.uiFeedback.error(err instanceof Error ? err.message : 'Erro ao salvar dados.');
         }
         this.loading = false;
       }

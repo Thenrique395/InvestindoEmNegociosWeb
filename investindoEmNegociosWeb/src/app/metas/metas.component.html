@@ -15,10 +15,6 @@
     </button>
   </header>
 
-  <div *ngIf="alerta" class="inline-alert" [ngClass]="alertaTipo">
-    {{ alerta }}
-  </div>
-
   <div class="filters">
     <label>
       Ano
@@ -134,7 +130,6 @@
       </div>
 
       <div class="form">
-        <p class="error" *ngIf="erro">{{ erro }}</p>
         <label>
           Nome da meta
           <input type="text" [(ngModel)]="metaNome" placeholder="Ex.: Fundo de emergência" />
@@ -185,7 +180,6 @@
         <button class="modal__close" type="button" [disabled]="saving" (click)="fecharAporte()">✕</button>
       </div>
 
-      <div class="error-floating" *ngIf="erro">{{ erro }}</div>
 
       <div class="form">
         <label>

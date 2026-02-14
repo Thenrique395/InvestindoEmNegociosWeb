@@ -45,7 +45,6 @@
         {{ saving ? 'Salvando...' : 'Adicionar' }}
       </button>
     </div>
-    <p class="error" *ngIf="erro">{{ erro }}</p>
   </section>
 
   <section class="card list-card" *ngIf="!loading; else loadingTpl">
@@ -107,8 +106,6 @@
     </div>
 
     <div class="status" *ngIf="adminLoading">Carregando categorias padrão...</div>
-    <div class="status error" *ngIf="adminError">{{ adminError }}</div>
-
     <div class="grid gap-3" *ngIf="!adminLoading && adminCategories.length">
       <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 md:grid-cols-[auto_1fr_auto] md:items-center" *ngFor="let c of adminCategories">
         <div class="grid h-10 w-10 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
@@ -173,7 +170,6 @@
           {{ adminSaving ? 'Salvando...' : 'Salvar' }}
         </button>
       </div>
-      <p class="error" *ngIf="adminError">{{ adminError }}</p>
     </div>
   </div>
 

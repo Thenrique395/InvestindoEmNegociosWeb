@@ -18,17 +18,6 @@
     </button>
   </div>
 
-  <div
-    *ngIf="alerta"
-    class="rounded-xl border px-4 py-3 text-sm text-[var(--text)]"
-    [ngClass]="alertaTipo === 'success'
-      ? 'border-emerald-400/30 bg-emerald-500/10'
-      : alertaTipo === 'error'
-        ? 'border-rose-400/30 bg-rose-500/10'
-        : 'border-sky-400/30 bg-sky-500/10'">
-    {{ alerta }}
-  </div>
-
   <app-cartoes-listagem [cards]="cards" [brands]="brands" (remover)="remover($event)" (editar)="editar($event)"></app-cartoes-listagem>
 
   <div *ngIf="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">

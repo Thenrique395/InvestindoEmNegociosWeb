@@ -19,7 +19,6 @@
         </label>
         <button type="button" class="ghost" (click)="limparAvatar()" [disabled]="!avatarUrl || avatarUploading">Remover</button>
         <small class="hint">PNG/JPG até 2MB.</small>
-        <small class="error" *ngIf="avatarError">{{ avatarError }}</small>
       </div>
     </div>
     <label>

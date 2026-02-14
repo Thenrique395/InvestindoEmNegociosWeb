@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-export type UiFeedbackType = 'success' | 'error' | 'info';
+export type UiFeedbackType = 'success' | 'error' | 'info' | 'warning';
 
 export interface UiFeedbackMessage {
   type: UiFeedbackType;
@@ -32,6 +32,10 @@ export class UiFeedbackService {
 
   info(text: string, durationMs = 3000): void {
     this.show('info', text, durationMs);
+  }
+
+  warning(text: string, durationMs = 3500): void {
+    this.show('warning', text, durationMs);
   }
 
   clear(): void {

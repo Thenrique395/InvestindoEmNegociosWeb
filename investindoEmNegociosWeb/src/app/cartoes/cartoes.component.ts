@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, NgClass } from '@angular/common';
+import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
 import { LookupsService, CardBrandLookup, InstitutionLookup } from '../lookups.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatCurrencyValue } from '../utils/locale-utils';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-cartoes',
@@ -20,7 +21,6 @@ import { formatCurrencyValue } from '../utils/locale-utils';
     NgSwitchCase,
     NgSwitchDefault,
     CartoesListagemComponent,
-    NgClass,
     DigitOnlyDirective
   ],
   templateUrl: './cartoes.component.html',
@@ -42,8 +42,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
   institutions: InstitutionLookup[] = [];
   mostrarModal = false;
   editandoId: string | null = null;
-  alerta = '';
-  alertaTipo: 'info' | 'success' | 'error' = 'info';
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   brands: CardBrandLookup[] = [];
 
@@ -58,7 +56,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
   private sub?: Subscription;
   private expensesSub?: Subscription;
 
-  constructor(private db: ApiDataService, private lookups: LookupsService) {}
+  constructor(
+    private db: ApiDataService,
+    private lookups: LookupsService,
+    private uiFeedback: UiFeedbackService
+  ) {}
 
   ngOnInit(): void {
     this.sub = this.db.cards$.subscribe((lista) => {
@@ -77,9 +79,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.brands = [];
-        this.alerta = 'Falha ao carregar bandeiras.';
-        this.alertaTipo = 'error';
-        setTimeout(() => (this.alerta = ''), 4000);
+        this.uiFeedback.error('Falha ao carregar bandeiras.');
       }
     });
     this.lookups.institutions('Bank').subscribe({
@@ -161,19 +161,20 @@ export class CartoesComponent implements OnInit, OnDestroy {
   remover(id: string): void {
     const possuiDespesa = this.expenses.some((e) => e.cartao === id);
     if (possuiDespesa) {
-      this.alerta = 'Não é possível remover este cartão; existem despesas vinculadas a ele.';
-      this.alertaTipo = 'error';
-      setTimeout(() => (this.alerta = ''), 4000);
+      this.uiFeedback.error('Não é possível remover este cartão; existem despesas vinculadas a ele.');
       return;
     }
     this.db.removeCard(id);
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
-    this.alerta = msg;
-    this.alertaTipo = tipo;
     if (this.alertaTimeout) clearTimeout(this.alertaTimeout);
-    this.alertaTimeout = setTimeout(() => (this.alerta = ''), duracao);
+    if (tipo === 'success') this.uiFeedback.success(msg, duracao);
+    if (tipo === 'error') this.uiFeedback.error(msg, duracao);
+    if (tipo === 'info') this.uiFeedback.info(msg, duracao);
+    this.alertaTimeout = setTimeout(() => {
+      /* noop */
+    }, duracao);
   }
 
   onNumeroInput(event: Event): void {

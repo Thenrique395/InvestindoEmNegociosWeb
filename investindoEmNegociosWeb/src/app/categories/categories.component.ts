@@ -23,12 +23,10 @@ export class CategoriesComponent implements OnInit {
   showModal = false;
   loading = false;
   saving = false;
-  erro = '';
   isAdmin = false;
 
   adminCategories: AdminCategory[] = [];
   adminLoading = false;
-  adminError = '';
   includeInactive = true;
   adminSaving = false;
   showAdminModal = false;
@@ -98,20 +96,24 @@ export class CategoriesComponent implements OnInit {
 
   carregar(): void {
     this.loading = true;
-    this.erro = '';
     this.categoriesService.list(this.filtroTipo || undefined).subscribe({
       next: (data) => (this.categorias = data),
-      error: (err) => (this.erro = err?.error ?? 'Não foi possível carregar as categorias.'),
+      error: (err) => {
+        this.uiFeedback.error(err?.error ?? 'Não foi possível carregar as categorias.');
+        this.loading = false;
+      },
       complete: () => (this.loading = false)
     });
   }
 
   loadAdmin(): void {
     this.adminLoading = true;
-    this.adminError = '';
     this.adminCategoriesService.list(this.includeInactive).subscribe({
       next: (data) => (this.adminCategories = data),
-      error: () => (this.adminError = 'Não foi possível carregar as categorias padrão.'),
+      error: () => {
+        this.uiFeedback.error('Não foi possível carregar as categorias padrão.');
+        this.adminLoading = false;
+      },
       complete: () => (this.adminLoading = false)
     });
   }
@@ -125,7 +127,6 @@ export class CategoriesComponent implements OnInit {
     this.showModal = true;
     this.nome = '';
     this.tipo = 'Expense';
-    this.erro = '';
   }
 
   fecharModal(): void {
@@ -135,11 +136,10 @@ export class CategoriesComponent implements OnInit {
 
   adicionar(): void {
     if (!this.nome.trim()) {
-      this.erro = 'Informe o nome da categoria.';
+      this.uiFeedback.warning('Informe o nome da categoria.');
       return;
     }
     this.saving = true;
-    this.erro = '';
 
     if (this.isAdmin && this.escopo === 'default') {
       this.adminCategoriesService
@@ -152,7 +152,10 @@ export class CategoriesComponent implements OnInit {
             this.carregar();
             this.uiFeedback.success('Categoria padrão adicionada com sucesso.');
           },
-          error: () => (this.erro = 'Erro ao adicionar categoria padrão.'),
+          error: () => {
+            this.uiFeedback.error('Erro ao adicionar categoria padrão.');
+            this.saving = false;
+          },
           complete: () => (this.saving = false)
         });
       return;
@@ -165,7 +168,10 @@ export class CategoriesComponent implements OnInit {
         this.showModal = false;
         this.uiFeedback.success('Categoria adicionada com sucesso.');
       },
-      error: (err) => (this.erro = err?.error ?? 'Erro ao adicionar categoria.'),
+      error: (err) => {
+        this.uiFeedback.error(err?.error ?? 'Erro ao adicionar categoria.');
+        this.saving = false;
+      },
       complete: () => (this.saving = false)
     });
   }
@@ -192,7 +198,7 @@ export class CategoriesComponent implements OnInit {
         this.categorias = this.categorias.filter((c) => c.id !== cat.id);
         this.uiFeedback.success('Categoria removida com sucesso.');
       },
-      error: (err) => (this.erro = err?.error ?? 'Não foi possível remover a categoria.')
+      error: (err) => this.uiFeedback.error(err?.error ?? 'Não foi possível remover a categoria.')
     });
   }
 
@@ -201,7 +207,6 @@ export class CategoriesComponent implements OnInit {
     this.adminName = category.name;
     this.adminAppliesTo = (category.appliesTo as CategoryType) || '';
     this.showAdminModal = true;
-    this.adminError = '';
   }
 
   closeAdminModal(): void {
@@ -212,11 +217,10 @@ export class CategoriesComponent implements OnInit {
 
   saveAdmin(): void {
     if (!this.adminEditing || !this.adminName.trim()) {
-      this.adminError = 'Informe o nome da categoria.';
+      this.uiFeedback.warning('Informe o nome da categoria.');
       return;
     }
     this.adminSaving = true;
-    this.adminError = '';
     const payload = {
       name: this.adminName.trim(),
       appliesTo: this.adminAppliesTo || null
@@ -229,7 +233,10 @@ export class CategoriesComponent implements OnInit {
         this.loadAdmin();
         this.carregar();
       },
-      error: () => (this.adminError = 'Não foi possível salvar a categoria padrão.'),
+      error: () => {
+        this.uiFeedback.error('Não foi possível salvar a categoria padrão.');
+        this.adminSaving = false;
+      },
       complete: () => (this.adminSaving = false)
     });
   }
@@ -243,7 +250,7 @@ export class CategoriesComponent implements OnInit {
       next: (updated) => (category.isActive = updated.isActive),
       error: () => {
         category.isActive = !next;
-        this.adminError = 'Não foi possível atualizar o status.';
+        this.uiFeedback.error('Não foi possível atualizar o status.');
       },
       complete: () => (this.adminSaving = false)
     });

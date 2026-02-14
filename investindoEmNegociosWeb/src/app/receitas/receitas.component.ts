@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
+import { UiFeedbackService } from '../ui-feedback.service';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -40,8 +41,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   editandoId: string | null = null;
   valorSugestao: number | null = null;
   saving = false;
-  alerta = '';
-  alertaTipo: 'info' | 'success' | 'error' = 'info';
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   private sub?: Subscription;
   private summarySub?: Subscription;
@@ -65,7 +64,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   constructor(
     private db: ApiDataService,
     private authService: AuthService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private uiFeedback: UiFeedbackService
   ) {}
 
   ngOnInit(): void {
@@ -425,10 +425,13 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
-    this.alerta = msg;
-    this.alertaTipo = tipo;
     if (this.alertaTimeout) clearTimeout(this.alertaTimeout);
-    this.alertaTimeout = setTimeout(() => (this.alerta = ''), duracao);
+    if (tipo === 'success') this.uiFeedback.success(msg, duracao);
+    if (tipo === 'error') this.uiFeedback.error(msg, duracao);
+    if (tipo === 'info') this.uiFeedback.info(msg, duracao);
+    this.alertaTimeout = setTimeout(() => {
+      /* noop */
+    }, duracao);
   }
 
   private criaRenda(): StoredIncome {

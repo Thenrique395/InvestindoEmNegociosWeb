@@ -13,10 +13,6 @@
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
     Carregando parâmetros...
   </div>
-  <div class="rounded-xl border border-rose-200 bg-rose-100 px-4 py-3 text-sm text-rose-700" *ngIf="error">
-    {{ error }}
-  </div>
-
   <div class="grid gap-6 lg:grid-cols-2" *ngIf="!loading">
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
       <div class="text-sm font-semibold text-[var(--text)]">Bandeiras de cartão</div>
@@ -46,7 +42,6 @@
           {{ savingCreateBrand ? 'Salvando...' : 'Cadastrar' }}
         </button>
       </div>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="createBrandError">{{ createBrandError }}</div>
       <div class="mt-4 flex items-center gap-3">
         <input
           type="text"
@@ -57,7 +52,6 @@
           {{ filteredCardBrands.length }} de {{ cardBrands.length }}
         </span>
       </div>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="errorCardBrands">{{ errorCardBrands }}</div>
       <div class="mt-4 space-y-3">
         <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let brand of filteredCardBrands">
           <div class="flex flex-wrap items-center gap-2 text-sm">
@@ -105,7 +99,6 @@
           {{ savingCreateMethod ? 'Salvando...' : 'Cadastrar' }}
         </button>
       </div>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="createMethodError">{{ createMethodError }}</div>
       <div class="mt-4 flex items-center gap-3">
         <input
           type="text"
@@ -116,7 +109,6 @@
           {{ filteredPaymentMethods.length }} de {{ paymentMethods.length }}
         </span>
       </div>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="errorPaymentMethods">{{ errorPaymentMethods }}</div>
       <div class="mt-4 space-y-3">
         <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let method of filteredPaymentMethods">
           <div class="flex flex-wrap items-center gap-2 text-sm">
@@ -170,7 +162,6 @@
           {{ savingCreateInstitution ? 'Salvando...' : 'Cadastrar' }}
         </button>
       </div>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="createInstitutionError">{{ createInstitutionError }}</div>
       <div class="mt-4 flex items-center gap-3">
         <input
           type="text"
@@ -181,7 +172,6 @@
           {{ filteredInstitutions.length }} de {{ institutions.length }}
         </span>
       </div>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="errorInstitutions">{{ errorInstitutions }}</div>
       <div class="mt-4 space-y-3">
         <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let inst of filteredInstitutions">
           <div class="flex flex-wrap items-center gap-2 text-sm">
@@ -210,7 +200,6 @@
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
       <div class="text-sm font-semibold text-[var(--text)]">Notificações globais</div>
       <p class="mt-1 text-sm text-[var(--text-muted)]">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
-      <div class="mt-3 rounded-lg border border-rose-200 bg-rose-100 px-3 py-2 text-sm text-rose-700" *ngIf="errorNotifications">{{ errorNotifications }}</div>
 
       <div class="mt-4 grid gap-4 md:grid-cols-2">
         <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">

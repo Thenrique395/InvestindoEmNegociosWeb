@@ -34,11 +34,6 @@ export class AdminParametersComponent implements OnInit {
     goalInactivityDays: 30
   };
   loading = false;
-  error = '';
-  errorCardBrands = '';
-  errorPaymentMethods = '';
-  errorInstitutions = '';
-  errorNotifications = '';
   savingKey = '';
   brandFilter = '';
   methodFilter = '';
@@ -48,9 +43,6 @@ export class AdminParametersComponent implements OnInit {
   newMethodName = '';
   newInstitutionName = '';
   newInstitutionType: 'Bank' | 'Broker' = 'Bank';
-  createBrandError = '';
-  createMethodError = '';
-  createInstitutionError = '';
   savingCreateBrand = false;
   savingCreateMethod = false;
   savingCreateInstitution = false;
@@ -81,33 +73,28 @@ export class AdminParametersComponent implements OnInit {
 
   loadAll(): void {
     this.loading = true;
-    this.error = '';
-    this.errorCardBrands = '';
-    this.errorPaymentMethods = '';
-    this.errorInstitutions = '';
-    this.errorNotifications = '';
     forkJoin({
       brands: this.adminParameters.listCardBrands().pipe(
         catchError(() => {
-          this.errorCardBrands = 'Não foi possível carregar as bandeiras.';
+          this.uiFeedback.error('Não foi possível carregar as bandeiras.');
           return of([] as CardBrandAdmin[]);
         })
       ),
       methods: this.adminParameters.listPaymentMethods().pipe(
         catchError(() => {
-          this.errorPaymentMethods = 'Não foi possível carregar as formas de pagamento.';
+          this.uiFeedback.error('Não foi possível carregar as formas de pagamento.');
           return of([] as PaymentMethodAdmin[]);
         })
       ),
       institutions: this.adminParameters.listInstitutions().pipe(
         catchError(() => {
-          this.errorInstitutions = 'Não foi possível carregar as instituições.';
+          this.uiFeedback.error('Não foi possível carregar as instituições.');
           return of([] as InstitutionAdmin[]);
         })
       ),
       notifications: this.adminParameters.getNotificationSettings().pipe(
         catchError(() => {
-          this.errorNotifications = 'Não foi possível carregar as notificações.';
+          this.uiFeedback.error('Não foi possível carregar as notificações.');
           return of(null);
         })
       )
@@ -119,12 +106,10 @@ export class AdminParametersComponent implements OnInit {
         if (notifications) {
           this.notificationSettings = notifications;
         }
-        if (this.errorCardBrands && this.errorPaymentMethods && this.errorInstitutions && this.errorNotifications) {
-          this.error = 'Não foi possível carregar os parâmetros.';
-        }
       },
       error: () => {
-        this.error = 'Não foi possível carregar os parâmetros.';
+        this.uiFeedback.error('Não foi possível carregar os parâmetros.');
+        this.loading = false;
       },
       complete: () => {
         this.loading = false;
@@ -152,24 +137,21 @@ export class AdminParametersComponent implements OnInit {
     const name = this.newBrandName.trim();
     const code = this.newBrandCode.trim();
     if (!name || !code) {
-      this.createBrandError = 'Informe nome e código da bandeira.';
+      this.uiFeedback.warning('Informe nome e código da bandeira.');
       return;
     }
 
     this.savingCreateBrand = true;
-    this.createBrandError = '';
     this.adminParameters.createCardBrand(name, code).subscribe({
       next: (created) => {
         this.cardBrands = [...this.cardBrands, created].sort((a, b) => a.id - b.id);
         this.lastUpdatedBrands[created.id] = new Date();
         this.newBrandName = '';
         this.newBrandCode = '';
-        this.createBrandError = '';
         this.uiFeedback.success('Bandeira cadastrada com sucesso.');
       },
       error: (err) => {
-        this.createBrandError = this.resolveErrorMessage(err, 'Erro ao cadastrar a bandeira.');
-        this.uiFeedback.error(this.createBrandError);
+        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao cadastrar a bandeira.'));
       },
       complete: () => {
         this.savingCreateBrand = false;
@@ -211,23 +193,20 @@ export class AdminParametersComponent implements OnInit {
     if (this.savingCreateMethod) return;
     const name = this.newMethodName.trim();
     if (!name) {
-      this.createMethodError = 'Informe o nome da forma de pagamento.';
+      this.uiFeedback.warning('Informe o nome da forma de pagamento.');
       return;
     }
 
     this.savingCreateMethod = true;
-    this.createMethodError = '';
     this.adminParameters.createPaymentMethod(name).subscribe({
       next: (created) => {
         this.paymentMethods = [...this.paymentMethods, created].sort((a, b) => a.id - b.id);
         this.lastUpdatedMethods[created.id] = new Date();
         this.newMethodName = '';
-        this.createMethodError = '';
         this.uiFeedback.success('Forma de pagamento cadastrada com sucesso.');
       },
       error: (err) => {
-        this.createMethodError = this.resolveErrorMessage(err, 'Erro ao cadastrar a forma de pagamento.');
-        this.uiFeedback.error(this.createMethodError);
+        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao cadastrar a forma de pagamento.'));
       },
       complete: () => {
         this.savingCreateMethod = false;
@@ -239,12 +218,11 @@ export class AdminParametersComponent implements OnInit {
     if (this.savingCreateInstitution) return;
     const name = this.newInstitutionName.trim();
     if (!name) {
-      this.createInstitutionError = 'Informe o nome da instituição.';
+      this.uiFeedback.warning('Informe o nome da instituição.');
       return;
     }
 
     this.savingCreateInstitution = true;
-    this.createInstitutionError = '';
     this.adminParameters.createInstitution(name, this.newInstitutionType).subscribe({
       next: (created) => {
         this.institutions = [...this.institutions, created].sort((a, b) => a.name.localeCompare(b.name));
@@ -253,8 +231,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Instituição cadastrada com sucesso.');
       },
       error: (err) => {
-        this.createInstitutionError = this.resolveErrorMessage(err, 'Erro ao cadastrar a instituição.');
-        this.uiFeedback.error(this.createInstitutionError);
+        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao cadastrar a instituição.'));
       },
       complete: () => {
         this.savingCreateInstitution = false;
@@ -265,7 +242,6 @@ export class AdminParametersComponent implements OnInit {
   salvarNotificacoes(): void {
     if (this.savingNotificationSettings) return;
     this.savingNotificationSettings = true;
-    this.errorNotifications = '';
     this.adminParameters.updateNotificationSettings(this.notificationSettings).subscribe({
       next: (updated) => {
         this.notificationSettings = updated;
@@ -273,8 +249,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Notificações globais atualizadas com sucesso.');
       },
       error: (err) => {
-        this.errorNotifications = this.resolveErrorMessage(err, 'Erro ao salvar notificações.');
-        this.uiFeedback.error(this.errorNotifications);
+        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao salvar notificações.'));
       },
       complete: () => {
         this.savingNotificationSettings = false;
@@ -390,7 +365,6 @@ export class AdminParametersComponent implements OnInit {
       },
       error: () => {
         brand.isActive = !next;
-        this.errorCardBrands = 'Erro ao atualizar a bandeira.';
         this.uiFeedback.error('Erro ao atualizar a bandeira.');
         this.savingKey = '';
       },
@@ -411,7 +385,6 @@ export class AdminParametersComponent implements OnInit {
       },
       error: () => {
         method.isActive = !next;
-        this.errorPaymentMethods = 'Erro ao atualizar a forma de pagamento.';
         this.uiFeedback.error('Erro ao atualizar a forma de pagamento.');
         this.savingKey = '';
       },
@@ -432,7 +405,6 @@ export class AdminParametersComponent implements OnInit {
       },
       error: () => {
         institution.isActive = !next;
-        this.errorInstitutions = 'Erro ao atualizar a instituição.';
         this.uiFeedback.error('Erro ao atualizar a instituição.');
         this.savingKey = '';
       },

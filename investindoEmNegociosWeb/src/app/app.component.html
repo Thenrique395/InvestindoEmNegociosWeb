@@ -461,7 +461,13 @@
     <button type="button" aria-label="Fechar alerta" (click)="signupAlert = ''">✕</button>
   </div>
 
-  <div class="global-alert global-alert--feedback" [class.success]="feedbackMessage.type === 'success'" [class.error]="feedbackMessage.type === 'error'" [class.info]="feedbackMessage.type === 'info'" *ngIf="feedbackMessage">
+  <div
+    class="global-alert global-alert--feedback"
+    [class.success]="feedbackMessage.type === 'success'"
+    [class.error]="feedbackMessage.type === 'error'"
+    [class.info]="feedbackMessage.type === 'info'"
+    [class.warning]="feedbackMessage.type === 'warning'"
+    *ngIf="feedbackMessage">
     {{ feedbackMessage.text }}
     <button type="button" aria-label="Fechar alerta" (click)="dismissFeedback()">✕</button>
   </div>

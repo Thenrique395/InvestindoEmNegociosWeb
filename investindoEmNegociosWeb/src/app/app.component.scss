@@ -196,6 +196,11 @@
     background: var(--info-10);
   }
 
+  &.warning {
+    border-color: color-mix(in srgb, var(--warning) 55%, transparent);
+    background: var(--warning-10);
+  }
+
   button {
     background: var(--surface-2);
     border: 1px solid var(--border);

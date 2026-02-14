@@ -16,7 +16,6 @@ export class UserProfileComponent implements OnInit {
   email = '';
   documento = '';
   avatarUrl = '';
-  avatarError = '';
   avatarUploading = false;
   idioma = 'pt-BR';
   telefone = '';
@@ -54,15 +53,14 @@ export class UserProfileComponent implements OnInit {
     const file = input?.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      this.avatarError = 'Selecione uma imagem válida.';
+      this.uiFeedback.warning('Selecione uma imagem válida.');
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      this.avatarError = 'Imagem muito grande. Use até 2MB.';
+      this.uiFeedback.warning('Imagem muito grande. Use até 2MB.');
       return;
     }
     this.avatarUploading = true;
-    this.avatarError = '';
     this.profileService.uploadAvatar(file).subscribe({
       next: (profile) => {
         this.avatarUrl = profile.avatarUrl || '';
@@ -70,14 +68,13 @@ export class UserProfileComponent implements OnInit {
       },
       error: (err) => {
         this.avatarUploading = false;
-        this.avatarError = err?.message || 'Falha ao enviar a imagem.';
+        this.uiFeedback.error(err?.message || 'Falha ao enviar a imagem.');
       }
     });
   }
 
   limparAvatar(): void {
     this.avatarUrl = '';
-    this.avatarError = '';
   }
 
   salvarPerfil(): void {

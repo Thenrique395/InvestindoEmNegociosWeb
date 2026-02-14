@@ -136,17 +136,6 @@
     </div>
   </div>
 
-  <div
-    *ngIf="alerta"
-    class="mt-4 rounded-xl border px-4 py-3 text-sm text-[var(--text)]"
-    [ngClass]="alertaTipo === 'success'
-      ? 'border-emerald-400/30 bg-emerald-500/10'
-      : alertaTipo === 'error'
-        ? 'border-rose-400/30 bg-rose-500/10'
-        : 'border-sky-400/30 bg-sky-500/10'">
-    {{ alerta }}
-  </div>
-
   <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-[12px] text-[var(--text-muted)]" *ngIf="selecionados.length">
     <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
     <div class="flex flex-wrap items-center gap-2">

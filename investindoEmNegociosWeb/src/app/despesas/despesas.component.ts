@@ -11,6 +11,7 @@ import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
+import { UiFeedbackService } from '../ui-feedback.service';
 import {
   formatLocaleDate,
   formatMonthLabelFromKey,
@@ -39,8 +40,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
   mostrarForm = false;
-  alerta = '';
-  alertaTipo: 'info' | 'success' | 'error' = 'info';
   saving = false;
   valorInput = '';
   vencimentoInput = '';
@@ -73,7 +72,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
   constructor(
     private db: ApiDataService,
     private installments: InstallmentsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private uiFeedback: UiFeedbackService
   ) {}
 
   ngOnInit(): void {
@@ -656,8 +656,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   openRemocao(d: StoredExpense, mesKey: string, index: number): void {
     if (d.cartao) {
-      this.alerta = 'Não é possível excluir uma despesa associada a um cartão. Altere a forma de pagamento ou exclua o cartão primeiro.';
-      setTimeout(() => (this.alerta = ''), 4000);
+      this.uiFeedback.error(
+        'Não é possível excluir uma despesa associada a um cartão. Altere a forma de pagamento ou exclua o cartão primeiro.'
+      );
       return;
     }
     if ((d.parcelasTotal && d.serieId) || d.fixa) {
@@ -790,10 +791,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
     if (this.alertaTimeout) {
       clearTimeout(this.alertaTimeout);
     }
-    this.alerta = msg;
-    this.alertaTipo = tipo;
+    if (tipo === 'success') this.uiFeedback.success(msg, duracao);
+    if (tipo === 'error') this.uiFeedback.error(msg, duracao);
+    if (tipo === 'info') this.uiFeedback.info(msg, duracao);
     this.alertaTimeout = setTimeout(() => {
-      this.alerta = '';
+      /* noop */
     }, duracao);
   }
 

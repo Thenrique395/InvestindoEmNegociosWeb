@@ -5,6 +5,7 @@ import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.servi
 import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/input-mask';
 import { formatLocaleDateFromIso, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-metas',
@@ -33,10 +34,6 @@ export class MetasComponent implements OnInit {
   ];
   loading = false;
   saving = false;
-  erro = '';
-  alerta = '';
-  alertaTipo: 'info' | 'success' | 'error' = 'info';
-  private alertaTimeout?: ReturnType<typeof setTimeout>;
   mostrarAporte = false;
   aporteValor = '';
   aporteData = new Date().toISOString().slice(0, 10);
@@ -78,7 +75,10 @@ export class MetasComponent implements OnInit {
     }
   }
 
-  constructor(private goalsService: GoalsService) {}
+  constructor(
+    private goalsService: GoalsService,
+    private uiFeedback: UiFeedbackService
+  ) {}
 
   ngOnInit(): void {
     this.prepararAnos();
@@ -115,26 +115,23 @@ export class MetasComponent implements OnInit {
       : '';
     this.metaVencimento = meta.targetDate ? this.formatarDataBR(meta.targetDate) : '';
     this.mostrarModal = true;
-    this.erro = '';
   }
 
   fecharModal(): void {
     if (this.saving) return;
     this.mostrarModal = false;
     this.resetarForm();
-    this.erro = '';
   }
 
   salvar(): void {
-    this.erro = '';
     const valor = this.parseValor(this.metaValor);
     const ano = Number(String(this.metaAno || '').replace(/\D/g, ''));
     if (!this.metaNome.trim() || !valor || valor <= 0) {
-      this.erro = 'Informe nome e valor maior que zero.';
+      this.uiFeedback.warning('Informe nome e valor maior que zero.');
       return;
     }
     if (!ano) {
-      this.erro = 'Informe um ano válido.';
+      this.uiFeedback.warning('Informe um ano válido.');
       return;
     }
 
@@ -159,11 +156,11 @@ export class MetasComponent implements OnInit {
         this.saving = false;
         this.fecharModal();
         this.aplicarFiltros();
-        this.setAlerta('Meta salva com sucesso.', 2500, 'success');
+        this.uiFeedback.success('Meta salva com sucesso.');
       },
       error: (err) => {
         this.saving = false;
-        this.erro = err?.error?.message ?? 'Falha ao salvar meta.';
+        this.uiFeedback.error(err?.error?.message ?? 'Falha ao salvar meta.');
       }
     });
   }
@@ -208,26 +205,24 @@ export class MetasComponent implements OnInit {
     this.aporteData = new Date().toISOString().slice(0, 10);
     this.aporteNota = '';
     this.mostrarAporte = true;
-    this.erro = '';
   }
 
   fecharAporte(): void {
     if (this.saving) return;
     this.mostrarAporte = false;
     this.metaSelecionada = undefined;
-    this.erro = '';
   }
 
   salvarAporte(): void {
     if (!this.metaSelecionada) return;
     const valor = this.parseValor(this.aporteValor);
     if (!valor || valor <= 0) {
-      this.erro = 'Informe um valor de aporte válido.';
+      this.uiFeedback.warning('Informe um valor de aporte válido.');
       return;
     }
     const restante = this.metaSelecionada.targetAmount - this.metaSelecionada.currentAmount;
     if (valor > restante) {
-      this.erro = 'Valor do aporte excede o restante da meta.';
+      this.uiFeedback.warning('Valor do aporte excede o restante da meta.');
       return;
     }
     this.saving = true;
@@ -248,11 +243,11 @@ export class MetasComponent implements OnInit {
           );
           this.fecharAporte();
           this.aplicarFiltros();
-          this.setAlerta('Aporte registrado com sucesso.', 2500, 'success');
+          this.uiFeedback.success('Aporte registrado com sucesso.');
         },
         error: () => {
           this.saving = false;
-          this.erro = 'Falha ao registrar aporte.';
+          this.uiFeedback.error('Falha ao registrar aporte.');
         }
       });
   }
@@ -300,11 +295,11 @@ export class MetasComponent implements OnInit {
         this.saving = false;
         const modo = this.confirmModal.mode;
         this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
-        this.setAlerta(modo === 'cancel' ? 'Meta cancelada.' : 'Meta reativada.', 2500, 'success');
+        this.uiFeedback.success(modo === 'cancel' ? 'Meta cancelada.' : 'Meta reativada.');
       },
       error: () => {
         this.saving = false;
-        this.erro = 'Falha ao atualizar o status da meta.';
+        this.uiFeedback.error('Falha ao atualizar o status da meta.');
       }
     });
   }
@@ -343,13 +338,6 @@ export class MetasComponent implements OnInit {
     this.historicoMeta = undefined;
   }
 
-  private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
-    this.alerta = msg;
-    this.alertaTipo = tipo;
-    if (this.alertaTimeout) clearTimeout(this.alertaTimeout);
-    this.alertaTimeout = setTimeout(() => (this.alerta = ''), duracao);
-  }
-
   private carregarMetas(): void {
     this.loading = true;
     const ano = this.filtroAno === 'ALL' ? undefined : this.filtroAno;
@@ -362,7 +350,7 @@ export class MetasComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.erro = 'Não foi possível carregar as metas.';
+        this.uiFeedback.error('Não foi possível carregar as metas.');
       }
     });
   }

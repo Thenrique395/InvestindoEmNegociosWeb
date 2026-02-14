@@ -1,38 +1,38 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService, AuthResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
+import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   email = '';
   password = '';
-  feedback = '';
-  error = '';
   loading = false;
 
-  constructor(private auth: AuthService, private router: Router, private profile: ProfileService) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private profile: ProfileService,
+    private uiFeedback: UiFeedbackService
+  ) {}
 
   onSubmit(): void {
     if (this.loading) return;
-    this.feedback = '';
-    this.error = '';
-
     if (!this.email || !this.email.includes('@')) {
-      this.error = 'Informe um e-mail válido.';
+      this.uiFeedback.warning('Informe um e-mail válido.');
       return;
     }
     if (!this.password || this.password.length < 4) {
-      this.error = 'Informe sua senha (mínimo 4 caracteres).';
+      this.uiFeedback.warning('Informe sua senha (mínimo 4 caracteres).');
       return;
     }
 
@@ -40,7 +40,7 @@ export class LoginComponent {
 
     this.auth.login(this.email, this.password).subscribe({
       next: (res: AuthResponse) => {
-        this.feedback = `Autenticado! Bem-vindo, ${res.name}.`;
+        this.uiFeedback.success(`Autenticado! Bem-vindo, ${res.name}.`);
         this.profile.getProfile().subscribe({
           next: (profile) => {
             this.loading = false;
@@ -66,16 +66,16 @@ export class LoginComponent {
       error: (err: unknown) => {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 423) {
-            this.error = 'Conta bloqueada temporariamente. Tente novamente em alguns minutos.';
+            this.uiFeedback.error('Conta bloqueada temporariamente. Tente novamente em alguns minutos.');
           } else if (err.status === 429) {
-            this.error = 'Muitas tentativas. Aguarde um pouco e tente novamente.';
+            this.uiFeedback.error('Muitas tentativas. Aguarde um pouco e tente novamente.');
           } else if (err.status === 401) {
-            this.error = 'E-mail ou senha incorretos.';
+            this.uiFeedback.error('E-mail ou senha incorretos.');
           } else {
-            this.error = err.error?.detail || err.error?.title || 'Erro ao autenticar';
+            this.uiFeedback.error(err.error?.detail || err.error?.title || 'Erro ao autenticar');
           }
         } else {
-          this.error = err instanceof Error ? err.message : 'Erro ao autenticar';
+          this.uiFeedback.error(err instanceof Error ? err.message : 'Erro ao autenticar');
         }
         this.loading = false;
       }

@@ -29,10 +29,6 @@
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
     Carregando usuários...
   </div>
-  <div class="rounded-xl border border-rose-200 bg-rose-100 px-4 py-3 text-sm text-rose-700" *ngIf="error">
-    {{ error }}
-  </div>
-
   <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]" *ngIf="!loading && users.length">
     <div class="overflow-x-auto">
       <table class="min-w-full text-sm">

@@ -23,7 +23,6 @@ type AdminUserRow = AdminUserSummary & {
 export class AdminUsersComponent implements OnInit {
   users: AdminUserRow[] = [];
   loading = false;
-  error = '';
   savingId: string | null = null;
   deletingId: string | null = null;
   confirmOpen = false;
@@ -46,7 +45,6 @@ export class AdminUsersComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.error = '';
     this.adminUsers.list().subscribe({
       next: (users) => {
         this.users = users.map((user) => ({
@@ -56,7 +54,10 @@ export class AdminUsersComponent implements OnInit {
           dirty: false
         }));
       },
-      error: () => (this.error = 'Não foi possível carregar os usuários.'),
+      error: () => {
+        this.uiFeedback.error('Não foi possível carregar os usuários.');
+        this.loading = false;
+      },
       complete: () => (this.loading = false)
     });
   }
@@ -97,7 +98,6 @@ export class AdminUsersComponent implements OnInit {
     }
 
     this.savingId = user.id;
-    this.error = '';
 
     forkJoin(requests.length ? requests : [of(user)]).subscribe({
       next: (responses) => {
@@ -108,8 +108,7 @@ export class AdminUsersComponent implements OnInit {
         this.uiFeedback.success('Alterações salvas com sucesso.');
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Não foi possível salvar as alterações.';
-        this.uiFeedback.error(this.error);
+        this.uiFeedback.error(err?.error?.detail || 'Não foi possível salvar as alterações.');
       },
       complete: () => {
         this.savingId = null;
@@ -156,15 +155,13 @@ export class AdminUsersComponent implements OnInit {
 
   private applyDeleteUser(user: AdminUserRow): void {
     this.deletingId = user.id;
-    this.error = '';
     this.adminUsers.remove(user.id).subscribe({
       next: () => {
         this.users = this.users.filter((u) => u.id !== user.id);
         this.uiFeedback.success('Usuário removido com sucesso.');
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Não foi possível excluir o usuário.';
-        this.uiFeedback.error(this.error);
+        this.uiFeedback.error(err?.error?.detail || 'Não foi possível excluir o usuário.');
       },
       complete: () => {
         this.deletingId = null;
