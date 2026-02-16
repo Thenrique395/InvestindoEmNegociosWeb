@@ -394,64 +394,6 @@
 
   <ng-container *ngIf="!isLogged">
     <main class="main">
-      <ng-container *ngIf="isHomeRoute && !isLogged">
-        <section class="hero">
-          <div class="hero__bg">
-            <div class="grid-line grid-line--1"></div>
-            <div class="grid-line grid-line--2"></div>
-            <div class="grid-line grid-line--3"></div>
-          </div>
-          <div class="hero__content">
-            <div class="hero__copy">
-              <p class="eyebrow brand-green">Planejamento inteligente</p>
-              <h1>{{ brandName }}. Uma vida financeira conduzida com clareza.</h1>
-              <p class="lead">
-                {{ brandPositioning }}
-              </p>
-              <div class="hero__actions">
-                <button class="btn-primary" type="button" (click)="openSignup()">Começar agora</button>
-                <a class="ghost-link" href="#">Ver como funciona</a>
-              </div>
-              <div class="pill">Carteira 360° • Alertas inteligentes • Simulador em tempo real</div>
-            </div>
-            <div class="hero__aside">
-              <div class="hero__panel">
-                <div class="panel__header">
-                  <span class="eyebrow">Progresso do plano</span>
-                  <span class="badge success">+12,4% YTD</span>
-                </div>
-                <div class="panel__chart">
-                  <div class="chart__bar bar--1"></div>
-                  <div class="chart__bar bar--2"></div>
-                  <div class="chart__bar bar--3"></div>
-                  <div class="chart__bar bar--4"></div>
-                  <div class="chart__bar bar--5"></div>
-                </div>
-                <div class="panel__stats">
-                  <div>
-                    <p class="eyebrow">Patrimônio monitorado</p>
-                    <h3>R$ 1,2 mi</h3>
-                  </div>
-                  <div>
-                    <p class="eyebrow">Metas ativas</p>
-                    <h3>4 metas</h3>
-                  </div>
-                  <div>
-                    <p class="eyebrow">Tempo médio</p>
-                    <h3>8 min</h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="hero__footer">
-            <div class="footer-card">
-              <h3>Simulador de Investimentos</h3>
-              <p>Descubra quanto precisa investir para alcançar sua liberdade financeira e qual é o prazo ideal.</p>
-            </div>
-          </div>
-        </section>
-      </ng-container>
       <router-outlet />
     </main>
   </ng-container>

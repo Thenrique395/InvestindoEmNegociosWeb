@@ -2,20 +2,18 @@
   <section id="visao" class="hero">
     <div class="hero__grid">
       <div>
-        <p class="tag">Página comercial (teste)</p>
-        <h1>App de gestão financeira pessoal para controlar gastos, metas, cartões e investimentos</h1>
+        <h1>App para organizar despesas pessoais, controlar gastos e planejar sua evolução financeira</h1>
         <p>
-          O Investindo em Negócios organiza receitas, despesas, cartões, parcelas e patrimônio em um único painel.
-          O cliente ganha clareza para decidir melhor e manter consistência na vida financeira.
+          O Investindo em Negócios ajuda você a sair do caos financeiro: despesas, receitas, cartões, faturas e metas
+          no mesmo painel para sobrar dinheiro no fim do mês.
         </p>
         <div class="hero__actions">
           <a routerLink="/login" class="btn btn--primary">Começar agora</a>
-          <a routerLink="/calculadora" class="btn btn--ghost">Testar calculadora</a>
         </div>
         <div class="hero__proof">
-          <span>✓ Fluxo completo de importação de fatura</span>
-          <span>✓ Exportação/importação de dados</span>
-          <span>✓ Dashboard com metas e projeções</span>
+          <span>✓ Controle de despesas pessoais por categoria</span>
+          <span>✓ Importação de fatura para evitar digitação manual</span>
+          <span>✓ Metas e visão mensal para melhorar decisões</span>
         </div>
       </div>
       <div class="hero__media">
@@ -27,17 +25,33 @@
             <span>Fluxo financeiro</span>
           </div>
           <div class="hero__mockup-body">
-            <div class="hero__mockup-kpi">
-              <strong>3 perfis</strong>
-              <small>Basic, Intermediate e Advanced</small>
+            <div class="hero__mockup-summary">
+              <div>
+                <small>Receitas</small>
+                <strong class="income">R$ 8.450</strong>
+              </div>
+              <div>
+                <small>Despesas</small>
+                <strong class="expense">R$ 5.980</strong>
+              </div>
+              <div>
+                <small>Saldo do mês</small>
+                <strong class="balance">+ R$ 2.470</strong>
+              </div>
             </div>
-            <div class="hero__mockup-kpi">
-              <strong>Importação PDF</strong>
-              <small>Suporte a múltiplos layouts de fatura</small>
+            <div class="hero__mockup-chart" aria-hidden="true">
+              <div class="bar-row">
+                <span>Receitas</span>
+                <div class="track"><div class="fill fill--income"></div></div>
+              </div>
+              <div class="bar-row">
+                <span>Despesas</span>
+                <div class="track"><div class="fill fill--expense"></div></div>
+              </div>
             </div>
-            <div class="hero__mockup-kpi">
-              <strong>Portabilidade de dados</strong>
-              <small>Exportação e importação JSON</small>
+            <div class="hero__mockup-benefit">
+              <strong>Benefício direto:</strong>
+              <small>menos gasto impulsivo e mais sobra no fim do mês.</small>
             </div>
           </div>
         </article>
@@ -46,35 +60,35 @@
   </section>
 
   <section class="block block--inside">
-    <h2>Visualize o sistema por dentro</h2>
+    <h2>Visualize o sistema por dentro (foco em despesas pessoais)</h2>
     <p class="block__lead">
       Acompanhe, organize e compare sua evolução financeira com telas práticas no dia a dia.
     </p>
     <div class="inside-grid">
       <article class="inside-card">
-        <p class="inside-card__kicker">Distribuição da carteira</p>
-        <h3>Entenda onde seu dinheiro está alocado e reduza riscos.</h3>
+        <p class="inside-card__kicker">Resumo de gastos</p>
+        <h3>Veja para onde seu dinheiro está indo e corte excessos.</h3>
         <div class="system-shot system-shot--dashboard" role="img" aria-label="Tela de dashboard da carteira">
-          <span>Dashboard</span>
+          <span>Dashboard de despesas</span>
         </div>
       </article>
       <article class="inside-card">
-        <p class="inside-card__kicker">Evolução mensal</p>
-        <h3>Veja o crescimento do patrimônio e o impacto dos aportes.</h3>
+        <p class="inside-card__kicker">Cartões e faturas</p>
+        <h3>Importe PDF da fatura e organize parcelas automaticamente.</h3>
         <div class="system-shot system-shot--cartoes" role="img" aria-label="Tela de cartões e faturas">
           <span>Cartões e faturas</span>
         </div>
       </article>
       <article class="inside-card">
-        <p class="inside-card__kicker">Detalhamento de ativos</p>
-        <h3>Analise resultado atual, valor aplicado e saldo líquido.</h3>
+        <p class="inside-card__kicker">Metas financeiras</p>
+        <h3>Defina objetivos e acompanhe progresso com clareza.</h3>
         <div class="system-shot system-shot--metas" role="img" aria-label="Tela de metas financeiras">
           <span>Metas</span>
         </div>
       </article>
       <article class="inside-card">
-        <p class="inside-card__kicker">Comparador</p>
-        <h3>Compare desempenho com benchmarks e ajuste sua estratégia.</h3>
+        <p class="inside-card__kicker">Evolução patrimonial</p>
+        <h3>Quando evoluir de plano, acompanhe investimentos no mesmo fluxo.</h3>
         <div class="system-shot system-shot--investimentos" role="img" aria-label="Tela de investimentos">
           <span>Investimentos</span>
         </div>
@@ -83,9 +97,9 @@
   </section>
 
   <section id="funcionalidades" class="block">
-    <h2>Funcionalidades principais</h2>
+    <h2>Funcionalidades principais para organizar despesas</h2>
     <p class="block__lead">
-      Tudo que o cliente precisa para controlar o presente, planejar o próximo mês e acompanhar crescimento patrimonial.
+      Tudo que você precisa para controlar o mês atual, reduzir desperdícios e planejar os próximos passos.
     </p>
     <div class="cards">
       <article class="card">
@@ -113,7 +127,7 @@
         </p>
       </article>
       <article class="card">
-        <h3><span class="card__icon">📈</span>Investimentos e patrimônio</h3>
+        <h3><span class="card__icon">📈</span>Investimentos e patrimônio (plano Advanced)</h3>
         <p>
           Registro de posições e movimentações para acompanhar rentabilidade e evolução da carteira.
         </p>

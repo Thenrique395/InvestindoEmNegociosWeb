@@ -40,7 +40,7 @@ export class LoginComponent {
 
     this.auth.login(this.email, this.password).subscribe({
       next: (res: AuthResponse) => {
-        this.uiFeedback.success(`Autenticado! Bem-vindo, ${res.name}.`);
+        this.uiFeedback.success(`Bem-vindo, ${res.name}.`);
         this.profile.getProfile().subscribe({
           next: (profile) => {
             this.loading = false;

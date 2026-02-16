@@ -22,10 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Investindo em Negócios';
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
-  brandPositioning =
-    'Controle receitas, despesas e metas com simplicidade. Informação confiável para decisões seguras.';
   isLoginRoute = false;
-  isHomeRoute = false;
   isReceitasRoute = false;
   isLightTheme = false;
   showSignupModal = false;
@@ -57,7 +54,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
-        this.isHomeRoute = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/#');
         this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
         this.userMenuOpen = false;
         this.notificationsOpen = false;

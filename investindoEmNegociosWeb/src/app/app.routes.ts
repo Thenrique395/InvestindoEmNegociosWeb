@@ -22,9 +22,8 @@ import { publicHomeGuard } from './public-home.guard';
 
 export const routes: Routes = [
   { path: '', component: ProductShowcaseComponent, canActivate: [publicHomeGuard], pathMatch: 'full' },
-  { path: 'produto-showcase', component: ProductShowcaseComponent },
   { path: 'dashboard', component: HomeComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'home', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'home', redirectTo: '', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'onboarding', component: OnboardingComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
   { path: 'calculadora', component: CalculatorComponent },
