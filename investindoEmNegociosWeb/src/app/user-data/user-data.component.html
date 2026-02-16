@@ -3,10 +3,43 @@
     <div>
       <p class="eyebrow">Dados</p>
       <h2>Exportar / Importar</h2>
-      <p class="muted">Baixe CSV, importe despesas/receitas ou faça backup.</p>
+      <p class="muted">Exporte todos os seus dados para JSON e importe quando precisar migrar conta.</p>
     </div>
   </div>
-  <div class="placeholder">
-    <p class="muted">Em breve: exportação/importação e backup de dados.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Exportar dados</h3>
+      <p class="muted">Baixa um arquivo JSON com seu perfil, cartões, metas, planos, parcelas e investimentos.</p>
+      <button type="button" class="btn btn--primary" [disabled]="exporting" (click)="exportData()">
+        {{ exporting ? 'Exportando...' : 'Baixar exportação' }}
+      </button>
+      <p class="meta" *ngIf="lastExportAt">Última exportação: {{ lastExportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Importar dados</h3>
+      <p class="muted">Envie um arquivo JSON exportado anteriormente.</p>
+
+      <label class="file">
+        <input #fileInput type="file" accept="application/json,.json" (change)="onFileSelected($event)" />
+        <span>{{ selectedFile?.name || 'Selecionar arquivo JSON' }}</span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" [(ngModel)]="replaceExisting" />
+        <span>Substituir dados atuais</span>
+      </label>
+
+      <div class="actions">
+        <button type="button" class="btn btn--ghost" (click)="clearFile(fileInput)" [disabled]="importing || !selectedFile">Limpar</button>
+        <button type="button" class="btn btn--primary" [disabled]="importing || !selectedFile" (click)="importData(fileInput)">
+          {{ importing ? 'Importando...' : 'Importar dados' }}
+        </button>
+      </div>
+
+      <p class="danger">Atenção: ao marcar “Substituir dados atuais”, os dados existentes da conta serão removidos antes da importação.</p>
+      <p class="meta" *ngIf="lastImportAt">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+    </div>
   </div>
 </section>

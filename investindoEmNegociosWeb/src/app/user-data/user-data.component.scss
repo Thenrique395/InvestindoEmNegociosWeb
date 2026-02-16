@@ -29,9 +29,88 @@
   color: var(--text-muted);
 }
 
-.placeholder {
-  border: 1px dashed var(--border);
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.card {
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: var(--space-2);
   background: var(--surface-2);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--text);
+}
+
+.btn {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn--ghost {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.file {
+  display: block;
+}
+
+.file input {
+  display: none;
+}
+
+.file span {
+  display: block;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 0.65rem 0.8rem;
+  color: var(--text);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.danger {
+  color: #b42318;
+  font-size: var(--text-sm);
+}
+
+.meta {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin: 0;
 }
