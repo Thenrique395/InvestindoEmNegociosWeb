@@ -7,7 +7,6 @@ import { ReceitasComponent } from './receitas/receitas.component';
 import { DespesasComponent } from './despesas/despesas.component';
 import { OnboardingComponent } from './onboarding/onboarding.component';
 import { authGuard } from './auth.guard';
-import { LandingComponent } from './landing.component';
 import { MetasComponent } from './metas/metas.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserPreferencesComponent } from './user-preferences/user-preferences.component';
@@ -18,9 +17,12 @@ import { CategoriesComponent } from './categories/categories.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { roleGuard } from './role.guard';
 import { AdminParametersComponent } from './admin-parameters/admin-parameters.component';
+import { ProductShowcaseComponent } from './product-showcase/product-showcase.component';
+import { publicHomeGuard } from './public-home.guard';
 
 export const routes: Routes = [
-  { path: '', component: LandingComponent, pathMatch: 'full' },
+  { path: '', component: ProductShowcaseComponent, canActivate: [publicHomeGuard], pathMatch: 'full' },
+  { path: 'produto-showcase', component: ProductShowcaseComponent },
   { path: 'dashboard', component: HomeComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
   { path: 'home', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
