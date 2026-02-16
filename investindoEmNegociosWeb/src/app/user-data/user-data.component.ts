@@ -53,6 +53,7 @@ export class UserDataComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.uiFeedback.error(this.resolveError(err, 'Falha ao exportar dados.'));
+        this.exporting = false;
       },
       complete: () => {
         this.exporting = false;
@@ -76,6 +77,7 @@ export class UserDataComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.uiFeedback.error(this.resolveError(err, 'Falha ao importar dados.'));
+        this.importing = false;
       },
       complete: () => {
         this.importing = false;
