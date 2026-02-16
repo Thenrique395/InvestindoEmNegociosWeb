@@ -6,6 +6,10 @@ export type InvoiceItem = {
   date?: string;
   description: string;
   amount?: string;
+  isInstallment?: boolean;
+  installmentCurrent?: number;
+  installmentTotal?: number;
+  baseDescription?: string;
 };
 
 export type InvoiceExtractResponse = {
@@ -14,6 +18,8 @@ export type InvoiceExtractResponse = {
   closeDate?: string;
   cardName?: string;
   bankName?: string;
+  totalDebitsBrazil?: string;
+  currentBalance?: string;
   items: InvoiceItem[];
   rawText: string;
 };

@@ -6,6 +6,10 @@ type InvoiceItem = {
   date?: string;
   description: string;
   amount?: string;
+  isInstallment?: boolean;
+  installmentCurrent?: number;
+  installmentTotal?: number;
+  baseDescription?: string;
 };
 
 type InvoiceExtract = {
@@ -14,6 +18,8 @@ type InvoiceExtract = {
   closeDate?: string;
   cardName?: string;
   bankName?: string;
+  totalDebitsBrazil?: string;
+  currentBalance?: string;
   items: InvoiceItem[];
 };
 
@@ -92,16 +98,23 @@ type InvoiceExtract = {
                     <tr>
                       <th class="px-3 py-2">Data</th>
                       <th class="px-3 py-2">Descricao</th>
+                      <th class="px-3 py-2">Parcela</th>
                       <th class="px-3 py-2 text-right">Valor</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngIf="!extract.items.length">
-                      <td class="px-3 py-3" colspan="3">Nenhum item identificado.</td>
+                      <td class="px-3 py-3" colspan="4">Nenhum item identificado.</td>
                     </tr>
                     <tr *ngFor="let item of extract.items">
                       <td class="px-3 py-2">{{ item.date || '-' }}</td>
-                      <td class="px-3 py-2">{{ item.description }}</td>
+                      <td class="px-3 py-2">{{ item.baseDescription || item.description }}</td>
+                      <td class="px-3 py-2">
+                        <span *ngIf="item.isInstallment && item.installmentCurrent && item.installmentTotal; else noInstallment">
+                          {{ item.installmentCurrent }}/{{ item.installmentTotal }}
+                        </span>
+                        <ng-template #noInstallment>-</ng-template>
+                      </td>
                       <td class="px-3 py-2 text-right">{{ item.amount || '-' }}</td>
                     </tr>
                   </tbody>
@@ -167,12 +180,15 @@ export class InvoiceImportComponent {
 
     this.invoiceImport.extract(file).subscribe({
       next: (response) => {
+        const displayTotal = this.resolveDisplayTotal(response.total, response.totalDebitsBrazil);
         this.extract = {
-          total: response.total,
+          total: displayTotal,
           dueDate: response.dueDate,
           closeDate: response.closeDate,
           cardName: response.cardName,
           bankName: response.bankName,
+          totalDebitsBrazil: response.totalDebitsBrazil,
+          currentBalance: response.currentBalance,
           items: response.items || []
         };
         this.rawText = response.rawText || '';
@@ -192,6 +208,22 @@ export class InvoiceImportComponent {
     this.rawText = '';
     this.error = '';
     this.extract = { items: [] };
+  }
+
+  private resolveDisplayTotal(total?: string, totalDebitsBrazil?: string): string | undefined {
+    if (!this.isZeroMoney(total)) return total;
+    if (!this.isZeroMoney(totalDebitsBrazil)) return totalDebitsBrazil;
+    return total;
+  }
+
+  private isZeroMoney(value?: string): boolean {
+    if (!value) return true;
+    const numeric = value
+      .replace(/[^\d,-]/g, '')
+      .replace(/\./g, '')
+      .replace(',', '.');
+    const parsed = Number.parseFloat(numeric);
+    return Number.isFinite(parsed) ? parsed === 0 : true;
   }
 
 }
