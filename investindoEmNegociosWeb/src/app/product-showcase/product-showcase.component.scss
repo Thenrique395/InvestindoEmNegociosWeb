@@ -14,7 +14,7 @@
 .hero__grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1.25fr 0.95fr;
+  grid-template-columns: 1.05fr 1.15fr;
 }
 
 .tag {
@@ -74,7 +74,7 @@
 
 .hero__media {
   position: relative;
-  min-height: 320px;
+  min-height: 440px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -110,7 +110,7 @@
 .hero__mockup {
   position: relative;
   z-index: 1;
-  width: min(92%, 430px);
+  width: min(96%, 560px);
   border-radius: 18px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -242,6 +242,43 @@
 .hero__mockup-benefit small {
   color: var(--text-secondary);
   font-size: 12px;
+}
+
+.hero__mockup-extra {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.hero__extra-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 0.5rem 0.55rem;
+}
+
+.hero__extra-item small {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hero__extra-item strong {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.hero__mockup-alert {
+  border: 1px solid color-mix(in srgb, var(--success) 32%, var(--border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--success) 10%, var(--surface));
+  padding: 0.55rem 0.65rem;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.hero__mockup-alert strong {
+  color: var(--text);
 }
 
 .block h2 {
@@ -483,6 +520,10 @@
   }
 
   .hero__mockup-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__mockup-extra {
     grid-template-columns: 1fr;
   }
 
