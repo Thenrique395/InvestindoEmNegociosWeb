@@ -74,6 +74,11 @@
   color: var(--text);
 }
 
+.btn--inline {
+  justify-self: start;
+  width: auto;
+}
+
 .file {
   display: block;
 }

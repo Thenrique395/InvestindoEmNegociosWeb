@@ -11,8 +11,8 @@
     <div class="card">
       <h3>Exportar dados</h3>
       <p class="muted">Baixa um arquivo JSON com seu perfil, cartões, metas, planos, parcelas e investimentos.</p>
-      <button type="button" class="btn btn--primary" [disabled]="exporting" (click)="exportData()">
-        {{ exporting ? 'Exportando...' : 'Baixar exportação' }}
+      <button type="button" class="btn btn--primary btn--inline" [disabled]="exporting" (click)="exportData()">
+        {{ exporting ? 'Exportando...' : 'Exportar dados' }}
       </button>
       <p class="meta" *ngIf="lastExportAt">Última exportação: {{ lastExportAt | date:'dd/MM/yyyy HH:mm' }}</p>
     </div>
