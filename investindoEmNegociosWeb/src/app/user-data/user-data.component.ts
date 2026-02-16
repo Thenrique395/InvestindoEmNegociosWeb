@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { DataPortabilityService } from '../data-portability.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-user-data',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './user-data.component.html',
   styleUrls: ['./user-data.component.scss']
 })
@@ -17,6 +18,7 @@ export class UserDataComponent {
   importing = false;
   replaceExisting = true;
   selectedFile: File | null = null;
+  confirmImportOpen = false;
   lastExportAt: Date | null = null;
   lastImportAt: Date | null = null;
 
@@ -33,6 +35,7 @@ export class UserDataComponent {
   clearFile(input: HTMLInputElement): void {
     input.value = '';
     this.selectedFile = null;
+    this.confirmImportOpen = false;
   }
 
   exportData(): void {
@@ -61,12 +64,18 @@ export class UserDataComponent {
     });
   }
 
+  requestImport(): void {
+    if (this.importing || !this.selectedFile) return;
+    this.confirmImportOpen = true;
+  }
+
+  cancelImportRequest(): void {
+    this.confirmImportOpen = false;
+  }
+
   importData(input: HTMLInputElement): void {
     if (this.importing || !this.selectedFile) return;
-    const confirmText = this.replaceExisting
-      ? 'Isso vai substituir os dados atuais pelo arquivo selecionado. Deseja continuar?'
-      : 'Isso vai adicionar dados do arquivo sem apagar os atuais. Deseja continuar?';
-    if (!window.confirm(confirmText)) return;
+    this.confirmImportOpen = false;
 
     this.importing = true;
     this.portabilityService.importData(this.selectedFile, this.replaceExisting).subscribe({

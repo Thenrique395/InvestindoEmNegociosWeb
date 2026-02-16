@@ -33,7 +33,7 @@
 
       <div class="actions">
         <button type="button" class="btn btn--ghost" (click)="clearFile(fileInput)" [disabled]="importing || !selectedFile">Limpar</button>
-        <button type="button" class="btn btn--primary" [disabled]="importing || !selectedFile" (click)="importData(fileInput)">
+        <button type="button" class="btn btn--primary" [disabled]="importing || !selectedFile" (click)="requestImport()">
           {{ importing ? 'Importando...' : 'Importar dados' }}
         </button>
       </div>
@@ -42,4 +42,17 @@
       <p class="meta" *ngIf="lastImportAt">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
     </div>
   </div>
+
+  <app-confirm-dialog
+    *ngIf="confirmImportOpen"
+    title="Confirmar importação"
+    [message]="replaceExisting
+      ? 'Isso vai substituir os dados atuais pelo arquivo selecionado. Deseja continuar?'
+      : 'Isso vai adicionar dados do arquivo sem apagar os atuais. Deseja continuar?'"
+    [confirmLabel]="importing ? 'Importando...' : 'Confirmar'"
+    cancelLabel="Cancelar"
+    [variant]="replaceExisting ? 'danger' : 'warning'"
+    (cancelled)="cancelImportRequest()"
+    (confirmed)="importData(fileInput)"
+  ></app-confirm-dialog>
 </section>
