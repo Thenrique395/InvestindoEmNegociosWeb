@@ -8,25 +8,49 @@
   </header>
 
   <section class="executive-grid">
-    <article class="card executive-card" title="Soma do valor atual de todas as posições ativas (quantidade x preço médio).">
-      <p class="label">Patrimônio total</p>
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Patrimônio total</p>
+        <button type="button" class="hint" aria-label="Explicação do card patrimônio total">
+          i
+          <span class="hint__panel">Soma do valor atual de todas as posições ativas (quantidade x preço médio).</span>
+        </button>
+      </div>
       <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
       <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
     </article>
-    <article class="card executive-card" title="Total de entradas por aportes/compras no mês atual.">
-      <p class="label">Aportes no mês</p>
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Aportes no mês</p>
+        <button type="button" class="hint" aria-label="Explicação do card aportes no mês">
+          i
+          <span class="hint__panel">Total de entradas por aportes e compras no mês atual.</span>
+        </button>
+      </div>
       <strong class="success">{{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</strong>
       <small>Resgates no mês: {{ resgateMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
     </article>
-    <article class="card executive-card" title="Fluxo do mês = aportes - resgates. Mostra se entrou ou saiu mais dinheiro no período.">
-      <p class="label">Resultado do mês (fluxo)</p>
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Resultado do mês (fluxo)</p>
+        <button type="button" class="hint" aria-label="Explicação do card resultado do mês">
+          i
+          <span class="hint__panel">Fluxo do mês = aportes menos resgates. Mostra se entrou ou saiu mais dinheiro no período.</span>
+        </button>
+      </div>
       <strong [class.success]="resultadoMes >= 0" [class.danger]="resultadoMes < 0">
         {{ resultadoMes | currency: 'BRL':'symbol':'1.2-2' }}
       </strong>
       <small>Entradas de aporte menos saídas de resgate</small>
     </article>
-    <article class="card executive-card" title="Estimativa de ganho/perda acumulada: patrimônio atual menos valor líquido aportado.">
-      <p class="label">Resultado estimado acumulado</p>
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Resultado estimado acumulado</p>
+        <button type="button" class="hint" aria-label="Explicação do card resultado estimado acumulado">
+          i
+          <span class="hint__panel">Estimativa de ganho/perda acumulada: patrimônio atual menos valor líquido aportado.</span>
+        </button>
+      </div>
       <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
         {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
       </strong>
@@ -34,10 +58,16 @@
     </article>
   </section>
 
-  <div class="card summary" title="Meta financeira para acompanhar evolução do patrimônio e distância até o objetivo.">
+  <div class="card summary">
     <div class="summary__info">
       <div class="meta-form">
-        <p class="label">Meta de patrimônio (R$)</p>
+        <div class="label-row">
+          <p class="label">Meta de patrimônio (R$)</p>
+          <button type="button" class="hint" aria-label="Explicação da meta de patrimônio">
+            i
+            <span class="hint__panel">Defina sua meta para acompanhar o progresso e quanto ainda falta para alcançar o objetivo.</span>
+          </button>
+        </div>
         <div class="meta-form__controls">
           <input type="text" [(ngModel)]="metaPatrimonioInput" digitOnly (input)="formatarMeta()" inputmode="numeric"
             placeholder="Ex.: 100.000,00" />
@@ -66,9 +96,15 @@
   </div>
 
   <section class="visual-grid">
-    <article class="card chart-card" title="Mostra como sua carteira está distribuída por classe de ativo.">
+    <article class="card chart-card">
       <div class="section-head">
-        <h3>Alocação da carteira</h3>
+        <div class="section-head__title">
+          <h3>Alocação da carteira</h3>
+          <button type="button" class="hint" aria-label="Explicação do gráfico de alocação">
+            i
+            <span class="hint__panel">Mostra como sua carteira está distribuída por classe de ativo.</span>
+          </button>
+        </div>
         <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
       </div>
       <div *ngIf="!distribuicaoPorTipoComCor.length" class="empty">Sem posições para exibir distribuição.</div>
@@ -89,9 +125,15 @@
       </div>
     </article>
 
-    <article class="card chart-card" title="Comparativo mensal dos últimos 6 meses entre aportes, resgates e proventos.">
+    <article class="card chart-card">
       <div class="section-head">
-        <h3>Evolução mensal</h3>
+        <div class="section-head__title">
+          <h3>Evolução mensal</h3>
+          <button type="button" class="hint" aria-label="Explicação do gráfico evolução mensal">
+            i
+            <span class="hint__panel">Comparativo mensal dos últimos 6 meses entre aportes, resgates e proventos.</span>
+          </button>
+        </div>
         <span class="muted">Aportes, resgates e proventos (6 meses)</span>
       </div>
       <div class="evolution-chart">
@@ -112,9 +154,15 @@
     </article>
   </section>
 
-  <article class="card chart-card" title="Ranking dos ativos que mais geraram dividendos, JCP e rendimentos.">
+  <article class="card chart-card">
     <div class="section-head">
-      <h3>Proventos por ativo</h3>
+      <div class="section-head__title">
+        <h3>Proventos por ativo</h3>
+        <button type="button" class="hint" aria-label="Explicação do gráfico proventos por ativo">
+          i
+          <span class="hint__panel">Ranking dos ativos que mais geraram dividendos, JCP e rendimentos.</span>
+        </button>
+      </div>
       <span class="muted">Total: {{ proventosTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
     </div>
     <div *ngIf="!proventosPorAtivo.length" class="empty">Sem proventos registrados.</div>
