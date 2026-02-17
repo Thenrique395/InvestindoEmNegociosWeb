@@ -27,6 +27,10 @@ type ChartBucket = { key: string; label: string; aporte: number; resgate: number
   styleUrls: ['./investments.component.scss']
 })
 export class InvestmentsComponent implements OnInit {
+  private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
   positions: InvestmentPosition[] = [];
   institutions: InstitutionLookup[] = [];
   searchTerm = '';
@@ -269,6 +273,16 @@ export class InvestmentsComponent implements OnInit {
 
   get proventosTotal(): number {
     return this.proventosPorAtivo.reduce((sum, item) => sum + item.total, 0);
+  }
+
+  tooltipMes(item: ChartBucket): string {
+    return [
+      `${item.label}`,
+      `Aportes: ${this.currencyFormatter.format(item.aporte)}`,
+      `Resgates: ${this.currencyFormatter.format(item.resgate)}`,
+      `Proventos: ${this.currencyFormatter.format(item.proventos)}`,
+      `Saldo: ${this.currencyFormatter.format(item.saldo)}`
+    ].join('\n');
   }
 
   get aporteTotal(): number {

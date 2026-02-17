@@ -20,6 +20,12 @@
   min-width: 0;
 }
 
+.executive-card[title],
+.chart-card[title],
+.summary[title] {
+  cursor: help;
+}
+
 .executive-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

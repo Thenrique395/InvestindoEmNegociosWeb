@@ -8,24 +8,24 @@
   </header>
 
   <section class="executive-grid">
-    <article class="card executive-card">
+    <article class="card executive-card" title="Soma do valor atual de todas as posições ativas (quantidade x preço médio).">
       <p class="label">Patrimônio total</p>
       <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
       <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
     </article>
-    <article class="card executive-card">
+    <article class="card executive-card" title="Total de entradas por aportes/compras no mês atual.">
       <p class="label">Aportes no mês</p>
       <strong class="success">{{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</strong>
       <small>Resgates no mês: {{ resgateMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
     </article>
-    <article class="card executive-card">
+    <article class="card executive-card" title="Fluxo do mês = aportes - resgates. Mostra se entrou ou saiu mais dinheiro no período.">
       <p class="label">Resultado do mês (fluxo)</p>
       <strong [class.success]="resultadoMes >= 0" [class.danger]="resultadoMes < 0">
         {{ resultadoMes | currency: 'BRL':'symbol':'1.2-2' }}
       </strong>
       <small>Entradas de aporte menos saídas de resgate</small>
     </article>
-    <article class="card executive-card">
+    <article class="card executive-card" title="Estimativa de ganho/perda acumulada: patrimônio atual menos valor líquido aportado.">
       <p class="label">Resultado estimado acumulado</p>
       <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
         {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
@@ -34,7 +34,7 @@
     </article>
   </section>
 
-  <div class="card summary">
+  <div class="card summary" title="Meta financeira para acompanhar evolução do patrimônio e distância até o objetivo.">
     <div class="summary__info">
       <div class="meta-form">
         <p class="label">Meta de patrimônio (R$)</p>
@@ -66,7 +66,7 @@
   </div>
 
   <section class="visual-grid">
-    <article class="card chart-card">
+    <article class="card chart-card" title="Mostra como sua carteira está distribuída por classe de ativo.">
       <div class="section-head">
         <h3>Alocação da carteira</h3>
         <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
@@ -89,17 +89,17 @@
       </div>
     </article>
 
-    <article class="card chart-card">
+    <article class="card chart-card" title="Comparativo mensal dos últimos 6 meses entre aportes, resgates e proventos.">
       <div class="section-head">
         <h3>Evolução mensal</h3>
         <span class="muted">Aportes, resgates e proventos (6 meses)</span>
       </div>
       <div class="evolution-chart">
-        <div class="evolution-column" *ngFor="let item of evolucaoMensalSeries; trackBy: trackByIndex">
+        <div class="evolution-column" *ngFor="let item of evolucaoMensalSeries; trackBy: trackByIndex" [attr.title]="tooltipMes(item)">
           <div class="evolution-bars">
-            <span class="bar aporte" [style.height.%]="(item.aporte / evolucaoMaxValor) * 100"></span>
-            <span class="bar resgate" [style.height.%]="(item.resgate / evolucaoMaxValor) * 100"></span>
-            <span class="bar provento" [style.height.%]="(item.proventos / evolucaoMaxValor) * 100"></span>
+            <span class="bar aporte" [style.height.%]="(item.aporte / evolucaoMaxValor) * 100" [attr.title]="'Aportes: ' + (item.aporte | currency:'BRL':'symbol':'1.2-2')"></span>
+            <span class="bar resgate" [style.height.%]="(item.resgate / evolucaoMaxValor) * 100" [attr.title]="'Resgates: ' + (item.resgate | currency:'BRL':'symbol':'1.2-2')"></span>
+            <span class="bar provento" [style.height.%]="(item.proventos / evolucaoMaxValor) * 100" [attr.title]="'Proventos: ' + (item.proventos | currency:'BRL':'symbol':'1.2-2')"></span>
           </div>
           <small>{{ item.label }}</small>
         </div>
@@ -112,7 +112,7 @@
     </article>
   </section>
 
-  <article class="card chart-card">
+  <article class="card chart-card" title="Ranking dos ativos que mais geraram dividendos, JCP e rendimentos.">
     <div class="section-head">
       <h3>Proventos por ativo</h3>
       <span class="muted">Total: {{ proventosTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
