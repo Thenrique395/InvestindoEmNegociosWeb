@@ -65,25 +65,71 @@
     </div>
   </div>
 
-  <div class="card distribution-card">
+  <section class="visual-grid">
+    <article class="card chart-card">
+      <div class="section-head">
+        <h3>Alocação da carteira</h3>
+        <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
+      </div>
+      <div *ngIf="!distribuicaoPorTipoComCor.length" class="empty">Sem posições para exibir distribuição.</div>
+      <div class="donut-layout" *ngIf="distribuicaoPorTipoComCor.length">
+        <div class="donut" [style.background]="distribuicaoConicGradient" aria-hidden="true"></div>
+        <div class="distribution-list">
+          <div class="distribution-item" *ngFor="let item of distribuicaoPorTipoComCor; trackBy: trackByIndex">
+            <div class="distribution-item__top">
+              <div class="legend">
+                <span class="legend__dot" [style.background]="item.color"></span>
+                <strong>{{ item.label }}</strong>
+              </div>
+              <span>{{ item.value | currency: 'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+            <small>{{ item.percent | number:'1.0-1' }}%</small>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <h3>Evolução mensal</h3>
+        <span class="muted">Aportes, resgates e proventos (6 meses)</span>
+      </div>
+      <div class="evolution-chart">
+        <div class="evolution-column" *ngFor="let item of evolucaoMensalSeries; trackBy: trackByIndex">
+          <div class="evolution-bars">
+            <span class="bar aporte" [style.height.%]="(item.aporte / evolucaoMaxValor) * 100"></span>
+            <span class="bar resgate" [style.height.%]="(item.resgate / evolucaoMaxValor) * 100"></span>
+            <span class="bar provento" [style.height.%]="(item.proventos / evolucaoMaxValor) * 100"></span>
+          </div>
+          <small>{{ item.label }}</small>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span><i class="chip aporte"></i> Aportes</span>
+        <span><i class="chip resgate"></i> Resgates</span>
+        <span><i class="chip provento"></i> Proventos</span>
+      </div>
+    </article>
+  </section>
+
+  <article class="card chart-card">
     <div class="section-head">
-      <h3>Distribuição por tipo</h3>
-      <span class="muted">{{ distribuicaoPorTipo.length }} tipo(s) com saldo</span>
+      <h3>Proventos por ativo</h3>
+      <span class="muted">Total: {{ proventosTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
     </div>
-    <div *ngIf="!distribuicaoPorTipo.length" class="empty">Sem posições para exibir distribuição.</div>
-    <div class="distribution-list" *ngIf="distribuicaoPorTipo.length">
-      <div class="distribution-item" *ngFor="let item of distribuicaoPorTipo; trackBy: trackByIndex">
-        <div class="distribution-item__top">
-          <strong>{{ item.label }}</strong>
-          <span>{{ item.value | currency: 'BRL':'symbol':'1.2-2' }}</span>
+    <div *ngIf="!proventosPorAtivo.length" class="empty">Sem proventos registrados.</div>
+    <div class="income-list" *ngIf="proventosPorAtivo.length">
+      <div class="income-item" *ngFor="let item of proventosPorAtivo; trackBy: trackByIndex">
+        <div class="income-item__top">
+          <strong>{{ item.asset }}</strong>
+          <span>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</span>
         </div>
         <div class="progress-bar slim">
-          <span [style.width.%]="item.percent"></span>
+          <span [style.width.%]="(item.total / proventosTotal) * 100"></span>
         </div>
-        <small>{{ item.percent | number:'1.0-1' }}%</small>
       </div>
     </div>
-  </div>
+  </article>
 
   <div class="top-actions">
     <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importar relatório B3</button>

@@ -17,6 +17,7 @@ import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 
 type FormMode = 'create' | 'movement';
+type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
 
 @Component({
   selector: 'app-investments',
@@ -173,6 +174,101 @@ export class InvestmentsComponent implements OnInit {
       })
       .filter((item) => item.value > 0)
       .sort((a, b) => b.value - a.value);
+  }
+
+  get distribuicaoPorTipoComCor(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
+    const palette: Record<InvestmentType, string> = {
+      RF: '#2563eb',
+      ACOES: '#7c3aed',
+      FUNDOS: '#0891b2',
+      CRIPTO: '#ea580c'
+    };
+    return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
+  }
+
+  get distribuicaoConicGradient(): string {
+    const parts: string[] = [];
+    let cursor = 0;
+    for (const item of this.distribuicaoPorTipoComCor) {
+      const next = cursor + item.percent;
+      parts.push(`${item.color} ${cursor}% ${next}%`);
+      cursor = next;
+    }
+    if (!parts.length) {
+      return 'conic-gradient(#cbd5e1 0 100%)';
+    }
+    return `conic-gradient(${parts.join(', ')})`;
+  }
+
+  get evolucaoMensalSeries(): ChartBucket[] {
+    const now = new Date();
+    const months: { key: string; label: string }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '');
+      months.push({ key, label });
+    }
+
+    const map = new Map<string, ChartBucket>(
+      months.map((m) => [m.key, { key: m.key, label: m.label, aporte: 0, resgate: 0, proventos: 0, saldo: 0 }])
+    );
+
+    for (const pos of this.positions) {
+      for (const mov of pos.movements || []) {
+        if (!mov?.date) continue;
+        const [y, m] = mov.date.split('T')[0].split('-');
+        const key = `${y}-${m}`;
+        const bucket = map.get(key);
+        if (!bucket) continue;
+        const value = (mov.quantity || 0) * (mov.price || 0);
+        switch (mov.type) {
+          case 'APORTE':
+          case 'COMPRA':
+            bucket.aporte += value;
+            bucket.saldo += value;
+            break;
+          case 'RESGATE':
+          case 'VENDA':
+            bucket.resgate += value;
+            bucket.saldo -= value;
+            break;
+          case 'DIVIDENDO':
+          case 'JCP':
+          case 'RENDIMENTO':
+            bucket.proventos += value;
+            bucket.saldo += value;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    return months.map((m) => map.get(m.key)!);
+  }
+
+  get evolucaoMaxValor(): number {
+    return this.evolucaoMensalSeries.reduce((max, item) => Math.max(max, item.aporte, item.resgate, item.proventos), 0) || 1;
+  }
+
+  get proventosPorAtivo(): { asset: string; total: number }[] {
+    const totals = new Map<string, number>();
+    for (const pos of this.positions) {
+      for (const mov of pos.movements || []) {
+        if (!['DIVIDENDO', 'JCP', 'RENDIMENTO'].includes(mov.type)) continue;
+        const value = (mov.quantity || 0) * (mov.price || 0);
+        totals.set(pos.asset, (totals.get(pos.asset) || 0) + value);
+      }
+    }
+    return Array.from(totals.entries())
+      .map(([asset, total]) => ({ asset, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 6);
+  }
+
+  get proventosTotal(): number {
+    return this.proventosPorAtivo.reduce((sum, item) => sum + item.total, 0);
   }
 
   get aporteTotal(): number {
@@ -399,7 +495,13 @@ export class InvestmentsComponent implements OnInit {
     if (!pos.movements?.length) return initial;
     return pos.movements.reduce((acc, mov) => {
       const value = (mov.quantity || 0) * (mov.price || 0);
-      return mov.type === 'RESGATE' ? acc - value : acc + value;
+      if (mov.type === 'RESGATE' || mov.type === 'VENDA') {
+        return acc - value;
+      }
+      if (mov.type === 'DIVIDENDO' || mov.type === 'JCP' || mov.type === 'RENDIMENTO') {
+        return acc;
+      }
+      return acc + value;
     }, 0);
   }
 
