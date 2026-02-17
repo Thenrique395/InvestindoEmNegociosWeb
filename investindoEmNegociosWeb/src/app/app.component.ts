@@ -42,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private sub: Subscription;
   private profileSub?: Subscription;
   private feedbackSub?: Subscription;
+  private userContextInitialized = false;
 
   constructor(
     private router: Router,
@@ -59,9 +60,12 @@ export class AppComponent implements OnInit, OnDestroy {
         this.notificationsOpen = false;
         this.sidebarOpen = false;
         if (this.isLogged) {
+          this.ensureUserContext();
           if (!event.urlAfterRedirects.startsWith('/receitas')) {
             this.apiDataService.refresh();
           }
+        } else {
+          this.resetUserContext();
         }
       }
     });
@@ -75,31 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
       document.documentElement.lang = initialLocale;
     }
     setLocaleSettings({ locale: initialLocale, currency: initialCurrency });
-    if (this.isLogged) {
-      this.profileSub = this.profileService.profile$.subscribe((profile) => {
-        this.profile = profile;
-      });
-      this.profileService.getProfile().subscribe({
-        error: () => {
-          /* ignore */
-        }
-      });
-      this.profileService.getPreferences().subscribe({
-        next: (prefs) => {
-          const locale = prefs.locales?.[0] || 'pt-BR';
-          const currency = prefs.currency || 'BRL';
-          if (typeof document !== 'undefined') {
-            document.documentElement.lang = locale;
-          }
-          setLocaleSettings({ locale, currency });
-          persistLocaleSettings(locale, currency);
-        },
-        error: () => {
-          /* ignore */
-        }
-      });
-      this.refreshNotifications();
-    }
+    if (this.isLogged) this.ensureUserContext();
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
       this.feedbackMessage = message;
     });
@@ -135,7 +115,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.clearSession();
-    this.profile = null;
+    this.resetUserContext();
     this.router.navigateByUrl('/');
   }
 
@@ -263,5 +243,47 @@ export class AppComponent implements OnInit, OnDestroy {
         this.apiDataService.refresh();
       }
     }
+  }
+
+  private ensureUserContext(): void {
+    if (!this.profileSub) {
+      this.profileSub = this.profileService.profile$.subscribe((profile) => {
+        this.profile = profile;
+      });
+    }
+
+    this.profileService.getProfile().subscribe({
+      error: () => {
+        /* ignore */
+      }
+    });
+
+    if (this.userContextInitialized) return;
+    this.userContextInitialized = true;
+
+    this.profileService.getPreferences().subscribe({
+      next: (prefs) => {
+        const locale = prefs.locales?.[0] || 'pt-BR';
+        const currency = prefs.currency || 'BRL';
+        if (typeof document !== 'undefined') {
+          document.documentElement.lang = locale;
+        }
+        setLocaleSettings({ locale, currency });
+        persistLocaleSettings(locale, currency);
+      },
+      error: () => {
+        /* ignore */
+      }
+    });
+    this.refreshNotifications();
+  }
+
+  private resetUserContext(): void {
+    this.profileSub?.unsubscribe();
+    this.profileSub = undefined;
+    this.profile = null;
+    this.userContextInitialized = false;
+    this.notifications = [];
+    this.unreadCount = 0;
   }
 }
