@@ -506,12 +506,6 @@
                 ↗
               </a>
             </div>
-            <div class="h-[4px] w-[120px] overflow-hidden rounded-full bg-[var(--surface-3)]">
-              <div
-                class="h-full"
-                [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.8)]' : 'bg-[rgba(239,68,68,0.7)]'"
-                [style.width.%]="maxRecentAmount ? (Math.abs(item.amount) / maxRecentAmount) * 100 : 0"></div>
-            </div>
           </div>
         </div>
       </div>

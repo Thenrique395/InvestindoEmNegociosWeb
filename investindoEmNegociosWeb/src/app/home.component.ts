@@ -69,7 +69,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     status?: string;
     recurring?: boolean;
   }[] = [];
-  maxRecentAmount = 0;
   Math = Math;
   metasResumo = {
     total: 0,
@@ -497,7 +496,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
     const slice = all.slice(0, 6);
     this.recentTransactions = slice;
-    this.maxRecentAmount = Math.max(...slice.map((item) => Math.abs(item.amount)), 0);
   }
 
   nextOnboarding(): void {
