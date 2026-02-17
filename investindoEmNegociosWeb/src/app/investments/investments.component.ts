@@ -52,6 +52,14 @@ export class InvestmentsComponent implements OnInit {
   b3FileName = '';
   b3Strategy: B3ImportStrategy = 'merge';
   b3Preview: B3ExtractResponse | null = null;
+  benchmarkLoading = false;
+  benchmarkError = '';
+  benchmarkComparativo: BenchmarkPoint[] = [
+    { name: 'SELIC (BCB)', carteira: 0, benchmark: 0 },
+    { name: 'IPCA (BCB)', carteira: 0, benchmark: 0 },
+    { name: 'Ibovespa (estimado)', carteira: 0, benchmark: 5.8 },
+    { name: 'S&P500 (estimado)', carteira: 0, benchmark: 6.7 }
+  ];
 
   // Prioridade 7: simulador, agenda, fiscal e CSV
   csvLoading = false;
@@ -94,6 +102,7 @@ export class InvestmentsComponent implements OnInit {
   ngOnInit(): void {
     this.carregarMeta();
     this.carregarPosicoes();
+    this.carregarBenchmarks();
     this.lookups.institutions('Broker').subscribe({
       next: (items) => (this.institutions = items || []),
       error: () => (this.institutions = [])
@@ -284,15 +293,12 @@ export class InvestmentsComponent implements OnInit {
     return this.rentabilidadeMensalPercent / 22;
   }
 
-  get benchmarkComparativo(): BenchmarkPoint[] {
-    const months = Math.max(this.evolucaoMensalSeries.length, 1);
-    const carteira = this.rentabilidadeAcumuladaPercent;
-    const annual: Record<string, number> = { CDI: 12.2, IPCA: 4.5, Ibovespa: 11.3, 'S&P500': 13.8 };
-    return Object.entries(annual).map(([name, yearly]) => {
-      const monthly = Math.pow(1 + yearly / 100, 1 / 12) - 1;
-      const bench = (Math.pow(1 + monthly, months) - 1) * 100;
-      return { name, carteira, benchmark: bench };
-    });
+  get mesesComparativo(): number {
+    return Math.max(this.evolucaoMensalSeries.length, 1);
+  }
+
+  get periodoComparativoLabel(): string {
+    return `${this.mesesComparativo} ${this.mesesComparativo === 1 ? 'mês' : 'meses'}`;
   }
 
   get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; alerta: boolean }[] {
@@ -612,7 +618,36 @@ export class InvestmentsComponent implements OnInit {
   }
 
   private carregarPosicoes(): void {
-    this.investments.listPositions().subscribe({ next: (list) => (this.positions = list) });
+    this.investments.listPositions().subscribe({
+      next: (list) => {
+        this.positions = list;
+        this.atualizarRentabilidadeCarteiraBenchmarks();
+      }
+    });
+  }
+
+  private async carregarBenchmarks(): Promise<void> {
+    this.benchmarkLoading = true;
+    this.benchmarkError = '';
+
+    try {
+      const response = await firstValueFrom(this.investments.getBenchmarks(this.mesesComparativo));
+      this.benchmarkComparativo = response.items.map((item) => ({
+        name: item.name,
+        benchmark: item.returnPercent,
+        carteira: this.rentabilidadeAcumuladaPercent
+      }));
+      this.atualizarRentabilidadeCarteiraBenchmarks();
+    } catch {
+      this.benchmarkError = 'Não foi possível atualizar benchmarks via backend agora.';
+    } finally {
+      this.benchmarkLoading = false;
+    }
+  }
+
+  private atualizarRentabilidadeCarteiraBenchmarks(): void {
+    const carteira = this.rentabilidadeAcumuladaPercent;
+    this.benchmarkComparativo = this.benchmarkComparativo.map((item) => ({ ...item, carteira }));
   }
 
   private parseValor(raw: string): number {

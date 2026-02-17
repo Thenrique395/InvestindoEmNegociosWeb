@@ -101,6 +101,18 @@ export interface B3ExtractResponse {
   rawText?: string;
 }
 
+export interface InvestmentBenchmarkItem {
+  name: string;
+  returnPercent: number;
+  source: string;
+  isEstimated: boolean;
+}
+
+export interface InvestmentBenchmarksResponse {
+  months: number;
+  items: InvestmentBenchmarkItem[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class InvestmentsService {
   private baseUrl = `${API_BASE_URL}/investments`;
@@ -147,5 +159,10 @@ export class InvestmentsService {
       importToken,
       strategy
     });
+  }
+
+  getBenchmarks(months = 6): Observable<InvestmentBenchmarksResponse> {
+    const params = new HttpParams().set('months', months);
+    return this.http.get<InvestmentBenchmarksResponse>(`${this.baseUrl}/benchmarks`, { params });
   }
 }

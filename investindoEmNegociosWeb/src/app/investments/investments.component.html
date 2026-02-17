@@ -228,8 +228,11 @@
             <span class="hint__panel">Comparativo da carteira contra CDI, IPCA, Ibovespa e S&P500 no mesmo período consolidado.</span>
           </button>
         </div>
-        <span class="muted">Base: 6 meses</span>
+        <span class="muted">Base: {{ periodoComparativoLabel }}</span>
       </div>
+      <small class="muted">IPCA (série 433) e SELIC (série 11) via backend (fonte BCB).</small>
+      <small class="muted" *ngIf="benchmarkLoading">Atualizando benchmarks...</small>
+      <small class="danger" *ngIf="benchmarkError">{{ benchmarkError }}</small>
       <div class="benchmark-list">
         <div class="benchmark-item" *ngFor="let item of benchmarkComparativo; trackBy: trackByIndex">
           <strong>{{ item.name }}</strong>
