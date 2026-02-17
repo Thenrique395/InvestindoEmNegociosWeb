@@ -65,4 +65,8 @@ export class CartoesListagemComponent {
   onRemover(id: string): void {
     this.remover.emit(id);
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

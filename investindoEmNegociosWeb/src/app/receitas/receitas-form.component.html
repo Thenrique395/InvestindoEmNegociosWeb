@@ -39,7 +39,7 @@
           name="categoria">
           <option [ngValue]="null" disabled>Selecione</option>
           <option *ngIf="!categorias.length" [ngValue]="null" disabled>Sem categorias cadastradas</option>
-          <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.name }}</option>
+          <option *ngFor="let cat of categorias; trackBy: trackByIndex" [value]="cat.id">{{ cat.name }}</option>
         </select>
         <div *ngIf="erroCategoria" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroCategoria }}</div>
       </label>

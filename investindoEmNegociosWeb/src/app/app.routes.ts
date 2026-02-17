@@ -1,44 +1,115 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { HomeComponent } from './home.component';
-import { CalculatorComponent } from './calculator/calculator.component';
-import { CartoesComponent } from './cartoes/cartoes.component';
-import { ReceitasComponent } from './receitas/receitas.component';
-import { DespesasComponent } from './despesas/despesas.component';
-import { OnboardingComponent } from './onboarding/onboarding.component';
 import { authGuard } from './auth.guard';
-import { MetasComponent } from './metas/metas.component';
-import { UserProfileComponent } from './user-profile/user-profile.component';
-import { UserPreferencesComponent } from './user-preferences/user-preferences.component';
-import { UserSecurityComponent } from './user-security/user-security.component';
-import { UserDataComponent } from './user-data/user-data.component';
-import { InvestmentsComponent } from './investments/investments.component';
-import { CategoriesComponent } from './categories/categories.component';
-import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { roleGuard } from './role.guard';
-import { AdminParametersComponent } from './admin-parameters/admin-parameters.component';
-import { ProductShowcaseComponent } from './product-showcase/product-showcase.component';
 import { publicHomeGuard } from './public-home.guard';
 
 export const routes: Routes = [
-  { path: '', component: ProductShowcaseComponent, canActivate: [publicHomeGuard], pathMatch: 'full' },
-  { path: 'dashboard', component: HomeComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
+  {
+    path: '',
+    canActivate: [publicHomeGuard],
+    data: { preload: true },
+    pathMatch: 'full',
+    loadComponent: () => import('./product-showcase/product-showcase.component').then((m) => m.ProductShowcaseComponent)
+  },
+  {
+    path: 'dashboard',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./home.component').then((m) => m.HomeComponent)
+  },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'onboarding', component: OnboardingComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'calculadora', component: CalculatorComponent },
-  { path: 'calculadora/:id', component: CalculatorComponent },
-  { path: 'cartoes', component: CartoesComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Intermediate' } },
-  { path: 'receitas', component: ReceitasComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'despesas', component: DespesasComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'investimentos', component: InvestmentsComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Advanced' } },
-  { path: 'categorias', component: CategoriesComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'metas', component: MetasComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Intermediate' } },
-  { path: 'perfil', component: UserProfileComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'preferencias', component: UserPreferencesComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'seguranca', component: UserSecurityComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'dados', component: UserDataComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Basic' } },
-  { path: 'admin/usuarios', component: AdminUsersComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Admin' } },
-  { path: 'admin/parametros', component: AdminParametersComponent, canActivate: [authGuard, roleGuard], data: { minRole: 'Admin' } },
+  {
+    path: 'login',
+    data: { preload: true },
+    loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent)
+  },
+  {
+    path: 'onboarding',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./onboarding/onboarding.component').then((m) => m.OnboardingComponent)
+  },
+  {
+    path: 'calculadora',
+    data: { preload: true },
+    loadComponent: () => import('./calculator/calculator.component').then((m) => m.CalculatorComponent)
+  },
+  {
+    path: 'calculadora/:id',
+    data: { preload: false },
+    loadComponent: () => import('./calculator/calculator.component').then((m) => m.CalculatorComponent)
+  },
+  {
+    path: 'cartoes',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Intermediate', preload: true },
+    loadComponent: () => import('./cartoes/cartoes.component').then((m) => m.CartoesComponent)
+  },
+  {
+    path: 'receitas',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./receitas/receitas.component').then((m) => m.ReceitasComponent)
+  },
+  {
+    path: 'despesas',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./despesas/despesas.component').then((m) => m.DespesasComponent)
+  },
+  {
+    path: 'investimentos',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Advanced', preload: false },
+    loadComponent: () => import('./investments/investments.component').then((m) => m.InvestmentsComponent)
+  },
+  {
+    path: 'categorias',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent)
+  },
+  {
+    path: 'metas',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Intermediate', preload: true },
+    loadComponent: () => import('./metas/metas.component').then((m) => m.MetasComponent)
+  },
+  {
+    path: 'perfil',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./user-profile/user-profile.component').then((m) => m.UserProfileComponent)
+  },
+  {
+    path: 'preferencias',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: true },
+    loadComponent: () => import('./user-preferences/user-preferences.component').then((m) => m.UserPreferencesComponent)
+  },
+  {
+    path: 'seguranca',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: false },
+    loadComponent: () => import('./user-security/user-security.component').then((m) => m.UserSecurityComponent)
+  },
+  {
+    path: 'dados',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: false },
+    loadComponent: () => import('./user-data/user-data.component').then((m) => m.UserDataComponent)
+  },
+  {
+    path: 'admin/usuarios',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Admin', preload: false },
+    loadComponent: () => import('./admin-users/admin-users.component').then((m) => m.AdminUsersComponent)
+  },
+  {
+    path: 'admin/parametros',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Admin', preload: false },
+    loadComponent: () => import('./admin-parameters/admin-parameters.component').then((m) => m.AdminParametersComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

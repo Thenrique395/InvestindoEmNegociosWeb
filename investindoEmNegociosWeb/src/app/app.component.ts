@@ -300,4 +300,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.notifications = [];
     this.unreadCount = 0;
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

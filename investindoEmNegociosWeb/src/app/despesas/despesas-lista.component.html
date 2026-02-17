@@ -92,7 +92,7 @@
               (action)="emptyAction.emit()"></app-empty-state>
           </td>
         </tr>
-        <tr *ngFor="let d of despesas" class="hover:bg-[var(--surface-2)]">
+        <tr *ngFor="let d of despesas; trackBy: trackByIndex" class="hover:bg-[var(--surface-2)]">
           <td class="px-5 py-4 align-middle">
             <input
               class="h-4 w-4 accent-[var(--primary)]"

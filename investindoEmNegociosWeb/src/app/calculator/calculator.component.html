@@ -14,7 +14,7 @@
         <p class="section-title">Financeiras</p>
         <div class="selector__grid">
           <button
-            *ngFor="let item of financeiras"
+            *ngFor="let item of financeiras; trackBy: trackByIndex"
             [routerLink]="['/calculadora', item.id]"
             [class.selector__item--disabled]="!item.implemented"
           >
@@ -35,7 +35,7 @@
         <p class="section-title">Trabalhistas</p>
         <div class="selector__grid">
           <button
-            *ngFor="let item of trabalhistas"
+            *ngFor="let item of trabalhistas; trackBy: trackByIndex"
             [routerLink]="['/calculadora', item.id]"
             [class.selector__item--disabled]="!item.implemented"
           >
@@ -97,7 +97,7 @@
           <div class="chart" *ngIf="jurosSeries.length">
             <div
               class="chart__bar"
-              *ngFor="let item of jurosSeries"
+              *ngFor="let item of jurosSeries; trackBy: trackByIndex"
               [style.height.%]="(item.valor / jurosMax) * 100"
             >
               <span class="chart__label">{{ item.mes }}m</span>
@@ -108,7 +108,7 @@
               <span>Mês</span>
               <span>Valor</span>
             </div>
-            <div class="table__row" *ngFor="let item of jurosSeries">
+            <div class="table__row" *ngFor="let item of jurosSeries; trackBy: trackByIndex">
               <span>{{ item.mes }}</span>
               <span>R$ {{ item.valor | number : "1.2-2" }}</span>
             </div>
@@ -124,7 +124,7 @@
             </div>
             <div
               class="table__row table__row--wide"
-              *ngFor="let ano of jurosAnual"
+              *ngFor="let ano of jurosAnual; trackBy: trackByIndex"
             >
               <span>{{ ano.ano }}</span>
               <span>R$ {{ ano.aporteAno | number : "1.2-2" }}</span>
@@ -304,7 +304,7 @@
               <span>Mês</span>
               <span>Receita estimada</span>
             </div>
-            <div class="table__row" *ngFor="let mes of rendaMeses">
+            <div class="table__row" *ngFor="let mes of rendaMeses; trackBy: trackByIndex">
               <span>{{ mes }}</span>
               <span>R$ {{ rendaResultado | number : "1.2-2" }}</span>
             </div>
@@ -348,7 +348,7 @@
           <div class="chart" *ngIf="milhaoSeries.length">
             <div
               class="chart__bar"
-              *ngFor="let item of milhaoSeries"
+              *ngFor="let item of milhaoSeries; trackBy: trackByIndex"
               [style.height.%]="(item.valor / milhaoMax) * 100"
             >
               <span class="chart__label">{{ item.mes }}m</span>
@@ -359,7 +359,7 @@
               <span>Mês</span>
               <span>Valor acumulado</span>
             </div>
-            <div class="table__row" *ngFor="let item of milhaoSeries">
+            <div class="table__row" *ngFor="let item of milhaoSeries; trackBy: trackByIndex">
               <span>{{ item.mes }}</span>
               <span>R$ {{ item.valor | number : "1.2-2" }}</span>
             </div>

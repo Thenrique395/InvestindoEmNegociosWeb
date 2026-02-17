@@ -7,7 +7,7 @@ import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
-import { formatMonthLabel, formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
+import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 
 @Component({
   selector: 'app-home',
@@ -25,16 +25,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   private incomesLoaded = false;
 
   dataAtual = new Date();
-  chartType: 'bar' | 'line' = 'bar';
-  lineTooltip:
-    | {
-        label: string;
-        type: 'income' | 'expense';
-        value: number;
-        left: number;
-        top: number;
-      }
-    | null = null;
   private expensesRaw: StoredExpense[] = [];
   private incomesRaw: StoredIncome[] = [];
   totalRendas = 0;
@@ -43,23 +33,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   periodo: 'month' | 'quarter' | 'year' = 'month';
   cards: StoredCard[] = [];
   totalDividaCartoes = 0;
-  monthlyData: { label: string; incomes: number; expenses: number }[] = [];
-  maxMonthlyValue = 0;
-  currentMonthDays = 0;
-  expenseCategoryData: { label: string; total: number }[] = [];
   expenseCategorySlices: { label: string; total: number; percent: number; color: string }[] = [];
   expenseCategoryTotal = 0;
   expenseCategoryChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
-  incomeSourceData: { label: string; total: number }[] = [];
   incomeSourceSlices: { label: string; total: number; percent: number; color: string }[] = [];
   incomeSourceTotal = 0;
   incomeSourceChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
-  maxExpenseCategory = 0;
-  maxIncomeSource = 0;
-  incomesPolyline = '';
-  expensesPolyline = '';
-  incomesPoints: { x: number; y: number; label: string; value: number }[] = [];
-  expensesPoints: { x: number; y: number; label: string; value: number }[] = [];
   recentTransactions: {
     id: string;
     title: string;
@@ -69,7 +48,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     status?: string;
     recurring?: boolean;
   }[] = [];
-  Math = Math;
   metasResumo = {
     total: 0,
     planned: 0,
@@ -160,7 +138,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.expensesRaw = lista;
       this.totalDespesas = this.somarDespesasMes(lista);
       this.atualizarSaldo();
-      this.updateMonthlyData();
       this.updateCategoryCharts();
       this.atualizarDividaCartoes();
       this.updateRecentTransactions();
@@ -171,7 +148,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.incomesRaw = lista;
       this.totalRendas = this.somarRendasMes(lista);
       this.atualizarSaldo();
-      this.updateMonthlyData();
       this.updateCategoryCharts();
       this.updateRecentTransactions();
       this.updateInsight();
@@ -205,30 +181,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     return formatMonthYearLabel(this.dataAtual);
   }
 
-  get chartTitle(): string {
-    if (this.periodo === 'month') return 'Receitas x Despesas no mês';
-    if (this.periodo === 'quarter') return 'Receitas x Despesas no trimestre';
-    return 'Receitas x Despesas no ano';
-  }
-
-  get chartSubtitle(): string {
-    if (this.periodo === 'month') return `Valores diários de ${this.mesAtualLabel}`;
-    if (this.periodo === 'quarter') return `Valores mensais de ${this.mesAtualLabel}`;
-    return `Valores mensais de ${this.dataAtual.getFullYear()}`;
-  }
-
-  get chartEmptyMessage(): string {
-    if (this.periodo === 'month') return 'Cadastre sua primeira receita ou despesa para ver o gráfico diário.';
-    if (this.periodo === 'quarter') return 'Cadastre sua primeira receita ou despesa para ver o gráfico do trimestre.';
-    return 'Cadastre sua primeira receita ou despesa para ver o gráfico anual.';
-  }
-
   get isLoadingDashboard(): boolean {
     return !(this.expensesLoaded && this.incomesLoaded);
-  }
-
-  get hasChartData(): boolean {
-    return this.monthlyData.some((m) => (m.incomes || 0) > 0 || (m.expenses || 0) > 0);
   }
 
   get showOnboarding(): boolean {
@@ -282,15 +236,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.saldo = this.totalRendas - this.totalDespesas;
   }
 
+  private isDateInRange(date: string, range: { startKey: string; endKey: string }): boolean {
+    const key = monthKeyFromLocaleDate(date);
+    return key ? this.isWithinRange(key, range) : false;
+  }
+
   private somarDespesasMes(
     lista: StoredExpense[],
     range: { startKey: string; endKey: string } = this.getPeriodRange()
   ): number {
     return lista
-      .filter((d) => {
-        const key = this.mesKeyFromVencimento(d.vencimento);
-        return key ? this.isWithinRange(key, range) : false;
-      })
+      .filter((d) => this.isDateInRange(d.vencimento, range))
       .reduce((sum, d) => sum + (d.valor || 0), 0);
   }
 
@@ -299,74 +255,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     range: { startKey: string; endKey: string } = this.getPeriodRange()
   ): number {
     return lista
-      .filter((r) => {
-        const key = this.mesKeyFromRecebimento(r.recebimento);
-        return key ? this.isWithinRange(key, range) : false;
-      })
+      .filter((r) => this.isDateInRange(r.recebimento, range))
       .reduce((sum, r) => sum + (r.valor || 0), 0);
-  }
-
-  private updateMonthlyData(): void {
-    const ano = this.dataAtual.getFullYear();
-    const mesIndex = this.dataAtual.getMonth();
-
-    if (this.periodo === 'month') {
-      const diasNoMes = new Date(ano, mesIndex + 1, 0).getDate();
-      this.currentMonthDays = diasNoMes;
-      const data = Array.from({ length: diasNoMes }).map((_, idx) => {
-        const day = idx + 1;
-        const start = new Date(ano, mesIndex, day);
-        const end = new Date(ano, mesIndex, day, 23, 59, 59);
-        const incomes = this.sumByDateRange(this.incomesRaw, 'recebimento', start, end);
-        const expenses = this.sumByDateRange(this.expensesRaw, 'vencimento', start, end);
-        return { label: String(day).padStart(2, '0'), incomes, expenses };
-      });
-      this.monthlyData = data;
-      this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
-      this.updatePolylineData();
-      return;
-    }
-
-    if (this.periodo === 'quarter') {
-      this.currentMonthDays = 0;
-        const quarterStart = Math.floor(mesIndex / 3) * 3;
-        const data = Array.from({ length: 3 }).map((_, idx) => {
-          const monthIndex = quarterStart + idx;
-          const label = formatMonthLabel(ano, monthIndex, 'short');
-          const key = `${ano}-${String(monthIndex + 1).padStart(2, '0')}`;
-          const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
-          const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
-        return { label, incomes, expenses };
-      });
-      this.monthlyData = data;
-      this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
-      this.updatePolylineData();
-      return;
-    }
-
-    this.currentMonthDays = 0;
-    const data = Array.from({ length: 12 }).map((_, idx) => {
-      const label = formatMonthLabel(ano, idx, 'short');
-      const key = `${ano}-${String(idx + 1).padStart(2, '0')}`;
-      const incomes = this.somarRendasMes(this.incomesRaw, { startKey: key, endKey: key });
-      const expenses = this.somarDespesasMes(this.expensesRaw, { startKey: key, endKey: key });
-      return { label, incomes, expenses };
-    });
-    this.monthlyData = data;
-    this.maxMonthlyValue = Math.max(...data.map((m) => Math.max(m.incomes, m.expenses, 0)), 0);
-    this.updatePolylineData();
   }
 
   private updateCategoryCharts(): void {
     const range = this.getPeriodRange();
-    const expenses = this.expensesRaw.filter((d) => {
-      const key = this.mesKeyFromVencimento(d.vencimento);
-      return key ? this.isWithinRange(key, range) : false;
-    });
-    const incomes = this.incomesRaw.filter((r) => {
-      const key = this.mesKeyFromRecebimento(r.recebimento);
-      return key ? this.isWithinRange(key, range) : false;
-    });
+    const expenses = this.expensesRaw.filter((d) => this.isDateInRange(d.vencimento, range));
+    const incomes = this.incomesRaw.filter((r) => this.isDateInRange(r.recebimento, range));
 
     const groupByLabel = <T extends { valor: number }>(
       items: T[],
@@ -392,7 +288,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     const expenseData = cap(groupByLabel(expenses, (d) => d.categoria || 'Sem categoria'));
     const incomeData = cap(groupByLabel(incomes, (r) => r.categoria || 'Sem categoria'));
 
-    this.expenseCategoryData = expenseData;
     this.expenseCategoryTotal = expenseData.reduce((sum, item) => sum + item.total, 0);
     this.expenseCategorySlices = expenseData.map((item, index) => ({
       ...item,
@@ -400,7 +295,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       color: this.expenseCategoryColors[index % this.expenseCategoryColors.length]
     }));
     this.expenseCategoryChartBackground = this.buildCategoryChartBackground();
-    this.incomeSourceData = incomeData;
     this.incomeSourceTotal = incomeData.reduce((sum, item) => sum + item.total, 0);
     this.incomeSourceSlices = incomeData.map((item, index) => ({
       ...item,
@@ -408,8 +302,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       color: this.incomeSourceColors[index % this.incomeSourceColors.length]
     }));
     this.incomeSourceChartBackground = this.buildIncomeChartBackground();
-    this.maxExpenseCategory = Math.max(...expenseData.map((item) => item.total), 0);
-    this.maxIncomeSource = Math.max(...incomeData.map((item) => item.total), 0);
   }
 
   private buildCategoryChartBackground(): string {
@@ -486,8 +378,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const range = this.getPeriodRange();
     const all = Array.from(grouped.values()).filter((item) => {
-      const key = item.type === 'income' ? this.mesKeyFromRecebimento(item.date) : this.mesKeyFromVencimento(item.date);
-      return key ? this.isWithinRange(key, range) : false;
+      return this.isDateInRange(item.date, range);
     });
     all.sort((a, b) => {
       const da = parseLocaleDate(a.date)?.getTime() || 0;
@@ -555,104 +446,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.totalDespesas = this.somarDespesasMes(this.expensesRaw);
     this.totalRendas = this.somarRendasMes(this.incomesRaw);
     this.atualizarSaldo();
-    this.updateMonthlyData();
     this.updateCategoryCharts();
     this.updateRecentTransactions();
     this.updateInsight();
-  }
-
-  trocarTipo(tipo: 'bar' | 'line'): void {
-    this.chartType = tipo;
-  }
-
-  showLineTooltip(
-    point: { x: number; y: number; label: string; value: number },
-    type: 'income' | 'expense'
-  ): void {
-    const left = (point.x / 1100) * 100;
-    const top = (point.y / 220) * 100;
-    this.lineTooltip = { label: point.label, type, value: point.value, left, top };
-  }
-
-  hideLineTooltip(): void {
-    this.lineTooltip = null;
-  }
-
-  private updatePolylineData(): void {
-    if (!this.monthlyData.length) {
-      this.incomesPolyline = '';
-      this.expensesPolyline = '';
-      this.incomesPoints = [];
-      this.expensesPoints = [];
-      return;
-    }
-    const lineData = this.buildLineData(this.monthlyData);
-    this.incomesPolyline = lineData.incomesPolyline;
-    this.expensesPolyline = lineData.expensesPolyline;
-    this.incomesPoints = lineData.incomesPoints;
-    this.expensesPoints = lineData.expensesPoints;
-  }
-
-  private buildLineData(
-    data: { label: string; incomes: number; expenses: number }[]
-  ): {
-    incomesPolyline: string;
-    expensesPolyline: string;
-    incomesPoints: { x: number; y: number; label: string; value: number }[];
-    expensesPoints: { x: number; y: number; label: string; value: number }[];
-  } {
-    const width = 1100;
-    const height = 200;
-    const padding = 14;
-    const usableW = width - padding * 2;
-    const usableH = height - padding * 2;
-    const max = this.maxMonthlyValue || 1;
-    const len = data.length || 1;
-    const step = len > 1 ? usableW / (len - 1) : usableW;
-
-    const build = (field: 'incomes' | 'expenses') => {
-      const points = data.map((m, idx) => {
-        const x = padding + idx * step;
-        const v = m[field];
-        const ratio = v / max;
-        const y = height - padding - ratio * usableH;
-        return { x, y, label: m.label, value: v };
-      });
-      const polyline = points.map((p) => `${p.x},${p.y}`).join(' ');
-      return { polyline, points };
-    };
-
-    const incomesData = build('incomes');
-    const expensesData = build('expenses');
-    return {
-      incomesPolyline: incomesData.polyline,
-      expensesPolyline: expensesData.polyline,
-      incomesPoints: incomesData.points,
-      expensesPoints: expensesData.points
-    };
-  }
-
-  private mesKey(): string {
-    const y = this.dataAtual.getFullYear();
-    const m = this.dataAtual.getMonth() + 1;
-    return `${y}-${String(m).padStart(2, '0')}`;
-  }
-
-  private mesKeyFromVencimento(vencimento: string): string | null {
-    return monthKeyFromLocaleDate(vencimento);
-  }
-
-  private mesKeyFromRecebimento(recebimento: string): string | null {
-    return monthKeyFromLocaleDate(recebimento);
-  }
-
-  private mesKeyFromMes(mesAno?: string): string | null {
-    if (!mesAno) return null;
-    const digits = mesAno.replace(/[^\d]/g, '');
-    if (digits.length < 6) return null;
-    const mes = digits.slice(0, 2);
-    const ano = digits.slice(2, 6);
-    return `${ano}-${mes}`;
   }
 
   private sumByMonthKey(
@@ -661,26 +457,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   ): number {
     return lista.reduce((sum, item) => {
       const dateKey = item.vencimento
-        ? this.mesKeyFromVencimento(item.vencimento)
+        ? monthKeyFromLocaleDate(item.vencimento)
         : item.recebimento
-          ? this.mesKeyFromRecebimento(item.recebimento)
+          ? monthKeyFromLocaleDate(item.recebimento)
           : null;
       if (dateKey !== key) return sum;
-      return sum + (item.valor || 0);
-    }, 0);
-  }
-
-  private sumByDateRange(
-    lista: Array<{ valor: number; vencimento?: string; recebimento?: string }>,
-    field: 'vencimento' | 'recebimento',
-    start: Date,
-    end: Date
-  ): number {
-    return lista.reduce((sum, item) => {
-      const raw = field === 'vencimento' ? item.vencimento : item.recebimento;
-      const date = raw ? parseLocaleDate(raw) : null;
-      if (!date) return sum;
-      if (date < start || date > end) return sum;
       return sum + (item.valor || 0);
     }, 0);
   }
@@ -705,12 +486,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private isWithinRange(key: string, range: { startKey: string; endKey: string }): boolean {
     return key >= range.startKey && key <= range.endKey;
-  }
-
-  private mesKeyBetween(target: string, inicio: string, fim: string | null): boolean {
-    if (target < inicio) return false;
-    if (fim && target > fim) return false;
-    return true;
   }
 
   private get storage(): Storage | null {
@@ -892,6 +667,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       message: 'Você manteve o saldo positivo e as despesas sob controle.',
       tone: 'ok'
     };
+  }
+  trackByIndex(index: number): number {
+    return index;
   }
 
 }

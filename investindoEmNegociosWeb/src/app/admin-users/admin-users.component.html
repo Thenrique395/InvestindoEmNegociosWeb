@@ -42,7 +42,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-[var(--border)]">
-          <tr *ngFor="let user of users" class="hover:bg-[var(--surface-2)]">
+          <tr *ngFor="let user of users; trackBy: trackByIndex" class="hover:bg-[var(--surface-2)]">
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
@@ -68,7 +68,7 @@
                 [(ngModel)]="user.pendingRole"
                 (ngModelChange)="updateRole(user, $event)"
                 [disabled]="savingId === user.id || deletingId === user.id">
-                <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+                <option *ngFor="let role of roles; trackBy: trackByIndex" [value]="role">{{ role }}</option>
               </select>
             </td>
             <td class="px-6 py-4">

@@ -106,7 +106,7 @@ type InvoiceExtract = {
                     <tr *ngIf="!extract.items.length">
                       <td class="px-3 py-3" colspan="4">Nenhum item identificado.</td>
                     </tr>
-                    <tr *ngFor="let item of extract.items">
+                    <tr *ngFor="let item of extract.items; trackBy: trackByIndex">
                       <td class="px-3 py-2">{{ item.date || '-' }}</td>
                       <td class="px-3 py-2">{{ item.baseDescription || item.description }}</td>
                       <td class="px-3 py-2">
@@ -224,6 +224,10 @@ export class InvoiceImportComponent {
       .replace(',', '.');
     const parsed = Number.parseFloat(numeric);
     return Number.isFinite(parsed) ? parsed === 0 : true;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
 }

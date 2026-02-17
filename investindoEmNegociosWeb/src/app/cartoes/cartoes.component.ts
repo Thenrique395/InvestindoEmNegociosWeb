@@ -264,4 +264,8 @@ export class CartoesComponent implements OnInit, OnDestroy {
     const brand = this.brands.find((b) => String(b.id) === id);
     return brand?.name || 'Cartão';
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

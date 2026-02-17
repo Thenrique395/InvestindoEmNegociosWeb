@@ -2,7 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection, LOCALE_ID } from '@angul
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import localeEn from '@angular/common/locales/en';
-import { provideRouter, RouteReuseStrategy, withRouterConfig } from '@angular/router';
+import { provideRouter, RouteReuseStrategy, withRouterConfig, withPreloading } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -10,6 +10,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { authInterceptor } from './auth.interceptor';
 import { NoReuseStrategy } from './no-reuse.strategy';
 import { getInitialLocale } from './utils/locale-settings';
+import { SelectivePreloadingStrategy } from './selective-preloading.strategy';
 
 registerLocaleData(localePt);
 registerLocaleData(localeEn);
@@ -17,7 +18,11 @@ registerLocaleData(localeEn);
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withRouterConfig({ onSameUrlNavigation: 'reload' })),
+    provideRouter(
+      routes,
+      withRouterConfig({ onSameUrlNavigation: 'reload' }),
+      withPreloading(SelectivePreloadingStrategy)
+    ),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     { provide: RouteReuseStrategy, useClass: NoReuseStrategy },

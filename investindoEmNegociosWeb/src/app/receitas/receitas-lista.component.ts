@@ -49,4 +49,8 @@ export class ReceitasListaComponent {
     if (!id) return false;
     return this.selectedIds.includes(id);
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

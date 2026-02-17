@@ -132,4 +132,8 @@ export class UserPreferencesComponent implements OnInit {
       this.localizacoes.unshift(this.linguaSelecionada);
     }
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

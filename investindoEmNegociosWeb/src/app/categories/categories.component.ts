@@ -17,6 +17,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
 export class CategoriesComponent implements OnInit {
   categorias: CategoryDto[] = [];
   filtroTipo: '' | CategoryType = '';
+  buscaNome = '';
   nome = '';
   tipo: CategoryType = 'Expense';
   escopo: 'user' | 'default' = 'user';
@@ -35,6 +36,7 @@ export class CategoriesComponent implements OnInit {
   adminAppliesTo: '' | CategoryType = '';
   showDeleteModal = false;
   deleteTarget: CategoryDto | null = null;
+  activeView: 'user' | 'admin' = 'user';
 
   tipos = [
     { id: 'Expense' as CategoryType, label: 'Despesa' },
@@ -53,6 +55,7 @@ export class CategoriesComponent implements OnInit {
     this.carregar();
     if (this.isAdmin) {
       this.loadAdmin();
+      this.activeView = 'user';
     }
   }
 
@@ -65,7 +68,33 @@ export class CategoriesComponent implements OnInit {
   }
 
   categoriasPorTipo(tipo: CategoryType): CategoryDto[] {
-    return this.categorias.filter((c) => c.appliesTo === tipo);
+    return this.categorias.filter((c) => c.appliesTo === tipo && this.matchSearch(c.name));
+  }
+
+  get categoriasVisiveis(): CategoryDto[] {
+    return this.categorias.filter((c) => this.matchSearch(c.name));
+  }
+
+  get adminCategoriesVisiveis(): AdminCategory[] {
+    return this.adminCategories.filter((c) => this.matchSearch(c.name));
+  }
+
+  get userMetrics(): { total: number; padrao: number; personalizadas: number } {
+    const list = this.categoriasVisiveis;
+    return {
+      total: list.length,
+      padrao: list.filter((c) => c.isDefault).length,
+      personalizadas: list.filter((c) => !c.isDefault).length
+    };
+  }
+
+  get adminMetrics(): { total: number; ativas: number; inativas: number } {
+    const list = this.adminCategoriesVisiveis;
+    return {
+      total: list.length,
+      ativas: list.filter((c) => c.isActive).length,
+      inativas: list.filter((c) => !c.isActive).length
+    };
   }
 
   iconForCategory(name: string, tipo: CategoryType): string {
@@ -135,15 +164,30 @@ export class CategoriesComponent implements OnInit {
   }
 
   adicionar(): void {
-    if (!this.nome.trim()) {
+    const nomeLimpo = this.nome.trim();
+    if (!nomeLimpo) {
       this.uiFeedback.warning('Informe o nome da categoria.');
       return;
     }
+    const conflito = this.findConflict(nomeLimpo, this.tipo, this.escopo);
+    if (conflito === 'default') {
+      this.uiFeedback.info('Essa categoria já existe no padrão do sistema. Use a categoria padrão para evitar duplicidade.');
+      return;
+    }
+    if (conflito === 'user') {
+      this.uiFeedback.warning('Já existe uma categoria personalizada com esse nome e tipo.');
+      return;
+    }
+    if (conflito === 'admin') {
+      this.uiFeedback.warning('Já existe uma categoria padrão com esse nome e tipo.');
+      return;
+    }
+
     this.saving = true;
 
     if (this.isAdmin && this.escopo === 'default') {
       this.adminCategoriesService
-        .create({ name: this.nome.trim(), appliesTo: this.tipo })
+        .create({ name: nomeLimpo, appliesTo: this.tipo })
         .subscribe({
           next: () => {
             this.nome = '';
@@ -161,7 +205,7 @@ export class CategoriesComponent implements OnInit {
       return;
     }
 
-    this.categoriesService.create({ name: this.nome.trim(), appliesTo: this.tipo }).subscribe({
+    this.categoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).subscribe({
       next: (cat) => {
         this.categorias = [...this.categorias, cat];
         this.nome = '';
@@ -255,4 +299,51 @@ export class CategoriesComponent implements OnInit {
       complete: () => (this.adminSaving = false)
     });
   }
+
+  setView(view: 'user' | 'admin'): void {
+    if (view === 'admin' && !this.isAdmin) return;
+    this.activeView = view;
+  }
+
+  private matchSearch(name: string): boolean {
+    if (!this.buscaNome.trim()) return true;
+    return this.normalizeText(name).includes(this.normalizeText(this.buscaNome));
+  }
+
+  private findConflict(
+    name: string,
+    type: CategoryType,
+    scope: 'user' | 'default'
+  ): 'default' | 'user' | 'admin' | null {
+    const normalizedName = this.normalizeText(name);
+    const sameName = (value: string) => this.normalizeText(value) === normalizedName;
+
+    if (scope === 'default') {
+      const existsInAdmin = this.adminCategories.some(
+        (c) => sameName(c.name) && (c.appliesTo === type || c.appliesTo === null || c.appliesTo === undefined)
+      );
+      return existsInAdmin ? 'admin' : null;
+    }
+
+    const duplicateDefault = this.categorias.some((c) => c.isDefault && c.appliesTo === type && sameName(c.name));
+    if (duplicateDefault) return 'default';
+
+    const duplicateUser = this.categorias.some((c) => !c.isDefault && c.appliesTo === type && sameName(c.name));
+    if (duplicateUser) return 'user';
+
+    return null;
+  }
+
+  private normalizeText(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

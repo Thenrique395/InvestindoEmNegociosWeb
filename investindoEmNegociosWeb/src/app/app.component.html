@@ -321,7 +321,7 @@
                   <button
                     type="button"
                     class="notif-item grid gap-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text)]"
-                    *ngFor="let item of notifications"
+                    *ngFor="let item of notifications; trackBy: trackByIndex"
                     [ngClass]="!item.readAt ? 'border-[rgba(37,99,235,0.35)] bg-[rgba(37,99,235,0.08)]' : ''"
                     (click)="markNotificationRead(item, $event)"
                   >

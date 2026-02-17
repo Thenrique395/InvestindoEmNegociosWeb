@@ -921,4 +921,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
       return acc;
     }, {} as Record<string, StoredExpense[]>);
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

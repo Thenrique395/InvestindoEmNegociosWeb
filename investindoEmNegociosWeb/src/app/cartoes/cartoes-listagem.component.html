@@ -1,6 +1,6 @@
 <div class="space-y-4">
   <div *ngIf="cards.length; else emptyCards" class="grid gap-3 md:grid-cols-2">
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]" *ngFor="let c of cards">
+    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]" *ngFor="let c of cards; trackBy: trackByIndex">
       <div class="flex items-start justify-between gap-3">
         <div class="flex min-w-0 items-start gap-3">
           <div class="flex h-10 w-14 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text)]">

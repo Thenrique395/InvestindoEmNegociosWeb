@@ -58,7 +58,9 @@
         </label>
         <div class="flex items-center justify-between text-[12px] text-[var(--text-muted)]">
           <span>Use seu email cadastrado.</span>
-          <a class="text-[var(--primary)] font-semibold hover:underline" href="#">Esqueci minha senha</a>
+          <button type="button" class="text-[var(--primary)] font-semibold hover:underline" aria-disabled="true">
+            Esqueci minha senha
+          </button>
         </div>
         <button type="submit" class="btn-primary w-full" [disabled]="loading">
           {{ loading ? 'Autenticando...' : 'Entrar' }}

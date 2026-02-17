@@ -10,13 +10,13 @@
     <label>
       Moeda
       <select [(ngModel)]="moedaSelecionada">
-        <option *ngFor="let m of moedas" [value]="m">{{ m }}</option>
+        <option *ngFor="let m of moedas; trackBy: trackByIndex" [value]="m">{{ m }}</option>
       </select>
     </label>
     <label>
       Idioma da aplicação
       <select [(ngModel)]="linguaSelecionada" (ngModelChange)="onLanguageChange($event)">
-        <option *ngFor="let l of linguas" [value]="l.id">{{ l.label }}</option>
+        <option *ngFor="let l of linguas; trackBy: trackByIndex" [value]="l.id">{{ l.label }}</option>
       </select>
     </label>
     <div class="full quick">
@@ -30,7 +30,7 @@
       <label>
         Localizações preferidas
         <div class="chips">
-          <span class="chip" *ngFor="let loc of localizacoes; let i = index">
+          <span class="chip" *ngFor="let loc of localizacoes; let i = index; trackBy: trackByIndex">
             {{ loc }}
             <button type="button" (click)="removerLocalizacao(i)">✕</button>
           </span>

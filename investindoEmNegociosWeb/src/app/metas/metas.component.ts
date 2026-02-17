@@ -405,4 +405,8 @@ export class MetasComponent implements OnInit {
     this.metaSelecionada = undefined;
     this.editando = false;
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

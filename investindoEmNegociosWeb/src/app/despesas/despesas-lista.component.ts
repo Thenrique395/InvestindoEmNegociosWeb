@@ -52,4 +52,8 @@ export class DespesasListaComponent {
     if (!id) return false;
     return this.selectedIds.includes(id);
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

@@ -2,29 +2,54 @@
   <header class="header">
     <div>
       <p class="eyebrow">Investimentos</p>
-      <h1>Meta + crescimento do patrimônio</h1>
-      <p class="muted">Defina uma meta de patrimônio e acompanhe seus aportes e evolução.</p>
+      <h1>Visão executiva da carteira</h1>
+      <p class="muted">Acompanhe patrimônio, fluxo do mês e distribuição por tipo para decidir com clareza.</p>
     </div>
   </header>
 
+  <section class="executive-grid">
+    <article class="card executive-card">
+      <p class="label">Patrimônio total</p>
+      <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+      <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
+    </article>
+    <article class="card executive-card">
+      <p class="label">Aportes no mês</p>
+      <strong class="success">{{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+      <small>Resgates no mês: {{ resgateMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
+    </article>
+    <article class="card executive-card">
+      <p class="label">Resultado do mês (fluxo)</p>
+      <strong [class.success]="resultadoMes >= 0" [class.danger]="resultadoMes < 0">
+        {{ resultadoMes | currency: 'BRL':'symbol':'1.2-2' }}
+      </strong>
+      <small>Entradas de aporte menos saídas de resgate</small>
+    </article>
+    <article class="card executive-card">
+      <p class="label">Resultado estimado acumulado</p>
+      <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
+        {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
+      </strong>
+      <small>Patrimônio atual menos valor líquido aportado</small>
+    </article>
+  </section>
+
   <div class="card summary">
     <div class="summary__info">
-      <div>
+      <div class="meta-form">
         <p class="label">Meta de patrimônio (R$)</p>
-        <input type="text" [(ngModel)]="metaPatrimonioInput" digitOnly (input)="formatarMeta()" inputmode="numeric"
-          placeholder="Ex.: 100.000,00" />
-        <button class="ghost sm" type="button" (click)="salvarMeta()" [disabled]="metaSalvando || !metaPatrimonio">
-          {{ metaSalvando ? 'Salvando...' : 'Salvar meta' }}
-        </button>
+        <div class="meta-form__controls">
+          <input type="text" [(ngModel)]="metaPatrimonioInput" digitOnly (input)="formatarMeta()" inputmode="numeric"
+            placeholder="Ex.: 100.000,00" />
+          <button class="btn-ghost sm" type="button" (click)="salvarMeta()" [disabled]="metaSalvando || !metaPatrimonio">
+            {{ metaSalvando ? 'Salvando...' : 'Salvar meta' }}
+          </button>
+        </div>
       </div>
       <div class="summary__grid">
         <div>
-          <p class="label">Patrimônio atual</p>
-          <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        </div>
-        <div>
-          <p class="label">Crescimento estimado</p>
-          <strong>{{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+          <p class="label">Aportado líquido</p>
+          <strong>{{ aporteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
         </div>
         <div>
           <p class="label">Falta para a meta</p>
@@ -40,84 +65,142 @@
     </div>
   </div>
 
+  <div class="card distribution-card">
+    <div class="section-head">
+      <h3>Distribuição por tipo</h3>
+      <span class="muted">{{ distribuicaoPorTipo.length }} tipo(s) com saldo</span>
+    </div>
+    <div *ngIf="!distribuicaoPorTipo.length" class="empty">Sem posições para exibir distribuição.</div>
+    <div class="distribution-list" *ngIf="distribuicaoPorTipo.length">
+      <div class="distribution-item" *ngFor="let item of distribuicaoPorTipo; trackBy: trackByIndex">
+        <div class="distribution-item__top">
+          <strong>{{ item.label }}</strong>
+          <span>{{ item.value | currency: 'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="progress-bar slim">
+          <span [style.width.%]="item.percent"></span>
+        </div>
+        <small>{{ item.percent | number:'1.0-1' }}%</small>
+      </div>
+    </div>
+  </div>
+
   <div class="top-actions">
     <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">
       {{ showCadastro ? 'Fechar cadastro' : 'Nova posição' }}
     </button>
   </div>
 
-  <div class="card" *ngIf="showCadastro">
-    <h3>Nova posição</h3>
-    <div class="form grid-form">
-      <div>
-        <label>Tipo</label>
-        <select [(ngModel)]="novaPosicao.type" name="type">
-          <option *ngFor="let t of tipos" [value]="t.value">{{ t.label }}</option>
-        </select>
-      </div>
-      <div>
-        <label>Ativo</label>
-        <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
-      </div>
-      <div>
-        <label>Quantidade</label>
-        <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
-      </div>
-      <div>
-        <label>Preço médio</label>
-        <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
-      </div>
-      <div>
-        <label>Data</label>
-        <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
-      </div>
-      <div>
-        <label>Conta/Corretora</label>
-        <input
-          type="text"
-          [(ngModel)]="novaPosicao.account"
-          name="account"
-          placeholder="Ex.: Nubank, XP"
-          list="brokerOptions" />
-        <datalist id="brokerOptions">
-          <option *ngFor="let inst of institutions" [value]="inst.name"></option>
-        </datalist>
-      </div>
-      <div>
-        <label>Categoria (opcional)</label>
-        <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
+  <div class="modal" *ngIf="showCadastro">
+    <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
+    <div class="modal__card">
+      <h3>Nova posição</h3>
+      <div class="form grid-form">
+        <div>
+          <label>Tipo</label>
+          <select [(ngModel)]="novaPosicao.type" name="type">
+            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+        <div>
+          <label>Ativo</label>
+          <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
+        </div>
+        <div>
+          <label>Quantidade</label>
+          <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
+        </div>
+        <div>
+          <label>Preço médio</label>
+          <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
+        </div>
+        <div>
+          <label>Data</label>
+          <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
+        </div>
+        <div>
+          <label>Conta/Corretora</label>
+          <input
+            type="text"
+            [(ngModel)]="novaPosicao.account"
+            name="account"
+            placeholder="Ex.: Nubank, XP"
+            list="brokerOptions" />
+          <datalist id="brokerOptions">
+            <option *ngFor="let inst of institutions; trackBy: trackByIndex" [value]="inst.name"></option>
+          </datalist>
+        </div>
+        <div>
+          <label>Categoria (opcional)</label>
+          <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
+        </div>
       </div>
       <div class="actions">
         <button class="btn-primary" type="button" (click)="salvarPosicao()">Salvar posição</button>
-        <button class="ghost sm" type="button" (click)="resetPosicao()">Limpar</button>
+        <button class="btn-cancel sm" type="button" (click)="resetPosicao()">Limpar</button>
+        <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Fechar</button>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <h3>Posições cadastradas</h3>
-    <div *ngIf="!positions.length" class="empty">Nenhuma posição ainda. Adicione a primeira.</div>
-    <div class="table-wrap" *ngIf="positions.length">
+    <div class="section-head">
+      <h3>Posições cadastradas</h3>
+      <span class="muted">{{ filteredPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
+    </div>
+
+    <div class="table-filters">
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por ativo, conta ou categoria" />
+      <select [(ngModel)]="filterType">
+        <option value="ALL">Todos os tipos</option>
+        <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
+      </select>
+      <select [(ngModel)]="filterAccount">
+        <option value="ALL">Todas as contas</option>
+        <option *ngFor="let acc of contasDisponiveis; trackBy: trackByIndex" [value]="acc">{{ acc }}</option>
+      </select>
+      <select [(ngModel)]="filterStatus">
+        <option value="ALL">Todos os status</option>
+        <option value="ACTIVE">Ativas</option>
+        <option value="ZEROED">Zeradas</option>
+      </select>
+    </div>
+
+    <div *ngIf="!filteredPositions.length" class="empty">Nenhuma posição para os filtros atuais.</div>
+    <div class="table-wrap" *ngIf="filteredPositions.length">
       <table>
         <thead>
           <tr>
             <th>Tipo</th>
             <th>Ativo</th>
+            <th>Status</th>
             <th>Quantidade</th>
             <th>Preço médio</th>
+            <th>Valor atual</th>
+            <th>Resultado est.</th>
             <th>Conta</th>
             <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of positions">
+          <tr *ngFor="let p of filteredPositions; trackBy: trackByIndex">
             <td>{{ p.type }}</td>
             <td>{{ p.asset }}</td>
+            <td>
+              <span class="status-pill" [class.zeroed]="p.quantity <= 0">
+                {{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}
+              </span>
+            </td>
             <td>{{ p.quantity }}</td>
-            <td>R$ {{ p.avgPrice | number : '1.2-2' }}</td>
+            <td>{{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}</td>
+            <td>{{ valorAtualPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}</td>
+            <td [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">
+              {{ resultadoPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}
+              <small>({{ resultadoPosicaoPercentual(p) | number:'1.1-1' }}%)</small>
+            </td>
             <td>{{ p.account }}</td>
             <td>
-              <button class="btn-edit sm" type="button" (click)="abrirMovimento(p)">Registrar movimento</button>
+              <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Registrar movimento</button>
             </td>
           </tr>
         </tbody>
@@ -125,30 +208,32 @@
     </div>
   </div>
 
-  <div class="card" *ngIf="showMovimento && posSelecionada">
-    <h3>Registrar movimento para {{ posSelecionada.asset }}</h3>
-    <div class="form inline">
-      <label>Tipo</label>
-      <select [(ngModel)]="movimento.type" name="movType">
-        <option value="APORTE">Aporte</option>
-        <option value="RESGATE">Resgate</option>
-      </select>
+  <div class="modal" *ngIf="showMovimento && posSelecionada">
+    <div class="modal__backdrop" (click)="closeMovimentoModal()"></div>
+    <div class="modal__card">
+      <h3>Registrar movimento para {{ posSelecionada.asset }}</h3>
+      <div class="form inline">
+        <label>Tipo</label>
+        <select [(ngModel)]="movimento.type" name="movType">
+          <option value="APORTE">Aporte</option>
+          <option value="RESGATE">Resgate</option>
+        </select>
 
-      <label>Qtd.</label>
-      <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
+        <label>Qtd.</label>
+        <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
 
-      <label>Preço</label>
-      <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
+        <label>Preço</label>
+        <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
 
-      <label>Data</label>
-      <input type="date" [(ngModel)]="movimento.date" name="movDate" />
+        <label>Data</label>
+        <input type="date" [(ngModel)]="movimento.date" name="movDate" />
 
-      <label>Nota</label>
-      <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
-
+        <label>Nota</label>
+        <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+      </div>
       <div class="actions">
         <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
-        <button class="btn-cancel sm" type="button" (click)="showMovimento = false; posSelecionada = null; selectedId = null">Cancelar</button>
+        <button class="btn-cancel sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
       </div>
     </div>
   </div>

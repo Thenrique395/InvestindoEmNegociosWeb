@@ -86,5 +86,8 @@ export class DespesasFormComponent {
   fechar(): void {
     this.cancel.emit();
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
 
 }

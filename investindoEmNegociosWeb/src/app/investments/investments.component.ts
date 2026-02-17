@@ -26,6 +26,10 @@ type FormMode = 'create' | 'movement';
 export class InvestmentsComponent implements OnInit {
   positions: InvestmentPosition[] = [];
   institutions: InstitutionLookup[] = [];
+  searchTerm = '';
+  filterType: 'ALL' | InvestmentType = 'ALL';
+  filterAccount = 'ALL';
+  filterStatus: 'ALL' | 'ACTIVE' | 'ZEROED' = 'ALL';
   mode: FormMode = 'create';
   selectedId: string | null = null;
   showCadastro = false;
@@ -79,14 +83,92 @@ export class InvestmentsComponent implements OnInit {
     return this.positions.reduce((sum, p) => sum + p.quantity * p.avgPrice, 0);
   }
 
+  get aporteMes(): number {
+    return this.positions.reduce((sum, pos) => {
+      const movimentosMes = pos.movements.filter((mov) => this.isCurrentMonth(mov.date));
+      return (
+        sum +
+        movimentosMes
+          .filter((mov) => mov.type === 'APORTE')
+          .reduce((acc, mov) => acc + mov.quantity * mov.price, 0)
+      );
+    }, 0);
+  }
+
+  get resgateMes(): number {
+    return this.positions.reduce((sum, pos) => {
+      const movimentosMes = pos.movements.filter((mov) => this.isCurrentMonth(mov.date));
+      return (
+        sum +
+        movimentosMes
+          .filter((mov) => mov.type === 'RESGATE')
+          .reduce((acc, mov) => acc + mov.quantity * mov.price, 0)
+      );
+    }, 0);
+  }
+
+  get resultadoMes(): number {
+    return this.aporteMes - this.resgateMes;
+  }
+
+  get totalPosicoesAtivas(): number {
+    return this.filteredPositions.filter((p) => p.quantity > 0).length;
+  }
+
+  get totalPosicoesZeradas(): number {
+    return this.filteredPositions.filter((p) => p.quantity <= 0).length;
+  }
+
+  get contasDisponiveis(): string[] {
+    const set = new Set<string>();
+    for (const pos of this.positions) {
+      if (pos.account?.trim()) set.add(pos.account.trim());
+    }
+    for (const inst of this.institutions) {
+      if (inst.name?.trim()) set.add(inst.name.trim());
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }
+
+  get filteredPositions(): InvestmentPosition[] {
+    const text = this.normalize(this.searchTerm);
+    return this.positions.filter((p) => {
+      const typeOk = this.filterType === 'ALL' || p.type === this.filterType;
+      const accountOk = this.filterAccount === 'ALL' || (p.account || '').trim() === this.filterAccount;
+      const statusOk =
+        this.filterStatus === 'ALL' ||
+        (this.filterStatus === 'ACTIVE' ? p.quantity > 0 : p.quantity <= 0);
+      const textOk =
+        !text ||
+        this.normalize(p.asset).includes(text) ||
+        this.normalize(p.account || '').includes(text) ||
+        this.normalize(p.category || '').includes(text);
+
+      return typeOk && accountOk && statusOk && textOk;
+    });
+  }
+
+  get distribuicaoPorTipo(): { key: InvestmentType; label: string; value: number; percent: number }[] {
+    const total = this.filteredPositions.reduce((sum, p) => sum + this.positionCurrentValue(p), 0);
+    return this.tipos
+      .map((tipo) => {
+        const value = this.filteredPositions
+          .filter((p) => p.type === tipo.value)
+          .reduce((sum, p) => sum + this.positionCurrentValue(p), 0);
+        return {
+          key: tipo.value,
+          label: tipo.label,
+          value,
+          percent: total > 0 ? (value / total) * 100 : 0
+        };
+      })
+      .filter((item) => item.value > 0)
+      .sort((a, b) => b.value - a.value);
+  }
+
   get aporteTotal(): number {
     return this.positions.reduce((sum, pos) => {
-      const inicial = pos.quantity * pos.avgPrice;
-      const movimentos = pos.movements.reduce((acc, mov) => {
-        const valor = mov.quantity * mov.price;
-        return mov.type === 'RESGATE' ? acc - valor : acc + valor;
-      }, 0);
-      return sum + (movimentos || inicial);
+      return sum + this.positionNetContributed(pos);
     }, 0);
   }
 
@@ -102,6 +184,20 @@ export class InvestmentsComponent implements OnInit {
   get faltaMeta(): number {
     if (!this.metaPatrimonio) return 0;
     return Math.max(this.metaPatrimonio - this.patrimonioAtual, 0);
+  }
+
+  valorAtualPosicao(pos: InvestmentPosition): number {
+    return this.positionCurrentValue(pos);
+  }
+
+  resultadoPosicao(pos: InvestmentPosition): number {
+    return this.positionCurrentValue(pos) - this.positionNetContributed(pos);
+  }
+
+  resultadoPosicaoPercentual(pos: InvestmentPosition): number {
+    const base = this.positionNetContributed(pos);
+    if (!base) return 0;
+    return (this.resultadoPosicao(pos) / base) * 100;
   }
 
   formatarMeta(): void {
@@ -184,6 +280,17 @@ export class InvestmentsComponent implements OnInit {
     };
   }
 
+  closeCadastroModal(): void {
+    this.showCadastro = false;
+    this.resetPosicao();
+  }
+
+  closeMovimentoModal(): void {
+    this.showMovimento = false;
+    this.posSelecionada = null;
+    this.selectedId = null;
+  }
+
   private carregarMeta(): void {
     this.investments.getGoal().subscribe({
       next: (goal) => {
@@ -205,4 +312,38 @@ export class InvestmentsComponent implements OnInit {
   private parseValor(raw: string): number {
     return parseLocalizedNumber(raw);
   }
+
+  private positionCurrentValue(pos: InvestmentPosition): number {
+    return (pos.quantity || 0) * (pos.avgPrice || 0);
+  }
+
+  private positionNetContributed(pos: InvestmentPosition): number {
+    const initial = this.positionCurrentValue(pos);
+    if (!pos.movements?.length) return initial;
+    return pos.movements.reduce((acc, mov) => {
+      const value = (mov.quantity || 0) * (mov.price || 0);
+      return mov.type === 'RESGATE' ? acc - value : acc + value;
+    }, 0);
+  }
+
+  private isCurrentMonth(iso: string): boolean {
+    if (!iso) return false;
+    const [year, month] = iso.split('T')[0].split('-').map(Number);
+    if (!year || !month) return false;
+    const now = new Date();
+    return year === now.getFullYear() && month === now.getMonth() + 1;
+  }
+
+  private normalize(value: string): string {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

@@ -61,5 +61,8 @@ export class ReceitasFormComponent {
   fecharModal(): void {
     this.fechar.emit();
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
 
 }

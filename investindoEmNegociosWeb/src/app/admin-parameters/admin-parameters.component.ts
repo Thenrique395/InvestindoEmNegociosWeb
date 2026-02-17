@@ -419,4 +419,8 @@ export class AdminParametersComponent implements OnInit {
     if (err?.status) return `${fallback} (HTTP ${err.status}).`;
     return fallback;
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

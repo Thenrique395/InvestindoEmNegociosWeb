@@ -430,4 +430,8 @@ export class CalculatorComponent implements OnDestroy {
   get isImplementado(): boolean {
     return !!this.selecionado?.implemented;
   }
+  trackByIndex(index: number): number {
+    return index;
+  }
+
 }

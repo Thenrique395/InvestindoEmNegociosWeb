@@ -44,7 +44,7 @@
           <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
             Bandeira
             <select class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="bandeira" name="bandeira">
-              <option *ngFor="let b of brands" [ngValue]="b.id.toString()">{{ b.name }}</option>
+              <option *ngFor="let b of brands; trackBy: trackByIndex" [ngValue]="b.id.toString()">{{ b.name }}</option>
             </select>
           </label>
 
@@ -81,7 +81,7 @@
             Banco (opcional)
             <input class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
             <datalist id="bankOptions">
-              <option *ngFor="let inst of institutions" [value]="inst.name"></option>
+              <option *ngFor="let inst of institutions; trackBy: trackByIndex" [value]="inst.name"></option>
             </datalist>
           </label>
 

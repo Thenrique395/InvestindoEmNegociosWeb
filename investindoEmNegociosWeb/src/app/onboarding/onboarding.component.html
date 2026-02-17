@@ -88,7 +88,7 @@
         <button
           type="button"
           class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-left text-[var(--text)] transition hover:border-[rgba(37,99,235,0.45)]"
-          *ngFor="let item of focusOptions"
+          *ngFor="let item of focusOptions; trackBy: trackByIndex"
           [ngClass]="focus === item.id ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)]' : ''"
           (click)="selectFocus(item.id)"
         >

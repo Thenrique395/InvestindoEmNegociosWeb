@@ -49,7 +49,7 @@
         <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">{{ onboardingCurrent.description }}</p>
       </div>
       <div class="flex flex-wrap gap-2">
-        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-1)] py-[var(--space-1)] text-[var(--text-sm)] text-[var(--text-muted)]" *ngFor="let item of onboardingCurrent.bullets">
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-1)] py-[var(--space-1)] text-[var(--text-sm)] text-[var(--text-muted)]" *ngFor="let item of onboardingCurrent.bullets; trackBy: trackByIndex">
           {{ item }}
         </span>
       </div>
@@ -211,7 +211,7 @@
       <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
         <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
         <ul class="mt-2 list-disc pl-[var(--space-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
-          <li *ngFor="let tip of insightTips">{{ tip }}</li>
+          <li *ngFor="let tip of insightTips; trackBy: trackByIndex">{{ tip }}</li>
         </ul>
       </div>
       <div class="flex justify-end gap-2">
@@ -295,7 +295,7 @@
         </div>
         <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'aporte'">
           <div class="grid gap-2" *ngIf="metasDetalhe.length; else semMetasDetalhe">
-            <div class="grid gap-2" *ngFor="let meta of metasDetalhe">
+            <div class="grid gap-2" *ngFor="let meta of metasDetalhe; trackBy: trackByIndex">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="min-w-0">
                   <strong class="block truncate text-[12px] text-[var(--text)]">{{ meta.title }}</strong>
@@ -414,7 +414,7 @@
             </div>
           </div>
           <div class="grid gap-2">
-            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of expenseCategorySlices | slice:0:5">
+            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of expenseCategorySlices | slice:0:5; trackBy: trackByIndex">
               <span class="inline-flex min-w-0 items-center gap-2">
                 <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
                 <span class="truncate font-semibold">{{ item.label }}</span>
@@ -441,7 +441,7 @@
             </div>
           </div>
           <div class="grid gap-2">
-            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of incomeSourceSlices | slice:0:5">
+            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of incomeSourceSlices | slice:0:5; trackBy: trackByIndex">
               <span class="inline-flex min-w-0 items-center gap-2">
                 <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
                 <span class="truncate font-semibold">{{ item.label }}</span>
@@ -474,7 +474,7 @@
         </button>
       </div>
       <div class="grid gap-2" *ngIf="recentTransactions.length; else semMovimentos">
-        <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]" *ngFor="let item of recentTransactions">
+        <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]" *ngFor="let item of recentTransactions; trackBy: trackByIndex">
           <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
             <span
               class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[12px] font-semibold text-[var(--text)]"

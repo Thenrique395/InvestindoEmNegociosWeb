@@ -41,6 +41,16 @@
 - Monitoramento de performance por tela (Core Web Vitals).
 - Testes de carga nos endpoints críticos (faturas, dashboard, investimentos).
 
+## Melhorias técnicas (limpeza e padrão de mercado)
+- Remover componente órfão `LandingComponent` sem rota ativa.
+- Limpar CSS legado no `app.component.scss` (blocos antigos de hero/painel não utilizados).
+- Adicionar `trackBy` em listas com `*ngFor` para reduzir re-render desnecessário.
+- Corrigir links placeholder (`href="#"`) para rotas reais ou botões sem navegação.
+- Revisar `AppComponent` e separar responsabilidades em serviços/componentes menores (shell, notificações, menu de usuário, tema).
+- Evitar `refresh()` global em toda navegação logada; aplicar cache/revalidação por feature.
+- Migrar rotas para lazy loading (`loadComponent`) para reduzir bundle inicial.
+- Definir estratégia de budgets por feature e otimização de assets, evitando apenas elevar limite.
+
 ## Prioridade 7 - Investimentos (núcleo de expansão)
 - Dashboard de carteira com rentabilidade diária, mensal e acumulada.
 - Comparação da carteira com benchmarks (CDI, IPCA, Ibovespa, S&P500).
