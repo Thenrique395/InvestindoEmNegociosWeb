@@ -124,6 +124,7 @@
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: var(--space-2);
+  align-items: start;
 }
 
 .chart-card {
@@ -531,6 +532,14 @@ th {
   flex-wrap: wrap;
 }
 
+.import-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
 .import-upload__button {
   display: inline-flex;
 }
@@ -541,6 +550,42 @@ th {
   align-items: end;
   gap: var(--space-2);
   flex-wrap: wrap;
+}
+
+.csv-preview {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 0.45rem 0.6rem;
+}
+
+.csv-preview summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+.csv-preview[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.section-collapsible {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 0.5rem 0.65rem;
+}
+
+.section-collapsible summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+.section-collapsible[open] summary {
+  margin-bottom: 0.65rem;
 }
 
 @media (max-width: 1200px) {
