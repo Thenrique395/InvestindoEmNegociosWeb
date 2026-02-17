@@ -3,6 +3,8 @@ import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   InvestmentsService,
+  B3ExtractResponse,
+  B3ImportStrategy,
   InvestmentPosition,
   InvestmentPositionRequest,
   InvestmentType,
@@ -34,10 +36,17 @@ export class InvestmentsComponent implements OnInit {
   selectedId: string | null = null;
   showCadastro = false;
   showMovimento = false;
+  showB3Import = false;
   posSelecionada?: InvestmentPosition | null;
   metaPatrimonioInput = '';
   metaPatrimonio = 0;
   metaSalvando = false;
+  b3Loading = false;
+  b3Importing = false;
+  b3Error = '';
+  b3FileName = '';
+  b3Strategy: B3ImportStrategy = 'merge';
+  b3Preview: B3ExtractResponse | null = null;
 
   novaPosicao: Omit<InvestmentPosition, 'id' | 'movements'> = {
     type: 'RF',
@@ -289,6 +298,74 @@ export class InvestmentsComponent implements OnInit {
     this.showMovimento = false;
     this.posSelecionada = null;
     this.selectedId = null;
+  }
+
+  openB3ImportModal(): void {
+    this.showB3Import = true;
+    this.b3Error = '';
+  }
+
+  closeB3ImportModal(): void {
+    if (this.b3Loading || this.b3Importing) return;
+    this.showB3Import = false;
+    this.b3Error = '';
+    this.b3FileName = '';
+    this.b3Preview = null;
+    this.b3Strategy = 'merge';
+  }
+
+  onB3FileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      this.b3Error = 'Formato inválido. Envie o relatório da B3 em PDF.';
+      input.value = '';
+      return;
+    }
+
+    this.b3FileName = file.name;
+    this.b3Error = '';
+    this.b3Preview = null;
+    this.b3Loading = true;
+
+    this.investments.extractB3Report(file).subscribe({
+      next: (preview) => {
+        this.b3Preview = preview;
+      },
+      error: (err) => {
+        this.b3Error = err?.error?.detail || 'Não foi possível ler o relatório da B3.';
+      },
+      complete: () => {
+        this.b3Loading = false;
+        input.value = '';
+      }
+    });
+  }
+
+  confirmarImportacaoB3(): void {
+    if (!this.b3Preview?.importToken) {
+      this.b3Error = 'Prévia sem token de importação. Extraia o arquivo novamente.';
+      return;
+    }
+    this.b3Importing = true;
+    this.b3Error = '';
+
+    this.investments.importB3Report(this.b3Preview.importToken, this.b3Strategy).subscribe({
+      next: () => {
+        this.uiFeedback.success('Relatório B3 importado com sucesso.');
+        this.carregarPosicoes();
+        this.b3Importing = false;
+        this.closeB3ImportModal();
+      },
+      error: (err) => {
+        this.b3Error = err?.error?.detail || 'Falha ao importar dados da B3.';
+      },
+      complete: () => {
+        this.b3Importing = false;
+      }
+    });
   }
 
   private carregarMeta(): void {

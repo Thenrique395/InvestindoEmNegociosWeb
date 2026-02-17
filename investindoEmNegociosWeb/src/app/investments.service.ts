@@ -5,7 +5,9 @@ import { API_BASE_URL } from './api.config';
 import { applyListQuery, ListQuery } from './api-query';
 
 export type InvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
-export type MovementType = 'APORTE' | 'RESGATE';
+export type MovementType = 'APORTE' | 'RESGATE' | 'COMPRA' | 'VENDA' | 'DIVIDENDO' | 'JCP' | 'RENDIMENTO' | 'TAXA';
+
+export type B3ImportStrategy = 'merge' | 'replace';
 
 export interface InvestmentGoal {
   id: string;
@@ -53,6 +55,52 @@ export interface InvestmentMovementRequest {
   note?: string | null;
 }
 
+export interface B3ExtractPosition {
+  product: string;
+  type: string;
+  institution: string;
+  quantity: number;
+  closingPrice: number;
+  updatedValue: number;
+}
+
+export interface B3ExtractIncome {
+  product: string;
+  paymentDate: string;
+  eventType: string;
+  institution: string;
+  quantity: number;
+  unitPrice: number;
+  netValue: number;
+}
+
+export interface B3ExtractTrade {
+  code: string;
+  period: string;
+  institution: string;
+  buyQuantity: number;
+  sellQuantity: number;
+  netQuantity: number;
+  avgBuyPrice: number;
+  avgSellPrice: number;
+}
+
+export interface B3ExtractResponse {
+  importToken?: string;
+  referenceMonth?: string;
+  holderName?: string;
+  document?: string;
+  totals: {
+    positions: number;
+    incomes: number;
+    trades: number;
+  };
+  positions: B3ExtractPosition[];
+  incomes: B3ExtractIncome[];
+  trades: B3ExtractTrade[];
+  rawText?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class InvestmentsService {
   private baseUrl = `${API_BASE_URL}/investments`;
@@ -86,5 +134,18 @@ export class InvestmentsService {
 
   addMovement(positionId: string, payload: InvestmentMovementRequest): Observable<InvestmentMovement> {
     return this.http.post<InvestmentMovement>(`${this.baseUrl}/positions/${positionId}/movements`, payload);
+  }
+
+  extractB3Report(file: File): Observable<B3ExtractResponse> {
+    const data = new FormData();
+    data.append('file', file);
+    return this.http.post<B3ExtractResponse>(`${this.baseUrl}/import/b3/extract`, data);
+  }
+
+  importB3Report(importToken: string, strategy: B3ImportStrategy): Observable<{ imported: number }> {
+    return this.http.post<{ imported: number }>(`${this.baseUrl}/import/b3/confirm`, {
+      importToken,
+      strategy
+    });
   }
 }

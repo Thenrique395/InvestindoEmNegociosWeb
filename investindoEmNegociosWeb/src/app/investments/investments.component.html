@@ -86,6 +86,7 @@
   </div>
 
   <div class="top-actions">
+    <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importar relatório B3</button>
     <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">
       {{ showCadastro ? 'Fechar cadastro' : 'Nova posição' }}
     </button>
@@ -235,6 +236,85 @@
         <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
         <button class="btn-cancel sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="showB3Import">
+    <div class="modal__backdrop" (click)="closeB3ImportModal()"></div>
+    <div class="modal__card modal__card--wide">
+      <h3>Importar relatório consolidado da B3</h3>
+      <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+
+      <div class="import-upload">
+        <label class="btn-primary sm import-upload__button">
+          <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
+          Escolher PDF
+        </label>
+        <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
+      </div>
+
+      <div class="muted" *ngIf="b3Loading">Lendo relatório...</div>
+      <div class="danger" *ngIf="b3Error">{{ b3Error }}</div>
+
+      <ng-container *ngIf="b3Preview">
+        <div class="executive-grid">
+          <article class="card executive-card">
+            <p class="label">Mês de referência</p>
+            <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
+          </article>
+          <article class="card executive-card">
+            <p class="label">Total em posições</p>
+            <strong>{{ b3Preview.totals.positions | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          </article>
+          <article class="card executive-card">
+            <p class="label">Proventos</p>
+            <strong>{{ b3Preview.totals.incomes | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          </article>
+          <article class="card executive-card">
+            <p class="label">Negociações</p>
+            <strong>{{ b3Preview.trades.length }}</strong>
+          </article>
+        </div>
+
+        <div class="table-wrap" *ngIf="b3Preview.positions.length">
+          <table>
+            <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Instituição</th>
+              <th>Qtd</th>
+              <th>Fechamento</th>
+              <th>Atualizado</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let p of b3Preview.positions; trackBy: trackByIndex">
+              <td>{{ p.product }}</td>
+              <td>{{ p.institution }}</td>
+              <td>{{ p.quantity }}</td>
+              <td>{{ p.closingPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ p.updatedValue | currency:'BRL':'symbol':'1.2-2' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="import-actions">
+          <label class="filter">
+            <span>Estratégia</span>
+            <select [(ngModel)]="b3Strategy">
+              <option value="merge">Mesclar com dados atuais</option>
+              <option value="replace">Substituir mês importado</option>
+            </select>
+          </label>
+          <div class="actions">
+            <button class="btn-cancel sm" type="button" (click)="closeB3ImportModal()">Cancelar</button>
+            <button class="btn-primary sm" type="button" (click)="confirmarImportacaoB3()" [disabled]="b3Importing">
+              {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </section>
