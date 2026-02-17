@@ -47,7 +47,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   maxMonthlyValue = 0;
   currentMonthDays = 0;
   expenseCategoryData: { label: string; total: number }[] = [];
+  expenseCategorySlices: { label: string; total: number; percent: number; color: string }[] = [];
+  expenseCategoryTotal = 0;
+  expenseCategoryChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
   incomeSourceData: { label: string; total: number }[] = [];
+  incomeSourceSlices: { label: string; total: number; percent: number; color: string }[] = [];
+  incomeSourceTotal = 0;
+  incomeSourceChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
   maxExpenseCategory = 0;
   maxIncomeSource = 0;
   incomesPolyline = '';
@@ -123,6 +129,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   ];
   showInsightDetails = false;
+  private readonly expenseCategoryColors = ['#2563EB', '#0EA5E9', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6'];
+  private readonly incomeSourceColors = ['#22C55E', '#0EA5E9', '#2563EB', '#8B5CF6', '#F59E0B', '#14B8A6'];
 
   constructor(
     private db: ApiDataService,
@@ -386,9 +394,55 @@ export class HomeComponent implements OnInit, OnDestroy {
     const incomeData = cap(groupByLabel(incomes, (r) => r.categoria || 'Sem categoria'));
 
     this.expenseCategoryData = expenseData;
+    this.expenseCategoryTotal = expenseData.reduce((sum, item) => sum + item.total, 0);
+    this.expenseCategorySlices = expenseData.map((item, index) => ({
+      ...item,
+      percent: this.expenseCategoryTotal > 0 ? (item.total / this.expenseCategoryTotal) * 100 : 0,
+      color: this.expenseCategoryColors[index % this.expenseCategoryColors.length]
+    }));
+    this.expenseCategoryChartBackground = this.buildCategoryChartBackground();
     this.incomeSourceData = incomeData;
+    this.incomeSourceTotal = incomeData.reduce((sum, item) => sum + item.total, 0);
+    this.incomeSourceSlices = incomeData.map((item, index) => ({
+      ...item,
+      percent: this.incomeSourceTotal > 0 ? (item.total / this.incomeSourceTotal) * 100 : 0,
+      color: this.incomeSourceColors[index % this.incomeSourceColors.length]
+    }));
+    this.incomeSourceChartBackground = this.buildIncomeChartBackground();
     this.maxExpenseCategory = Math.max(...expenseData.map((item) => item.total), 0);
     this.maxIncomeSource = Math.max(...incomeData.map((item) => item.total), 0);
+  }
+
+  private buildCategoryChartBackground(): string {
+    if (!this.expenseCategorySlices.length || this.expenseCategoryTotal <= 0) {
+      return 'conic-gradient(var(--surface-3) 0deg 360deg)';
+    }
+
+    let start = 0;
+    const parts = this.expenseCategorySlices.map((item) => {
+      const end = start + (item.percent / 100) * 360;
+      const segment = `${item.color} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`;
+      start = end;
+      return segment;
+    });
+
+    return `conic-gradient(${parts.join(', ')})`;
+  }
+
+  private buildIncomeChartBackground(): string {
+    if (!this.incomeSourceSlices.length || this.incomeSourceTotal <= 0) {
+      return 'conic-gradient(var(--surface-3) 0deg 360deg)';
+    }
+
+    let start = 0;
+    const parts = this.incomeSourceSlices.map((item) => {
+      const end = start + (item.percent / 100) * 360;
+      const segment = `${item.color} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`;
+      start = end;
+      return segment;
+    });
+
+    return `conic-gradient(${parts.join(', ')})`;
   }
 
   private updateRecentTransactions(): void {

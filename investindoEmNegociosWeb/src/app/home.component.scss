@@ -1,1 +1,37 @@
-/* Tailwind handles layout */
+.expense-donut-wrap {
+  display: grid;
+  place-items: center;
+}
+
+.expense-donut {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.expense-donut__center {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 0.35rem;
+}
+
+.expense-donut__center small {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.expense-donut__center strong {
+  font-size: 12px;
+  color: var(--text);
+}

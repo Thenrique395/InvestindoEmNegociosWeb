@@ -404,10 +404,25 @@
     <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1">
       <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
-        <div class="grid gap-2" *ngIf="expenseCategoryData.length; else despesasVazio5">
-          <div class="flex items-center justify-between text-[12px]" *ngFor="let item of expenseCategoryData | slice:0:4">
-            <span class="truncate font-semibold">{{ item.label }}</span>
-            <span class="font-semibold text-[var(--text)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
+        <div class="grid gap-3" *ngIf="expenseCategorySlices.length; else despesasVazio5">
+          <div class="expense-donut-wrap">
+            <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuicao de despesas por categoria">
+              <div class="expense-donut__center">
+                <small>Total</small>
+                <strong>{{ expenseCategoryTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of expenseCategorySlices | slice:0:5">
+              <span class="inline-flex min-w-0 items-center gap-2">
+                <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
+                <span class="truncate font-semibold">{{ item.label }}</span>
+              </span>
+              <span class="font-semibold text-[var(--text)]">
+                {{ item.percent | number:'1.0-0' }}%
+              </span>
+            </div>
           </div>
         </div>
         <ng-template #despesasVazio5>
@@ -416,10 +431,25 @@
       </div>
       <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por categoria</p>
-        <div class="grid gap-2" *ngIf="incomeSourceData.length; else receitasVazio5">
-          <div class="flex items-center justify-between text-[12px]" *ngFor="let item of incomeSourceData | slice:0:4">
-            <span class="truncate font-semibold">{{ item.label }}</span>
-            <span class="font-semibold text-[var(--text)]">{{ item.total | currency: 'BRL':'symbol':'1.2-2' }}</span>
+        <div class="grid gap-3" *ngIf="incomeSourceSlices.length; else receitasVazio5">
+          <div class="expense-donut-wrap">
+            <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuicao de receitas por categoria">
+              <div class="expense-donut__center">
+                <small>Total</small>
+                <strong>{{ incomeSourceTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of incomeSourceSlices | slice:0:5">
+              <span class="inline-flex min-w-0 items-center gap-2">
+                <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
+                <span class="truncate font-semibold">{{ item.label }}</span>
+              </span>
+              <span class="font-semibold text-[var(--text)]">
+                {{ item.percent | number:'1.0-0' }}%
+              </span>
+            </div>
           </div>
         </div>
         <ng-template #receitasVazio5>
