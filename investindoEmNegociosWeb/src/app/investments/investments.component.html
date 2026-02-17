@@ -32,10 +32,10 @@
     </article>
     <article class="card executive-card">
       <div class="label-row">
-        <p class="label">Resultado do mês (fluxo)</p>
+        <p class="label">Saldo do mês</p>
         <button type="button" class="hint" aria-label="Explicação do card resultado do mês">
           i
-          <span class="hint__panel">Fluxo do mês = aportes menos resgates. Mostra se entrou ou saiu mais dinheiro no período.</span>
+          <span class="hint__panel">Entradas menos saídas no mês atual (aportes e compras menos resgates e vendas).</span>
         </button>
       </div>
       <strong [class.success]="resultadoMes >= 0" [class.danger]="resultadoMes < 0">
@@ -45,7 +45,7 @@
     </article>
     <article class="card executive-card">
       <div class="label-row">
-        <p class="label">Resultado estimado acumulado</p>
+        <p class="label">Resultado acumulado</p>
         <button type="button" class="hint" aria-label="Explicação do card resultado estimado acumulado">
           i
           <span class="hint__panel">Estimativa de ganho/perda acumulada: patrimônio atual menos valor líquido aportado.</span>
@@ -59,52 +59,65 @@
   </section>
 
   <div class="top-actions">
-    <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importar relatório B3</button>
+    <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
     <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">
       {{ showCadastro ? 'Fechar cadastro' : 'Nova posição' }}
     </button>
   </div>
 
-  <div class="card">
+  <article class="card action-card">
+    <div>
+      <p class="label">O que fazer agora</p>
+      <strong>{{ proximaAcao.titulo }}</strong>
+      <small>{{ proximaAcao.descricao }}</small>
+    </div>
+    <button class="btn-primary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
+  </article>
+
+  <div class="card" id="sec-posicoes">
     <div class="section-head">
-      <h3>Posições cadastradas</h3>
-      <span class="muted">{{ filteredPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
+      <h3>Posições</h3>
+      <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
     </div>
 
     <div class="table-filters">
-      <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por ativo, conta ou categoria" />
-      <select [(ngModel)]="filterType">
+      <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onFiltroMudou()" placeholder="Buscar por ativo, conta ou categoria" />
+      <select [(ngModel)]="filterType" (ngModelChange)="onFiltroMudou()">
         <option value="ALL">Todos os tipos</option>
         <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
       </select>
-      <select [(ngModel)]="filterAccount">
+      <select [(ngModel)]="filterAccount" (ngModelChange)="onFiltroMudou()">
         <option value="ALL">Todas as contas</option>
         <option *ngFor="let acc of contasDisponiveis; trackBy: trackByIndex" [value]="acc">{{ acc }}</option>
       </select>
-      <select [(ngModel)]="filterStatus">
+      <select [(ngModel)]="filterStatus" (ngModelChange)="onFiltroMudou()">
         <option value="ALL">Todos os status</option>
         <option value="ACTIVE">Ativas</option>
         <option value="ZEROED">Zeradas</option>
       </select>
     </div>
 
-    <div *ngIf="!filteredPositions.length" class="empty">Nenhuma posição para os filtros atuais.</div>
-    <div class="table-wrap" *ngIf="filteredPositions.length">
+    <div *ngIf="!sortedPositions.length" class="empty">Nenhuma posição para os filtros atuais.</div>
+    <div class="table-wrap" *ngIf="sortedPositions.length">
       <table>
         <thead>
           <tr>
-            <th>Ativo</th>
-            <th>Status</th>
-            <th>Quantidade</th>
-            <th>Preço médio</th>
-            <th>Valor atual</th>
-            <th>Resultado est.</th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('asset')">Ativo <span>{{ sortIcon('asset') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('paperType')" title="Classificação do ativo: ON/PN/PNA/PNB/UNT ou Cotas">Classe <span>{{ sortIcon('paperType') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('status')">Status <span>{{ sortIcon('status') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('portfolioPercent')" title="Participação desta posição no patrimônio total da carteira">% carteira <span>{{ sortIcon('portfolioPercent') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade percentual estimada da posição com base no valor atual e no valor líquido investido">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('estimatedResult')">Resultado <span>{{ sortIcon('estimatedResult') }}</span></button></th>
             <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of filteredPositions; trackBy: trackByIndex">
+          <tr *ngFor="let p of pagedPositions; trackBy: trackByIndex">
             <td>{{ p.asset }}</td>
+            <td>{{ tipoPapel(p) }}</td>
             <td>
               <span class="status-pill" [class.zeroed]="p.quantity <= 0">
                 {{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}
@@ -113,9 +126,12 @@
             <td>{{ p.quantity }}</td>
             <td>{{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}</td>
             <td>{{ valorAtualPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}</td>
+            <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
+            <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
+              {{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%
+            </td>
             <td [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">
               {{ resultadoPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}
-              <small>({{ resultadoPosicaoPercentual(p) | number:'1.1-1' }}%)</small>
             </td>
             <td>
               <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Registrar movimento</button>
@@ -124,47 +140,15 @@
         </tbody>
       </table>
     </div>
-  </div>
-
-  <div class="card summary">
-    <div class="summary__info">
-      <div class="meta-form">
-        <div class="label-row">
-          <p class="label">Meta de patrimônio (R$)</p>
-          <button type="button" class="hint" aria-label="Explicação da meta de patrimônio">
-            i
-            <span class="hint__panel">Defina sua meta para acompanhar o progresso e quanto ainda falta para alcançar o objetivo.</span>
-          </button>
-        </div>
-        <div class="meta-form__controls">
-          <input type="text" [(ngModel)]="metaPatrimonioInput" digitOnly (input)="formatarMeta()" inputmode="numeric"
-            placeholder="Ex.: 100.000,00" />
-          <button class="btn-ghost sm" type="button" (click)="salvarMeta()" [disabled]="metaSalvando || !metaPatrimonio">
-            {{ metaSalvando ? 'Salvando...' : 'Salvar meta' }}
-          </button>
-        </div>
-      </div>
-      <div class="summary__grid">
-        <div>
-          <p class="label">Aportado líquido</p>
-          <strong>{{ aporteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        </div>
-        <div>
-          <p class="label">Falta para a meta</p>
-          <strong>{{ faltaMeta | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        </div>
-      </div>
-    </div>
-    <div class="summary__progress">
-      <div class="progress-bar">
-        <span [style.width.%]="progressoMeta"></span>
-      </div>
-      <small>{{ progressoMeta | number : '1.0-0' }}% da meta atingida</small>
+    <div class="table-pagination" *ngIf="sortedPositions.length">
+      <button class="btn-ghost sm" type="button" (click)="mudarPagina(-1)" [disabled]="currentPage <= 1">Anterior</button>
+      <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }}</small>
+      <button class="btn-ghost sm" type="button" (click)="mudarPagina(1)" [disabled]="currentPage >= totalPages">Próxima</button>
     </div>
   </div>
 
   <section class="visual-grid">
-    <article class="card chart-card">
+    <article class="card chart-card" id="sec-alocacao">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Alocação da carteira</h3>
@@ -193,7 +177,7 @@
       </div>
     </article>
 
-    <article class="card chart-card">
+    <article class="card chart-card" id="sec-benchmarks">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Evolução mensal</h3>
@@ -303,10 +287,15 @@
       <small class="danger" *ngIf="benchmarkError">{{ benchmarkError }}</small>
       <div class="benchmark-list">
         <div class="benchmark-item" *ngFor="let item of benchmarkComparativo; trackBy: trackByIndex">
-          <strong>
-            {{ item.name }}
-            <span *ngIf="item.isEstimated">(FAKE - TEMPORARIAMENTE)</span>
-          </strong>
+          <strong>{{ item.name }}</strong>
+          <small>
+            Origem:
+            <span [class.warning]="item.isEstimated">
+              {{ item.isEstimated ? 'FAKE - TEMPORARIAMENTE' : 'OFICIAL' }}
+            </span>
+            · {{ item.source || '-' }}
+          </small>
+          <small>Atualizado em: {{ benchmarkUpdatedAt ? (benchmarkUpdatedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</small>
           <span>Carteira: {{ item.carteira | number:'1.2-2' }}%</span>
           <span>Benchmark: {{ item.benchmark | number:'1.2-2' }}%</span>
           <small [class.success]="item.carteira - item.benchmark >= 0" [class.danger]="item.carteira - item.benchmark < 0">
@@ -428,7 +417,7 @@
       </div>
     </article>
 
-    <article class="card chart-card">
+    <article class="card chart-card" id="sec-projecao">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Projeção de meta</h3>
@@ -462,67 +451,18 @@
     </article>
   </section>
 
-  <section class="visual-grid">
-    <article class="card chart-card">
+  <article class="card chart-card">
       <div class="section-head">
         <div class="section-head__title">
-          <h3>Importação por CSV</h3>
-          <button type="button" class="hint" aria-label="Explicação da importação CSV">
-            i
-            <span class="hint__panel">Onboarding rápido via planilha. Use o modelo CSV para importar múltiplas posições de uma vez.</span>
-          </button>
-        </div>
-      </div>
-      <div class="import-compact">
-        <div class="import-upload">
-          <label class="btn-primary sm import-upload__button">
-            <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
-            Importar CSV
-          </label>
-          <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Baixar modelo</button>
-        </div>
-        <small class="muted">Importados nesta execução: {{ csvImported }}</small>
-      </div>
-      <div class="danger" *ngIf="csvError">{{ csvError }}</div>
-      <details class="csv-preview" *ngIf="csvPreviewRows.length">
-        <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Ativo</th>
-                <th>Qtd</th>
-                <th>Preço médio</th>
-                <th>Conta</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of csvPreviewRows; trackBy: trackByIndex">
-                <td>{{ row.type }}</td>
-                <td>{{ row.asset }}</td>
-                <td>{{ row.quantity }}</td>
-                <td>{{ row.avgPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
-                <td>{{ row.account }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </details>
-    </article>
-
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Resumo fiscal básico</h3>
+          <h3>Resumo anual de operações (pré-IR)</h3>
           <button type="button" class="hint" aria-label="Explicação do resumo fiscal">
             i
-            <span class="hint__panel">Resumo anual de compras, vendas, proventos e taxas para facilitar conferência e fechamento.</span>
+            <span class="hint__panel">Resumo anual para conferência de operações. Não substitui apuração oficial de imposto.</span>
           </button>
         </div>
       </div>
       <details class="section-collapsible">
-        <summary>Abrir resumo do ano</summary>
+        <summary>Ver resumo do ano</summary>
         <div class="filter">
           <span>Ano de referência</span>
           <select [(ngModel)]="fiscalAnoSelecionado" [ngModelOptions]="{standalone:true}">
@@ -531,31 +471,60 @@
         </div>
         <div class="summary__grid">
           <div>
-            <p class="label">Compras + aportes</p>
+            <div class="label-row">
+              <p class="label">Compras + aportes</p>
+              <button type="button" class="hint" aria-label="Explicação de compras e aportes">
+                i
+                <span class="hint__panel">Total investido no ano: compras de ativos e aportes registrados.</span>
+              </button>
+            </div>
             <strong>{{ resumoFiscal.compras | currency:'BRL':'symbol':'1.2-2' }}</strong>
           </div>
           <div>
-            <p class="label">Vendas + resgates</p>
+            <div class="label-row">
+              <p class="label">Vendas + resgates</p>
+              <button type="button" class="hint" aria-label="Explicação de vendas e resgates">
+                i
+                <span class="hint__panel">Total recebido por vendas de ativos e resgates no ano.</span>
+              </button>
+            </div>
             <strong>{{ resumoFiscal.vendas | currency:'BRL':'symbol':'1.2-2' }}</strong>
           </div>
           <div>
-            <p class="label">Proventos</p>
+            <div class="label-row">
+              <p class="label">Proventos</p>
+              <button type="button" class="hint" aria-label="Explicação de proventos">
+                i
+                <span class="hint__panel">Dividendos, JCP e rendimentos recebidos no ano.</span>
+              </button>
+            </div>
             <strong class="success">{{ resumoFiscal.proventos | currency:'BRL':'symbol':'1.2-2' }}</strong>
           </div>
           <div>
-            <p class="label">Taxas</p>
+            <div class="label-row">
+              <p class="label">Taxas</p>
+              <button type="button" class="hint" aria-label="Explicação de taxas">
+                i
+                <span class="hint__panel">Custos operacionais registrados como taxa no ano.</span>
+              </button>
+            </div>
             <strong class="danger">{{ resumoFiscal.taxas | currency:'BRL':'symbol':'1.2-2' }}</strong>
           </div>
         </div>
         <div>
-          <p class="label">Saldo fiscal estimado</p>
+          <div class="label-row">
+            <p class="label">Resultado anual (estimado)</p>
+            <button type="button" class="hint" aria-label="Explicação do resultado anual estimado">
+              i
+              <span class="hint__panel">Cálculo simplificado: vendas + proventos - compras - taxas.</span>
+            </button>
+          </div>
           <strong [class.success]="resumoFiscal.saldo >= 0" [class.danger]="resumoFiscal.saldo < 0">
             {{ resumoFiscal.saldo | currency:'BRL':'symbol':'1.2-2' }}
           </strong>
         </div>
       </details>
-    </article>
-  </section>
+  </article>
 
   <div class="modal" *ngIf="showCadastro">
     <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
@@ -642,19 +611,63 @@
   <div class="modal" *ngIf="showB3Import">
     <div class="modal__backdrop" (click)="closeB3ImportModal()"></div>
     <div class="modal__card modal__card--wide">
-      <h3>Importar relatório consolidado da B3</h3>
-      <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+      <h3>Importações e exportações</h3>
 
-      <div class="import-upload">
-        <label class="btn-primary sm import-upload__button">
-          <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
-          Escolher PDF
-        </label>
-        <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
-      </div>
+      <section class="import-section">
+        <p class="label">Relatório consolidado da B3 (PDF)</p>
+        <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+        <div class="import-upload">
+          <label class="btn-primary sm import-upload__button">
+            <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
+            Escolher PDF
+          </label>
+          <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
+        </div>
 
-      <div class="muted" *ngIf="b3Loading">Lendo relatório...</div>
-      <div class="danger" *ngIf="b3Error">{{ b3Error }}</div>
+        <div class="muted" *ngIf="b3Loading">Lendo relatório...</div>
+        <div class="danger" *ngIf="b3Error">{{ b3Error }}</div>
+      </section>
+
+      <section class="import-section">
+        <p class="label">Planilha CSV</p>
+        <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
+        <div class="import-compact">
+          <div class="import-upload">
+            <label class="btn-primary sm import-upload__button">
+              <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
+              Importar CSV
+            </label>
+            <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Exportar modelo</button>
+          </div>
+          <small class="muted">Importados nesta execução: {{ csvImported }}</small>
+        </div>
+        <div class="danger" *ngIf="csvError">{{ csvError }}</div>
+        <details class="csv-preview" *ngIf="csvPreviewRows.length">
+          <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Ativo</th>
+                  <th>Qtd</th>
+                  <th>Preço médio</th>
+                  <th>Conta</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of csvPreviewRows; trackBy: trackByIndex">
+                  <td>{{ row.type }}</td>
+                  <td>{{ row.asset }}</td>
+                  <td>{{ row.quantity }}</td>
+                  <td>{{ row.avgPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ row.account }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
 
       <ng-container *ngIf="b3Preview">
         <div class="executive-grid">

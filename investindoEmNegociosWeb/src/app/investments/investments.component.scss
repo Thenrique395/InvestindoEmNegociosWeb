@@ -1,6 +1,6 @@
 .investments {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .muted {
@@ -281,9 +281,9 @@
 .benchmark-item,
 .allocation-item,
 .event-item {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 12px;
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
   padding: var(--space-1);
   display: grid;
   gap: 0.25rem;
@@ -326,6 +326,22 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-1);
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.action-card strong {
+  display: block;
+  color: var(--text);
+}
+
+.action-card small {
+  color: var(--text-muted);
 }
 
 .section-head {
@@ -465,6 +481,37 @@ td {
 th {
   font-size: var(--text-sm);
   color: var(--text-muted);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.sort-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sort-btn span {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
 }
 
 .status-pill {
@@ -544,6 +591,15 @@ th {
   display: inline-flex;
 }
 
+.import-section {
+  border: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  padding: var(--space-1);
+  display: grid;
+  gap: 0.45rem;
+}
+
 .import-actions {
   display: flex;
   justify-content: space-between;
@@ -553,9 +609,9 @@ th {
 }
 
 .csv-preview {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 10px;
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
   padding: 0.45rem 0.6rem;
 }
 
@@ -571,9 +627,9 @@ th {
 }
 
 .section-collapsible {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 10px;
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
   padding: 0.5rem 0.65rem;
 }
 
@@ -609,6 +665,12 @@ th {
 
   .table-filters {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .action-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: start;
   }
 
   .evolution-chart {

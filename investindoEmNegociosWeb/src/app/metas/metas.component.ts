@@ -8,6 +8,14 @@ import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
+type GoalKind = 'ALL' | 'DESPESA' | 'RECEITA' | 'INVESTIMENTO' | 'GERAL';
+type GoalSection = {
+  kind: Exclude<GoalKind, 'ALL'>;
+  label: string;
+  subtitle: string;
+  metas: Goal[];
+};
+
 @Component({
   selector: 'app-metas',
   standalone: true,
@@ -17,6 +25,7 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 })
 export class MetasComponent implements OnInit {
   mostrarModal = false;
+  metaTipo: Exclude<GoalKind, 'ALL'> = 'GERAL';
   metaNome = '';
   metaValor = '';
   metaAno = String(new Date().getFullYear());
@@ -27,6 +36,13 @@ export class MetasComponent implements OnInit {
   anos: number[] = [];
   filtroAno: number | 'ALL' = new Date().getFullYear();
   filtroStatus: GoalStatus | 'ALL' = 'ALL';
+  filtroTipo: GoalKind = 'ALL';
+  metaTipos = [
+    { id: 'DESPESA' as const, label: 'Despesas' },
+    { id: 'RECEITA' as const, label: 'Receitas' },
+    { id: 'INVESTIMENTO' as const, label: 'Investimentos' },
+    { id: 'GERAL' as const, label: 'Geral' }
+  ];
   statusLista = [
     { id: 'Planned' as GoalStatus, label: 'Planejada' },
     { id: 'InProgress' as GoalStatus, label: 'Em andamento' },
@@ -86,6 +102,37 @@ export class MetasComponent implements OnInit {
     this.carregarMetas();
   }
 
+  get totalMetasAtivas(): number {
+    return this.metas.filter((meta) => meta.status !== 'Canceled').length;
+  }
+
+  get metasPorSecao(): GoalSection[] {
+    const grouped = new Map<Exclude<GoalKind, 'ALL'>, Goal[]>();
+    const order: Exclude<GoalKind, 'ALL'>[] = ['DESPESA', 'RECEITA', 'INVESTIMENTO', 'GERAL'];
+    order.forEach((kind) => grouped.set(kind, []));
+
+    this.metas
+      .slice()
+      .sort((a, b) => this.compareMetas(a, b))
+      .forEach((meta) => grouped.get(this.extrairTipoMeta(meta.description))?.push(meta));
+
+    const sectionMeta: Record<Exclude<GoalKind, 'ALL'>, { label: string; subtitle: string }> = {
+      DESPESA: { label: 'Metas de despesas', subtitle: 'Controle de gastos e teto por período.' },
+      RECEITA: { label: 'Metas de receitas', subtitle: 'Aumento de entradas e previsibilidade mensal.' },
+      INVESTIMENTO: { label: 'Metas de investimentos', subtitle: 'Acúmulo patrimonial e aportes recorrentes.' },
+      GERAL: { label: 'Metas gerais', subtitle: 'Objetivos financeiros complementares.' }
+    };
+
+    return order
+      .map((kind) => ({
+        kind,
+        label: sectionMeta[kind].label,
+        subtitle: sectionMeta[kind].subtitle,
+        metas: grouped.get(kind) ?? []
+      }))
+      .filter((section) => section.metas.length > 0);
+  }
+
   prepararAnos(): void {
     const atual = new Date().getFullYear();
     this.anos = [];
@@ -107,10 +154,11 @@ export class MetasComponent implements OnInit {
   abrirModalEditar(meta: Goal): void {
     this.editando = true;
     this.metaSelecionada = meta;
+    this.metaTipo = this.extrairTipoMeta(meta.description);
     this.metaNome = meta.title;
     this.metaValor = formatNumberValue(meta.targetAmount);
     this.metaAno = String(meta.year);
-    this.metaDescricao = meta.description || '';
+    this.metaDescricao = this.limparDescricaoMeta(meta.description) || '';
     this.metaMensal = meta.expectedMonthly
       ? formatNumberValue(meta.expectedMonthly)
       : '';
@@ -141,7 +189,7 @@ export class MetasComponent implements OnInit {
       targetAmount: valor,
       currentAmount: this.metaSelecionada?.currentAmount ?? 0,
       year: ano,
-      description: this.metaDescricao?.trim() || null,
+      description: this.montarDescricaoMeta(this.metaDescricao, this.metaTipo),
       status: (this.metaSelecionada?.status as GoalStatus) ?? ('Planned' as GoalStatus),
       expectedMonthly: this.parseValor(this.metaMensal),
       targetDate: this.toTargetDate()
@@ -345,7 +393,8 @@ export class MetasComponent implements OnInit {
     const status = this.filtroStatus === 'ALL' ? undefined : this.filtroStatus;
     this.goalsService.list(ano, status).subscribe({
       next: (lista) => {
-        this.metas = lista;
+        this.metas = lista
+          .filter((meta) => this.filtroTipo === 'ALL' || this.extrairTipoMeta(meta.description) === this.filtroTipo);
         this.loading = false;
         this.metas.forEach((m) => this.carregarContribuicoes(m.id));
       },
@@ -396,6 +445,7 @@ export class MetasComponent implements OnInit {
   }
 
   private resetarForm(): void {
+    this.metaTipo = 'GERAL';
     this.metaNome = '';
     this.metaValor = '';
     this.metaMensal = '';
@@ -405,8 +455,72 @@ export class MetasComponent implements OnInit {
     this.metaSelecionada = undefined;
     this.editando = false;
   }
+
+  tipoMetaLabel(meta: Goal): string {
+    const tipo = this.extrairTipoMeta(meta.description);
+    switch (tipo) {
+      case 'DESPESA':
+        return 'Controle de Despesas';
+      case 'RECEITA':
+        return 'Meta de Receitas';
+      case 'INVESTIMENTO':
+        return 'Meta de Investimentos';
+      default:
+        return 'Meta Geral';
+    }
+  }
+
+  descricaoMeta(meta: Goal): string | null {
+    return this.limparDescricaoMeta(meta.description);
+  }
+
+  private montarDescricaoMeta(descricao: string, tipo: Exclude<GoalKind, 'ALL'>): string | null {
+    const clean = (descricao || '').trim();
+    const tag = `[TIPO:${tipo}]`;
+    return clean ? `${tag} ${clean}` : tag;
+  }
+
+  private extrairTipoMeta(description?: string | null): Exclude<GoalKind, 'ALL'> {
+    const normalized = (description || '').toUpperCase();
+    if (normalized.includes('[TIPO:DESPESA]')) return 'DESPESA';
+    if (normalized.includes('[TIPO:RECEITA]')) return 'RECEITA';
+    if (normalized.includes('[TIPO:INVESTIMENTO]')) return 'INVESTIMENTO';
+    return 'GERAL';
+  }
+
+  private limparDescricaoMeta(description?: string | null): string | null {
+    if (!description) return description ?? null;
+    return description.replace(/\[TIPO:[A-Z]+\]\s*/i, '').trim() || null;
+  }
+
+  private compareMetas(a: Goal, b: Goal): number {
+    const typeOrder: Record<Exclude<GoalKind, 'ALL'>, number> = {
+      DESPESA: 0,
+      RECEITA: 1,
+      INVESTIMENTO: 2,
+      GERAL: 3
+    };
+    const aType = this.extrairTipoMeta(a.description);
+    const bType = this.extrairTipoMeta(b.description);
+    const byType = typeOrder[aType] - typeOrder[bType];
+    if (byType !== 0) return byType;
+
+    const byProgress = this.progresso(b) - this.progresso(a);
+    if (byProgress !== 0) return byProgress;
+
+    return a.title.localeCompare(b.title, 'pt-BR');
+  }
+
   trackByIndex(index: number): number {
     return index;
+  }
+
+  trackByGoal(_: number, meta: Goal): string {
+    return meta.id;
+  }
+
+  trackBySection(_: number, section: GoalSection): string {
+    return section.kind;
   }
 
 }

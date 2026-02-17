@@ -12,19 +12,19 @@ import {
 } from '../investments.service';
 import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
-import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
-type BenchmarkPoint = { name: string; carteira: number; benchmark: number; isEstimated?: boolean };
+type BenchmarkPoint = { name: string; carteira: number; benchmark: number; source?: string; isEstimated?: boolean };
+type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
 
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, CurrencyPipe, DigitOnlyDirective],
+  imports: [CommonModule, FormsModule, DecimalPipe, CurrencyPipe],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss']
 })
@@ -54,12 +54,17 @@ export class InvestmentsComponent implements OnInit {
   b3Preview: B3ExtractResponse | null = null;
   benchmarkLoading = false;
   benchmarkError = '';
+  benchmarkUpdatedAt: Date | null = null;
   benchmarkComparativo: BenchmarkPoint[] = [
-    { name: 'SELIC (BCB)', carteira: 0, benchmark: 0, isEstimated: false },
-    { name: 'IPCA (BCB)', carteira: 0, benchmark: 0, isEstimated: false },
-    { name: 'Ibovespa', carteira: 0, benchmark: 5.8, isEstimated: true },
-    { name: 'S&P500', carteira: 0, benchmark: 6.7, isEstimated: true }
+    { name: 'SELIC (BCB)', carteira: 0, benchmark: 0, source: 'BCB/SGS-11', isEstimated: false },
+    { name: 'IPCA (BCB)', carteira: 0, benchmark: 0, source: 'BCB/SGS-433', isEstimated: false },
+    { name: 'Ibovespa', carteira: 0, benchmark: 5.8, source: 'estimado', isEstimated: true },
+    { name: 'S&P500', carteira: 0, benchmark: 6.7, source: 'estimado', isEstimated: true }
   ];
+  sortBy: PositionSortKey = 'asset';
+  sortDir: 'asc' | 'desc' = 'asc';
+  currentPage = 1;
+  pageSize = 8;
 
   // Prioridade 7: simulador, agenda, fiscal e CSV
   csvLoading = false;
@@ -165,6 +170,130 @@ export class InvestmentsComponent implements OnInit {
       const textOk = !text || this.normalize(p.asset).includes(text) || this.normalize(p.account || '').includes(text) || this.normalize(p.category || '').includes(text);
       return typeOk && accountOk && statusOk && textOk;
     });
+  }
+
+  get sortedPositions(): InvestmentPosition[] {
+    const list = [...this.filteredPositions];
+    const direction = this.sortDir === 'asc' ? 1 : -1;
+    list.sort((a, b) => {
+      const statusA = a.quantity > 0 ? 1 : 0;
+      const statusB = b.quantity > 0 ? 1 : 0;
+      const valueA = this.positionCurrentValue(a);
+      const valueB = this.positionCurrentValue(b);
+      const resultA = this.resultadoPosicao(a);
+      const resultB = this.resultadoPosicao(b);
+      const portfolioA = this.percentualNaCarteira(a);
+      const portfolioB = this.percentualNaCarteira(b);
+      const currentReturnA = this.rentabilidadeAtualPercent(a);
+      const currentReturnB = this.rentabilidadeAtualPercent(b);
+      const paperTypeA = this.tipoPapel(a);
+      const paperTypeB = this.tipoPapel(b);
+
+      switch (this.sortBy) {
+        case 'paperType':
+          return paperTypeA.localeCompare(paperTypeB, 'pt-BR') * direction;
+        case 'status':
+          return (statusA - statusB) * direction;
+        case 'quantity':
+          return ((a.quantity || 0) - (b.quantity || 0)) * direction;
+        case 'avgPrice':
+          return ((a.avgPrice || 0) - (b.avgPrice || 0)) * direction;
+        case 'currentValue':
+          return (valueA - valueB) * direction;
+        case 'portfolioPercent':
+          return (portfolioA - portfolioB) * direction;
+        case 'currentReturn':
+          return (currentReturnA - currentReturnB) * direction;
+        case 'estimatedResult':
+          return (resultA - resultB) * direction;
+        case 'asset':
+        default:
+          return a.asset.localeCompare(b.asset, 'pt-BR') * direction;
+      }
+    });
+    return list;
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.sortedPositions.length / this.pageSize));
+  }
+
+  get pagedPositions(): InvestmentPosition[] {
+    if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+    if (this.currentPage < 1) this.currentPage = 1;
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.sortedPositions.slice(start, start + this.pageSize);
+  }
+
+  get pageLabel(): string {
+    const total = this.sortedPositions.length;
+    if (!total) return '0 de 0';
+    const start = (this.currentPage - 1) * this.pageSize + 1;
+    const end = Math.min(this.currentPage * this.pageSize, total);
+    return `${start}-${end} de ${total}`;
+  }
+
+  percentualNaCarteira(pos: InvestmentPosition): number {
+    if (!this.patrimonioAtual) return 0;
+    return (this.valorAtualPosicao(pos) / this.patrimonioAtual) * 100;
+  }
+
+  rentabilidadeAtualPercent(pos: InvestmentPosition): number {
+    return this.resultadoPosicaoPercentual(pos);
+  }
+
+  tipoPapel(pos: InvestmentPosition): string {
+    if (pos.type === 'FUNDOS') return 'Cotas';
+    const ticker = (pos.asset || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const match = ticker.match(/(\d{1,2})$/);
+    const code = match?.[1] ?? '';
+
+    if (code === '3') return 'ON';
+    if (code === '4') return 'PN';
+    if (code === '5') return 'PNA';
+    if (code === '6') return 'PNB';
+    if (code === '11') return pos.type === 'ACOES' ? 'UNT' : 'Cotas';
+    return '-';
+  }
+
+  get hasRebalanceAlert(): boolean {
+    return this.alvoAlocacao.some((item) => item.alerta);
+  }
+
+  get proximaAcao(): { titulo: string; descricao: string; cta: string; targetId?: string; openForm?: boolean } {
+    if (this.hasRebalanceAlert) {
+      return {
+        titulo: 'Rebalancear carteira',
+        descricao: 'Existe classe com desvio maior que 7 p.p. do alvo. Vale revisar a alocação.',
+        cta: 'Ver alocação',
+        targetId: 'sec-alocacao'
+      };
+    }
+
+    if (this.aporteMes <= 0) {
+      return {
+        titulo: 'Registrar aporte do mês',
+        descricao: 'Ainda não há entrada no mês atual. Registrar aporte ajuda na disciplina do plano.',
+        cta: 'Nova posição',
+        openForm: true
+      };
+    }
+
+    if (this.metaPatrimonio > 0 && this.progressoMeta < 100) {
+      return {
+        titulo: 'Ajustar plano da meta',
+        descricao: `Faltam ${this.currencyFormatter.format(this.faltaMeta)} para atingir sua meta de patrimônio.`,
+        cta: 'Ver projeção',
+        targetId: 'sec-projecao'
+      };
+    }
+
+    return {
+      titulo: 'Carteira em rotina estável',
+      descricao: 'Com os dados atuais, siga acompanhando rentabilidade e proventos.',
+      cta: 'Ver benchmarks',
+      targetId: 'sec-benchmarks'
+    };
   }
 
   get distribuicaoPorTipo(): { key: InvestmentType; label: string; value: number; percent: number }[] {
@@ -407,6 +536,42 @@ export class InvestmentsComponent implements OnInit {
     return { compras, vendas, proventos, taxas, saldo: vendas + proventos - compras - taxas };
   }
 
+  ordenarPor(column: PositionSortKey): void {
+    if (this.sortBy === column) {
+      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortDir = column === 'asset' ? 'asc' : 'desc';
+    }
+    this.currentPage = 1;
+  }
+
+  sortIcon(column: PositionSortKey): string {
+    if (this.sortBy !== column) return '↕';
+    return this.sortDir === 'asc' ? '↑' : '↓';
+  }
+
+  onFiltroMudou(): void {
+    this.currentPage = 1;
+  }
+
+  mudarPagina(delta: number): void {
+    const next = this.currentPage + delta;
+    if (next < 1 || next > this.totalPages) return;
+    this.currentPage = next;
+  }
+
+  executarProximaAcao(): void {
+    const action = this.proximaAcao;
+    if (action.openForm) {
+      this.showCadastro = true;
+      return;
+    }
+    if (action.targetId) {
+      this.scrollToSection(action.targetId);
+    }
+  }
+
   tooltipMes(item: ChartBucket): string {
     return [
       `${item.label}`,
@@ -636,8 +801,10 @@ export class InvestmentsComponent implements OnInit {
         name: item.name,
         benchmark: item.returnPercent,
         carteira: this.rentabilidadeAcumuladaPercent,
+        source: item.source,
         isEstimated: item.isEstimated
       }));
+      this.benchmarkUpdatedAt = new Date();
       this.atualizarRentabilidadeCarteiraBenchmarks();
     } catch {
       this.benchmarkError = 'Não foi possível atualizar benchmarks via backend agora.';
@@ -727,6 +894,10 @@ export class InvestmentsComponent implements OnInit {
       .replace(/[\u0300-\u036f]/g, '')
       .trim()
       .toLowerCase();
+  }
+
+  private scrollToSection(id: string): void {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   trackByIndex(index: number): number {
