@@ -69,6 +69,9 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
 ## Possíveis melhorias
+- Sincronização automática dos compromissos.
+- Receber lembretes automáticos no WhatsApp.
+- Recursos de organização e produtividade no dia a dia (rotinas, prioridades e acompanhamento de tarefas financeiras).
 - Lembretes configuráveis por parcela/série (dias antes do vencimento), com job diário na API para disparar notificações (SMTP MailHog/SendGrid ou web-push) e badges/toasts no front.
 - Exportar/Importar: exportar despesas do mês em CSV/Excel e importar lista simples (nome, valor, vencimento, categoria) para agilizar migração.
 - Ações em lote: botão “Mover vencimento” para reagendar várias despesas de uma vez (apenas status elegíveis), salvando vencimento original e aplicando regras como evitar pagas/canceladas.
