@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
@@ -111,6 +111,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
   dismissFeedback(): void {
     this.uiFeedback.clear();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Element | null;
+    if (!target) return;
+
+    if (this.notificationsOpen && !target.closest('.notifications')) {
+      this.notificationsOpen = false;
+    }
+
+    if (this.userMenuOpen && !target.closest('.user-menu')) {
+      this.userMenuOpen = false;
+    }
   }
 
   logout(): void {
