@@ -19,7 +19,7 @@ import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
-type BenchmarkPoint = { name: string; carteira: number; benchmark: number };
+type BenchmarkPoint = { name: string; carteira: number; benchmark: number; isEstimated?: boolean };
 
 @Component({
   selector: 'app-investments',
@@ -55,10 +55,10 @@ export class InvestmentsComponent implements OnInit {
   benchmarkLoading = false;
   benchmarkError = '';
   benchmarkComparativo: BenchmarkPoint[] = [
-    { name: 'SELIC (BCB)', carteira: 0, benchmark: 0 },
-    { name: 'IPCA (BCB)', carteira: 0, benchmark: 0 },
-    { name: 'Ibovespa (estimado)', carteira: 0, benchmark: 5.8 },
-    { name: 'S&P500 (estimado)', carteira: 0, benchmark: 6.7 }
+    { name: 'SELIC (BCB)', carteira: 0, benchmark: 0, isEstimated: false },
+    { name: 'IPCA (BCB)', carteira: 0, benchmark: 0, isEstimated: false },
+    { name: 'Ibovespa', carteira: 0, benchmark: 5.8, isEstimated: true },
+    { name: 'S&P500', carteira: 0, benchmark: 6.7, isEstimated: true }
   ];
 
   // Prioridade 7: simulador, agenda, fiscal e CSV
@@ -635,7 +635,8 @@ export class InvestmentsComponent implements OnInit {
       this.benchmarkComparativo = response.items.map((item) => ({
         name: item.name,
         benchmark: item.returnPercent,
-        carteira: this.rentabilidadeAcumuladaPercent
+        carteira: this.rentabilidadeAcumuladaPercent,
+        isEstimated: item.isEstimated
       }));
       this.atualizarRentabilidadeCarteiraBenchmarks();
     } catch {
