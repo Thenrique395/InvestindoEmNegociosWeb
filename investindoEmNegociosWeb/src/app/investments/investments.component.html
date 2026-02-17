@@ -179,6 +179,299 @@
     </div>
   </article>
 
+  <section class="executive-grid executive-grid--three">
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Rentabilidade diária (est.)</p>
+        <button type="button" class="hint" aria-label="Explicação da rentabilidade diária">
+          i
+          <span class="hint__panel">Estimativa diária baseada na rentabilidade mensal dividida por 22 pregões úteis.</span>
+        </button>
+      </div>
+      <strong [class.success]="rentabilidadeDiariaPercent >= 0" [class.danger]="rentabilidadeDiariaPercent < 0">
+        {{ rentabilidadeDiariaPercent | number:'1.2-2' }}%
+      </strong>
+    </article>
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Rentabilidade mensal (est.)</p>
+        <button type="button" class="hint" aria-label="Explicação da rentabilidade mensal">
+          i
+          <span class="hint__panel">Variação estimada do último mês pelo saldo de aportes, resgates e proventos.</span>
+        </button>
+      </div>
+      <strong [class.success]="rentabilidadeMensalPercent >= 0" [class.danger]="rentabilidadeMensalPercent < 0">
+        {{ rentabilidadeMensalPercent | number:'1.2-2' }}%
+      </strong>
+    </article>
+    <article class="card executive-card">
+      <div class="label-row">
+        <p class="label">Rentabilidade acumulada</p>
+        <button type="button" class="hint" aria-label="Explicação da rentabilidade acumulada">
+          i
+          <span class="hint__panel">Resultado total estimado sobre o capital líquido aportado na carteira.</span>
+        </button>
+      </div>
+      <strong [class.success]="rentabilidadeAcumuladaPercent >= 0" [class.danger]="rentabilidadeAcumuladaPercent < 0">
+        {{ rentabilidadeAcumuladaPercent | number:'1.2-2' }}%
+      </strong>
+    </article>
+  </section>
+
+  <section class="visual-grid">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Carteira x benchmarks</h3>
+          <button type="button" class="hint" aria-label="Explicação comparação com benchmarks">
+            i
+            <span class="hint__panel">Comparativo da carteira contra CDI, IPCA, Ibovespa e S&P500 no mesmo período consolidado.</span>
+          </button>
+        </div>
+        <span class="muted">Base: 6 meses</span>
+      </div>
+      <div class="benchmark-list">
+        <div class="benchmark-item" *ngFor="let item of benchmarkComparativo; trackBy: trackByIndex">
+          <strong>{{ item.name }}</strong>
+          <span>Carteira: {{ item.carteira | number:'1.2-2' }}%</span>
+          <span>Benchmark: {{ item.benchmark | number:'1.2-2' }}%</span>
+          <small [class.success]="item.carteira - item.benchmark >= 0" [class.danger]="item.carteira - item.benchmark < 0">
+            Diferença: {{ item.carteira - item.benchmark | number:'1.2-2' }} p.p.
+          </small>
+        </div>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Alocação alvo e alertas</h3>
+          <button type="button" class="hint" aria-label="Explicação da alocação alvo">
+            i
+            <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
+          </button>
+        </div>
+      </div>
+      <div class="allocation-list">
+        <div class="allocation-item" *ngFor="let item of alvoAlocacao; trackBy: trackByIndex">
+          <div class="allocation-item__top">
+            <strong>{{ item.label }}</strong>
+            <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
+          </div>
+          <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
+          <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? '• rebalancear' : '' }}</small>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="visual-grid">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Retorno total (preço + renda)</h3>
+          <button type="button" class="hint" aria-label="Explicação do retorno total">
+            i
+            <span class="hint__panel">Separação do resultado total entre valorização de preço e renda recebida (dividendos/JCP/rendimentos).</span>
+          </button>
+        </div>
+      </div>
+      <div class="summary__grid">
+        <div>
+          <p class="label">Retorno por preço</p>
+          <strong [class.success]="retornoTotalPreco >= 0" [class.danger]="retornoTotalPreco < 0">
+            {{ retornoTotalPreco | currency:'BRL':'symbol':'1.2-2' }}
+          </strong>
+        </div>
+        <div>
+          <p class="label">Retorno por renda</p>
+          <strong class="success">{{ retornoTotalRenda | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+      <div class="summary__grid">
+        <div>
+          <p class="label">Retorno total</p>
+          <strong [class.success]="retornoTotalGeral >= 0" [class.danger]="retornoTotalGeral < 0">
+            {{ retornoTotalGeral | currency:'BRL':'symbol':'1.2-2' }}
+          </strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Agenda financeira</h3>
+          <button type="button" class="hint" aria-label="Explicação da agenda financeira">
+            i
+            <span class="hint__panel">Eventos projetados de aportes e vencimentos para ajudar no planejamento mensal.</span>
+          </button>
+        </div>
+      </div>
+      <div class="events-list" *ngIf="eventosAgenda.length; else noEvents">
+        <div class="event-item" *ngFor="let event of eventosAgenda; trackBy: trackByIndex">
+          <strong>{{ event.date | date:'dd/MM/yyyy' }}</strong>
+          <span>{{ event.tipo }}</span>
+          <small>{{ event.descricao }}</small>
+        </div>
+      </div>
+      <ng-template #noEvents>
+        <div class="empty">Sem eventos no horizonte atual.</div>
+      </ng-template>
+    </article>
+  </section>
+
+  <section class="visual-grid">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Simulador de aportes recorrentes</h3>
+          <button type="button" class="hint" aria-label="Explicação do simulador de aportes">
+            i
+            <span class="hint__panel">Projeção com cenários conservador, base e otimista usando juros compostos com aporte mensal.</span>
+          </button>
+        </div>
+      </div>
+      <div class="grid-form">
+        <div>
+          <label>Aporte mensal (R$)</label>
+          <input type="number" min="0" step="any" [(ngModel)]="simuladorAporteMensal" [ngModelOptions]="{standalone:true}" />
+        </div>
+        <div>
+          <label>Horizonte (meses)</label>
+          <input type="number" min="1" step="1" [(ngModel)]="simuladorHorizonteMeses" [ngModelOptions]="{standalone:true}" />
+        </div>
+      </div>
+      <div class="benchmark-list">
+        <div class="benchmark-item" *ngFor="let cenario of simuladorCenarios; trackBy: trackByIndex">
+          <strong>{{ cenario.nome }}</strong>
+          <span>Taxa mensal: {{ cenario.taxaMensal * 100 | number:'1.2-2' }}%</span>
+          <small>Valor final estimado: {{ cenario.valorFinal | currency:'BRL':'symbol':'1.2-2' }}</small>
+        </div>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Projeção de meta</h3>
+          <button type="button" class="hint" aria-label="Explicação da projeção da meta">
+            i
+            <span class="hint__panel">Estimativa do prazo para atingir a meta com base no aporte mensal planejado.</span>
+          </button>
+        </div>
+      </div>
+      <div class="grid-form">
+        <div>
+          <label>Aporte planejado/mês (R$)</label>
+          <input type="number" min="0" step="any" [(ngModel)]="metaMensalPlanejada" [ngModelOptions]="{standalone:true}" />
+        </div>
+        <div>
+          <label>Dia padrão do aporte</label>
+          <input type="number" min="1" max="28" step="1" [(ngModel)]="metaDay" [ngModelOptions]="{standalone:true}" />
+        </div>
+      </div>
+      <div class="summary__grid">
+        <div>
+          <p class="label">Prazo estimado</p>
+          <strong *ngIf="prazoMetaMeses !== null">{{ prazoMetaMeses }} mês(es)</strong>
+          <strong *ngIf="prazoMetaMeses === null">Sem projeção</strong>
+        </div>
+        <div>
+          <p class="label">Data estimada</p>
+          <strong>{{ prazoMetaDataEstimada || '-' }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="visual-grid">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Importação por CSV</h3>
+          <button type="button" class="hint" aria-label="Explicação da importação CSV">
+            i
+            <span class="hint__panel">Onboarding rápido via planilha. Use o modelo CSV para importar múltiplas posições de uma vez.</span>
+          </button>
+        </div>
+      </div>
+      <div class="import-upload">
+        <label class="btn-primary sm import-upload__button">
+          <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
+          Importar CSV
+        </label>
+        <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Baixar modelo</button>
+      </div>
+      <small class="muted">Importados nesta execução: {{ csvImported }}</small>
+      <div class="danger" *ngIf="csvError">{{ csvError }}</div>
+      <div class="table-wrap" *ngIf="csvPreviewRows.length">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Ativo</th>
+              <th>Qtd</th>
+              <th>Preço médio</th>
+              <th>Conta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of csvPreviewRows; trackBy: trackByIndex">
+              <td>{{ row.type }}</td>
+              <td>{{ row.asset }}</td>
+              <td>{{ row.quantity }}</td>
+              <td>{{ row.avgPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ row.account }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Resumo fiscal básico</h3>
+          <button type="button" class="hint" aria-label="Explicação do resumo fiscal">
+            i
+            <span class="hint__panel">Resumo anual de compras, vendas, proventos e taxas para facilitar conferência e fechamento.</span>
+          </button>
+        </div>
+      </div>
+      <div class="filter">
+        <span>Ano de referência</span>
+        <select [(ngModel)]="fiscalAnoSelecionado" [ngModelOptions]="{standalone:true}">
+          <option *ngFor="let ano of anosFiscaisDisponiveis; trackBy: trackByIndex" [ngValue]="ano">{{ ano }}</option>
+        </select>
+      </div>
+      <div class="summary__grid">
+        <div>
+          <p class="label">Compras + aportes</p>
+          <strong>{{ resumoFiscal.compras | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div>
+          <p class="label">Vendas + resgates</p>
+          <strong>{{ resumoFiscal.vendas | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div>
+          <p class="label">Proventos</p>
+          <strong class="success">{{ resumoFiscal.proventos | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div>
+          <p class="label">Taxas</p>
+          <strong class="danger">{{ resumoFiscal.taxas | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+      <div>
+        <p class="label">Saldo fiscal estimado</p>
+        <strong [class.success]="resumoFiscal.saldo >= 0" [class.danger]="resumoFiscal.saldo < 0">
+          {{ resumoFiscal.saldo | currency:'BRL':'symbol':'1.2-2' }}
+        </strong>
+      </div>
+    </article>
+  </section>
+
   <div class="top-actions">
     <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importar relatório B3</button>
     <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">

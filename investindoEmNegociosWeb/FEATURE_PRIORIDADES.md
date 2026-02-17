@@ -52,12 +52,13 @@
 - Definir estratégia de budgets por feature e otimização de assets, evitando apenas elevar limite.
 
 ## Prioridade 7 - Investimentos (núcleo de expansão)
-- Dashboard de carteira com rentabilidade diária, mensal e acumulada.
-- Comparação da carteira com benchmarks (CDI, IPCA, Ibovespa, S&P500).
-- Alocação por classe de ativo com alerta de desbalanceamento.
-- Agenda de eventos: dividendos, juros, vencimentos e aportes planejados.
-- Registro de proventos e cálculo de retorno total (preço + renda).
-- Simulador de aportes recorrentes com cenários conservador/base/otimista.
-- Metas de patrimônio com projeção de prazo e esforço de aporte.
-- Importação de posição por CSV/planilha para onboarding rápido.
-- Relatório fiscal básico (resumo de operações e proventos por período).
+- [x] Dashboard de carteira com rentabilidade diária, mensal e acumulada.
+- [x] Comparação da carteira com benchmarks (CDI, IPCA, Ibovespa, S&P500).
+- [x] Alocação por classe de ativo com alerta de desbalanceamento.
+- [x] Agenda de eventos: dividendos, juros, vencimentos e aportes planejados.
+- [x] Registro de proventos e cálculo de retorno total (preço + renda).
+- [x] Simulador de aportes recorrentes com cenários conservador/base/otimista.
+- [x] Metas de patrimônio com projeção de prazo e esforço de aporte.
+- [x] Importação de posição por CSV/planilha para onboarding rápido.
+- [x] Relatório fiscal básico (resumo de operações e proventos por período).
+- [ ] Integração direta com APIs da B3 para sincronização automática (pendente, depende de credenciais e política oficial de acesso).
