@@ -1503,8 +1503,12 @@ export class InvestmentsComponent implements OnInit {
 
   private restoreTab(): void {
     if (typeof window === 'undefined') return;
-    this.activeTab = 'RESUMO';
-    window.localStorage.setItem(this.tabStorageKey, 'RESUMO');
+    const saved = window.localStorage.getItem(this.tabStorageKey) as InvestmentsTab | null;
+    const exists = saved && this.tabs.some((tab) => tab.key === saved);
+    this.activeTab = exists ? saved : 'RESUMO';
+    if (!exists) {
+      window.localStorage.setItem(this.tabStorageKey, this.activeTab);
+    }
   }
 
   private normalizeAllocationValue(value: unknown, fallback: number): number {
