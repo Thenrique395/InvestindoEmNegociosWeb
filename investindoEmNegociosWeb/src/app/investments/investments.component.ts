@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -55,7 +55,8 @@ const DEFAULT_TARGET_ALLOCATION: Record<InvestmentType, number> = { RF: 40, ACOE
   standalone: true,
   imports: [CommonModule, FormsModule, DecimalPipe, CurrencyPipe],
   templateUrl: './investments.component.html',
-  styleUrls: ['./investments.component.scss']
+  styleUrls: ['./investments.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InvestmentsComponent implements OnInit {
   private readonly tabStorageKey = 'investments.activeTab';

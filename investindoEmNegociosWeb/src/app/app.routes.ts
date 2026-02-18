@@ -14,7 +14,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./home.component').then((m) => m.HomeComponent)
   },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
@@ -26,7 +26,7 @@ export const routes: Routes = [
   {
     path: 'onboarding',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./onboarding/onboarding.component').then((m) => m.OnboardingComponent)
   },
   {
@@ -42,19 +42,19 @@ export const routes: Routes = [
   {
     path: 'cartoes',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: true },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./cartoes/cartoes.component').then((m) => m.CartoesComponent)
   },
   {
     path: 'receitas',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./receitas/receitas.component').then((m) => m.ReceitasComponent)
   },
   {
     path: 'despesas',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./despesas/despesas.component').then((m) => m.DespesasComponent)
   },
   {
@@ -66,25 +66,25 @@ export const routes: Routes = [
   {
     path: 'categorias',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent)
   },
   {
     path: 'metas',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: true },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./metas/metas.component').then((m) => m.MetasComponent)
   },
   {
     path: 'perfil',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./user-profile/user-profile.component').then((m) => m.UserProfileComponent)
   },
   {
     path: 'preferencias',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: true },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./user-preferences/user-preferences.component').then((m) => m.UserPreferencesComponent)
   },
   {
