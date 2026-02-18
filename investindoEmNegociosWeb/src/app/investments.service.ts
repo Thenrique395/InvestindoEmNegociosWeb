@@ -14,6 +14,21 @@ export interface InvestmentGoal {
   targetAmount: number;
 }
 
+export interface InvestmentAllocationTarget {
+  rf: number;
+  acoes: number;
+  fundos: number;
+  cripto: number;
+  total: number;
+}
+
+export interface InvestmentAllocationTargetRequest {
+  rf: number;
+  acoes: number;
+  fundos: number;
+  cripto: number;
+}
+
 export interface InvestmentMovement {
   id: string;
   type: MovementType;
@@ -170,6 +185,14 @@ export class InvestmentsService {
 
   upsertGoal(targetAmount: number): Observable<InvestmentGoal> {
     return this.http.put<InvestmentGoal>(`${this.baseUrl}/goal`, { targetAmount });
+  }
+
+  getAllocationTarget(): Observable<InvestmentAllocationTarget> {
+    return this.http.get<InvestmentAllocationTarget>(`${this.baseUrl}/allocation-target`);
+  }
+
+  upsertAllocationTarget(payload: InvestmentAllocationTargetRequest): Observable<InvestmentAllocationTarget> {
+    return this.http.put<InvestmentAllocationTarget>(`${this.baseUrl}/allocation-target`, payload);
   }
 
   listPositions(query?: ListQuery): Observable<InvestmentPosition[]> {

@@ -646,7 +646,7 @@
         <small class="muted" [class.danger]="targetAllocationTotal !== 100">
           Total configurado: {{ targetAllocationTotal | number:'1.1-1' }}%
         </small>
-        <div class="actions">
+        <div class="allocation-config__actions">
           <button class="btn-ghost sm" type="button" (click)="resetTargetAllocation()">Resetar padrão</button>
           <button class="btn-primary sm" type="button" (click)="saveTargetAllocation()">Salvar</button>
         </div>

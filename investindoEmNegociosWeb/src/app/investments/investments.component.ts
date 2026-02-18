@@ -48,6 +48,8 @@ type RentabilidadeMonthPoint = {
   benchmarkAc: number;
 };
 
+const DEFAULT_TARGET_ALLOCATION: Record<InvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
+
 @Component({
   selector: 'app-investments',
   standalone: true,
@@ -57,7 +59,6 @@ type RentabilidadeMonthPoint = {
 })
 export class InvestmentsComponent implements OnInit {
   private readonly tabStorageKey = 'investments.activeTab';
-  private readonly allocationStorageKey = 'investments.targetAllocation';
   private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   positions: InvestmentPosition[] = [];
@@ -96,7 +97,7 @@ export class InvestmentsComponent implements OnInit {
   consolidacaoTipoFiltro: 'ALL' | InvestmentType = 'ALL';
   consolidacaoSearchTerm = '';
   showAlocacaoConfig = false;
-  targetAllocation: Record<InvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
+  targetAllocation: Record<InvestmentType, number> = { ...DEFAULT_TARGET_ALLOCATION };
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
   tabs: Array<{ key: InvestmentsTab; label: string }> = [
@@ -165,7 +166,7 @@ export class InvestmentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.restoreTab();
-    this.restoreAllocationTarget();
+    this.carregarAlocacaoTarget();
     this.carregarMeta();
     this.carregarPosicoes();
     this.lookups.institutions('Broker').subscribe({
@@ -992,15 +993,27 @@ export class InvestmentsComponent implements OnInit {
   }
 
   saveTargetAllocation(): void {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(this.allocationStorageKey, JSON.stringify(this.targetAllocation));
-    this.showAlocacaoConfig = false;
-    this.uiFeedback.success('Alocação alvo salva.');
+    if (Math.abs(this.targetAllocationTotal - 100) > 0.001) {
+      this.uiFeedback.error('A soma da alocação alvo precisa fechar em 100%.');
+      return;
+    }
+    this.investments.upsertAllocationTarget({
+      rf: this.targetAllocation.RF,
+      acoes: this.targetAllocation.ACOES,
+      fundos: this.targetAllocation.FUNDOS,
+      cripto: this.targetAllocation.CRIPTO
+    }).subscribe({
+      next: (response) => {
+        this.targetAllocation = this.mapTargetAllocationResponse(response);
+        this.showAlocacaoConfig = false;
+        this.uiFeedback.success('Alocação alvo salva.');
+      },
+      error: (err) => this.uiFeedback.error(this.resolveHttpError(err, 'Falha ao salvar alocação alvo.'))
+    });
   }
 
   resetTargetAllocation(): void {
-    this.targetAllocation = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
-    this.saveTargetAllocation();
+    this.targetAllocation = { ...DEFAULT_TARGET_ALLOCATION };
   }
 
   ordenarPor(column: PositionSortKey): void {
@@ -1372,6 +1385,17 @@ export class InvestmentsComponent implements OnInit {
     });
   }
 
+  private carregarAlocacaoTarget(): void {
+    this.investments.getAllocationTarget().subscribe({
+      next: (target) => {
+        this.targetAllocation = this.mapTargetAllocationResponse(target);
+      },
+      error: () => {
+        this.targetAllocation = { ...DEFAULT_TARGET_ALLOCATION };
+      }
+    });
+  }
+
   private parseValor(raw: string): number {
     return parseLocalizedNumber(raw);
   }
@@ -1477,21 +1501,19 @@ export class InvestmentsComponent implements OnInit {
     window.localStorage.setItem(this.tabStorageKey, 'RESUMO');
   }
 
-  private restoreAllocationTarget(): void {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = window.localStorage.getItem(this.allocationStorageKey);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<Record<InvestmentType, number>>;
-      this.targetAllocation = {
-        RF: Number(parsed.RF ?? 40),
-        ACOES: Number(parsed.ACOES ?? 35),
-        FUNDOS: Number(parsed.FUNDOS ?? 20),
-        CRIPTO: Number(parsed.CRIPTO ?? 5)
-      };
-    } catch {
-      this.targetAllocation = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
-    }
+  private normalizeAllocationValue(value: unknown, fallback: number): number {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(100, Math.max(0, parsed));
+  }
+
+  private mapTargetAllocationResponse(target: { rf: number; acoes: number; fundos: number; cripto: number }): Record<InvestmentType, number> {
+    return {
+      RF: this.normalizeAllocationValue(target.rf, DEFAULT_TARGET_ALLOCATION.RF),
+      ACOES: this.normalizeAllocationValue(target.acoes, DEFAULT_TARGET_ALLOCATION.ACOES),
+      FUNDOS: this.normalizeAllocationValue(target.fundos, DEFAULT_TARGET_ALLOCATION.FUNDOS),
+      CRIPTO: this.normalizeAllocationValue(target.cripto, DEFAULT_TARGET_ALLOCATION.CRIPTO)
+    };
   }
 
   trackByIndex(index: number): number {

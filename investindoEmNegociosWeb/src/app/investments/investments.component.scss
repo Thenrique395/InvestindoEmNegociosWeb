@@ -791,6 +791,44 @@
   background: color-mix(in srgb, var(--success) 35%, white);
 }
 
+.allocation-config {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: var(--space-1);
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+.allocation-config__inputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.allocation-config__inputs label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.allocation-config__inputs input {
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 0.65rem;
+}
+
+.allocation-config__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
 .allocation-list {
   display: grid;
   gap: var(--space-1);
@@ -1281,6 +1319,10 @@ th {
     grid-template-columns: 1fr;
   }
 
+  .allocation-config__inputs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .table-filters {
     grid-template-columns: 1fr 1fr;
   }
@@ -1304,7 +1346,8 @@ th {
   .executive-grid,
   .executive-grid--three,
   .summary__grid,
-  .table-filters {
+  .table-filters,
+  .allocation-config__inputs {
     grid-template-columns: 1fr;
   }
 
