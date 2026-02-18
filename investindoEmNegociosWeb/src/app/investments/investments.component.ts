@@ -8,9 +8,7 @@ import {
   InvestmentPosition,
   InvestmentPositionRequest,
   InvestmentType,
-  MovementType,
-  MarketProfileResponse,
-  MarketQuoteResponse
+  MovementType
 } from '../investments.service';
 import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
@@ -75,9 +73,6 @@ export class InvestmentsComponent implements OnInit {
   csvError = '';
   csvImported = 0;
   csvPreviewRows: InvestmentPositionRequest[] = [];
-  marketQuotes: Record<string, MarketQuoteResponse> = {};
-  marketProfiles: Record<string, MarketProfileResponse> = {};
-  private marketRequested = new Set<string>();
 
   novaPosicao: Omit<InvestmentPosition, 'id' | 'movements'> = {
     type: 'RF',
@@ -279,15 +274,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   marketPrice(pos: InvestmentPosition): number | null {
-    const symbol = this.extractMarketSymbol(pos);
-    if (!symbol) return null;
-    return this.marketQuotes[symbol]?.price ?? null;
-  }
-
-  marketChange(pos: InvestmentPosition): number | null {
-    const symbol = this.extractMarketSymbol(pos);
-    if (!symbol) return null;
-    return this.marketQuotes[symbol]?.changePercent ?? null;
+    return pos.marketPrice ?? null;
   }
 
   variacaoPrecoPercent(pos: InvestmentPosition): number | null {
@@ -298,15 +285,11 @@ export class InvestmentsComponent implements OnInit {
   }
 
   marketLogo(pos: InvestmentPosition): string | null {
-    const symbol = this.extractMarketSymbol(pos);
-    if (!symbol) return null;
-    return this.marketProfiles[symbol]?.logoUrl ?? null;
+    return pos.marketLogoUrl ?? null;
   }
 
   marketLabel(pos: InvestmentPosition): string | null {
-    const symbol = this.extractMarketSymbol(pos);
-    if (!symbol) return null;
-    return this.marketQuotes[symbol]?.name ?? this.marketProfiles[symbol]?.name ?? null;
+    return pos.marketName ?? null;
   }
 
   get hasRebalanceAlert(): boolean {
@@ -856,7 +839,6 @@ export class InvestmentsComponent implements OnInit {
     this.investments.listPositions().subscribe({
       next: (list) => {
         this.positions = list;
-        this.hydrateMarketData(list);
       }
     });
   }
@@ -913,45 +895,6 @@ export class InvestmentsComponent implements OnInit {
     const market = this.marketPrice(pos);
     const price = market && market > 0 ? market : (pos.avgPrice || 0);
     return (pos.quantity || 0) * price;
-  }
-
-  private hydrateMarketData(list: InvestmentPosition[]): void {
-    for (const pos of list) {
-      if (pos.type !== 'ACOES' && pos.type !== 'FUNDOS') continue;
-      const symbol = this.extractMarketSymbol(pos);
-      if (!symbol || this.marketRequested.has(symbol)) continue;
-      this.marketRequested.add(symbol);
-      this.loadMarketData(symbol);
-    }
-  }
-
-  private async loadMarketData(symbol: string): Promise<void> {
-    const [quoteRes, profileRes] = await Promise.allSettled([
-      firstValueFrom(this.investments.getMarketQuote(symbol)),
-      firstValueFrom(this.investments.getMarketProfile(symbol))
-    ]);
-
-    if (quoteRes.status === 'fulfilled') {
-      this.marketQuotes[symbol] = quoteRes.value;
-    }
-
-    if (profileRes.status === 'fulfilled') {
-      this.marketProfiles[symbol] = profileRes.value;
-    }
-  }
-
-  private extractMarketSymbol(pos: InvestmentPosition): string | null {
-    const raw = (pos.asset || '').toUpperCase();
-    const explicit = raw.match(/[A-Z]{4}\d{1,2}/);
-    if (explicit) return explicit[0];
-
-    const token = raw
-      .replace(/[^A-Z0-9 ]/g, ' ')
-      .split(/\s+/)
-      .find((part) => /[A-Z]{4}\d{1,2}/.test(part));
-
-    if (token) return token;
-    return null;
   }
 
   private positionNetContributed(pos: InvestmentPosition): number {

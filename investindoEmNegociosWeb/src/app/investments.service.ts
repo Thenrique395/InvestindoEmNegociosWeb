@@ -34,6 +34,13 @@ export interface InvestmentPosition {
   category?: string;
   note?: string;
   movements: InvestmentMovement[];
+  marketSymbol?: string | null;
+  marketPrice?: number | null;
+  marketChangePercent?: number | null;
+  marketName?: string | null;
+  marketLogoUrl?: string | null;
+  marketSource?: string | null;
+  marketProvider?: string | null;
 }
 
 export interface InvestmentPositionRequest {
