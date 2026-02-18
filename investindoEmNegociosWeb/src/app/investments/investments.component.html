@@ -1,12 +1,4 @@
 <section class="investments">
-  <header class="header">
-    <div>
-      <p class="eyebrow">Investimentos</p>
-      <h1>Visão executiva da carteira</h1>
-      <p class="muted">Acompanhe patrimônio, fluxo do mês e distribuição por tipo para decidir com clareza.</p>
-    </div>
-  </header>
-
   <nav class="tabs card" aria-label="Abas de investimentos">
     <button
       type="button"
@@ -106,7 +98,95 @@
     </article>
   </section>
 
-  <article class="card action-card" *ngIf="activeTab === 'RESUMO'">
+  <section class="visual-grid visual-grid--resume" *ngIf="activeTab === 'RESUMO'">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Evolução do patrimônio</h3>
+        </div>
+        <div class="chart-filters">
+          <select [(ngModel)]="patrimonioRangeMonths">
+            <option [ngValue]="12">12 meses</option>
+            <option [ngValue]="6">6 meses</option>
+          </select>
+          <select [(ngModel)]="patrimonioTypeFilter">
+            <option value="ALL">Todos os tipos</option>
+            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="patrimony-chart">
+        <div class="patrimony-axis">
+          <span *ngFor="let tick of patrimonioAxisTicks; trackBy: trackByIndex">{{ formatPatrimonioAxisValue(tick) }}</span>
+        </div>
+        <div class="patrimony-plot">
+          <div class="patrimony-chart__bars" [style.gridTemplateColumns]="patrimonioGridColumns">
+            <div class="patrimony-column" *ngFor="let item of patrimonioEvolucaoSeries; trackBy: trackByIndex">
+              <div class="patrimony-bars">
+                <div class="patrimony-chart__grid">
+                  <span class="patrimony-chart__line" *ngFor="let _ of [1,2,3,4,5,6]; trackBy: trackByIndex"></span>
+                </div>
+                <div class="patrimony-bars__stack">
+                  <span class="bar aplicado" [style.height.%]="(item.aplicado / patrimonioChartMax) * 100"></span>
+                  <span class="bar ganho" [style.height.%]="(item.ganho / patrimonioChartMax) * 100"></span>
+                </div>
+              </div>
+              <span class="chart-hover-tip">
+                Aplicado: {{ item.aplicado | currency:'BRL':'symbol':'1.2-2' }}<br />
+                Ganho: {{ item.ganho | currency:'BRL':'symbol':'1.2-2' }}<br />
+                Total: {{ item.total | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+              <small class="patrimony-x-label">{{ item.label }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span><i class="chip aplicado"></i> Valor aplicado</span>
+        <span><i class="chip ganho"></i> Ganho capital</span>
+        <span *ngIf="patrimonioEvolucaoEstimado" class="muted">Série estimada pelo saldo atual (histórico mensal insuficiente)</span>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Ativos na carteira</h3>
+        </div>
+        <div class="chart-filters">
+          <select [(ngModel)]="carteiraTypeFilter">
+            <option value="ALL">Todos os tipos</option>
+            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="donut-layout" *ngIf="carteiraDistribuicaoChart.length; else semDistribuicaoResumo">
+        <div class="donut" [style.background]="carteiraDistribuicaoConicGradient" aria-hidden="true"></div>
+        <div class="distribution-list">
+          <div class="distribution-item" *ngFor="let item of carteiraDistribuicaoChart; trackBy: trackByIndex">
+            <div class="distribution-item__top">
+              <div class="legend">
+                <span class="legend__dot" [style.background]="item.color"></span>
+                <strong>{{ item.label }}</strong>
+              </div>
+              <span>{{ item.percent | number:'1.1-1' }}%</span>
+            </div>
+            <small>{{ item.value | currency:'BRL':'symbol':'1.2-2' }}</small>
+            <span class="chart-hover-tip">
+              {{ item.label }}<br />
+              Participação: {{ item.percent | number:'1.1-1' }}%<br />
+              Valor: {{ item.value | currency:'BRL':'symbol':'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <ng-template #semDistribuicaoResumo>
+        <div class="empty">Sem dados para a distribuição atual.</div>
+      </ng-template>
+    </article>
+  </section>
+
+  <article class="card action-card" *ngIf="activeTab === 'ANALISE'">
     <div>
       <p class="label">O que fazer agora</p>
       <strong>{{ proximaAcao.titulo }}</strong>

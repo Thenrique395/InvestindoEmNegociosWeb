@@ -20,6 +20,7 @@ type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
 type InvestmentsTab = 'RESUMO' | 'LANCAMENTOS' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
+type PatrimonioBucket = { key: string; label: string; aplicado: number; ganho: number; total: number };
 type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
 
 @Component({
@@ -58,6 +59,9 @@ export class InvestmentsComponent implements OnInit {
   sortDir: 'asc' | 'desc' = 'asc';
   currentPage = 1;
   pageSize = 8;
+  patrimonioRangeMonths = 12;
+  patrimonioTypeFilter: 'ALL' | InvestmentType = 'ALL';
+  carteiraTypeFilter: 'ALL' | InvestmentType = 'ALL';
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
   tabs: Array<{ key: InvestmentsTab; label: string }> = [
@@ -403,6 +407,112 @@ export class InvestmentsComponent implements OnInit {
     }
 
     return months.map((m) => map.get(m.key)!);
+  }
+
+  get patrimonioEvolucaoSeries(): PatrimonioBucket[] {
+    const months = this.patrimonioRangeMonths === 6 ? 6 : 12;
+    const now = new Date();
+    const timeline: { key: string; label: string }[] = [];
+
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      timeline.push({
+        key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+        label: d.toLocaleDateString('pt-BR', { month: '2-digit', year: '2-digit' })
+      });
+    }
+
+    const flowByMonth = new Map<string, { aplicado: number; ganho: number }>(
+      timeline.map((m) => [m.key, { aplicado: 0, ganho: 0 }])
+    );
+
+    for (const pos of this.positions) {
+      if (this.patrimonioTypeFilter !== 'ALL' && pos.type !== this.patrimonioTypeFilter) continue;
+      for (const mov of pos.movements || []) {
+        if (!mov?.date) continue;
+        const [y, m] = mov.date.split('T')[0].split('-');
+        const bucket = flowByMonth.get(`${y}-${m}`);
+        if (!bucket) continue;
+
+        const value = (mov.quantity || 0) * (mov.price || 0);
+        if (mov.type === 'COMPRA' || mov.type === 'APORTE') bucket.aplicado += value;
+        if (mov.type === 'VENDA' || mov.type === 'RESGATE') bucket.aplicado -= value;
+        if (mov.type === 'DIVIDENDO' || mov.type === 'JCP' || mov.type === 'RENDIMENTO') bucket.ganho += value;
+      }
+    }
+
+    let aplicadoAcumulado = 0;
+    let ganhoAcumulado = 0;
+    const computed = timeline.map((m) => {
+      const flow = flowByMonth.get(m.key)!;
+      aplicadoAcumulado += flow.aplicado;
+      ganhoAcumulado += flow.ganho;
+      const aplicado = Math.max(aplicadoAcumulado, 0);
+      const ganho = ganhoAcumulado;
+      return { key: m.key, label: m.label, aplicado, ganho, total: aplicado + ganho };
+    });
+
+    const nonZeroPoints = computed.filter((x) => x.total > 0).length;
+    if (nonZeroPoints <= 1) {
+      const aplicadoAtual = Math.max(this.aporteTotal, 0);
+      const ganhoAtual = this.crescimentoEstimado;
+      return computed.map((x) => ({
+        ...x,
+        aplicado: aplicadoAtual,
+        ganho: ganhoAtual,
+        total: aplicadoAtual + ganhoAtual
+      }));
+    }
+
+    return computed;
+  }
+
+  get patrimonioChartMax(): number {
+    return this.patrimonioEvolucaoSeries.reduce((max, item) => Math.max(max, item.total), 0) || 1;
+  }
+
+  get patrimonioEvolucaoEstimado(): boolean {
+    const series = this.patrimonioEvolucaoSeries;
+    if (series.length <= 1) return false;
+    const first = series[0].total;
+    return series.every((item) => Math.abs(item.total - first) < 0.0001);
+  }
+
+  get patrimonioGridColumns(): string {
+    return `repeat(${Math.max(this.patrimonioEvolucaoSeries.length, 1)}, minmax(0, 1fr))`;
+  }
+
+  get patrimonioAxisTicks(): number[] {
+    const steps = 6;
+    const max = Math.max(this.patrimonioChartMax, 1);
+    const roughStep = max / steps;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+    const normalized = roughStep / magnitude;
+    const niceNormalized = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+    const niceStep = niceNormalized * magnitude;
+    const top = niceStep * steps;
+    return Array.from({ length: steps + 1 }, (_, i) => top - i * niceStep);
+  }
+
+  formatPatrimonioAxisValue(value: number): string {
+    return this.currencyFormatter.format(value);
+  }
+
+  get carteiraDistribuicaoChart(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
+    const base = this.distribuicaoPorTipoComCor;
+    if (this.carteiraTypeFilter === 'ALL') return base;
+    return base.filter((item) => item.key === this.carteiraTypeFilter);
+  }
+
+  get carteiraDistribuicaoConicGradient(): string {
+    const parts: string[] = [];
+    let cursor = 0;
+    for (const item of this.carteiraDistribuicaoChart) {
+      const next = cursor + item.percent;
+      parts.push(`${item.color} ${cursor}% ${next}%`);
+      cursor = next;
+    }
+    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(#cbd5e1 0 100%)';
   }
 
   get evolucaoMaxValor(): number {
