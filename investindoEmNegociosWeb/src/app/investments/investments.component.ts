@@ -290,6 +290,13 @@ export class InvestmentsComponent implements OnInit {
     return this.marketQuotes[symbol]?.changePercent ?? null;
   }
 
+  variacaoPrecoPercent(pos: InvestmentPosition): number | null {
+    const market = this.marketPrice(pos);
+    const avg = pos.avgPrice || 0;
+    if (market === null || avg <= 0) return null;
+    return ((market / avg) - 1) * 100;
+  }
+
   marketLogo(pos: InvestmentPosition): string | null {
     const symbol = this.extractMarketSymbol(pos);
     if (!symbol) return null;

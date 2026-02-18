@@ -93,6 +93,12 @@
   font-size: 0.9rem;
 }
 
+.kpi-icon svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
 .executive-card strong {
   font-size: var(--text-xl);
   line-height: 1.2;
