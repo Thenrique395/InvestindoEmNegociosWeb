@@ -18,10 +18,35 @@ import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
-type InvestmentsTab = 'RESUMO' | 'LANCAMENTOS' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
+type InvestmentsTab = 'RESUMO' | 'CONSOLIDACAO' | 'LANCAMENTOS' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
 type PatrimonioBucket = { key: string; label: string; aplicado: number; ganho: number; total: number };
 type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
+type ProventoMonthBucket = { key: string; label: string; total: number };
+type ConsolidacaoBucket = { key: string; label: string; compras: number; vendas: number };
+type ConsolidacaoMovimentoRow = {
+  id: string;
+  asset: string;
+  investmentType: InvestmentType;
+  ordem: 'Compra' | 'Venda';
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  quantityAfter: number;
+  date: string;
+  source: 'B3' | 'Manual';
+};
+type BenchmarkKey = 'CDI' | 'IPCA' | 'IFIX' | 'IBOV' | 'SMLL' | 'IDIV' | 'IVVB11';
+type RentabilidadeMonthPoint = {
+  key: string;
+  year: number;
+  month: number;
+  label: string;
+  carteiraMes: number;
+  benchmarkMes: number;
+  carteiraAc: number;
+  benchmarkAc: number;
+};
 
 @Component({
   selector: 'app-investments',
@@ -62,14 +87,31 @@ export class InvestmentsComponent implements OnInit {
   patrimonioRangeMonths = 12;
   patrimonioTypeFilter: 'ALL' | InvestmentType = 'ALL';
   carteiraTypeFilter: 'ALL' | InvestmentType = 'ALL';
+  rentabilidadePeriodo: 'SINCE_START' | 'LAST_12M' = 'SINCE_START';
+  rentabilidadeTipoFiltro: 'ALL' | InvestmentType = 'ALL';
+  rentabilidadeBenchmark: BenchmarkKey = 'CDI';
+  consolidacaoGranularidade: 'MONTHLY' = 'MONTHLY';
+  consolidacaoHorizonteAnos = 2;
+  consolidacaoTipoFiltro: 'ALL' | InvestmentType = 'ALL';
+  consolidacaoSearchTerm = '';
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
   tabs: Array<{ key: InvestmentsTab; label: string }> = [
     { key: 'RESUMO', label: 'Resumo' },
+    { key: 'CONSOLIDACAO', label: 'Consolidação' },
     { key: 'LANCAMENTOS', label: 'Lançamentos' },
     { key: 'PROVENTOS', label: 'Proventos' },
     { key: 'RENTABILIDADE', label: 'Rentabilidade' },
     { key: 'ANALISE', label: 'Análise' }
+  ];
+  benchmarkOptions: Array<{ key: BenchmarkKey; label: string; color: string }> = [
+    { key: 'CDI', label: 'CDI', color: '#f59e0b' },
+    { key: 'IPCA', label: 'IPCA', color: '#84cc16' },
+    { key: 'IFIX', label: 'IFIX', color: '#92400e' },
+    { key: 'IBOV', label: 'IBOV', color: '#ef4444' },
+    { key: 'SMLL', label: 'SMLL', color: '#06b6d4' },
+    { key: 'IDIV', label: 'IDIV', color: '#f97316' },
+    { key: 'IVVB11', label: 'IVVB11', color: '#a855f7' }
   ];
 
   // Prioridade 7: importação CSV
@@ -348,7 +390,12 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get distribuicaoPorTipoComCor(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
-    const palette: Record<InvestmentType, string> = { RF: '#2563eb', ACOES: '#7c3aed', FUNDOS: '#0891b2', CRIPTO: '#ea580c' };
+    const palette: Record<InvestmentType, string> = {
+      RF: '#2563eb',
+      ACOES: '#16a34a',
+      FUNDOS: '#0ea5a4',
+      CRIPTO: '#f59e0b'
+    };
     return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
   }
 
@@ -519,6 +566,75 @@ export class InvestmentsComponent implements OnInit {
     return this.evolucaoMensalSeries.reduce((max, item) => Math.max(max, item.aporte, item.resgate, item.proventos), 0) || 1;
   }
 
+  get proventosMensaisSeries(): ProventoMonthBucket[] {
+    const now = new Date();
+    const months: ProventoMonthBucket[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({
+        key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+        label: d.toLocaleDateString('pt-BR', { month: '2-digit', year: '2-digit' }),
+        total: 0
+      });
+    }
+
+    const byMonth = new Map(months.map((m) => [m.key, m]));
+    for (const pos of this.positions) {
+      for (const mov of pos.movements || []) {
+        if (!mov?.date || !this.isProventoMovement(mov.type)) continue;
+        const [year, month] = mov.date.split('T')[0].split('-');
+        const bucket = byMonth.get(`${year}-${month}`);
+        if (!bucket) continue;
+        bucket.total += (mov.quantity || 0) * (mov.price || 0);
+      }
+    }
+
+    return months;
+  }
+
+  get proventosMensaisMax(): number {
+    return this.proventosMensaisSeries.reduce((max, item) => Math.max(max, item.total), 0) || 1;
+  }
+
+  get proventosTotal12Meses(): number {
+    return this.proventosMensaisSeries.reduce((sum, item) => sum + item.total, 0);
+  }
+
+  get proventosMedia12Meses(): number {
+    return this.proventosTotal12Meses / 12;
+  }
+
+  get proventosPorAtivo12Meses(): { asset: string; total: number; percent: number }[] {
+    const totals = new Map<string, number>();
+    const limitDate = new Date();
+    limitDate.setMonth(limitDate.getMonth() - 11);
+    limitDate.setDate(1);
+
+    for (const pos of this.positions) {
+      for (const mov of pos.movements || []) {
+        if (!mov?.date || !this.isProventoMovement(mov.type)) continue;
+        const movDate = new Date(mov.date);
+        if (Number.isNaN(movDate.getTime()) || movDate < limitDate) continue;
+        const value = (mov.quantity || 0) * (mov.price || 0);
+        totals.set(pos.asset, (totals.get(pos.asset) || 0) + value);
+      }
+    }
+
+    const total = Array.from(totals.values()).reduce((sum, value) => sum + value, 0);
+    return Array.from(totals.entries())
+      .map(([asset, value]) => ({
+        asset,
+        total: value,
+        percent: total > 0 ? (value / total) * 100 : 0
+      }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 8);
+  }
+
+  get proventosAtivosPagadores(): number {
+    return this.proventosPorAtivo12Meses.length;
+  }
+
   get proventosPorAtivo(): { asset: string; total: number }[] {
     const totals = new Map<string, number>();
     for (const pos of this.positions) {
@@ -533,6 +649,10 @@ export class InvestmentsComponent implements OnInit {
 
   get proventosTotal(): number {
     return this.proventosPorAtivo.reduce((sum, item) => sum + item.total, 0);
+  }
+
+  private isProventoMovement(type: MovementType): boolean {
+    return type === 'DIVIDENDO' || type === 'JCP' || type === 'RENDIMENTO';
   }
 
   get aporteTotal(): number {
@@ -566,6 +686,284 @@ export class InvestmentsComponent implements OnInit {
 
   get rentabilidadeDiariaPercent(): number {
     return this.rentabilidadeMensalPercent / 22;
+  }
+
+  get rentabilidadeSeriesFull(): RentabilidadeMonthPoint[] {
+    const movimentos = this.positions
+      .filter((p) => this.rentabilidadeTipoFiltro === 'ALL' || p.type === this.rentabilidadeTipoFiltro)
+      .flatMap((p) => (p.movements || []).map((m) => ({ movement: m })))
+      .filter((entry) => !!entry.movement?.date);
+
+    const now = new Date();
+    const nowMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const minDate = movimentos.length
+      ? movimentos
+          .map((entry) => new Date(entry.movement.date))
+          .filter((d) => !Number.isNaN(d.getTime()))
+          .sort((a, b) => a.getTime() - b.getTime())[0]
+      : new Date(now.getFullYear(), now.getMonth() - 11, 1);
+
+    const start = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    const monthMap = new Map<string, { aporte: number; resgate: number; proventos: number }>();
+
+    for (let cursor = new Date(start); cursor <= nowMonth; cursor.setMonth(cursor.getMonth() + 1)) {
+      const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+      monthMap.set(key, { aporte: 0, resgate: 0, proventos: 0 });
+    }
+
+    for (const pos of this.positions) {
+      if (this.rentabilidadeTipoFiltro !== 'ALL' && pos.type !== this.rentabilidadeTipoFiltro) continue;
+      for (const mov of pos.movements || []) {
+        if (!mov?.date) continue;
+        const date = new Date(mov.date);
+        if (Number.isNaN(date.getTime())) continue;
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const bucket = monthMap.get(key);
+        if (!bucket) continue;
+        const value = (mov.quantity || 0) * (mov.price || 0);
+        if (mov.type === 'COMPRA' || mov.type === 'APORTE') bucket.aporte += value;
+        if (mov.type === 'VENDA' || mov.type === 'RESGATE') bucket.resgate += value;
+        if (this.isProventoMovement(mov.type)) bucket.proventos += value;
+      }
+    }
+
+    const points: RentabilidadeMonthPoint[] = [];
+    let baseCapital = 0;
+    let carteiraAc = 0;
+    let benchmarkAc = 0;
+    const benchmarkMesFixo = this.benchmarkMonthPercent(this.rentabilidadeBenchmark);
+
+    for (const [key, bucket] of monthMap) {
+      const [yearText, monthText] = key.split('-');
+      const year = Number(yearText);
+      const month = Number(monthText);
+      baseCapital = Math.max(baseCapital + bucket.aporte - bucket.resgate, 0);
+      const carteiraMes = baseCapital > 0 ? (bucket.proventos / baseCapital) * 100 : 0;
+      carteiraAc = ((1 + carteiraAc / 100) * (1 + carteiraMes / 100) - 1) * 100;
+      benchmarkAc = ((1 + benchmarkAc / 100) * (1 + benchmarkMesFixo / 100) - 1) * 100;
+      points.push({
+        key,
+        year,
+        month,
+        label: `${String(month).padStart(2, '0')}/${String(year).slice(-2)}`,
+        carteiraMes,
+        benchmarkMes: benchmarkMesFixo,
+        carteiraAc,
+        benchmarkAc
+      });
+      baseCapital += bucket.proventos;
+    }
+
+    return points;
+  }
+
+  get rentabilidadeSeries(): RentabilidadeMonthPoint[] {
+    const full = this.rentabilidadeSeriesFull;
+    if (this.rentabilidadePeriodo === 'LAST_12M') return full.slice(-12);
+    return full;
+  }
+
+  get rentabilidadeTotalPercent(): number {
+    const last = this.rentabilidadeSeriesFull[this.rentabilidadeSeriesFull.length - 1];
+    return last?.carteiraAc || 0;
+  }
+
+  get rentabilidadeTotalCdiPercent(): number {
+    const last = this.rentabilidadeSeriesFull[this.rentabilidadeSeriesFull.length - 1];
+    return last?.benchmarkAc || 0;
+  }
+
+  get rentabilidade12mPercent(): number {
+    const points = this.rentabilidadeSeriesFull.slice(-12);
+    if (!points.length) return 0;
+    return points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.carteiraMes / 100) - 1) * 100, 0);
+  }
+
+  get rentabilidade12mCdiPercent(): number {
+    const points = this.rentabilidadeSeriesFull.slice(-12);
+    if (!points.length) return 0;
+    return points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.benchmarkMes / 100) - 1) * 100, 0);
+  }
+
+  get rentabilidadeUltimoMesPercent(): number {
+    const last = this.rentabilidadeSeriesFull[this.rentabilidadeSeriesFull.length - 1];
+    return last?.carteiraMes || 0;
+  }
+
+  get rentabilidadeUltimoMesCdiPercent(): number {
+    const last = this.rentabilidadeSeriesFull[this.rentabilidadeSeriesFull.length - 1];
+    return last?.benchmarkMes || 0;
+  }
+
+  get rentabilidadeChartMin(): number {
+    const values = this.rentabilidadeSeries.flatMap((point) => [point.carteiraAc, point.benchmarkAc]);
+    const min = Math.min(...values, 0);
+    return Math.floor(min / 5) * 5;
+  }
+
+  get rentabilidadeChartMax(): number {
+    const values = this.rentabilidadeSeries.flatMap((point) => [point.carteiraAc, point.benchmarkAc]);
+    const max = Math.max(...values, 0);
+    const padded = max <= 0 ? 5 : max * 1.15;
+    return Math.ceil(padded / 5) * 5;
+  }
+
+  get rentabilidadeChartTicks(): number[] {
+    const min = this.rentabilidadeChartMin;
+    const max = this.rentabilidadeChartMax;
+    const steps = 5;
+    const span = max - min || 1;
+    return Array.from({ length: steps + 1 }, (_, i) => max - (span / steps) * i);
+  }
+
+  get rentabilidadeLinhaCarteira(): string {
+    return this.buildRentabilidadePolyline('carteiraAc');
+  }
+
+  get rentabilidadeLinhaCdi(): string {
+    return this.buildRentabilidadePolyline('benchmarkAc');
+  }
+
+  get indiceSelecionadoLabel(): string {
+    return this.benchmarkOptions.find((item) => item.key === this.rentabilidadeBenchmark)?.label || 'Índice';
+  }
+
+  get indiceSelecionadoCor(): string {
+    return this.benchmarkOptions.find((item) => item.key === this.rentabilidadeBenchmark)?.color || '#f59e0b';
+  }
+
+  get rentabilidadeTabelaAnual(): Array<{ year: number; months: Array<number | null>; yearValue: number; acumulado: number }> {
+    const byYear = new Map<number, RentabilidadeMonthPoint[]>();
+    for (const point of this.rentabilidadeSeriesFull) {
+      const list = byYear.get(point.year) || [];
+      list.push(point);
+      byYear.set(point.year, list);
+    }
+
+    return Array.from(byYear.entries())
+      .sort((a, b) => b[0] - a[0])
+      .map(([year, points]) => {
+        const months: Array<number | null> = Array.from({ length: 12 }, () => null);
+        for (const point of points) months[point.month - 1] = point.carteiraMes;
+        const yearValue = points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.carteiraMes / 100) - 1) * 100, 0);
+        const acumulado = points[points.length - 1]?.carteiraAc || 0;
+        return { year, months, yearValue, acumulado };
+      });
+  }
+
+  comparativoCdiLabel(carteira: number, benchmark: number): string {
+    const diff = carteira - benchmark;
+    const prefix = diff >= 0 ? 'acima' : 'abaixo';
+    return `${Math.abs(diff).toFixed(2)}% ${prefix} do ${this.indiceSelecionadoLabel}`;
+  }
+
+  private buildRentabilidadePolyline(field: 'carteiraAc' | 'benchmarkAc'): string {
+    const points = this.rentabilidadeSeries;
+    if (!points.length) return '';
+    const width = 1000;
+    const height = 280;
+    const min = this.rentabilidadeChartMin;
+    const max = this.rentabilidadeChartMax;
+    const span = max - min || 1;
+    return points
+      .map((point, index) => {
+        const x = (index / Math.max(points.length - 1, 1)) * width;
+        const y = height - (((point[field] - min) / span) * height);
+        return `${x},${y}`;
+      })
+      .join(' ');
+  }
+
+  private benchmarkMonthPercent(key: BenchmarkKey): number {
+    const monthly: Record<BenchmarkKey, number> = {
+      CDI: 0.85,
+      IPCA: 0.45,
+      IFIX: 0.7,
+      IBOV: 1.1,
+      SMLL: 1.25,
+      IDIV: 0.95,
+      IVVB11: 1.05
+    };
+    return monthly[key] ?? 0.85;
+  }
+
+  get consolidacaoSeries(): ConsolidacaoBucket[] {
+    const now = new Date();
+    const start = new Date(now.getFullYear() - this.consolidacaoHorizonteAnos + 1, now.getMonth(), 1);
+    const months: ConsolidacaoBucket[] = [];
+    const cursor = new Date(start);
+
+    while (cursor <= now) {
+      months.push({
+        key: `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`,
+        label: cursor.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
+        compras: 0,
+        vendas: 0
+      });
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    const byMonth = new Map(months.map((m) => [m.key, m]));
+    for (const row of this.consolidacaoRows) {
+      const date = new Date(row.date);
+      if (Number.isNaN(date.getTime())) continue;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const bucket = byMonth.get(key);
+      if (!bucket) continue;
+      if (row.ordem === 'Compra') bucket.compras += row.total;
+      if (row.ordem === 'Venda') bucket.vendas += row.total;
+    }
+
+    return months;
+  }
+
+  get consolidacaoChartMax(): number {
+    return this.consolidacaoSeries.reduce((max, item) => Math.max(max, item.compras, item.vendas), 0) || 1;
+  }
+
+  get consolidacaoRows(): ConsolidacaoMovimentoRow[] {
+    const rows: ConsolidacaoMovimentoRow[] = [];
+    const horizonStart = new Date();
+    horizonStart.setFullYear(horizonStart.getFullYear() - this.consolidacaoHorizonteAnos);
+    const text = this.normalize(this.consolidacaoSearchTerm);
+
+    for (const pos of this.positions) {
+      if (this.consolidacaoTipoFiltro !== 'ALL' && pos.type !== this.consolidacaoTipoFiltro) continue;
+      const relevant = (pos.movements || [])
+        .filter((mov) => mov.type === 'COMPRA' || mov.type === 'VENDA')
+        .map((mov, idx) => ({ mov, idx }))
+        .sort((a, b) => new Date(a.mov.date).getTime() - new Date(b.mov.date).getTime());
+
+      let runningQty = 0;
+      for (const entry of relevant) {
+        const date = new Date(entry.mov.date);
+        if (Number.isNaN(date.getTime())) continue;
+        runningQty += entry.mov.type === 'COMPRA' ? entry.mov.quantity : -entry.mov.quantity;
+
+        if (date < horizonStart) continue;
+        const source: 'B3' | 'Manual' = (entry.mov.note || '').toUpperCase().includes('B3') ? 'B3' : 'Manual';
+        if (text && !this.normalize(pos.asset).includes(text)) continue;
+
+        rows.push({
+          id: `${pos.id}-${entry.idx}`,
+          asset: pos.asset,
+          investmentType: pos.type,
+          ordem: entry.mov.type === 'COMPRA' ? 'Compra' : 'Venda',
+          quantity: entry.mov.quantity,
+          unitPrice: entry.mov.price,
+          total: entry.mov.quantity * entry.mov.price,
+          quantityAfter: runningQty,
+          date: entry.mov.date,
+          source
+        });
+      }
+    }
+
+    return rows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  investimentoTipoLabel(type: InvestmentType): string {
+    return this.tipos.find((t) => t.value === type)?.label || type;
   }
 
   get mesesComparativo(): number {
@@ -730,7 +1128,7 @@ export class InvestmentsComponent implements OnInit {
       this.closeCadastroModal();
       this.carregarPosicoes();
     } catch (err: any) {
-      this.uiFeedback.error(err?.error?.detail || 'Falha ao registrar venda.');
+      this.uiFeedback.error(this.resolveHttpError(err, 'Falha ao registrar venda.'));
     }
   }
 
@@ -1028,6 +1426,12 @@ export class InvestmentsComponent implements OnInit {
       .toLowerCase();
   }
 
+  private resolveHttpError(err: any, fallback: string): string {
+    const status = err?.status ? ` (${err.status})` : '';
+    const detail = err?.error?.detail || err?.error?.title || err?.error?.message || err?.message;
+    return detail ? `${detail}${status}` : fallback;
+  }
+
   private scrollToSection(id: string): void {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -1048,11 +1452,8 @@ export class InvestmentsComponent implements OnInit {
 
   private restoreTab(): void {
     if (typeof window === 'undefined') return;
-    const raw = window.localStorage.getItem(this.tabStorageKey);
-    const valid = new Set(this.tabs.map((t) => t.key));
-    if (raw && valid.has(raw as InvestmentsTab)) {
-      this.activeTab = raw as InvestmentsTab;
-    }
+    this.activeTab = 'RESUMO';
+    window.localStorage.setItem(this.tabStorageKey, 'RESUMO');
   }
 
   trackByIndex(index: number): number {

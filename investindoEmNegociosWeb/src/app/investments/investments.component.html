@@ -99,7 +99,7 @@
   </section>
 
   <section class="visual-grid visual-grid--resume" *ngIf="activeTab === 'RESUMO'">
-    <article class="card chart-card">
+    <article class="card chart-card chart-card--allocation">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Evolução do patrimônio</h3>
@@ -301,7 +301,109 @@
     </div>
   </div>
 
-  <section class="visual-grid" *ngIf="activeTab === 'ANALISE' || activeTab === 'RENTABILIDADE'">
+  <section *ngIf="activeTab === 'CONSOLIDACAO'" class="consolidacao">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Consolidação de aportes</h3>
+        </div>
+        <div class="chart-filters">
+          <select [(ngModel)]="consolidacaoGranularidade">
+            <option value="MONTHLY">Mensal</option>
+          </select>
+          <select [(ngModel)]="consolidacaoHorizonteAnos">
+            <option [ngValue]="1">1 ano</option>
+            <option [ngValue]="2">2 anos</option>
+            <option [ngValue]="3">3 anos</option>
+          </select>
+          <select [(ngModel)]="consolidacaoTipoFiltro">
+            <option value="ALL">Todos os tipos</option>
+            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="consolidacao-chart">
+        <div class="consolidacao-axis">
+          <span>{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
+          <span>{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
+          <span>R$ 0</span>
+          <span>-{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
+          <span>-{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="consolidacao-plot">
+          <div class="consolidacao-grid-lines">
+            <span *ngFor="let _ of [1,2,3,4,5]; trackBy: trackByIndex"></span>
+          </div>
+          <div class="consolidacao-zero-line"></div>
+          <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + consolidacaoSeries.length + ', minmax(0, 1fr))'">
+            <div class="consolidacao-col" *ngFor="let item of consolidacaoSeries; trackBy: trackByIndex">
+              <div class="consolidacao-bars__stack">
+                <span
+                  class="bar compra"
+                  [style.height.%]="(item.compras / consolidacaoChartMax) * 50"
+                  [attr.title]="'Compras: ' + (item.compras | currency:'BRL':'symbol':'1.2-2')"></span>
+                <span
+                  class="bar venda"
+                  [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"
+                  [attr.title]="'Vendas: ' + (item.vendas | currency:'BRL':'symbol':'1.2-2')"></span>
+              </div>
+              <small>{{ item.label }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span><i class="chip compra"></i> Compras</span>
+        <span><i class="chip venda"></i> Vendas</span>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Lançamentos consolidados</h3>
+        </div>
+        <input type="text" [(ngModel)]="consolidacaoSearchTerm" placeholder="Buscar ativos" />
+      </div>
+
+      <div class="table-wrap" *ngIf="consolidacaoRows.length; else semConsolidacaoRows">
+        <table>
+          <thead>
+            <tr>
+              <th>Ativo</th>
+              <th>Tipo de investimento</th>
+              <th>Tipo de ordem</th>
+              <th>Quantidade</th>
+              <th>Preço unitário</th>
+              <th>Total</th>
+              <th>Quantidade total</th>
+              <th>Data do lançamento</th>
+              <th>Fonte</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of consolidacaoRows; trackBy: trackById">
+              <td><strong>{{ row.asset }}</strong></td>
+              <td>{{ investimentoTipoLabel(row.investmentType) }}</td>
+              <td [class.success]="row.ordem === 'Compra'" [class.danger]="row.ordem === 'Venda'">{{ row.ordem }}</td>
+              <td>{{ row.quantity | number:'1.0-4' }}</td>
+              <td>{{ row.unitPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ row.total | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ row.quantityAfter | number:'1.0-4' }}</td>
+              <td>{{ row.date | date:'dd/MM/yyyy' }}</td>
+              <td><span class="status-pill" [class.zeroed]="row.source === 'Manual'">{{ row.source }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #semConsolidacaoRows>
+        <div class="empty">Sem lançamentos para os filtros atuais.</div>
+      </ng-template>
+    </article>
+  </section>
+
+  <section class="visual-grid" *ngIf="activeTab === 'ANALISE'">
     <article class="card chart-card" id="sec-alocacao" *ngIf="activeTab === 'ANALISE'">
       <div class="section-head">
         <div class="section-head__title">
@@ -331,31 +433,129 @@
       </div>
     </article>
 
-    <article class="card chart-card" id="sec-evolucao" *ngIf="activeTab === 'RENTABILIDADE'">
+  </section>
+
+  <section class="rentabilidade-grid" *ngIf="activeTab === 'RENTABILIDADE'">
+    <div class="rentabilidade-side">
+      <article class="card executive-card rent-card">
+        <p class="label">Total</p>
+        <small>Rentabilidade</small>
+        <strong [class.success]="rentabilidadeTotalPercent >= 0" [class.danger]="rentabilidadeTotalPercent < 0">
+          {{ rentabilidadeTotalPercent | number:'1.2-2' }}%
+        </strong>
+        <small>{{ comparativoCdiLabel(rentabilidadeTotalPercent, rentabilidadeTotalCdiPercent) }}</small>
+      </article>
+      <article class="card executive-card rent-card">
+        <p class="label">Últimos 12 meses</p>
+        <small>Rentabilidade</small>
+        <strong [class.success]="rentabilidade12mPercent >= 0" [class.danger]="rentabilidade12mPercent < 0">
+          {{ rentabilidade12mPercent | number:'1.2-2' }}%
+        </strong>
+        <small>{{ comparativoCdiLabel(rentabilidade12mPercent, rentabilidade12mCdiPercent) }}</small>
+      </article>
+      <article class="card executive-card rent-card">
+        <p class="label">Último mês</p>
+        <small>Rentabilidade</small>
+        <strong [class.success]="rentabilidadeUltimoMesPercent >= 0" [class.danger]="rentabilidadeUltimoMesPercent < 0">
+          {{ rentabilidadeUltimoMesPercent | number:'1.2-2' }}%
+        </strong>
+        <small>{{ comparativoCdiLabel(rentabilidadeUltimoMesPercent, rentabilidadeUltimoMesCdiPercent) }}</small>
+      </article>
+    </div>
+
+    <article class="card chart-card rentabilidade-main" id="sec-evolucao">
       <div class="section-head">
         <div class="section-head__title">
-          <h3>Evolução mensal</h3>
-          <button type="button" class="hint" aria-label="Explicação do gráfico evolução mensal">
-            i
-            <span class="hint__panel">Comparativo mensal dos últimos 6 meses entre aportes, resgates e proventos.</span>
-          </button>
+          <h3>Rentabilidade comparada com índices</h3>
         </div>
-        <span class="muted">Aportes, resgates e proventos (6 meses)</span>
+        <div class="chart-filters">
+          <select [(ngModel)]="rentabilidadePeriodo">
+            <option value="SINCE_START">Desde o início</option>
+            <option value="LAST_12M">Últimos 12 meses</option>
+          </select>
+          <select [(ngModel)]="rentabilidadeBenchmark">
+            <option *ngFor="let item of benchmarkOptions; trackBy: trackByIndex" [value]="item.key">{{ item.label }}</option>
+          </select>
+          <select [(ngModel)]="rentabilidadeTipoFiltro">
+            <option value="ALL">Todos os tipos</option>
+            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
       </div>
-      <div class="evolution-chart">
-        <div class="evolution-column" *ngFor="let item of evolucaoMensalSeries; trackBy: trackByIndex" [attr.title]="tooltipMes(item)">
-          <div class="evolution-bars">
-            <span class="bar aporte" [style.height.%]="(item.aporte / evolucaoMaxValor) * 100" [attr.title]="'Aportes: ' + (item.aporte | currency:'BRL':'symbol':'1.2-2')"></span>
-            <span class="bar resgate" [style.height.%]="(item.resgate / evolucaoMaxValor) * 100" [attr.title]="'Resgates: ' + (item.resgate | currency:'BRL':'symbol':'1.2-2')"></span>
-            <span class="bar provento" [style.height.%]="(item.proventos / evolucaoMaxValor) * 100" [attr.title]="'Proventos: ' + (item.proventos | currency:'BRL':'symbol':'1.2-2')"></span>
+
+      <div class="rentabilidade-chart">
+        <div class="rentabilidade-axis">
+          <span *ngFor="let tick of rentabilidadeChartTicks; trackBy: trackByIndex">{{ tick | number:'1.0-0' }}%</span>
+        </div>
+        <div class="rentabilidade-plot">
+          <div class="rentabilidade-grid-lines">
+            <span *ngFor="let _ of [1,2,3,4,5]; trackBy: trackByIndex"></span>
           </div>
-          <small>{{ item.label }}</small>
+          <svg
+            viewBox="0 0 1000 280"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label="Evolução de rentabilidade da carteira e índice"
+            [style.--benchmark-color]="indiceSelecionadoCor">
+            <polyline class="line cdi" [attr.points]="rentabilidadeLinhaCdi"></polyline>
+            <polyline class="line carteira" [attr.points]="rentabilidadeLinhaCarteira"></polyline>
+          </svg>
+          <div class="rentabilidade-x-axis">
+            <small *ngFor="let point of rentabilidadeSeries; trackBy: trackByIndex">{{ point.label }}</small>
+          </div>
         </div>
       </div>
       <div class="legend-row">
-        <span><i class="chip aporte"></i> Aportes</span>
-        <span><i class="chip resgate"></i> Resgates</span>
-        <span><i class="chip provento"></i> Proventos</span>
+        <span><i class="chip carteira"></i> Carteira</span>
+        <span><i class="chip cdi" [style.background]="indiceSelecionadoCor"></i> {{ indiceSelecionadoLabel }} (estimado no período)</span>
+      </div>
+    </article>
+  </section>
+
+  <section class="proventos-grid" *ngIf="activeTab === 'PROVENTOS'">
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Resumo de proventos</h3>
+        </div>
+      </div>
+      <div class="proventos-summary">
+        <div class="proventos-summary__row">
+          <small>Média mensal (12 meses)</small>
+          <strong>{{ proventosMedia12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="proventos-summary__row">
+          <small>Total em 12 meses</small>
+          <strong>{{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="proventos-summary__row">
+          <small>Ativos pagadores</small>
+          <strong>{{ proventosAtivosPagadores }}</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Evolução mensal de proventos</h3>
+          <button type="button" class="hint" aria-label="Explicação do gráfico evolução de proventos">
+            i
+            <span class="hint__panel">Total recebido por mês em dividendos, JCP e rendimentos nos últimos 12 meses.</span>
+          </button>
+        </div>
+        <span class="muted">Últimos 12 meses</span>
+      </div>
+      <div class="proventos-evolution">
+        <div class="proventos-evolution__column" *ngFor="let item of proventosMensaisSeries; trackBy: trackByIndex">
+          <div class="proventos-evolution__bars">
+            <span
+              class="bar provento"
+              [style.height.%]="(item.total / proventosMensaisMax) * 100"
+              [attr.title]="item.label + ': ' + (item.total | currency:'BRL':'symbol':'1.2-2')"></span>
+          </div>
+          <small>{{ item.label }}</small>
+        </div>
       </div>
     </article>
   </section>
@@ -363,66 +563,65 @@
   <article class="card chart-card" *ngIf="activeTab === 'PROVENTOS'">
     <div class="section-head">
       <div class="section-head__title">
-        <h3>Proventos por ativo</h3>
-        <button type="button" class="hint" aria-label="Explicação do gráfico proventos por ativo">
-          i
-          <span class="hint__panel">Ranking dos ativos que mais geraram dividendos, JCP e rendimentos.</span>
-        </button>
+        <h3>Ativos que pagam proventos</h3>
       </div>
-      <span class="muted">Total: {{ proventosTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
+      <span class="muted">Total: {{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</span>
     </div>
-    <div *ngIf="!proventosPorAtivo.length" class="empty">Sem proventos registrados.</div>
-    <div class="income-list" *ngIf="proventosPorAtivo.length">
-      <div class="income-item" *ngFor="let item of proventosPorAtivo; trackBy: trackByIndex">
+    <div *ngIf="!proventosPorAtivo12Meses.length" class="empty">Sem proventos registrados no período.</div>
+    <div class="income-list" *ngIf="proventosPorAtivo12Meses.length">
+      <div class="income-item" *ngFor="let item of proventosPorAtivo12Meses; trackBy: trackByIndex">
         <div class="income-item__top">
           <strong>{{ item.asset }}</strong>
           <span>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</span>
         </div>
         <div class="progress-bar slim">
-          <span [style.width.%]="(item.total / proventosTotal) * 100"></span>
+          <span [style.width.%]="(item.total / proventosTotal12Meses) * 100"></span>
         </div>
+        <small>{{ item.percent | number:'1.1-1' }}% do total</small>
       </div>
     </div>
   </article>
 
-  <section class="executive-grid executive-grid--three" *ngIf="activeTab === 'RENTABILIDADE'">
-    <article class="card executive-card">
-      <div class="label-row">
-        <p class="label">Rentabilidade diária (est.)</p>
-        <button type="button" class="hint" aria-label="Explicação da rentabilidade diária">
-          i
-          <span class="hint__panel">Estimativa diária baseada na rentabilidade mensal dividida por 22 pregões úteis.</span>
-        </button>
+  <article class="card chart-card" *ngIf="activeTab === 'RENTABILIDADE'">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Rentabilidade mensal</h3>
       </div>
-      <strong [class.success]="rentabilidadeDiariaPercent >= 0" [class.danger]="rentabilidadeDiariaPercent < 0">
-        {{ rentabilidadeDiariaPercent | number:'1.2-2' }}%
-      </strong>
-    </article>
-    <article class="card executive-card">
-      <div class="label-row">
-        <p class="label">Rentabilidade mensal (est.)</p>
-        <button type="button" class="hint" aria-label="Explicação da rentabilidade mensal">
-          i
-          <span class="hint__panel">Variação estimada do último mês pelo saldo de aportes, resgates e proventos.</span>
-        </button>
-      </div>
-      <strong [class.success]="rentabilidadeMensalPercent >= 0" [class.danger]="rentabilidadeMensalPercent < 0">
-        {{ rentabilidadeMensalPercent | number:'1.2-2' }}%
-      </strong>
-    </article>
-    <article class="card executive-card">
-      <div class="label-row">
-        <p class="label">Rentabilidade acumulada</p>
-        <button type="button" class="hint" aria-label="Explicação da rentabilidade acumulada">
-          i
-          <span class="hint__panel">Resultado total estimado sobre o capital líquido aportado na carteira.</span>
-        </button>
-      </div>
-      <strong [class.success]="rentabilidadeAcumuladaPercent >= 0" [class.danger]="rentabilidadeAcumuladaPercent < 0">
-        {{ rentabilidadeAcumuladaPercent | number:'1.2-2' }}%
-      </strong>
-    </article>
-  </section>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ano</th>
+            <th>Jan</th>
+            <th>Fev</th>
+            <th>Mar</th>
+            <th>Abr</th>
+            <th>Mai</th>
+            <th>Jun</th>
+            <th>Jul</th>
+            <th>Ago</th>
+            <th>Set</th>
+            <th>Out</th>
+            <th>Nov</th>
+            <th>Dez</th>
+            <th>Ano</th>
+            <th>Acumulado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rentabilidadeTabelaAnual; trackBy: trackByIndex">
+            <td><strong>{{ row.year }}</strong></td>
+            <td *ngFor="let monthValue of row.months; trackBy: trackByIndex" [class.success]="(monthValue || 0) >= 0" [class.danger]="(monthValue || 0) < 0">
+              {{ monthValue === null ? '-' : ((monthValue | number:'1.2-2') + '%') }}
+            </td>
+            <td [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">{{ row.yearValue | number:'1.2-2' }}%</td>
+            <td [class.success]="row.acumulado >= 0" [class.danger]="row.acumulado < 0">{{ row.acumulado | number:'1.2-2' }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
 
   <section class="visual-grid" *ngIf="activeTab === 'ANALISE'">
     <article class="card chart-card">
