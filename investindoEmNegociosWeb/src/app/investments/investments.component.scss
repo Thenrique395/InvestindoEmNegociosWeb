@@ -11,6 +11,40 @@
   color: var(--text-muted);
 }
 
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  overflow-x: auto;
+}
+
+.tab {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.tab.active {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+}
+
+.launch-actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .card {
   border: 1px solid var(--border);
   background: var(--surface);

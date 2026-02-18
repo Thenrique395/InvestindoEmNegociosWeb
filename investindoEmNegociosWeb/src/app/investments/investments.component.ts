@@ -18,6 +18,7 @@ import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
+type InvestmentsTab = 'RESUMO' | 'POSICOES' | 'LANCAMENTOS' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
 type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
 
@@ -29,6 +30,7 @@ type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice
   styleUrls: ['./investments.component.scss']
 })
 export class InvestmentsComponent implements OnInit {
+  private readonly tabStorageKey = 'investments.activeTab';
   private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   positions: InvestmentPosition[] = [];
@@ -57,6 +59,15 @@ export class InvestmentsComponent implements OnInit {
   currentPage = 1;
   pageSize = 8;
   cadastroOperacao: CadastroOperacao = 'COMPRA';
+  activeTab: InvestmentsTab = 'RESUMO';
+  tabs: Array<{ key: InvestmentsTab; label: string }> = [
+    { key: 'RESUMO', label: 'Resumo' },
+    { key: 'POSICOES', label: 'Posições' },
+    { key: 'LANCAMENTOS', label: 'Lançamentos' },
+    { key: 'PROVENTOS', label: 'Proventos' },
+    { key: 'RENTABILIDADE', label: 'Rentabilidade' },
+    { key: 'ANALISE', label: 'Análise' }
+  ];
 
   // Prioridade 7: importação CSV
   csvLoading = false;
@@ -106,6 +117,7 @@ export class InvestmentsComponent implements OnInit {
   constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService) {}
 
   ngOnInit(): void {
+    this.restoreTab();
     this.carregarMeta();
     this.carregarPosicoes();
     this.lookups.institutions('Broker').subscribe({
@@ -470,11 +482,20 @@ export class InvestmentsComponent implements OnInit {
   executarProximaAcao(): void {
     const action = this.proximaAcao;
     if (action.openForm) {
+      this.setActiveTab('LANCAMENTOS');
       this.openCadastroModal();
       return;
     }
     if (action.targetId) {
+      this.ensureTabForTarget(action.targetId);
       this.scrollToSection(action.targetId);
+    }
+  }
+
+  setActiveTab(tab: InvestmentsTab): void {
+    this.activeTab = tab;
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(this.tabStorageKey, tab);
     }
   }
 
@@ -884,6 +905,29 @@ export class InvestmentsComponent implements OnInit {
 
   private scrollToSection(id: string): void {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  private ensureTabForTarget(targetId: string): void {
+    if (targetId === 'sec-evolucao') {
+      this.setActiveTab('RENTABILIDADE');
+      return;
+    }
+    if (targetId === 'sec-alocacao') {
+      this.setActiveTab('ANALISE');
+      return;
+    }
+    if (targetId === 'sec-posicoes') {
+      this.setActiveTab('POSICOES');
+    }
+  }
+
+  private restoreTab(): void {
+    if (typeof window === 'undefined') return;
+    const raw = window.localStorage.getItem(this.tabStorageKey);
+    const valid = new Set(this.tabs.map((t) => t.key));
+    if (raw && valid.has(raw as InvestmentsTab)) {
+      this.activeTab = raw as InvestmentsTab;
+    }
   }
 
   trackByIndex(index: number): number {

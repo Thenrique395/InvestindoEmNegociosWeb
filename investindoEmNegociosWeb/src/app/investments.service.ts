@@ -113,6 +113,44 @@ export interface InvestmentBenchmarksResponse {
   items: InvestmentBenchmarkItem[];
 }
 
+export interface MarketQuoteResponse {
+  symbol: string;
+  price: number | null;
+  changePercent: number | null;
+  currency: string;
+  name: string | null;
+  lastUpdatedUtc: string | null;
+  source: string;
+  isEstimated: boolean;
+  providerLabel: string;
+}
+
+export interface MarketProfileResponse {
+  symbol: string;
+  name: string | null;
+  sector: string | null;
+  industry: string | null;
+  website: string | null;
+  logoUrl: string | null;
+  source: string;
+  isEstimated: boolean;
+  providerLabel: string;
+}
+
+export interface MarketHistoryPointResponse {
+  date: string;
+  close: number;
+}
+
+export interface MarketHistoryResponse {
+  symbol: string;
+  period: string;
+  source: string;
+  isEstimated: boolean;
+  providerLabel: string;
+  points: MarketHistoryPointResponse[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class InvestmentsService {
   private baseUrl = `${API_BASE_URL}/investments`;
@@ -164,5 +202,20 @@ export class InvestmentsService {
   getBenchmarks(months = 6): Observable<InvestmentBenchmarksResponse> {
     const params = new HttpParams().set('months', months);
     return this.http.get<InvestmentBenchmarksResponse>(`${this.baseUrl}/benchmarks`, { params });
+  }
+
+  getMarketQuote(symbol: string): Observable<MarketQuoteResponse> {
+    const params = new HttpParams().set('symbol', symbol);
+    return this.http.get<MarketQuoteResponse>(`${this.baseUrl}/market/quote`, { params });
+  }
+
+  getMarketProfile(symbol: string): Observable<MarketProfileResponse> {
+    const params = new HttpParams().set('symbol', symbol);
+    return this.http.get<MarketProfileResponse>(`${this.baseUrl}/market/profile`, { params });
+  }
+
+  getMarketHistory(symbol: string, period = '6mo'): Observable<MarketHistoryResponse> {
+    const params = new HttpParams().set('symbol', symbol).set('period', period);
+    return this.http.get<MarketHistoryResponse>(`${this.baseUrl}/market/history`, { params });
   }
 }

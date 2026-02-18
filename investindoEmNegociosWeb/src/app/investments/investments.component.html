@@ -7,7 +7,18 @@
     </div>
   </header>
 
-  <section class="executive-grid">
+  <nav class="tabs card" aria-label="Abas de investimentos">
+    <button
+      type="button"
+      class="tab"
+      *ngFor="let tab of tabs; trackBy: trackByIndex"
+      [class.active]="activeTab === tab.key"
+      (click)="setActiveTab(tab.key)">
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <section class="executive-grid" *ngIf="activeTab === 'RESUMO'">
     <article class="card executive-card">
       <div class="label-row">
         <p class="label">Patrimônio total</p>
@@ -58,14 +69,7 @@
     </article>
   </section>
 
-  <div class="top-actions">
-    <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
-    <button class="btn-primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
-      {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
-    </button>
-  </div>
-
-  <article class="card action-card">
+  <article class="card action-card" *ngIf="activeTab === 'RESUMO'">
     <div>
       <p class="label">O que fazer agora</p>
       <strong>{{ proximaAcao.titulo }}</strong>
@@ -74,7 +78,21 @@
     <button class="btn-primary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
   </article>
 
-  <div class="card" id="sec-posicoes">
+  <section *ngIf="activeTab === 'LANCAMENTOS'" class="launch-actions">
+    <div class="top-actions">
+      <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
+      <button class="btn-primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
+        {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
+      </button>
+    </div>
+    <article class="card">
+      <p class="label">Como usar</p>
+      <strong>Registre compras e vendas no mesmo modal</strong>
+      <small class="muted">Use “Novo lançamento” para compra/venda manual e “Importações” para B3/CSV.</small>
+    </article>
+  </section>
+
+  <div class="card" id="sec-posicoes" *ngIf="activeTab === 'POSICOES'">
     <div class="section-head">
       <h3>Posições</h3>
       <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
@@ -147,8 +165,8 @@
     </div>
   </div>
 
-  <section class="visual-grid">
-    <article class="card chart-card" id="sec-alocacao">
+  <section class="visual-grid" *ngIf="activeTab === 'ANALISE' || activeTab === 'RENTABILIDADE'">
+    <article class="card chart-card" id="sec-alocacao" *ngIf="activeTab === 'ANALISE'">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Alocação da carteira</h3>
@@ -177,7 +195,7 @@
       </div>
     </article>
 
-    <article class="card chart-card" id="sec-evolucao">
+    <article class="card chart-card" id="sec-evolucao" *ngIf="activeTab === 'RENTABILIDADE'">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Evolução mensal</h3>
@@ -206,7 +224,7 @@
     </article>
   </section>
 
-  <article class="card chart-card">
+  <article class="card chart-card" *ngIf="activeTab === 'PROVENTOS'">
     <div class="section-head">
       <div class="section-head__title">
         <h3>Proventos por ativo</h3>
@@ -231,7 +249,7 @@
     </div>
   </article>
 
-  <section class="executive-grid executive-grid--three">
+  <section class="executive-grid executive-grid--three" *ngIf="activeTab === 'RENTABILIDADE'">
     <article class="card executive-card">
       <div class="label-row">
         <p class="label">Rentabilidade diária (est.)</p>
@@ -270,7 +288,7 @@
     </article>
   </section>
 
-  <section class="visual-grid">
+  <section class="visual-grid" *ngIf="activeTab === 'ANALISE'">
     <article class="card chart-card">
       <div class="section-head">
         <div class="section-head__title">
