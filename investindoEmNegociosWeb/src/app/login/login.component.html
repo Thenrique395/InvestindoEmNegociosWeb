@@ -1,76 +1,75 @@
-<section class="flex min-h-[70vh] items-center justify-center p-[var(--space-3)]">
-  <div
-    class="grid w-full max-w-[1040px] grid-cols-1 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)] md:grid-cols-[1.05fr_0.95fr]">
-    <div
-      class="hidden min-h-full flex-col justify-between gap-6 bg-[radial-gradient(circle_at_15%_20%,rgba(37,99,235,0.14),transparent_45%),linear-gradient(160deg,var(--surface-2),var(--surface))] p-[var(--space-5)] md:flex">
-      <div class="space-y-4">
-        <span class="text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--text-muted)]">Investindo em Negócios</span>
-        <h2 class="text-[28px] font-semibold text-[var(--text)]">Controle financeiro com clareza diária.</h2>
-        <p class="text-[var(--text-muted)]">
-          Tenha visão de receitas, despesas e metas em um painel simples, pensado para decisões rápidas.
-        </p>
-      </div>
-      <div class="grid gap-3 text-[13px] text-[var(--text-muted)]">
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-[var(--success)]"></span>
-          Resumo do mês e alertas inteligentes
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-[var(--primary)]"></span>
-          Metas e progresso por meta
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-[var(--warning)]"></span>
-          Comparativo com mês anterior
-        </div>
-      </div>
-    </div>
+<section class="login-shell">
+  <div class="login-shell__aura login-shell__aura--left" aria-hidden="true"></div>
+  <div class="login-shell__aura login-shell__aura--right" aria-hidden="true"></div>
 
-    <div class="flex flex-col gap-3 p-[var(--space-5)]">
-      <div class="space-y-2">
-        <span class="text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--text-muted)]">Entrar</span>
-        <h1 class="m-0 text-[26px] font-semibold text-[var(--text)]">Bem-vindo de volta</h1>
-        <p class="m-0 text-[var(--text-muted)]">
-          Acesse sua conta para acompanhar o mês, metas e alertas.
-        </p>
+  <div class="login-card">
+    <aside class="login-card__hero">
+      <p class="login-card__eyebrow">INVESTINDO EM NEGÓCIOS</p>
+      <h2>Seu mês financeiro organizado, sem planilha manual.</h2>
+      <p class="login-card__desc">
+        Centralize receitas, despesas, metas e investimentos em um único fluxo com visão diária e decisões objetivas.
+      </p>
+
+      <div class="login-card__feature-list">
+        <div class="login-card__feature"><span></span>Fechamento mensal com visão de saldo real</div>
+        <div class="login-card__feature"><span></span>Metas por tipo: despesas, receitas e investimentos</div>
+        <div class="login-card__feature"><span></span>Importação de faturas e lançamentos em minutos</div>
       </div>
 
-      <form class="mt-2 flex flex-col gap-4" (ngSubmit)="onSubmit()">
-        <label class="flex flex-col gap-2 text-[var(--text)] font-semibold">
+      <div class="login-card__kpis">
+        <article>
+          <strong>+12</strong>
+          <small>visões do negócio pessoal</small>
+        </article>
+        <article>
+          <strong>3 perfis</strong>
+          <small>Basic, Intermediate e Advanced</small>
+        </article>
+      </div>
+    </aside>
+
+    <main class="login-card__form-wrap">
+      <div class="login-card__head">
+        <p class="login-card__eyebrow">ENTRAR</p>
+        <h1>Bem-vindo de volta</h1>
+        <p>Acesse sua conta e continue seu planejamento.</p>
+      </div>
+
+      <form class="login-form" (ngSubmit)="onSubmit()">
+        <label>
           Email
           <input
-            class="w-full rounded-[12px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
             [(ngModel)]="email"
             name="email"
             type="email"
-            placeholder="seuemail@exemplo.com"
+            placeholder="E-mail"
             required />
         </label>
-        <label class="flex flex-col gap-2 text-[var(--text)] font-semibold">
+
+        <label>
           Senha
           <input
-            class="w-full rounded-[12px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
             [(ngModel)]="password"
             name="password"
             type="password"
             placeholder="••••••••"
             required />
         </label>
-        <div class="flex items-center justify-between text-[12px] text-[var(--text-muted)]">
+
+        <div class="login-form__meta">
           <span>Use seu email cadastrado.</span>
-          <button type="button" class="text-[var(--primary)] font-semibold hover:underline" aria-disabled="true">
-            Esqueci minha senha
-          </button>
+          <button type="button" aria-disabled="true">Esqueci minha senha</button>
         </div>
-        <button type="submit" class="btn-primary w-full" [disabled]="loading">
+
+        <button type="submit" class="btn-primary login-form__submit" [disabled]="loading">
           {{ loading ? 'Autenticando...' : 'Entrar' }}
         </button>
       </form>
 
-      <div class="mt-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-2)] py-[var(--space-2)] text-[12px] text-[var(--text-muted)]">
-        Ainda não tem conta? <span class="text-[var(--primary)] font-semibold">Crie sua conta no topo.</span>
+      <div class="login-card__cta">
+        Ainda não tem conta?
+        <span>Crie sua conta no topo.</span>
       </div>
-
-    </div>
+    </main>
   </div>
 </section>

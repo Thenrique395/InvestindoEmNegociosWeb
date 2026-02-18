@@ -1,1 +1,215 @@
-/* Tailwind handles layout */
+.login-shell {
+  min-height: 72vh;
+  padding: var(--space-3);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-shell__aura {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(40px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.login-shell__aura--left {
+  width: 360px;
+  height: 360px;
+  left: -120px;
+  top: 60px;
+  background: color-mix(in srgb, var(--primary) 65%, transparent);
+}
+
+.login-shell__aura--right {
+  width: 320px;
+  height: 320px;
+  right: -110px;
+  bottom: 40px;
+  background: color-mix(in srgb, var(--success) 55%, transparent);
+}
+
+.login-card {
+  width: min(1080px, 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.login-card__hero {
+  padding: clamp(1.2rem, 2vw, 2rem);
+  background:
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 48%),
+    linear-gradient(160deg, var(--surface-2), var(--surface));
+  display: grid;
+  gap: 1rem;
+}
+
+.login-card__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.login-card h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.login-card__desc {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+.login-card__feature-list {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+}
+
+.login-card__feature {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+}
+
+.login-card__feature span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--success);
+  flex: 0 0 8px;
+}
+
+.login-card__kpis {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.login-card__kpis article {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border-radius: 12px;
+  padding: 0.7rem 0.75rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.login-card__kpis strong {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.login-card__kpis small {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.login-card__form-wrap {
+  padding: clamp(1.2rem, 2vw, 2rem);
+  display: grid;
+  gap: 1rem;
+}
+
+.login-card__head h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.login-card__head p {
+  margin: 0.4rem 0 0;
+  color: var(--text-muted);
+}
+
+.login-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.login-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.login-form input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.68rem 0.8rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.login-form__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.login-form__meta button {
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.login-form__submit {
+  width: 100%;
+}
+
+.login-card__cta {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.login-card__cta span {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card__hero {
+    border-bottom: 1px solid var(--border);
+  }
+}

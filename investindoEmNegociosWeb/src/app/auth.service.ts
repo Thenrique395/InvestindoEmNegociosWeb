@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, shareReplay, throwError } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import { parseRole, UserRole } from './roles';
 
@@ -23,6 +23,7 @@ export interface RegisterPayload {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly baseUrl = `${API_BASE_URL}/auth`;
+  private refreshInFlight$?: Observable<AuthResponse>;
 
   constructor(private http: HttpClient) {}
 
@@ -38,16 +39,26 @@ export class AuthService {
   }
 
   refresh(refreshToken?: string) {
+    if (this.refreshInFlight$) {
+      return this.refreshInFlight$;
+    }
+
     const token = refreshToken || this.getRefreshToken();
     if (!token) {
       return throwError(() => new Error('Refresh token ausente.'));
     }
-    return this.http
+    const request$ = this.http
       .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken: token })
       .pipe(
         map((res) => this.persistSession(res)),
-        catchError((err) => this.wrapError(err, 'Erro ao renovar sessão.'))
+        catchError((err) => this.wrapError(err, 'Sessão expirada. Faça login novamente.', false)),
+        finalize(() => {
+          this.refreshInFlight$ = undefined;
+        }),
+        shareReplay(1)
       );
+    this.refreshInFlight$ = request$;
+    return request$;
   }
 
   register(payload: RegisterPayload) {
@@ -80,7 +91,12 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    return typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null;
+    if (typeof localStorage === 'undefined') return null;
+    if (this.isAccessTokenExpired()) {
+      this.clearSession();
+      return null;
+    }
+    return localStorage.getItem('access_token');
   }
 
   getRefreshToken(): string | null {
@@ -115,6 +131,31 @@ export class AuthService {
     }
   }
 
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
+  }
+
+  isAccessTokenExpired(): boolean {
+    if (typeof localStorage === 'undefined') return true;
+    const token = localStorage.getItem('access_token');
+    if (!token) return true;
+
+    const expiresAt = localStorage.getItem('access_expires_at');
+    if (expiresAt) {
+      const exp = new Date(expiresAt).getTime();
+      if (Number.isFinite(exp)) {
+        return Date.now() >= exp;
+      }
+    }
+
+    const jwtExp = this.readExpFromToken(token);
+    if (jwtExp) {
+      return Date.now() >= jwtExp * 1000;
+    }
+
+    return false;
+  }
+
   private readRoleFromToken(token: string | null): string | null {
     if (!token || typeof atob === 'undefined') return null;
     const parts = token.split('.');
@@ -131,7 +172,22 @@ export class AuthService {
     }
   }
 
-  private wrapError(err: unknown, fallback: string) {
+  private readExpFromToken(token: string | null): number | null {
+    if (!token || typeof atob === 'undefined') return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
+    try {
+      const decoded = JSON.parse(atob(padded));
+      return Number(decoded?.exp) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private wrapError(err: unknown, fallback: string, mapUnauthorizedToLogin = true) {
     // Log detalhado no console para facilitar depuração no front.
     // Não lança erro aqui; apenas registra e converte para mensagem amigável.
     // eslint-disable-next-line no-console
@@ -148,7 +204,7 @@ export class AuthService {
       message = detail;
     }
 
-    if (httpErr?.status === 401) {
+    if (httpErr?.status === 401 && mapUnauthorizedToLogin) {
       message = 'E-mail ou senha inválidos.';
       code = 'unauthorized';
     }

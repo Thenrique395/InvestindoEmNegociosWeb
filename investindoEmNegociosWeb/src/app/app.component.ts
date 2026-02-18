@@ -134,7 +134,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   get isLogged(): boolean {
-    return !!this.storage?.getItem('access_token');
+    return this.authService.isAuthenticated();
   }
 
   get displayName(): string {
