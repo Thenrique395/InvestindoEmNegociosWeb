@@ -20,52 +20,64 @@
 
   <section class="executive-grid" *ngIf="activeTab === 'RESUMO'">
     <article class="card executive-card">
-      <div class="label-row">
+      <div class="executive-card__head">
+        <span class="kpi-icon" aria-hidden="true">💼</span>
         <p class="label">Patrimônio total</p>
+      </div>
+      <div class="label-row">
         <button type="button" class="hint" aria-label="Explicação do card patrimônio total">
           i
           <span class="hint__panel">Soma do valor atual de todas as posições ativas (quantidade x preço médio).</span>
         </button>
       </div>
       <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-      <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
+      <small>Valor investido: {{ aporteTotal | currency: 'BRL':'symbol':'1.2-2' }}</small>
     </article>
     <article class="card executive-card">
+      <div class="executive-card__head">
+        <span class="kpi-icon" aria-hidden="true">📈</span>
+        <p class="label">Lucro total</p>
+      </div>
       <div class="label-row">
-        <p class="label">Aportes no mês</p>
         <button type="button" class="hint" aria-label="Explicação do card aportes no mês">
           i
-          <span class="hint__panel">Total de entradas por aportes e compras no mês atual.</span>
-        </button>
-      </div>
-      <strong class="success">{{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-      <small>Resgates no mês: {{ resgateMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
-    </article>
-    <article class="card executive-card">
-      <div class="label-row">
-        <p class="label">Saldo do mês</p>
-        <button type="button" class="hint" aria-label="Explicação do card resultado do mês">
-          i
-          <span class="hint__panel">Entradas menos saídas no mês atual (aportes e compras menos resgates e vendas).</span>
-        </button>
-      </div>
-      <strong [class.success]="resultadoMes >= 0" [class.danger]="resultadoMes < 0">
-        {{ resultadoMes | currency: 'BRL':'symbol':'1.2-2' }}
-      </strong>
-      <small>Entradas de aporte menos saídas de resgate</small>
-    </article>
-    <article class="card executive-card">
-      <div class="label-row">
-        <p class="label">Resultado acumulado</p>
-        <button type="button" class="hint" aria-label="Explicação do card resultado estimado acumulado">
-          i
-          <span class="hint__panel">Estimativa de ganho/perda acumulada: patrimônio atual menos valor líquido aportado.</span>
+          <span class="hint__panel">Diferença entre o patrimônio atual e o valor líquido aportado.</span>
         </button>
       </div>
       <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
         {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
       </strong>
-      <small>Patrimônio atual menos valor líquido aportado</small>
+      <small>Aportes no mês: {{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
+    </article>
+    <article class="card executive-card">
+      <div class="executive-card__head">
+        <span class="kpi-icon" aria-hidden="true">💰</span>
+        <p class="label">Proventos recebidos</p>
+      </div>
+      <div class="label-row">
+        <button type="button" class="hint" aria-label="Explicação do card proventos recebidos">
+          i
+          <span class="hint__panel">Total acumulado de dividendos, JCP e rendimentos registrados na carteira.</span>
+        </button>
+      </div>
+      <strong class="success">{{ proventosTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+      <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
+    </article>
+    <article class="card executive-card">
+      <div class="executive-card__head">
+        <span class="kpi-icon" aria-hidden="true">📊</span>
+        <p class="label">Rentabilidade</p>
+      </div>
+      <div class="label-row">
+        <button type="button" class="hint" aria-label="Explicação do card rentabilidade">
+          i
+          <span class="hint__panel">Comparativo percentual do desempenho estimado no mês e no acumulado.</span>
+        </button>
+      </div>
+      <strong [class.success]="rentabilidadeAcumuladaPercent >= 0" [class.danger]="rentabilidadeAcumuladaPercent < 0">
+        {{ rentabilidadeAcumuladaPercent | number:'1.2-2' }}%
+      </strong>
+      <small>Variação no mês: {{ rentabilidadeMensalPercent | number:'1.2-2' }}%</small>
     </article>
   </section>
 
@@ -92,7 +104,7 @@
     </article>
   </section>
 
-  <div class="card" id="sec-posicoes" *ngIf="activeTab === 'POSICOES'">
+  <div class="card" id="sec-posicoes" *ngIf="activeTab === 'RESUMO'">
     <div class="section-head">
       <h3>Posições</h3>
       <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
@@ -125,6 +137,8 @@
             <th><button class="sort-btn" type="button" (click)="ordenarPor('status')">Status <span>{{ sortIcon('status') }}</span></button></th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
+            <th>Preço mercado</th>
+            <th>Var. dia</th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('portfolioPercent')" title="Participação desta posição no patrimônio total da carteira">% carteira <span>{{ sortIcon('portfolioPercent') }}</span></button></th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade percentual estimada da posição com base no valor atual e no valor líquido investido">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
@@ -134,7 +148,12 @@
         </thead>
         <tbody>
           <tr *ngFor="let p of pagedPositions; trackBy: trackByIndex">
-            <td>{{ p.asset }}</td>
+            <td>
+              <div class="asset-cell">
+                <img *ngIf="marketLogo(p)" [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" />
+                <span>{{ p.asset }}</span>
+              </div>
+            </td>
             <td>{{ tipoPapel(p) }}</td>
             <td>
               <span class="status-pill" [class.zeroed]="p.quantity <= 0">
@@ -143,6 +162,14 @@
             </td>
             <td>{{ p.quantity }}</td>
             <td>{{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}</td>
+            <td>
+              <span *ngIf="marketPrice(p) !== null; else noMarketPrice">{{ marketPrice(p) | currency: 'BRL':'symbol':'1.2-2' }}</span>
+              <ng-template #noMarketPrice><span class="muted">-</span></ng-template>
+            </td>
+            <td [class.success]="(marketChange(p) || 0) >= 0" [class.danger]="(marketChange(p) || 0) < 0">
+              <span *ngIf="marketChange(p) !== null; else noMarketChange">{{ marketChange(p) | number:'1.2-2' }}%</span>
+              <ng-template #noMarketChange><span class="muted">-</span></ng-template>
+            </td>
             <td>{{ valorAtualPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}</td>
             <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
             <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
