@@ -17,6 +17,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
+type CadastroOperacao = 'COMPRA' | 'VENDA';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
 type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
 
@@ -55,13 +56,13 @@ export class InvestmentsComponent implements OnInit {
   sortDir: 'asc' | 'desc' = 'asc';
   currentPage = 1;
   pageSize = 8;
+  cadastroOperacao: CadastroOperacao = 'COMPRA';
 
-  // Prioridade 7: simulador, fiscal e CSV
+  // Prioridade 7: importação CSV
   csvLoading = false;
   csvError = '';
   csvImported = 0;
   csvPreviewRows: InvestmentPositionRequest[] = [];
-  fiscalAnoSelecionado = new Date().getFullYear();
 
   novaPosicao: Omit<InvestmentPosition, 'id' | 'movements'> = {
     type: 'RF',
@@ -82,6 +83,13 @@ export class InvestmentsComponent implements OnInit {
   };
   cadastroCustos = 0;
   movimentoCustos = 0;
+  vendaPositionId = '';
+  venda: { quantity: number; price: number; date: string; note?: string } = {
+    quantity: 0,
+    price: 0,
+    date: new Date().toISOString().slice(0, 10),
+    note: ''
+  };
 
   tipos: { value: InvestmentType; label: string }[] = [
     { value: 'RF', label: 'Renda Fixa' },
@@ -151,6 +159,12 @@ export class InvestmentsComponent implements OnInit {
     for (const pos of this.positions) if (pos.account?.trim()) set.add(pos.account.trim());
     for (const inst of this.institutions) if (inst.name?.trim()) set.add(inst.name.trim());
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }
+
+  get posicoesVendaveis(): InvestmentPosition[] {
+    return this.positions
+      .filter((p) => p.quantity > 0)
+      .sort((a, b) => a.asset.localeCompare(b.asset, 'pt-BR'));
   }
 
   get filteredPositions(): InvestmentPosition[] {
@@ -428,48 +442,6 @@ export class InvestmentsComponent implements OnInit {
     });
   }
 
-  get retornoTotalRenda(): number {
-    return this.proventosTotal;
-  }
-
-  get retornoTotalPreco(): number {
-    return this.crescimentoEstimado - this.proventosTotal;
-  }
-
-  get retornoTotalGeral(): number {
-    return this.crescimentoEstimado;
-  }
-
-  get anosFiscaisDisponiveis(): number[] {
-    const years = new Set<number>([new Date().getFullYear()]);
-    for (const pos of this.positions) {
-      for (const mov of pos.movements || []) {
-        const year = Number(mov.date?.slice(0, 4));
-        if (year) years.add(year);
-      }
-    }
-    return Array.from(years).sort((a, b) => b - a);
-  }
-
-  get resumoFiscal(): { compras: number; vendas: number; proventos: number; taxas: number; saldo: number } {
-    let compras = 0;
-    let vendas = 0;
-    let proventos = 0;
-    let taxas = 0;
-    for (const pos of this.positions) {
-      for (const mov of pos.movements || []) {
-        const year = Number(mov.date?.slice(0, 4));
-        if (year !== this.fiscalAnoSelecionado) continue;
-        const value = (mov.quantity || 0) * (mov.price || 0);
-        if (mov.type === 'COMPRA' || mov.type === 'APORTE') compras += value;
-        else if (mov.type === 'VENDA' || mov.type === 'RESGATE') vendas += value;
-        else if (mov.type === 'DIVIDENDO' || mov.type === 'JCP' || mov.type === 'RENDIMENTO') proventos += value;
-        else if (mov.type === 'TAXA') taxas += value;
-      }
-    }
-    return { compras, vendas, proventos, taxas, saldo: vendas + proventos - compras - taxas };
-  }
-
   ordenarPor(column: PositionSortKey): void {
     if (this.sortBy === column) {
       this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
@@ -498,7 +470,7 @@ export class InvestmentsComponent implements OnInit {
   executarProximaAcao(): void {
     const action = this.proximaAcao;
     if (action.openForm) {
-      this.showCadastro = true;
+      this.openCadastroModal();
       return;
     }
     if (action.targetId) {
@@ -580,6 +552,39 @@ export class InvestmentsComponent implements OnInit {
     }
   }
 
+  async salvarVenda(): Promise<void> {
+    if (!this.vendaPositionId || this.venda.quantity <= 0 || this.venda.price <= 0) return;
+
+    const position = this.positions.find((p) => p.id === this.vendaPositionId);
+    if (!position) {
+      this.uiFeedback.error('Selecione uma posição válida para venda.');
+      return;
+    }
+
+    if (this.venda.quantity > position.quantity) {
+      this.uiFeedback.error(`Quantidade de venda maior que a posição atual (${position.quantity}).`);
+      return;
+    }
+
+    const custos = this.cadastroCustos > 0 ? this.cadastroCustos : 0;
+    const noteParts = [this.venda.note?.trim(), custos > 0 ? `Custos: ${this.currencyFormatter.format(custos)}` : ''].filter(Boolean);
+
+    try {
+      await firstValueFrom(this.investments.addMovement(this.vendaPositionId, {
+        type: 'VENDA',
+        quantity: this.venda.quantity,
+        price: this.venda.price,
+        date: this.venda.date,
+        note: noteParts.join(' | ') || undefined
+      }));
+      this.uiFeedback.success('Venda registrada com sucesso.');
+      this.closeCadastroModal();
+      this.carregarPosicoes();
+    } catch (err: any) {
+      this.uiFeedback.error(err?.error?.detail || 'Falha ao registrar venda.');
+    }
+  }
+
   abrirMovimento(pos: InvestmentPosition): void {
     this.selectedId = pos.id;
     this.posSelecionada = pos;
@@ -613,9 +618,46 @@ export class InvestmentsComponent implements OnInit {
     this.cadastroCustos = 0;
   }
 
+  resetVenda(): void {
+    this.vendaPositionId = '';
+    this.venda = {
+      quantity: 0,
+      price: 0,
+      date: new Date().toISOString().slice(0, 10),
+      note: ''
+    };
+    this.cadastroCustos = 0;
+  }
+
+  onVendaPositionChange(): void {
+    const pos = this.positions.find((p) => p.id === this.vendaPositionId);
+    this.venda.price = pos?.avgPrice || 0;
+  }
+
+  setCadastroOperacao(tipo: CadastroOperacao): void {
+    this.cadastroOperacao = tipo;
+    this.cadastroCustos = 0;
+    if (tipo === 'COMPRA') {
+      this.resetPosicao();
+      return;
+    }
+    this.resetVenda();
+    if (this.posicoesVendaveis.length === 1) {
+      this.vendaPositionId = this.posicoesVendaveis[0].id;
+      this.onVendaPositionChange();
+    }
+  }
+
+  openCadastroModal(): void {
+    this.setCadastroOperacao('COMPRA');
+    this.showCadastro = true;
+  }
+
   closeCadastroModal(): void {
     this.showCadastro = false;
     this.resetPosicao();
+    this.resetVenda();
+    this.cadastroOperacao = 'COMPRA';
   }
 
   closeMovimentoModal(): void {
@@ -627,6 +669,10 @@ export class InvestmentsComponent implements OnInit {
 
   get cadastroValorTotal(): number {
     return (this.novaPosicao.quantity || 0) * (this.novaPosicao.avgPrice || 0) + (this.cadastroCustos || 0);
+  }
+
+  get vendaValorTotal(): number {
+    return (this.venda.quantity || 0) * (this.venda.price || 0) - (this.cadastroCustos || 0);
   }
 
   get movimentoValorTotal(): number {
@@ -842,5 +888,9 @@ export class InvestmentsComponent implements OnInit {
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  trackById(_: number, item: { id: string }): string {
+    return item.id;
   }
 }

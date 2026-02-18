@@ -60,8 +60,8 @@
 
   <div class="top-actions">
     <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
-    <button class="btn-primary" type="button" (click)="showCadastro = !showCadastro">
-      {{ showCadastro ? 'Fechar cadastro' : 'Nova posição' }}
+    <button class="btn-primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
+      {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
     </button>
   </div>
 
@@ -294,116 +294,6 @@
     </article>
   </section>
 
-  <section class="visual-grid">
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Retorno total (preço + renda)</h3>
-          <button type="button" class="hint" aria-label="Explicação do retorno total">
-            i
-            <span class="hint__panel">Separação do resultado total entre valorização de preço e renda recebida (dividendos/JCP/rendimentos).</span>
-          </button>
-        </div>
-      </div>
-      <div class="summary__grid">
-        <div>
-          <p class="label">Retorno por preço</p>
-          <strong [class.success]="retornoTotalPreco >= 0" [class.danger]="retornoTotalPreco < 0">
-            {{ retornoTotalPreco | currency:'BRL':'symbol':'1.2-2' }}
-          </strong>
-        </div>
-        <div>
-          <p class="label">Retorno por renda</p>
-          <strong class="success">{{ retornoTotalRenda | currency:'BRL':'symbol':'1.2-2' }}</strong>
-        </div>
-      </div>
-      <div class="summary__grid">
-        <div>
-          <p class="label">Retorno total</p>
-          <strong [class.success]="retornoTotalGeral >= 0" [class.danger]="retornoTotalGeral < 0">
-            {{ retornoTotalGeral | currency:'BRL':'symbol':'1.2-2' }}
-          </strong>
-        </div>
-      </div>
-    </article>
-
-  </section>
-
-  <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Resumo anual de operações (pré-IR)</h3>
-          <button type="button" class="hint" aria-label="Explicação do resumo fiscal">
-            i
-            <span class="hint__panel">Resumo anual para conferência de operações. Não substitui apuração oficial de imposto.</span>
-          </button>
-        </div>
-      </div>
-      <details class="section-collapsible">
-        <summary>Ver resumo do ano</summary>
-        <div class="filter">
-          <span>Ano de referência</span>
-          <select [(ngModel)]="fiscalAnoSelecionado" [ngModelOptions]="{standalone:true}">
-            <option *ngFor="let ano of anosFiscaisDisponiveis; trackBy: trackByIndex" [ngValue]="ano">{{ ano }}</option>
-          </select>
-        </div>
-        <div class="summary__grid">
-          <div>
-            <div class="label-row">
-              <p class="label">Compras + aportes</p>
-              <button type="button" class="hint" aria-label="Explicação de compras e aportes">
-                i
-                <span class="hint__panel">Total investido no ano: compras de ativos e aportes registrados.</span>
-              </button>
-            </div>
-            <strong>{{ resumoFiscal.compras | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          </div>
-          <div>
-            <div class="label-row">
-              <p class="label">Vendas + resgates</p>
-              <button type="button" class="hint" aria-label="Explicação de vendas e resgates">
-                i
-                <span class="hint__panel">Total recebido por vendas de ativos e resgates no ano.</span>
-              </button>
-            </div>
-            <strong>{{ resumoFiscal.vendas | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          </div>
-          <div>
-            <div class="label-row">
-              <p class="label">Proventos</p>
-              <button type="button" class="hint" aria-label="Explicação de proventos">
-                i
-                <span class="hint__panel">Dividendos, JCP e rendimentos recebidos no ano.</span>
-              </button>
-            </div>
-            <strong class="success">{{ resumoFiscal.proventos | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          </div>
-          <div>
-            <div class="label-row">
-              <p class="label">Taxas</p>
-              <button type="button" class="hint" aria-label="Explicação de taxas">
-                i
-                <span class="hint__panel">Custos operacionais registrados como taxa no ano.</span>
-              </button>
-            </div>
-            <strong class="danger">{{ resumoFiscal.taxas | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          </div>
-        </div>
-        <div>
-          <div class="label-row">
-            <p class="label">Resultado anual (estimado)</p>
-            <button type="button" class="hint" aria-label="Explicação do resultado anual estimado">
-              i
-              <span class="hint__panel">Cálculo simplificado: vendas + proventos - compras - taxas.</span>
-            </button>
-          </div>
-          <strong [class.success]="resumoFiscal.saldo >= 0" [class.danger]="resumoFiscal.saldo < 0">
-            {{ resumoFiscal.saldo | currency:'BRL':'symbol':'1.2-2' }}
-          </strong>
-        </div>
-      </details>
-  </article>
-
   <div class="modal" *ngIf="showCadastro">
     <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
     <div class="modal__card modal__card--launch">
@@ -412,10 +302,10 @@
         <button class="modal__close" type="button" (click)="closeCadastroModal()">✕</button>
       </div>
       <div class="launch-type">
-        <button type="button" class="launch-pill active">Compra</button>
-        <button type="button" class="launch-pill" disabled>Venda</button>
+        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao('COMPRA')">Compra</button>
+        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao('VENDA')">Venda</button>
       </div>
-      <div class="form grid-form">
+      <div class="form grid-form" *ngIf="cadastroOperacao === 'COMPRA'">
         <div>
           <label>Tipo de ativo</label>
           <select [(ngModel)]="novaPosicao.type" name="type">
@@ -459,13 +349,46 @@
           <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
         </div>
       </div>
+      <div class="form grid-form" *ngIf="cadastroOperacao === 'VENDA'">
+        <div>
+          <label>Ativo</label>
+          <select [(ngModel)]="vendaPositionId" name="vendaPositionId" (ngModelChange)="onVendaPositionChange()">
+            <option value="">Selecione</option>
+            <option *ngFor="let p of posicoesVendaveis; trackBy: trackById" [value]="p.id">
+              {{ p.asset }} ({{ p.quantity | number:'1.0-4' }})
+            </option>
+          </select>
+        </div>
+        <div>
+          <label>Quantidade</label>
+          <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
+        </div>
+        <div>
+          <label>Preço em R$</label>
+          <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
+        </div>
+        <div>
+          <label>Outros custos <span class="muted">(opcional)</span></label>
+          <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="vendaCustos" />
+        </div>
+        <div>
+          <label>Data da venda</label>
+          <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
+        </div>
+        <div>
+          <label>Observação (opcional)</label>
+          <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
+        </div>
+      </div>
       <div class="launch-total">
-        <span>Valor total</span>
-        <strong>{{ cadastroValorTotal | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
+        <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | currency:'BRL':'symbol':'1.2-2' }}</strong>
       </div>
       <div class="actions">
         <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
-        <button class="btn-primary" type="button" (click)="salvarPosicao()">Adicionar lançamento</button>
+        <button class="btn-primary" type="button" (click)="cadastroOperacao === 'COMPRA' ? salvarPosicao() : salvarVenda()">
+          {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
+        </button>
       </div>
     </div>
   </div>
