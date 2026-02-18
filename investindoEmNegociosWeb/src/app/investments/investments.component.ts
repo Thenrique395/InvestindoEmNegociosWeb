@@ -97,6 +97,7 @@ export class InvestmentsComponent implements OnInit {
   consolidacaoTipoFiltro: 'ALL' | InvestmentType = 'ALL';
   consolidacaoSearchTerm = '';
   showAlocacaoConfig = false;
+  private allocationLoadWarned = false;
   targetAllocation: Record<InvestmentType, number> = { ...DEFAULT_TARGET_ALLOCATION };
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
@@ -1014,6 +1015,7 @@ export class InvestmentsComponent implements OnInit {
 
   resetTargetAllocation(): void {
     this.targetAllocation = { ...DEFAULT_TARGET_ALLOCATION };
+    this.saveTargetAllocation();
   }
 
   ordenarPor(column: PositionSortKey): void {
@@ -1392,6 +1394,10 @@ export class InvestmentsComponent implements OnInit {
       },
       error: () => {
         this.targetAllocation = { ...DEFAULT_TARGET_ALLOCATION };
+        if (!this.allocationLoadWarned) {
+          this.uiFeedback.warning('Não foi possível carregar a alocação salva. Mostrando padrão.');
+          this.allocationLoadWarned = true;
+        }
       }
     });
   }
