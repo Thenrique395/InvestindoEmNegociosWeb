@@ -18,7 +18,7 @@ import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
-type InvestmentsTab = 'RESUMO' | 'CONSOLIDACAO' | 'LANCAMENTOS' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
+type InvestmentsTab = 'RESUMO' | 'CONSOLIDACAO' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
 type PatrimonioBucket = { key: string; label: string; aplicado: number; ganho: number; total: number };
 type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
@@ -57,6 +57,7 @@ type RentabilidadeMonthPoint = {
 })
 export class InvestmentsComponent implements OnInit {
   private readonly tabStorageKey = 'investments.activeTab';
+  private readonly allocationStorageKey = 'investments.targetAllocation';
   private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   positions: InvestmentPosition[] = [];
@@ -94,12 +95,13 @@ export class InvestmentsComponent implements OnInit {
   consolidacaoHorizonteAnos = 2;
   consolidacaoTipoFiltro: 'ALL' | InvestmentType = 'ALL';
   consolidacaoSearchTerm = '';
+  showAlocacaoConfig = false;
+  targetAllocation: Record<InvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
   tabs: Array<{ key: InvestmentsTab; label: string }> = [
     { key: 'RESUMO', label: 'Resumo' },
     { key: 'CONSOLIDACAO', label: 'Consolidação' },
-    { key: 'LANCAMENTOS', label: 'Lançamentos' },
     { key: 'PROVENTOS', label: 'Proventos' },
     { key: 'RENTABILIDADE', label: 'Rentabilidade' },
     { key: 'ANALISE', label: 'Análise' }
@@ -163,6 +165,7 @@ export class InvestmentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.restoreTab();
+    this.restoreAllocationTarget();
     this.carregarMeta();
     this.carregarPosicoes();
     this.lookups.institutions('Broker').subscribe({
@@ -971,13 +974,33 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; alerta: boolean }[] {
-    const target: Record<InvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
     const atualMap = new Map(this.distribuicaoPorTipo.map((i) => [i.key, i.percent]));
     return this.tipos.map((t) => {
       const atual = atualMap.get(t.value) || 0;
-      const desvio = atual - target[t.value];
-      return { key: t.value, label: t.label, alvo: target[t.value], atual, desvio, alerta: Math.abs(desvio) >= 7 };
+      const desvio = atual - this.targetAllocation[t.value];
+      return { key: t.value, label: t.label, alvo: this.targetAllocation[t.value], atual, desvio, alerta: Math.abs(desvio) >= 7 };
     });
+  }
+
+  get targetAllocationTotal(): number {
+    return this.targetAllocation.RF + this.targetAllocation.ACOES + this.targetAllocation.FUNDOS + this.targetAllocation.CRIPTO;
+  }
+
+  updateTargetAllocation(type: InvestmentType, value: number): void {
+    const safe = Number.isFinite(value) ? value : 0;
+    this.targetAllocation[type] = Math.min(100, Math.max(0, safe));
+  }
+
+  saveTargetAllocation(): void {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(this.allocationStorageKey, JSON.stringify(this.targetAllocation));
+    this.showAlocacaoConfig = false;
+    this.uiFeedback.success('Alocação alvo salva.');
+  }
+
+  resetTargetAllocation(): void {
+    this.targetAllocation = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
+    this.saveTargetAllocation();
   }
 
   ordenarPor(column: PositionSortKey): void {
@@ -1008,7 +1031,6 @@ export class InvestmentsComponent implements OnInit {
   executarProximaAcao(): void {
     const action = this.proximaAcao;
     if (action.openForm) {
-      this.setActiveTab('LANCAMENTOS');
       this.openCadastroModal();
       return;
     }
@@ -1134,7 +1156,6 @@ export class InvestmentsComponent implements OnInit {
 
   abrirMovimento(pos: InvestmentPosition): void {
     // Unifica o fluxo no modal principal "Novo lançamento".
-    this.setActiveTab('LANCAMENTOS');
     this.setCadastroOperacao('VENDA');
     this.vendaPositionId = pos.id;
     this.onVendaPositionChange();
@@ -1454,6 +1475,23 @@ export class InvestmentsComponent implements OnInit {
     if (typeof window === 'undefined') return;
     this.activeTab = 'RESUMO';
     window.localStorage.setItem(this.tabStorageKey, 'RESUMO');
+  }
+
+  private restoreAllocationTarget(): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(this.allocationStorageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Partial<Record<InvestmentType, number>>;
+      this.targetAllocation = {
+        RF: Number(parsed.RF ?? 40),
+        ACOES: Number(parsed.ACOES ?? 35),
+        FUNDOS: Number(parsed.FUNDOS ?? 20),
+        CRIPTO: Number(parsed.CRIPTO ?? 5)
+      };
+    } catch {
+      this.targetAllocation = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
+    }
   }
 
   trackByIndex(index: number): number {

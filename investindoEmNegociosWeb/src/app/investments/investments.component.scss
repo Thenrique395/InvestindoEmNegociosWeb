@@ -19,6 +19,16 @@
   overflow-x: auto;
 }
 
+.tabs-actions {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 8;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
 .tab {
   border: 1px solid transparent;
   background: transparent;
@@ -1306,6 +1316,12 @@ th {
   .import-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .tabs-actions {
+    justify-content: stretch;
+    grid-template-columns: 1fr 1fr;
+    display: grid;
   }
 
   .hint__panel {

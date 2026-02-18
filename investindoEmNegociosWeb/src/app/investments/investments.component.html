@@ -10,6 +10,13 @@
     </button>
   </nav>
 
+  <div class="tabs-actions card">
+    <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
+    <button class="btn-primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
+      {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
+    </button>
+  </div>
+
   <section class="executive-grid" *ngIf="activeTab === 'RESUMO'">
     <article class="card executive-card">
       <div class="executive-card__head">
@@ -194,20 +201,6 @@
     </div>
     <button class="btn-primary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
   </article>
-
-  <section *ngIf="activeTab === 'LANCAMENTOS'" class="launch-actions">
-    <div class="top-actions">
-      <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
-      <button class="btn-primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
-        {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
-      </button>
-    </div>
-    <article class="card">
-      <p class="label">Como usar</p>
-      <strong>Registre compras e vendas no mesmo modal</strong>
-      <small class="muted">Use “Novo lançamento” para compra/venda manual e “Importações” para B3/CSV.</small>
-    </article>
-  </section>
 
   <div class="card" id="sec-posicoes" *ngIf="activeTab === 'RESUMO'">
     <div class="section-head">
@@ -632,6 +625,30 @@
             i
             <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
           </button>
+        </div>
+        <button class="btn-ghost sm" type="button" (click)="showAlocacaoConfig = !showAlocacaoConfig">
+          {{ showAlocacaoConfig ? 'Fechar parâmetros' : 'Editar alocação alvo' }}
+        </button>
+      </div>
+      <div class="allocation-config" *ngIf="showAlocacaoConfig">
+        <div class="allocation-config__inputs">
+          <label *ngFor="let t of tipos; trackBy: trackByIndex">
+            <span>{{ t.label }}</span>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              step="0.1"
+              [ngModel]="targetAllocation[t.value]"
+              (ngModelChange)="updateTargetAllocation(t.value, $event)" />
+          </label>
+        </div>
+        <small class="muted" [class.danger]="targetAllocationTotal !== 100">
+          Total configurado: {{ targetAllocationTotal | number:'1.1-1' }}%
+        </small>
+        <div class="actions">
+          <button class="btn-ghost sm" type="button" (click)="resetTargetAllocation()">Resetar padrão</button>
+          <button class="btn-primary sm" type="button" (click)="saveTargetAllocation()">Salvar</button>
         </div>
       </div>
       <div class="allocation-list">
