@@ -177,7 +177,7 @@
       </div>
     </article>
 
-    <article class="card chart-card" id="sec-benchmarks">
+    <article class="card chart-card" id="sec-evolucao">
       <div class="section-head">
         <div class="section-head__title">
           <h3>Evolução mensal</h3>
@@ -274,40 +274,6 @@
     <article class="card chart-card">
       <div class="section-head">
         <div class="section-head__title">
-          <h3>Carteira x benchmarks</h3>
-          <button type="button" class="hint" aria-label="Explicação comparação com benchmarks">
-            i
-            <span class="hint__panel">Comparativo da carteira contra CDI, IPCA, Ibovespa e S&P500 no mesmo período consolidado.</span>
-          </button>
-        </div>
-        <span class="muted">Base: {{ periodoComparativoLabel }}</span>
-      </div>
-      <small class="muted">IPCA (série 433) e SELIC (série 11) via backend (fonte BCB).</small>
-      <small class="muted" *ngIf="benchmarkLoading">Atualizando benchmarks...</small>
-      <small class="danger" *ngIf="benchmarkError">{{ benchmarkError }}</small>
-      <div class="benchmark-list">
-        <div class="benchmark-item" *ngFor="let item of benchmarkComparativo; trackBy: trackByIndex">
-          <strong>{{ item.name }}</strong>
-          <small>
-            Origem:
-            <span [class.warning]="item.isEstimated">
-              {{ item.isEstimated ? 'FAKE - TEMPORARIAMENTE' : 'OFICIAL' }}
-            </span>
-            · {{ item.source || '-' }}
-          </small>
-          <small>Atualizado em: {{ benchmarkUpdatedAt ? (benchmarkUpdatedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</small>
-          <span>Carteira: {{ item.carteira | number:'1.2-2' }}%</span>
-          <span>Benchmark: {{ item.benchmark | number:'1.2-2' }}%</span>
-          <small [class.success]="item.carteira - item.benchmark >= 0" [class.danger]="item.carteira - item.benchmark < 0">
-            Diferença: {{ item.carteira - item.benchmark | number:'1.2-2' }} p.p.
-          </small>
-        </div>
-      </div>
-    </article>
-
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
           <h3>Alocação alvo e alertas</h3>
           <button type="button" class="hint" aria-label="Explicação da alocação alvo">
             i
@@ -361,94 +327,6 @@
       </div>
     </article>
 
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Agenda financeira</h3>
-          <button type="button" class="hint" aria-label="Explicação da agenda financeira">
-            i
-            <span class="hint__panel">Eventos projetados de aportes e vencimentos para ajudar no planejamento mensal.</span>
-          </button>
-        </div>
-      </div>
-      <details class="section-collapsible" open>
-        <summary>Próximos eventos</summary>
-        <div class="events-list" *ngIf="eventosAgenda.length; else noEvents">
-          <div class="event-item" *ngFor="let event of eventosAgenda; trackBy: trackByIndex">
-            <strong>{{ event.date | date:'dd/MM/yyyy' }}</strong>
-            <span>{{ event.tipo }}</span>
-            <small>{{ event.descricao }}</small>
-          </div>
-        </div>
-      </details>
-      <ng-template #noEvents>
-        <div class="empty">Sem eventos no horizonte atual.</div>
-      </ng-template>
-    </article>
-  </section>
-
-  <section class="visual-grid">
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Simulador de aportes recorrentes</h3>
-          <button type="button" class="hint" aria-label="Explicação do simulador de aportes">
-            i
-            <span class="hint__panel">Projeção com cenários conservador, base e otimista usando juros compostos com aporte mensal.</span>
-          </button>
-        </div>
-      </div>
-      <div class="grid-form">
-        <div>
-          <label>Aporte mensal (R$)</label>
-          <input type="number" min="0" step="any" [(ngModel)]="simuladorAporteMensal" [ngModelOptions]="{standalone:true}" />
-        </div>
-        <div>
-          <label>Horizonte (meses)</label>
-          <input type="number" min="1" step="1" [(ngModel)]="simuladorHorizonteMeses" [ngModelOptions]="{standalone:true}" />
-        </div>
-      </div>
-      <div class="benchmark-list">
-        <div class="benchmark-item" *ngFor="let cenario of simuladorCenarios; trackBy: trackByIndex">
-          <strong>{{ cenario.nome }}</strong>
-          <span>Taxa mensal: {{ cenario.taxaMensal * 100 | number:'1.2-2' }}%</span>
-          <small>Valor final estimado: {{ cenario.valorFinal | currency:'BRL':'symbol':'1.2-2' }}</small>
-        </div>
-      </div>
-    </article>
-
-    <article class="card chart-card" id="sec-projecao">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Projeção de meta</h3>
-          <button type="button" class="hint" aria-label="Explicação da projeção da meta">
-            i
-            <span class="hint__panel">Estimativa do prazo para atingir a meta com base no aporte mensal planejado.</span>
-          </button>
-        </div>
-      </div>
-      <div class="grid-form">
-        <div>
-          <label>Aporte planejado/mês (R$)</label>
-          <input type="number" min="0" step="any" [(ngModel)]="metaMensalPlanejada" [ngModelOptions]="{standalone:true}" />
-        </div>
-        <div>
-          <label>Dia padrão do aporte</label>
-          <input type="number" min="1" max="28" step="1" [(ngModel)]="metaDay" [ngModelOptions]="{standalone:true}" />
-        </div>
-      </div>
-      <div class="summary__grid">
-        <div>
-          <p class="label">Prazo estimado</p>
-          <strong *ngIf="prazoMetaMeses !== null">{{ prazoMetaMeses }} mês(es)</strong>
-          <strong *ngIf="prazoMetaMeses === null">Sem projeção</strong>
-        </div>
-        <div>
-          <p class="label">Data estimada</p>
-          <strong>{{ prazoMetaDataEstimada || '-' }}</strong>
-        </div>
-      </div>
-    </article>
   </section>
 
   <article class="card chart-card">
@@ -528,11 +406,18 @@
 
   <div class="modal" *ngIf="showCadastro">
     <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
-    <div class="modal__card">
-      <h3>Nova posição</h3>
+    <div class="modal__card modal__card--launch">
+      <div class="launch-header">
+        <h3>Adicionar lançamento</h3>
+        <button class="modal__close" type="button" (click)="closeCadastroModal()">✕</button>
+      </div>
+      <div class="launch-type">
+        <button type="button" class="launch-pill active">Compra</button>
+        <button type="button" class="launch-pill" disabled>Venda</button>
+      </div>
       <div class="form grid-form">
         <div>
-          <label>Tipo</label>
+          <label>Tipo de ativo</label>
           <select [(ngModel)]="novaPosicao.type" name="type">
             <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
           </select>
@@ -546,11 +431,15 @@
           <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
         </div>
         <div>
-          <label>Preço médio</label>
+          <label>Preço em R$</label>
           <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
         </div>
         <div>
-          <label>Data</label>
+          <label>Outros custos <span class="muted">(opcional)</span></label>
+          <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="cadastroCustos" />
+        </div>
+        <div>
+          <label>Data da compra</label>
           <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
         </div>
         <div>
@@ -570,10 +459,13 @@
           <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
         </div>
       </div>
+      <div class="launch-total">
+        <span>Valor total</span>
+        <strong>{{ cadastroValorTotal | currency:'BRL':'symbol':'1.2-2' }}</strong>
+      </div>
       <div class="actions">
-        <button class="btn-primary" type="button" (click)="salvarPosicao()">Salvar posição</button>
-        <button class="btn-cancel sm" type="button" (click)="resetPosicao()">Limpar</button>
-        <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Fechar</button>
+        <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
+        <button class="btn-primary" type="button" (click)="salvarPosicao()">Adicionar lançamento</button>
       </div>
     </div>
   </div>
@@ -581,25 +473,31 @@
   <div class="modal" *ngIf="showMovimento && posSelecionada">
     <div class="modal__backdrop" (click)="closeMovimentoModal()"></div>
     <div class="modal__card">
-      <h3>Registrar movimento para {{ posSelecionada.asset }}</h3>
+      <h3>Registrar compra/venda para {{ posSelecionada.asset }}</h3>
       <div class="form inline">
-        <label>Tipo</label>
+        <label>Operação</label>
         <select [(ngModel)]="movimento.type" name="movType">
-          <option value="APORTE">Aporte</option>
-          <option value="RESGATE">Resgate</option>
+          <option *ngFor="let tipo of movimentoTipos; trackBy: trackByIndex" [value]="tipo.value">{{ tipo.label }}</option>
         </select>
 
         <label>Qtd.</label>
         <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
 
-        <label>Preço</label>
+        <label>Preço unitário</label>
         <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
+
+        <label>Outros custos</label>
+        <input type="number" min="0" step="any" [(ngModel)]="movimentoCustos" name="movCost" />
 
         <label>Data</label>
         <input type="date" [(ngModel)]="movimento.date" name="movDate" />
 
         <label>Nota</label>
         <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+      </div>
+      <div class="launch-total">
+        <span>Valor total</span>
+        <strong>{{ movimentoValorTotal | currency:'BRL':'symbol':'1.2-2' }}</strong>
       </div>
       <div class="actions">
         <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>

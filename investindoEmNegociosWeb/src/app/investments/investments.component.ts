@@ -18,7 +18,6 @@ import { firstValueFrom } from 'rxjs';
 
 type FormMode = 'create' | 'movement';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
-type BenchmarkPoint = { name: string; carteira: number; benchmark: number; source?: string; isEstimated?: boolean };
 type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
 
 @Component({
@@ -52,29 +51,16 @@ export class InvestmentsComponent implements OnInit {
   b3FileName = '';
   b3Strategy: B3ImportStrategy = 'merge';
   b3Preview: B3ExtractResponse | null = null;
-  benchmarkLoading = false;
-  benchmarkError = '';
-  benchmarkUpdatedAt: Date | null = null;
-  benchmarkComparativo: BenchmarkPoint[] = [
-    { name: 'SELIC (BCB)', carteira: 0, benchmark: 0, source: 'BCB/SGS-11', isEstimated: false },
-    { name: 'IPCA (BCB)', carteira: 0, benchmark: 0, source: 'BCB/SGS-433', isEstimated: false },
-    { name: 'Ibovespa', carteira: 0, benchmark: 5.8, source: 'estimado', isEstimated: true },
-    { name: 'S&P500', carteira: 0, benchmark: 6.7, source: 'estimado', isEstimated: true }
-  ];
   sortBy: PositionSortKey = 'asset';
   sortDir: 'asc' | 'desc' = 'asc';
   currentPage = 1;
   pageSize = 8;
 
-  // Prioridade 7: simulador, agenda, fiscal e CSV
+  // Prioridade 7: simulador, fiscal e CSV
   csvLoading = false;
   csvError = '';
   csvImported = 0;
   csvPreviewRows: InvestmentPositionRequest[] = [];
-  simuladorAporteMensal = 1000;
-  simuladorHorizonteMeses = 120;
-  metaMensalPlanejada = 1000;
-  metaDay = 5;
   fiscalAnoSelecionado = new Date().getFullYear();
 
   novaPosicao: Omit<InvestmentPosition, 'id' | 'movements'> = {
@@ -88,12 +74,14 @@ export class InvestmentsComponent implements OnInit {
   };
 
   movimento: { type: MovementType; quantity: number; price: number; date: string; note?: string } = {
-    type: 'APORTE',
+    type: 'COMPRA',
     quantity: 0,
     price: 0,
     date: new Date().toISOString().slice(0, 10),
     note: ''
   };
+  cadastroCustos = 0;
+  movimentoCustos = 0;
 
   tipos: { value: InvestmentType; label: string }[] = [
     { value: 'RF', label: 'Renda Fixa' },
@@ -102,12 +90,16 @@ export class InvestmentsComponent implements OnInit {
     { value: 'CRIPTO', label: 'Cripto' }
   ];
 
+  movimentoTipos: { value: MovementType; label: string }[] = [
+    { value: 'COMPRA', label: 'Compra' },
+    { value: 'VENDA', label: 'Venda' }
+  ];
+
   constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService) {}
 
   ngOnInit(): void {
     this.carregarMeta();
     this.carregarPosicoes();
-    this.carregarBenchmarks();
     this.lookups.institutions('Broker').subscribe({
       next: (items) => (this.institutions = items || []),
       error: () => (this.institutions = [])
@@ -283,16 +275,16 @@ export class InvestmentsComponent implements OnInit {
       return {
         titulo: 'Ajustar plano da meta',
         descricao: `Faltam ${this.currencyFormatter.format(this.faltaMeta)} para atingir sua meta de patrimônio.`,
-        cta: 'Ver projeção',
-        targetId: 'sec-projecao'
+        cta: 'Ver evolução',
+        targetId: 'sec-evolucao'
       };
     }
 
     return {
       titulo: 'Carteira em rotina estável',
       descricao: 'Com os dados atuais, siga acompanhando rentabilidade e proventos.',
-      cta: 'Ver benchmarks',
-      targetId: 'sec-benchmarks'
+      cta: 'Ver evolução',
+      targetId: 'sec-evolucao'
     };
   }
 
@@ -426,10 +418,6 @@ export class InvestmentsComponent implements OnInit {
     return Math.max(this.evolucaoMensalSeries.length, 1);
   }
 
-  get periodoComparativoLabel(): string {
-    return `${this.mesesComparativo} ${this.mesesComparativo === 1 ? 'mês' : 'meses'}`;
-  }
-
   get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; alerta: boolean }[] {
     const target: Record<InvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
     const atualMap = new Map(this.distribuicaoPorTipo.map((i) => [i.key, i.percent]));
@@ -438,44 +426,6 @@ export class InvestmentsComponent implements OnInit {
       const desvio = atual - target[t.value];
       return { key: t.value, label: t.label, alvo: target[t.value], atual, desvio, alerta: Math.abs(desvio) >= 7 };
     });
-  }
-
-  get eventosAgenda(): { date: string; tipo: string; descricao: string }[] {
-    const events: { date: string; tipo: string; descricao: string }[] = [];
-    const today = new Date();
-    for (let i = 0; i < 3; i++) {
-      const d = new Date(today.getFullYear(), today.getMonth() + i, this.metaDay);
-      events.push({
-        date: d.toISOString().slice(0, 10),
-        tipo: 'Aporte planejado',
-        descricao: `Aporte mensal de ${this.currencyFormatter.format(this.metaMensalPlanejada || this.simuladorAporteMensal)}`
-      });
-    }
-
-    for (const p of this.positions) {
-      const match = /\b(20\d{2})\b/.exec(p.asset || '');
-      if (!match) continue;
-      const year = Number(match[1]);
-      if (!year || year < today.getFullYear()) continue;
-      events.push({ date: `${year}-12-31`, tipo: 'Vencimento', descricao: `${p.asset} (${p.account || 'Conta'})` });
-    }
-
-    return events.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 8);
-  }
-
-  get prazoMetaMeses(): number | null {
-    if (!this.metaPatrimonio || this.patrimonioAtual >= this.metaPatrimonio) return 0;
-    const mediaFluxo = this.evolucaoMensalSeries.reduce((acc, m) => acc + m.saldo, 0) / Math.max(this.evolucaoMensalSeries.length, 1);
-    const aporteMensal = this.metaMensalPlanejada || mediaFluxo;
-    if (aporteMensal <= 0) return null;
-    return Math.ceil((this.metaPatrimonio - this.patrimonioAtual) / aporteMensal);
-  }
-
-  get prazoMetaDataEstimada(): string | null {
-    if (this.prazoMetaMeses === null) return null;
-    const d = new Date();
-    d.setMonth(d.getMonth() + this.prazoMetaMeses);
-    return d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   }
 
   get retornoTotalRenda(): number {
@@ -488,22 +438,6 @@ export class InvestmentsComponent implements OnInit {
 
   get retornoTotalGeral(): number {
     return this.crescimentoEstimado;
-  }
-
-  get simuladorCenarios(): { nome: string; taxaMensal: number; valorFinal: number }[] {
-    const initial = this.patrimonioAtual;
-    const aporte = this.simuladorAporteMensal || 0;
-    const meses = this.simuladorHorizonteMeses || 0;
-    const scenarios = [
-      { nome: 'Conservador', taxaMensal: 0.004 },
-      { nome: 'Base', taxaMensal: 0.008 },
-      { nome: 'Otimista', taxaMensal: 0.012 }
-    ];
-    return scenarios.map((s) => {
-      let total = initial;
-      for (let i = 0; i < meses; i++) total = (total + aporte) * (1 + s.taxaMensal);
-      return { ...s, valorFinal: total };
-    });
   }
 
   get anosFiscaisDisponiveis(): number[] {
@@ -613,16 +547,37 @@ export class InvestmentsComponent implements OnInit {
     });
   }
 
-  salvarPosicao(): void {
+  async salvarPosicao(): Promise<void> {
     if (!this.novaPosicao.asset || this.novaPosicao.quantity <= 0 || this.novaPosicao.avgPrice <= 0) return;
-    const payload: InvestmentPositionRequest = { ...this.novaPosicao, category: this.novaPosicao.category || '' };
-    this.investments.createPosition(payload).subscribe({
-      next: () => {
-        this.resetPosicao();
-        this.showCadastro = false;
-        this.carregarPosicoes();
-      }
-    });
+    const custos = this.cadastroCustos > 0 ? this.cadastroCustos : 0;
+    const avgPriceComCustos = custos > 0
+      ? ((this.novaPosicao.quantity * this.novaPosicao.avgPrice) + custos) / this.novaPosicao.quantity
+      : this.novaPosicao.avgPrice;
+    const payload: InvestmentPositionRequest = {
+      ...this.novaPosicao,
+      avgPrice: avgPriceComCustos,
+      category: this.novaPosicao.category || ''
+    };
+    try {
+      const created = await firstValueFrom(this.investments.createPosition(payload));
+      await firstValueFrom(
+        this.investments.addMovement(created.id, {
+          type: 'COMPRA',
+          quantity: this.novaPosicao.quantity,
+          price: this.novaPosicao.avgPrice,
+          date: payload.openedAt,
+          note: custos > 0
+            ? `Cadastro inicial da posição (custos: ${this.currencyFormatter.format(custos)})`
+            : 'Cadastro inicial da posição'
+        })
+      );
+      this.resetPosicao();
+      this.showCadastro = false;
+      this.carregarPosicoes();
+      this.uiFeedback.success('Posição cadastrada com compra inicial registrada.');
+    } catch (err: any) {
+      this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar posição.');
+    }
   }
 
   abrirMovimento(pos: InvestmentPosition): void {
@@ -630,12 +585,15 @@ export class InvestmentsComponent implements OnInit {
     this.posSelecionada = pos;
     this.mode = 'movement';
     this.showMovimento = true;
-    this.movimento = { type: 'APORTE', quantity: 0, price: pos.avgPrice, date: new Date().toISOString().slice(0, 10), note: '' };
+    this.movimento = { type: 'COMPRA', quantity: 0, price: pos.avgPrice, date: new Date().toISOString().slice(0, 10), note: '' };
+    this.movimentoCustos = 0;
   }
 
   salvarMovimento(): void {
     if (!this.selectedId || this.movimento.quantity <= 0 || this.movimento.price <= 0) return;
-    this.investments.addMovement(this.selectedId, this.movimento).subscribe({
+    const custos = this.movimentoCustos > 0 ? this.movimentoCustos : 0;
+    const noteParts = [this.movimento.note?.trim(), custos > 0 ? `Custos: ${this.currencyFormatter.format(custos)}` : ''].filter(Boolean);
+    this.investments.addMovement(this.selectedId, { ...this.movimento, note: noteParts.join(' | ') || undefined }).subscribe({
       next: () => {
         this.mode = 'create';
         this.selectedId = null;
@@ -652,6 +610,7 @@ export class InvestmentsComponent implements OnInit {
       type: 'RF', asset: '', quantity: 0, avgPrice: 0,
       openedAt: new Date().toISOString().slice(0, 10), account: '', category: ''
     };
+    this.cadastroCustos = 0;
   }
 
   closeCadastroModal(): void {
@@ -663,6 +622,15 @@ export class InvestmentsComponent implements OnInit {
     this.showMovimento = false;
     this.posSelecionada = null;
     this.selectedId = null;
+    this.movimentoCustos = 0;
+  }
+
+  get cadastroValorTotal(): number {
+    return (this.novaPosicao.quantity || 0) * (this.novaPosicao.avgPrice || 0) + (this.cadastroCustos || 0);
+  }
+
+  get movimentoValorTotal(): number {
+    return (this.movimento.quantity || 0) * (this.movimento.price || 0) + (this.movimentoCustos || 0);
   }
 
   openB3ImportModal(): void {
@@ -786,36 +754,8 @@ export class InvestmentsComponent implements OnInit {
     this.investments.listPositions().subscribe({
       next: (list) => {
         this.positions = list;
-        this.atualizarRentabilidadeCarteiraBenchmarks();
       }
     });
-  }
-
-  private async carregarBenchmarks(): Promise<void> {
-    this.benchmarkLoading = true;
-    this.benchmarkError = '';
-
-    try {
-      const response = await firstValueFrom(this.investments.getBenchmarks(this.mesesComparativo));
-      this.benchmarkComparativo = response.items.map((item) => ({
-        name: item.name,
-        benchmark: item.returnPercent,
-        carteira: this.rentabilidadeAcumuladaPercent,
-        source: item.source,
-        isEstimated: item.isEstimated
-      }));
-      this.benchmarkUpdatedAt = new Date();
-      this.atualizarRentabilidadeCarteiraBenchmarks();
-    } catch {
-      this.benchmarkError = 'Não foi possível atualizar benchmarks via backend agora.';
-    } finally {
-      this.benchmarkLoading = false;
-    }
-  }
-
-  private atualizarRentabilidadeCarteiraBenchmarks(): void {
-    const carteira = this.rentabilidadeAcumuladaPercent;
-    this.benchmarkComparativo = this.benchmarkComparativo.map((item) => ({ ...item, carteira }));
   }
 
   private parseValor(raw: string): number {
