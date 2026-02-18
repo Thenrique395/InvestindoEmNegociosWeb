@@ -157,17 +157,17 @@
       <table>
         <thead>
           <tr>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('asset')">Ativo <span>{{ sortIcon('asset') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('asset')" title="Código do ativo na carteira (ticker B3).">Ativo <span>{{ sortIcon('asset') }}</span></button></th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('paperType')" title="Classificação do ativo: ON/PN/PNA/PNB/UNT ou Cotas">Classe <span>{{ sortIcon('paperType') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('status')">Status <span>{{ sortIcon('status') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
-            <th>Preço mercado</th>
-            <th title="Variação do preço atual versus seu preço médio">Variação</th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('status')" title="Ativa: quantidade maior que zero. Zerada: quantidade igual a zero.">Status <span>{{ sortIcon('status') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')" title="Quantidade atual do ativo em carteira.">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')" title="Preço médio por unidade da posição (custo médio).">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
+            <th title="Preço atual de mercado por unidade, quando disponível na fonte de cotação.">Preço mercado</th>
+            <th title="Variação percentual entre preço de mercado e preço médio: (preço mercado - preço médio) / preço médio.">Variação</th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')" title="Valor atual da posição: quantidade × preço de mercado (ou preço médio no fallback).">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
             <th><button class="sort-btn" type="button" (click)="ordenarPor('portfolioPercent')" title="Participação desta posição no patrimônio total da carteira">% carteira <span>{{ sortIcon('portfolioPercent') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade percentual estimada da posição com base no valor atual e no valor líquido investido">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('estimatedResult')">Resultado <span>{{ sortIcon('estimatedResult') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade atual da posição: (resultado / base da posição) × 100.">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
+            <th><button class="sort-btn" type="button" (click)="ordenarPor('estimatedResult')" title="Resultado financeiro da posição: valor atual - base da posição (quantidade × preço médio).">Resultado <span>{{ sortIcon('estimatedResult') }}</span></button></th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -208,7 +208,7 @@
               {{ resultadoPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}
             </td>
             <td>
-              <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Registrar movimento</button>
+              <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
             </td>
           </tr>
         </tbody>

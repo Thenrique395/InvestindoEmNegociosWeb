@@ -625,12 +625,12 @@ export class InvestmentsComponent implements OnInit {
   }
 
   abrirMovimento(pos: InvestmentPosition): void {
-    this.selectedId = pos.id;
-    this.posSelecionada = pos;
-    this.mode = 'movement';
-    this.showMovimento = true;
-    this.movimento = { type: 'COMPRA', quantity: 0, price: pos.avgPrice, date: new Date().toISOString().slice(0, 10), note: '' };
-    this.movimentoCustos = 0;
+    // Unifica o fluxo no modal principal "Novo lançamento".
+    this.setActiveTab('LANCAMENTOS');
+    this.setCadastroOperacao('VENDA');
+    this.vendaPositionId = pos.id;
+    this.onVendaPositionChange();
+    this.showCadastro = true;
   }
 
   salvarMovimento(): void {
@@ -898,14 +898,9 @@ export class InvestmentsComponent implements OnInit {
   }
 
   private positionNetContributed(pos: InvestmentPosition): number {
-    const initial = this.positionCurrentValue(pos);
-    if (!pos.movements?.length) return initial;
-    return pos.movements.reduce((acc, mov) => {
-      const value = (mov.quantity || 0) * (mov.price || 0);
-      if (mov.type === 'RESGATE' || mov.type === 'VENDA') return acc - value;
-      if (mov.type === 'DIVIDENDO' || mov.type === 'JCP' || mov.type === 'RENDIMENTO') return acc;
-      return acc + value;
-    }, 0);
+    // Base da posição para "Rent. atual" e "Resultado":
+    // quantidade atual x preço médio atual.
+    return (pos.quantity || 0) * (pos.avgPrice || 0);
   }
 
   private isCurrentMonth(iso: string): boolean {
