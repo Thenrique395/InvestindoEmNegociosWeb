@@ -40,6 +40,14 @@
 - Observabilidade de erro no front.
 - Monitoramento de performance por tela (Core Web Vitals).
 - Testes de carga nos endpoints críticos (faturas, dashboard, investimentos).
+- Backend: endpoint de posições com modo leve (`withMarket=false`) para reduzir p95.
+- Backend: análise de queries críticas com `EXPLAIN ANALYZE` + índices por uso real.
+- Backend: export/import de portabilidade em job assíncrono com status.
+- Backend: rate limit e timeout/circuit breaker para rotas e integrações críticas.
+- Backend: OpenTelemetry com dashboard p50/p95/p99 por endpoint e alertas.
+- Frontend: virtualização de tabelas longas (movimentos, proventos, lançamentos).
+- Frontend: cancelar requests ao trocar aba/filtro e padronizar loading/skeleton.
+- Frontend: gate de performance no CI (Lighthouse + budget de bundle com fail automático).
 
 ## Melhorias técnicas (limpeza e padrão de mercado)
 - Remover componente órfão `LandingComponent` sem rota ativa.
@@ -103,4 +111,3 @@ Objetivo: saber quando a antecipação ocorreu.
 Proposta:
 - Armazenar `anticipationDate` na despesa/parcela.
 - Mostrar no histórico detalhado.
-
