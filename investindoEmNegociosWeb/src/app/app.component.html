@@ -6,7 +6,10 @@
           class="brand__logo"
           [src]="isLightTheme ? '/assets/logoHeaderInvestindoemNegocios2.png' : '/assets/logoHeaderInvestindoemNegocios.png'"
           [alt]="brandName"
-          loading="lazy" />
+          width="36"
+          height="36"
+          loading="eager"
+          decoding="async" />
       </a>
     </div>
     <nav class="menu">
@@ -35,7 +38,10 @@
             class="sidebar__logo block h-[34px] w-auto max-md:h-[28px]"
             [src]="isLightTheme ? '/assets/logoHeaderInvestindoemNegocios2.png' : '/assets/logoHeaderInvestindoemNegocios.png'"
           [alt]="brandName"
-          loading="lazy" />
+          width="34"
+          height="34"
+          loading="eager"
+          decoding="async" />
           <span class="sidebar__title text-[var(--text-lg)] font-bold tracking-[0.02em] text-[var(--text)] max-md:text-[var(--text-md)]">{{ brandName }}</span>
         </div>
         <div class="sidebar__label px-[var(--space-1)] pt-[var(--space-1)] text-[var(--text-xs)] tracking-[0.12em] text-[var(--text-muted)] max-md:px-0 max-md:pt-0">Menu</div>

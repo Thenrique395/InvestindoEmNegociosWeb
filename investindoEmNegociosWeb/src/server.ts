@@ -5,6 +5,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import compression from 'compression';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,6 +14,12 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+app.use(
+  compression({
+    threshold: 1024,
+  }),
+);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
@@ -38,6 +45,11 @@ app.use(
     maxAge: '1y',
     index: false,
     redirect: false,
+    setHeaders: (res, path) => {
+      if (/\.[0-9A-Z_-]{8,}\./i.test(path)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
   }),
 );
 

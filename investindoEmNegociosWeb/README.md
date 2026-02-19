@@ -54,6 +54,27 @@ To execute unit tests with the [Karma](https://karma-runner.github.io) test runn
 ng test
 ```
 
+## Qualidade e performance (frontend)
+
+Para validar padrao de qualidade + performance antes de deploy:
+
+```bash
+npm run quality:frontend
+```
+
+Esse comando executa:
+- `typecheck` (TypeScript sem emitir build)
+- `test:ci` (Karma em ChromeHeadless + coverage)
+- `build:prod` (respeitando budgets do `angular.json`)
+
+Para medir performance no browser com Lighthouse:
+
+```bash
+npm run perf:lighthouse
+```
+
+O resultado gera link publico temporario do Lighthouse CI e aplica thresholds definidos em `.lighthouserc.json`.
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

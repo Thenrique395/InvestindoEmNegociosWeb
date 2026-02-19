@@ -6,7 +6,7 @@ import { provideRouter, RouteReuseStrategy, withRouterConfig, withPreloading } f
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideClientHydration } from '@angular/platform-browser';
 import { authInterceptor } from './auth.interceptor';
 import { NoReuseStrategy } from './no-reuse.strategy';
 import { getInitialLocale } from './utils/locale-settings';
@@ -23,7 +23,7 @@ export const appConfig: ApplicationConfig = {
       withRouterConfig({ onSameUrlNavigation: 'reload' }),
       withPreloading(SelectivePreloadingStrategy)
     ),
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     { provide: RouteReuseStrategy, useClass: NoReuseStrategy },
     { provide: LOCALE_ID, useFactory: () => getInitialLocale() }
