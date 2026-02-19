@@ -12,6 +12,11 @@ Resumo pratico:
 - **Modais**: evitar `window.confirm` e usar modal do sistema.
 - **Datas**: usar `DD/MM/AAAA` e parse sem deslocamento de fuso.
 
+## Documentação principal
+- Arquitetura e operação das aplicações: `DOCUMENTACAO_APLICACOES.md`
+- Design system oficial: `systemDesigner.md`
+- Plano de produção e custos: `PRD_CUSTOS_E_PROXIMOS_PASSOS.md`
+
 ## Development server
 
 To start a local development server, run:
