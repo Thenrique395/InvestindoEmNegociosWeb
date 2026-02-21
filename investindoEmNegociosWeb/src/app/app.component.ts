@@ -143,7 +143,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get isPublicLayoutRoute(): boolean {
     const current = this.getCurrentPath();
-    return current === '/' || current.startsWith('/login') || current.startsWith('/calculadora');
+    return current === '/'
+      || current.startsWith('/login')
+      || current.startsWith('/calculadora')
+      || current.startsWith('/forgot-password')
+      || current.startsWith('/reset-password');
   }
 
   get showPublicExperience(): boolean {
