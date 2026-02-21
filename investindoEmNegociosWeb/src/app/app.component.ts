@@ -137,6 +137,15 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.authService.isAuthenticated();
   }
 
+  get isPublicLayoutRoute(): boolean {
+    const current = (this.router.url || '/').split('?')[0];
+    return current === '/' || current.startsWith('/login') || current.startsWith('/calculadora');
+  }
+
+  get showPublicExperience(): boolean {
+    return !this.isLogged && this.isPublicLayoutRoute;
+  }
+
   get displayName(): string {
     return this.profile?.fullName?.trim() || 'Usuário';
   }
