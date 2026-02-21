@@ -5,12 +5,11 @@ O ecossistema é composto por:
 - **Frontend web** em Angular SSR (`investindoEmNegociosWeb`).
 - **Backend API** em .NET 9 (`InvestindoEmNegocio`).
 - **Banco de dados** PostgreSQL.
-- **Proxy reverso e TLS** com Traefik.
 
 Ambiente atual publicado:
-- Frontend: `https://app.35.174.50.187.sslip.io`
-- API Docs: `https://api.35.174.50.187.sslip.io/docs`
-- Health API: `https://api.35.174.50.187.sslip.io/health/ready`
+- Frontend: `http://35.174.50.187:4000`
+- API Docs: `http://35.174.50.187:5059/docs`
+- Health API: `http://35.174.50.187:5059/health/ready`
 
 ---
 
@@ -41,10 +40,8 @@ Ambiente atual publicado:
 
 Fluxo principal:
 1. Usuário acessa frontend.
-2. Traefik roteia `app.*` para o container do frontend.
-3. Frontend consome API em `api.*`.
-4. Traefik roteia `api.*` para backend.
-5. Backend persiste/consulta no PostgreSQL.
+2. Frontend consome API via IP/porta do servidor.
+3. Backend persiste/consulta no PostgreSQL.
 
 Camadas do backend:
 - `Controllers` (entrada HTTP)
@@ -115,28 +112,20 @@ Controladores disponíveis:
 ## 6. Infra e deploy
 
 ## 6.1 Containers
-- Frontend + Traefik: `InvestindoEmNegociosWeb/docker-compose.yml`
+- Frontend: `InvestindoEmNegociosWeb/docker-compose.yml`
 - Backend + Postgres: `InvestindoEmNegocio/docker-compose.yml`
 
-## 6.2 TLS e roteamento
-- Traefik usa:
-  - Docker provider
-  - Let’s Encrypt (resolver `letsencrypt`)
-  - Redirect HTTP -> HTTPS
-
-## 6.3 Variáveis essenciais
+## 6.2 Variáveis essenciais
 
 Frontend (`InvestindoEmNegociosWeb/.env`):
-- `LETSENCRYPT_EMAIL`
-- `FRONTEND_HOST`
-- `API_HOST`
+- `API_BASE_URL`
 
 Backend (`InvestindoEmNegocio/.env`):
 - `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`
 - `DB_CONN`
 - `JWT_SECRET_KEY`
 - `BRAPI_TOKEN`
-- `API_HOST`
+- `ASPNETCORE_URLS` (opcional)
 
 ---
 
@@ -156,9 +145,9 @@ Backend (`InvestindoEmNegocio/.env`):
   - configs em `InvestindoEmNegocio/perf/config`
 
 ## 7.3 Smoke de produção
-- `curl -I https://app.35.174.50.187.sslip.io`
-- `curl -I https://api.35.174.50.187.sslip.io/health/ready`
-- `curl -I https://api.35.174.50.187.sslip.io/docs`
+- `curl -I http://35.174.50.187:4000`
+- `curl -I http://35.174.50.187:5059/health/ready`
+- `curl -I http://35.174.50.187:5059/docs`
 
 ---
 
@@ -168,26 +157,20 @@ Backend (`InvestindoEmNegocio/.env`):
 - Manter backup diário e teste de restore.
 - Monitorar p95/p99 e taxa de erro.
 - Manter rollback operacional simples.
-- Considerar remover porta pública da API (`5059`) e deixar acesso via Traefik.
+- Em produção final, considerar reverse proxy (Nginx) + TLS.
 
 ---
 
 ## 9. Guia rápido de troubleshooting
 
-## 9.1 TLS inválido/default cert no Traefik
-- Verificar `LETSENCRYPT_EMAIL` real no `.env`.
-- Verificar host rules (`FRONTEND_HOST`, `API_HOST`).
-- Ver logs:
-  - `docker logs investindoemnegociosweb-traefik-1`
-
-## 9.2 `docker compose` sem arquivo
+## 9.1 `docker compose` sem arquivo
 - Executar no diretório correto do projeto.
 
-## 9.3 Erro de variável não definida
+## 9.2 Erro de variável não definida
 - Conferir `.env` local da VPS.
 - Rodar `docker compose config` para validar interpolação.
 
-## 9.4 API lenta/carga
+## 9.3 API lenta/carga
 - Usar scripts k6 (`perf/` no backend).
 - Verificar p95 por endpoint antes de otimizar.
 
@@ -197,5 +180,3 @@ Backend (`InvestindoEmNegocio/.env`):
 - `README.md` (frontend)
 - `systemDesigner.md` (design system)
 - `PRD_CUSTOS_E_PROXIMOS_PASSOS.md` (plano de produção)
-- `TRAEFIK_SETUP.md` (setup de proxy/TLS)
-

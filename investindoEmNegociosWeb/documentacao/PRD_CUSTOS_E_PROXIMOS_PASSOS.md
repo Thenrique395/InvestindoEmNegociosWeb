@@ -21,7 +21,7 @@ Este documento resume:
 ## 1.2 Custos anuais
 - Domínio `.com`: **US$ 10 a US$ 20/ano**.
 - Domínio `.com.br`: **R$ 40 a R$ 60/ano**.
-- SSL/TLS: **US$ 0** (Let's Encrypt + Traefik).
+- SSL/TLS: **US$ 0** (Let's Encrypt + Nginx/Caddy).
 
 ## 1.3 Faixa total
 - MVP econômico: **US$ 15 a US$ 40/mês** + domínio.
@@ -33,8 +33,8 @@ Este documento resume:
 
 ## 2.1 Infra e deploy
 - [ ] Definir domínio oficial (`.com` ou `.com.br`) quando sair de teste.
-- [ ] Manter Traefik + HTTPS automático com Let's Encrypt.
-- [ ] Remover exposição pública direta da API (`5059`) e manter acesso via Traefik.
+- [ ] Configurar HTTPS automático com Let's Encrypt (Nginx/Caddy).
+- [ ] Remover exposição pública direta da API (`5059`) e manter acesso via reverse proxy.
 - [ ] Separar ambientes: `staging` e `production`.
 - [ ] Configurar pipeline CI/CD com rollback simples (última imagem estável).
 - [ ] Versionar imagens por tag (evitar depender só de `latest`).
@@ -120,4 +120,3 @@ Este documento resume:
 - [ ] Logs, métricas e alertas ativos.
 - [ ] Testes críticos passando (frontend e backend).
 - [ ] Documento de incidentes (quem aciona, como reverte, onde olhar).
-

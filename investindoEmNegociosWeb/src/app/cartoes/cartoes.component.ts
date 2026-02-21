@@ -74,7 +74,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
         const list = Array.isArray(brands) ? brands : [];
         const active = list.filter((b) => b.isActive !== false);
         this.brands = active;
-        console.log('Bandeiras carregadas:', this.brands);
         this.bandeira = this.brands.length ? String(this.brands[0].id) : '';
       },
       error: () => {
