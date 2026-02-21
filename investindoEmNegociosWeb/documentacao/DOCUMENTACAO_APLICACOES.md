@@ -7,7 +7,7 @@ O ecossistema é composto por:
 - **Banco de dados** PostgreSQL.
 
 Ambiente atual publicado:
-- Frontend: `http://35.174.50.187:4000`
+- Frontend: `http://35.174.50.187:4200`
 - API Docs: `http://35.174.50.187:5059/docs`
 - Health API: `http://35.174.50.187:5059/health/ready`
 
@@ -145,7 +145,7 @@ Backend (`InvestindoEmNegocio/.env`):
   - configs em `InvestindoEmNegocio/perf/config`
 
 ## 7.3 Smoke de produção
-- `curl -I http://35.174.50.187:4000`
+- `curl -I http://35.174.50.187:4200`
 - `curl -I http://35.174.50.187:5059/health/ready`
 - `curl -I http://35.174.50.187:5059/docs`
 

@@ -24,6 +24,16 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent)
   },
   {
+    path: 'forgot-password',
+    data: { preload: false },
+    loadComponent: () => import('./forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent)
+  },
+  {
+    path: 'reset-password',
+    data: { preload: false },
+    loadComponent: () => import('./reset-password/reset-password.component').then((m) => m.ResetPasswordComponent)
+  },
+  {
     path: 'onboarding',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },

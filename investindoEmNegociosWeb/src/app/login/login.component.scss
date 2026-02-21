@@ -177,6 +177,7 @@
   color: var(--text-muted);
 }
 
+.login-form__meta a,
 .login-form__meta button {
   border: 0;
   background: transparent;
@@ -184,6 +185,7 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0;
+  text-decoration: none;
 }
 
 .login-form__submit {

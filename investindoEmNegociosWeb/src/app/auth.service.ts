@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, finalize, map, shareReplay, throwError } from 'rxjs';
 import { API_BASE_URL } from './api.config';
@@ -72,63 +72,68 @@ export class AuthService {
       .pipe(catchError((err) => this.wrapError(err, 'Erro ao criar conta.')));
   }
 
+  forgotPassword(email: string) {
+    const body = {
+      email: email.trim().toLowerCase()
+    };
+
+    return this.http
+      .post<void>(`${this.baseUrl}/forgot-password`, body)
+      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível enviar o e-mail de recuperação.', false)));
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    const body = {
+      token,
+      newPassword
+    };
+
+    return this.http
+      .post<void>(`${this.baseUrl}/reset-password`, body)
+      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível redefinir a senha.', false)));
+  }
+
   private persistSession(res: AuthResponse): AuthResponse {
-    try {
-      localStorage.setItem('access_token', res.token);
-      if (res.role) {
-        localStorage.setItem('user_role', res.role);
-      }
-      if (res.refreshToken) {
-        localStorage.setItem('refresh_token', res.refreshToken);
-      }
-      if (res.expiresAt) {
-        localStorage.setItem('access_expires_at', res.expiresAt);
-      }
-    } catch {
-      /* ignore storage errors em ambientes não browser */
-    }
+    this.setStorageItem('access_token', res.token);
+    if (res.role) this.setStorageItem('user_role', res.role);
+    if (res.refreshToken) this.setStorageItem('refresh_token', res.refreshToken);
+    if (res.expiresAt) this.setStorageItem('access_expires_at', res.expiresAt);
     return res;
   }
 
   getAccessToken(): string | null {
-    if (typeof localStorage === 'undefined') return null;
     if (this.isAccessTokenExpired()) {
       this.clearSession();
       return null;
     }
-    return localStorage.getItem('access_token');
+    return this.getStorageItem('access_token');
   }
 
   getRefreshToken(): string | null {
-    return typeof localStorage !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+    return this.getStorageItem('refresh_token');
   }
 
   getRole(): UserRole | null {
-    if (typeof localStorage === 'undefined') return null;
-    const stored = parseRole(localStorage.getItem('user_role'));
+    const stored = parseRole(this.getStorageItem('user_role'));
     if (stored) return stored;
 
     const tokenRole = parseRole(this.readRoleFromToken(this.getAccessToken()));
     if (tokenRole) {
-      localStorage.setItem('user_role', tokenRole);
+      this.setStorageItem('user_role', tokenRole);
       return tokenRole;
     }
     if (this.getAccessToken()) {
-      localStorage.setItem('user_role', 'Basic');
+      this.setStorageItem('user_role', 'Basic');
       return 'Basic';
     }
     return null;
   }
 
   clearSession(): void {
-    try {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('access_expires_at');
-      localStorage.removeItem('user_role');
-    } catch {
-      /* ignore */
-    }
+    this.removeStorageItem('access_token');
+    this.removeStorageItem('refresh_token');
+    this.removeStorageItem('access_expires_at');
+    this.removeStorageItem('user_role');
   }
 
   isAuthenticated(): boolean {
@@ -136,11 +141,10 @@ export class AuthService {
   }
 
   isAccessTokenExpired(): boolean {
-    if (typeof localStorage === 'undefined') return true;
-    const token = localStorage.getItem('access_token');
+    const token = this.getStorageItem('access_token');
     if (!token) return true;
 
-    const expiresAt = localStorage.getItem('access_expires_at');
+    const expiresAt = this.getStorageItem('access_expires_at');
     if (expiresAt) {
       const exp = new Date(expiresAt).getTime();
       if (Number.isFinite(exp)) {
@@ -188,10 +192,9 @@ export class AuthService {
   }
 
   private wrapError(err: unknown, fallback: string, mapUnauthorizedToLogin = true) {
-    // Log detalhado no console para facilitar depuração no front.
-    // Não lança erro aqui; apenas registra e converte para mensagem amigável.
-    // eslint-disable-next-line no-console
-    console.error('AuthService error', err);
+    if (isDevMode()) {
+      console.error('AuthService error', err);
+    }
 
     let message = fallback;
     let code: string | undefined;
@@ -217,5 +220,43 @@ export class AuthService {
     const error = new Error(message) as Error & { code?: string };
     if (code) error.code = code;
     return throwError(() => error);
+  }
+
+  private getStorageItem(key: string): string | null {
+    const storage = this.getSafeStorage();
+    return storage ? storage.getItem(key) : null;
+  }
+
+  private setStorageItem(key: string, value: string): void {
+    const storage = this.getSafeStorage();
+    if (!storage) return;
+    try {
+      storage.setItem(key, value);
+    } catch {
+      /* ignore storage errors */
+    }
+  }
+
+  private removeStorageItem(key: string): void {
+    const storage = this.getSafeStorage();
+    if (!storage) return;
+    try {
+      storage.removeItem(key);
+    } catch {
+      /* ignore storage errors */
+    }
+  }
+
+  private getSafeStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null {
+    if (typeof localStorage === 'undefined') return null;
+    const storage = localStorage as Partial<Storage>;
+    if (
+      typeof storage.getItem !== 'function' ||
+      typeof storage.setItem !== 'function' ||
+      typeof storage.removeItem !== 'function'
+    ) {
+      return null;
+    }
+    return storage as Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
   }
 }
