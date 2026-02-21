@@ -14,6 +14,7 @@ Resumo pratico:
 
 ## Documentação principal
 - Arquitetura e operação das aplicações: `DOCUMENTACAO_APLICACOES.md`
+- Padrões de implementação do backend: `BACKEND_PADROES_IMPLEMENTACAO.md`
 - Design system oficial: `systemDesigner.md`
 - Plano de produção e custos: `PRD_CUSTOS_E_PROXIMOS_PASSOS.md`
 
