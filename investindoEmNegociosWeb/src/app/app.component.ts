@@ -1,6 +1,6 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf, NgFor, NgClass } from '@angular/common';
+import { NgIf, NgFor, NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
@@ -10,6 +10,7 @@ import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 import { NotificationsService, NotificationItem } from './notifications.service';
 import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
+import { Inject, PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -43,8 +44,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private profileSub?: Subscription;
   private feedbackSub?: Subscription;
   private userContextInitialized = false;
+  private readonly isBrowser: boolean;
 
   constructor(
+    @Inject(PLATFORM_ID) platformId: object,
     private router: Router,
     private profileService: ProfileService,
     private authService: AuthService,
@@ -52,6 +55,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private notificationsService: NotificationsService,
     private uiFeedback: UiFeedbackService
   ) {
+    this.isBrowser = isPlatformBrowser(platformId);
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login');
@@ -138,12 +142,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   get isPublicLayoutRoute(): boolean {
-    const current = (this.router.url || '/').split('?')[0];
+    const current = this.getCurrentPath();
     return current === '/' || current.startsWith('/login') || current.startsWith('/calculadora');
   }
 
   get showPublicExperience(): boolean {
-    return !this.isLogged && this.isPublicLayoutRoute;
+    return !this.isLogged && this.isPublicLayoutRoute && this.router.navigated;
   }
 
   get displayName(): string {
@@ -166,6 +170,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private get storage(): Storage | null {
     return typeof localStorage !== 'undefined' ? localStorage : null;
+  }
+
+  private getCurrentPath(): string {
+    if (this.isBrowser && typeof window !== 'undefined') {
+      return (window.location.pathname || '/').split('?')[0];
+    }
+    return (this.router.url || '/').split('?')[0];
   }
 
   get currentRole(): UserRole | null {
