@@ -111,3 +111,31 @@ Objetivo: saber quando a antecipação ocorreu.
 Proposta:
 - Armazenar `anticipationDate` na despesa/parcela.
 - Mostrar no histórico detalhado.
+
+## Investimentos estratégicos (futuro)
+Objetivo: evoluir o produto para decisão financeira, não só registro.
+
+Backlog funcional:
+- Competência mensal configurável (`competenceCarryOverDay`) aplicada nas visões e cálculos.
+- Saldo Disponível Real (SDR) como indicador oficial no resumo financeiro.
+- Simulador de decisão de dívida: amortizar vs investir (com cenários).
+- Projeções futuras (conservador/base/agressivo) para fluxo e patrimônio.
+- Alertas de deterioração de padrão de gasto e risco de liquidez.
+
+## Assistente financeiro (futuro)
+Objetivo: orientar o usuário com recomendações acionáveis.
+
+Backlog funcional:
+- Assistente de diagnóstico mensal (“o que melhorou/piorou e por quê”).
+- Recomendações priorizadas com impacto estimado (curto e médio prazo).
+- Explicação de recomendação baseada nos dados da própria conta.
+- “Próxima melhor ação” semanal com checklist.
+
+## Monetização funcional (futuro)
+Objetivo: preparar produto para planos pagos sem quebrar experiência.
+
+Backlog funcional:
+- Planos Free/Pro com limites por feature no backend e frontend.
+- Trial com onboarding guiado e metas de ativação.
+- Upgrade contextual por uso (feature gates + call-to-action).
+- Gestão de assinatura, status de plano e histórico de cobrança.
