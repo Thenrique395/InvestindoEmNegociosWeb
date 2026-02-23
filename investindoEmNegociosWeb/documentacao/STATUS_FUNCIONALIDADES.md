@@ -41,7 +41,7 @@
 | Resumo de receitas por mês | ✅ | `GET /api/v1/receitas/summary` | Consumido no frontend de receitas. |
 | Categorias personalizadas do usuário | ✅ | `GET/POST/PUT/DELETE /api/v1/categories` | Inclui categorias padrão + do usuário. |
 | Calendário financeiro mensal | ✅ | Rota frontend `/calendario` + `calendario.component.spec.ts` | Visão mensal com receitas, despesas e vencimentos de cartão, filtros por tipo/categoria/status, resumo mensal e ação de marcar como pago implementados e testados. |
-| Importação automática de fatura/cartão | ⚠️ | `InvoiceImportController` + tela no frontend | Existe no projeto; validar cobertura de formatos e robustez em produção. |
+| Importação automática de fatura/cartão + conciliação | ⚠️ | `InvoiceImportController` + tela no frontend | Tratar como pacote único: importação multi-formato e conciliação devem evoluir juntas; validar cobertura de formatos, deduplicação e fechamento de fatura. |
 
 ## 3. Metas e Objetivos
 
@@ -72,6 +72,7 @@
 | Gestão de usuários (admin) | ✅ | `AdminUsersController` | Inclui atualização e remoção sob regras administrativas. |
 | Gestão de categorias padrão (admin) | ✅ | `AdminCategoriesController` | Catálogo administrável. |
 | Gestão de parâmetros (instituições, bandeiras, meios pagamento) | ✅ | `AdminParametersController` | Inclui ativação/desativação. |
+| Monitoramento e execução de robôs (admin) | ✅ | `GET/POST /api/v1/admin/robots/*` + rota frontend `/admin/robots` | Painel temporário com status de execução, histórico recente e disparo manual individual/em lote. |
 | Controle de acesso por perfil | ⚠️ | Roles presentes em auth/JWT | Recomenda-se revisão de matriz de autorização por endpoint. |
 
 ## 6. Notificações e Alertas
@@ -80,7 +81,7 @@
 |---|---|---|---|
 | Listar notificações do usuário | ✅ | `GET /api/v1/notifications` | Com filtro de não lidas. |
 | Marcar como lida | ✅ | `POST /api/v1/notifications/{id}/read` | Fluxo básico completo. |
-| Geração de notificações | ✅ | `POST /api/v1/notifications/generate` | Geração sob demanda implementada. |
+| Geração de notificações | ✅ | `POST /api/v1/notifications/generate` + `RoboLembretes` (scheduler diário) | Geração sob demanda e execução automática diária implementadas. |
 | Preferências de notificação (in-app/email) | ⚠️ | `PUT /api/v1/preferences` | Personalização simples por usuário; sem granularidade por tipo. |
 | Envio de e-mail real | ⚠️ | Preferência existe | Falta consolidar provedor transacional no fluxo produtivo. |
 
@@ -100,7 +101,7 @@
 ### Prioridade 1 - Fluxo financeiro core
 - Recorrência de receitas e despesas.
 - Lembretes reais (push/WhatsApp).
-- Conciliação de cartões e faturas.
+- Importação de faturas + conciliação de cartões e faturas (pacote único).
 - Calendário financeiro mensal.
 - Alertas por faixa de valor.
 
@@ -149,6 +150,7 @@
 - 2026-02-21: adicionado backlog priorizado com base no `FEATURE_PRIORIDADES.md`.
 - 2026-02-21: recuperação de senha evoluída para status parcial (API pronta, pendente configuração SMTP para envio real).
 - 2026-02-23: calendário financeiro mensal evoluído com rota MVP e testes unitários iniciais.
+- 2026-02-23: painel admin de monitoramento de robôs adicionado com execução manual e histórico.
 
 ---
 

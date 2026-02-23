@@ -3,7 +3,7 @@
 ## Prioridade 1 - Fluxo financeiro core
 - Recorrência de receitas e despesas.
 - Lembretes reais (push/WhatsApp).
-- Conciliação simples de cartões e faturas.
+- Importação de faturas (multi-formato) + conciliação de cartões e faturas em um único fluxo.
 - Calendário financeiro mensal com compromissos e vencimentos.
 - Regra de alertas por faixa de valor (alto impacto no orçamento).
 

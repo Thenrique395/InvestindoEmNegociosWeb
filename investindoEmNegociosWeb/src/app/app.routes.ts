@@ -127,5 +127,11 @@ export const routes: Routes = [
     data: { minRole: 'Admin', preload: false },
     loadComponent: () => import('./admin-parameters/admin-parameters.component').then((m) => m.AdminParametersComponent)
   },
+  {
+    path: 'admin/robots',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Admin', preload: false },
+    loadComponent: () => import('./admin-robots/admin-robots.component').then((m) => m.AdminRobotsComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

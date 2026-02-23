@@ -1,0 +1,95 @@
+<section class="admin-robots space-y-6 text-[var(--text)]">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Monitor de Robôs</h1>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">Acompanhe execução, falhas e rode manualmente quando necessário.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" class="btn-primary sm" (click)="runAll()" [disabled]="loading || runningAll || !!runningRobot">
+        {{ runningAll ? 'Executando...' : 'Executar todos' }}
+      </button>
+      <button type="button" class="btn-ghost sm" (click)="load()" [disabled]="loading">
+        {{ loading ? 'Atualizando...' : 'Atualizar' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
+    Carregando monitor...
+  </div>
+
+  <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3" *ngIf="!loading && robots.length">
+    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]" *ngFor="let robot of robots">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-base font-semibold">{{ robot.robotName }}</h2>
+        <span
+          class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+          [ngClass]="robot.lastSuccess === null
+            ? 'border border-slate-200 bg-slate-100 text-slate-600'
+            : robot.lastSuccess
+              ? 'border border-emerald-200 bg-emerald-100 text-emerald-700'
+              : 'border border-rose-200 bg-rose-100 text-rose-700'">
+          {{ statusLabel(robot.lastSuccess) }}
+        </span>
+      </div>
+      <p class="mt-2 text-sm text-[var(--text-muted)]" *ngIf="robot.lastStartedAt">
+        Última execução: {{ robot.lastStartedAt | date: 'short' }}
+      </p>
+      <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="!robot.lastStartedAt">
+        Sem histórico de execução.
+      </p>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">Itens processados: {{ robot.lastProcessedCount }}</p>
+      <p class="mt-1 text-xs text-rose-600" *ngIf="robot.lastError">{{ robot.lastError }}</p>
+
+      <div class="mt-3">
+        <button
+          type="button"
+          class="btn-warning sm"
+          (click)="runRobot(robot.robotName)"
+          [disabled]="runningAll || !!runningRobot">
+          {{ runningRobot === robot.robotName ? 'Executando...' : 'Executar agora' }}
+        </button>
+      </div>
+    </article>
+  </div>
+
+  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]" *ngIf="!loading && recentRuns.length">
+    <div class="border-b border-[var(--border)] px-4 py-3">
+      <h3 class="text-base font-semibold">Histórico recente</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
+          <tr class="border-b border-[var(--border)]">
+            <th class="px-4 py-3 font-semibold">Robô</th>
+            <th class="px-4 py-3 font-semibold">Início</th>
+            <th class="px-4 py-3 font-semibold">Fim</th>
+            <th class="px-4 py-3 font-semibold">Status</th>
+            <th class="px-4 py-3 font-semibold">Itens</th>
+            <th class="px-4 py-3 font-semibold">Erro</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border)]">
+          <tr *ngFor="let row of recentRuns">
+            <td class="px-4 py-3 font-medium">{{ row.robotName }}</td>
+            <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.startedAt | date: 'short' }}</td>
+            <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.finishedAt | date: 'short' }}</td>
+            <td class="px-4 py-3">
+              <span
+                class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
+                [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-rose-200 bg-rose-100 text-rose-700'">
+                {{ row.success ? 'Sucesso' : 'Falha' }}
+              </span>
+            </td>
+            <td class="px-4 py-3">{{ row.processedCount }}</td>
+            <td class="px-4 py-3 text-rose-600">{{ row.error || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]" *ngIf="!loading && !robots.length">
+    Nenhum robô encontrado.
+  </div>
+</section>
