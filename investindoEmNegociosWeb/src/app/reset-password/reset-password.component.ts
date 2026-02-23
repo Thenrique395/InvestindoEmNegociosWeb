@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -25,6 +25,7 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private auth: AuthService,
     private uiFeedback: UiFeedbackService
   ) {}
@@ -34,14 +35,7 @@ export class ResetPasswordComponent implements OnInit {
 
     // Remove o token da barra de endereço após ler o valor, reduzindo exposição em histórico/referer.
     if (this.token) {
-      const queryParams = { ...this.route.snapshot.queryParams };
-      delete queryParams['token'];
-
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams,
-        replaceUrl: true
-      });
+      this.location.replaceState('/reset-password');
     }
   }
 
