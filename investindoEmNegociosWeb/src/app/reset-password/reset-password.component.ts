@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 
@@ -24,7 +24,6 @@ export class ResetPasswordComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private location: Location,
     private auth: AuthService,
     private uiFeedback: UiFeedbackService
