@@ -17,6 +17,10 @@ export class ResetPasswordComponent implements OnInit {
   newPassword = '';
   confirmPassword = '';
   loading = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+  formError = '';
+  success = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,18 +33,63 @@ export class ResetPasswordComponent implements OnInit {
     this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
   }
 
+  get hasToken(): boolean {
+    return this.token.trim().length > 0;
+  }
+
+  get hasMinLength(): boolean {
+    return this.newPassword.length >= 8;
+  }
+
+  get hasUppercase(): boolean {
+    return /[A-Z]/.test(this.newPassword);
+  }
+
+  get hasNumber(): boolean {
+    return /\d/.test(this.newPassword);
+  }
+
+  get passwordsMatch(): boolean {
+    return this.newPassword.length > 0 && this.newPassword === this.confirmPassword;
+  }
+
+  get canSubmit(): boolean {
+    return this.hasToken && this.hasMinLength && this.hasUppercase && this.hasNumber && this.passwordsMatch && !this.loading && !this.success;
+  }
+
+  get hasPasswordInput(): boolean {
+    return this.newPassword.length > 0;
+  }
+
+  get hasConfirmInput(): boolean {
+    return this.confirmPassword.length > 0;
+  }
+
+  toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   onSubmit(): void {
     if (this.loading) return;
-    if (!this.token) {
-      this.uiFeedback.error('Token de recuperação ausente.');
+    this.formError = '';
+
+    if (!this.hasToken) {
+      this.formError = 'Token de recuperação ausente ou inválido.';
+      this.uiFeedback.error(this.formError);
       return;
     }
-    if (!this.newPassword || this.newPassword.length < 8) {
-      this.uiFeedback.warning('A nova senha deve ter no mínimo 8 caracteres.');
+    if (!this.hasMinLength || !this.hasUppercase || !this.hasNumber) {
+      this.formError = 'A senha deve ter no mínimo 8 caracteres, 1 letra maiúscula e 1 número.';
+      this.uiFeedback.warning(this.formError);
       return;
     }
-    if (this.newPassword !== this.confirmPassword) {
-      this.uiFeedback.warning('As senhas não conferem.');
+    if (!this.passwordsMatch) {
+      this.formError = 'As senhas não conferem.';
+      this.uiFeedback.warning(this.formError);
       return;
     }
 
@@ -48,12 +97,13 @@ export class ResetPasswordComponent implements OnInit {
     this.auth.resetPassword(this.token, this.newPassword).subscribe({
       next: () => {
         this.loading = false;
+        this.success = true;
         this.uiFeedback.success('Senha redefinida com sucesso. Faça login novamente.');
-        this.router.navigateByUrl('/login');
       },
       error: (err: unknown) => {
         this.loading = false;
-        this.uiFeedback.error(err instanceof Error ? err.message : 'Falha ao redefinir senha.');
+        this.formError = err instanceof Error ? err.message : 'Falha ao redefinir senha.';
+        this.uiFeedback.error(this.formError);
       }
     });
   }

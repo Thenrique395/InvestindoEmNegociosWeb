@@ -15,6 +15,8 @@ import { UiFeedbackService } from '../ui-feedback.service';
 export class ForgotPasswordComponent {
   email = '';
   loading = false;
+  success = false;
+  formError = '';
 
   constructor(
     private auth: AuthService,
@@ -23,8 +25,10 @@ export class ForgotPasswordComponent {
 
   onSubmit(): void {
     if (this.loading) return;
+    this.formError = '';
     if (!this.email || !this.email.includes('@')) {
-      this.uiFeedback.warning('Informe um e-mail válido.');
+      this.formError = 'Informe um e-mail válido.';
+      this.uiFeedback.warning(this.formError);
       return;
     }
 
@@ -32,11 +36,13 @@ export class ForgotPasswordComponent {
     this.auth.forgotPassword(this.email).subscribe({
       next: () => {
         this.loading = false;
+        this.success = true;
         this.uiFeedback.success('Se o e-mail existir, enviaremos instruções para redefinir sua senha.');
       },
       error: (err: unknown) => {
         this.loading = false;
-        this.uiFeedback.error(err instanceof Error ? err.message : 'Falha ao solicitar recuperação de senha.');
+        this.formError = err instanceof Error ? err.message : 'Falha ao solicitar recuperação de senha.';
+        this.uiFeedback.error(this.formError);
       }
     });
   }
