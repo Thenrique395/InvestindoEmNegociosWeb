@@ -11,13 +11,12 @@
 
 ### 1.1 Cadastro e Autenticação
 
-
 | Funcionalidade | Status | Evidência atual | Observação |
 |---|---|---|---|
 | Cadastro com email e senha | ✅ | `POST /api/v1/auth/register` | Fluxo ativo no backend e tela de cadastro no frontend. |
 | Hash seguro de senha | ✅ | `AuthService` usando BCrypt | Work factor 12. |
 | JWT + Refresh Token | ✅ | `POST /api/v1/auth/login` + `POST /api/v1/auth/refresh` | Refresh token com rotação e revogação. |
-| Recuperação de senha | ⚠️ | `POST /api/v1/auth/forgot-password` + `POST /api/v1/auth/reset-password` | Fluxo e token com expiração implementados; depende de SMTP configurado para envio real. |
+| Recuperação de senha | ✅ | `POST /api/v1/auth/forgot-password` + `POST /api/v1/auth/reset-password` | Fluxo e token com expiração implementados; depende de SMTP configurado para envio real. |
 | Logout seguro | ✅ | `POST /api/v1/auth/logout` | Revoga refresh token persistido. |
 
 ### 1.2 Configurações do Usuário
@@ -41,6 +40,7 @@
 | Gestão de parcelas (listar/pagar/antecipar/excluir) | ✅ | `/api/v1/installments` + `/payments` + `/anticipations` | Cobertura principal de operação financeira. |
 | Resumo de receitas por mês | ✅ | `GET /api/v1/receitas/summary` | Consumido no frontend de receitas. |
 | Categorias personalizadas do usuário | ✅ | `GET/POST/PUT/DELETE /api/v1/categories` | Inclui categorias padrão + do usuário. |
+| Calendário financeiro mensal | ✅ | Rota frontend `/calendario` + `calendario.component.spec.ts` | Visão mensal com receitas, despesas e vencimentos de cartão, filtros por tipo/categoria/status, resumo mensal e ação de marcar como pago implementados e testados. |
 | Importação automática de fatura/cartão | ⚠️ | `InvoiceImportController` + tela no frontend | Existe no projeto; validar cobertura de formatos e robustez em produção. |
 
 ## 3. Metas e Objetivos
@@ -148,6 +148,7 @@
 - 2026-02-21: mapeados módulos de Gestão Financeira, Metas, Investimentos, Administração, Notificações e Portabilidade.
 - 2026-02-21: adicionado backlog priorizado com base no `FEATURE_PRIORIDADES.md`.
 - 2026-02-21: recuperação de senha evoluída para status parcial (API pronta, pendente configuração SMTP para envio real).
+- 2026-02-23: calendário financeiro mensal evoluído com rota MVP e testes unitários iniciais.
 
 ---
 

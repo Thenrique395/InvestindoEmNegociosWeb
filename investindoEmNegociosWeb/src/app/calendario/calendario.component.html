@@ -1,0 +1,113 @@
+<section class="calendar-page">
+  <header class="calendar-head">
+    <div>
+      <p class="eyebrow">Calendário financeiro</p>
+      <p class="muted">Acompanhe vencimentos, receitas e compromissos do mês em uma visão diária.</p>
+    </div>
+    <div class="calendar-head__actions">
+      <button type="button" class="ghost" (click)="previousMonth()">Mês anterior</button>
+      <button type="button" class="btn-primary" (click)="goToToday()">Hoje</button>
+      <button type="button" class="ghost" (click)="nextMonth()">Próximo mês</button>
+    </div>
+  </header>
+
+  <div class="calendar-toolbar">
+    <strong>{{ monthTitle }}</strong>
+    <label><input type="checkbox" [(ngModel)]="showExpenses" /> Despesas</label>
+    <label><input type="checkbox" [(ngModel)]="showIncomes" /> Receitas</label>
+    <label><input type="checkbox" [(ngModel)]="showCardDue" /> Cartões</label>
+    <label>
+      Categoria
+      <select [(ngModel)]="selectedCategory">
+        <option value="all">Todas</option>
+        <option *ngFor="let category of categoryOptions" [value]="category">{{ category }}</option>
+      </select>
+    </label>
+    <label>
+      Status
+      <select [(ngModel)]="selectedStatus">
+        <option value="all">Todos</option>
+        <option *ngFor="let status of statusOptions" [value]="status">{{ statusLabel(status) }}</option>
+      </select>
+    </label>
+  </div>
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <p class="summary-card__label">Receitas do mês</p>
+      <strong class="summary-card__value">{{ formatCurrency(monthIncomeTotal) }}</strong>
+    </article>
+    <article class="summary-card">
+      <p class="summary-card__label">Despesas do mês</p>
+      <strong class="summary-card__value">{{ formatCurrency(monthExpenseTotal) }}</strong>
+    </article>
+    <article class="summary-card">
+      <p class="summary-card__label">Saldo previsto</p>
+      <strong class="summary-card__value">{{ formatCurrency(monthProjectedBalance) }}</strong>
+    </article>
+    <article class="summary-card">
+      <p class="summary-card__label">Pendências abertas</p>
+      <strong class="summary-card__value">{{ monthOpenCount }}</strong>
+      <p class="muted">Próximos 7 dias: {{ upcomingDueCount }}</p>
+    </article>
+  </section>
+
+  <div class="calendar-layout">
+    <section class="calendar-grid-wrap">
+      <div class="weekdays">
+        <span *ngFor="let day of weekdays">{{ day }}</span>
+      </div>
+
+      <div class="calendar-grid">
+        <button
+          type="button"
+          class="day-cell"
+          *ngFor="let cell of monthCells; trackBy: trackCell"
+          [ngClass]="{
+            'day-cell--outside': !cell.inMonth,
+            'day-cell--today': cell.isToday,
+            'day-cell--selected': cell.isSelected
+          }"
+          (click)="selectDate(cell.date)">
+          <span class="day-number">{{ cell.date.getDate() }}</span>
+          <div class="day-dots">
+            <span class="dot dot--expense" *ngIf="hasTypeInDay(cell, 'expense')"></span>
+            <span class="dot dot--income" *ngIf="hasTypeInDay(cell, 'income')"></span>
+            <span class="dot dot--card" *ngIf="hasTypeInDay(cell, 'card-due')"></span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <aside class="day-panel">
+      <h2>Compromissos do dia</h2>
+      <p class="muted">{{ selectedDateLabel }}</p>
+
+      <div class="day-events" *ngIf="visibleEvents.length; else emptyState">
+        <article class="event-card" *ngFor="let event of visibleEvents; trackBy: trackEvent">
+          <div class="event-card__top">
+            <span [class]="badgeClass(event.type)">{{ eventTypeLabel(event.type) }}</span>
+            <strong *ngIf="event.amount">{{ formatCurrency(event.amount) }}</strong>
+          </div>
+          <h3>{{ event.title }}</h3>
+          <p class="muted" *ngIf="event.meta">{{ event.meta }}</p>
+          <p class="muted" *ngIf="event.status">Status: {{ statusLabel(event.status) }}</p>
+          <button
+            *ngIf="canMarkAsPaid(event)"
+            type="button"
+            class="event-action"
+            [disabled]="isPaymentPending(event)"
+            (click)="markAsPaid(event)">
+            {{ isPaymentPending(event) ? 'Processando...' : 'Marcar como pago' }}
+          </button>
+        </article>
+      </div>
+
+      <ng-template #emptyState>
+        <div class="empty">
+          Nenhum compromisso para esse dia com os filtros atuais.
+        </div>
+      </ng-template>
+    </aside>
+  </div>
+</section>

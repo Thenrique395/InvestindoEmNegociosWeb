@@ -52,6 +52,9 @@ jobs:
             set -euo pipefail
             mkdir -p /home/ubuntu/InvestindoEmNegociosWeb
             cd /home/ubuntu/InvestindoEmNegociosWeb
-            docker login ghcr.io -u ${{ secrets.GHCR_USER }} -p ${{ secrets.GHCR_TOKEN }}
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
             docker compose pull
-            docker compose up -d --no-build
+            # limpa conflitos de nome e containers órfãos de execuções anteriores
+            docker rm -f investindoemnegociosweb-frontend-1 >/dev/null 2>&1 || true
+            docker compose down --remove-orphans || true
+            docker compose up -d --no-build --force-recreate --remove-orphans

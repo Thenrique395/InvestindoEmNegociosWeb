@@ -111,6 +111,26 @@
             <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Receitas</span>
           </a>
           <a
+            routerLink="/calendario"
+            routerLinkActive="active"
+            #calActive="routerLinkActive"
+            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            *ngIf="hasAccess('Basic')"
+            (click)="reloadIfSame('/calendario', $event)"
+            [ngClass]="calActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
+          >
+            <span
+              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              [ngClass]="calActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]' : ''"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Calendário</span>
+          </a>
+          <a
             routerLink="/cartoes"
             routerLinkActive="active"
             #cartActive="routerLinkActive"

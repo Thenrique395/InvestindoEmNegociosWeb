@@ -281,6 +281,20 @@ export class ApiDataService {
     );
   }
 
+  markExpensePaid(installmentId: string, amount: number) {
+    return this.installments.pay(installmentId, {
+      paidAmount: amount,
+      paidAt: new Date().toISOString(),
+      methodId: null,
+      note: null
+    }).pipe(
+      tap(() => {
+        this.setExpenseStatusLocal(installmentId, 'PAID');
+        this.refresh();
+      })
+    );
+  }
+
   refresh(force = false): void {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
@@ -418,6 +432,15 @@ export class ApiDataService {
       income.id === installmentId ? { ...income, status } : income
     );
     this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
+  }
+
+  setExpenseStatusLocal(installmentId: string, status: InstallmentStatus): void {
+    const current = this.dbSubject.value;
+    if (!current.expenses.length) return;
+    const expenses = current.expenses.map((expense) =>
+      expense.id === installmentId ? { ...expense, status } : expense
+    );
+    this.dbSubject.next({ incomes: current.incomes, expenses, cards: current.cards });
   }
 
   private mapIncomes(plans: Plan[], installments: Installment[], categoryMap?: Map<string, string>): StoredIncome[] {
