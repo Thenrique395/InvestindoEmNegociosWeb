@@ -31,6 +31,18 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
+
+    // Remove o token da barra de endereço após ler o valor, reduzindo exposição em histórico/referer.
+    if (this.token) {
+      const queryParams = { ...this.route.snapshot.queryParams };
+      delete queryParams['token'];
+
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams,
+        replaceUrl: true
+      });
+    }
   }
 
   get hasToken(): boolean {
