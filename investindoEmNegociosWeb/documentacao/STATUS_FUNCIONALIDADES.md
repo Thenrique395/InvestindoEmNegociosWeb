@@ -11,6 +11,7 @@
 
 ### 1.1 Cadastro e Autenticação
 
+
 | Funcionalidade | Status | Evidência atual | Observação |
 |---|---|---|---|
 | Cadastro com email e senha | ✅ | `POST /api/v1/auth/register` | Fluxo ativo no backend e tela de cadastro no frontend. |
