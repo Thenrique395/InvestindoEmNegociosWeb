@@ -267,12 +267,13 @@ export class ApiDataService {
     });
   }
 
-  markIncomeReceived(installmentId: string, amount: number) {
+  markIncomeReceived(installmentId: string, amount: number, accountId?: string | null) {
     return this.installments.pay(installmentId, {
       paidAmount: amount,
       paidAt: new Date().toISOString(),
       methodId: null,
-      note: null
+      note: null,
+      accountId: accountId || null
     }).pipe(
       tap(() => {
         this.setIncomeStatusLocal(installmentId, 'PAID');
@@ -281,12 +282,13 @@ export class ApiDataService {
     );
   }
 
-  markExpensePaid(installmentId: string, amount: number) {
+  markExpensePaid(installmentId: string, amount: number, accountId?: string | null) {
     return this.installments.pay(installmentId, {
       paidAmount: amount,
       paidAt: new Date().toISOString(),
       methodId: null,
-      note: null
+      note: null,
+      accountId: accountId || null
     }).pipe(
       tap(() => {
         this.setExpenseStatusLocal(installmentId, 'PAID');

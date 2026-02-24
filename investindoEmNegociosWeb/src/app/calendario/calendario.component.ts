@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
 import { formatCurrencyValue, formatLocaleDate, formatMonthYearLabel, parseLocaleDate } from '../utils/locale-utils';
 import { InstallmentStatus } from '../types/money-types';
+import { AccountsService } from '../accounts.service';
 
 type CalendarEventType = 'expense' | 'income' | 'card-due';
 
@@ -53,12 +54,14 @@ export class CalendarioComponent implements OnInit, OnDestroy {
   selectedCategory = 'all';
   selectedStatus = 'all';
   pendingPaymentIds = new Set<string>();
+  defaultAccountId: string | null = null;
 
   weekdays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
 
-  constructor(private dataService: ApiDataService) {}
+  constructor(private dataService: ApiDataService, private accountsService: AccountsService) {}
 
   ngOnInit(): void {
+    this.defaultAccountId = this.accountsService.getDefaultAccountId();
     this.expensesSub = this.dataService.expenses$.subscribe((items) => {
       this.expenses = items || [];
       this.rebuildEvents();
@@ -257,14 +260,14 @@ export class CalendarioComponent implements OnInit, OnDestroy {
     };
 
     if (event.type === 'expense') {
-      this.dataService.markExpensePaid(event.installmentId, amount).subscribe({
+      this.dataService.markExpensePaid(event.installmentId, amount, this.defaultAccountId).subscribe({
         next: () => onComplete(),
         error: () => onComplete()
       });
       return;
     }
 
-    this.dataService.markIncomeReceived(event.installmentId, amount).subscribe({
+    this.dataService.markIncomeReceived(event.installmentId, amount, this.defaultAccountId).subscribe({
       next: () => onComplete(),
       error: () => onComplete()
     });

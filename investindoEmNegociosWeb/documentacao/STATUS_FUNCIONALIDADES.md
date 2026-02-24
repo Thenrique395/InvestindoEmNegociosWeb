@@ -161,7 +161,7 @@
 | Item | Tema | Status | Observação resumida |
 |---|---|---|---|
 | 2.1 | CarryOverDay | ❌ | Não há configuração de competência mensal por dia de corte. |
-| 2.2 | Competência de cartão por closing day | ⚠️ | Campos de fechamento/vencimento existem, mas não há engine formal completa de competência desacoplada da conta. |
+| 2.2 | Competência de cartão por closing day | ⚠️ | Implementação técnica realizada no backend e em validação funcional; marcar como concluído apenas após confirmação final. |
 | 3.1 | Gestão de contas (corrente/poupança/digital/carteira) | ❌ | Não existe entidade de conta bancária/carteira no domínio atual. |
 | 3.2 | Saldo atual por transações | ⚠️ | Controle financeiro existe por planos/parcelas/pagamentos, sem módulo completo de saldo de conta. |
 | 4.1 | Cadastro de cartão (limite/fechamento/vencimento) | ✅ | Implementado em `cards`. |

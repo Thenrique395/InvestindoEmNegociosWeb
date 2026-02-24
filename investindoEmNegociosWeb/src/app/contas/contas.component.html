@@ -1,0 +1,137 @@
+<section class="grid gap-4">
+  <header class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+    <h1 class="text-xl font-semibold text-[var(--text)]">Contas</h1>
+    <p class="text-sm text-[var(--text-muted)]">Cadastre contas e acompanhe saldo atual por movimentações.</p>
+  </header>
+
+  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+    <h2 class="mb-3 text-lg font-semibold text-[var(--text)]">{{ editingId ? 'Editar conta' : 'Nova conta' }}</h2>
+
+    <div class="grid gap-3 md:grid-cols-4">
+      <label class="grid gap-1 text-sm text-[var(--text)]">
+        Nome
+        <input
+          type="text"
+          [(ngModel)]="form.name"
+          class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm"
+          placeholder="Ex.: Nubank" />
+      </label>
+
+      <label class="grid gap-1 text-sm text-[var(--text)]">
+        Tipo
+        <select [(ngModel)]="form.type" class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm">
+          <option *ngFor="let t of accountTypes" [value]="t">{{ accountTypeLabel(t) }}</option>
+        </select>
+      </label>
+
+      <label class="grid gap-1 text-sm text-[var(--text)]">
+        Saldo inicial
+        <input
+          type="number"
+          step="0.01"
+          [(ngModel)]="form.initialBalance"
+          class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm" />
+      </label>
+
+      <label class="mt-6 inline-flex items-center gap-2 text-sm text-[var(--text)]">
+        <input type="checkbox" [(ngModel)]="form.isActive" />
+        Conta ativa
+      </label>
+    </div>
+
+    <div class="mt-4 flex flex-wrap gap-2">
+      <button type="button" class="btn-primary sm" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Salvando...' : (editingId ? 'Atualizar conta' : 'Criar conta') }}
+      </button>
+      <button type="button" class="btn-ghost sm" (click)="startCreate()">Limpar</button>
+    </div>
+
+    <p *ngIf="error" class="mt-3 text-sm text-[var(--danger)]">{{ error }}</p>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-[var(--text)]">Minhas contas</h2>
+      <button type="button" class="btn-ghost sm" (click)="loadAccounts()">Atualizar</button>
+    </div>
+
+    <p *ngIf="loading" class="text-sm text-[var(--text-muted)]">Carregando contas...</p>
+    <p *ngIf="!loading && !hasAccounts" class="text-sm text-[var(--text-muted)]">Nenhuma conta cadastrada.</p>
+
+    <div class="grid gap-3 md:grid-cols-2" *ngIf="!loading && hasAccounts">
+      <article
+        *ngFor="let account of accounts"
+        class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h3 class="text-base font-semibold text-[var(--text)]">{{ account.name }}</h3>
+            <p class="text-xs text-[var(--text-muted)]">{{ accountTypeLabel(account.type) }}</p>
+          </div>
+          <span class="rounded-full px-2 py-1 text-xs font-semibold" [ngClass]="account.isActive ? 'bg-[rgba(34,197,94,0.16)] text-[var(--success)]' : 'bg-[rgba(239,68,68,0.12)] text-[var(--danger)]'">
+            {{ account.isActive ? 'Ativa' : 'Inativa' }}
+          </span>
+        </div>
+
+        <div class="mt-3 grid gap-1 text-sm text-[var(--text)]">
+          <p>Saldo inicial: <strong>R$ {{ account.initialBalance | number:'1.2-2' }}</strong></p>
+          <p>Saldo atual: <strong>R$ {{ account.currentBalance | number:'1.2-2' }}</strong></p>
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button type="button" class="btn-ghost sm" (click)="selectAccount(account.id)">Ver extrato</button>
+          <button type="button" class="btn-ghost sm" (click)="startEdit(account)">Editar</button>
+          <button type="button" class="btn-danger sm" (click)="remove(account)">Remover</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]" *ngIf="selectedAccount">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <h2 class="text-lg font-semibold text-[var(--text)]">Extrato: {{ selectedAccount.name }}</h2>
+      <div class="flex flex-wrap items-end gap-2">
+        <label class="grid gap-1 text-xs text-[var(--text-muted)]">
+          De
+          <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
+        </label>
+        <label class="grid gap-1 text-xs text-[var(--text-muted)]">
+          Até
+          <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
+        </label>
+        <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
+      </div>
+    </div>
+
+    <p *ngIf="loadingTransactions" class="text-sm text-[var(--text-muted)]">Carregando extrato...</p>
+    <p *ngIf="!loadingTransactions && !transactions.length" class="text-sm text-[var(--text-muted)]">Nenhuma movimentação para o período.</p>
+
+    <div class="overflow-x-auto" *ngIf="!loadingTransactions && transactions.length">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+            <th class="py-2 pr-4">Data</th>
+            <th class="py-2 pr-4">Tipo</th>
+            <th class="py-2 pr-4">Descrição</th>
+            <th class="py-2 pr-4">Origem</th>
+            <th class="py-2 text-right">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of transactions" class="border-b border-[var(--border)]/60 text-[var(--text)]">
+            <td class="py-2 pr-4">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="py-2 pr-4">
+              <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
+              </span>
+            </td>
+            <td class="py-2 pr-4">{{ tx.description }}</td>
+            <td class="py-2 pr-4">{{ tx.sourceType || '-' }}</td>
+            <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

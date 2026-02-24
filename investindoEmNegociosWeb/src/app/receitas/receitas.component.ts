@@ -12,6 +12,7 @@ import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { AccountsService, AccountResponse } from '../accounts.service';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -54,6 +55,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   editReceivedSource = '';
   selectedIds = new Set<string>();
   loadingRecebido = false;
+  contas: AccountResponse[] = [];
+  contaBaixaId: string | null = null;
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
@@ -65,7 +68,8 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     private db: ApiDataService,
     private authService: AuthService,
     private categoriesService: CategoriesService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private accountsService: AccountsService
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +81,18 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     });
     this.summarySub = this.db.incomeSummary$.subscribe((summary) => {
       this.summary = summary;
+    });
+
+    this.accountsService.list().subscribe({
+      next: (items) => {
+        this.contas = (items || []).filter((c) => c.isActive);
+        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
+      },
+      error: () => {
+        this.contas = [];
+        this.contaBaixaId = null;
+        this.accountsService.setDefaultAccountId(null);
+      }
     });
   }
 
@@ -378,7 +394,12 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       this.setAlerta('Nenhuma receita selecionada para marcar como recebida.', 2000);
       return;
     }
-    const pedidos = selecionadas.map((r) => this.db.markIncomeReceived(r.id, r.valor));
+    if (!this.contaBaixaId) {
+      this.setAlerta('Selecione uma conta ativa para registrar os recebimentos.', 3000, 'error');
+      return;
+    }
+    this.accountsService.setDefaultAccountId(this.contaBaixaId);
+    const pedidos = selecionadas.map((r) => this.db.markIncomeReceived(r.id, r.valor, this.contaBaixaId));
     this.loadingRecebido = true;
     forkJoin(pedidos)
       .pipe(finalize(() => (this.loadingRecebido = false)))

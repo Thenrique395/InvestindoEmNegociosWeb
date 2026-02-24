@@ -19,6 +19,7 @@ export interface PaymentPayload {
   paidAt: string; // ISO datetime
   methodId?: number | null;
   note?: string | null;
+  accountId?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

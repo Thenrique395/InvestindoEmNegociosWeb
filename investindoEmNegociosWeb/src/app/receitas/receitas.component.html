@@ -161,7 +161,19 @@
   </div>
 
   <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-[12px] text-[var(--text-muted)]" *ngIf="selecionados.length">
-    <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
+    <div class="flex flex-wrap items-center gap-3">
+      <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
+      <label class="inline-flex items-center gap-2 text-[12px] text-[var(--text-muted)]">
+        <span>Conta de entrada</span>
+        <select
+          class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-[12px] text-[var(--text)]"
+          [(ngModel)]="contaBaixaId">
+          <option *ngFor="let conta of contas; trackBy: trackByIndex" [ngValue]="conta.id">
+            {{ conta.name }}
+          </option>
+        </select>
+      </label>
+    </div>
     <button
       type="button"
       class="btn-primary sm"

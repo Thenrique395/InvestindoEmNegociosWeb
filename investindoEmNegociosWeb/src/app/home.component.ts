@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
+import { AccountsService, AccountResponse } from './accounts.service';
 
 @Component({
   selector: 'app-home',
@@ -21,6 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subIncomes?: Subscription;
   private subCards?: Subscription;
   private subGoals?: Subscription;
+  private subAccounts?: Subscription;
   private expensesLoaded = false;
   private incomesLoaded = false;
 
@@ -33,6 +35,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   periodo: 'month' | 'quarter' | 'year' = 'month';
   cards: StoredCard[] = [];
   totalDividaCartoes = 0;
+  accountBalances: AccountResponse[] = [];
   expenseCategorySlices: { label: string; total: number; percent: number; color: string }[] = [];
   expenseCategoryTotal = 0;
   expenseCategoryChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
@@ -113,7 +116,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private db: ApiDataService,
     private goalsService: GoalsService,
     private cardsService: CardsService,
-    private onboardingService: OnboardingService
+    private onboardingService: OnboardingService,
+    private accountsService: AccountsService
   ) {}
 
   ngOnInit(): void {
@@ -156,6 +160,17 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.cards = lista;
     });
     if (this.isLogged) {
+      this.subAccounts = this.accountsService.list().subscribe({
+        next: (accounts) => {
+          this.accountBalances = (accounts || []).filter((a) => a.isActive);
+          this.accountsService.resolveDefaultAccountId(this.accountBalances);
+        },
+        error: () => {
+          this.accountBalances = [];
+        }
+      });
+    }
+    if (this.isLogged) {
       this.subGoals = this.goalsService.list(this.dataAtual.getFullYear()).subscribe({
         next: (goals) => this.atualizarMetas(goals),
         error: (err) => console.error('Falha ao carregar metas', err)
@@ -168,6 +183,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subIncomes?.unsubscribe();
     this.subCards?.unsubscribe();
     this.subGoals?.unsubscribe();
+    this.subAccounts?.unsubscribe();
   }
 
   get mesAtualLabel(): string {
@@ -216,6 +232,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get cardsCount(): number {
     return this.cards.length;
+  }
+
+  get totalSaldoContas(): number {
+    return this.accountBalances.reduce((sum, item) => sum + (item.currentBalance || 0), 0);
   }
 
   private atualizarDividaCartoes(): void {
@@ -489,7 +509,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private get storage(): Storage | null {
-    return typeof localStorage !== 'undefined' ? localStorage : null;
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+      ? window.localStorage
+      : null;
   }
 
   private atualizarMetas(goals: Goal[]): void {

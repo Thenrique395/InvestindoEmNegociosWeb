@@ -173,7 +173,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private get storage(): Storage | null {
-    return typeof localStorage !== 'undefined' ? localStorage : null;
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+      ? window.localStorage
+      : null;
   }
 
   private getCurrentPath(): string {

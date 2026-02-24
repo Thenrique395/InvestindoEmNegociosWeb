@@ -56,6 +56,12 @@ export const routes: Routes = [
     loadComponent: () => import('./cartoes/cartoes.component').then((m) => m.CartoesComponent)
   },
   {
+    path: 'contas',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: false },
+    loadComponent: () => import('./contas/contas.component').then((m) => m.ContasComponent)
+  },
+  {
     path: 'receitas',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },

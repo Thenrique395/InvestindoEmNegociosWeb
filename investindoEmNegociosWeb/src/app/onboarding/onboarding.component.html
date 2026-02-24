@@ -104,30 +104,54 @@
     </div>
 
     <div *ngIf="step === 2" class="grid gap-4">
-      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Pronto para comecar</p>
-      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Dashboard preparado</h2>
+      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Configuração obrigatória</p>
+      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Crie sua primeira conta</h2>
       <p class="text-[var(--text-muted)]">
-        Seu ambiente esta configurado. Vamos para o painel e comece a registrar seus movimentos.
+        Para registrar receitas e despesas com saldo real, você precisa de ao menos uma conta ativa.
       </p>
 
-      <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
-        <div>
-          <h5 class="m-0 text-[var(--text-sm)] font-semibold text-[var(--text)]">Proximo passo</h5>
-          <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">
-            {{ focus === 'receitas' ? 'Cadastre suas receitas' : focus === 'despesas' ? 'Registre suas despesas' : 'Crie sua meta anual' }}.
-          </p>
-        </div>
-        <div>
-          <h5 class="m-0 text-[var(--text-sm)] font-semibold text-[var(--text)]">O que voce ganha</h5>
-          <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">Alertas inteligentes, metas claras e controle do saldo em tempo real.</p>
-        </div>
+      <div *ngIf="!accountReady" class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] sm:grid-cols-3">
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Nome da conta</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text"
+            [(ngModel)]="accountForm.name"
+            placeholder="Ex.: Nubank" />
+        </label>
+
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Tipo</span>
+          <select
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            [(ngModel)]="accountForm.type">
+            <option *ngFor="let t of accountTypes; trackBy: trackByIndex" [value]="t">{{ accountTypeLabel(t) }}</option>
+          </select>
+        </label>
+
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Saldo inicial</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="number"
+            step="0.01"
+            [(ngModel)]="accountForm.initialBalance" />
+        </label>
+      </div>
+
+      <div *ngIf="accountReady" class="rounded-[12px] border border-emerald-400/40 bg-emerald-500/10 p-[var(--space-2)] text-[var(--text)]">
+        Conta ativa configurada. Você já pode concluir o onboarding.
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-3">
         <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
-        <button class="btn-primary" type="button" (click)="finishOnboarding()">Ir para o dashboard</button>
+        <div class="flex gap-2">
+          <button class="ghost" type="button" *ngIf="!accountReady" [disabled]="creatingAccount" (click)="createAccount()">
+            {{ creatingAccount ? 'Criando conta...' : 'Criar conta' }}
+          </button>
+          <button class="btn-primary" type="button" [disabled]="!accountReady" (click)="finishOnboarding()">Ir para o dashboard</button>
+        </div>
       </div>
-      <button class="text-[var(--primary)]" type="button" (click)="skipOnboarding()">Fazer depois</button>
     </div>
   </div>
 </div>

@@ -248,8 +248,8 @@ export class AuthService {
   }
 
   private getSafeStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null {
-    if (typeof localStorage === 'undefined') return null;
-    const storage = localStorage as Partial<Storage>;
+    if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return null;
+    const storage = window.localStorage as Partial<Storage>;
     if (
       typeof storage.getItem !== 'function' ||
       typeof storage.setItem !== 'function' ||

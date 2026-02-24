@@ -9,6 +9,7 @@ import { DespesasFormComponent } from './despesas-form.component';
 import { InstallmentsService } from '../installments.service';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService, CategoryDto } from '../categories.service';
+import { AccountsService, AccountResponse } from '../accounts.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -47,6 +48,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
   private categoriaMap = new Map<string, string>();
   private expensesCache: StoredExpense[] = [];
   cartoes: StoredCard[] = [];
+  contas: AccountResponse[] = [];
+  contaBaixaId: string | null = null;
   despesasPorMes: Record<string, StoredExpense[]> = {};
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
@@ -85,6 +88,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     private db: ApiDataService,
     private installments: InstallmentsService,
     private categoriesService: CategoriesService,
+    private accountsService: AccountsService,
     private uiFeedback: UiFeedbackService
   ) {}
 
@@ -123,6 +127,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
       }
       if (!this.cartoes.length) {
         this.cartaoSelecionadoId = null;
+      }
+    });
+
+    this.accountsService.list().subscribe({
+      next: (items) => {
+        this.contas = (items || []).filter((c) => c.isActive);
+        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
+      },
+      error: () => {
+        this.contas = [];
+        this.contaBaixaId = null;
+        this.accountsService.setDefaultAccountId(null);
       }
     });
   }
@@ -326,6 +342,10 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   pagarDespesaPorId(id: string): void {
+    if (!this.contaBaixaId) {
+      this.setAlerta('Selecione uma conta ativa para registrar o pagamento.', 3000, 'error');
+      return;
+    }
     const lista = this.despesasPorMes[this.mesKey()] || [];
     const item = lista.find((d) => d.id === id);
     if (!item) return;
@@ -333,9 +353,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
       paidAmount: item.valor,
       paidAt: new Date().toISOString(),
       methodId: null,
-      note: null
+      note: null,
+      accountId: this.contaBaixaId
     };
     this.loadingPagar = true;
+    this.accountsService.setDefaultAccountId(this.contaBaixaId);
     this.installments
       .pay(id, payload)
       .pipe(finalize(() => (this.loadingPagar = false)))
@@ -357,17 +379,23 @@ export class DespesasComponent implements OnInit, OnDestroy {
       this.setAlerta('Nenhuma despesa selecionada para pagar.', 2000);
       return;
     }
+    if (!this.contaBaixaId) {
+      this.setAlerta('Selecione uma conta ativa para registrar os pagamentos.', 3000, 'error');
+      return;
+    }
 
     const pedidos = pagaveis.map((item) =>
       this.installments.pay(item.id, {
         paidAmount: item.valor,
         paidAt: new Date().toISOString(),
         methodId: null,
-        note: null
+        note: null,
+        accountId: this.contaBaixaId
       })
     );
 
     this.loadingPagar = true;
+    this.accountsService.setDefaultAccountId(this.contaBaixaId);
     forkJoin(pedidos)
       .pipe(finalize(() => (this.loadingPagar = false)))
       .subscribe({
