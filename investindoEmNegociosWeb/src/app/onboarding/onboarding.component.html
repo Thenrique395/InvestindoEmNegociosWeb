@@ -15,7 +15,23 @@
     <div *ngIf="step === 0">
       <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Primeiro acesso</p>
       <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Complete seus dados</h2>
-      <p class="mt-2 text-[var(--text-muted)]">Usamos essas informações para personalizar sua experiência e manter sua conta segura.</p>
+      <p class="mt-2 text-[var(--text-muted)]">Passo 1 de 3: dados básicos e seu objetivo inicial no app.</p>
+
+      <div class="mt-4 grid gap-3">
+        <p class="m-0 text-sm font-semibold text-[var(--text)]">Qual seu objetivo principal agora?</p>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+          <button
+            type="button"
+            class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-left text-[var(--text)] transition hover:border-[rgba(37,99,235,0.45)]"
+            *ngFor="let item of focusOptions; trackBy: trackByIndex"
+            [ngClass]="focus === item.id ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)]' : ''"
+            (click)="selectFocus(item.id)"
+          >
+            <h4 class="m-0 text-[var(--text-lg)] font-semibold">{{ item.title }}</h4>
+            <p class="mt-2 text-[var(--text-sm)] text-[var(--text-muted)]">{{ item.description }}</p>
+          </button>
+        </div>
+      </div>
 
       <form class="mt-4 grid gap-4 sm:grid-cols-2" [formGroup]="form" (ngSubmit)="submit()">
         <label class="sm:col-span-2 grid gap-2 font-semibold text-[var(--text)]">
@@ -72,7 +88,7 @@
 
         <div class="sm:col-span-2">
           <button class="btn-primary w-full" type="submit" [disabled]="loading">
-            {{ loading ? 'Salvando...' : 'Salvar e continuar' }}
+            {{ loading ? 'Salvando...' : 'Salvar e continuar para conta' }}
           </button>
         </div>
 
@@ -80,34 +96,10 @@
     </div>
 
     <div *ngIf="step === 1" class="grid gap-4">
-      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Seu foco inicial</p>
-      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Onde voce quer comecar?</h2>
-      <p class="text-[var(--text-muted)]">Escolha o que deseja organizar primeiro. Voce pode mudar depois.</p>
-
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
-        <button
-          type="button"
-          class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-left text-[var(--text)] transition hover:border-[rgba(37,99,235,0.45)]"
-          *ngFor="let item of focusOptions; trackBy: trackByIndex"
-          [ngClass]="focus === item.id ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.12)]' : ''"
-          (click)="selectFocus(item.id)"
-        >
-          <h4 class="m-0 text-[var(--text-lg)] font-semibold">{{ item.title }}</h4>
-          <p class="mt-2 text-[var(--text-sm)] text-[var(--text-muted)]">{{ item.description }}</p>
-        </button>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
-        <button class="btn-primary" type="button" (click)="continueFromFocus()">Continuar</button>
-      </div>
-    </div>
-
-    <div *ngIf="step === 2" class="grid gap-4">
       <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Configuração obrigatória</p>
       <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Crie sua primeira conta</h2>
       <p class="text-[var(--text-muted)]">
-        Para registrar receitas e despesas com saldo real, você precisa de ao menos uma conta ativa.
+        Passo 2 de 3: para registrar movimentações com saldo real, você precisa de ao menos uma conta ativa.
       </p>
 
       <div *ngIf="!accountReady" class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] sm:grid-cols-3">
@@ -149,8 +141,88 @@
           <button class="ghost" type="button" *ngIf="!accountReady" [disabled]="creatingAccount" (click)="createAccount()">
             {{ creatingAccount ? 'Criando conta...' : 'Criar conta' }}
           </button>
-          <button class="btn-primary" type="button" [disabled]="!accountReady" (click)="finishOnboarding()">Ir para o dashboard</button>
+          <button class="btn-primary" type="button" [disabled]="!accountReady" (click)="nextStep()">Continuar para receita e despesa</button>
         </div>
+      </div>
+    </div>
+
+    <div *ngIf="step === 2" class="grid gap-4">
+      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Movimentações iniciais</p>
+      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Cadastre sua primeira receita e despesa</h2>
+      <p class="text-[var(--text-muted)]">
+        Passo 3 de 3: isso já deixa seu dashboard com dados reais para começar.
+      </p>
+
+      <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] sm:grid-cols-3">
+        <h3 class="sm:col-span-3 m-0 text-base font-semibold text-[var(--text)]">Receita inicial</h3>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Fonte</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text"
+            [(ngModel)]="initialIncome.source"
+            placeholder="Ex.: Salário" />
+        </label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Valor</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="number"
+            step="0.01"
+            [(ngModel)]="initialIncome.amount" />
+        </label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Data</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="date"
+            [(ngModel)]="initialIncome.receivedOn" />
+        </label>
+      </div>
+
+      <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] sm:grid-cols-3">
+        <h3 class="sm:col-span-3 m-0 text-base font-semibold text-[var(--text)]">Despesa inicial</h3>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Nome</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="text"
+            [(ngModel)]="initialExpense.name"
+            placeholder="Ex.: Aluguel" />
+        </label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Valor</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="number"
+            step="0.01"
+            [(ngModel)]="initialExpense.amount" />
+        </label>
+        <label class="grid gap-2 font-semibold text-[var(--text)]">
+          <span>Data</span>
+          <input
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            type="date"
+            [(ngModel)]="initialExpense.dueDate" />
+        </label>
+        <label class="sm:col-span-3 grid gap-2 font-semibold text-[var(--text)]">
+          <span>Categoria da despesa (opcional)</span>
+          <select
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            [(ngModel)]="initialExpense.categoryId">
+            <option [ngValue]="null">Sem categoria</option>
+            <option *ngFor="let category of expenseCategories; trackBy: trackByIndex" [ngValue]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </label>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <button class="ghost" type="button" (click)="prevStep()">Voltar</button>
+        <button class="btn-primary" type="button" [disabled]="savingEntries" (click)="saveInitialEntriesAndFinish()">
+          {{ savingEntries ? 'Salvando...' : 'Concluir onboarding' }}
+        </button>
       </div>
     </div>
   </div>

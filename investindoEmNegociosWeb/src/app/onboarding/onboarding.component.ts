@@ -2,11 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
 import { FocusArea } from './onboarding.types';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
+import { CreatePlanPayload, PlansService } from '../plans.service';
+import { CategoriesService, CategoryDto } from '../categories.service';
 
 @Component({
   selector: 'app-onboarding',
@@ -19,6 +22,7 @@ export class OnboardingComponent implements OnInit {
   form: FormGroup;
   loading = false;
   creatingAccount = false;
+  savingEntries = false;
   step = 0;
   focus: FocusArea | null = null;
   focusOptions: { id: FocusArea; title: string; description: string }[] = [
@@ -46,6 +50,18 @@ export class OnboardingComponent implements OnInit {
     isActive: true
   };
   accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
+  expenseCategories: CategoryDto[] = [];
+  initialIncome = {
+    source: '',
+    amount: 0,
+    receivedOn: this.todayIso()
+  };
+  initialExpense = {
+    name: '',
+    amount: 0,
+    dueDate: this.todayIso(),
+    categoryId: null as string | null
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -53,7 +69,9 @@ export class OnboardingComponent implements OnInit {
     private router: Router,
     private onboarding: OnboardingService,
     private uiFeedback: UiFeedbackService,
-    private accountsService: AccountsService
+    private accountsService: AccountsService,
+    private plansService: PlansService,
+    private categoriesService: CategoriesService
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -113,10 +131,24 @@ export class OnboardingComponent implements OnInit {
         this.accountReady = false;
       }
     });
+
+    this.categoriesService.list('Expense').subscribe({
+      next: (categories) => {
+        this.expenseCategories = categories || [];
+      },
+      error: () => {
+        this.expenseCategories = [];
+      }
+    });
   }
 
   submit(): void {
     if (this.loading) return;
+
+    if (!this.focus) {
+      this.uiFeedback.warning('Selecione seu objetivo inicial.');
+      return;
+    }
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -129,7 +161,7 @@ export class OnboardingComponent implements OnInit {
     this.profile.upsert(payload).subscribe({
       next: () => {
         this.loading = false;
-        this.uiFeedback.success('Dados salvos! Vamos para o proximo passo.');
+        this.uiFeedback.success('Dados e objetivo salvos. Vamos para o próximo passo.');
         this.nextStep();
       },
       error: (err) => {
@@ -170,7 +202,7 @@ export class OnboardingComponent implements OnInit {
   finishOnboarding(): void {
     if (!this.accountReady) {
       this.uiFeedback.warning('Crie uma conta para concluir o cadastro.');
-      this.step = 2;
+      this.step = 1;
       return;
     }
     this.persistStep(true);
@@ -179,7 +211,7 @@ export class OnboardingComponent implements OnInit {
 
   skipOnboarding(): void {
     this.uiFeedback.warning('Para concluir, crie ao menos uma conta.');
-    this.step = 2;
+    this.step = 1;
   }
 
   createAccount(): void {
@@ -200,11 +232,73 @@ export class OnboardingComponent implements OnInit {
         this.creatingAccount = false;
         this.accountReady = true;
         this.accountsService.setDefaultAccountId(account.id);
-        this.uiFeedback.success('Conta criada com sucesso.');
+        this.uiFeedback.success('Conta criada com sucesso. Próximo: cadastrar primeira receita e despesa.');
       },
       error: (err) => {
         this.creatingAccount = false;
         this.uiFeedback.error(err?.error?.detail || 'Falha ao criar conta.');
+      }
+    });
+  }
+
+  saveInitialEntriesAndFinish(): void {
+    if (!this.accountReady) {
+      this.uiFeedback.warning('Crie uma conta antes de cadastrar receita e despesa.');
+      this.step = 1;
+      return;
+    }
+
+    const incomeSource = this.initialIncome.source.trim();
+    const incomeAmount = Number(this.initialIncome.amount);
+    const expenseName = this.initialExpense.name.trim();
+    const expenseAmount = Number(this.initialExpense.amount);
+
+    if (!incomeSource || incomeAmount <= 0) {
+      this.uiFeedback.warning('Preencha uma receita válida.');
+      return;
+    }
+    if (!expenseName || expenseAmount <= 0) {
+      this.uiFeedback.warning('Preencha uma despesa válida.');
+      return;
+    }
+
+    const incomePayload: CreatePlanPayload = {
+      type: 'Income',
+      title: incomeSource,
+      amount: incomeAmount,
+      schedule: 'OneTime',
+      startDate: this.initialIncome.receivedOn || this.todayIso(),
+      frequency: null,
+      installmentsCount: 1,
+      categoryId: null,
+      cardId: null
+    };
+
+    const expensePayload: CreatePlanPayload = {
+      type: 'Expense',
+      title: expenseName,
+      amount: expenseAmount,
+      schedule: 'OneTime',
+      startDate: this.initialExpense.dueDate || this.todayIso(),
+      frequency: null,
+      installmentsCount: 1,
+      categoryId: this.initialExpense.categoryId,
+      cardId: null
+    };
+
+    this.savingEntries = true;
+    forkJoin([
+      this.plansService.create(incomePayload),
+      this.plansService.create(expensePayload)
+    ]).subscribe({
+      next: () => {
+        this.savingEntries = false;
+        this.uiFeedback.success('Receita e despesa iniciais cadastradas.');
+        this.finishOnboarding();
+      },
+      error: (err) => {
+        this.savingEntries = false;
+        this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar receita e despesa iniciais.');
       }
     });
   }
@@ -308,6 +402,10 @@ export class OnboardingComponent implements OnInit {
   }
   trackByIndex(index: number): number {
     return index;
+  }
+
+  private todayIso(): string {
+    return new Date().toISOString().slice(0, 10);
   }
 
 }
