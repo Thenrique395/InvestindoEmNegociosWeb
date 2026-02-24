@@ -344,6 +344,16 @@
               {{ statusLabel('PAID') }}
             </div>
             <div class="font-semibold text-[var(--text)]">R$ {{ h.valor | number:'1.2-2' }}</div>
+            <div>
+              <button
+                type="button"
+                class="btn-ghost sm"
+                [disabled]="isReversing(h.id)"
+                (click)="estornarDespesa(h)">
+                <span *ngIf="!isReversing(h.id)">Estornar pagamento</span>
+                <span *ngIf="isReversing(h.id)">Estornando...</span>
+              </button>
+            </div>
           </div>
         </div>
         <ng-template #semPagas><p class="text-sm text-[var(--text-muted)]">Nenhuma parcela paga.</p></ng-template>

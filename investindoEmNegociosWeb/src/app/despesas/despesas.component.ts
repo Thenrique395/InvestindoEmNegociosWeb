@@ -82,6 +82,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   historicoAberto = false;
   historicoTitulo = '';
   historicoItens: StoredExpense[] = [];
+  reversingIds = new Set<string>();
   mostrarImportFatura = false;
 
   novaDespesa: StoredExpense = this.criaDespesa();
@@ -350,6 +351,54 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.historicoAberto = false;
     this.historicoItens = [];
     this.historicoTitulo = '';
+    this.reversingIds.clear();
+  }
+
+  isReversing(installmentId: string): boolean {
+    return this.reversingIds.has(installmentId);
+  }
+
+  estornarDespesa(h: StoredExpense): void {
+    if (!h?.id || this.isReversing(h.id)) return;
+    if (h.status !== 'PAID' && h.status !== 'PARTIALLY_PAID') {
+      this.setAlerta('Somente parcelas pagas podem ser estornadas.', 2500, 'info');
+      return;
+    }
+
+    this.reversingIds.add(h.id);
+    this.installments.listPayments(h.id).subscribe({
+      next: (payments) => {
+        const target = [...(payments || [])]
+          .filter((p) => p.canReverse && p.paidAmount > 0)
+          .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
+
+        if (!target) {
+          this.reversingIds.delete(h.id);
+          this.setAlerta('Nenhum pagamento elegível para estorno nesta parcela.', 3000, 'info');
+          return;
+        }
+
+        this.installments
+          .reversePayment(h.id, target.id, {
+            reversedAt: new Date().toISOString(),
+            note: 'Estorno solicitado pela UI de despesas'
+          })
+          .pipe(finalize(() => this.reversingIds.delete(h.id)))
+          .subscribe({
+            next: () => {
+              this.db.refresh(true);
+              this.setAlerta('Pagamento estornado com sucesso.', 3000, 'success');
+            },
+            error: () => {
+              this.setAlerta('Falha ao estornar pagamento.', 3000, 'error');
+            }
+          });
+      },
+      error: () => {
+        this.reversingIds.delete(h.id);
+        this.setAlerta('Falha ao consultar pagamentos da parcela.', 3000, 'error');
+      }
+    });
   }
 
   pagarDespesaPorId(id: string): void {

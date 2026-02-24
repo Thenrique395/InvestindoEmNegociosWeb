@@ -22,6 +22,21 @@ export interface PaymentPayload {
   accountId?: string | null;
 }
 
+export interface InstallmentPayment {
+  id: string;
+  paidAt: string;
+  paidAmount: number;
+  methodId?: number | null;
+  note?: string | null;
+  isReversal: boolean;
+  canReverse: boolean;
+}
+
+export interface PaymentReversalPayload {
+  reversedAt?: string | null;
+  note?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class InstallmentsService {
   private readonly baseUrl = `${API_BASE_URL}/installments`;
@@ -40,6 +55,14 @@ export class InstallmentsService {
 
   pay(id: string, payload: PaymentPayload) {
     return this.http.post(`${this.baseUrl}/${id}/payments`, payload);
+  }
+
+  listPayments(id: string): Observable<InstallmentPayment[]> {
+    return this.http.get<InstallmentPayment[]>(`${this.baseUrl}/${id}/payments`);
+  }
+
+  reversePayment(id: string, paymentId: string, payload: PaymentReversalPayload = {}) {
+    return this.http.post(`${this.baseUrl}/${id}/payments/${paymentId}/reversals`, payload);
   }
 
   anticipate(id: string, payload: { dueDate: string; note?: string | null }) {

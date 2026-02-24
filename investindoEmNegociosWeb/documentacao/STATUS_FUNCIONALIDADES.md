@@ -154,6 +154,7 @@
 - 2026-02-24: monitor de robôs evoluído (filtros, detalhe de execução, execução segura/idempotente com cooldown, auditoria de disparo, alerta proativo por falhas consecutivas e rate limit admin).
 - 2026-02-24: UX do detalhe de execução no monitor de robôs refinada (modal com KPIs, contexto técnico e resultado, com melhor legibilidade em desktop/mobile).
 - 2026-02-24: saldo por transações evoluído com conta automática para Basic, bloqueio de gestão de contas no Basic, limpeza de ledger em exclusão de parcelas e script de backfill para histórico (`Infrastructure/Data/scripts/backfill_account_transactions_from_payments.sql`).
+- 2026-02-24: saldo por transações evoluído com estorno explícito de pagamento (`POST /installments/{id}/payments/{paymentId}/reversals`), regra mais rígida para seleção de conta em perfis não-Basic e playbook de testes em base limpa (`docs/FLUXO_SALDO_TRANSACOES_PLAYBOOK.md`).
 
 ---
 
@@ -164,7 +165,7 @@
 | 2.1 | CarryOverDay | ❌ | Não há configuração de competência mensal por dia de corte. |
 | 2.2 | Competência de cartão por closing day | ⚠️ | Implementação técnica realizada no backend e em validação funcional; marcar como concluído apenas após confirmação final. |
 | 3.1 | Gestão de contas (corrente/poupança/digital/carteira) | ✅ | Implementado com CRUD, extrato por conta e saldo consolidado em `accounts`/`account_transactions`. |
-| 3.2 | Saldo atual por transações | ⚠️ | Ledger operacional ativo (pagamento/recebimento + limpeza em delete + backfill histórico). Pendente cobrir reversões/edições avançadas e transferências entre contas. |
+| 3.2 | Saldo atual por transações | ⚠️ | Ledger operacional ativo (pagamento/recebimento + estorno explícito + limpeza em delete + backfill histórico). Pendente principal: transferência entre contas e ajustes avançados no front para multi-conta. |
 | 4.1 | Cadastro de cartão (limite/fechamento/vencimento) | ✅ | Implementado em `cards`. |
 | 4.2 | Compras no cartão + parcelamento + compromissos futuros | ✅ | Fluxo implementado por planos/parcelas/pagamentos. |
 | 4.3 | Fatura por competência | ⚠️ | Há base funcional, mas sem engine explícita de consolidação de ciclo de fatura separado de conta. |
