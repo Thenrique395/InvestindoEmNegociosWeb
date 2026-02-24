@@ -21,7 +21,7 @@ export class DespesasListaComponent {
   @Input() sortDir: 1 | -1 = 1;
   @Input() pagamentoLabelFn?: (d: StoredExpense) => string;
   @Input() cardLabelFn?: (id?: string) => string;
-   @Input() selectedIds: string[] = [];
+  @Input() selectedIds: string[] = [];
 
   @Output() ordenar = new EventEmitter<'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status'>();
   @Output() editar = new EventEmitter<string>();
@@ -46,6 +46,18 @@ export class DespesasListaComponent {
 
   statusLabel(status?: string): string {
     return expenseStatusLabel(status);
+  }
+
+  isSelecionavel(despesa: StoredExpense): boolean {
+    return despesa.status !== 'PAID' && despesa.status !== 'CANCELED';
+  }
+
+  get selectableCount(): number {
+    return this.despesas.filter((d) => this.isSelecionavel(d)).length;
+  }
+
+  get selectedSelectableCount(): number {
+    return this.despesas.filter((d) => this.isSelecionavel(d) && this.isSelecionado(d.id)).length;
   }
 
   isSelecionado(id?: string): boolean {

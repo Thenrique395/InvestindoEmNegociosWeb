@@ -7,8 +7,8 @@
             <input
               class="h-4 w-4 accent-[var(--primary)]"
               type="checkbox"
-              [checked]="rendas.length && selectedIds.length === rendas.length"
-              [indeterminate]="selectedIds.length > 0 && selectedIds.length < rendas.length"
+              [checked]="selectableCount > 0 && selectedSelectableCount === selectableCount"
+              [indeterminate]="selectedSelectableCount > 0 && selectedSelectableCount < selectableCount"
               (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
               aria-label="Selecionar todas" />
           </th>

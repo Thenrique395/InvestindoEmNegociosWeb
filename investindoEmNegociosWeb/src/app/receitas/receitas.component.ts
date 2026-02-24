@@ -131,11 +131,18 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   }
 
   get selecionados(): string[] {
-    return Array.from(this.selectedIds);
+    const visiveisSelecionaveis = new Set(
+      this.rendas
+        .filter((r) => r.status !== 'PAID' && r.status !== 'CANCELED')
+        .map((r) => r.id)
+        .filter((id): id is string => !!id)
+    );
+    return Array.from(this.selectedIds).filter((id) => visiveisSelecionaveis.has(id));
   }
 
   get selecionadosRecebiveis(): StoredIncome[] {
-    return this.rendas.filter((r) => this.selectedIds.has(r.id) && r.status !== 'PAID' && r.status !== 'CANCELED');
+    const selecionados = new Set(this.selecionados);
+    return this.rendas.filter((r) => selecionados.has(r.id) && r.status !== 'PAID' && r.status !== 'CANCELED');
   }
 
   get rendas(): StoredIncome[] {
@@ -416,7 +423,10 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   toggleSelecionarTodos(checked: boolean): void {
     if (checked) {
-      const ids = (this.rendas || []).map((r) => r.id).filter(Boolean) as string[];
+      const ids = (this.rendas || [])
+        .filter((r) => r.status !== 'PAID' && r.status !== 'CANCELED')
+        .map((r) => r.id)
+        .filter((id): id is string => !!id);
       this.selectedIds = new Set(ids);
     } else {
       this.selectedIds.clear();

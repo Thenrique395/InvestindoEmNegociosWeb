@@ -45,6 +45,18 @@ export class ReceitasListaComponent {
     return incomeStatusLabel(renda.status);
   }
 
+  isSelecionavel(renda: StoredIncome): boolean {
+    return renda.status !== 'PAID' && renda.status !== 'CANCELED';
+  }
+
+  get selectableCount(): number {
+    return this.rendas.filter((r) => this.isSelecionavel(r)).length;
+  }
+
+  get selectedSelectableCount(): number {
+    return this.rendas.filter((r) => this.isSelecionavel(r) && this.isSelecionado(r.id)).length;
+  }
+
   isSelecionado(id?: string): boolean {
     if (!id) return false;
     return this.selectedIds.includes(id);

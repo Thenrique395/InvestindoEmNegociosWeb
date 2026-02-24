@@ -246,11 +246,18 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   get selecionados(): string[] {
-    return Array.from(this.selectedIds);
+    const visiveisSelecionaveis = new Set(
+      this.despesasFiltradas
+        .filter((d) => d.status !== 'PAID' && d.status !== 'CANCELED')
+        .map((d) => d.id)
+        .filter((id): id is string => !!id)
+    );
+    return Array.from(this.selectedIds).filter((id) => visiveisSelecionaveis.has(id));
   }
 
   get selecionadosPagaveis(): StoredExpense[] {
-    return this.despesas.filter((d) => this.selectedIds.has(d.id) && d.status !== 'PAID' && d.status !== 'CANCELED');
+    const selecionados = new Set(this.selecionados);
+    return this.despesas.filter((d) => selecionados.has(d.id) && d.status !== 'PAID' && d.status !== 'CANCELED');
   }
 
   get selecionadosAntecipaveis(): StoredExpense[] {
@@ -258,8 +265,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
     const hoje = new Date();
     const mesHoje = hoje.getMonth();
     const anoHoje = hoje.getFullYear();
+    const selecionados = new Set(this.selecionados);
     return this.despesas.filter((d) => {
-      if (!this.selectedIds.has(d.id)) return false;
+      if (!selecionados.has(d.id)) return false;
       if (d.status === 'PAID' || d.status === 'CANCELED' || d.status === 'ANTICIPATED') return false;
       const data = this.parseData(d.vencimento || '');
       if (!data) return false;
@@ -361,7 +369,10 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   toggleSelecionarTodos(checked: boolean): void {
     if (checked) {
-      const ids = (this.despesasPorMes[this.mesKey()] || []).map((d) => d.id).filter(Boolean) as string[];
+      const ids = this.despesasFiltradas
+        .filter((d) => d.status !== 'PAID' && d.status !== 'CANCELED')
+        .map((d) => d.id)
+        .filter((id): id is string => !!id);
       this.selectedIds = new Set(ids);
     } else {
       this.selectedIds.clear();

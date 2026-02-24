@@ -7,8 +7,8 @@
             <input
               class="h-4 w-4 accent-[var(--primary)]"
               type="checkbox"
-              [checked]="despesas.length && selectedIds.length === despesas.length"
-              [indeterminate]="selectedIds.length > 0 && selectedIds.length < despesas.length"
+              [checked]="selectableCount > 0 && selectedSelectableCount === selectableCount"
+              [indeterminate]="selectedSelectableCount > 0 && selectedSelectableCount < selectableCount"
               (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
               aria-label="Selecionar todas" />
           </th>
@@ -116,7 +116,20 @@
           <td class="px-5 py-4">
             <div class="flex items-center justify-end gap-2">
               <button type="button" class="icon-action icon-action--info" (click)="historico.emit(d.id!)" aria-label="Histórico" title="Histórico">ℹ️</button>
+              <button
+                type="button"
+                class="icon-action icon-action--success"
+                *ngIf="d.status !== 'PAID' && d.status !== 'CANCELED'"
+                (click)="pagar.emit(d.id!)"
+                aria-label="Marcar como paga"
+                title="Marcar como paga">✓</button>
               <button type="button" class="icon-action icon-action--edit" (click)="editar.emit(d.id!)" aria-label="Editar" title="Editar">✏️</button>
+              <button
+                type="button"
+                class="icon-action icon-action--danger"
+                (click)="remover.emit(d.id!)"
+                aria-label="Excluir"
+                title="Excluir">🗑</button>
             </div>
           </td>
         </tr>
