@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminRobotsService, RobotExecutionLog, RobotStatus } from '../admin-robots.service';
+import { AdminRobotsService, RobotExecutionLog, RobotMonitorSummary, RobotStatus } from '../admin-robots.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
@@ -16,6 +16,16 @@ export class AdminRobotsComponent implements OnInit {
   runningRobot: string | null = null;
   robots: RobotStatus[] = [];
   recentRuns: RobotExecutionLog[] = [];
+  summary24h: RobotMonitorSummary = {
+    totalRuns: 0,
+    successRuns: 0,
+    failedRuns: 0,
+    successRatePercent: 0,
+    itemsGenerated: 0,
+    emailsAttempted: 0,
+    emailsSent: 0,
+    emailsFailed: 0
+  };
 
   constructor(
     private adminRobots: AdminRobotsService,
@@ -30,6 +40,7 @@ export class AdminRobotsComponent implements OnInit {
     this.loading = true;
     this.adminRobots.monitor(100).subscribe({
       next: (response) => {
+        this.summary24h = response.summary24h || this.summary24h;
         this.robots = response.robots || [];
         this.recentRuns = response.recentRuns || [];
       },
@@ -85,5 +96,18 @@ export class AdminRobotsComponent implements OnInit {
   statusLabel(value: boolean | null): string {
     if (value === null) return 'Nunca executado';
     return value ? 'Sucesso' : 'Falha';
+  }
+
+  processedCountHint(count: number): string {
+    if (count > 0) return `${count} item(ns) processado(s) nesta execução.`;
+    return 'Nenhum item novo para processar nesta execução.';
+  }
+
+  zeroItemsReasonLabel(reasonCode: string | null): string {
+    if (!reasonCode) return 'Sem motivo específico.';
+    if (reasonCode === 'NO_USERS') return 'Sem usuários cadastrados.';
+    if (reasonCode === 'NO_ACTIVE_USERS') return 'Sem usuários ativos.';
+    if (reasonCode === 'NO_NEW_NOTIFICATIONS') return 'Sem novos eventos elegíveis para gerar notificações.';
+    return reasonCode;
   }
 }
