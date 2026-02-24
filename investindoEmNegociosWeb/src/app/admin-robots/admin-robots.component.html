@@ -42,6 +42,45 @@
     </article>
   </div>
 
+  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
+    <div class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <label class="text-xs text-[var(--text-muted)]">Robô
+        <input class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.robotName" />
+      </label>
+      <label class="text-xs text-[var(--text-muted)]">Status
+        <select class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.status">
+          <option value="all">Todos</option>
+          <option value="success">Sucesso</option>
+          <option value="failed">Falha</option>
+        </select>
+      </label>
+      <label class="text-xs text-[var(--text-muted)]">De
+        <input type="datetime-local" class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.from" />
+      </label>
+      <label class="text-xs text-[var(--text-muted)]">Até
+        <input type="datetime-local" class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.to" />
+      </label>
+      <label class="text-xs text-[var(--text-muted)]">Buscar erro/texto
+        <input class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.search" />
+      </label>
+      <div class="flex items-end gap-2">
+        <button type="button" class="btn-ghost sm" (click)="clearFilters()">Limpar</button>
+        <button type="button" class="btn-primary sm" (click)="load()">Aplicar</button>
+      </div>
+    </div>
+
+    <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+      <label class="inline-flex items-center gap-2">
+        <input type="checkbox" [(ngModel)]="forceRun" />
+        Forçar execução (ignorar janela segura)
+      </label>
+      <label class="inline-flex items-center gap-2">
+        Janela segura (min)
+        <input type="number" min="1" max="120" class="w-20 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="cooldownMinutes" />
+      </label>
+    </div>
+  </div>
+
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
     Carregando monitor...
   </div>
@@ -67,7 +106,7 @@
         Sem histórico de execução.
       </p>
       <p class="mt-1 text-sm text-[var(--text-muted)]">Itens gerados: {{ robot.lastMetrics.itemsGenerated }}</p>
-      <p class="mt-1 text-xs text-[var(--text-muted)]">{{ processedCountHint(robot.lastMetrics.itemsGenerated) }}</p>
+      <p class="mt-1 text-xs text-[var(--text-muted)]">Duração: {{ robot.lastDurationMs }}ms | Host: {{ robot.lastHostName || 'n/d' }}</p>
       <p class="mt-1 text-xs text-[var(--text-muted)]">E-mails: {{ robot.lastMetrics.emailsSent }}/{{ robot.lastMetrics.emailsAttempted }} (falhas: {{ robot.lastMetrics.emailsFailed }})</p>
       <p class="mt-1 text-xs text-[var(--text-muted)]" *ngIf="robot.lastMetrics.itemsGenerated === 0">
         Motivo do zero: {{ zeroItemsReasonLabel(robot.lastMetrics.zeroItemsReasonCode) }}
@@ -102,6 +141,7 @@
             <th class="px-4 py-3 font-semibold">E-mails</th>
             <th class="px-4 py-3 font-semibold">Motivo do zero</th>
             <th class="px-4 py-3 font-semibold">Detalhe do erro</th>
+            <th class="px-4 py-3 font-semibold">Ação</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[var(--border)]">
@@ -113,13 +153,16 @@
               <span
                 class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
                 [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-rose-200 bg-rose-100 text-rose-700'">
-                {{ row.success ? 'Sucesso' : 'Falha' }}
+                {{ row.wasSkipped ? 'Pulado' : (row.success ? 'Sucesso' : 'Falha') }}
               </span>
             </td>
             <td class="px-4 py-3">{{ row.metrics.itemsGenerated }}</td>
             <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-muted)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
             <td class="px-4 py-3 text-[var(--text-muted)]">{{ zeroItemsReasonLabel(row.metrics.zeroItemsReasonCode) }}</td>
             <td class="px-4 py-3 text-rose-600">{{ row.error || '-' }}</td>
+            <td class="px-4 py-3">
+              <button class="btn-ghost sm" type="button" (click)="openRunDetails(row)">Ver detalhe</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -128,5 +171,30 @@
 
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]" *ngIf="!loading && !robots.length">
     Nenhum robô encontrado.
+  </div>
+
+  <div class="fixed inset-0 z-50 grid place-items-center bg-[rgba(15,23,42,0.45)] p-4" *ngIf="selectedRun">
+    <div class="w-full max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="flex items-start justify-between gap-3">
+        <h3 class="text-lg font-semibold">Detalhe da execução</h3>
+        <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
+      </div>
+
+      <div class="mt-4 grid gap-2 text-sm">
+        <p><strong>Robô:</strong> {{ selectedRun?.robotName }}</p>
+        <p><strong>Status:</strong> {{ selectedRun?.wasSkipped ? 'Pulado' : (selectedRun?.success ? 'Sucesso' : 'Falha') }}</p>
+        <p><strong>Início:</strong> {{ selectedRun?.startedAt | date: 'medium' }}</p>
+        <p><strong>Fim:</strong> {{ selectedRun?.finishedAt | date: 'medium' }}</p>
+        <p><strong>Duração:</strong> {{ selectedRun?.durationMs }} ms</p>
+        <p><strong>CorrelationId:</strong> {{ selectedRun?.correlationId }}</p>
+        <p><strong>Host:</strong> {{ selectedRun?.hostName }}</p>
+        <p><strong>Disparado por (user):</strong> {{ selectedRun?.triggeredByUserId || 'scheduler/sistema' }}</p>
+        <p><strong>Itens gerados:</strong> {{ selectedRun?.metrics?.itemsGenerated }}</p>
+        <p><strong>E-mails:</strong> {{ selectedRun?.metrics?.emailsSent }}/{{ selectedRun?.metrics?.emailsAttempted }} (falhas: {{ selectedRun?.metrics?.emailsFailed }})</p>
+        <p><strong>Motivo do zero:</strong> {{ zeroItemsReasonLabel(selectedRun?.metrics?.zeroItemsReasonCode || null) }}</p>
+        <p><strong>Skip reason:</strong> {{ selectedRun?.skipReason || '-' }}</p>
+        <p class="text-rose-600"><strong>Erro:</strong> {{ selectedRun?.error || '-' }}</p>
+      </div>
+    </div>
   </div>
 </section>

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminRobotsService, RobotExecutionLog, RobotMonitorSummary, RobotStatus } from '../admin-robots.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 
 @Component({
   selector: 'app-admin-robots',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-robots.component.html',
   styleUrls: ['./admin-robots.component.scss']
 })
@@ -16,6 +17,7 @@ export class AdminRobotsComponent implements OnInit {
   runningRobot: string | null = null;
   robots: RobotStatus[] = [];
   recentRuns: RobotExecutionLog[] = [];
+  selectedRun: RobotExecutionLog | null = null;
   summary24h: RobotMonitorSummary = {
     totalRuns: 0,
     successRuns: 0,
@@ -26,6 +28,17 @@ export class AdminRobotsComponent implements OnInit {
     emailsSent: 0,
     emailsFailed: 0
   };
+
+  filters = {
+    robotName: '',
+    status: 'all' as 'all' | 'success' | 'failed',
+    from: '',
+    to: '',
+    search: ''
+  };
+
+  forceRun = false;
+  cooldownMinutes = 10;
 
   constructor(
     private adminRobots: AdminRobotsService,
@@ -38,7 +51,15 @@ export class AdminRobotsComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.adminRobots.monitor(100).subscribe({
+    const success = this.filters.status === 'all' ? null : this.filters.status === 'success';
+    this.adminRobots.monitor({
+      take: 100,
+      robotName: this.filters.robotName.trim() || undefined,
+      success,
+      from: this.filters.from || undefined,
+      to: this.filters.to || undefined,
+      search: this.filters.search.trim() || undefined
+    }).subscribe({
       next: (response) => {
         this.summary24h = response.summary24h || this.summary24h;
         this.robots = response.robots || [];
@@ -53,12 +74,28 @@ export class AdminRobotsComponent implements OnInit {
     });
   }
 
+  clearFilters(): void {
+    this.filters = {
+      robotName: '',
+      status: 'all',
+      from: '',
+      to: '',
+      search: ''
+    };
+    this.load();
+  }
+
   runRobot(robotName: string): void {
     if (!robotName || this.runningRobot || this.runningAll) return;
     this.runningRobot = robotName;
-    this.adminRobots.run(robotName).subscribe({
+    this.adminRobots.run(robotName, {
+      force: this.forceRun,
+      cooldownMinutes: this.cooldownMinutes
+    }).subscribe({
       next: (result) => {
-        if (result.success) {
+        if (result.wasSkipped) {
+          this.uiFeedback.info(`${result.robotName} pulado por segurança (${result.skipReason || 'janela recente'}).`);
+        } else if (result.success) {
           this.uiFeedback.success(`${result.robotName} executado com sucesso.`);
         } else {
           this.uiFeedback.warning(`${result.robotName} falhou: ${result.error || 'erro desconhecido'}`);
@@ -93,6 +130,14 @@ export class AdminRobotsComponent implements OnInit {
     });
   }
 
+  openRunDetails(run: RobotExecutionLog): void {
+    this.selectedRun = run;
+  }
+
+  closeRunDetails(): void {
+    this.selectedRun = null;
+  }
+
   statusLabel(value: boolean | null): string {
     if (value === null) return 'Nunca executado';
     return value ? 'Sucesso' : 'Falha';
@@ -108,6 +153,7 @@ export class AdminRobotsComponent implements OnInit {
     if (reasonCode === 'NO_USERS') return 'Sem usuários cadastrados.';
     if (reasonCode === 'NO_ACTIVE_USERS') return 'Sem usuários ativos.';
     if (reasonCode === 'NO_NEW_NOTIFICATIONS') return 'Sem novos eventos elegíveis para gerar notificações.';
+    if (reasonCode === 'SKIPPED_SAFETY_WINDOW') return 'Execução pulada por janela de segurança anti-duplicidade.';
     return reasonCode;
   }
 }

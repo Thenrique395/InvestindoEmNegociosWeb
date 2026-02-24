@@ -14,9 +14,12 @@ export interface RobotStatus {
   robotName: string;
   lastStartedAt: string | null;
   lastFinishedAt: string | null;
+  lastDurationMs: number;
   lastSuccess: boolean | null;
   lastProcessedCount: number;
   lastMetrics: RobotExecutionMetrics;
+  lastCorrelationId: string | null;
+  lastHostName: string | null;
   lastError: string | null;
 }
 
@@ -25,9 +28,15 @@ export interface RobotExecutionLog {
   robotName: string;
   startedAt: string;
   finishedAt: string;
+  durationMs: number;
+  correlationId: string;
+  hostName: string;
+  triggeredByUserId: string | null;
   success: boolean;
   processedCount: number;
   metrics: RobotExecutionMetrics;
+  wasSkipped: boolean;
+  skipReason: string | null;
   error: string | null;
 }
 
@@ -52,9 +61,15 @@ export interface RobotRunResult {
   robotName: string;
   startedAt: string;
   finishedAt: string;
+  durationMs: number;
+  correlationId: string;
+  hostName: string;
+  triggeredByUserId: string | null;
   success: boolean;
   processedCount: number;
   metrics: RobotExecutionMetrics;
+  wasSkipped: boolean;
+  skipReason: string | null;
   error: string | null;
 }
 
@@ -64,12 +79,29 @@ export class AdminRobotsService {
 
   constructor(private http: HttpClient) {}
 
-  monitor(take = 50) {
-    return this.http.get<RobotMonitorResponse>(`${this.baseUrl}/monitor?take=${take}`);
+  monitor(query: {
+    take?: number;
+    robotName?: string;
+    success?: boolean | null;
+    from?: string | null;
+    to?: string | null;
+    search?: string;
+  } = {}) {
+    const params = new URLSearchParams();
+    params.set('take', String(query.take ?? 50));
+    if (query.robotName) params.set('robotName', query.robotName);
+    if (query.success !== null && query.success !== undefined) params.set('success', String(query.success));
+    if (query.from) params.set('from', query.from);
+    if (query.to) params.set('to', query.to);
+    if (query.search) params.set('search', query.search);
+    return this.http.get<RobotMonitorResponse>(`${this.baseUrl}/monitor?${params.toString()}`);
   }
 
-  run(robotName: string) {
-    return this.http.post<RobotRunResult>(`${this.baseUrl}/run/${encodeURIComponent(robotName)}`, {});
+  run(robotName: string, options: { force?: boolean; cooldownMinutes?: number } = {}) {
+    const params = new URLSearchParams();
+    params.set('force', String(options.force ?? false));
+    params.set('cooldownMinutes', String(options.cooldownMinutes ?? 10));
+    return this.http.post<RobotRunResult>(`${this.baseUrl}/run/${encodeURIComponent(robotName)}?${params.toString()}`, {});
   }
 
   runAll() {
