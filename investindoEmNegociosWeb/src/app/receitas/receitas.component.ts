@@ -105,6 +105,10 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return this.authService.getRole();
   }
 
+  get canChooseAccount(): boolean {
+    return hasAtLeastRole(this.currentRole, 'Intermediate');
+  }
+
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
   }
@@ -394,12 +398,15 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       this.setAlerta('Nenhuma receita selecionada para marcar como recebida.', 2000);
       return;
     }
-    if (!this.contaBaixaId) {
+    if (this.canChooseAccount && !this.contaBaixaId) {
       this.setAlerta('Selecione uma conta ativa para registrar os recebimentos.', 3000, 'error');
       return;
     }
-    this.accountsService.setDefaultAccountId(this.contaBaixaId);
-    const pedidos = selecionadas.map((r) => this.db.markIncomeReceived(r.id, r.valor, this.contaBaixaId));
+    if (this.canChooseAccount) {
+      this.accountsService.setDefaultAccountId(this.contaBaixaId);
+    }
+    const accountId = this.canChooseAccount ? this.contaBaixaId : null;
+    const pedidos = selecionadas.map((r) => this.db.markIncomeReceived(r.id, r.valor, accountId));
     this.loadingRecebido = true;
     forkJoin(pedidos)
       .pipe(finalize(() => (this.loadingRecebido = false)))

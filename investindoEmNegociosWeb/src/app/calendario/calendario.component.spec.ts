@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
+import { AccountsService } from '../accounts.service';
 import { CalendarioComponent } from './calendario.component';
 
 class ApiDataServiceMock {
@@ -25,6 +26,12 @@ class ApiDataServiceMock {
   }
 }
 
+class AccountsServiceMock {
+  getDefaultAccountId(): string | null {
+    return null;
+  }
+}
+
 describe('CalendarioComponent', () => {
   let component: CalendarioComponent;
   let fixture: ComponentFixture<CalendarioComponent>;
@@ -33,7 +40,10 @@ describe('CalendarioComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CalendarioComponent],
-      providers: [{ provide: ApiDataService, useClass: ApiDataServiceMock }]
+      providers: [
+        { provide: ApiDataService, useClass: ApiDataServiceMock },
+        { provide: AccountsService, useClass: AccountsServiceMock }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(CalendarioComponent);

@@ -10,6 +10,8 @@ import { InstallmentsService } from '../installments.service';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
+import { AuthService } from '../auth.service';
+import { hasAtLeastRole, UserRole } from '../roles';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -89,8 +91,17 @@ export class DespesasComponent implements OnInit, OnDestroy {
     private installments: InstallmentsService,
     private categoriesService: CategoriesService,
     private accountsService: AccountsService,
+    private authService: AuthService,
     private uiFeedback: UiFeedbackService
   ) {}
+
+  get currentRole(): UserRole | null {
+    return this.authService.getRole();
+  }
+
+  get canChooseAccount(): boolean {
+    return hasAtLeastRole(this.currentRole, 'Intermediate');
+  }
 
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
@@ -342,7 +353,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   pagarDespesaPorId(id: string): void {
-    if (!this.contaBaixaId) {
+    if (this.canChooseAccount && !this.contaBaixaId) {
       this.setAlerta('Selecione uma conta ativa para registrar o pagamento.', 3000, 'error');
       return;
     }
@@ -354,10 +365,12 @@ export class DespesasComponent implements OnInit, OnDestroy {
       paidAt: new Date().toISOString(),
       methodId: null,
       note: null,
-      accountId: this.contaBaixaId
+      accountId: this.canChooseAccount ? this.contaBaixaId : null
     };
     this.loadingPagar = true;
-    this.accountsService.setDefaultAccountId(this.contaBaixaId);
+    if (this.canChooseAccount) {
+      this.accountsService.setDefaultAccountId(this.contaBaixaId);
+    }
     this.installments
       .pay(id, payload)
       .pipe(finalize(() => (this.loadingPagar = false)))
@@ -379,7 +392,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
       this.setAlerta('Nenhuma despesa selecionada para pagar.', 2000);
       return;
     }
-    if (!this.contaBaixaId) {
+    if (this.canChooseAccount && !this.contaBaixaId) {
       this.setAlerta('Selecione uma conta ativa para registrar os pagamentos.', 3000, 'error');
       return;
     }
@@ -390,12 +403,14 @@ export class DespesasComponent implements OnInit, OnDestroy {
         paidAt: new Date().toISOString(),
         methodId: null,
         note: null,
-        accountId: this.contaBaixaId
+        accountId: this.canChooseAccount ? this.contaBaixaId : null
       })
     );
 
     this.loadingPagar = true;
-    this.accountsService.setDefaultAccountId(this.contaBaixaId);
+    if (this.canChooseAccount) {
+      this.accountsService.setDefaultAccountId(this.contaBaixaId);
+    }
     forkJoin(pedidos)
       .pipe(finalize(() => (this.loadingPagar = false)))
       .subscribe({

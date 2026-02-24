@@ -58,7 +58,7 @@ export const routes: Routes = [
   {
     path: 'contas',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./contas/contas.component').then((m) => m.ContasComponent)
   },
   {
@@ -70,7 +70,7 @@ export const routes: Routes = [
   {
     path: 'calendario',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./calendario/calendario.component').then((m) => m.CalendarioComponent)
   },
   {
@@ -88,13 +88,13 @@ export const routes: Routes = [
   {
     path: 'categorias',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent)
   },
   {
     path: 'metas',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: false },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./metas/metas.component').then((m) => m.MetasComponent)
   },
   {
