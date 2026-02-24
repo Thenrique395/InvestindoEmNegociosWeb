@@ -53,9 +53,15 @@
         </a>
       </div>
 
-      <div class="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+      <div
+        class="flex items-center justify-between gap-4 rounded-xl border px-4 py-3 transition"
+        [ngClass]="
+          novaRenda.fixa
+            ? 'border-[var(--primary)] bg-[var(--primary)]/10'
+            : 'border-[var(--border)] bg-[var(--surface-2)]'
+        ">
         <div>
-          <p class="text-sm font-semibold text-[var(--text)]">Recorrência</p>
+          <p class="text-sm font-semibold" [ngClass]="novaRenda.fixa ? 'text-[var(--primary)]' : 'text-[var(--text)]'">Recorrência</p>
           <p class="text-xs text-[var(--text-muted)]">Repete todo mês automaticamente.</p>
         </div>
         <label class="relative inline-flex items-center" aria-label="Receita recorrente mensal">
@@ -66,7 +72,7 @@
             name="fixa"
             (ngModelChange)="onFixaChange($event)" />
           <span
-            class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:bg-[var(--primary)]/70">
+            class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:border-[var(--primary)] peer-checked:bg-[var(--primary)]">
           </span>
           <span
             class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5">

@@ -82,6 +82,8 @@ export class ApiDataService {
   private refreshIncomesInFlight = false;
   private lastRefreshAt = 0;
   private lastRefreshIncomesAt = 0;
+  private incomePlansCache = new Map<string, Plan>();
+  private incomeCategoriesCache = new Map<string, string>();
 
   readonly expenses$ = this.db$.pipe(
     map((state) => state.expenses),
@@ -316,7 +318,7 @@ export class ApiDataService {
       expenseInstallments: this.installments.list({ type: 'Expense' }),
       cards: this.cardsApi.list(),
       expenseCategories: this.categoriesApi.list('Expense'),
-      incomeCategories: this.categoriesApi.list()
+      incomeCategories: this.categoriesApi.list('Income')
     }).subscribe({
       next: ({
         incomePlans,
@@ -343,6 +345,8 @@ export class ApiDataService {
             })
             .map((c) => [c.id, c.name])
         );
+        this.incomePlansCache = new Map(incomePlans.map((p) => [p.id, p]));
+        this.incomeCategoriesCache = new Map(incomeCategoryMap);
         const incomes = this.mapIncomes(incomePlans, incomeInstallments, incomeCategoryMap);
         const expenses = this.mapExpenses(expensePlans, expenseInstallments, categoryMap);
         const mappedCards = this.mapCards(cards);
@@ -374,43 +378,41 @@ export class ApiDataService {
 
     forkJoin({
       summary: this.receitasSummary.getSummary(month),
-      incomePlans: this.plans.list('Income'),
-      incomeCategories: this.categoriesApi.list()
+      incomeInstallments: this.installments.list({ type: 'Income' })
     }).subscribe({
-      next: ({ summary, incomePlans, incomeCategories }) => {
-        const planMap = new Map(incomePlans.map((p) => [p.id, p]));
-        const categoryMap = new Map(
-          incomeCategories
-            .filter((c) => {
-              const applies = (c.appliesTo || '').toString().toLowerCase();
-              return applies === 'income' || applies === 'receita' || applies === 'receitas';
-            })
-            .map((c) => [c.id, c.name])
+      next: ({ summary, incomeInstallments }) => {
+        const installmentStatusMap = new Map(
+          (incomeInstallments || []).map((inst) => [
+            inst.id,
+            (((inst as any)?.status || '').toString().toUpperCase() as InstallmentStatus) || 'OPEN'
+          ])
         );
+        const previousById = new Map(current.incomes.map((income) => [income.id, income]));
 
         const incomes: StoredIncome[] = summary.items.map((item) => {
-          const plan = planMap.get(item.planId);
-          const categoryId = plan?.categoryId ?? null;
+          const previous = previousById.get(item.id);
+          const plan = this.incomePlansCache.get(item.planId);
+          const categoryId = previous?.categoryId ?? plan?.categoryId ?? null;
           return {
             id: item.id,
             planId: item.planId,
             fonte: item.source,
-            categoria: categoryMap.get(categoryId || '') || 'Sem categoria',
+            categoria:
+              previous?.categoria ||
+              this.incomeCategoriesCache.get(categoryId || '') ||
+              'Sem categoria',
             categoryId,
             valor: item.amount,
             recebimento: item.receivedOn,
-            schedule: item.schedule,
-            startDateIso: item.startDateIso,
-            fixa: item.isRecurring,
-            fixaInicio: item.recurringStart || ''
+            schedule: previous?.schedule ?? item.schedule,
+            startDateIso: previous?.startDateIso ?? item.startDateIso,
+            fixa: previous?.fixa ?? item.isRecurring,
+            fixaInicio: (previous?.fixaInicio ?? item.recurringStart) || '',
+            status: installmentStatusMap.get(item.id) || statusMap.get(item.id) || 'OPEN'
           };
         });
 
-        const merged = incomes.map((income) => ({
-          ...income,
-          status: statusMap.get(income.id) || income.status || 'OPEN'
-        }));
-        this.dbSubject.next({ incomes: merged, expenses: current.expenses, cards: current.cards });
+        this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
         this.incomeSummarySubject.next({
           month: summary.month,
           total: summary.total,
@@ -419,6 +421,7 @@ export class ApiDataService {
           previousMonth: summary.previousMonth ?? null,
           history: summary.history ?? []
         });
+        this.enrichIncomeMetadataInBackground();
       },
       error: (err) => console.error('Falha ao carregar receitas do backend', err),
       complete: () => {
@@ -443,6 +446,63 @@ export class ApiDataService {
       expense.id === installmentId ? { ...expense, status } : expense
     );
     this.dbSubject.next({ incomes: current.incomes, expenses, cards: current.cards });
+  }
+
+  private enrichIncomeMetadataInBackground(): void {
+    const current = this.dbSubject.value;
+    if (!current.incomes.length) return;
+    const hasMissingMetadata = current.incomes.some(
+      (income) =>
+        !income.schedule ||
+        !income.startDateIso ||
+        income.categoryId == null ||
+        !income.categoria ||
+        income.categoria === 'Sem categoria'
+    );
+    if (!hasMissingMetadata && this.incomePlansCache.size > 0 && this.incomeCategoriesCache.size > 0) {
+      return;
+    }
+
+    forkJoin({
+      incomePlans: this.plans.list('Income'),
+      incomeCategories: this.categoriesApi.list('Income')
+    }).subscribe({
+      next: ({ incomePlans, incomeCategories }) => {
+        this.incomePlansCache = new Map(incomePlans.map((p) => [p.id, p]));
+        this.incomeCategoriesCache = new Map(
+          incomeCategories
+            .filter((c) => {
+              const applies = (c.appliesTo || '').toString().toLowerCase();
+              return applies === 'income' || applies === 'receita' || applies === 'receitas';
+            })
+            .map((c) => [c.id, c.name])
+        );
+
+        const currentState = this.dbSubject.value;
+        if (!currentState.incomes.length) return;
+
+        const incomes = currentState.incomes.map((income) => {
+          const plan = income.planId ? this.incomePlansCache.get(income.planId) : undefined;
+          const categoryId = income.categoryId ?? plan?.categoryId ?? null;
+          return {
+            ...income,
+            categoryId,
+            categoria: this.incomeCategoriesCache.get(categoryId || '') || income.categoria || 'Sem categoria',
+            schedule: income.schedule ?? plan?.schedule,
+            startDateIso: income.startDateIso ?? plan?.startDate,
+            fixa: income.fixa ?? (plan?.schedule === 'Recurring'),
+            fixaInicio:
+              income.fixaInicio ||
+              (plan?.schedule === 'Recurring' ? this.formatMonth(plan.startDate) : '')
+          };
+        });
+
+        this.dbSubject.next({ incomes, expenses: currentState.expenses, cards: currentState.cards });
+      },
+      error: () => {
+        /* não bloqueia renderização inicial */
+      }
+    });
   }
 
   private mapIncomes(plans: Plan[], installments: Installment[], categoryMap?: Map<string, string>): StoredIncome[] {

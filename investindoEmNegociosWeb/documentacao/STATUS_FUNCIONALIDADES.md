@@ -156,8 +156,11 @@
 - 2026-02-24: saldo por transações evoluído com conta automática para Basic, bloqueio de gestão de contas no Basic, limpeza de ledger em exclusão de parcelas e script de backfill para histórico (`Infrastructure/Data/scripts/backfill_account_transactions_from_payments.sql`).
 - 2026-02-24: saldo por transações evoluído com estorno explícito de pagamento (`POST /installments/{id}/payments/{paymentId}/reversals`), regra mais rígida para seleção de conta em perfis não-Basic e playbook de testes em base limpa (`docs/FLUXO_SALDO_TRANSACOES_PLAYBOOK.md`).
 
----
+--------------
 
+
+quando seleciono essa opcao, ela e salva? E usada para alguma coisa??
+--------------
 ## 10. Gap Analysis (escopo estratégico 2–25)
 
 | Item | Tema | Status | Observação resumida |

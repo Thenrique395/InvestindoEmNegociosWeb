@@ -235,10 +235,8 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   get valorParcelaLabel(): string {
     const valor = this.parseValor(this.valorInput);
-    if (this.fixa) return this.valorInput;
-    if (!valor || !this.parcelar || this.parcelasCount < 2) return this.valorInput;
-    const parcela = valor / (this.parcelasCount || 1);
-    return formatNumberValue(parcela);
+    if (!valor) return this.valorInput;
+    return formatNumberValue(valor);
   }
 
   get despesasFiltradas(): StoredExpense[] {
@@ -478,6 +476,26 @@ export class DespesasComponent implements OnInit, OnDestroy {
   excluirSelecionadas(): void {
     const ids = Array.from(this.selectedIds);
     if (!ids.length) return;
+
+    if (ids.length === 1) {
+      this.openRemocaoPorId(ids[0]);
+      return;
+    }
+
+    const selectedItems = ids
+      .map((id) => this.despesas.find((d) => d.id === id))
+      .filter((d): d is StoredExpense => !!d);
+
+    const hasSeriesOrRecurring = selectedItems.some((d) => !!d.fixa || !!d.parcelasTotal || !!d.serieId || !!d.planId);
+    if (hasSeriesOrRecurring) {
+      this.setAlerta(
+        'Para despesas recorrentes/parceladas, exclua uma por vez para escolher entre somente esta ou toda a série.',
+        3500,
+        'info'
+      );
+      return;
+    }
+
     ids.forEach((id) => this.db.removeExpense(id));
     this.selectedIds.clear();
   }
@@ -599,7 +617,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     }
 
     const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
-    const valorParcela = parcelas > 1 ? valor / parcelas : valor;
+    const valorParcela = valor;
     const fixaMeses = this.fixa ? this.fixaMeses || null : null;
 
     this.saving = true;

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
 import { FocusArea } from './onboarding.types';
@@ -10,11 +9,16 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
 import { CreatePlanPayload, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
+import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
+import { ReceitasFormComponent } from '../receitas/receitas-form.component';
+import { DespesasFormComponent } from '../despesas/despesas-form.component';
+import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
+import { parseLocaleDate, parseLocalizedNumber } from '../utils/locale-utils';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ReceitasFormComponent, DespesasFormComponent],
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.scss']
 })
@@ -24,6 +28,8 @@ export class OnboardingComponent implements OnInit {
   creatingAccount = false;
   savingEntries = false;
   liveMessage = '';
+  readonly minBirthDate = '1900-01-01';
+  readonly maxBirthDate = this.todayIso();
   step = 0;
   focus: FocusArea | null = null;
   focusOptions: { id: FocusArea; title: string; description: string; tooltip: string; icon: 'growth' | 'debt' | 'invest' | 'shield' }[] = [
@@ -65,17 +71,30 @@ export class OnboardingComponent implements OnInit {
   };
   accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
   expenseCategories: CategoryDto[] = [];
-  initialIncome = {
-    source: '',
-    amount: 0,
-    receivedOn: this.todayIso()
-  };
-  initialExpense = {
-    name: '',
-    amount: 0,
-    dueDate: this.todayIso(),
-    categoryId: null as string | null
-  };
+  incomeCategories: CategoryDto[] = [];
+  showIncomeModal = false;
+  showExpenseModal = false;
+  savingIncomeModal = false;
+  savingExpenseModal = false;
+  modalIncome: StoredIncome = this.createIncomeDraft();
+  modalIncomeAmountInput = '';
+  modalIncomeDateInput = '';
+  modalIncomeDateError = '';
+  modalIncomeCategoryError = '';
+  modalExpense: StoredExpense = this.createExpenseDraft();
+  modalExpenseAmountInput = '';
+  modalExpenseDateInput = '';
+  modalExpenseDateError = '';
+  modalExpenseCategoryError = '';
+  modalExpenseFormaPagamento: 'avista' | 'cartao' = 'avista';
+  modalExpenseParcelar = false;
+  modalExpenseParcelas = 1;
+  modalExpenseFixa = false;
+  modalExpenseFixaMeses: number | null = null;
+  modalExpenseCartaoId: string | null = null;
+  readonly modalExpenseCartoes: StoredCard[] = [];
+  initialIncome = { source: '', amount: 0, receivedOn: '' };
+  initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null as string | null };
 
   constructor(
     private fb: FormBuilder,
@@ -91,7 +110,7 @@ export class OnboardingComponent implements OnInit {
       fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
       document: ['', [Validators.required, this.cpfValidator()]],
       phone: ['', [Validators.required, this.phoneValidator()]],
-      birthDate: ['', [Validators.required]],
+      birthDate: ['', [Validators.required, this.birthDateRangeValidator()]],
       city: ['', [Validators.required, this.noBlankValidator()]],
       state: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2), this.noBlankValidator()]],
       country: ['', [Validators.required, this.noBlankValidator()]]
@@ -158,6 +177,14 @@ export class OnboardingComponent implements OnInit {
       },
       error: () => {
         this.expenseCategories = [];
+      }
+    });
+    this.categoriesService.list('Income').subscribe({
+      next: (categories) => {
+        this.incomeCategories = categories || [];
+      },
+      error: () => {
+        this.incomeCategories = [];
       }
     });
   }
@@ -277,64 +304,12 @@ export class OnboardingComponent implements OnInit {
       this.step = 1;
       return;
     }
-
-    const incomeSource = this.initialIncome.source.trim();
-    const incomeAmount = Number(this.initialIncome.amount);
-    const expenseName = this.initialExpense.name.trim();
-    const expenseAmount = Number(this.initialExpense.amount);
-
-    if (!incomeSource || incomeAmount <= 0) {
-      this.uiFeedback.warning('Preencha uma receita válida.');
-      this.announce('Preencha uma receita válida.');
+    if (!this.hasInitialIncome || !this.hasInitialExpense) {
+      this.uiFeedback.warning('Cadastre uma receita e uma despesa para concluir.');
+      this.announce('Cadastre uma receita e uma despesa para concluir o onboarding.');
       return;
     }
-    if (!expenseName || expenseAmount <= 0) {
-      this.uiFeedback.warning('Preencha uma despesa válida.');
-      this.announce('Preencha uma despesa válida.');
-      return;
-    }
-
-    const incomePayload: CreatePlanPayload = {
-      type: 'Income',
-      title: incomeSource,
-      amount: incomeAmount,
-      schedule: 'OneTime',
-      startDate: this.initialIncome.receivedOn || this.todayIso(),
-      frequency: null,
-      installmentsCount: 1,
-      categoryId: null,
-      cardId: null
-    };
-
-    const expensePayload: CreatePlanPayload = {
-      type: 'Expense',
-      title: expenseName,
-      amount: expenseAmount,
-      schedule: 'OneTime',
-      startDate: this.initialExpense.dueDate || this.todayIso(),
-      frequency: null,
-      installmentsCount: 1,
-      categoryId: this.initialExpense.categoryId,
-      cardId: null
-    };
-
-    this.savingEntries = true;
-    forkJoin([
-      this.plansService.create(incomePayload),
-      this.plansService.create(expensePayload)
-    ]).subscribe({
-      next: () => {
-        this.savingEntries = false;
-        this.uiFeedback.success('Receita e despesa iniciais cadastradas.');
-        this.announce('Receita e despesa iniciais cadastradas com sucesso.');
-        this.finishOnboarding();
-      },
-      error: (err) => {
-        this.savingEntries = false;
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar receita e despesa iniciais.');
-        this.announce('Falha ao cadastrar receita e despesa iniciais.');
-      }
-    });
+    this.finishOnboarding();
   }
 
   accountTypeLabel(type: AccountType): string {
@@ -388,6 +363,7 @@ export class OnboardingComponent implements OnInit {
 
     if (c.errors['cpf']) return 'CPF inválido.';
     if (c.errors['phone']) return 'Use o formato (81) 99525-7823.';
+    if (c.errors['birthDateRange']) return 'Informe uma data válida entre 01/01/1900 e hoje.';
 
     return 'Campo inválido.';
   }
@@ -419,6 +395,246 @@ export class OnboardingComponent implements OnInit {
     }
 
     this.form.get('phone')?.setValue(masked, { emitEvent: false });
+  }
+
+  get hasInitialIncome(): boolean {
+    return !!this.initialIncome.source && this.initialIncome.amount > 0 && !!this.initialIncome.receivedOn;
+  }
+
+  get hasInitialExpense(): boolean {
+    return !!this.initialExpense.name && this.initialExpense.amount > 0 && !!this.initialExpense.dueDate;
+  }
+
+  get canFinishWithInitialEntries(): boolean {
+    return this.accountReady && this.hasInitialIncome && this.hasInitialExpense && !this.savingEntries;
+  }
+
+  get modalExpenseParcelValueLabel(): string {
+    return this.modalExpenseAmountInput;
+  }
+
+  openIncomeModal(): void {
+    if (!this.accountReady || this.savingIncomeModal) return;
+    this.modalIncome = this.createIncomeDraft();
+    this.modalIncomeAmountInput = '';
+    this.modalIncomeDateInput = this.isoToBr(this.todayIso());
+    this.modalIncomeDateError = '';
+    this.modalIncomeCategoryError = '';
+    this.showIncomeModal = true;
+  }
+
+  closeIncomeModal(): void {
+    if (this.savingIncomeModal) return;
+    this.showIncomeModal = false;
+  }
+
+  onIncomeAmountChange(raw: string): void {
+    this.modalIncomeAmountInput = maskMoneyInput(raw);
+  }
+
+  onIncomeDateChange(raw: string): void {
+    this.modalIncomeDateInput = maskDateDDMMYYYY(raw);
+    this.modalIncomeDateError =
+      !this.modalIncomeDateInput || this.isValidBrDate(this.modalIncomeDateInput)
+        ? ''
+        : 'Data inválida. Use o formato DD/MM/AAAA.';
+  }
+
+  onIncomeSourceChange(value: string): void {
+    this.modalIncome.fonte = value;
+  }
+
+  onIncomeFixaChange(value: boolean): void {
+    this.modalIncome.fixa = value;
+  }
+
+  saveIncomeModal(): void {
+    if (this.savingIncomeModal) return;
+    const amount = parseLocalizedNumber(this.modalIncomeAmountInput);
+    if (!this.modalIncome.fonte?.trim() || amount <= 0) {
+      this.uiFeedback.warning('Preencha uma receita válida.');
+      return;
+    }
+    if (!this.modalIncome.categoryId) {
+      this.modalIncomeCategoryError = 'Selecione uma categoria.';
+      return;
+    }
+    this.modalIncomeCategoryError = '';
+    if (!this.modalIncomeDateInput || !this.isValidBrDate(this.modalIncomeDateInput)) {
+      this.modalIncomeDateError = 'Data inválida. Use o formato DD/MM/AAAA.';
+      return;
+    }
+    this.modalIncomeDateError = '';
+
+    const payload: CreatePlanPayload = {
+      type: 'Income',
+      title: this.modalIncome.fonte.trim(),
+      amount,
+      schedule: this.modalIncome.fixa ? 'Recurring' : 'OneTime',
+      startDate: this.brToIso(this.modalIncomeDateInput),
+      frequency: this.modalIncome.fixa ? 'Monthly' : null,
+      installmentsCount: this.modalIncome.fixa ? null : 1,
+      categoryId: this.modalIncome.categoryId,
+      cardId: null
+    };
+
+    this.savingIncomeModal = true;
+    this.plansService.create(payload).subscribe({
+      next: () => {
+        this.savingIncomeModal = false;
+        this.showIncomeModal = false;
+        this.initialIncome = {
+          source: this.modalIncome.fonte.trim(),
+          amount,
+          receivedOn: this.brToIso(this.modalIncomeDateInput)
+        };
+        this.uiFeedback.success('Receita inicial cadastrada.');
+      },
+      error: (err) => {
+        this.savingIncomeModal = false;
+        this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar receita inicial.');
+      }
+    });
+  }
+
+  openExpenseModal(): void {
+    if (!this.accountReady || this.savingExpenseModal) return;
+    this.modalExpense = this.createExpenseDraft();
+    this.modalExpenseAmountInput = '';
+    this.modalExpenseDateInput = this.isoToBr(this.todayIso());
+    this.modalExpenseDateError = '';
+    this.modalExpenseCategoryError = '';
+    this.modalExpenseFormaPagamento = 'avista';
+    this.modalExpenseParcelar = false;
+    this.modalExpenseParcelas = 1;
+    this.modalExpenseFixa = false;
+    this.modalExpenseFixaMeses = null;
+    this.modalExpenseCartaoId = null;
+    this.showExpenseModal = true;
+  }
+
+  closeExpenseModal(): void {
+    if (this.savingExpenseModal) return;
+    this.showExpenseModal = false;
+  }
+
+  onExpenseAmountChange(raw: string): void {
+    this.modalExpenseAmountInput = maskMoneyInput(raw);
+  }
+
+  onExpenseDateChange(raw: string): void {
+    this.modalExpenseDateInput = maskDateDDMMYYYY(raw);
+    this.modalExpenseDateError =
+      !this.modalExpenseDateInput || this.isValidBrDate(this.modalExpenseDateInput)
+        ? ''
+        : 'Data inválida. Use o formato DD/MM/AAAA.';
+  }
+
+  onExpenseFormaPagamentoChange(value: 'avista' | 'cartao'): void {
+    this.modalExpenseFormaPagamento = value;
+    if (value !== 'cartao') {
+      this.modalExpenseParcelar = false;
+      this.modalExpenseParcelas = 1;
+      this.modalExpenseCartaoId = null;
+    }
+  }
+
+  onExpenseParcelarChange(value: boolean): void {
+    this.modalExpenseParcelar = value;
+    if (!value) this.modalExpenseParcelas = 1;
+  }
+
+  onExpenseParcelasChange(value: number): void {
+    this.modalExpenseParcelas = Math.max(1, Number(value || 1));
+  }
+
+  onExpenseFixaChange(value: boolean): void {
+    this.modalExpenseFixa = value;
+    if (value) {
+      this.modalExpenseFormaPagamento = 'avista';
+      this.modalExpenseParcelar = false;
+      this.modalExpenseParcelas = 1;
+      this.modalExpenseCartaoId = null;
+    } else {
+      this.modalExpenseFixaMeses = null;
+    }
+  }
+
+  onExpenseFixaMesesChange(value: number | null): void {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      this.modalExpenseFixaMeses = null;
+      return;
+    }
+    this.modalExpenseFixaMeses = Number(value);
+  }
+
+  saveExpenseModal(): void {
+    if (this.savingExpenseModal) return;
+    const amount = parseLocalizedNumber(this.modalExpenseAmountInput);
+    if (!this.modalExpense.nome?.trim() || amount <= 0) {
+      this.uiFeedback.warning('Preencha uma despesa válida.');
+      return;
+    }
+    if (!this.modalExpense.categoryId) {
+      this.modalExpenseCategoryError = 'Selecione uma categoria.';
+      return;
+    }
+    this.modalExpenseCategoryError = '';
+    if (!this.modalExpenseDateInput || !this.isValidBrDate(this.modalExpenseDateInput)) {
+      this.modalExpenseDateError = 'Data inválida. Use o formato DD/MM/AAAA.';
+      return;
+    }
+    this.modalExpenseDateError = '';
+
+    let schedule: 'OneTime' | 'Installments' | 'Recurring' = 'OneTime';
+    let installmentsCount: number | null = 1;
+    let frequency: 'Monthly' | null = null;
+    let launchAmount = amount;
+
+    if (this.modalExpenseFixa) {
+      if (this.modalExpenseFixaMeses && this.modalExpenseFixaMeses > 1) {
+        schedule = 'Installments';
+        installmentsCount = this.modalExpenseFixaMeses;
+      } else {
+        schedule = 'Recurring';
+        installmentsCount = null;
+        frequency = 'Monthly';
+      }
+    } else if (this.modalExpenseFormaPagamento === 'cartao' && this.modalExpenseParcelar && this.modalExpenseParcelas > 1) {
+      schedule = 'Installments';
+      installmentsCount = this.modalExpenseParcelas;
+    }
+
+    const payload: CreatePlanPayload = {
+      type: 'Expense',
+      title: this.modalExpense.nome.trim(),
+      amount: launchAmount,
+      schedule,
+      startDate: this.brToIso(this.modalExpenseDateInput),
+      frequency,
+      installmentsCount,
+      categoryId: this.modalExpense.categoryId,
+      cardId: this.modalExpenseFormaPagamento === 'cartao' ? this.modalExpenseCartaoId : null
+    };
+
+    this.savingExpenseModal = true;
+    this.plansService.create(payload).subscribe({
+      next: () => {
+        this.savingExpenseModal = false;
+        this.showExpenseModal = false;
+        this.initialExpense = {
+          name: this.modalExpense.nome.trim(),
+          amount,
+          dueDate: this.brToIso(this.modalExpenseDateInput),
+          categoryId: this.modalExpense.categoryId || null
+        };
+        this.uiFeedback.success('Despesa inicial cadastrada.');
+      },
+      error: (err) => {
+        this.savingExpenseModal = false;
+        this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar despesa inicial.');
+      }
+    });
   }
 
   private normalizePayload() {
@@ -487,6 +703,20 @@ export class OnboardingComponent implements OnInit {
     };
   }
 
+  private birthDateRangeValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = (control.value ?? '').toString().trim();
+      if (!value) return null;
+
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return { birthDateRange: true };
+
+      const min = new Date(`${this.minBirthDate}T00:00:00`);
+      const max = new Date(`${this.maxBirthDate}T00:00:00`);
+      return date >= min && date <= max ? null : { birthDateRange: true };
+    };
+  }
+
   private persistStep(completed: boolean): void {
     this.onboarding.updateStatus({ step: this.step, completed }).subscribe({
       error: () => {
@@ -516,6 +746,45 @@ export class OnboardingComponent implements OnInit {
 
   private todayIso(): string {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  private createIncomeDraft(): StoredIncome {
+    return {
+      id: '',
+      fonte: '',
+      categoria: '',
+      categoryId: null,
+      valor: 0,
+      recebimento: '',
+      fixa: false
+    };
+  }
+
+  private createExpenseDraft(): StoredExpense {
+    return {
+      id: '',
+      nome: '',
+      categoria: '',
+      categoryId: null,
+      valor: 0,
+      vencimento: ''
+    };
+  }
+
+  private isValidBrDate(value: string): boolean {
+    return !!parseLocaleDate(value);
+  }
+
+  private brToIso(value: string): string {
+    const [dd, mm, yyyy] = value.split('/');
+    if (!dd || !mm || !yyyy) return this.todayIso();
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private isoToBr(value: string): string {
+    const [yyyy, mm, dd] = (value || '').split('-');
+    if (!yyyy || !mm || !dd) return '';
+    return `${dd}/${mm}/${yyyy}`;
   }
 
   private announce(message: string): void {

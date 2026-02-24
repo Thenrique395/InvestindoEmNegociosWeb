@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
 import { CardsService } from './cards.service';
 import { GoalsService, Goal, GoalStatus } from './goals.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
@@ -32,8 +32,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   private expensesRaw: StoredExpense[] = [];
   private incomesRaw: StoredIncome[] = [];
   totalRendas = 0;
+  totalRendasPendentes = 0;
   totalDespesas = 0;
   saldo = 0;
+  saldoAnterior = 0;
   periodo: 'month' | 'quarter' | 'year' = 'month';
   cards: StoredCard[] = [];
   totalDividaCartoes = 0;
@@ -120,13 +122,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     private cardsService: CardsService,
     private onboardingService: OnboardingService,
     private accountsService: AccountsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     if (this.isLogged) {
       this.onboardingService.getStatus().subscribe({
         next: (status) => {
+          if (!status.completed) {
+            this.router.navigateByUrl('/onboarding');
+            return;
+          }
           this.onboardingStep = Math.min(Math.max(status.step || 0, 0), 2);
           this.onboardingDone = !!status.completed;
           this.hideOnboarding = this.onboardingDone;
@@ -154,6 +161,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.incomesLoaded = true;
       this.incomesRaw = lista;
       this.totalRendas = this.somarRendasMes(lista);
+      this.totalRendasPendentes = this.somarRendasPendentesMes(lista);
       this.atualizarSaldo();
       this.updateCategoryCharts();
       this.updateRecentTransactions();
@@ -242,10 +250,25 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get saldoPrincipal(): number {
-    if (this.accountBalances.length > 0) {
-      return this.totalSaldoContas;
-    }
-    return this.saldo;
+    return this.saldoAnterior + this.totalRendas - this.totalDespesas;
+  }
+
+  get saldoBaseDisponivel(): number {
+    return Math.max(this.saldoAnterior + this.totalRendas, 0);
+  }
+
+  get saldoComposicaoTotal(): number {
+    return this.saldoBaseDisponivel + Math.max(this.totalDespesas, 0);
+  }
+
+  get saldoBasePercentual(): number {
+    if (!this.saldoComposicaoTotal) return 0;
+    return (this.saldoBaseDisponivel / this.saldoComposicaoTotal) * 100;
+  }
+
+  get saldoDespesasPercentual(): number {
+    if (!this.saldoComposicaoTotal) return 0;
+    return (Math.max(this.totalDespesas, 0) / this.saldoComposicaoTotal) * 100;
   }
 
   get currentRole(): UserRole | null {
@@ -271,7 +294,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private atualizarSaldo(): void {
-    this.saldo = this.totalRendas - this.totalDespesas;
+    const range = this.getPeriodRange();
+    this.saldoAnterior = this.calcularSaldoAnterior(range);
+    this.saldo = this.saldoPrincipal;
   }
 
   private isDateInRange(date: string, range: { startKey: string; endKey: string }): boolean {
@@ -293,8 +318,40 @@ export class HomeComponent implements OnInit, OnDestroy {
     range: { startKey: string; endKey: string } = this.getPeriodRange()
   ): number {
     return lista
-      .filter((r) => this.isDateInRange(r.recebimento, range))
+      .filter((r) => this.isDateInRange(r.recebimento, range) && this.isIncomeReceived(r.status))
       .reduce((sum, r) => sum + (r.valor || 0), 0);
+  }
+
+  private somarRendasPendentesMes(
+    lista: StoredIncome[],
+    range: { startKey: string; endKey: string } = this.getPeriodRange()
+  ): number {
+    return lista
+      .filter((r) => this.isDateInRange(r.recebimento, range) && this.isIncomePending(r.status))
+      .reduce((sum, r) => sum + (r.valor || 0), 0);
+  }
+
+  private calcularSaldoAnterior(range: { startKey: string; endKey: string }): number {
+    const receitasRecebidasAntes = this.incomesRaw
+      .filter((r) => this.isBeforeRange(r.recebimento, range) && this.isIncomeReceived(r.status))
+      .reduce((sum, r) => sum + (r.valor || 0), 0);
+    const despesasAntes = this.expensesRaw
+      .filter((d) => this.isBeforeRange(d.vencimento, range))
+      .reduce((sum, d) => sum + (d.valor || 0), 0);
+    return receitasRecebidasAntes - despesasAntes;
+  }
+
+  private isIncomeReceived(status?: string): boolean {
+    return status === 'PAID' || status === 'PARTIALLY_PAID' || status === 'ANTICIPATED';
+  }
+
+  private isIncomePending(status?: string): boolean {
+    return !status || status === 'OPEN';
+  }
+
+  private isBeforeRange(date: string, range: { startKey: string; endKey: string }): boolean {
+    const key = monthKeyFromLocaleDate(date);
+    return !!key && key < range.startKey;
   }
 
   private updateCategoryCharts(): void {
@@ -483,6 +540,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.periodo = periodo;
     this.totalDespesas = this.somarDespesasMes(this.expensesRaw);
     this.totalRendas = this.somarRendasMes(this.incomesRaw);
+    this.totalRendasPendentes = this.somarRendasPendentesMes(this.incomesRaw);
     this.atualizarSaldo();
     this.updateCategoryCharts();
     this.updateRecentTransactions();
