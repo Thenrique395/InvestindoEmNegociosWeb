@@ -39,6 +39,11 @@ export interface NotificationSettings {
   goalInactivityDays: number;
 }
 
+export interface RobotSettings {
+  enabled: boolean;
+  dailyRunTimeUtc: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminParametersService {
   private readonly baseUrl = `${API_BASE_URL}/admin/parameters`;
@@ -87,5 +92,13 @@ export class AdminParametersService {
 
   updateNotificationSettings(settings: NotificationSettings) {
     return this.http.put<NotificationSettings>(`${this.baseUrl}/notification-settings`, settings);
+  }
+
+  getRobotSettings() {
+    return this.http.get<RobotSettings>(`${this.baseUrl}/robot-settings`);
+  }
+
+  updateRobotSettings(settings: RobotSettings) {
+    return this.http.put<RobotSettings>(`${this.baseUrl}/robot-settings`, settings);
   }
 }

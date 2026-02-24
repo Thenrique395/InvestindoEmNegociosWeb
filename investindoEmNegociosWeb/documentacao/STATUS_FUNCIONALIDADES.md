@@ -71,8 +71,8 @@
 |---|---|---|---|
 | Gestão de usuários (admin) | ✅ | `AdminUsersController` | Inclui atualização e remoção sob regras administrativas. |
 | Gestão de categorias padrão (admin) | ✅ | `AdminCategoriesController` | Catálogo administrável. |
-| Gestão de parâmetros (instituições, bandeiras, meios pagamento) | ✅ | `AdminParametersController` | Inclui ativação/desativação. |
-| Monitoramento e execução de robôs (admin) | ✅ | `GET/POST /api/v1/admin/robots/*` + rota frontend `/admin/robots` | Painel temporário com status de execução, histórico recente e disparo manual individual/em lote. |
+| Gestão de parâmetros (instituições, bandeiras, meios pagamento e agendamento de robôs) | ✅ | `AdminParametersController` | Inclui ativação/desativação e configuração do horário de execução automática dos robôs via painel admin. |
+| Monitoramento e execução de robôs (admin) | ✅ | `GET/POST /api/v1/admin/robots/*` + rota frontend `/admin/robots` | Painel com status, histórico filtrável, detalhe por execução, disparo seguro com cooldown/force, observabilidade (duration/correlation/host), auditoria de disparo e rate limit admin. |
 | Controle de acesso por perfil | ⚠️ | Roles presentes em auth/JWT | Recomenda-se revisão de matriz de autorização por endpoint. |
 
 ## 6. Notificações e Alertas
@@ -151,6 +151,8 @@
 - 2026-02-21: recuperação de senha evoluída para status parcial (API pronta, pendente configuração SMTP para envio real).
 - 2026-02-23: calendário financeiro mensal evoluído com rota MVP e testes unitários iniciais.
 - 2026-02-23: painel admin de monitoramento de robôs adicionado com execução manual e histórico.
+- 2026-02-24: monitor de robôs evoluído (filtros, detalhe de execução, execução segura/idempotente com cooldown, auditoria de disparo, alerta proativo por falhas consecutivas e rate limit admin).
+- 2026-02-24: UX do detalhe de execução no monitor de robôs refinada (modal com KPIs, contexto técnico e resultado, com melhor legibilidade em desktop/mobile).
 
 ---
 

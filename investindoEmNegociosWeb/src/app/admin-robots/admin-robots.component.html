@@ -44,26 +44,26 @@
 
   <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
     <div class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-      <label class="text-xs text-[var(--text-muted)]">Robô
-        <input class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.robotName" />
+      <label class="filter-label text-xs text-[var(--text-muted)]">Robô
+        <input class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.robotName" />
       </label>
-      <label class="text-xs text-[var(--text-muted)]">Status
-        <select class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.status">
+      <label class="filter-label text-xs text-[var(--text-muted)]">Status
+        <select class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.status">
           <option value="all">Todos</option>
           <option value="success">Sucesso</option>
           <option value="failed">Falha</option>
         </select>
       </label>
-      <label class="text-xs text-[var(--text-muted)]">De
-        <input type="datetime-local" class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.from" />
+      <label class="filter-label text-xs text-[var(--text-muted)]">De
+        <input type="datetime-local" class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.from" />
       </label>
-      <label class="text-xs text-[var(--text-muted)]">Até
-        <input type="datetime-local" class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.to" />
+      <label class="filter-label text-xs text-[var(--text-muted)]">Até
+        <input type="datetime-local" class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.to" />
       </label>
-      <label class="text-xs text-[var(--text-muted)]">Buscar erro/texto
-        <input class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="filters.search" />
+      <label class="filter-label text-xs text-[var(--text-muted)]">Buscar erro/texto
+        <input class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.search" />
       </label>
-      <div class="flex items-end gap-2">
+      <div class="filter-actions flex items-end gap-2">
         <button type="button" class="btn-ghost sm" (click)="clearFilters()">Limpar</button>
         <button type="button" class="btn-primary sm" (click)="load()">Aplicar</button>
       </div>
@@ -76,7 +76,7 @@
       </label>
       <label class="inline-flex items-center gap-2">
         Janela segura (min)
-        <input type="number" min="1" max="120" class="w-20 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 text-sm" [(ngModel)]="cooldownMinutes" />
+        <input type="number" min="1" max="120" class="filter-control w-24 rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="cooldownMinutes" />
       </label>
     </div>
   </div>
@@ -173,27 +173,85 @@
     Nenhum robô encontrado.
   </div>
 
-  <div class="fixed inset-0 z-50 grid place-items-center bg-[rgba(15,23,42,0.45)] p-4" *ngIf="selectedRun">
-    <div class="w-full max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="flex items-start justify-between gap-3">
-        <h3 class="text-lg font-semibold">Detalhe da execução</h3>
-        <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
+  <div class="fixed inset-0 z-50 grid place-items-center bg-[rgba(15,23,42,0.55)] p-4" *ngIf="selectedRun">
+    <div class="robot-run-modal w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="flex flex-col gap-3 border-b border-[var(--border)] pb-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Execução</p>
+          <h3 class="mt-1 text-2xl font-semibold text-[var(--text)]">{{ selectedRun.robotName }}</h3>
+          <p class="mt-1 text-sm text-[var(--text-muted)]">
+            {{ selectedRun.startedAt | date: 'dd/MM/yyyy HH:mm:ss' }} - {{ selectedRun.finishedAt | date: 'HH:mm:ss' }}
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span
+            class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
+            [ngClass]="selectedRun.wasSkipped
+              ? 'border-amber-200 bg-amber-100 text-amber-700'
+              : (selectedRun.success
+                  ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
+                  : 'border-rose-200 bg-rose-100 text-rose-700')">
+            {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}
+          </span>
+          <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
+        </div>
       </div>
 
-      <div class="mt-4 grid gap-2 text-sm">
-        <p><strong>Robô:</strong> {{ selectedRun.robotName }}</p>
-        <p><strong>Status:</strong> {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}</p>
-        <p><strong>Início:</strong> {{ selectedRun.startedAt | date: 'medium' }}</p>
-        <p><strong>Fim:</strong> {{ selectedRun.finishedAt | date: 'medium' }}</p>
-        <p><strong>Duração:</strong> {{ selectedRun.durationMs }} ms</p>
-        <p><strong>CorrelationId:</strong> {{ selectedRun.correlationId }}</p>
-        <p><strong>Host:</strong> {{ selectedRun.hostName }}</p>
-        <p><strong>Disparado por (user):</strong> {{ selectedRun.triggeredByUserId || 'scheduler/sistema' }}</p>
-        <p><strong>Itens gerados:</strong> {{ selectedRun.metrics.itemsGenerated }}</p>
-        <p><strong>E-mails:</strong> {{ selectedRun.metrics.emailsSent }}/{{ selectedRun.metrics.emailsAttempted }} (falhas: {{ selectedRun.metrics.emailsFailed }})</p>
-        <p><strong>Motivo do zero:</strong> {{ zeroItemsReasonLabel(selectedRun.metrics.zeroItemsReasonCode || null) }}</p>
-        <p><strong>Skip reason:</strong> {{ selectedRun.skipReason || '-' }}</p>
-        <p class="text-rose-600"><strong>Erro:</strong> {{ selectedRun.error || '-' }}</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="modal-kpi">
+          <p class="modal-kpi__label">Duração</p>
+          <p class="modal-kpi__value">{{ selectedRun.durationMs }} ms</p>
+        </article>
+        <article class="modal-kpi">
+          <p class="modal-kpi__label">Itens gerados</p>
+          <p class="modal-kpi__value">{{ selectedRun.metrics.itemsGenerated }}</p>
+        </article>
+        <article class="modal-kpi">
+          <p class="modal-kpi__label">E-mails enviados</p>
+          <p class="modal-kpi__value">{{ selectedRun.metrics.emailsSent }}/{{ selectedRun.metrics.emailsAttempted }}</p>
+        </article>
+        <article class="modal-kpi">
+          <p class="modal-kpi__label">Falhas de e-mail</p>
+          <p class="modal-kpi__value">{{ selectedRun.metrics.emailsFailed }}</p>
+        </article>
+      </div>
+
+      <div class="mt-5 grid gap-4 lg:grid-cols-2">
+        <section class="modal-section">
+          <h4 class="modal-section__title">Contexto técnico</h4>
+          <dl class="modal-dl">
+            <div class="modal-dl__row">
+              <dt>CorrelationId</dt>
+              <dd class="break-all">{{ selectedRun.correlationId || '-' }}</dd>
+            </div>
+            <div class="modal-dl__row">
+              <dt>Host</dt>
+              <dd>{{ selectedRun.hostName || '-' }}</dd>
+            </div>
+            <div class="modal-dl__row">
+              <dt>Disparado por</dt>
+              <dd>{{ selectedRun.triggeredByUserId || 'scheduler/sistema' }}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="modal-section">
+          <h4 class="modal-section__title">Resultado</h4>
+          <dl class="modal-dl">
+            <div class="modal-dl__row">
+              <dt>Motivo do zero</dt>
+              <dd>{{ zeroItemsReasonLabel(selectedRun.metrics.zeroItemsReasonCode || null) }}</dd>
+            </div>
+            <div class="modal-dl__row">
+              <dt>Skip reason</dt>
+              <dd>{{ selectedRun.skipReason || '-' }}</dd>
+            </div>
+            <div class="modal-dl__row">
+              <dt>Erro</dt>
+              <dd [ngClass]="selectedRun.error ? 'text-rose-600' : 'text-[var(--text-muted)]'">{{ selectedRun.error || '-' }}</dd>
+            </div>
+          </dl>
+        </section>
       </div>
     </div>
   </div>

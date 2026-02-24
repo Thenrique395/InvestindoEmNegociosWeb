@@ -294,6 +294,38 @@
         <span class="item-meta" *ngIf="notificationUpdatedLabel()">{{ notificationUpdatedLabel() }}</span>
       </div>
     </div>
+
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="text-sm font-semibold text-[var(--text)]">Agendamento de robôs</div>
+      <p class="mt-1 text-sm text-[var(--text-muted)]">
+        Defina se a execução automática diária fica ativa e o horário em UTC.
+      </p>
+
+      <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <label class="toggle-row">
+          <span>Execução automática ativa</span>
+          <input type="checkbox" [(ngModel)]="robotSettings.enabled" />
+        </label>
+        <label class="field-row">
+          <span>Horário diário (UTC)</span>
+          <input
+            type="time"
+            [(ngModel)]="robotSettings.dailyRunTimeUtc"
+            class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
+        </label>
+      </div>
+
+      <div class="card__actions">
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="salvarRobotSettings()"
+          [disabled]="savingRobotSettings || loading">
+          {{ savingRobotSettings ? 'Salvando...' : 'Salvar agendamento' }}
+        </button>
+        <span class="item-meta" *ngIf="robotUpdatedLabel()">{{ robotUpdatedLabel() }}</span>
+      </div>
+    </div>
   </div>
 
   <app-confirm-dialog

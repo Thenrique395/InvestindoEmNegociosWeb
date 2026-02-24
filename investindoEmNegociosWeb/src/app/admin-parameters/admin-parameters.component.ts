@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
-import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin } from '../admin-parameters.service';
+import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin, RobotSettings } from '../admin-parameters.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
@@ -33,6 +33,10 @@ export class AdminParametersComponent implements OnInit {
     goalInactivityEnabled: true,
     goalInactivityDays: 30
   };
+  robotSettings: RobotSettings = {
+    enabled: true,
+    dailyRunTimeUtc: '08:00'
+  };
   loading = false;
   savingKey = '';
   brandFilter = '';
@@ -47,7 +51,9 @@ export class AdminParametersComponent implements OnInit {
   savingCreateMethod = false;
   savingCreateInstitution = false;
   savingNotificationSettings = false;
+  savingRobotSettings = false;
   notificationsUpdatedAt?: Date;
+  robotsUpdatedAt?: Date;
   private lastUpdatedBrands: Record<number, Date> = {};
   private lastUpdatedMethods: Record<number, Date> = {};
   private lastUpdatedInstitutions: Record<number, Date> = {};
@@ -97,14 +103,23 @@ export class AdminParametersComponent implements OnInit {
           this.uiFeedback.error('Não foi possível carregar as notificações.');
           return of(null);
         })
+      ),
+      robots: this.adminParameters.getRobotSettings().pipe(
+        catchError(() => {
+          this.uiFeedback.error('Não foi possível carregar as configurações de robôs.');
+          return of(null);
+        })
       )
     }).subscribe({
-      next: ({ brands, methods, institutions, notifications }) => {
+      next: ({ brands, methods, institutions, notifications, robots }) => {
         this.cardBrands = brands;
         this.paymentMethods = methods;
         this.institutions = institutions;
         if (notifications) {
           this.notificationSettings = notifications;
+        }
+        if (robots) {
+          this.robotSettings = robots;
         }
       },
       error: () => {
@@ -257,6 +272,29 @@ export class AdminParametersComponent implements OnInit {
     });
   }
 
+  salvarRobotSettings(): void {
+    if (this.savingRobotSettings) return;
+    if (!/^\d{2}:\d{2}$/.test(this.robotSettings.dailyRunTimeUtc)) {
+      this.uiFeedback.warning('Informe o horário no formato HH:mm (UTC).');
+      return;
+    }
+
+    this.savingRobotSettings = true;
+    this.adminParameters.updateRobotSettings(this.robotSettings).subscribe({
+      next: (updated) => {
+        this.robotSettings = updated;
+        this.robotsUpdatedAt = new Date();
+        this.uiFeedback.success('Agendamento dos robôs atualizado com sucesso.');
+      },
+      error: (err) => {
+        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao salvar agendamento dos robôs.'));
+      },
+      complete: () => {
+        this.savingRobotSettings = false;
+      }
+    });
+  }
+
   get filteredCardBrands(): CardBrandAdmin[] {
     return this.filterList(this.cardBrands, this.brandFilter, (brand) => `${brand.name} ${brand.code}`);
   }
@@ -295,6 +333,10 @@ export class AdminParametersComponent implements OnInit {
 
   notificationUpdatedLabel(): string {
     return this.formatUpdatedLabel(this.notificationsUpdatedAt);
+  }
+
+  robotUpdatedLabel(): string {
+    return this.formatUpdatedLabel(this.robotsUpdatedAt);
   }
 
   private brandKey(id: number): string {
