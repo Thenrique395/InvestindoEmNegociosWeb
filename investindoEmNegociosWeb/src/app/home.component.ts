@@ -12,6 +12,7 @@ import { AccountsService, AccountResponse } from './accounts.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ProfileService } from './profile.service';
+import { NotificationsService, NotificationItem } from './notifications.service';
 
 type InsightDiagnostics = {
   healthScore: number;
@@ -48,6 +49,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subGoals?: Subscription;
   private subAccounts?: Subscription;
   private subProfile?: Subscription;
+  private subNotifications?: Subscription;
   private expensesLoaded = false;
   private incomesLoaded = false;
 
@@ -116,6 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   insightComparison: string[] = [];
   insightChangesToday: string[] = [];
   insightTodoItems: InsightTodoItem[] = [];
+  robotInsightTips: string[] = [];
   insightDrillDown = {
     expensesRoute: '/despesas',
     expensesQuery: { focus: 'overdue' as const },
@@ -173,6 +176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private accountsService: AccountsService,
     private authService: AuthService,
     private profileService: ProfileService,
+    private notificationsService: NotificationsService,
     private router: Router
   ) {}
 
@@ -203,6 +207,12 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.onboardingDone = false;
           this.hideOnboarding = false;
           this.onboardingLoaded = true;
+        }
+      });
+      this.subNotifications = this.notificationsService.list(false, 20).subscribe({
+        next: (items) => this.consumeRobotInsight(items || []),
+        error: () => {
+          this.robotInsightTips = [];
         }
       });
     }
@@ -255,6 +265,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subGoals?.unsubscribe();
     this.subAccounts?.unsubscribe();
     this.subProfile?.unsubscribe();
+    this.subNotifications?.unsubscribe();
   }
 
   get mesAtualLabel(): string {
@@ -285,6 +296,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get insightTips(): string[] {
+    if (this.robotInsightTips.length > 0) {
+      return this.robotInsightTips;
+    }
     switch (this.insight.tone) {
       case 'danger':
         return [
@@ -299,6 +313,27 @@ export class HomeComponent implements OnInit, OnDestroy {
       default:
         return ['Mantenha o ritmo atual', 'Reavalie suas metas no fim do mes'];
     }
+  }
+
+  private consumeRobotInsight(items: NotificationItem[]): void {
+    const latestInsight = items
+      .filter((item) => item.kind === 'CashflowInsight')
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+    if (!latestInsight) {
+      this.robotInsightTips = [];
+      return;
+    }
+    this.robotInsightTips = this.extractRobotTips(latestInsight.message);
+  }
+
+  private extractRobotTips(message: string): string[] {
+    const match = message.match(/Dicas:\s*(.+)\.?$/i);
+    if (!match?.[1]) return [];
+    return match[1]
+      .split('|')
+      .map((tip) => tip.trim())
+      .filter((tip) => tip.length > 0)
+      .slice(0, 4);
   }
 
   get insightHealthToneClass(): string {
