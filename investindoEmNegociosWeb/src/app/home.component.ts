@@ -9,6 +9,8 @@ import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 import { AccountsService, AccountResponse } from './accounts.service';
+import { AuthService } from './auth.service';
+import { hasAtLeastRole, UserRole } from './roles';
 
 @Component({
   selector: 'app-home',
@@ -117,7 +119,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private goalsService: GoalsService,
     private cardsService: CardsService,
     private onboardingService: OnboardingService,
-    private accountsService: AccountsService
+    private accountsService: AccountsService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -236,6 +239,21 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get totalSaldoContas(): number {
     return this.accountBalances.reduce((sum, item) => sum + (item.currentBalance || 0), 0);
+  }
+
+  get saldoPrincipal(): number {
+    if (this.accountBalances.length > 0) {
+      return this.totalSaldoContas;
+    }
+    return this.saldo;
+  }
+
+  get currentRole(): UserRole | null {
+    return this.authService.getRole();
+  }
+
+  hasAccess(minRole: UserRole): boolean {
+    return hasAtLeastRole(this.currentRole, minRole);
   }
 
   private atualizarDividaCartoes(): void {

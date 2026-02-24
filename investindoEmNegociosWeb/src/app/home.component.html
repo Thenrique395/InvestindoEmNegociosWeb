@@ -79,17 +79,19 @@
             <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Total</p>
+        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo principal</p>
           <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo total">
             i
           <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Saldo total do mês: diferença entre receitas e despesas. Saldo positivo indica sobra; saldo negativo indica déficit no mês.
+            Saldo principal: quando há contas ativas, usa o consolidado do ledger por conta; sem contas ativas, usa receitas menos despesas do período.
           </span>
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
           </button>
       </div>
-      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldo | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Receitas menos despesas do mês.</p>
+      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoPrincipal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+      <p class="mt-1 text-[11px] text-[var(--text-muted)]">
+        {{ accountBalances.length ? 'Consolidado das contas ativas.' : 'Receitas menos despesas do período.' }}
+      </p>
     </div>
 
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
@@ -180,7 +182,7 @@
         <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
         <p class="m-0 text-[11px] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}</p>
       </div>
-      <a routerLink="/contas" class="btn-ghost sm">Gerenciar contas</a>
+      <a routerLink="/contas" class="btn-ghost sm" *ngIf="hasAccess('Intermediate')">Gerenciar contas</a>
     </div>
     <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2">
       <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]" *ngFor="let account of accountBalances; trackBy: trackByIndex">
