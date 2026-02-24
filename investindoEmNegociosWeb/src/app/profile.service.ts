@@ -13,6 +13,7 @@ export interface UserProfile {
   city?: string;
   state?: string;
   country?: string;
+  financialGoal?: string;
   language?: string;
   currency?: string;
   locales?: string[];

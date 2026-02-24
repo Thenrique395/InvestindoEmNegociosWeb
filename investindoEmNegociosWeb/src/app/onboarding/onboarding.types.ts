@@ -1,1 +1,1 @@
-export type FocusArea = 'receitas' | 'despesas' | 'metas';
+export type FocusArea = 'vida-financeira' | 'sair-dividas' | 'comecar-investir' | 'reserva-emergencia';

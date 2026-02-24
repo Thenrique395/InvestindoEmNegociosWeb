@@ -23,23 +23,37 @@ export class OnboardingComponent implements OnInit {
   loading = false;
   creatingAccount = false;
   savingEntries = false;
+  liveMessage = '';
   step = 0;
   focus: FocusArea | null = null;
-  focusOptions: { id: FocusArea; title: string; description: string }[] = [
+  focusOptions: { id: FocusArea; title: string; description: string; tooltip: string; icon: 'growth' | 'debt' | 'invest' | 'shield' }[] = [
     {
-      id: 'receitas',
-      title: 'Organizar receitas',
-      description: 'Cadastre suas fontes e recorrencias.'
+      id: 'vida-financeira',
+      title: 'Melhorar vida financeira',
+      description: 'Criar rotina para gastar melhor e ter mais controle no mês.',
+      tooltip: 'Você vai priorizar organização geral: entradas, saídas e previsibilidade do mês.',
+      icon: 'growth'
     },
     {
-      id: 'despesas',
-      title: 'Controlar despesas',
-      description: 'Entenda para onde vai o dinheiro.'
+      id: 'sair-dividas',
+      title: 'Sair das dívidas',
+      description: 'Priorizar pagamentos e reduzir pressão financeira.',
+      tooltip: 'Foco em reduzir dívidas atuais, controlar juros e acompanhar progresso de quitação.',
+      icon: 'debt'
     },
     {
-      id: 'metas',
-      title: 'Definir metas',
-      description: 'Planeje objetivos com clareza.'
+      id: 'comecar-investir',
+      title: 'Começar a investir',
+      description: 'Organizar sobra mensal para iniciar aportes com consistência.',
+      tooltip: 'Objetivo voltado para criar sobra recorrente e transformar em aportes mensais.',
+      icon: 'invest'
+    },
+    {
+      id: 'reserva-emergencia',
+      title: 'Criar reserva de emergência',
+      description: 'Montar segurança para imprevistos antes de assumir mais risco.',
+      tooltip: 'Prioridade em construir proteção financeira para imprevistos sem depender de crédito.',
+      icon: 'shield'
     }
   ];
   accountReady = false;
@@ -74,18 +88,24 @@ export class OnboardingComponent implements OnInit {
     private categoriesService: CategoriesService
   ) {
     this.form = this.fb.group({
-      fullName: ['', [Validators.required, Validators.minLength(3)]],
+      fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
       document: ['', [Validators.required, this.cpfValidator()]],
       phone: ['', [Validators.required, this.phoneValidator()]],
-      birthDate: [''],
-      city: ['', [Validators.required]],
-      state: ['', [Validators.required, Validators.minLength(2)]],
-      country: ['', [Validators.required]]
+      birthDate: ['', [Validators.required]],
+      city: ['', [Validators.required, this.noBlankValidator()]],
+      state: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2), this.noBlankValidator()]],
+      country: ['', [Validators.required, this.noBlankValidator()]]
     });
 
     this.profile.getProfile().subscribe({
       next: (data) => {
         if (data) {
+          const goals = new Set(this.focusOptions.map((x) => x.id));
+          const savedGoal = (data as { financialGoal?: string }).financialGoal;
+          if (savedGoal && goals.has(savedGoal as FocusArea)) {
+            this.focus = savedGoal as FocusArea;
+          }
+
           this.form.patchValue({
             fullName: data.fullName,
             document: this.maskCpf(data.document),
@@ -147,12 +167,14 @@ export class OnboardingComponent implements OnInit {
 
     if (!this.focus) {
       this.uiFeedback.warning('Selecione seu objetivo inicial.');
+      this.announce('Selecione um objetivo inicial para continuar.');
       return;
     }
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.uiFeedback.warning('Revise os campos.');
+      this.announce('Existem campos obrigatórios para revisar.');
       return;
     }
 
@@ -162,14 +184,17 @@ export class OnboardingComponent implements OnInit {
       next: () => {
         this.loading = false;
         this.uiFeedback.success('Dados e objetivo salvos. Vamos para o próximo passo.');
+        this.announce('Dados e objetivo salvos com sucesso.');
         this.nextStep();
       },
       error: (err) => {
         if (err?.status === 401) {
           this.uiFeedback.error('Sessão expirada. Faça login novamente.');
+          this.announce('Sessão expirada. Faça login novamente.');
           this.router.navigateByUrl('/login');
         } else {
           this.uiFeedback.error(err instanceof Error ? err.message : 'Erro ao salvar dados.');
+          this.announce('Falha ao salvar os dados do perfil.');
         }
         this.loading = false;
       }
@@ -202,6 +227,7 @@ export class OnboardingComponent implements OnInit {
   finishOnboarding(): void {
     if (!this.accountReady) {
       this.uiFeedback.warning('Crie uma conta para concluir o cadastro.');
+      this.announce('Crie uma conta ativa para concluir o cadastro.');
       this.step = 1;
       return;
     }
@@ -218,6 +244,7 @@ export class OnboardingComponent implements OnInit {
     if (this.creatingAccount) return;
     if (!this.accountForm.name?.trim()) {
       this.uiFeedback.warning('Informe o nome da conta.');
+      this.announce('Informe o nome da conta para continuar.');
       return;
     }
 
@@ -233,10 +260,12 @@ export class OnboardingComponent implements OnInit {
         this.accountReady = true;
         this.accountsService.setDefaultAccountId(account.id);
         this.uiFeedback.success('Conta criada com sucesso. Próximo: cadastrar primeira receita e despesa.');
+        this.announce('Conta criada com sucesso.');
       },
       error: (err) => {
         this.creatingAccount = false;
         this.uiFeedback.error(err?.error?.detail || 'Falha ao criar conta.');
+        this.announce('Falha ao criar conta.');
       }
     });
   }
@@ -244,6 +273,7 @@ export class OnboardingComponent implements OnInit {
   saveInitialEntriesAndFinish(): void {
     if (!this.accountReady) {
       this.uiFeedback.warning('Crie uma conta antes de cadastrar receita e despesa.');
+      this.announce('Crie uma conta antes de cadastrar receita e despesa.');
       this.step = 1;
       return;
     }
@@ -255,10 +285,12 @@ export class OnboardingComponent implements OnInit {
 
     if (!incomeSource || incomeAmount <= 0) {
       this.uiFeedback.warning('Preencha uma receita válida.');
+      this.announce('Preencha uma receita válida.');
       return;
     }
     if (!expenseName || expenseAmount <= 0) {
       this.uiFeedback.warning('Preencha uma despesa válida.');
+      this.announce('Preencha uma despesa válida.');
       return;
     }
 
@@ -294,11 +326,13 @@ export class OnboardingComponent implements OnInit {
       next: () => {
         this.savingEntries = false;
         this.uiFeedback.success('Receita e despesa iniciais cadastradas.');
+        this.announce('Receita e despesa iniciais cadastradas com sucesso.');
         this.finishOnboarding();
       },
       error: (err) => {
         this.savingEntries = false;
         this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar receita e despesa iniciais.');
+        this.announce('Falha ao cadastrar receita e despesa iniciais.');
       }
     });
   }
@@ -313,9 +347,49 @@ export class OnboardingComponent implements OnInit {
     }
   }
 
-  hasError(control: 'fullName' | 'document' | 'phone' | 'city' | 'state' | 'country', type: string): boolean {
+  hasError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country', type: string): boolean {
     const c = this.form.get(control);
     return !!c && c.touched && c.hasError(type);
+  }
+
+  getControlError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country'): string | null {
+    const c = this.form.get(control);
+    if (!c || !c.touched || !c.errors) return null;
+
+    if (c.errors['required']) {
+      switch (control) {
+        case 'fullName': return 'Informe seu nome.';
+        case 'document': return 'Informe seu CPF.';
+        case 'phone': return 'Informe seu telefone.';
+        case 'birthDate': return 'Informe sua data de nascimento.';
+        case 'city': return 'Informe sua cidade.';
+        case 'state': return 'Informe seu estado.';
+        case 'country': return 'Informe seu país.';
+      }
+    }
+
+    if (c.errors['blank']) {
+      switch (control) {
+        case 'fullName': return 'Informe seu nome.';
+        case 'city': return 'Informe sua cidade.';
+        case 'state': return 'Informe seu estado.';
+        case 'country': return 'Informe seu país.';
+      }
+    }
+
+    if (c.errors['minlength']) {
+      if (control === 'fullName') return 'Mínimo de 3 caracteres.';
+      if (control === 'state') return 'Use 2 letras (UF).';
+    }
+
+    if (c.errors['maxlength'] && control === 'state') {
+      return 'Use 2 letras (UF).';
+    }
+
+    if (c.errors['cpf']) return 'CPF inválido.';
+    if (c.errors['phone']) return 'Use o formato (81) 99525-7823.';
+
+    return 'Campo inválido.';
   }
 
   onCpfInput(event: Event): void {
@@ -331,11 +405,18 @@ export class OnboardingComponent implements OnInit {
 
   onPhoneInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const digits = (input.value || '').replace(/\D/g, '').slice(0, 13);
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
     let masked = digits;
-    if (digits.length >= 1) masked = `+${digits}`;
-    if (digits.length > 2) masked = `+${digits.slice(0, 2)} ${digits.slice(2)}`;
-    if (digits.length > 4) masked = `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4)}`;
+
+    if (digits.length > 0) {
+      masked = `(${digits.slice(0, Math.min(2, digits.length))}`;
+    }
+    if (digits.length >= 3) {
+      masked = `(${digits.slice(0, 2)}) ${digits.slice(2, Math.min(7, digits.length))}`;
+    }
+    if (digits.length >= 8) {
+      masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+    }
 
     this.form.get('phone')?.setValue(masked, { emitEvent: false });
   }
@@ -343,10 +424,10 @@ export class OnboardingComponent implements OnInit {
   private normalizePayload() {
     const raw = this.form.value;
     const docDigits = (raw.document as string).replace(/\D/g, '').slice(0, 11);
-    const phoneDigits = (raw.phone as string).replace(/\D/g, '').slice(0, 13);
+    const phoneDigits = (raw.phone as string).replace(/\D/g, '').slice(0, 11);
     const formattedPhone =
-      phoneDigits.length === 13
-        ? `+${phoneDigits.slice(0, 2)} ${phoneDigits.slice(2, 4)} ${phoneDigits.slice(4)}`
+      phoneDigits.length === 11
+        ? `(${phoneDigits.slice(0, 2)}) ${phoneDigits.slice(2, 7)}-${phoneDigits.slice(7, 11)}`
         : raw.phone;
     const birthDateIso = raw.birthDate ? `${raw.birthDate}T00:00:00Z` : undefined;
 
@@ -359,6 +440,7 @@ export class OnboardingComponent implements OnInit {
       city: (raw.city as string).trim(),
       state: (raw.state as string).trim().toUpperCase(),
       country: (raw.country as string).trim(),
+      financialGoal: this.focus ?? '',
       language: 'pt-BR'
     };
   }
@@ -366,14 +448,42 @@ export class OnboardingComponent implements OnInit {
   private cpfValidator(): ValidatorFn {
     return (control: AbstractControl) => {
       const digits = (control.value || '').toString().replace(/\D/g, '');
-      return digits.length === 11 ? null : { cpf: true };
+      if (!digits) return null;
+      if (digits.length !== 11) return { cpf: true };
+      if (/^(\d)\1{10}$/.test(digits)) return { cpf: true };
+
+      const firstVerifier = this.calculateCpfVerifier(digits.slice(0, 9), 10);
+      const secondVerifier = this.calculateCpfVerifier(digits.slice(0, 10), 11);
+
+      const isValid =
+        Number(digits[9]) === firstVerifier &&
+        Number(digits[10]) === secondVerifier;
+
+      return isValid ? null : { cpf: true };
     };
+  }
+
+  private calculateCpfVerifier(base: string, startWeight: number): number {
+    const sum = base
+      .split('')
+      .reduce((acc, digit, index) => acc + Number(digit) * (startWeight - index), 0);
+    const remainder = sum % 11;
+    return remainder < 2 ? 0 : 11 - remainder;
   }
 
   private phoneValidator(): ValidatorFn {
     return (control: AbstractControl) => {
       const digits = (control.value || '').toString().replace(/\D/g, '');
-      return digits.length === 13 ? null : { phone: true };
+      if (!digits) return null;
+      return digits.length === 11 ? null : { phone: true };
+    };
+  }
+
+  private noBlankValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = (control.value ?? '').toString();
+      if (!value) return null;
+      return value.trim().length > 0 ? null : { blank: true };
     };
   }
 
@@ -394,11 +504,11 @@ export class OnboardingComponent implements OnInit {
   }
 
   private maskPhone(value: string): string {
-    const digits = (value || '').replace(/\D/g, '').slice(0, 13);
+    const digits = (value || '').replace(/\D/g, '').slice(0, 11);
     if (!digits) return '';
-    if (digits.length <= 2) return `+${digits}`;
-    if (digits.length <= 4) return `+${digits.slice(0, 2)} ${digits.slice(2)}`;
-    return `+${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4)}`;
+    if (digits.length <= 2) return `(${digits}`;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   }
   trackByIndex(index: number): number {
     return index;
@@ -406,6 +516,13 @@ export class OnboardingComponent implements OnInit {
 
   private todayIso(): string {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  private announce(message: string): void {
+    this.liveMessage = '';
+    setTimeout(() => {
+      this.liveMessage = message;
+    }, 0);
   }
 
 }
