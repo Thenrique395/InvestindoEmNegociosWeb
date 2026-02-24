@@ -248,6 +248,12 @@
                    [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
                    [style.width.%]="insightScoreGaugeWidth"></div>
             </div>
+            <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-2" *ngIf="robotScoreBreakdown.length">
+              <p class="m-0 text-[10px] text-[var(--text-muted)]">Como chegamos nesse score:</p>
+              <ul class="m-0 mt-1 list-disc pl-4 text-[10px] text-[var(--text-secondary)]">
+                <li *ngFor="let item of robotScoreBreakdown; trackBy: trackByIndex">{{ item }}</li>
+              </ul>
+            </div>
           </article>
           <div class="grid gap-2">
             <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightRiskToneClass">

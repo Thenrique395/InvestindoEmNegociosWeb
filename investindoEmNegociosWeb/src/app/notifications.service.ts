@@ -27,6 +27,21 @@ export interface NotificationItem {
   dueDate?: string | null;
   createdAt: string;
   readAt?: string | null;
+  payload?: {
+    scenario?: string;
+    priority?: 'critical' | 'warning' | 'ok';
+    healthScore?: number;
+    riskDay?: string | null;
+    overdueExpenses?: number;
+    overdueIncomes?: number;
+    dueSoonExpensesAmount?: number;
+    currentCoverage?: number;
+    projectedCoverage?: number;
+    projectedBalance?: number;
+    action?: string;
+    tips?: string[];
+    scoreBreakdown?: string[];
+  } | null;
 }
 
 @Injectable({ providedIn: 'root' })

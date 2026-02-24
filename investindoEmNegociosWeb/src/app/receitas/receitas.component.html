@@ -105,6 +105,17 @@
           Próximo mês ▶
         </button>
       </div>
+      <div
+        class="inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[11px] font-semibold text-sky-700"
+        *ngIf="focusMode !== 'none'">
+        <span>{{ focusBadgeLabel }}</span>
+        <button
+          type="button"
+          class="rounded-full border border-sky-300/60 bg-white/70 px-2 py-[2px] text-[10px] font-semibold text-sky-800"
+          (click)="clearFocusFilter()">
+          Limpar filtro
+        </button>
+      </div>
     </div>
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-right">
       <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total {{ mesAtualLabel }}</span>

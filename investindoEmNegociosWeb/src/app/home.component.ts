@@ -119,6 +119,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   insightChangesToday: string[] = [];
   insightTodoItems: InsightTodoItem[] = [];
   robotInsightTips: string[] = [];
+  robotScoreBreakdown: string[] = [];
   insightDrillDown = {
     expensesRoute: '/despesas',
     expensesQuery: { focus: 'overdue' as const },
@@ -321,12 +322,19 @@ export class HomeComponent implements OnInit, OnDestroy {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
     if (!latestInsight) {
       this.robotInsightTips = [];
+      this.robotScoreBreakdown = [];
       return;
     }
-    this.robotInsightTips = this.extractRobotTips(latestInsight.message);
+    this.robotInsightTips = this.extractRobotTips(latestInsight);
+    this.robotScoreBreakdown = this.extractRobotScoreBreakdown(latestInsight);
   }
 
-  private extractRobotTips(message: string): string[] {
+  private extractRobotTips(notification: NotificationItem): string[] {
+    const payloadTips = notification.payload?.tips;
+    if (Array.isArray(payloadTips) && payloadTips.length > 0) {
+      return payloadTips.map((tip) => String(tip).trim()).filter(Boolean).slice(0, 4);
+    }
+    const message = notification.message || '';
     const match = message.match(/Dicas:\s*(.+)\.?$/i);
     if (!match?.[1]) return [];
     return match[1]
@@ -334,6 +342,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       .map((tip) => tip.trim())
       .filter((tip) => tip.length > 0)
       .slice(0, 4);
+  }
+
+  private extractRobotScoreBreakdown(notification: NotificationItem): string[] {
+    const breakdown = notification.payload?.scoreBreakdown;
+    if (!Array.isArray(breakdown)) return [];
+    return breakdown.map((item) => String(item).trim()).filter(Boolean).slice(0, 8);
   }
 
   get insightHealthToneClass(): string {

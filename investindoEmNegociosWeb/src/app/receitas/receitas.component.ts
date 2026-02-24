@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DecimalPipe, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
@@ -45,6 +47,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   private sub?: Subscription;
   private summarySub?: Subscription;
+  private routeSub?: Subscription;
   showDeleteModal = false;
   deletePlanId: string | null = null;
   deleteInstallmentId: string | null = null;
@@ -60,6 +63,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
+  focusMode: 'none' | 'pending' = 'none';
   sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
   categorias: CategoryDto[] = [];
@@ -69,10 +73,22 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private categoriesService: CategoriesService,
     private uiFeedback: UiFeedbackService,
-    private accountsService: AccountsService
+    private accountsService: AccountsService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.routeSub = this.route.queryParamMap.subscribe((params) => {
+      const focus = (params.get('focus') || '').toLowerCase();
+      if (focus === 'pending') {
+        this.focusMode = 'pending';
+        this.filtroStatus = 'pending';
+      } else {
+        this.focusMode = 'none';
+      }
+    });
+
     this.db.refreshIncomes(this.mesKey());
     this.loadCategorias();
     this.sub = this.db.incomes$.subscribe((lista) => {
@@ -99,6 +115,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     this.summarySub?.unsubscribe();
+    this.routeSub?.unsubscribe();
   }
 
   get currentRole(): UserRole | null {
@@ -237,6 +254,20 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   get mesAtualLabel(): string {
     return formatMonthYearLabel(this.dataAtual);
+  }
+
+  get focusBadgeLabel(): string {
+    if (this.focusMode === 'pending') return 'Filtro automático: receitas pendentes';
+    return '';
+  }
+
+  clearFocusFilter(): void {
+    this.focusMode = 'none';
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { focus: null },
+      queryParamsHandling: 'merge'
+    });
   }
 
   abrirModal(): void {
