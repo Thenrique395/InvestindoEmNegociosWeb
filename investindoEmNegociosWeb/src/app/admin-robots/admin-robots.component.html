@@ -181,19 +181,19 @@
       </div>
 
       <div class="mt-4 grid gap-2 text-sm">
-        <p><strong>Robô:</strong> {{ selectedRun?.robotName }}</p>
-        <p><strong>Status:</strong> {{ selectedRun?.wasSkipped ? 'Pulado' : (selectedRun?.success ? 'Sucesso' : 'Falha') }}</p>
-        <p><strong>Início:</strong> {{ selectedRun?.startedAt | date: 'medium' }}</p>
-        <p><strong>Fim:</strong> {{ selectedRun?.finishedAt | date: 'medium' }}</p>
-        <p><strong>Duração:</strong> {{ selectedRun?.durationMs }} ms</p>
-        <p><strong>CorrelationId:</strong> {{ selectedRun?.correlationId }}</p>
-        <p><strong>Host:</strong> {{ selectedRun?.hostName }}</p>
-        <p><strong>Disparado por (user):</strong> {{ selectedRun?.triggeredByUserId || 'scheduler/sistema' }}</p>
-        <p><strong>Itens gerados:</strong> {{ selectedRun?.metrics?.itemsGenerated }}</p>
-        <p><strong>E-mails:</strong> {{ selectedRun?.metrics?.emailsSent }}/{{ selectedRun?.metrics?.emailsAttempted }} (falhas: {{ selectedRun?.metrics?.emailsFailed }})</p>
-        <p><strong>Motivo do zero:</strong> {{ zeroItemsReasonLabel(selectedRun?.metrics?.zeroItemsReasonCode || null) }}</p>
-        <p><strong>Skip reason:</strong> {{ selectedRun?.skipReason || '-' }}</p>
-        <p class="text-rose-600"><strong>Erro:</strong> {{ selectedRun?.error || '-' }}</p>
+        <p><strong>Robô:</strong> {{ selectedRun.robotName }}</p>
+        <p><strong>Status:</strong> {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}</p>
+        <p><strong>Início:</strong> {{ selectedRun.startedAt | date: 'medium' }}</p>
+        <p><strong>Fim:</strong> {{ selectedRun.finishedAt | date: 'medium' }}</p>
+        <p><strong>Duração:</strong> {{ selectedRun.durationMs }} ms</p>
+        <p><strong>CorrelationId:</strong> {{ selectedRun.correlationId }}</p>
+        <p><strong>Host:</strong> {{ selectedRun.hostName }}</p>
+        <p><strong>Disparado por (user):</strong> {{ selectedRun.triggeredByUserId || 'scheduler/sistema' }}</p>
+        <p><strong>Itens gerados:</strong> {{ selectedRun.metrics.itemsGenerated }}</p>
+        <p><strong>E-mails:</strong> {{ selectedRun.metrics.emailsSent }}/{{ selectedRun.metrics.emailsAttempted }} (falhas: {{ selectedRun.metrics.emailsFailed }})</p>
+        <p><strong>Motivo do zero:</strong> {{ zeroItemsReasonLabel(selectedRun.metrics.zeroItemsReasonCode || null) }}</p>
+        <p><strong>Skip reason:</strong> {{ selectedRun.skipReason || '-' }}</p>
+        <p class="text-rose-600"><strong>Erro:</strong> {{ selectedRun.error || '-' }}</p>
       </div>
     </div>
   </div>
