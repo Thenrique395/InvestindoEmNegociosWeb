@@ -7,14 +7,36 @@
   min-height: 180px;
 }
 
+.filter-panel {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--primary) 10%, transparent), transparent 45%),
+    var(--surface);
+}
+
 .filter-label {
   display: block;
+  min-width: 0;
+}
+
+.filter-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 10px 12px;
+}
+
+.filter-item__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
 }
 
 .filter-control {
   height: 2.5rem;
   padding: 0 0.75rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.2;
 }
 
@@ -24,6 +46,33 @@
 
 .filter-actions {
   min-height: 2.5rem;
+}
+
+.filters-grid {
+  align-items: end;
+}
+
+.filters-footer {
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.filter-options {
+  row-gap: 10px;
+}
+
+.filter-options label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.filter-hint {
+  display: inline-flex;
+  align-items: center;
+  max-width: 460px;
+  line-height: 1.35;
+  font-size: 0.75rem;
 }
 
 .robot-run-modal {
