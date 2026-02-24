@@ -185,19 +185,131 @@
         <p class="text-[10px] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
         <h3 class="m-0 text-[var(--text-sm)] font-semibold">{{ insight.title }}</h3>
         <p class="mt-1 text-[11px] text-[var(--text-muted)]">{{ insight.message }}</p>
+        <div class="mt-2" *ngIf="insightAction">
+          <a
+            class="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[11px] font-semibold text-[var(--text)] hover:border-[var(--primary)]"
+            [routerLink]="insightAction.route">
+            Ação recomendada: {{ insightAction.label }}
+          </a>
+        </div>
+        <div class="mt-2 flex flex-wrap gap-1.5" *ngIf="insightHighlights.length">
+          <span
+            class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
+            *ngFor="let item of insightHighlights; trackBy: trackByIndex">
+            {{ item }}
+          </span>
+        </div>
       </div>
     </div>
     <button class="ghost sm" type="button" (click)="openInsightDetails()">Detalhes</button>
   </section>
 
   <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]" *ngIf="showInsightDetails">
-    <div class="relative grid w-full max-w-[560px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)]">
+    <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 sm:pb-[var(--space-3)]">
       <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
         ×
       </button>
-      <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+      <div class="flex flex-wrap items-center gap-2 pr-10">
+        <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+        <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" [ngClass]="insightPriorityClass">
+          {{ insightPriority }}
+        </span>
+      </div>
       <h3 class="m-0 text-[var(--text-lg)] font-semibold">{{ insight.title }}</h3>
       <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">{{ insight.message }}</p>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
+        <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ insightActionSentence }}</p>
+        <p class="m-1 text-[10px] text-[var(--text-muted)]">{{ insightDeadlineLabel }}</p>
+        <p class="m-0 text-[10px] text-[var(--text-secondary)]">{{ insightShortGoal }}</p>
+      </div>
+      <div class="flex flex-wrap gap-1.5" *ngIf="insightHighlights.length">
+        <span
+          class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
+          *ngFor="let item of insightHighlights; trackBy: trackByIndex">
+          {{ item }}
+        </span>
+      </div>
+      <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <div class="flex items-center justify-between gap-2">
+          <p class="m-0 text-[11px] font-semibold text-[var(--text)]">Painel de risco</p>
+          <span class="text-[10px] text-[var(--text-muted)]">Atualização automática</span>
+        </div>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1.15fr_1fr]">
+          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+            <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira</p>
+            <div class="mt-2 flex items-center justify-between gap-2">
+              <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-semibold" [ngClass]="insightHealthToneClass">
+                {{ insightDiagnostics.healthScore }}/100
+              </strong>
+              <span class="text-[10px] text-[var(--text-muted)]">Score mensal</span>
+            </div>
+            <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+              <div class="h-full rounded-full transition-all duration-300"
+                   [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
+                   [style.width.%]="insightScoreGaugeWidth"></div>
+            </div>
+          </article>
+          <div class="grid gap-2">
+            <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightRiskToneClass">
+              <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
+              <strong class="mt-2 block text-[13px] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
+            </article>
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+              <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
+              <strong class="mt-2 block text-[14px] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              <p class="mt-1 text-[10px] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
+            </article>
+          </div>
+        </div>
+        <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightOverdueToneClass">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
+              <strong class="mt-1 block text-[13px] font-semibold">
+                {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
+              </strong>
+            </div>
+          </div>
+          <div class="mt-2 grid gap-2" *ngIf="insightTodoItems.length; else noTodoItems">
+            <article
+              class="rounded-[10px] border px-2 py-2 text-[11px]"
+              *ngFor="let todo of insightTodoItems; trackBy: trackByIndex"
+              [ngClass]="todo.severity === 'danger'
+                ? 'border-rose-300/60 bg-rose-500/10 text-rose-700'
+                : todo.severity === 'warn'
+                  ? 'border-amber-300/60 bg-amber-500/10 text-amber-700'
+                  : 'border-sky-300/60 bg-sky-500/10 text-sky-700'">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="m-0 flex-1">{{ todo.text }}</p>
+                <a
+                  class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text)]"
+                  [routerLink]="todo.route"
+                  [queryParams]="todo.queryParams">
+                  {{ todo.actionLabel }}
+                </a>
+              </div>
+            </article>
+          </div>
+          <ng-template #noTodoItems>
+            <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem pendências acionáveis no momento.</p>
+          </ng-template>
+        </article>
+      </div>
+
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+          <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Comparação com mês anterior</p>
+          <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
+            <li *ngFor="let item of insightComparison; trackBy: trackByIndex">{{ item }}</li>
+          </ul>
+        </div>
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+          <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">O que mudou hoje</p>
+          <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
+            <li *ngFor="let item of insightChangesToday; trackBy: trackByIndex">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
       <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
         <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
         <ul class="mt-2 list-disc pl-[var(--space-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
@@ -207,6 +319,12 @@
       <div class="flex justify-end gap-2">
         <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
         <a class="btn-primary sm" routerLink="/despesas">Ver despesas</a>
+      </div>
+      <div class="fixed inset-x-0 bottom-0 z-[2200] border-t border-[var(--border)] bg-[var(--surface)]/95 p-3 backdrop-blur sm:hidden">
+        <div class="mx-auto flex max-w-[620px] items-center justify-end gap-2">
+          <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
+          <a class="btn-primary sm" routerLink="/despesas">Resolver agora</a>
+        </div>
       </div>
     </div>
   </div>
@@ -453,7 +571,7 @@
     </div>
   </div>
 
-    <aside class="grid content-start self-start h-fit gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+    <aside class="grid grid-rows-[auto_minmax(0,1fr)] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
       <div class="flex items-center justify-between">
         <div>
           <p class="m-0 text-[13px] font-semibold text-[var(--text)]">Movimentos recentes</p>
@@ -467,7 +585,7 @@
           <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
         </button>
       </div>
-      <div class="grid gap-2" *ngIf="recentTransactions.length; else semMovimentos">
+      <div class="grid gap-2 min-h-0 overflow-y-auto pr-1" *ngIf="recentTransactions.length; else semMovimentos">
         <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]" *ngFor="let item of recentTransactions; trackBy: trackByIndex">
           <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
             <span

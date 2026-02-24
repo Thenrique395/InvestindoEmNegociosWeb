@@ -14,7 +14,8 @@ export type NotificationKind =
   | 'GoalCompleted'
   | 'GoalInactive'
   | 'Upcoming'
-  | 'Overdue';
+  | 'Overdue'
+  | 'CashflowInsight';
 export type MoneyType = 'Income' | 'Expense';
 
 export interface NotificationItem {

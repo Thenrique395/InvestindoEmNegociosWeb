@@ -25,6 +25,7 @@
 |---|---|---|---|
 | IntelligenceMode (B ou C) | ❌ | Não encontrado em DTO/entidade/endpoint | Planejar modelo + endpoint + tela. |
 | CarryOverDay (competência configurável) | ❌ | Não encontrado em DTO/entidade/endpoint | Planejar regra de competência por usuário. |
+| Objetivo inicial do onboarding (persistência e uso) | ✅ | `FinancialGoal` em `user_profiles` + `ProfileService.Upsert` + dashboard | Objetivo selecionado é salvo no perfil e usado para enriquecer o Insight automático no home. |
 | Preferências de notificação | ⚠️ | `GET/PUT /api/v1/preferences` | Existe in-app/email; personalização ainda básica. |
 | Exclusão de conta (LGPD) | ❌ | Não há endpoint self-service | Falta fluxo de exclusão/anonimização para o próprio usuário. |
 
@@ -156,11 +157,6 @@
 - 2026-02-24: saldo por transações evoluído com conta automática para Basic, bloqueio de gestão de contas no Basic, limpeza de ledger em exclusão de parcelas e script de backfill para histórico (`Infrastructure/Data/scripts/backfill_account_transactions_from_payments.sql`).
 - 2026-02-24: saldo por transações evoluído com estorno explícito de pagamento (`POST /installments/{id}/payments/{paymentId}/reversals`), regra mais rígida para seleção de conta em perfis não-Basic e playbook de testes em base limpa (`docs/FLUXO_SALDO_TRANSACOES_PLAYBOOK.md`).
 
---------------
-
-
-quando seleciono essa opcao, ela e salva? E usada para alguma coisa??
---------------
 ## 10. Gap Analysis (escopo estratégico 2–25)
 
 | Item | Tema | Status | Observação resumida |
