@@ -18,6 +18,7 @@ type InsightDiagnostics = {
   healthScore: number;
   riskDayLabel: string | null;
   overdueExpensesCount: number;
+  overdueExpensesAmount: number;
   overdueIncomesCount: number;
   dueSoonExpensesAmount: number;
   projectedBalance: number;
@@ -130,6 +131,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     healthScore: 100,
     riskDayLabel: null,
     overdueExpensesCount: 0,
+    overdueExpensesAmount: 0,
     overdueIncomesCount: 0,
     dueSoonExpensesAmount: 0,
     projectedBalance: 0,
@@ -827,14 +829,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.updateInsightDiagnostics();
 
     if (this.insightDiagnostics.overdueExpensesCount > 0) {
+      const overdueCritical = this.hasCriticalOverdueExpenseContext(
+        this.insightDiagnostics.overdueExpensesCount,
+        this.insightDiagnostics.overdueExpensesAmount
+      );
       this.setInsight(
         'Despesas vencidas em aberto',
-        `Você tem ${this.insightDiagnostics.overdueExpensesCount} despesa(s) vencida(s). Priorize o pagamento.`,
-        'danger',
+        overdueCritical
+          ? `Você tem ${this.insightDiagnostics.overdueExpensesCount} despesa(s) vencida(s) e o caixa não cobre o atraso atual. Priorize o pagamento agora.`
+          : `Você tem ${this.insightDiagnostics.overdueExpensesCount} despesa(s) vencida(s), mas há saldo para quitar. Pague e dê baixa no sistema.`,
+        overdueCritical ? 'danger' : 'warn',
         [
           `Recebidas: ${this.formatCurrency(this.totalRendas)}`,
           `Despesas: ${this.formatCurrency(this.totalDespesas)}`,
-          `Saldo principal: ${this.formatCurrency(this.saldoPrincipal)}`
+          `Saldo principal: ${this.formatCurrency(this.saldoPrincipal)}`,
+          `Atrasado: ${this.formatCurrency(this.insightDiagnostics.overdueExpensesAmount)}`
         ],
         { label: 'Quitar despesas vencidas', route: '/despesas' }
       );
@@ -1044,6 +1053,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     const dueSoonExpensesAmount = dueSoonExpenses.reduce((sum, expense) => sum + (expense.valor || 0), 0);
+    const overdueExpensesAmount = overdueExpenses.reduce((sum, expense) => sum + (expense.valor || 0), 0);
     const projectedBalance = this.saldoProjetadoComPendencias;
     const currentCoverage = this.totalDespesas > 0 ? (this.saldoBaseDisponivel / this.totalDespesas) * 100 : 100;
     const projectedCoverage = this.totalDespesas > 0 ? ((this.saldoBaseDisponivel + this.totalRendasPendentes) / this.totalDespesas) * 100 : 100;
@@ -1057,8 +1067,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       dueSoonExpensesAmount,
       projectedBalance
     );
-    this.updateInsightPriority(overdueExpenses.length, projectedBalance, this.totalRendasPendentes, dueSoonExpensesAmount);
-    this.updateInsightActionSentence(overdueExpenses.length, projectedBalance, overdueIncomes.length);
+    this.updateInsightPriority(overdueExpenses.length, overdueExpensesAmount, projectedBalance, this.totalRendasPendentes, dueSoonExpensesAmount);
+    this.updateInsightActionSentence(overdueExpenses.length, overdueExpensesAmount, projectedBalance, overdueIncomes.length);
     this.updateInsightShortGoal(projectedBalance, dueSoonExpensesAmount, overdueExpenses.length);
     this.updateInsightDeadline(startOfToday, openExpenses);
     this.updateInsightComparison();
@@ -1069,6 +1079,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       healthScore,
       riskDayLabel: riskDay ? riskDay.toLocaleDateString('pt-BR') : null,
       overdueExpensesCount: overdueExpenses.length,
+      overdueExpensesAmount,
       overdueIncomesCount: overdueIncomes.length,
       dueSoonExpensesAmount,
       projectedBalance,
@@ -1079,11 +1090,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private updateInsightPriority(
     overdueExpensesCount: number,
+    overdueExpensesAmount: number,
     projectedBalance: number,
     pendingIncomeAmount: number,
     dueSoonExpenseAmount: number
   ): void {
-    if (overdueExpensesCount > 0 || projectedBalance < 0) {
+    if (
+      projectedBalance < 0 ||
+      this.hasCriticalOverdueExpenseContext(overdueExpensesCount, overdueExpensesAmount)
+    ) {
       this.insightPriority = 'Crítico';
       return;
     }
@@ -1096,11 +1111,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private updateInsightActionSentence(
     overdueExpensesCount: number,
+    overdueExpensesAmount: number,
     projectedBalance: number,
     overdueIncomesCount: number
   ): void {
     if (overdueExpensesCount > 0) {
-      this.insightActionSentence = `Pague ${overdueExpensesCount} despesa(s) atrasada(s) hoje para reduzir risco.`;
+      const overdueCritical = this.hasCriticalOverdueExpenseContext(
+        overdueExpensesCount,
+        overdueExpensesAmount
+      );
+      this.insightActionSentence = overdueCritical
+        ? `Pague ${overdueExpensesCount} despesa(s) atrasada(s) hoje para evitar agravamento do caixa.`
+        : `Você tem saldo para quitar ${overdueExpensesCount} despesa(s) atrasada(s). Pague e dê baixa no sistema.`;
       return;
     }
     if (projectedBalance < 0) {
@@ -1260,12 +1282,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       const first = overdueExpenses[0].date.toLocaleDateString('pt-BR');
       const last = overdueExpenses[overdueExpenses.length - 1].date.toLocaleDateString('pt-BR');
       const count = overdueExpenses.length;
+      const overdueAmount = overdueExpenses.reduce((sum, item) => sum + (item.item.valor || 0), 0);
+      const overdueCritical = this.hasCriticalOverdueExpenseContext(count, overdueAmount);
       const period = first === last ? first : `${first} a ${last}`;
       todos.push({
         id: 'overdue-expenses',
-        severity: 'danger',
-        text: `Você tem ${count} despesa(s) vencida(s) no período ${period}.`,
-        actionLabel: 'Quitar despesas',
+        severity: overdueCritical ? 'danger' : 'warn',
+        text: overdueCritical
+          ? `Você tem ${count} despesa(s) vencida(s) no período ${period} e o caixa não cobre o total atrasado.`
+          : `Você tem ${count} despesa(s) vencida(s) no período ${period} e saldo para quitar.`,
+        actionLabel: overdueCritical ? 'Quitar despesas' : 'Quitar e dar baixa',
         route: '/despesas',
         queryParams: { focus: 'overdue' }
       });
@@ -1285,6 +1311,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     this.insightTodoItems = todos.slice(0, 4);
+  }
+
+  private hasCriticalOverdueExpenseContext(overdueExpensesCount: number, overdueExpensesAmount: number): boolean {
+    if (overdueExpensesCount <= 0) return false;
+    const amount = Math.max(overdueExpensesAmount || 0, 0);
+    const availableNow = Math.max(this.saldoBaseDisponivel || 0, 0);
+    return availableNow < amount || this.saldoPrincipal < 0;
   }
 
   private calculateInsightHealthScore(
