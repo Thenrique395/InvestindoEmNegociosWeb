@@ -7,6 +7,7 @@ import { OnboardingService } from '../onboarding.service';
 import { FocusArea } from './onboarding.types';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
+import { CardDto, CardsService } from '../cards.service';
 import { CreatePlanPayload, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
@@ -92,7 +93,8 @@ export class OnboardingComponent implements OnInit {
   modalExpenseFixa = false;
   modalExpenseFixaMeses: number | null = null;
   modalExpenseCartaoId: string | null = null;
-  readonly modalExpenseCartoes: StoredCard[] = [];
+  modalExpenseCartoes: StoredCard[] = [];
+  cardsCount = 0;
   initialIncome = { source: '', amount: 0, receivedOn: '' };
   initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null as string | null };
 
@@ -103,6 +105,7 @@ export class OnboardingComponent implements OnInit {
     private onboarding: OnboardingService,
     private uiFeedback: UiFeedbackService,
     private accountsService: AccountsService,
+    private cardsService: CardsService,
     private plansService: PlansService,
     private categoriesService: CategoriesService
   ) {
@@ -116,32 +119,6 @@ export class OnboardingComponent implements OnInit {
       country: ['', [Validators.required, this.noBlankValidator()]]
     });
 
-    this.profile.getProfile().subscribe({
-      next: (data) => {
-        if (data) {
-          const goals = new Set(this.focusOptions.map((x) => x.id));
-          const savedGoal = (data as { financialGoal?: string }).financialGoal;
-          if (savedGoal && goals.has(savedGoal as FocusArea)) {
-            this.focus = savedGoal as FocusArea;
-          }
-
-          this.form.patchValue({
-            fullName: data.fullName,
-            document: this.maskCpf(data.document),
-            phone: this.maskPhone(data.phone),
-            birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
-            city: data.city ?? '',
-            state: data.state ?? '',
-            country: data.country ?? ''
-          });
-        }
-      },
-      error: (err) => {
-        if (err.status === 401) {
-          this.router.navigateByUrl('/login');
-        }
-      }
-    });
   }
 
   ngOnInit(): void {
@@ -152,9 +129,10 @@ export class OnboardingComponent implements OnInit {
           return;
         }
         this.step = Math.min(Math.max(status.step || 0, 0), 2);
+        this.loadProfile(this.step > 0);
       },
       error: () => {
-        /* ignore */
+        this.loadProfile(false);
       }
     });
 
@@ -185,6 +163,17 @@ export class OnboardingComponent implements OnInit {
       },
       error: () => {
         this.incomeCategories = [];
+      }
+    });
+
+    this.cardsService.list().subscribe({
+      next: (cards) => {
+        this.cardsCount = (cards || []).length;
+        this.modalExpenseCartoes = (cards || []).map((card) => this.toStoredCard(card));
+      },
+      error: () => {
+        this.cardsCount = 0;
+        this.modalExpenseCartoes = [];
       }
     });
   }
@@ -409,6 +398,10 @@ export class OnboardingComponent implements OnInit {
     return this.accountReady && this.hasInitialIncome && this.hasInitialExpense && !this.savingEntries;
   }
 
+  get hasInitialCard(): boolean {
+    return this.cardsCount > 0;
+  }
+
   get modalExpenseParcelValueLabel(): string {
     return this.modalExpenseAmountInput;
   }
@@ -511,6 +504,10 @@ export class OnboardingComponent implements OnInit {
     this.modalExpenseFixaMeses = null;
     this.modalExpenseCartaoId = null;
     this.showExpenseModal = true;
+  }
+
+  openCardsPage(): void {
+    this.router.navigateByUrl('/cartoes');
   }
 
   closeExpenseModal(): void {
@@ -744,6 +741,14 @@ export class OnboardingComponent implements OnInit {
     return index;
   }
 
+  isStepActive(stepIndex: number): boolean {
+    return this.step === stepIndex;
+  }
+
+  isStepDone(stepIndex: number): boolean {
+    return this.step > stepIndex;
+  }
+
   private todayIso(): string {
     return new Date().toISOString().slice(0, 10);
   }
@@ -792,6 +797,50 @@ export class OnboardingComponent implements OnInit {
     setTimeout(() => {
       this.liveMessage = message;
     }, 0);
+  }
+
+  private loadProfile(prefillForm: boolean): void {
+    this.profile.getProfile().subscribe({
+      next: (data) => {
+        if (!data) return;
+
+        const goals = new Set(this.focusOptions.map((x) => x.id));
+        const savedGoal = (data as { financialGoal?: string }).financialGoal;
+        if (savedGoal && goals.has(savedGoal as FocusArea)) {
+          this.focus = savedGoal as FocusArea;
+        }
+
+        if (!prefillForm) return;
+
+        this.form.patchValue({
+          fullName: data.fullName,
+          document: this.maskCpf(data.document),
+          phone: this.maskPhone(data.phone),
+          birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
+          city: data.city ?? '',
+          state: data.state ?? '',
+          country: data.country ?? ''
+        });
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.router.navigateByUrl('/login');
+        }
+      }
+    });
+  }
+
+  private toStoredCard(card: CardDto): StoredCard {
+    return {
+      id: card.id,
+      bandeira: String(card.brandId),
+      numero: card.last4,
+      nome: card.nickname || card.holderName,
+      banco: card.bank || '',
+      limiteCredito: card.creditLimit ?? 0,
+      diaFechamento: card.statementCloseDay ?? 1,
+      diaVencimento: card.dueDay ?? 1
+    };
   }
 
 }

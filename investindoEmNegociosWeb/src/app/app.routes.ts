@@ -52,7 +52,7 @@ export const routes: Routes = [
   {
     path: 'cartoes',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: false },
+    data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./cartoes/cartoes.component').then((m) => m.CartoesComponent)
   },
   {

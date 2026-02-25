@@ -12,6 +12,7 @@ import { CategoriesService, CategoryDto } from '../categories.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { AuthService } from '../auth.service';
 import { hasAtLeastRole, UserRole } from '../roles';
+import { LookupsService } from '../lookups.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -50,6 +51,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   private categoriaMap = new Map<string, string>();
   private expensesCache: StoredExpense[] = [];
   cartoes: StoredCard[] = [];
+  cardBrandMap: Record<string, string> = {};
   contas: AccountResponse[] = [];
   contaBaixaId: string | null = null;
   despesasPorMes: Record<string, StoredExpense[]> = {};
@@ -92,6 +94,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     private installments: InstallmentsService,
     private categoriesService: CategoriesService,
     private accountsService: AccountsService,
+    private lookupsService: LookupsService,
     private authService: AuthService,
     private uiFeedback: UiFeedbackService
   ) {}
@@ -151,6 +154,21 @@ export class DespesasComponent implements OnInit, OnDestroy {
         this.contas = [];
         this.contaBaixaId = null;
         this.accountsService.setDefaultAccountId(null);
+      }
+    });
+
+    this.lookupsService.cardBrands().subscribe({
+      next: (brands) => {
+        const nextMap: Record<string, string> = {};
+        for (const brand of brands || []) {
+          const idKey = String(brand.id);
+          const readable = (brand.name || brand.code || '').trim();
+          if (readable) nextMap[idKey] = readable;
+        }
+        this.cardBrandMap = nextMap;
+      },
+      error: () => {
+        this.cardBrandMap = {};
       }
     });
   }
@@ -842,13 +860,25 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   formatarCartaoLabel(card: StoredCard): string {
-    const final = this.finaisCartao(card.numero);
-    return `Cartão ${final}`;
+    const bandeira = this.resolveBrandName(card.bandeira);
+    const masked = this.maskedCardNumber(card.numero);
+    return `Cartão - ${bandeira} - ${masked}`;
   }
 
-  private finaisCartao(numero: string): string {
+  private resolveBrandName(brandIdOrName?: string): string {
+    const raw = (brandIdOrName || '').toString().trim();
+    if (!raw) return 'Cartão';
+    return this.cardBrandMap[raw] || raw;
+  }
+
+  private maskedCardNumber(numero?: string): string {
     const digits = (numero || '').replace(/\D/g, '');
-    return digits ? `•••• ${digits.slice(-4)}` : '';
+    const last4 = digits.slice(-4).padStart(4, '*');
+    if (digits.length >= 8) {
+      const first4 = digits.slice(0, 4);
+      return `${first4} *********** ${last4}`;
+    }
+    return `**** *********** ${last4}`;
   }
 
   private mesKeyFromDate(date: Date): string {

@@ -1,4 +1,4 @@
-import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, HostListener, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIf, NgFor, NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
@@ -55,6 +55,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(PLATFORM_ID) platformId: object,
+    private ngZone: NgZone,
     private router: Router,
     private profileService: ProfileService,
     private authService: AuthService,
@@ -353,7 +354,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.stopSessionMonitor();
     this.lastActivityAt = Date.now();
     this.registerActivityListeners();
-    this.sessionMonitorId = setInterval(() => this.checkSessionHealth(), this.sessionCheckIntervalMs);
+    this.ngZone.runOutsideAngular(() => {
+      this.sessionMonitorId = setInterval(() => {
+        this.ngZone.run(() => this.checkSessionHealth());
+      }, this.sessionCheckIntervalMs);
+    });
   }
 
   private stopSessionMonitor(): void {

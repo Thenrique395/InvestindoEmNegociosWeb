@@ -2,13 +2,10 @@
   <div class="w-full max-w-[720px] min-w-0 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)] sm:p-[clamp(1.5rem,2.5vw,2rem)]">
     <p class="sr-only" aria-live="polite" role="status">{{ liveMessage }}</p>
     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex gap-2">
-        <span class="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-sm)] font-bold text-[var(--text-muted)]"
-          [ngClass]="step === 0 ? 'border-[#2563eb] bg-[#2563eb] text-white' : step > 0 ? 'border-[rgba(37,99,235,0.35)] bg-[rgba(37,99,235,0.12)] text-[var(--primary)]' : ''">1</span>
-        <span class="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-sm)] font-bold text-[var(--text-muted)]"
-          [ngClass]="step === 1 ? 'border-[#2563eb] bg-[#2563eb] text-white' : step > 1 ? 'border-[rgba(37,99,235,0.35)] bg-[rgba(37,99,235,0.12)] text-[var(--primary)]' : ''">2</span>
-        <span class="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-sm)] font-bold text-[var(--text-muted)]"
-          [ngClass]="step === 2 ? 'border-[#2563eb] bg-[#2563eb] text-white' : ''">3</span>
+      <div class="step-chips">
+        <span class="step-chip" [class.step-chip--active]="isStepActive(0)" [class.step-chip--done]="isStepDone(0)">1</span>
+        <span class="step-chip" [class.step-chip--active]="isStepActive(1)" [class.step-chip--done]="isStepDone(1)">2</span>
+        <span class="step-chip" [class.step-chip--active]="isStepActive(2)" [class.step-chip--done]="isStepDone(2)">3</span>
       </div>
       <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">Passo {{ step + 1 }} de 3</p>
     </div>
@@ -192,7 +189,7 @@
         Use os mesmos modais das telas principais para manter o mesmo padrão de cadastro.
       </p>
 
-      <div class="grid gap-3 md:grid-cols-2">
+      <div class="grid gap-3 md:grid-cols-3">
         <article class="rounded-[12px] border p-[var(--space-2)]"
           [ngClass]="hasInitialIncome ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-[var(--border)] bg-[var(--surface-2)]'">
           <p class="m-0 text-sm font-semibold text-[var(--text)]">Receita inicial</p>
@@ -216,6 +213,23 @@
           <p class="mt-1 text-xs text-[var(--text-muted)]" *ngIf="hasInitialExpense">Data: {{ initialExpense.dueDate }}</p>
           <button class="mt-3 btn-primary min-h-[42px] w-full sm:w-auto" type="button" (click)="openExpenseModal()">
             {{ hasInitialExpense ? 'Editar despesa inicial' : 'Adicionar despesa' }}
+          </button>
+        </article>
+
+        <article class="rounded-[12px] border p-[var(--space-2)]"
+          [ngClass]="hasInitialCard ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-amber-400/40 bg-amber-500/10'">
+          <p class="m-0 text-sm font-semibold text-[var(--text)]">Cartão (opcional)</p>
+          <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="!hasInitialCard">
+            Nenhum cartão cadastrado.
+          </p>
+          <p class="mt-1 text-sm text-[var(--text)]" *ngIf="hasInitialCard">
+            {{ cardsCount }} cartão(ões) cadastrado(s).
+          </p>
+          <p class="mt-2 text-xs text-[var(--text-muted)]">
+            Você pode concluir sem cartão. Para lançar despesas no crédito, cadastre um cartão quando quiser.
+          </p>
+          <button class="mt-3 ghost min-h-[42px] w-full sm:w-auto" type="button" (click)="openCardsPage()">
+            {{ hasInitialCard ? 'Gerenciar cartões' : 'Cadastrar cartão agora' }}
           </button>
         </article>
       </div>

@@ -31,6 +31,7 @@ export class DespesasFormComponent {
   @Input() saving = false;
   @Input() cartaoSelecionadoId: string | null = null;
   @Input() cartaoSelecionadoLabel = '';
+  @Input() cardBrandMap: Record<string, string> = {};
   @Input() isEdit = false;
 
   @Output() valorChange = new EventEmitter<string>();
@@ -44,15 +45,30 @@ export class DespesasFormComponent {
   @Output() submitForm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 
-  private finalCartao(numero?: string): string {
-    if (!numero) return '••••';
+  get semCartaoNoCredito(): boolean {
+    return this.formaPagamento === 'cartao' && !this.cartoes.length;
+  }
+
+  private resolveBrandName(brandIdOrName?: string): string {
+    const raw = (brandIdOrName || '').toString().trim();
+    if (!raw) return 'Cartão';
+    return this.cardBrandMap[raw] || raw;
+  }
+
+  private maskedCardNumber(numero?: string): string {
+    if (!numero) return '**** *********** ****';
     const digits = numero.replace(/\D/g, '');
-    return digits.slice(-4).padStart(4, '•');
+    const last4 = digits.slice(-4).padStart(4, '*');
+    if (digits.length >= 8) {
+      const first4 = digits.slice(0, 4);
+      return `${first4} *********** ${last4}`;
+    }
+    return `**** *********** ${last4}`;
   }
 
   cartaoLabel(cartao: StoredCard): string {
-    const bandeira = cartao?.bandeira || 'Cartão';
-    return `Cartão - ${bandeira} •••• ${this.finalCartao(cartao?.numero)}`;
+    const bandeira = this.resolveBrandName(cartao?.bandeira);
+    return `Cartão - ${bandeira} - ${this.maskedCardNumber(cartao?.numero)}`;
   }
 
   onValorChange(value: string): void {
@@ -80,6 +96,7 @@ export class DespesasFormComponent {
   }
 
   salvar(): void {
+    if (this.semCartaoNoCredito) return;
     this.submitForm.emit();
   }
 

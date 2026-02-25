@@ -34,7 +34,7 @@ export class MetasComponent implements OnInit {
   metaVencimento = '';
   metas: Goal[] = [];
   anos: number[] = [];
-  filtroAno: number | 'ALL' = new Date().getFullYear();
+  filtroAno: number | 'ALL' = 'ALL';
   filtroStatus: GoalStatus | 'ALL' = 'ALL';
   filtroTipo: GoalKind = 'ALL';
   metaTipos = [
