@@ -14,6 +14,13 @@ import { CategoryDto } from '../categories.service';
   styleUrls: ['./despesas-form.component.scss']
 })
 export class DespesasFormComponent {
+  private readonly brandFallbackMap: Record<string, string> = {
+    '1': 'VISA',
+    '2': 'MASTERCARD',
+    '3': 'ELO',
+    '4': 'AMEX',
+    '5': 'HIPERCARD'
+  };
   @Input() mostrarForm = false;
   @Input() categorias: CategoryDto[] = [];
   @Input() cartoes: StoredCard[] = [];
@@ -52,7 +59,12 @@ export class DespesasFormComponent {
   private resolveBrandName(brandIdOrName?: string): string {
     const raw = (brandIdOrName || '').toString().trim();
     if (!raw) return 'Cartão';
-    return this.cardBrandMap[raw] || raw;
+    return (
+      this.cardBrandMap[raw] ||
+      this.cardBrandMap[raw.toUpperCase()] ||
+      this.brandFallbackMap[raw] ||
+      raw.toUpperCase()
+    );
   }
 
   private maskedCardNumber(numero?: string): string {
