@@ -38,11 +38,13 @@
             <th class="px-6 py-4 font-semibold">Status</th>
             <th class="px-6 py-4 font-semibold">Criado em</th>
             <th class="px-6 py-4 font-semibold">Nível</th>
+            <th class="px-6 py-4 font-semibold">Features</th>
             <th class="px-6 py-4 font-semibold text-right">Ações</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[var(--border)]">
-          <tr *ngFor="let user of users; trackBy: trackByIndex" class="hover:bg-[var(--surface-2)]">
+          <ng-container *ngFor="let user of users; trackBy: trackByUser">
+          <tr class="hover:bg-[var(--surface-2)]">
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
@@ -70,6 +72,15 @@
                 [disabled]="savingId === user.id || deletingId === user.id">
                 <option *ngFor="let role of roles; trackBy: trackByIndex" [value]="role">{{ role }}</option>
               </select>
+            </td>
+            <td class="px-6 py-4">
+              <button
+                type="button"
+                class="btn-secondary sm"
+                (click)="toggleFeatures(user)"
+                [disabled]="savingId === user.id || deletingId === user.id || !!featuresLoadingForUserId">
+                {{ featuresOpenForUserId === user.id ? 'Fechar' : 'Gerenciar' }}
+              </button>
             </td>
             <td class="px-6 py-4">
               <div class="flex flex-wrap items-center justify-end gap-2">
@@ -139,6 +150,34 @@
               </div>
             </td>
           </tr>
+          <tr *ngIf="featuresOpenForUserId === user.id">
+            <td colspan="6" class="px-6 pb-4">
+              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+                <div class="text-xs text-[var(--text-muted)]" *ngIf="featuresLoadingForUserId === user.id">
+                  Carregando features...
+                </div>
+                <div class="grid gap-3 md:grid-cols-2" *ngIf="featuresLoadingForUserId !== user.id">
+                  <label class="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3" *ngFor="let feature of getFeatures(user.id); trackBy: trackByFeature">
+                    <div>
+                      <div class="text-sm font-semibold text-[var(--text)]">{{ featureLabel(feature.featureKey) }}</div>
+                      <div class="text-xs text-[var(--text-muted)]">
+                        Base perfil: {{ feature.enabledByRole ? 'habilitado' : 'bloqueado' }} ·
+                        Efetivo: {{ feature.effectiveEnabled ? 'habilitado' : 'bloqueado' }}
+                      </div>
+                    </div>
+                    <select
+                      class="h-9 min-w-[120px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-xs text-[var(--text)]"
+                      [ngModel]="getFeatureMode(feature)"
+                      (ngModelChange)="onFeatureModeChange(user, feature, $event)"
+                      [disabled]="isFeatureBusy(user.id, feature.featureKey)">
+                      <option *ngFor="let mode of featureModeOptions" [ngValue]="mode">{{ modeLabel(mode) }}</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </td>
+          </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>

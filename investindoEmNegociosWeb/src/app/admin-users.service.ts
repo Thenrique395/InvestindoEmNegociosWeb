@@ -12,6 +12,13 @@ export interface AdminUserSummary {
   createdAt: string;
 }
 
+export interface AdminUserFeatureAccess {
+  featureKey: string;
+  effectiveEnabled: boolean;
+  enabledByRole: boolean;
+  overrideEnabled: boolean | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminUsersService {
   private readonly baseUrl = `${API_BASE_URL}/admin/users`;
@@ -32,5 +39,17 @@ export class AdminUsersService {
 
   remove(id: string) {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  listFeatures(id: string) {
+    return this.http.get<AdminUserFeatureAccess[]>(`${this.baseUrl}/${id}/features`);
+  }
+
+  setFeatureOverride(id: string, featureKey: string, isEnabled: boolean) {
+    return this.http.put<AdminUserFeatureAccess[]>(`${this.baseUrl}/${id}/features/${encodeURIComponent(featureKey)}`, { isEnabled });
+  }
+
+  clearFeatureOverride(id: string, featureKey: string) {
+    return this.http.delete<AdminUserFeatureAccess[]>(`${this.baseUrl}/${id}/features/${encodeURIComponent(featureKey)}`);
   }
 }

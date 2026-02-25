@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminUsersService, AdminUserSummary } from '../admin-users.service';
+import { AdminUsersService, AdminUserFeatureAccess, AdminUserSummary } from '../admin-users.service';
 import { UserRole } from '../roles';
 import { forkJoin, of } from 'rxjs';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -30,6 +30,11 @@ export class AdminUsersComponent implements OnInit {
   confirmMessage = '';
   confirmLabel = 'Confirmar';
   confirmVariant: 'warning' | 'danger' | 'primary' = 'warning';
+  featuresOpenForUserId: string | null = null;
+  featuresLoadingForUserId: string | null = null;
+  featureSavingKey: string | null = null;
+  readonly featureModeOptions: Array<'inherit' | 'enabled' | 'disabled'> = ['inherit', 'enabled', 'disabled'];
+  private featuresByUserId: Record<string, AdminUserFeatureAccess[]> = {};
   private pendingAction: { kind: 'toggle'; user: AdminUserRow; nextActive: boolean } | { kind: 'delete'; user: AdminUserRow } | null = null;
 
   roles: UserRole[] = ['Basic', 'Intermediate', 'Advanced', 'Admin'];
@@ -126,6 +131,96 @@ export class AdminUsersComponent implements OnInit {
     }, { kind: 'delete', user });
   }
 
+  toggleFeatures(user: AdminUserRow): void {
+    if (this.featuresLoadingForUserId || this.savingId || this.deletingId) return;
+    if (this.featuresOpenForUserId === user.id) {
+      this.featuresOpenForUserId = null;
+      return;
+    }
+
+    this.featuresOpenForUserId = user.id;
+    if (this.featuresByUserId[user.id]?.length) return;
+
+    this.featuresLoadingForUserId = user.id;
+    this.adminUsers.listFeatures(user.id).subscribe({
+      next: (features) => {
+        this.featuresByUserId[user.id] = features;
+      },
+      error: (err) => {
+        this.uiFeedback.error(err?.error?.detail || 'Não foi possível carregar as permissões por feature.');
+      },
+      complete: () => {
+        this.featuresLoadingForUserId = null;
+      }
+    });
+  }
+
+  getFeatures(userId: string): AdminUserFeatureAccess[] {
+    return this.featuresByUserId[userId] || [];
+  }
+
+  getFeatureMode(feature: AdminUserFeatureAccess): 'inherit' | 'enabled' | 'disabled' {
+    if (feature.overrideEnabled === true) return 'enabled';
+    if (feature.overrideEnabled === false) return 'disabled';
+    return 'inherit';
+  }
+
+  onFeatureModeChange(user: AdminUserRow, feature: AdminUserFeatureAccess, mode: 'inherit' | 'enabled' | 'disabled'): void {
+    if (this.featureSavingKey || this.featuresLoadingForUserId) return;
+    this.featureSavingKey = `${user.id}:${feature.featureKey}`;
+
+    const request$ = mode === 'inherit'
+      ? this.adminUsers.clearFeatureOverride(user.id, feature.featureKey)
+      : this.adminUsers.setFeatureOverride(user.id, feature.featureKey, mode === 'enabled');
+
+    request$.subscribe({
+      next: (features) => {
+        this.featuresByUserId[user.id] = features;
+      },
+      error: (err) => {
+        this.uiFeedback.error(err?.error?.detail || 'Não foi possível atualizar o override da feature.');
+      },
+      complete: () => {
+        this.featureSavingKey = null;
+      }
+    });
+  }
+
+  isFeatureBusy(userId: string, featureKey: string): boolean {
+    return this.featureSavingKey === `${userId}:${featureKey}`;
+  }
+
+  featureLabel(featureKey: string): string {
+    switch (featureKey) {
+      case 'investments.access':
+        return 'Investimentos';
+      case 'cards.access':
+        return 'Cartões';
+      case 'accounts.access':
+        return 'Contas';
+      case 'categories.access':
+        return 'Categorias';
+      case 'invoice-import.access':
+        return 'Importação de fatura';
+      case 'admin.users.manage':
+        return 'Admin · Usuários';
+      case 'admin.parameters.manage':
+        return 'Admin · Parâmetros';
+      case 'admin.robots.manage':
+        return 'Admin · Robôs';
+      case 'admin.categories.manage':
+        return 'Admin · Categorias';
+      default:
+        return featureKey;
+    }
+  }
+
+  modeLabel(mode: 'inherit' | 'enabled' | 'disabled'): string {
+    if (mode === 'enabled') return 'Habilitar';
+    if (mode === 'disabled') return 'Bloquear';
+    return 'Padrão';
+  }
+
   confirmAction(): void {
     if (!this.pendingAction) {
       this.confirmOpen = false;
@@ -186,6 +281,14 @@ export class AdminUsersComponent implements OnInit {
   }
   trackByIndex(index: number): number {
     return index;
+  }
+
+  trackByUser(_: number, user: AdminUserRow): string {
+    return user.id;
+  }
+
+  trackByFeature(_: number, feature: AdminUserFeatureAccess): string {
+    return feature.featureKey;
   }
 
 }
