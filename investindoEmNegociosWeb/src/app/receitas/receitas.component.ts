@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DecimalPipe, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Router } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
@@ -47,6 +46,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   private sub?: Subscription;
   private summarySub?: Subscription;
+  private incomesLoadingSub?: Subscription;
   private routeSub?: Subscription;
   showDeleteModal = false;
   deletePlanId: string | null = null;
@@ -58,8 +58,11 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   editReceivedSource = '';
   selectedIds = new Set<string>();
   loadingRecebido = false;
+  loadingMes = true;
   contas: AccountResponse[] = [];
   contaBaixaId: string | null = null;
+  private contasCarregadas = false;
+  private carregandoContas = false;
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
@@ -74,8 +77,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     private categoriesService: CategoriesService,
     private uiFeedback: UiFeedbackService,
     private accountsService: AccountsService,
-    private route: ActivatedRoute,
-    private router: Router
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -89,6 +91,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.loadingMes = true;
     this.db.refreshIncomes(this.mesKey());
     this.loadCategorias();
     this.sub = this.db.incomes$.subscribe((lista) => {
@@ -98,23 +101,16 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.summarySub = this.db.incomeSummary$.subscribe((summary) => {
       this.summary = summary;
     });
-
-    this.accountsService.list().subscribe({
-      next: (items) => {
-        this.contas = (items || []).filter((c) => c.isActive);
-        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
-      },
-      error: () => {
-        this.contas = [];
-        this.contaBaixaId = null;
-        this.accountsService.setDefaultAccountId(null);
-      }
+    this.incomesLoadingSub = this.db.incomesLoading$.subscribe((loading) => {
+      this.loadingMes = loading;
     });
+
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     this.summarySub?.unsubscribe();
+    this.incomesLoadingSub?.unsubscribe();
     this.routeSub?.unsubscribe();
   }
 
@@ -268,15 +264,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  clearFocusFilter(): void {
-    this.focusMode = 'none';
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { focus: null },
-      queryParamsHandling: 'merge'
-    });
-  }
-
   abrirModal(): void {
     if (this.saving) return;
     this.resetarForm();
@@ -416,6 +403,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   toggleSelecionar(id: string, checked: boolean): void {
     if (checked) {
       this.selectedIds.add(id);
+      this.ensureContasCarregadas();
     } else {
       this.selectedIds.delete(id);
     }
@@ -428,6 +416,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
         .map((r) => r.id)
         .filter((id): id is string => !!id);
       this.selectedIds = new Set(ids);
+      this.ensureContasCarregadas();
     } else {
       this.selectedIds.clear();
     }
@@ -440,6 +429,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.canChooseAccount && !this.contaBaixaId) {
+      this.ensureContasCarregadas();
       this.setAlerta('Selecione uma conta ativa para registrar os recebimentos.', 3000, 'error');
       return;
     }
@@ -603,13 +593,34 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     return ordenadas[0].valor;
   }
 
+  private ensureContasCarregadas(): void {
+    if (!this.canChooseAccount || this.contasCarregadas || this.carregandoContas) return;
+    this.carregandoContas = true;
+    this.accountsService.list().subscribe({
+      next: (items) => {
+        this.contas = (items || []).filter((c) => c.isActive);
+        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
+        this.contasCarregadas = true;
+        this.carregandoContas = false;
+      },
+      error: () => {
+        this.contas = [];
+        this.contaBaixaId = null;
+        this.accountsService.setDefaultAccountId(null);
+        this.carregandoContas = false;
+      }
+    });
+  }
+
   mesAnterior(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
+    this.loadingMes = true;
     this.db.refreshIncomes(this.mesKey());
   }
 
   proximoMes(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() + 1, 1);
+    this.loadingMes = true;
     this.db.refreshIncomes(this.mesKey());
   }
 

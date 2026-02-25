@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TitleCasePipe, NgIf, DecimalPipe, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { Router } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
@@ -74,11 +72,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number; isRecurring?: boolean } | null = null;
   private sub?: Subscription;
   private categoriasSub?: Subscription;
-  private routeSub?: Subscription;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
-  focusMode: 'none' | 'overdue' | 'upcoming' = 'none';
   filtroCategoria: string = 'ALL';
   filtroNome: string = '';
   loadingPagar = false;
@@ -97,9 +93,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
     private categoriesService: CategoriesService,
     private accountsService: AccountsService,
     private authService: AuthService,
-    private uiFeedback: UiFeedbackService,
-    private route: ActivatedRoute,
-    private router: Router
+    private uiFeedback: UiFeedbackService
   ) {}
 
   get currentRole(): UserRole | null {
@@ -111,19 +105,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.routeSub = this.route.queryParamMap.subscribe((params) => {
-      const focus = (params.get('focus') || '').toLowerCase();
-      if (focus === 'overdue') {
-        this.focusMode = 'overdue';
-        this.filtroStatus = 'OPEN';
-      } else if (focus === 'upcoming') {
-        this.focusMode = 'upcoming';
-        this.filtroStatus = 'OPEN';
-      } else {
-        this.focusMode = 'none';
-      }
-    });
-
     this.sub = this.db.expenses$.subscribe((lista) => {
       this.expensesCache = lista;
       this.rebuildDespesas();
@@ -177,7 +158,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     this.categoriasSub?.unsubscribe();
-    this.routeSub?.unsubscribe();
   }
 
   get mesAtualLabel(): string {
@@ -186,21 +166,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
 
   get mesAtual(): string {
     return this.mesAtualLabel;
-  }
-
-  get focusBadgeLabel(): string {
-    if (this.focusMode === 'overdue') return 'Filtro automático: despesas vencidas';
-    if (this.focusMode === 'upcoming') return 'Filtro automático: despesas próximas do vencimento';
-    return '';
-  }
-
-  clearFocusFilter(): void {
-    this.focusMode = 'none';
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { focus: null },
-      queryParamsHandling: 'merge'
-    });
   }
 
   get previousComparison(): {
@@ -283,25 +248,13 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   get despesasFiltradas(): StoredExpense[] {
-    const hoje = new Date();
-    const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    const limiteProximo = new Date(inicioHoje);
-    limiteProximo.setDate(limiteProximo.getDate() + 5);
-
     const base = this.despesas.filter((d) => {
       const statusOk = this.filtroStatus === 'ALL' ? true : (d.status || 'OPEN') === this.filtroStatus;
       const categoriaOk = this.filtroCategoria === 'ALL' ? true : d.categoryId === this.filtroCategoria;
       const nomeOk = this.filtroNome
         ? (d.nome || '').toLowerCase().includes(this.filtroNome.toLowerCase())
         : true;
-      const data = this.parseData(d.vencimento || '');
-      const focusOk =
-        this.focusMode === 'none' || !data
-          ? true
-          : this.focusMode === 'overdue'
-            ? data < inicioHoje
-            : data >= inicioHoje && data <= limiteProximo;
-      return statusOk && categoriaOk && nomeOk && focusOk;
+      return statusOk && categoriaOk && nomeOk;
     });
     if (!this.sortBy) return base;
     const compare = (a: StoredExpense, b: StoredExpense) => {

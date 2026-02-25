@@ -82,7 +82,15 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-[var(--border)]">
-        <tr *ngIf="!rendas.length">
+        <tr *ngIf="loading">
+          <td class="px-5 py-6" [attr.colspan]="showStatus ? 8 : 7">
+            <div class="flex items-center justify-center gap-2 text-[13px] text-[var(--text-muted)]">
+              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)]"></span>
+              Carregando receitas...
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && !rendas.length">
           <td class="px-5 py-6" [attr.colspan]="showStatus ? 8 : 7">
             <app-empty-state
               [title]="emptyTitle"

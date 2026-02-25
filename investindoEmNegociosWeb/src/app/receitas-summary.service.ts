@@ -9,7 +9,7 @@ export interface IncomeItemResponse {
   planId: string;
   source: string;
   amount: number;
-  receivedOn: string; // DD/MM/YYYY
+  receivedOn: string; // yyyy-MM-dd (legacy compatível com dd/MM/yyyy)
   schedule: ScheduleType;
   startDateIso: string; // yyyy-MM-dd
   isRecurring: boolean;

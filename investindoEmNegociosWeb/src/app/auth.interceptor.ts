@@ -31,6 +31,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       const refreshToken = auth.getRefreshToken();
       if (!refreshToken) {
+        auth.clearSession();
+        if (!router.url.startsWith('/login')) {
+          router.navigateByUrl('/login');
+        }
         return throwError(() => err);
       }
 
@@ -45,7 +49,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }),
         catchError((refreshErr) => {
           auth.clearSession();
-          router.navigateByUrl('/login');
+          if (!router.url.startsWith('/login')) {
+            router.navigateByUrl('/login');
+          }
           return throwError(() => refreshErr);
         })
       );

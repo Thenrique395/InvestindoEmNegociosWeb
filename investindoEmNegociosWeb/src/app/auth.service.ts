@@ -160,6 +160,20 @@ export class AuthService {
     return false;
   }
 
+  getAccessTokenExpiresAtMs(): number | null {
+    const token = this.getStorageItem('access_token');
+    if (!token) return null;
+
+    const expiresAt = this.getStorageItem('access_expires_at');
+    if (expiresAt) {
+      const exp = new Date(expiresAt).getTime();
+      if (Number.isFinite(exp)) return exp;
+    }
+
+    const jwtExp = this.readExpFromToken(token);
+    return jwtExp ? jwtExp * 1000 : null;
+  }
+
   private readRoleFromToken(token: string | null): string | null {
     if (!token || typeof atob === 'undefined') return null;
     const parts = token.split('.');

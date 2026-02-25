@@ -14,6 +14,7 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 })
 export class ReceitasListaComponent {
   @Input() rendas: StoredIncome[] = [];
+  @Input() loading = false;
   @Input() showStatus = false;
   @Input() emptyTitle = 'Sem receitas neste período';
   @Input() emptyDescription = 'Cadastre sua primeira receita para iniciar o acompanhamento.';

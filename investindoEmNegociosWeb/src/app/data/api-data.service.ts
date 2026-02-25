@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, forkJoin, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, finalize, forkJoin, map, switchMap, tap } from 'rxjs';
 import { PlansService, Plan, CreatePlanPayload } from '../plans.service';
 import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
@@ -76,7 +76,9 @@ export class ApiDataService {
   private readonly dbSubject = new BehaviorSubject<PersistedDb>({ expenses: [], cards: [], incomes: [] });
   private readonly db$ = this.dbSubject.asObservable();
   private readonly incomeSummarySubject = new BehaviorSubject<IncomeSummaryState | null>(null);
+  private readonly incomesLoadingSubject = new BehaviorSubject<boolean>(false);
   readonly incomeSummary$ = this.incomeSummarySubject.asObservable();
+  readonly incomesLoading$ = this.incomesLoadingSubject.asObservable();
   private lastIncomeMonth?: string;
   private refreshInFlight = false;
   private refreshIncomesInFlight = false;
@@ -84,6 +86,7 @@ export class ApiDataService {
   private lastRefreshIncomesAt = 0;
   private incomePlansCache = new Map<string, Plan>();
   private incomeCategoriesCache = new Map<string, string>();
+  private pendingIncomeMonth?: string;
 
   readonly expenses$ = this.db$.pipe(
     map((state) => state.expenses),
@@ -363,15 +366,25 @@ export class ApiDataService {
     if (!this.authService.getAccessToken()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
       this.incomeSummarySubject.next(null);
+       this.incomesLoadingSubject.next(false);
       return;
     }
     this.lastIncomeMonth = month;
+    const currentSummaryMonth = this.incomeSummarySubject.value?.month;
+    const monthChanged = (month || '') !== (currentSummaryMonth || '');
+
+    if (this.refreshIncomesInFlight) {
+      this.pendingIncomeMonth = month;
+      return;
+    }
+
     const now = Date.now();
-    if (!force && (this.refreshIncomesInFlight || now - this.lastRefreshIncomesAt < 1500)) {
+    if (!force && !monthChanged && now - this.lastRefreshIncomesAt < 1500) {
       return;
     }
     this.refreshIncomesInFlight = true;
     this.lastRefreshIncomesAt = now;
+    this.incomesLoadingSubject.next(true);
 
     const current = this.dbSubject.value;
     const statusMap = new Map(current.incomes.map((income) => [income.id, income.status]));
@@ -379,15 +392,29 @@ export class ApiDataService {
     forkJoin({
       summary: this.receitasSummary.getSummary(month),
       incomeInstallments: this.installments.list({ type: 'Income' })
-    }).subscribe({
+    })
+      .pipe(
+        finalize(() => {
+          this.refreshIncomesInFlight = false;
+          if (this.pendingIncomeMonth !== undefined) {
+            const nextMonth = this.pendingIncomeMonth;
+            this.pendingIncomeMonth = undefined;
+            this.refreshIncomes(nextMonth, true);
+            return;
+          }
+          this.incomesLoadingSubject.next(false);
+        })
+      )
+      .subscribe({
       next: ({ summary, incomeInstallments }) => {
+        const currentState = this.dbSubject.value;
         const installmentStatusMap = new Map(
           (incomeInstallments || []).map((inst) => [
             inst.id,
             (((inst as any)?.status || '').toString().toUpperCase() as InstallmentStatus) || 'OPEN'
           ])
         );
-        const previousById = new Map(current.incomes.map((income) => [income.id, income]));
+        const previousById = new Map(currentState.incomes.map((income) => [income.id, income]));
 
         const incomes: StoredIncome[] = summary.items.map((item) => {
           const previous = previousById.get(item.id);
@@ -403,7 +430,7 @@ export class ApiDataService {
               'Sem categoria',
             categoryId,
             valor: item.amount,
-            recebimento: item.receivedOn,
+            recebimento: this.normalizeSummaryDate(item.receivedOn),
             schedule: previous?.schedule ?? item.schedule,
             startDateIso: previous?.startDateIso ?? item.startDateIso,
             fixa: previous?.fixa ?? item.isRecurring,
@@ -412,7 +439,7 @@ export class ApiDataService {
           };
         });
 
-        this.dbSubject.next({ incomes, expenses: current.expenses, cards: current.cards });
+        this.dbSubject.next({ incomes, expenses: currentState.expenses, cards: currentState.cards });
         this.incomeSummarySubject.next({
           month: summary.month,
           total: summary.total,
@@ -423,10 +450,7 @@ export class ApiDataService {
         });
         this.enrichIncomeMetadataInBackground();
       },
-      error: (err) => console.error('Falha ao carregar receitas do backend', err),
-      complete: () => {
-        this.refreshIncomesInFlight = false;
-      }
+      error: (err) => console.error('Falha ao carregar receitas do backend', err)
     });
   }
 
@@ -604,22 +628,22 @@ export class ApiDataService {
     if (expense.fixa) {
       const months = expense.fixaMeses && expense.fixaMeses > 0 ? expense.fixaMeses : null;
       const schedule: ScheduleType = months ? 'Installments' : 'Recurring';
-    return {
-      type: 'Expense',
-      title: expense.nome,
-      amount: expense.valor,
-      schedule,
-      startDate,
-      categoryId,
-      frequency: schedule === 'Recurring' ? 'Monthly' : null,
-      installmentsCount: schedule === 'Installments' ? months : null,
-      cardId: expense.cartao || null
-    };
-  }
+      return {
+        type: 'Expense',
+        title: expense.nome,
+        amount: expense.valor,
+        schedule,
+        startDate,
+        categoryId,
+        frequency: schedule === 'Recurring' ? 'Monthly' : null,
+        installmentsCount: schedule === 'Installments' ? months : null,
+        cardId: expense.cartao || null
+      };
+    }
 
     const parcelas = expense.parcelasTotal && expense.parcelasTotal > 1 ? expense.parcelasTotal : 1;
     const schedule: ScheduleType = parcelas > 1 ? 'Installments' : 'OneTime';
-    const amount = parcelas > 1 ? expense.valor / parcelas : expense.valor;
+    const amount = expense.valor;
 
     return {
       type: 'Expense',
@@ -646,6 +670,25 @@ export class ApiDataService {
 
   private toIsoDate(ddmmyyyy: string): string | null {
     return toIsoDateFromLocale(ddmmyyyy);
+  }
+
+  private normalizeSummaryDate(value: string): string {
+    const raw = (value || '').trim();
+    const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+    if (iso) {
+      return formatLocaleDateFromIso(raw);
+    }
+    const br = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(raw);
+    if (!br) return raw;
+    const day = Number(br[1]);
+    const month = Number(br[2]);
+    const year = Number(br[3]);
+    if (!day || !month || !year) return raw;
+    const date = new Date(year, month - 1, day);
+    if (Number.isNaN(date.getTime())) return raw;
+    return formatLocaleDateFromIso(
+      `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    );
   }
 
   private todayIso(): string {

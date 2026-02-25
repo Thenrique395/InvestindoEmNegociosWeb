@@ -45,6 +45,13 @@ export class AppComponent implements OnInit, OnDestroy {
   private feedbackSub?: Subscription;
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
+  private lastActivityAt = Date.now();
+  private sessionMonitorId: ReturnType<typeof setInterval> | null = null;
+  private readonly sessionIdleTimeoutMs = 15 * 60 * 1000;
+  private readonly sessionRefreshWindowMs = 2 * 60 * 1000;
+  private readonly sessionCheckIntervalMs = 30 * 1000;
+  private readonly activityEvents: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
+  private sessionRefreshInFlight = false;
 
   constructor(
     @Inject(PLATFORM_ID) platformId: object,
@@ -84,6 +91,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     setLocaleSettings({ locale: initialLocale, currency: initialCurrency });
     if (this.isLogged) this.ensureUserContext();
+    this.startSessionMonitor();
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
       this.feedbackMessage = message;
     });
@@ -93,6 +101,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
     this.profileSub?.unsubscribe();
     this.feedbackSub?.unsubscribe();
+    this.stopSessionMonitor();
   }
 
   goToLogin(): void {
@@ -128,6 +137,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
     if (this.userMenuOpen && !target.closest('.user-menu')) {
       this.userMenuOpen = false;
+    }
+  }
+
+  @HostListener('window:focus')
+  onWindowFocus(): void {
+    this.markActivity();
+  }
+
+  @HostListener('document:visibilitychange')
+  onVisibilityChange(): void {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      this.markActivity();
     }
   }
 
@@ -325,6 +346,80 @@ export class AppComponent implements OnInit, OnDestroy {
     this.userContextInitialized = false;
     this.notifications = [];
     this.unreadCount = 0;
+  }
+
+  private startSessionMonitor(): void {
+    if (!this.isBrowser) return;
+    this.stopSessionMonitor();
+    this.lastActivityAt = Date.now();
+    this.registerActivityListeners();
+    this.sessionMonitorId = setInterval(() => this.checkSessionHealth(), this.sessionCheckIntervalMs);
+  }
+
+  private stopSessionMonitor(): void {
+    if (this.sessionMonitorId) {
+      clearInterval(this.sessionMonitorId);
+      this.sessionMonitorId = null;
+    }
+    this.unregisterActivityListeners();
+    this.sessionRefreshInFlight = false;
+  }
+
+  private registerActivityListeners(): void {
+    if (!this.isBrowser || typeof window === 'undefined') return;
+    this.activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, this.handleUserActivity, { passive: true });
+    });
+  }
+
+  private unregisterActivityListeners(): void {
+    if (!this.isBrowser || typeof window === 'undefined') return;
+    this.activityEvents.forEach((eventName) => {
+      window.removeEventListener(eventName, this.handleUserActivity);
+    });
+  }
+
+  private readonly handleUserActivity = (): void => {
+    this.markActivity();
+  };
+
+  private markActivity(): void {
+    this.lastActivityAt = Date.now();
+  }
+
+  private checkSessionHealth(): void {
+    if (!this.isBrowser || !this.authService.isAuthenticated()) return;
+
+    const now = Date.now();
+    const idleMs = now - this.lastActivityAt;
+    if (idleMs >= this.sessionIdleTimeoutMs) {
+      this.authService.clearSession();
+      this.resetUserContext();
+      if (!this.router.url.startsWith('/login')) {
+        this.uiFeedback.warning('Sessão encerrada por inatividade. Faça login novamente.');
+        this.router.navigateByUrl('/login');
+      }
+      return;
+    }
+
+    const expiresAtMs = this.authService.getAccessTokenExpiresAtMs();
+    if (!expiresAtMs || this.sessionRefreshInFlight) return;
+
+    const remainingMs = expiresAtMs - now;
+    if (remainingMs > this.sessionRefreshWindowMs) return;
+
+    const refreshToken = this.authService.getRefreshToken();
+    if (!refreshToken) return;
+
+    this.sessionRefreshInFlight = true;
+    this.authService.refresh(refreshToken).subscribe({
+      next: () => {
+        this.sessionRefreshInFlight = false;
+      },
+      error: () => {
+        this.sessionRefreshInFlight = false;
+      }
+    });
   }
   trackByIndex(index: number): number {
     return index;
