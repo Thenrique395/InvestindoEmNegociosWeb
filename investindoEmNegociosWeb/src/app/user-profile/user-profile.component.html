@@ -64,6 +64,13 @@
       País
       <input type="text" [(ngModel)]="pais" placeholder="País" />
     </label>
+    <label>
+      Modo de inteligência
+      <select [(ngModel)]="intelligenceMode">
+        <option value="B">Balanceado</option>
+        <option value="C">Conservador</option>
+      </select>
+    </label>
   </div>
   <div class="panel__actions">
     <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPerfil()">

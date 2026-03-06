@@ -23,6 +23,7 @@ export class UserProfileComponent implements OnInit {
   cidade = '';
   estado = '';
   pais = '';
+  intelligenceMode: 'B' | 'C' = 'B';
 
   senhaAtual = '';
   novaSenha = '';
@@ -43,6 +44,7 @@ export class UserProfileComponent implements OnInit {
       this.cidade = p.city || '';
       this.estado = p.state || '';
       this.pais = p.country || '';
+      this.intelligenceMode = p.intelligenceMode === 'C' ? 'C' : 'B';
       this.idioma = p.language || 'pt-BR';
       this.email = ''; // email viria de outro endpoint; placeholder
     });
@@ -87,6 +89,7 @@ export class UserProfileComponent implements OnInit {
       city: this.cidade,
       state: this.estado,
       country: this.pais,
+      intelligenceMode: this.intelligenceMode,
       language: this.idioma
     };
     this.loading = true;

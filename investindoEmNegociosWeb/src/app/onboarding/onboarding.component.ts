@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, A
 import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
-import { FocusArea } from './onboarding.types';
+import { FocusArea, IntelligenceMode } from './onboarding.types';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
 import { CardDto, CardsService } from '../cards.service';
@@ -33,6 +33,19 @@ export class OnboardingComponent implements OnInit {
   readonly maxBirthDate = this.todayIso();
   step = 0;
   focus: FocusArea | null = null;
+  intelligenceMode: IntelligenceMode = 'B';
+  readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string }[] = [
+    {
+      id: 'B',
+      title: 'Balanceado',
+      description: 'Orientações objetivas para manter equilíbrio entre controle e crescimento.'
+    },
+    {
+      id: 'C',
+      title: 'Conservador',
+      description: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.'
+    }
+  ];
   focusOptions: { id: FocusArea; title: string; description: string; tooltip: string; icon: 'growth' | 'debt' | 'invest' | 'shield' }[] = [
     {
       id: 'vida-financeira',
@@ -654,7 +667,8 @@ export class OnboardingComponent implements OnInit {
       state: (raw.state as string).trim().toUpperCase(),
       country: (raw.country as string).trim(),
       financialGoal: this.focus ?? '',
-      language: 'pt-BR'
+      language: 'pt-BR',
+      intelligenceMode: this.intelligenceMode
     };
   }
 
@@ -808,6 +822,10 @@ export class OnboardingComponent implements OnInit {
         const savedGoal = (data as { financialGoal?: string }).financialGoal;
         if (savedGoal && goals.has(savedGoal as FocusArea)) {
           this.focus = savedGoal as FocusArea;
+        }
+        const savedMode = (data as { intelligenceMode?: string }).intelligenceMode?.toUpperCase();
+        if (savedMode === 'B' || savedMode === 'C') {
+          this.intelligenceMode = savedMode as IntelligenceMode;
         }
 
         if (!prefillForm) return;
