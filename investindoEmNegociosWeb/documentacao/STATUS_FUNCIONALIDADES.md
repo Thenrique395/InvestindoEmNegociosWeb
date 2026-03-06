@@ -95,8 +95,8 @@
 | Listar notificações do usuário | ✅ | `GET /api/v1/notifications` | Com filtro de não lidas. |
 | Marcar notificação como lida | ✅ | `POST /api/v1/notifications/{id}/read` | Fluxo básico completo. |
 | Geração de notificações | ✅ | `POST /api/v1/notifications/generate` + `RoboLembretes` | Geração sob demanda e execução automática diária. |
-| Preferências de notificação (in-app/email) | ⚠️ | `PUT /api/v1/preferences` | Personalização ainda básica (sem granularidade por tipo). |
-| Envio de e-mail real | ⚠️ | Preferência existe | Falta consolidar provedor transacional em produção. |
+| Preferências de notificação (in-app/email) | ✅ | `GET/PUT /api/v1/preferences` + `UpdatePreferencesRequestValidator` | Granularidade por tipo implementada (`upcoming`, `overdue`, `in-app`, `email`, `daysBeforeDue`). |
+| Envio de e-mail real | ⚠️ | `ReminderRobotTask` + `IEmailSender` (`SmtpEmailSender`) | Envio automático de resumo diário já implementado quando `NotifyEmailEnabled=true`; pendente consolidar credenciais/provedor transacional em PRD. |
 
 ### 1.11 Tela de Configurações / Dados do Usuário
 
@@ -147,7 +147,8 @@
 | Exportar dados do usuário (JSON) | ✅ | `GET /api/v1/dataportability/export` | Endpoint pronto e usado em testes de carga. |
 | Importar dados do usuário | ✅ | `POST /api/v1/dataportability/import` | Suporta substituição de dados existentes. |
 | Validação de integridade na importação | ⚠️ | `DataPortabilityService` com validações | Cobertura boa; manter testes para casos extremos. |
-| Fluxo LGPD completo (download + exclusão/anonimização) | ⚠️ | Export/import implementados | Exclusão self-service ainda pendente. |
+| Fluxo LGPD completo (download + exclusão/anonimização) | ✅ | `GET /api/v1/dataportability/export` + `POST /api/v1/preferences/account/delete` | Download/export e exclusão de conta self-service disponíveis no produto. |
+| Governança LGPD avançada (anonimização/retenção) | ⚠️ | Processo/documentação | Manter item separado para política de retenção, anonimização avançada e governança jurídica-operacional. |
 
 ---
 
@@ -192,6 +193,7 @@
 - 2026-03-06: controle de acesso evoluído com matriz central de features no backend (`AppFeatureMatrix`) e frontend (`features.ts` + `roleGuard` por `feature`).
 - 2026-03-06: adicionada matriz funcional de features por perfil neste documento (feature key x tela x perfis) para governança de autorização.
 - 2026-03-06: tela `1.11 Configurações` concluída com personalização completa de notificações e exclusão de conta self-service (LGPD) com confirmação de senha.
+- 2026-03-06: `1.13 Portabilidade` atualizado para `✅` no fluxo LGPD de produto; pendência remanescente separada em `Governança LGPD avançada (anonimização/retenção)`.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
