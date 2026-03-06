@@ -24,9 +24,23 @@ export type InvoiceExtractResponse = {
   rawText: string;
 };
 
+export type InvoiceImportRequest = {
+  cardId?: string | null;
+  categoryId?: string | null;
+  defaultDueDate?: string | null;
+  skipDuplicates: boolean;
+  items: InvoiceItem[];
+};
+
+export type InvoiceImportResult = {
+  created: number;
+  skipped: number;
+  failed: number;
+};
+
 @Injectable({ providedIn: 'root' })
 export class InvoiceImportService {
-  private readonly baseUrl = `${API_BASE_URL}/invoiceimport`;
+  private readonly baseUrl = `${API_BASE_URL}/invoice-import`;
 
   constructor(private http: HttpClient) {}
 
@@ -34,5 +48,9 @@ export class InvoiceImportService {
     const data = new FormData();
     data.append('file', file);
     return this.http.post<InvoiceExtractResponse>(`${this.baseUrl}/extract`, data);
+  }
+
+  import(payload: InvoiceImportRequest) {
+    return this.http.post<InvoiceImportResult>(`${this.baseUrl}/import`, payload);
   }
 }

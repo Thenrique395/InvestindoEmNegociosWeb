@@ -265,6 +265,9 @@
 
   <app-invoice-import
     [open]="mostrarImportFatura"
+    [cards]="cartoes"
+    [categories]="categorias"
+    (imported)="onImportFaturaConcluida($event)"
     (close)="fecharImportFatura()"></app-invoice-import>
 
   <div *ngIf="confirmEdicao" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">

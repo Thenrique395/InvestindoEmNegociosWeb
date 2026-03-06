@@ -69,4 +69,39 @@ describe('HomeComponent smoke', () => {
 
     expect(component.robotInsightTips).toEqual(['Pagar hoje', 'Evitar compras', 'Confirmar recebimentos.']);
   });
+
+  it('deve aplicar prioridade e recomendações do robô quando insight estiver fresco', () => {
+    const component = createComponent();
+    (component as any).expensesLoaded = true;
+    (component as any).incomesLoaded = true;
+    const recentInsight: NotificationItem = {
+      id: 'n3',
+      title: 'Ação imediata: despesas atrasadas',
+      message: 'Você tem despesas vencidas em aberto.',
+      kind: 'CashflowInsight',
+      createdAt: new Date().toISOString(),
+      payload: {
+        priority: 'critical',
+        action: 'Ação recomendada: regularize hoje as despesas vencidas.',
+        recommendations: [
+          {
+            id: 'overdue-expenses',
+            severity: 'danger',
+            text: 'Você tem 2 despesas vencidas e o caixa não cobre o atraso.',
+            actionLabel: 'Quitar despesas',
+            route: '/despesas',
+            queryParams: { focus: 'overdue' }
+          }
+        ]
+      }
+    };
+
+    (component as any).consumeRobotInsight([recentInsight]);
+
+    expect(component.insightPriority).toBe('Crítico');
+    expect(component.insightActionSentence).toContain('regularize');
+    expect(component.insightTodoItems.length).toBe(1);
+    expect(component.insightTodoItems[0].route).toBe('/despesas');
+    expect(component.insightTodoItems[0].queryParams['focus']).toBe('overdue');
+  });
 });

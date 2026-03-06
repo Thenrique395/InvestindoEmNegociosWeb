@@ -31,7 +31,7 @@
 
 | Funcionalidade | Status | Evidência atual | Observação |
 |---|---|---|---|
-| Insight automático financeiro | ⚠️ | Home + `NotificationsService`/robôs | Base funcional ativa; evoluir motor de decisão e priorização de recomendações. |
+| Insight automático financeiro | ✅ | Home + `NotificationsService`/robôs + payload de recomendações ranqueadas | Motor evoluído com priorização explícita (`critical/warning/ok`), reason codes e recomendações acionáveis por rota/foco. |
 | Saldo atual por transações | ✅ | Ledger `accounts`/`account_transactions` + fluxo `payments/reversals` | Fluxo principal validado; evolução futura: transferência entre contas e UX multi-conta. |
 | Total de dívida em cartões | ✅ | `GET /api/v1/cards/debt/total` | Já exposto na API e consumido no dashboard. |
 
@@ -44,7 +44,7 @@
 | Parcelamento automático | ✅ | Motor de planos/parcelas | Implementado. |
 | Competência de cartão por closing day | ✅ | `CardStatementCycleCalculator` + testes + front com `Fatura MM/AAAA` | Validado tecnicamente e com checklist manual documentado. |
 | Fatura por competência (engine consolidada de ciclo) | ⚠️ | Campos de competência ativos em parcelas | Há base funcional; falta motor explícito de consolidação de ciclo separado de conta. |
-| Importação automática de fatura/cartão + conciliação | ⚠️ | `InvoiceImportController` + tela frontend | Evoluir como pacote único (importação multi-formato + conciliação + deduplicação + fechamento). |
+| Importação automática de fatura/cartão + conciliação | ⚠️ | `InvoiceImportController` (`extract` + `import`) + modal em `Despesas` | Importação automática de itens do PDF para lançamentos de despesa já implementada (com seleção de cartão/categoria e skip de duplicados). Pendente conciliação avançada e fechamento automatizado. |
 
 ### 1.5 Tela de Receitas
 
@@ -201,6 +201,8 @@
 - 2026-03-06: cobertura do onboarding reforçada com `onboarding.component.smoke.spec.ts` (passos 1/2/3, bloqueios e sucesso), elevando cobertura automatizada do fluxo para nível alto na matriz de testes.
 - 2026-03-06: cobertura de receitas reforçada com `receitas.component.smoke.spec.ts` (filtro mensal/status, navegação de mês, baixa em lote por perfil e consistência de summary).
 - 2026-03-06: ativados gates de CI para bloquear regressão em push/PR (`InvestindoEmNegociosApi/.github/workflows/ci-backend.yml` e `InvestindoEmNegociosWeb/.github/workflows/ci-frontend.yml`).
+- 2026-03-06: insight automático evoluído com priorização explícita (`critical/warning/ok`), `reasonCodes` e recomendações ranqueadas no payload do robô, consumidas pela Home para orientar ações com rota/foco.
+- 2026-03-06: importação automática de fatura evoluída com endpoint de confirmação (`POST /api/v1/invoiceimport/import`) e integração na tela de Despesas para persistir lançamentos automaticamente a partir do PDF, com skip de duplicados.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 

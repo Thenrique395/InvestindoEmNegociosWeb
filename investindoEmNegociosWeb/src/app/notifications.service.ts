@@ -39,6 +39,17 @@ export interface NotificationItem {
     projectedCoverage?: number;
     projectedBalance?: number;
     action?: string;
+    reasonCodes?: string[];
+    recommendations?: Array<{
+      id?: string;
+      severity?: 'danger' | 'warn' | 'info';
+      text?: string;
+      actionLabel?: string;
+      route?: string;
+      queryParams?: Record<string, string>;
+      amount?: number;
+      dueDate?: string;
+    }>;
     tips?: string[];
     scoreBreakdown?: string[];
   } | null;

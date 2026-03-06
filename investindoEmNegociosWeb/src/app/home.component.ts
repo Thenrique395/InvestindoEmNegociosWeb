@@ -51,6 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subAccounts?: Subscription;
   private subProfile?: Subscription;
   private subNotifications?: Subscription;
+  private latestRobotInsight: NotificationItem | null = null;
   private expensesLoaded = false;
   private incomesLoaded = false;
 
@@ -323,12 +324,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       .filter((item) => item.kind === 'CashflowInsight')
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
     if (!latestInsight) {
+      this.latestRobotInsight = null;
       this.robotInsightTips = [];
       this.robotScoreBreakdown = [];
       return;
     }
+    this.latestRobotInsight = latestInsight;
     this.robotInsightTips = this.extractRobotTips(latestInsight);
     this.robotScoreBreakdown = this.extractRobotScoreBreakdown(latestInsight);
+    this.updateInsight();
   }
 
   private extractRobotTips(notification: NotificationItem): string[] {
@@ -350,6 +354,76 @@ export class HomeComponent implements OnInit, OnDestroy {
     const breakdown = notification.payload?.scoreBreakdown;
     if (!Array.isArray(breakdown)) return [];
     return breakdown.map((item) => String(item).trim()).filter(Boolean).slice(0, 8);
+  }
+
+  private isRobotInsightFresh(notification: NotificationItem | null): boolean {
+    if (!notification) return false;
+    const createdAt = new Date(notification.createdAt);
+    if (Number.isNaN(createdAt.getTime())) return false;
+    const ageMs = Date.now() - createdAt.getTime();
+    const maxAgeMs = 36 * 60 * 60 * 1000;
+    return ageMs >= 0 && ageMs <= maxAgeMs;
+  }
+
+  private applyRobotInsight(notification: NotificationItem): void {
+    const payload = notification.payload ?? null;
+    const priority = payload?.priority ?? 'warning';
+    const tone: 'ok' | 'warn' | 'danger' =
+      priority === 'critical' ? 'danger' : priority === 'warning' ? 'warn' : 'ok';
+    const highlights = [
+      `Cobertura atual: ${(payload?.currentCoverage ?? this.insightDiagnostics.currentCoverage).toFixed(0)}%`,
+      `Cobertura projetada: ${(payload?.projectedCoverage ?? this.insightDiagnostics.projectedCoverage).toFixed(0)}%`,
+      `Saldo projetado: ${this.formatCurrency(payload?.projectedBalance ?? this.insightDiagnostics.projectedBalance)}`
+    ];
+    const firstRecommendation = payload?.recommendations?.[0];
+    const action =
+      firstRecommendation?.actionLabel && firstRecommendation?.route
+        ? { label: firstRecommendation.actionLabel, route: firstRecommendation.route }
+        : null;
+    this.setInsight(notification.title, notification.message, tone, highlights, action);
+
+    this.insightPriority =
+      priority === 'critical' ? 'Crítico' : priority === 'warning' ? 'Atenção' : 'Estável';
+    this.insightActionSentence = payload?.action || this.insightActionSentence;
+
+    const recommendationItems = (payload?.recommendations || [])
+      .map((item, index) => {
+        const route = item.route || '/home';
+        const queryParams = Object.entries(item.queryParams || {}).reduce<Record<string, string>>((acc, [k, v]) => {
+          acc[k] = String(v);
+          return acc;
+        }, {});
+        const severity: 'danger' | 'warn' | 'info' =
+          item.severity === 'danger' || item.severity === 'warn' ? item.severity : 'info';
+        return {
+          id: item.id || `robot-${index + 1}`,
+          severity,
+          text: item.text || '',
+          actionLabel: item.actionLabel || 'Ver detalhes',
+          route,
+          queryParams
+        } as InsightTodoItem;
+      })
+      .filter((item) => item.text.length > 0)
+      .slice(0, 4);
+
+    if (recommendationItems.length > 0) {
+      this.insightTodoItems = recommendationItems;
+    }
+
+    this.insightDiagnostics = {
+      ...this.insightDiagnostics,
+      healthScore: payload?.healthScore ?? this.insightDiagnostics.healthScore,
+      riskDayLabel: payload?.riskDay
+        ? new Date(`${payload.riskDay}T00:00:00`).toLocaleDateString('pt-BR')
+        : this.insightDiagnostics.riskDayLabel,
+      overdueExpensesCount: payload?.overdueExpenses ?? this.insightDiagnostics.overdueExpensesCount,
+      overdueIncomesCount: payload?.overdueIncomes ?? this.insightDiagnostics.overdueIncomesCount,
+      dueSoonExpensesAmount: payload?.dueSoonExpensesAmount ?? this.insightDiagnostics.dueSoonExpensesAmount,
+      projectedBalance: payload?.projectedBalance ?? this.insightDiagnostics.projectedBalance,
+      currentCoverage: payload?.currentCoverage ?? this.insightDiagnostics.currentCoverage,
+      projectedCoverage: payload?.projectedCoverage ?? this.insightDiagnostics.projectedCoverage
+    };
   }
 
   get insightHealthToneClass(): string {
@@ -827,6 +901,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   private updateInsight(): void {
     if (!this.expensesLoaded && !this.incomesLoaded) return;
     this.updateInsightDiagnostics();
+    if (this.isRobotInsightFresh(this.latestRobotInsight)) {
+      this.applyRobotInsight(this.latestRobotInsight!);
+      return;
+    }
 
     if (this.insightDiagnostics.overdueExpensesCount > 0) {
       const overdueCritical = this.hasCriticalOverdueExpenseContext(

@@ -6,6 +6,7 @@ Pasta padrão para registrar cenários funcionais de cada feature implementada.
 - `1.10_insight-automatico-financeiro.md`
 - `1.2_carry-over-day-competencia.md`
 - `1.2_intelligence-mode-b-c.md`
+- `1.4_importacao-automatica-fatura.md`
 - `1.11_configuracoes-preferencias-lgpd.md`
 - `2.2_competencia-cartao-closing-day.md`
 - `4.3_fatura-por-competencia.md`

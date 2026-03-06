@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { InvoiceImportService } from '../invoice-import.service';
+import { FormsModule } from '@angular/forms';
+import { StoredCard } from '../data/api-data.service';
+import { CategoryDto } from '../categories.service';
 
 type InvoiceItem = {
   date?: string;
@@ -26,7 +29,7 @@ type InvoiceExtract = {
 @Component({
   selector: 'app-invoice-import',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, FormsModule],
   providers: [InvoiceImportService],
   template: `
     <div *ngIf="open" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
@@ -67,6 +70,24 @@ type InvoiceExtract = {
             </div>
 
             <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              <label class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Cartão destino</p>
+                <select class="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2 text-[var(--text-sm)] text-[var(--text)]" [(ngModel)]="selectedCardId">
+                  <option [ngValue]="null">Selecione</option>
+                  <option *ngFor="let card of cards; trackBy: trackByCardId" [ngValue]="card.id">
+                    {{ card.nome }} · {{ card.numero }}
+                  </option>
+                </select>
+              </label>
+              <label class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Categoria padrão</p>
+                <select class="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2 text-[var(--text-sm)] text-[var(--text)]" [(ngModel)]="selectedCategoryId">
+                  <option [ngValue]="null">Sem categoria</option>
+                  <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </label>
               <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
                 <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Total</p>
                 <p class="text-[var(--text-lg)] font-semibold text-[var(--text)]">{{ extract.total || 'Nao identificado' }}</p>
@@ -137,23 +158,37 @@ type InvoiceExtract = {
 
         <div class="mt-4 flex flex-wrap items-center justify-end gap-2">
           <button type="button" class="btn-cancel" (click)="close.emit()">Fechar</button>
-          <button type="button" class="btn-primary" [disabled]="!fileName">Salvar fatura (proximo passo)</button>
+          <button type="button" class="btn-primary" (click)="salvarImportacao()" [disabled]="!canImport || importing">
+            {{ importing ? 'Importando...' : 'Salvar fatura' }}
+          </button>
         </div>
       </div>
     </div>
   `
 })
-export class InvoiceImportComponent {
+export class InvoiceImportComponent implements OnChanges {
   @Input() open = false;
+  @Input() cards: StoredCard[] = [];
+  @Input() categories: CategoryDto[] = [];
   @Output() close = new EventEmitter<void>();
+  @Output() imported = new EventEmitter<{ created: number; skipped: number; failed: number }>();
 
   loading = false;
+  importing = false;
   error = '';
   fileName = '';
+  selectedCardId: string | null = null;
+  selectedCategoryId: string | null = null;
   rawText = '';
   extract: InvoiceExtract = { items: [] };
 
   private invoiceImport = inject(InvoiceImportService);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['cards'] && !this.selectedCardId && this.cards.length) {
+      this.selectedCardId = this.cards[0].id;
+    }
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -207,7 +242,39 @@ export class InvoiceImportComponent {
     this.fileName = '';
     this.rawText = '';
     this.error = '';
+    this.importing = false;
     this.extract = { items: [] };
+  }
+
+  get canImport(): boolean {
+    return !!this.fileName && this.extract.items.length > 0 && !!this.selectedCardId;
+  }
+
+  salvarImportacao(): void {
+    if (!this.canImport || this.importing) return;
+    this.error = '';
+    this.importing = true;
+    this.invoiceImport
+      .import({
+        cardId: this.selectedCardId,
+        categoryId: this.selectedCategoryId,
+        defaultDueDate: this.extract.dueDate || null,
+        skipDuplicates: true,
+        items: this.extract.items
+      })
+      .subscribe({
+        next: (result) => {
+          this.imported.emit(result);
+          this.clear();
+          this.close.emit();
+        },
+        error: (err) => {
+          this.error = err?.error?.detail || err?.error?.title || 'Falha ao salvar a fatura.';
+        },
+        complete: () => {
+          this.importing = false;
+        }
+      });
   }
 
   private resolveDisplayTotal(total?: string, totalDebitsBrazil?: string): string | undefined {
@@ -228,6 +295,14 @@ export class InvoiceImportComponent {
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  trackByCardId(_index: number, card: StoredCard): string {
+    return card.id;
+  }
+
+  trackByCategoryId(_index: number, category: CategoryDto): string {
+    return category.id;
   }
 
 }

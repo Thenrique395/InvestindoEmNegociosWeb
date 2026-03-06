@@ -760,6 +760,19 @@ export class DespesasComponent implements OnInit, OnDestroy {
     this.mostrarImportFatura = false;
   }
 
+  onImportFaturaConcluida(result: { created: number; skipped: number; failed: number }): void {
+    this.db.refresh(true);
+    if (result.failed > 0) {
+      this.uiFeedback.warning(
+        `Importação parcial: ${result.created} criado(s), ${result.skipped} ignorado(s), ${result.failed} com falha.`
+      );
+      return;
+    }
+    this.uiFeedback.success(
+      `Importação concluída: ${result.created} lançamento(s) criado(s) e ${result.skipped} ignorado(s).`
+    );
+  }
+
   fecharModal(): void {
     if (this.saving) return;
     this.mostrarForm = false;
