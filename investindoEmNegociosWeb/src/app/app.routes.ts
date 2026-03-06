@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { roleGuard } from './role.guard';
 import { publicHomeGuard } from './public-home.guard';
+import { APP_FEATURE_KEYS } from './features';
 
 export const routes: Routes = [
   {
@@ -52,13 +53,13 @@ export const routes: Routes = [
   {
     path: 'cartoes',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { feature: APP_FEATURE_KEYS.cardsAccess, preload: false },
     loadComponent: () => import('./cartoes/cartoes.component').then((m) => m.CartoesComponent)
   },
   {
     path: 'contas',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: false },
+    data: { feature: APP_FEATURE_KEYS.accountsAccess, preload: false },
     loadComponent: () => import('./contas/contas.component').then((m) => m.ContasComponent)
   },
   {
@@ -82,13 +83,13 @@ export const routes: Routes = [
   {
     path: 'investimentos',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Advanced', preload: false },
+    data: { feature: APP_FEATURE_KEYS.investmentsAccess, preload: false },
     loadComponent: () => import('./investments/investments.component').then((m) => m.InvestmentsComponent)
   },
   {
     path: 'categorias',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: false },
+    data: { feature: APP_FEATURE_KEYS.categoriesAccess, preload: false },
     loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent)
   },
   {
@@ -124,19 +125,19 @@ export const routes: Routes = [
   {
     path: 'admin/usuarios',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Admin', preload: false },
+    data: { feature: APP_FEATURE_KEYS.adminUsersManage, preload: false },
     loadComponent: () => import('./admin-users/admin-users.component').then((m) => m.AdminUsersComponent)
   },
   {
     path: 'admin/parametros',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Admin', preload: false },
+    data: { feature: APP_FEATURE_KEYS.adminParametersManage, preload: false },
     loadComponent: () => import('./admin-parameters/admin-parameters.component').then((m) => m.AdminParametersComponent)
   },
   {
     path: 'admin/robots',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Admin', preload: false },
+    data: { feature: APP_FEATURE_KEYS.adminRobotsManage, preload: false },
     loadComponent: () => import('./admin-robots/admin-robots.component').then((m) => m.AdminRobotsComponent)
   },
   { path: '**', redirectTo: '' }

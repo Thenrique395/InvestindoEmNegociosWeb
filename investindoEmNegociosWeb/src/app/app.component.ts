@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
+import { AppFeatureKey, hasFeatureForRole } from './features';
 import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 import { NotificationsService, NotificationItem } from './notifications.service';
@@ -213,6 +214,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
+  }
+
+  hasFeature(featureKey: AppFeatureKey): boolean {
+    return hasFeatureForRole(this.currentRole, featureKey);
   }
 
   toggleTheme(): void {

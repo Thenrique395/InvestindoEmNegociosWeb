@@ -113,7 +113,7 @@
 | Gestão de categorias padrão (admin) | ✅ | `AdminCategoriesController` | Catálogo administrável. |
 | Gestão de parâmetros (instituições, bandeiras, meios de pagamento e agendamento de robôs) | ✅ | `AdminParametersController` | Inclui configuração de horário de execução automática dos robôs via painel admin. |
 | Monitoramento e execução de robôs (admin) | ✅ | `GET/POST /api/v1/admin/robots/*` + rota `/admin/robots` | Painel com histórico, detalhe de execução, cooldown/force e auditoria de disparo. |
-| Controle de acesso por perfil | ⚠️ | Roles presentes em auth/JWT | Revisar matriz de autorização por endpoint (policies por feature). |
+| Controle de acesso por perfil | ⚠️ | Roles em auth/JWT + matriz de features central no backend (`AppFeatureMatrix`) e frontend (`features.ts`) | Base central implementada; manter revisão contínua de policies por endpoint e cobertura de testes por perfil. |
 
 ### 1.13 Tela de Portabilidade de Dados
 
@@ -164,6 +164,7 @@
 - 2026-03-06: item `2.2 Competência de cartão por closing day` marcado como concluído após validação automatizada (`CardStatementCycleCalculatorTests` + `PlansServiceTests`) e checklist manual documentado em `documentacao/Cenarios de teste/2.2_competencia-cartao-closing-day.md`.
 - 2026-03-06: item `1.2 IntelligenceMode (B ou C)` implementado com persistência em `user_profiles`, validação (`B|C`) e cobertura em onboarding/perfil no frontend.
 - 2026-03-06: item `1.2 CarryOverDay` implementado com persistência (`user_profiles`), validação (`1..31`), edição em onboarding/perfil e aplicação na competência do insight automático.
+- 2026-03-06: controle de acesso evoluído com matriz central de features no backend (`AppFeatureMatrix`) e frontend (`features.ts` + `roleGuard` por `feature`).
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
