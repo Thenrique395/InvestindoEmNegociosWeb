@@ -52,8 +52,11 @@ export class AdminParametersComponent implements OnInit {
   savingCreateInstitution = false;
   savingNotificationSettings = false;
   savingRobotSettings = false;
+  sendingTestEmail = false;
   notificationsUpdatedAt?: Date;
   robotsUpdatedAt?: Date;
+  testEmailTo = '';
+  testEmailSentAt?: Date;
   private lastUpdatedBrands: Record<number, Date> = {};
   private lastUpdatedMethods: Record<number, Date> = {};
   private lastUpdatedInstitutions: Record<number, Date> = {};
@@ -295,6 +298,30 @@ export class AdminParametersComponent implements OnInit {
     });
   }
 
+  enviarEmailTeste(): void {
+    if (this.sendingTestEmail) return;
+    const to = this.testEmailTo.trim();
+    if (!to) {
+      this.uiFeedback.warning('Informe um e-mail de destino para o teste.');
+      return;
+    }
+
+    this.sendingTestEmail = true;
+    this.adminParameters.sendTestEmail(to).subscribe({
+      next: (result) => {
+        this.testEmailTo = result.to;
+        this.testEmailSentAt = new Date(result.sentAtUtc);
+        this.uiFeedback.success(`E-mail de teste enviado para ${result.to}.`);
+      },
+      error: (err) => {
+        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao enviar e-mail de teste.'));
+      },
+      complete: () => {
+        this.sendingTestEmail = false;
+      }
+    });
+  }
+
   get filteredCardBrands(): CardBrandAdmin[] {
     return this.filterList(this.cardBrands, this.brandFilter, (brand) => `${brand.name} ${brand.code}`);
   }
@@ -337,6 +364,10 @@ export class AdminParametersComponent implements OnInit {
 
   robotUpdatedLabel(): string {
     return this.formatUpdatedLabel(this.robotsUpdatedAt);
+  }
+
+  testEmailUpdatedLabel(): string {
+    return this.formatUpdatedLabel(this.testEmailSentAt);
   }
 
   private brandKey(id: number): string {

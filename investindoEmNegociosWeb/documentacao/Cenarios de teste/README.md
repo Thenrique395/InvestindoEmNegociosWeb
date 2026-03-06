@@ -2,6 +2,15 @@
 
 Pasta padrão para registrar cenários funcionais de cada feature implementada.
 
+## Cenários já documentados
+- `1.10_insight-automatico-financeiro.md`
+- `1.2_carry-over-day-competencia.md`
+- `1.2_intelligence-mode-b-c.md`
+- `1.11_configuracoes-preferencias-lgpd.md`
+- `2.2_competencia-cartao-closing-day.md`
+- `4.3_fatura-por-competencia.md`
+- `5.1_tipos-transacao-transferencia.md`
+
 ## Regra de uso
 - Para toda feature nova, criar 1 arquivo de cenário nesta pasta.
 - Nome sugerido: `XX.Y_nome-da-feature.md` (seguindo o item do `STATUS_FUNCIONALIDADES.md`).

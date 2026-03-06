@@ -5,6 +5,7 @@ import { API_BASE_URL } from './api.config';
 
 export type AccountType = 'Checking' | 'Savings' | 'DigitalWallet' | 'Cash' | 'Other';
 export type AccountTransactionKind = 'Credit' | 'Debit';
+export type AccountTransactionType = 'Income' | 'Expense' | 'Transfer';
 
 export interface AccountRequest {
   name: string;
@@ -35,12 +36,30 @@ export interface AccountTransactionResponse {
   id: string;
   accountId: string;
   occurredAt: string;
+  type: AccountTransactionType;
   kind: AccountTransactionKind;
   amount: number;
   description: string;
   sourceType?: string | null;
   sourceId?: string | null;
   createdAt: string;
+}
+
+export interface AccountTransferRequest {
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+  occurredAt?: string | null;
+  description?: string | null;
+}
+
+export interface AccountTransferResponse {
+  transferId: string;
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+  occurredAtUtc: string;
+  description: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -107,6 +126,10 @@ export class AccountsService {
     if (options.fromUtc) params = params.set('fromUtc', options.fromUtc);
     if (options.toUtc) params = params.set('toUtc', options.toUtc);
     return this.http.get<AccountTransactionResponse[]>(`${this.baseUrl}/${id}/transactions`, { params });
+  }
+
+  transfer(payload: AccountTransferRequest): Observable<AccountTransferResponse> {
+    return this.http.post<AccountTransferResponse>(`${this.baseUrl}/transfers`, payload);
   }
 
   private safeStorage(): Storage | null {

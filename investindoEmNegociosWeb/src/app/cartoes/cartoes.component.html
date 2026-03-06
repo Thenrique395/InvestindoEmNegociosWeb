@@ -28,6 +28,50 @@
     (editar)="editar($event)"
     (emptyAction)="abrirModal()"></app-cartoes-listagem>
 
+  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+    <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h3 class="text-base font-semibold text-[var(--text)]">Fatura por competência</h3>
+        <p class="text-xs text-[var(--text-muted)]">Consolidação por ciclo de fechamento e vencimento do cartão.</p>
+      </div>
+      <div class="grid gap-2 sm:grid-cols-4">
+        <select class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm" [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
+          <option *ngFor="let c of cards; trackBy: trackByIndex" [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
+        </select>
+        <input
+          type="number"
+          min="2000"
+          max="2100"
+          class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm"
+          [(ngModel)]="statementYear" />
+        <select class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm" [(ngModel)]="statementMonth">
+          <option [ngValue]="null">Todos os meses</option>
+          <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">{{ statementMonthLabel(m) }}</option>
+        </select>
+        <button class="btn-ghost sm" type="button" (click)="loadStatementCycles()">Aplicar</button>
+      </div>
+    </div>
+
+    <p *ngIf="statementLoading" class="text-sm text-[var(--text-muted)]">Carregando faturas...</p>
+    <p *ngIf="!statementLoading && !statementCycles.length" class="text-sm text-[var(--text-muted)]">Nenhuma fatura encontrada para os filtros.</p>
+
+    <div class="grid gap-3" *ngIf="!statementLoading && statementCycles.length">
+      <article class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3" *ngFor="let cycle of statementCycles; trackBy: trackByStatement">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="text-sm font-semibold text-[var(--text)]">
+            Ciclo {{ statementMonthLabel(cycle.statementMonth) }}/{{ cycle.statementYear }} • fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} • vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}
+          </div>
+          <div class="text-xs text-[var(--text-muted)]">{{ cycle.itemsCount }} lançamento(s)</div>
+        </div>
+        <div class="mt-2 grid gap-2 text-sm sm:grid-cols-3">
+          <div>Total: <strong>R$ {{ cycle.totalAmount | number:'1.2-2' }}</strong></div>
+          <div class="text-[var(--success)]">Pago: <strong>R$ {{ cycle.totalPaid | number:'1.2-2' }}</strong></div>
+          <div class="text-[var(--danger)]">Em aberto: <strong>R$ {{ cycle.totalOpen | number:'1.2-2' }}</strong></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
   <div *ngIf="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
     <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharModal()"></div>
     <div class="relative w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">

@@ -44,6 +44,11 @@ export interface RobotSettings {
   dailyRunTimeUtc: string;
 }
 
+export interface TestEmailResult {
+  to: string;
+  sentAtUtc: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminParametersService {
   private readonly baseUrl = `${API_BASE_URL}/admin/parameters`;
@@ -100,5 +105,9 @@ export class AdminParametersService {
 
   updateRobotSettings(settings: RobotSettings) {
     return this.http.put<RobotSettings>(`${this.baseUrl}/robot-settings`, settings);
+  }
+
+  sendTestEmail(to: string) {
+    return this.http.post<TestEmailResult>(`${this.baseUrl}/test-email`, { to });
   }
 }

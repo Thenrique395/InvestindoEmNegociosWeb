@@ -11,9 +11,25 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: "22.x"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node.js (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: investindoEmNegociosWeb/package-lock.json
+
+      - name: Validate frontend (test + build)
+        working-directory: ./investindoEmNegociosWeb
+        run: |
+          npm ci
+          npm run test -- --watch=false --browsers=ChromeHeadless
+          npm run build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

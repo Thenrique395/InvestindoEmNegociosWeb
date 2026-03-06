@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { UpperCasePipe, DatePipe, DecimalPipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
@@ -8,6 +8,7 @@ import { LookupsService, CardBrandLookup, InstitutionLookup } from '../lookups.s
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatCurrencyValue } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { CardStatementCycleDto, CardsService } from '../cards.service';
 
 @Component({
   selector: 'app-cartoes',
@@ -15,6 +16,8 @@ import { UiFeedbackService } from '../ui-feedback.service';
   imports: [
     FormsModule,
     UpperCasePipe,
+    DatePipe,
+    DecimalPipe,
     NgIf,
     NgFor,
     NgSwitch,
@@ -44,6 +47,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
   editandoId: string | null = null;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   brands: CardBrandLookup[] = [];
+  statementCardId: string | null = null;
+  statementYear = new Date().getFullYear();
+  statementMonth: number | null = null;
+  statementLoading = false;
+  statementCycles: CardStatementCycleDto[] = [];
 
   get bandeiraCode(): string {
     const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
@@ -59,12 +67,23 @@ export class CartoesComponent implements OnInit, OnDestroy {
   constructor(
     private db: ApiDataService,
     private lookups: LookupsService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private cardsService: CardsService
   ) {}
 
   ngOnInit(): void {
     this.sub = this.db.cards$.subscribe((lista) => {
       this.cards = lista;
+      if (!this.cards.length) {
+        this.statementCardId = null;
+        this.statementCycles = [];
+        return;
+      }
+
+      if (!this.statementCardId || !this.cards.some((c) => c.id === this.statementCardId)) {
+        this.statementCardId = this.cards[0].id;
+      }
+      this.loadStatementCycles();
     });
     this.expensesSub = this.db.expenses$.subscribe((lista) => {
       this.expenses = lista;
@@ -262,6 +281,40 @@ export class CartoesComponent implements OnInit, OnDestroy {
   tituloBandeira(id: string): string {
     const brand = this.brands.find((b) => String(b.id) === id);
     return brand?.name || 'Cartão';
+  }
+
+  loadStatementCycles(): void {
+    if (!this.statementCardId) {
+      this.statementCycles = [];
+      return;
+    }
+
+    this.statementLoading = true;
+    this.cardsService
+      .statements(this.statementCardId, {
+        year: this.statementYear || undefined,
+        month: this.statementMonth || undefined
+      })
+      .subscribe({
+        next: (cycles) => {
+          this.statementCycles = cycles || [];
+        },
+        error: () => {
+          this.statementCycles = [];
+          this.uiFeedback.error('Falha ao carregar faturas por competência.');
+        },
+        complete: () => {
+          this.statementLoading = false;
+        }
+      });
+  }
+
+  statementMonthLabel(month: number): string {
+    return String(month).padStart(2, '0');
+  }
+
+  trackByStatement(index: number): number {
+    return index;
   }
   trackByIndex(index: number): number {
     return index;

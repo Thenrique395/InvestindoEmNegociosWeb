@@ -96,7 +96,7 @@
 | Marcar notificação como lida | ✅ | `POST /api/v1/notifications/{id}/read` | Fluxo básico completo. |
 | Geração de notificações | ✅ | `POST /api/v1/notifications/generate` + `RoboLembretes` | Geração sob demanda e execução automática diária. |
 | Preferências de notificação (in-app/email) | ✅ | `GET/PUT /api/v1/preferences` + `UpdatePreferencesRequestValidator` | Granularidade por tipo implementada (`upcoming`, `overdue`, `in-app`, `email`, `daysBeforeDue`). |
-| Envio de e-mail real | ⚠️ | `ReminderRobotTask` + `IEmailSender` (`SmtpEmailSender`) | Envio automático de resumo diário já implementado quando `NotifyEmailEnabled=true`; pendente consolidar credenciais/provedor transacional em PRD. |
+| Envio de e-mail real | ⚠️ | `ReminderRobotTask` + `IEmailSender` (`SmtpEmailSender`) + mapeamento `SMTP_*`/`Smtp__*` em `EnvironmentConfigurationExtensions` + `POST /api/v1/admin/parameters/test-email` (tela Admin Parameters) | Envio automático de resumo diário implementado quando `NotifyEmailEnabled=true`; credenciais existentes já podem ser reaproveitadas sem ajuste de nome de variável e há disparo manual de teste SMTP no admin. Mantém pendência operacional de validação final em PRD. |
 
 ### 1.11 Tela de Configurações / Dados do Usuário
 
@@ -194,6 +194,9 @@
 - 2026-03-06: adicionada matriz funcional de features por perfil neste documento (feature key x tela x perfis) para governança de autorização.
 - 2026-03-06: tela `1.11 Configurações` concluída com personalização completa de notificações e exclusão de conta self-service (LGPD) com confirmação de senha.
 - 2026-03-06: `1.13 Portabilidade` atualizado para `✅` no fluxo LGPD de produto; pendência remanescente separada em `Governança LGPD avançada (anonimização/retenção)`.
+- 2026-03-06: envio de e-mail por SMTP ajustado para falhar explicitamente quando configuração estiver ausente (sem sucesso silencioso), com cobertura em `ReminderRobotTaskTests`.
+- 2026-03-06: `4.3 Fatura por competência` e `5.1 Tipos de transação (com transferência formal)` concluídos com endpoint de consolidação de fatura por ciclo e endpoint de transferência entre contas integrado à tela de Contas.
+- 2026-03-06: criada suíte de smoke global (API + Web) com ampliação de smoke tests para `Contas` (transferência) e `Cartões` (fatura por competência), além de guia operacional em `docs/SMOKE_TESTS_SUITE.md`.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
@@ -205,8 +208,8 @@
 | 3.2 | Saldo atual por transações | ✅ | Ledger operacional ativo (pagamento/recebimento + estorno explícito + limpeza em delete + backfill histórico) e fluxo principal validado. Evoluções futuras: transferência entre contas e UX avançada multi-conta. |
 | 4.1 | Cadastro de cartão (limite/fechamento/vencimento) | ✅ | Implementado em `cards`. |
 | 4.2 | Compras no cartão + parcelamento + compromissos futuros | ✅ | Fluxo implementado por planos/parcelas/pagamentos. |
-| 4.3 | Fatura por competência | ⚠️ | Há base funcional, mas sem engine explícita de consolidação de ciclo de fatura separado de conta. |
-| 5.1 | Tipos de transação (receita/despesa/transferência) | ⚠️ | Receita/despesa existem; transferência formal não está modelada. |
+| 4.3 | Fatura por competência | ✅ | Engine explícita implementada com consolidação por ciclo em `CardsService.ListStatementCyclesAsync` + endpoint `GET /api/v1/cards/{id}/statements` e visualização na tela de cartões. |
+| 5.1 | Tipos de transação (receita/despesa/transferência) | ✅ | Transferência formal implementada em `POST /api/v1/accounts/transfers` (débito + crédito no ledger com `SourceType=AccountTransfer`) e classificada no extrato como `Transfer`. |
 | 5.2 | Campos completos (competência + source type etc.) | ⚠️ | Parte dos campos existe; competência e `SourceType` padronizado não estão completos. |
 | 5.3 | Parcelamento automático | ✅ | Implementado. |
 | 6.1 | Importação OFX | ❌ | Não encontrado parser/fluxo OFX. |

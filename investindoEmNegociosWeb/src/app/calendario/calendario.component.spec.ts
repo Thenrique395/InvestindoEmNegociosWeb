@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
 import { AccountsService } from '../accounts.service';
 import { CalendarioComponent } from './calendario.component';
+import { setLocaleSettings } from '../utils/locale-settings';
 
 class ApiDataServiceMock {
   private readonly expensesSubject = new BehaviorSubject<StoredExpense[]>([]);
@@ -38,6 +39,8 @@ describe('CalendarioComponent', () => {
   let dataService: ApiDataServiceMock;
 
   beforeEach(async () => {
+    setLocaleSettings({ locale: 'pt-BR', currency: 'BRL' });
+
     await TestBed.configureTestingModule({
       imports: [CalendarioComponent],
       providers: [
