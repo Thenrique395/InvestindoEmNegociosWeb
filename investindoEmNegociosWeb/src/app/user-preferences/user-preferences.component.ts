@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
 import { getInitialLocale, persistLocaleSettings, setLocaleSettings } from '../utils/locale-settings';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-preferences',
@@ -23,10 +25,21 @@ export class UserPreferencesComponent implements OnInit {
   ];
   linguaSelecionada = 'pt-BR';
   loading = false;
+  deletingAccount = false;
   notifyInApp = true;
   notifyEmail = false;
+  notifyUpcoming = true;
+  notifyOverdue = true;
+  notifyDaysBeforeDue = 3;
+  deletePassword = '';
+  deleteConfirmation = '';
 
-  constructor(private profileService: ProfileService, private uiFeedback: UiFeedbackService) {}
+  constructor(
+    private profileService: ProfileService,
+    private uiFeedback: UiFeedbackService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.profileService.getPreferences().subscribe((prefs) => {
@@ -37,8 +50,11 @@ export class UserPreferencesComponent implements OnInit {
         this.ensurePrimaryLocale();
       }
       if (prefs.notifications) {
+        this.notifyUpcoming = prefs.notifications.upcomingEnabled;
+        this.notifyOverdue = prefs.notifications.overdueEnabled;
         this.notifyInApp = prefs.notifications.inAppEnabled;
         this.notifyEmail = prefs.notifications.emailEnabled;
+        this.notifyDaysBeforeDue = prefs.notifications.daysBeforeDue;
       }
     });
   }
@@ -52,8 +68,11 @@ export class UserPreferencesComponent implements OnInit {
       currency: this.moedaSelecionada,
       locales,
       notifications: {
+        upcomingEnabled: this.notifyUpcoming,
+        overdueEnabled: this.notifyOverdue,
         inAppEnabled: this.notifyInApp,
-        emailEnabled: this.notifyEmail
+        emailEnabled: this.notifyEmail,
+        daysBeforeDue: Math.max(0, Math.min(60, Number(this.notifyDaysBeforeDue) || 0))
       }
     };
     this.loading = true;
@@ -73,6 +92,36 @@ export class UserPreferencesComponent implements OnInit {
       error: () => {
         this.loading = false;
         this.uiFeedback.error('Falha ao salvar preferências.');
+      }
+    });
+  }
+
+  excluirConta(): void {
+    const password = this.deletePassword.trim();
+    const confirmationText = this.deleteConfirmation.trim().toUpperCase();
+
+    if (!password) {
+      this.uiFeedback.warning('Informe sua senha atual para excluir a conta.');
+      return;
+    }
+
+    if (confirmationText !== 'EXCLUIR') {
+      this.uiFeedback.warning('Digite EXCLUIR para confirmar a exclusão da conta.');
+      return;
+    }
+
+    this.deletingAccount = true;
+    this.profileService.deleteOwnAccount({ currentPassword: password, confirmationText }).subscribe({
+      next: () => {
+        this.deletingAccount = false;
+        this.authService.clearSession();
+        this.uiFeedback.success('Conta excluída com sucesso.');
+        this.router.navigateByUrl('/login');
+      },
+      error: (err) => {
+        this.deletingAccount = false;
+        const message = err?.error?.detail || err?.error?.title || 'Não foi possível excluir a conta.';
+        this.uiFeedback.error(message);
       }
     });
   }

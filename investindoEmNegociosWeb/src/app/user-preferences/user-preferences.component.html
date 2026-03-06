@@ -71,6 +71,14 @@
       <p class="muted">Notificações</p>
       <div class="notify-grid">
         <label class="toggle-row">
+          <span>Lembrete de vencimento próximo</span>
+          <input type="checkbox" [(ngModel)]="notifyUpcoming" />
+        </label>
+        <label class="toggle-row">
+          <span>Alerta de vencimento em atraso</span>
+          <input type="checkbox" [(ngModel)]="notifyOverdue" />
+        </label>
+        <label class="toggle-row">
           <span>Notificações no app</span>
           <input type="checkbox" [(ngModel)]="notifyInApp" />
         </label>
@@ -79,7 +87,33 @@
           <input type="checkbox" [(ngModel)]="notifyEmail" />
         </label>
       </div>
-      <p class="muted">As regras e prazos são definidos pelo administrador.</p>
+      <label class="days-before-due">
+        Dias antes do vencimento para alerta
+        <input type="number" min="0" max="60" [(ngModel)]="notifyDaysBeforeDue" />
+      </label>
+      <p class="muted">Configure os canais e o prazo de antecedência dos lembretes.</p>
+    </div>
+
+    <div class="full account-danger-zone">
+      <p class="danger-title">Excluir conta (LGPD self-service)</p>
+      <p class="muted">
+        Esta ação remove permanentemente seus dados financeiros e seu usuário. Não é possível desfazer.
+      </p>
+      <div class="danger-grid">
+        <label>
+          Senha atual
+          <input type="password" [(ngModel)]="deletePassword" placeholder="Digite sua senha" />
+        </label>
+        <label>
+          Confirmação
+          <input type="text" [(ngModel)]="deleteConfirmation" placeholder="Digite EXCLUIR" />
+        </label>
+      </div>
+      <div class="danger-actions">
+        <button type="button" class="btn-danger" [disabled]="deletingAccount" (click)="excluirConta()">
+          {{ deletingAccount ? 'Excluindo...' : 'Excluir minha conta' }}
+        </button>
+      </div>
     </div>
   </div>
 

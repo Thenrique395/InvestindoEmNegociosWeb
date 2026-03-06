@@ -161,3 +161,48 @@ input {
   background: var(--surface-2);
   font-weight: 600;
 }
+
+.days-before-due {
+  max-width: 280px;
+}
+
+.account-danger-zone {
+  border: 1px solid #f7b5ba;
+  border-radius: 12px;
+  background: #fff3f4;
+  padding: var(--space-2);
+  display: grid;
+  gap: 0.7rem;
+}
+
+.danger-title {
+  margin: 0;
+  color: #a22830;
+  font-weight: 700;
+}
+
+.danger-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+
+.danger-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-danger {
+  border: 1px solid #d6454f;
+  background: #d6454f;
+  color: #fff;
+  border-radius: 10px;
+  padding: var(--space-1) var(--space-2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-danger:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

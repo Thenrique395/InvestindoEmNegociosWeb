@@ -102,8 +102,8 @@
 
 | Funcionalidade | Status | Evidência atual | Observação |
 |---|---|---|---|
-| Preferências de notificação | ⚠️ | `GET/PUT /api/v1/preferences` | Existe in-app/email; personalização ainda básica. |
-| Exclusão de conta (LGPD self-service) | ❌ | Não há endpoint self-service | Falta fluxo de exclusão/anonimização para o próprio usuário. |
+| Preferências de notificação | ✅ | `GET/PUT /api/v1/preferences` + `UpdatePreferencesRequestValidator` | Personalização completa disponível (`upcoming`, `overdue`, `in-app`, `email`, `daysBeforeDue`). |
+| Exclusão de conta (LGPD self-service) | ✅ | `POST /api/v1/preferences/account/delete` + `DeleteOwnAccountRequestValidator` | Fluxo self-service implementado com confirmação explícita (`EXCLUIR`) e validação de senha atual. |
 
 ### 1.12 Área Administrativa
 
@@ -114,6 +114,31 @@
 | Gestão de parâmetros (instituições, bandeiras, meios de pagamento e agendamento de robôs) | ✅ | `AdminParametersController` | Inclui configuração de horário de execução automática dos robôs via painel admin. |
 | Monitoramento e execução de robôs (admin) | ✅ | `GET/POST /api/v1/admin/robots/*` + rota `/admin/robots` | Painel com histórico, detalhe de execução, cooldown/force e auditoria de disparo. |
 | Controle de acesso por perfil | ⚠️ | Roles em auth/JWT + matriz de features central no backend (`AppFeatureMatrix`) e frontend (`features.ts`) | Base central implementada; manter revisão contínua de policies por endpoint e cobertura de testes por perfil. |
+
+#### Matriz de features por perfil (fonte de verdade)
+
+> Referência técnica: `Domain/Security/AppFeatureMatrix.cs` (API) e `src/app/features.ts` (Web).
+
+**Features de produto**
+
+| Feature key | Tela/uso principal | Basic | Intermediate | Advanced | Admin |
+|---|---|---|---|---|---|
+| `cards.access` | Menu/Tela Cartões + seleção de cartão em despesa | ✅ | ✅ | ✅ | ✅ |
+| `accounts.access` | Gestão de contas e saldo por conta | ✅ | ✅ | ✅ | ✅ |
+| `categories.access` | Catálogo de categorias no app | ✅ | ✅ | ✅ | ✅ |
+| `invoice-import.access` | Importação e conciliação de fatura/cartão | ❌ | ✅ | ✅ | ✅ |
+| `investments.access` | Módulo de investimentos | ❌ | ❌ | ✅ | ✅ |
+
+**Features administrativas**
+
+| Feature key | Tela/uso principal | Basic | Intermediate | Advanced | Admin |
+|---|---|---|---|---|---|
+| `admin.users.manage` | Admin > Usuários | ❌ | ❌ | ❌ | ✅ |
+| `admin.parameters.manage` | Admin > Parâmetros | ❌ | ❌ | ❌ | ✅ |
+| `admin.robots.manage` | Admin > Robôs/Monitoramento | ❌ | ❌ | ❌ | ✅ |
+| `admin.categories.manage` | Admin > Categorias padrão | ❌ | ❌ | ❌ | ✅ |
+
+> Regra de manutenção: alteração de acesso deve ser feita primeiro na matriz central (API + Web) e só depois nas telas/endpoints específicos.
 
 ### 1.13 Tela de Portabilidade de Dados
 
@@ -165,6 +190,8 @@
 - 2026-03-06: item `1.2 IntelligenceMode (B ou C)` implementado com persistência em `user_profiles`, validação (`B|C`) e cobertura em onboarding/perfil no frontend.
 - 2026-03-06: item `1.2 CarryOverDay` implementado com persistência (`user_profiles`), validação (`1..31`), edição em onboarding/perfil e aplicação na competência do insight automático.
 - 2026-03-06: controle de acesso evoluído com matriz central de features no backend (`AppFeatureMatrix`) e frontend (`features.ts` + `roleGuard` por `feature`).
+- 2026-03-06: adicionada matriz funcional de features por perfil neste documento (feature key x tela x perfis) para governança de autorização.
+- 2026-03-06: tela `1.11 Configurações` concluída com personalização completa de notificações e exclusão de conta self-service (LGPD) com confirmação de senha.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 

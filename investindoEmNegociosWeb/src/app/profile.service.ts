@@ -28,8 +28,11 @@ export interface Preferences {
 }
 
 export interface NotificationPreferences {
+  upcomingEnabled: boolean;
+  overdueEnabled: boolean;
   inAppEnabled: boolean;
   emailEnabled: boolean;
+  daysBeforeDue: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -79,5 +82,9 @@ export class ProfileService {
 
   updatePreferences(prefs: Preferences) {
     return this.http.put<Preferences>(this.prefsUrl, prefs);
+  }
+
+  deleteOwnAccount(payload: { currentPassword: string; confirmationText: string }) {
+    return this.http.post<void>(`${this.prefsUrl}/account/delete`, payload);
   }
 }
