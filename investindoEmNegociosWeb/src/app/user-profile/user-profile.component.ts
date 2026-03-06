@@ -23,6 +23,8 @@ export class UserProfileComponent implements OnInit {
   cidade = '';
   estado = '';
   pais = '';
+  carryOverDay = 1;
+  readonly carryOverDayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
   intelligenceMode: 'B' | 'C' = 'B';
 
   senhaAtual = '';
@@ -44,6 +46,9 @@ export class UserProfileComponent implements OnInit {
       this.cidade = p.city || '';
       this.estado = p.state || '';
       this.pais = p.country || '';
+      this.carryOverDay = Number.isInteger(p.carryOverDay) && (p.carryOverDay ?? 0) >= 1 && (p.carryOverDay ?? 0) <= 31
+        ? (p.carryOverDay as number)
+        : 1;
       this.intelligenceMode = p.intelligenceMode === 'C' ? 'C' : 'B';
       this.idioma = p.language || 'pt-BR';
       this.email = ''; // email viria de outro endpoint; placeholder
@@ -89,6 +94,7 @@ export class UserProfileComponent implements OnInit {
       city: this.cidade,
       state: this.estado,
       country: this.pais,
+      carryOverDay: this.carryOverDay,
       intelligenceMode: this.intelligenceMode,
       language: this.idioma
     };

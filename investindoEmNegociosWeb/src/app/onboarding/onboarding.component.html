@@ -92,6 +92,21 @@
         </div>
       </div>
 
+      <div class="mt-4 grid gap-2">
+        <p class="m-0 text-sm font-semibold text-[var(--text)]">Dia de início da competência</p>
+        <div class="grid gap-2 md:max-w-[280px]">
+          <select
+            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
+            [(ngModel)]="carryOverDay"
+            [ngModelOptions]="{ standalone: true }">
+            <option *ngFor="let day of carryOverDayOptions; trackBy: trackByIndex" [ngValue]="day">Dia {{ day }}</option>
+          </select>
+          <small class="text-[var(--text-muted)]">
+            Ex.: dia 10 considera a competência de 10 até o dia 9 do mês seguinte.
+          </small>
+        </div>
+      </div>
+
       <form class="mt-4 grid gap-4 md:grid-cols-2" [formGroup]="form" (ngSubmit)="submit()">
         <label class="md:col-span-2 grid gap-2 font-semibold text-[var(--text)]">
           <span>Nome completo</span>

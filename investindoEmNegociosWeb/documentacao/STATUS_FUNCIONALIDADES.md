@@ -25,7 +25,7 @@
 |---|---|---|---|
 | Objetivo inicial do onboarding (persistência e uso) | ✅ | `FinancialGoal` em `user_profiles` + `ProfileService.Upsert` + dashboard | Objetivo selecionado é salvo e usado no Insight automático. |
 | IntelligenceMode (B ou C) | ✅ | `user_profiles.IntelligenceMode` + `ProfileService` + onboarding/user-profile no frontend | Persistência e edição disponíveis em perfil/onboarding com validação de domínio e API (`B` ou `C`). |
-| CarryOverDay (competência configurável) | ❌ | Não encontrado em DTO/entidade/endpoint | Planejar regra de competência por usuário. |
+| CarryOverDay (competência configurável) | ✅ | `user_profiles.CarryOverDay` + DTO/validator + onboarding/user-profile + `NotificationsService` | Configurável por usuário (1..31), persistido na API e aplicado no insight automático para janela de competência. |
 
 ### 1.3 Tela de Dashboard (Home)
 
@@ -163,12 +163,13 @@
 - 2026-03-06: item `3.2 Saldo atual por transações` marcado como concluído após validação funcional do fluxo principal.
 - 2026-03-06: item `2.2 Competência de cartão por closing day` marcado como concluído após validação automatizada (`CardStatementCycleCalculatorTests` + `PlansServiceTests`) e checklist manual documentado em `documentacao/Cenarios de teste/2.2_competencia-cartao-closing-day.md`.
 - 2026-03-06: item `1.2 IntelligenceMode (B ou C)` implementado com persistência em `user_profiles`, validação (`B|C`) e cobertura em onboarding/perfil no frontend.
+- 2026-03-06: item `1.2 CarryOverDay` implementado com persistência (`user_profiles`), validação (`1..31`), edição em onboarding/perfil e aplicação na competência do insight automático.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
 | Item | Tema | Status | Observação resumida |
 |---|---|---|---|
-| 2.1 | CarryOverDay | ❌ | Não há configuração de competência mensal por dia de corte. |
+| 2.1 | CarryOverDay | ✅ | Configuração por usuário disponível em perfil/onboarding e regra de competência aplicada no insight automático. |
 | 2.2 | Competência de cartão por closing day | ✅ | Cálculo por fechamento/vencimento operacional no backend, campos de competência propagados para o frontend e testes automatizados cobrindo cenários de borda. Manter regressão manual conforme playbook de cenários. |
 | 3.1 | Gestão de contas (corrente/poupança/digital/carteira) | ✅ | Implementado com CRUD, extrato por conta e saldo consolidado em `accounts`/`account_transactions`. |
 | 3.2 | Saldo atual por transações | ✅ | Ledger operacional ativo (pagamento/recebimento + estorno explícito + limpeza em delete + backfill histórico) e fluxo principal validado. Evoluções futuras: transferência entre contas e UX avançada multi-conta. |

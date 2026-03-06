@@ -14,6 +14,7 @@ export interface UserProfile {
   state?: string;
   country?: string;
   financialGoal?: string;
+  carryOverDay?: number;
   intelligenceMode?: 'B' | 'C';
   language?: string;
   currency?: string;

@@ -71,6 +71,12 @@
         <option value="C">Conservador</option>
       </select>
     </label>
+    <label>
+      Dia de início da competência
+      <select [(ngModel)]="carryOverDay">
+        <option *ngFor="let day of carryOverDayOptions" [ngValue]="day">Dia {{ day }}</option>
+      </select>
+    </label>
   </div>
   <div class="panel__actions">
     <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPerfil()">

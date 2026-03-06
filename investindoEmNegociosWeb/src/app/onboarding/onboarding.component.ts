@@ -34,6 +34,8 @@ export class OnboardingComponent implements OnInit {
   step = 0;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode = 'B';
+  carryOverDay = 1;
+  readonly carryOverDayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
   readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string }[] = [
     {
       id: 'B',
@@ -668,6 +670,7 @@ export class OnboardingComponent implements OnInit {
       country: (raw.country as string).trim(),
       financialGoal: this.focus ?? '',
       language: 'pt-BR',
+      carryOverDay: this.carryOverDay,
       intelligenceMode: this.intelligenceMode
     };
   }
@@ -826,6 +829,10 @@ export class OnboardingComponent implements OnInit {
         const savedMode = (data as { intelligenceMode?: string }).intelligenceMode?.toUpperCase();
         if (savedMode === 'B' || savedMode === 'C') {
           this.intelligenceMode = savedMode as IntelligenceMode;
+        }
+        const savedCarryOver = Number((data as { carryOverDay?: number }).carryOverDay);
+        if (Number.isInteger(savedCarryOver) && savedCarryOver >= 1 && savedCarryOver <= 31) {
+          this.carryOverDay = savedCarryOver;
         }
 
         if (!prefillForm) return;
