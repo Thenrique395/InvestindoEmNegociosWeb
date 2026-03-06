@@ -1,0 +1,40 @@
+name: CI Frontend
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-and-unit:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: "22.x"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: investindoEmNegociosWeb/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./investindoEmNegociosWeb
+        run: npm ci
+
+      - name: Test suite
+        working-directory: ./investindoEmNegociosWeb
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+      - name: Production build
+        working-directory: ./investindoEmNegociosWeb
+        run: npm run build

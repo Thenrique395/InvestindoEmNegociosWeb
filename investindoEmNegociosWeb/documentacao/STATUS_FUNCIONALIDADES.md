@@ -197,6 +197,10 @@
 - 2026-03-06: envio de e-mail por SMTP ajustado para falhar explicitamente quando configuração estiver ausente (sem sucesso silencioso), com cobertura em `ReminderRobotTaskTests`.
 - 2026-03-06: `4.3 Fatura por competência` e `5.1 Tipos de transação (com transferência formal)` concluídos com endpoint de consolidação de fatura por ciclo e endpoint de transferência entre contas integrado à tela de Contas.
 - 2026-03-06: criada suíte de smoke global (API + Web) com ampliação de smoke tests para `Contas` (transferência) e `Cartões` (fatura por competência), além de guia operacional em `docs/SMOKE_TESTS_SUITE.md`.
+- 2026-03-06: cobertura de testes reforçada para `Insight automático financeiro` (cenários warning/critical/deduplicação), front smoke da Home e consolidada matriz de cobertura por funcionalidade em `documentacao/MATRIZ_COBERTURA_TESTES.md`.
+- 2026-03-06: cobertura do onboarding reforçada com `onboarding.component.smoke.spec.ts` (passos 1/2/3, bloqueios e sucesso), elevando cobertura automatizada do fluxo para nível alto na matriz de testes.
+- 2026-03-06: cobertura de receitas reforçada com `receitas.component.smoke.spec.ts` (filtro mensal/status, navegação de mês, baixa em lote por perfil e consistência de summary).
+- 2026-03-06: ativados gates de CI para bloquear regressão em push/PR (`InvestindoEmNegociosApi/.github/workflows/ci-backend.yml` e `InvestindoEmNegociosWeb/.github/workflows/ci-frontend.yml`).
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
