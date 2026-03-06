@@ -375,6 +375,9 @@ export class ApiDataService {
 
     if (this.refreshIncomesInFlight) {
       this.pendingIncomeMonth = month;
+      // Mantém a UI em estado de carregamento contínuo quando o usuário troca de mês
+      // enquanto uma requisição anterior ainda está em voo.
+      this.incomesLoadingSubject.next(true);
       return;
     }
 
