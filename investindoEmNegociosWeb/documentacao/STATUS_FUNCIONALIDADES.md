@@ -155,15 +155,17 @@
 - 2026-02-24: UX do detalhe de execução no monitor de robôs refinada (modal com KPIs, contexto técnico e resultado, com melhor legibilidade em desktop/mobile).
 - 2026-02-24: saldo por transações evoluído com conta automática para Basic, bloqueio de gestão de contas no Basic, limpeza de ledger em exclusão de parcelas e script de backfill para histórico (`Infrastructure/Data/scripts/backfill_account_transactions_from_payments.sql`).
 - 2026-02-24: saldo por transações evoluído com estorno explícito de pagamento (`POST /installments/{id}/payments/{paymentId}/reversals`), regra mais rígida para seleção de conta em perfis não-Basic e playbook de testes em base limpa (`docs/FLUXO_SALDO_TRANSACOES_PLAYBOOK.md`).
+- 2026-03-06: item `3.2 Saldo atual por transações` marcado como concluído após validação funcional do fluxo principal.
+- 2026-03-06: item `2.2 Competência de cartão por closing day` marcado como concluído após validação automatizada (`CardStatementCycleCalculatorTests` + `PlansServiceTests`) e checklist manual documentado em `documentacao/Cenarios de teste/2.2_competencia-cartao-closing-day.md`.
 
 ## 10. Gap Analysis (escopo estratégico 2–25)
 
 | Item | Tema | Status | Observação resumida |
 |---|---|---|---|
 | 2.1 | CarryOverDay | ❌ | Não há configuração de competência mensal por dia de corte. |
-| 2.2 | Competência de cartão por closing day | ⚠️ | Implementação técnica realizada no backend e em validação funcional; marcar como concluído apenas após confirmação final. |
+| 2.2 | Competência de cartão por closing day | ✅ | Cálculo por fechamento/vencimento operacional no backend, campos de competência propagados para o frontend e testes automatizados cobrindo cenários de borda. Manter regressão manual conforme playbook de cenários. |
 | 3.1 | Gestão de contas (corrente/poupança/digital/carteira) | ✅ | Implementado com CRUD, extrato por conta e saldo consolidado em `accounts`/`account_transactions`. |
-| 3.2 | Saldo atual por transações | ⚠️ | Ledger operacional ativo (pagamento/recebimento + estorno explícito + limpeza em delete + backfill histórico). Pendente principal: transferência entre contas e ajustes avançados no front para multi-conta. |
+| 3.2 | Saldo atual por transações | ✅ | Ledger operacional ativo (pagamento/recebimento + estorno explícito + limpeza em delete + backfill histórico) e fluxo principal validado. Evoluções futuras: transferência entre contas e UX avançada multi-conta. |
 | 4.1 | Cadastro de cartão (limite/fechamento/vencimento) | ✅ | Implementado em `cards`. |
 | 4.2 | Compras no cartão + parcelamento + compromissos futuros | ✅ | Fluxo implementado por planos/parcelas/pagamentos. |
 | 4.3 | Fatura por competência | ⚠️ | Há base funcional, mas sem engine explícita de consolidação de ciclo de fatura separado de conta. |

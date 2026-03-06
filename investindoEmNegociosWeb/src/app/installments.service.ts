@@ -12,6 +12,10 @@ export interface Installment {
   dueDate: string; // yyyy-MM-dd
   amount: number;
   status: InstallmentStatus;
+  statementYear?: number | null;
+  statementMonth?: number | null;
+  statementCloseDate?: string | null;
+  statementDueDate?: string | null;
 }
 
 export interface PaymentPayload {

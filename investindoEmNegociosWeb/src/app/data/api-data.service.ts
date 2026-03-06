@@ -26,6 +26,10 @@ export interface StoredExpense {
   fixa?: boolean;
   fixaMeses?: number | null;
   status?: InstallmentStatus;
+  statementYear?: number | null;
+  statementMonth?: number | null;
+  statementCloseDate?: string | null;
+  statementDueDate?: string | null;
 }
 
 export interface StoredCard {
@@ -587,7 +591,11 @@ export class ApiDataService {
         serieId: isSeries ? plan?.id : undefined,
         fixa: isRecurring,
         fixaMeses: isRecurring ? null : undefined,
-        status: status || 'OPEN'
+        status: status || 'OPEN',
+        statementYear: (inst as any)?.statementYear ?? null,
+        statementMonth: (inst as any)?.statementMonth ?? null,
+        statementCloseDate: (inst as any)?.statementCloseDate ?? null,
+        statementDueDate: (inst as any)?.statementDueDate ?? null
       };
     });
   }
