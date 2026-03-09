@@ -13,6 +13,21 @@ type InvoiceItem = {
   installmentCurrent?: number;
   installmentTotal?: number;
   baseDescription?: string;
+  categoryId?: string | null;
+  suggestedCategoryId?: string | null;
+  suggestedCategoryName?: string | null;
+  suggestedCategoryConfidence?: number | null;
+  suggestedCategoryScore?: number | null;
+  suggestedCategoryConfidenceBand?: string | null;
+  suggestedCategoryReasonCode?: string | null;
+  suggestedRecurrence?: {
+    isRecurringCandidate?: boolean;
+    frequency?: string | null;
+    score?: number | null;
+    confidenceBand?: string | null;
+    reasonCode?: string | null;
+    evidenceLabel?: string | null;
+  } | null;
 };
 
 type InvoiceExtract = {
@@ -120,12 +135,14 @@ type InvoiceExtract = {
                       <th class="px-3 py-2">Data</th>
                       <th class="px-3 py-2">Descricao</th>
                       <th class="px-3 py-2">Parcela</th>
+                      <th class="px-3 py-2">Categoria</th>
+                      <th class="px-3 py-2">Recorrência</th>
                       <th class="px-3 py-2 text-right">Valor</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngIf="!extract.items.length">
-                      <td class="px-3 py-3" colspan="4">Nenhum item identificado.</td>
+                      <td class="px-3 py-3" colspan="6">Nenhum item identificado.</td>
                     </tr>
                     <tr *ngFor="let item of extract.items; trackBy: trackByIndex">
                       <td class="px-3 py-2">{{ item.date || '-' }}</td>
@@ -135,6 +152,28 @@ type InvoiceExtract = {
                           {{ item.installmentCurrent }}/{{ item.installmentTotal }}
                         </span>
                         <ng-template #noInstallment>-</ng-template>
+                      </td>
+                      <td class="px-3 py-2">
+                        <select
+                          class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
+                          [(ngModel)]="item.categoryId">
+                          <option [ngValue]="null">Sem categoria</option>
+                          <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
+                            {{ category.name }}
+                          </option>
+                        </select>
+                        <small class="block pt-1 text-[10px] opacity-70" *ngIf="item.suggestedCategoryName">
+                          Sugestão: {{ item.suggestedCategoryName }} · {{ confidenceLabel(item.suggestedCategoryScore, item.suggestedCategoryConfidenceBand, item.suggestedCategoryConfidence) }}
+                        </small>
+                      </td>
+                      <td class="px-3 py-2">
+                        <span *ngIf="item.suggestedRecurrence?.isRecurringCandidate; else noRecurrence">
+                          {{ recurrenceLabel(item.suggestedRecurrence?.frequency) }}
+                          <small class="block text-[10px] opacity-70">
+                            {{ recurrenceScoreLabel(item.suggestedRecurrence?.score, item.suggestedRecurrence?.confidenceBand) }}
+                          </small>
+                        </span>
+                        <ng-template #noRecurrence>-</ng-template>
                       </td>
                       <td class="px-3 py-2 text-right">{{ item.amount || '-' }}</td>
                     </tr>
@@ -224,7 +263,10 @@ export class InvoiceImportComponent implements OnChanges {
           bankName: response.bankName,
           totalDebitsBrazil: response.totalDebitsBrazil,
           currentBalance: response.currentBalance,
-          items: response.items || []
+          items: (response.items || []).map((item) => ({
+            ...item,
+            categoryId: item.suggestedCategoryId ?? null
+          }))
         };
         this.rawText = response.rawText || '';
       },
@@ -261,7 +303,10 @@ export class InvoiceImportComponent implements OnChanges {
         defaultDueDate: this.extract.dueDate || null,
         importIdempotencyKey: this.buildImportIdempotencyKey(),
         skipDuplicates: true,
-        items: this.extract.items
+        items: this.extract.items.map((item) => ({
+          ...item,
+          categoryId: item.categoryId || this.selectedCategoryId || item.suggestedCategoryId || null
+        }))
       })
       .subscribe({
         next: (result) => {
@@ -308,6 +353,34 @@ export class InvoiceImportComponent implements OnChanges {
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  confidenceLabel(score?: number | null, band?: string | null, value?: number | null): string {
+    const resolvedScore = score ?? (value == null ? null : Math.round(value * 100));
+    const resolvedBand = band || (resolvedScore == null
+      ? null
+      : resolvedScore >= 95
+        ? 'high'
+        : resolvedScore >= 85
+          ? 'medium'
+          : 'low');
+    if (resolvedScore == null) return '';
+    if (resolvedBand === 'high') return `Alta (${resolvedScore}/100)`;
+    if (resolvedBand === 'medium') return `Boa (${resolvedScore}/100)`;
+    return `Inicial (${resolvedScore}/100)`;
+  }
+
+  recurrenceLabel(frequency?: string | null): string {
+    if (!frequency) return 'Recorrente';
+    if (frequency === 'Monthly') return 'Recorrente mensal';
+    return `Recorrente ${frequency.toLowerCase()}`;
+  }
+
+  recurrenceScoreLabel(score?: number | null, band?: string | null): string {
+    if (score == null) return '';
+    if (band === 'high') return `Alta (${score}/100)`;
+    if (band === 'medium') return `Boa (${score}/100)`;
+    return `Inicial (${score}/100)`;
   }
 
   trackByCardId(_index: number, card: StoredCard): string {

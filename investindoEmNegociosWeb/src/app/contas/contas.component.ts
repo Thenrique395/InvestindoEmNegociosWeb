@@ -7,8 +7,12 @@ import {
   AccountTransferRequest,
   AccountTransactionResponse,
   AccountType,
-  AccountsService
+  AccountsService,
+  CsvExtractResponse,
+  OfxExtractResponse,
+  OfxTransactionPreview
 } from '../accounts.service';
+import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
 
 @Component({
   selector: 'app-contas',
@@ -35,16 +39,32 @@ export class ContasComponent implements OnInit {
   transferDescription = '';
   transferOccurredAtInput = '';
   transferring = false;
+  importingOfx = false;
+  extractingOfx = false;
+  ofxFileName = '';
+  ofxSkipDuplicates = true;
+  ofxRawText = '';
+  ofxExtract: OfxExtractResponse = { items: [], rawText: '' };
+  importingCsv = false;
+  extractingCsv = false;
+  csvFileName = '';
+  csvSkipDuplicates = true;
+  csvRawText = '';
+  csvExtract: CsvExtractResponse = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
+  categories: CategoryDto[] = [];
 
   editingId: string | null = null;
   form: AccountRequest = this.createEmptyForm();
 
   readonly accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
 
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(
+    private readonly accountsService: AccountsService,
+    private readonly categoriesService: CategoriesService) {}
 
   ngOnInit(): void {
     this.loadAccounts();
+    this.loadCategories();
   }
 
   get selectedAccount(): AccountResponse | undefined {
@@ -212,6 +232,176 @@ export class ContasComponent implements OnInit {
     });
   }
 
+  onOfxSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (!this.selectedAccountId) {
+      this.error = 'Selecione uma conta antes de importar OFX.';
+      input.value = '';
+      return;
+    }
+
+    const fileName = file.name.toLowerCase();
+    const supportedType = file.type === 'application/x-ofx' || file.type === 'application/octet-stream' || file.type === 'text/plain';
+    if (!fileName.endsWith('.ofx') && !supportedType) {
+      this.error = 'Formato não suportado. Use um arquivo .ofx.';
+      input.value = '';
+      return;
+    }
+
+    this.error = '';
+    this.ofxFileName = file.name;
+    this.extractingOfx = true;
+    this.ofxRawText = '';
+    this.ofxExtract = { items: [], rawText: '' };
+
+    this.accountsService.extractOfx(file, this.selectedAccountId).subscribe({
+      next: (result) => {
+        this.ofxExtract = {
+          ...result,
+          items: (result.items || []).map((item) => ({
+            ...item,
+            categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
+          }))
+        };
+        this.ofxRawText = result.rawText || '';
+      },
+      error: (err) => {
+        this.error = err?.error?.detail || 'Falha ao processar arquivo OFX.';
+        this.clearOfxState();
+      },
+      complete: () => {
+        this.extractingOfx = false;
+        input.value = '';
+      }
+    });
+  }
+
+  importOfx(): void {
+    if (this.importingOfx || !this.selectedAccountId || !this.ofxExtract.items.length) return;
+
+    this.importingOfx = true;
+    this.error = '';
+    this.accountsService.importOfx({
+      accountId: this.selectedAccountId,
+      skipDuplicates: this.ofxSkipDuplicates,
+      items: this.ofxExtract.items.map((item) => ({
+        postedAt: item.postedAt,
+        amount: item.amount,
+        kind: item.kind,
+        description: item.description,
+        memo: item.memo ?? null,
+        externalId: item.externalId ?? null,
+        type: item.type ?? null,
+        categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
+      }))
+    }).subscribe({
+      next: () => {
+        this.loadAccounts();
+        this.loadTransactions();
+        this.clearOfxState();
+      },
+      error: (err) => {
+        this.error = err?.error?.detail || 'Falha ao importar OFX.';
+      },
+      complete: () => {
+        this.importingOfx = false;
+      }
+    });
+  }
+
+  clearOfxState(): void {
+    this.ofxFileName = '';
+    this.ofxRawText = '';
+    this.ofxExtract = { items: [], rawText: '' };
+  }
+
+  onCsvSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (!this.selectedAccountId) {
+      this.error = 'Selecione uma conta antes de importar CSV.';
+      input.value = '';
+      return;
+    }
+
+    const fileName = file.name.toLowerCase();
+    const supportedType = file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'text/plain';
+    if (!fileName.endsWith('.csv') && !supportedType) {
+      this.error = 'Formato não suportado. Use um arquivo .csv.';
+      input.value = '';
+      return;
+    }
+
+    this.error = '';
+    this.csvFileName = file.name;
+    this.extractingCsv = true;
+    this.csvRawText = '';
+    this.csvExtract = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
+
+    this.accountsService.extractCsv(file, this.selectedAccountId).subscribe({
+      next: (result) => {
+        this.csvExtract = {
+          ...result,
+          items: (result.items || []).map((item) => ({
+            ...item,
+            categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
+          }))
+        };
+        this.csvRawText = result.rawText || '';
+      },
+      error: (err) => {
+        this.error = err?.error?.detail || 'Falha ao processar arquivo CSV.';
+        this.clearCsvState();
+      },
+      complete: () => {
+        this.extractingCsv = false;
+        input.value = '';
+      }
+    });
+  }
+
+  importCsv(): void {
+    if (this.importingCsv || !this.selectedAccountId || !this.csvExtract.items.length) return;
+
+    this.importingCsv = true;
+    this.error = '';
+    this.accountsService.importCsv({
+      accountId: this.selectedAccountId,
+      skipDuplicates: this.csvSkipDuplicates,
+      items: this.csvExtract.items.map((item) => ({
+        postedAt: item.postedAt,
+        amount: item.amount,
+        kind: item.kind,
+        description: item.description,
+        memo: item.memo ?? null,
+        externalId: item.externalId ?? null,
+        type: item.type ?? null,
+        categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
+      }))
+    }).subscribe({
+      next: () => {
+        this.loadAccounts();
+        this.loadTransactions();
+        this.clearCsvState();
+      },
+      error: (err) => {
+        this.error = err?.error?.detail || 'Falha ao importar CSV.';
+      },
+      complete: () => {
+        this.importingCsv = false;
+      }
+    });
+  }
+
+  clearCsvState(): void {
+    this.csvFileName = '';
+    this.csvRawText = '';
+    this.csvExtract = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
+  }
+
   accountTypeLabel(type: AccountType): string {
     switch (type) {
       case 'Checking': return 'Conta corrente';
@@ -226,13 +416,65 @@ export class ContasComponent implements OnInit {
     return this.accounts.filter((a) => a.isActive).length >= 2;
   }
 
-  sourceTypeLabel(sourceType?: string | null): string {
+  sourceTypeLabel(sourceType?: string | null, sourceLabel?: string | null): string {
+    if (sourceLabel?.trim()) return sourceLabel.trim();
     const raw = (sourceType || '').trim();
-    if (!raw) return '-';
-    if (raw === 'InstallmentPayment') return 'Receita/Despesa';
-    if (raw === 'InstallmentPaymentReversal') return 'Estorno';
-    if (raw === 'AccountTransfer') return 'Transferência';
-    return raw;
+    return raw || '-';
+  }
+
+  duplicateCount(): number {
+    return this.ofxExtract.items.filter((item) => item.isDuplicate).length;
+  }
+
+  importableCount(): number {
+    if (!this.ofxSkipDuplicates) return this.ofxExtract.items.length;
+    return this.ofxExtract.items.filter((item) => !item.isDuplicate).length;
+  }
+
+  trackOfxItem(index: number, item: OfxTransactionPreview): string {
+    return `${item.externalId || item.description}-${item.postedAt}-${index}`;
+  }
+
+  categoriesForItem(kind: 'Credit' | 'Debit'): CategoryDto[] {
+    const type: CategoryType = kind === 'Credit' ? 'Income' : 'Expense';
+    return this.categories.filter((category) => category.appliesTo === type || category.appliesTo === null);
+  }
+
+  confidenceLabel(score?: number | null, band?: string | null, value?: number | null): string {
+    const resolvedScore = score ?? (value == null ? null : Math.round(value * 100));
+    const resolvedBand = band || (resolvedScore == null
+      ? null
+      : resolvedScore >= 95
+        ? 'high'
+        : resolvedScore >= 85
+          ? 'medium'
+          : 'low');
+    if (resolvedScore == null) return '';
+    if (resolvedBand === 'high') return `Alta (${resolvedScore}/100)`;
+    if (resolvedBand === 'medium') return `Boa (${resolvedScore}/100)`;
+    return `Inicial (${resolvedScore}/100)`;
+  }
+
+  recurrenceLabel(frequency?: string | null): string {
+    if (!frequency) return 'Recorrente';
+    if (frequency === 'Monthly') return 'Recorrente mensal';
+    return `Recorrente ${frequency.toLowerCase()}`;
+  }
+
+  recurrenceScoreLabel(score?: number | null, band?: string | null): string {
+    if (score == null) return '';
+    if (band === 'high') return `Alta (${score}/100)`;
+    if (band === 'medium') return `Boa (${score}/100)`;
+    return `Inicial (${score}/100)`;
+  }
+
+  csvDuplicateCount(): number {
+    return this.csvExtract.items.filter((item) => item.isDuplicate).length;
+  }
+
+  csvImportableCount(): number {
+    if (!this.csvSkipDuplicates) return this.csvExtract.items.length;
+    return this.csvExtract.items.filter((item) => !item.isDuplicate).length;
   }
 
   private createEmptyForm(): AccountRequest {
@@ -258,5 +500,13 @@ export class ContasComponent implements OnInit {
     if (!this.transferToAccountId || !active.some((a) => a.id === this.transferToAccountId) || this.transferToAccountId === this.transferFromAccountId) {
       this.transferToAccountId = active.find((a) => a.id !== this.transferFromAccountId)?.id ?? null;
     }
+  }
+
+  private loadCategories(): void {
+    this.categoriesService.list(undefined, { pageSize: 200 }).subscribe({
+      next: (items) => {
+        this.categories = items || [];
+      }
+    });
   }
 }

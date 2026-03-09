@@ -41,6 +41,8 @@ export interface AccountTransactionResponse {
   amount: number;
   description: string;
   sourceType?: string | null;
+  sourceGroup?: string | null;
+  sourceLabel?: string | null;
   sourceId?: string | null;
   createdAt: string;
 }
@@ -60,6 +62,75 @@ export interface AccountTransferResponse {
   amount: number;
   occurredAtUtc: string;
   description: string;
+}
+
+export interface OfxTransactionPreview {
+  postedAt: string;
+  amount: number;
+  kind: AccountTransactionKind;
+  description: string;
+  memo?: string | null;
+  externalId?: string | null;
+  type?: string | null;
+  isDuplicate: boolean;
+  categoryId?: string | null;
+  suggestedCategory?: {
+    categoryId?: string | null;
+    categoryName?: string | null;
+    confidence?: number | null;
+    score?: number | null;
+    confidenceBand?: string | null;
+    reasonCode?: string | null;
+  } | null;
+  suggestedRecurrence?: {
+    isRecurringCandidate?: boolean;
+    frequency?: string | null;
+    score?: number | null;
+    confidenceBand?: string | null;
+    reasonCode?: string | null;
+    evidenceLabel?: string | null;
+  } | null;
+}
+
+export interface OfxExtractResponse {
+  bankId?: string | null;
+  branchId?: string | null;
+  accountNumber?: string | null;
+  accountType?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  ledgerBalance?: number | null;
+  items: OfxTransactionPreview[];
+  rawText: string;
+}
+
+export interface OfxImportItemRequest {
+  postedAt: string;
+  amount: number;
+  kind: AccountTransactionKind;
+  description: string;
+  memo?: string | null;
+  externalId?: string | null;
+  type?: string | null;
+  categoryId?: string | null;
+}
+
+export interface OfxImportRequest {
+  accountId: string;
+  skipDuplicates: boolean;
+  items: OfxImportItemRequest[];
+}
+
+export interface OfxImportResult {
+  created: number;
+  skipped: number;
+}
+
+export interface CsvExtractResponse {
+  delimiter: string;
+  detectedColumns: string[];
+  items: OfxTransactionPreview[];
+  rawText: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -130,6 +201,32 @@ export class AccountsService {
 
   transfer(payload: AccountTransferRequest): Observable<AccountTransferResponse> {
     return this.http.post<AccountTransferResponse>(`${this.baseUrl}/transfers`, payload);
+  }
+
+  extractOfx(file: File, accountId?: string | null): Observable<OfxExtractResponse> {
+    const data = new FormData();
+    data.append('file', file);
+    if (accountId) {
+      data.append('accountId', accountId);
+    }
+    return this.http.post<OfxExtractResponse>(`${this.baseUrl}/ofx/extract`, data);
+  }
+
+  importOfx(payload: OfxImportRequest): Observable<OfxImportResult> {
+    return this.http.post<OfxImportResult>(`${this.baseUrl}/ofx/import`, payload);
+  }
+
+  extractCsv(file: File, accountId?: string | null): Observable<CsvExtractResponse> {
+    const data = new FormData();
+    data.append('file', file);
+    if (accountId) {
+      data.append('accountId', accountId);
+    }
+    return this.http.post<CsvExtractResponse>(`${this.baseUrl}/csv/extract`, data);
+  }
+
+  importCsv(payload: OfxImportRequest): Observable<OfxImportResult> {
+    return this.http.post<OfxImportResult>(`${this.baseUrl}/csv/import`, payload);
   }
 
   private safeStorage(): Storage | null {

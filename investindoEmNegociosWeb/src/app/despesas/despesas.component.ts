@@ -319,6 +319,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
   pagamentoLabel(d: StoredExpense): string {
     if (!d.cartao) return 'À vista';
     const card = this.cardLabel(d.cartao);
+    if (d.statementReference) {
+      return `${card} · Fatura ${d.statementReference}`;
+    }
     const month = d.statementMonth ? String(d.statementMonth).padStart(2, '0') : null;
     const year = d.statementYear ?? null;
     if (month && year) {

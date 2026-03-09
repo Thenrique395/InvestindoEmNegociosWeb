@@ -10,6 +10,21 @@ export type InvoiceItem = {
   installmentCurrent?: number;
   installmentTotal?: number;
   baseDescription?: string;
+  categoryId?: string | null;
+  suggestedCategoryId?: string | null;
+  suggestedCategoryName?: string | null;
+  suggestedCategoryConfidence?: number | null;
+  suggestedCategoryScore?: number | null;
+  suggestedCategoryConfidenceBand?: string | null;
+  suggestedCategoryReasonCode?: string | null;
+  suggestedRecurrence?: {
+    isRecurringCandidate?: boolean;
+    frequency?: string | null;
+    score?: number | null;
+    confidenceBand?: string | null;
+    reasonCode?: string | null;
+    evidenceLabel?: string | null;
+  } | null;
 };
 
 export type InvoiceExtractResponse = {

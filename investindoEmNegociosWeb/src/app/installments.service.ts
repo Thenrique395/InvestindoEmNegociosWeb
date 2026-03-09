@@ -16,6 +16,7 @@ export interface Installment {
   statementMonth?: number | null;
   statementCloseDate?: string | null;
   statementDueDate?: string | null;
+  statementReference?: string | null;
 }
 
 export interface PaymentPayload {

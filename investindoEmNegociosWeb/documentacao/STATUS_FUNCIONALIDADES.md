@@ -67,7 +67,7 @@
 | CRUD de metas financeiras | ✅ | `GET/POST/PUT/DELETE /api/v1/goals` | Fluxo completo implementado. |
 | Meta de receita anual | ✅ | `GET/PUT /api/v1/goals/income` | Funcionalidade separada das metas gerais. |
 | Contribuições para metas | ✅ | `GET/POST /api/v1/goals/{goalId}/contributions` | Lançamentos de evolução disponíveis. |
-| Alertas automáticos por progresso | ⚠️ | Notificações em `/api/v1/notifications` | Regras específicas de metas ainda dependem da geração atual. |
+| Alertas automáticos por progresso | ✅ | `NotificationsService` + `/api/v1/notifications` + `NotificationsServiceTests` | Geração automática cobre meta concluída, abaixo do esperado e sem aportes, com parâmetros configuráveis no Admin. |
 
 ### 1.8 Tela de Calendário
 
@@ -204,6 +204,14 @@
 - 2026-03-06: insight automático evoluído com priorização explícita (`critical/warning/ok`), `reasonCodes` e recomendações ranqueadas no payload do robô, consumidas pela Home para orientar ações com rota/foco.
 - 2026-03-06: importação automática de fatura evoluída com endpoint de confirmação (`POST /api/v1/invoiceimport/import`) e integração na tela de Despesas para persistir lançamentos automaticamente a partir do PDF, com skip de duplicados.
 - 2026-03-06: hardening técnico aplicado no fluxo de importação de fatura e insights: update de plano sem reflexão (`MoneyPlan.Update`), parser unificado (`FinanceInputParser`), import com transação + chave de idempotência, contrato HTTP padronizado (`400` validação / `422` regra de negócio), payload de insight tipado no frontend e logs estruturados de geração/importação.
+- 2026-03-09: item `1.7 Alertas automáticos por progresso` atualizado para `✅` após validação do `NotificationsService` (cenários `GoalCompleted`, `GoalBelowExpected` e `GoalInactive`) e confirmação dos parâmetros correspondentes no painel Admin.
+- 2026-03-09: item `6.1 Importação OFX` implementado com parser OFX no backend, endpoints de preview/confirmação em `accounts/ofx/*`, importação para `account_transactions`, deduplicação por chave determinística e revisão/importação na tela `Contas`.
+- 2026-03-09: itens `6.2 Importação CSV de extrato bancário` e `6.3 Deduplicação unificada` implementados com `accounts/csv/*`, parser CSV para extrato bancário e motor compartilhado (`ImportIdentityEngine` + `BankStatementImportEngine`) reutilizado por OFX, CSV e importação de fatura.
+- 2026-03-09: item `5.2 Campos completos` concluído com `SourceType` centralizado por constantes (`AccountTransactionSourceTypes`), resposta de extrato enriquecida com `SourceGroup/SourceLabel` e competência exposta por `StatementReference` nas parcelas.
+- 2026-03-09: item `7.1 Categorization Bot` implementado com `CategorizationService`, cobrindo heurística por histórico do usuário, regras por merchant/regex e match por nome de categoria, com sugestão e confiança expostas nos previews de importação bancária e de fatura.
+- 2026-03-09: item `7.2 Score de confiança` implementado com score formal (`0..100`) e faixa (`high/medium/low`) no `CategorizationSuggestionDto`, mantendo compatibilidade com `confidence` decimal no frontend.
+- 2026-03-09: item `7.3 Aprendizado incremental` implementado com memória explícita (`user_categorization_feedback`) e override por item nos fluxos de OFX, CSV e fatura, permitindo que correções manuais retroalimentem sugestões futuras.
+- 2026-03-09: item `8 Recurrence Detector` implementado com `RecurrenceDetectorService`, sugerindo recorrência mensal nos previews quando encontra plano recorrente semelhante, padrão mensal no ledger ou repetição histórica de planos.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
@@ -217,15 +225,15 @@
 | 4.2 | Compras no cartão + parcelamento + compromissos futuros | ✅ | Fluxo implementado por planos/parcelas/pagamentos. |
 | 4.3 | Fatura por competência | ✅ | Engine explícita implementada com consolidação por ciclo em `CardsService.ListStatementCyclesAsync` + endpoint `GET /api/v1/cards/{id}/statements` e visualização na tela de cartões. |
 | 5.1 | Tipos de transação (receita/despesa/transferência) | ✅ | Transferência formal implementada em `POST /api/v1/accounts/transfers` (débito + crédito no ledger com `SourceType=AccountTransfer`) e classificada no extrato como `Transfer`. |
-| 5.2 | Campos completos (competência + source type etc.) | ⚠️ | Parte dos campos existe; competência e `SourceType` padronizado não estão completos. |
+| 5.2 | Campos completos (competência + source type etc.) | ✅ | `InstallmentResponse.StatementReference` + `AccountTransactionSourceTypes` + `AccountTransactionResponse.SourceGroup/SourceLabel` | Competência de cartão exposta com referência pronta (`MM/AAAA`) e `SourceType` padronizado/derivado no extrato para consumo consistente no frontend. |
 | 5.3 | Parcelamento automático | ✅ | Implementado. |
-| 6.1 | Importação OFX | ❌ | Não encontrado parser/fluxo OFX. |
-| 6.2 | Importação CSV de extrato bancário | ❌ | Não encontrado fluxo de CSV bancário configurável (há CSV em investimentos). |
-| 6.3 | Deduplicação por hash valor+data+descrição | ⚠️ | Existem dedups em importações específicas (ex.: fatura), não como motor unificado de extrato. |
-| 7.1 | Categorization Bot (merchant/histórico/regex) | ❌ | Não implementado como motor dedicado. |
-| 7.2 | Score de confiança | ❌ | Não implementado. |
-| 7.3 | Aprendizado incremental | ❌ | Não implementado. |
-| 8 | Recurrence Detector | ❌ | Não implementado. |
+| 6.1 | Importação OFX | ✅ | Fluxo implementado em `POST /api/v1/accounts/ofx/extract` + `POST /api/v1/accounts/ofx/import`, com preview na tela `Contas` e deduplicação por identificador determinístico (`FITID` ou fallback). |
+| 6.2 | Importação CSV de extrato bancário | ✅ | `POST /api/v1/accounts/csv/extract` + `POST /api/v1/accounts/csv/import` + tela `Contas` | Parser configurável por cabeçalho comum (`data`, `descrição`, `valor`, `crédito`, `débito`, `tipo`) com preview antes da importação. |
+| 6.3 | Deduplicação por hash valor+data+descrição | ✅ | `ImportIdentityEngine` + `BankStatementImportEngine` + `InvoiceImportService` | Motor unificado de identidade/deduplicação aplicado em OFX, CSV e importação de fatura, com chave determinística por contexto de importação. |
+| 7.1 | Categorization Bot (merchant/histórico/regex) | ✅ | `CategorizationService` + sugestões no preview de OFX/CSV/fatura | Motor dedicado implementado com heurística por histórico, merchant/regex e match por nome de categoria, retornando sugestão com confiança nos fluxos de importação. |
+| 7.2 | Score de confiança | ✅ | `CategorizationSuggestionDto.Score` + `ConfidenceBand` no preview de OFX/CSV/fatura | Score formalizado em escala `0..100`, com faixa (`high/medium/low`) e compatibilidade mantida via `confidence` decimal. |
+| 7.3 | Aprendizado incremental | ✅ | `UserCategorizationFeedback` + overrides por item em OFX/CSV/fatura | Correções manuais do usuário passam a retroalimentar o motor por padrão normalizado, com reaproveitamento nas próximas importações. |
+| 8 | Recurrence Detector | ✅ | `RecurrenceDetectorService` + sugestões no preview de OFX/CSV/fatura | Detecta recorrência mensal por plano recorrente já existente, padrão mensal no ledger e histórico de planos semelhantes. |
 | 9 | Saldo Disponível Real (SDR) | ❌ | Não implementado como indicador oficial. |
 | 10.1 | Projection Engine (simulação diária) | ❌ | Não implementado. |
 | 10.2 | Data provável de risco | ❌ | Não implementado. |

@@ -1,6 +1,7 @@
 import { of, throwError } from 'rxjs';
 import { ContasComponent } from './contas.component';
 import { AccountResponse, AccountsService } from '../accounts.service';
+import { CategoriesService } from '../categories.service';
 
 class AccountsServiceMock {
   list = jasmine.createSpy().and.returnValue(of([]));
@@ -10,15 +11,25 @@ class AccountsServiceMock {
   getBalance = jasmine.createSpy().and.returnValue(of({}));
   listTransactions = jasmine.createSpy().and.returnValue(of([]));
   transfer = jasmine.createSpy().and.returnValue(of({}));
+  extractOfx = jasmine.createSpy().and.returnValue(of({ items: [], rawText: '' }));
+  importOfx = jasmine.createSpy().and.returnValue(of({ created: 1, skipped: 0 }));
+  extractCsv = jasmine.createSpy().and.returnValue(of({ delimiter: ';', detectedColumns: [], items: [], rawText: '' }));
+  importCsv = jasmine.createSpy().and.returnValue(of({ created: 1, skipped: 0 }));
+}
+
+class CategoriesServiceMock {
+  list = jasmine.createSpy().and.returnValue(of([]));
 }
 
 describe('ContasComponent smoke', () => {
   let component: ContasComponent;
   let service: AccountsServiceMock;
+  let categoriesService: CategoriesServiceMock;
 
   beforeEach(() => {
     service = new AccountsServiceMock();
-    component = new ContasComponent(service as unknown as AccountsService);
+    categoriesService = new CategoriesServiceMock();
+    component = new ContasComponent(service as unknown as AccountsService, categoriesService as unknown as CategoriesService);
   });
 
   it('deve carregar contas no init e sincronizar defaults de transferência', () => {
@@ -77,5 +88,65 @@ describe('ContasComponent smoke', () => {
     component.transfer();
 
     expect(component.error).toContain('Falha teste');
+  });
+
+  it('deve bloquear seleção de OFX sem conta escolhida', () => {
+    const input = document.createElement('input');
+    const file = new File(['OFX'], 'extrato.ofx', { type: 'application/x-ofx' });
+    spyOnProperty(input, 'files').and.returnValue([file] as unknown as FileList);
+
+    component.selectedAccountId = null;
+    component.onOfxSelected({ target: input } as unknown as Event);
+
+    expect(service.extractOfx).not.toHaveBeenCalled();
+    expect(component.error).toContain('Selecione uma conta');
+  });
+
+  it('deve enviar importação OFX para a conta selecionada', () => {
+    component.selectedAccountId = 'a1';
+    component.ofxExtract = {
+      rawText: 'OFX',
+      items: [
+        {
+          postedAt: '2026-03-01T00:00:00Z',
+          amount: 10,
+          kind: 'Debit',
+          description: 'Padaria',
+          memo: 'Compra',
+          externalId: 'FIT-1',
+          type: 'DEBIT',
+          isDuplicate: false
+        }
+      ]
+    };
+
+    component.importOfx();
+
+    expect(service.importOfx).toHaveBeenCalled();
+  });
+
+  it('deve enviar importação CSV para a conta selecionada', () => {
+    component.selectedAccountId = 'a1';
+    component.csvExtract = {
+      delimiter: ';',
+      detectedColumns: ['data', 'descricao', 'valor'],
+      rawText: 'CSV',
+      items: [
+        {
+          postedAt: '2026-03-01T00:00:00Z',
+          amount: 10,
+          kind: 'Debit',
+          description: 'Padaria',
+          memo: null,
+          externalId: '1',
+          type: 'DEBIT',
+          isDuplicate: false
+        }
+      ]
+    };
+
+    component.importCsv();
+
+    expect(service.importCsv).toHaveBeenCalled();
   });
 });

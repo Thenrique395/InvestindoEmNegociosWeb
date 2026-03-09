@@ -30,6 +30,7 @@ export interface StoredExpense {
   statementMonth?: number | null;
   statementCloseDate?: string | null;
   statementDueDate?: string | null;
+  statementReference?: string | null;
 }
 
 export interface StoredCard {
@@ -595,7 +596,8 @@ export class ApiDataService {
         statementYear: (inst as any)?.statementYear ?? null,
         statementMonth: (inst as any)?.statementMonth ?? null,
         statementCloseDate: (inst as any)?.statementCloseDate ?? null,
-        statementDueDate: (inst as any)?.statementDueDate ?? null
+        statementDueDate: (inst as any)?.statementDueDate ?? null,
+        statementReference: (inst as any)?.statementReference ?? null
       };
     });
   }

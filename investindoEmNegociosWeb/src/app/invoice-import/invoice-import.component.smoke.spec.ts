@@ -30,7 +30,7 @@ describe('InvoiceImportComponent smoke', () => {
     component.cards = [{ id: 'c1', nome: 'Cartão principal', numero: '**** 1234' } as any];
     component.extract = {
       dueDate: '15/03/2026',
-      items: [{ description: 'Mercado', amount: 'R$ 100,00', date: '10/03/2026' }]
+      items: [{ description: 'Mercado', amount: 'R$ 100,00', date: '10/03/2026', suggestedCategoryId: 'cat-1', suggestedCategoryName: 'Alimentação' }]
     } as any;
     component.fileName = 'fatura.pdf';
     component.selectedCardId = 'c1';
