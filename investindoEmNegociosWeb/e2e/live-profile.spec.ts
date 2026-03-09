@@ -55,26 +55,25 @@ test.describe('live profile flow', () => {
     expect(download.suggestedFilename().toLowerCase()).toContain('.json');
   });
 
-  test('envia atualizacao real de preferencias com preview em ingles e usd', async ({ page }, testInfo) => {
+  test('salva preferencia real de notificacao', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
 
     await page.goto('/preferencias', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { level: 2, name: 'Configurações pessoais' })).toBeVisible();
 
-    await page.getByLabel('Moeda').selectOption('USD');
-    await page.getByLabel('Idioma da aplicação').selectOption('en-US');
-    await page.getByPlaceholder('Ex.: pt-BR ou en-US').fill('fr-FR');
-    await page.getByRole('button', { name: 'Adicionar' }).click();
-    await expect(page.getByText('fr-FR')).toBeVisible();
-
-    await expect(page.getByText('$12,345.67')).toBeVisible({ timeout: 20000 });
+    await page.getByLabel('Notificações por e-mail').check();
+    await page.getByLabel('Dias antes do vencimento para alerta').fill('5');
 
     const saveResponse = page.waitForResponse((response) =>
       response.request().method() === 'PUT' && response.url().includes('/preferences')
     );
     await page.getByRole('button', { name: 'Salvar preferências' }).click();
-    await expect((await saveResponse).status()).toBe(200);
+    const response = await saveResponse;
+    await expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body.notifications?.emailEnabled).toBe(true);
+    expect(body.notifications?.daysBeforeDue).toBe(5);
   });
 
   test('faz logout real e bloqueia retorno direto ao dashboard', async ({ page }, testInfo) => {
