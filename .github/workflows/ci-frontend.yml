@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  smoke-and-unit:
+  quality:
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: "22.x"
@@ -27,14 +27,5 @@ jobs:
           cache: npm
           cache-dependency-path: investindoEmNegociosWeb/package-lock.json
 
-      - name: Install dependencies
-        working-directory: ./investindoEmNegociosWeb
-        run: npm ci
-
-      - name: Test suite
-        working-directory: ./investindoEmNegociosWeb
-        run: npm run test -- --watch=false --browsers=ChromeHeadless
-
-      - name: Production build
-        working-directory: ./investindoEmNegociosWeb
-        run: npm run build
+      - name: Frontend quality gate
+        run: bash ./scripts/quality-frontend.sh
