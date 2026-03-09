@@ -632,7 +632,7 @@
       </div>
       <div class="allocation-config" *ngIf="showAlocacaoConfig">
         <div class="allocation-config__inputs">
-          <label *ngFor="let t of tipos; trackBy: trackByIndex">
+          <label *ngFor="let t of allocationTypes; trackBy: trackByIndex">
             <span>{{ t.label }}</span>
             <input
               type="number"

@@ -177,6 +177,10 @@ export class AppComponent implements OnInit, OnDestroy {
     return !this.isLogged && this.isPublicLayoutRoute && this.router.navigated;
   }
 
+  isActiveRoute(path: string): boolean {
+    return this.getCurrentPath().startsWith(path);
+  }
+
   get displayName(): string {
     return this.profile?.fullName?.trim() || 'Usuário';
   }

@@ -85,6 +85,7 @@ export interface DebtSummaryResponse {
 export interface WealthAssetBreakdownResponse {
   accountsBalance: number;
   investmentsBalance: number;
+  tangibleAssetsBalance: number;
   totalAssets: number;
 }
 
@@ -109,6 +110,7 @@ export interface NetWorthHistoryPointResponse {
   label: string;
   accountsBalance: number;
   investmentsBalance: number;
+  tangibleAssetsBalance: number;
   totalAssets: number;
   totalLiabilities: number;
   netWorth: number;

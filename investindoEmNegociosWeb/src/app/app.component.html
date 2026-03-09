@@ -455,6 +455,12 @@
         <main class="main relative z-[1] flex flex-col gap-8 p-[var(--space-3)]" [ngClass]="isReceitasRoute ? 'gap-4 px-[var(--space-3)] pb-[var(--space-3)] pt-0 -mt-12' : ''">
           <router-outlet />
         </main>
+        <nav class="mobile-dock" *ngIf="isLogged" aria-label="Navegação rápida">
+          <a routerLink="/dashboard" [class.active]="isActiveRoute('/dashboard')">Início</a>
+          <a routerLink="/despesas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/despesas')">Despesas</a>
+          <a routerLink="/contas" *ngIf="hasFeature('categories.access')" [class.active]="isActiveRoute('/contas')">Contas</a>
+          <a routerLink="/investimentos" *ngIf="hasFeature('investments.access')" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
+        </nav>
       </div>
     </div>
   </ng-container>

@@ -4,7 +4,10 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { DataPortabilityService } from '../data-portability.service';
+import { AuthService } from '../auth.service';
+import { ProfileService, PrivacySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-data',
@@ -16,16 +19,29 @@ import { UiFeedbackService } from '../ui-feedback.service';
 export class UserDataComponent {
   exporting = false;
   importing = false;
+  deletingAccount = false;
   replaceExisting = true;
   selectedFile: File | null = null;
   confirmImportOpen = false;
+  confirmDeleteOpen = false;
   lastExportAt: Date | null = null;
   lastImportAt: Date | null = null;
+  privacySummary: PrivacySummary | null = null;
+  privacyLoading = true;
+  deletePayload = {
+    currentPassword: '',
+    confirmationText: ''
+  };
 
   constructor(
     private readonly portabilityService: DataPortabilityService,
+    private readonly profileService: ProfileService,
+    private readonly authService: AuthService,
+    private readonly router: Router,
     private readonly uiFeedback: UiFeedbackService
-  ) {}
+  ) {
+    this.loadPrivacySummary();
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -73,6 +89,36 @@ export class UserDataComponent {
     this.confirmImportOpen = false;
   }
 
+  requestDeleteAccount(): void {
+    if (this.deletingAccount) return;
+    this.confirmDeleteOpen = true;
+  }
+
+  cancelDeleteRequest(): void {
+    this.confirmDeleteOpen = false;
+  }
+
+  confirmDeleteAccount(): void {
+    if (this.deletingAccount) return;
+    this.deletingAccount = true;
+    this.confirmDeleteOpen = false;
+
+    this.profileService.deleteOwnAccount(this.deletePayload).subscribe({
+      next: () => {
+        this.authService.clearSession();
+        this.uiFeedback.success('Conta excluída com sucesso.');
+        this.router.navigateByUrl('/');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.uiFeedback.error(this.resolveError(err, 'Falha ao excluir conta.'));
+        this.deletingAccount = false;
+      },
+      complete: () => {
+        this.deletingAccount = false;
+      }
+    });
+  }
+
   importData(input: HTMLInputElement): void {
     if (this.importing || !this.selectedFile) return;
     this.confirmImportOpen = false;
@@ -106,5 +152,19 @@ export class UserDataComponent {
     const apiDetail = err?.error?.detail as string | undefined;
     const apiTitle = err?.error?.title as string | undefined;
     return apiDetail || apiTitle || fallback;
+  }
+
+  private loadPrivacySummary(): void {
+    this.privacyLoading = true;
+    this.profileService.getPrivacySummary().subscribe({
+      next: (summary) => {
+        this.privacySummary = summary;
+        this.privacyLoading = false;
+      },
+      error: () => {
+        this.privacySummary = null;
+        this.privacyLoading = false;
+      }
+    });
   }
 }

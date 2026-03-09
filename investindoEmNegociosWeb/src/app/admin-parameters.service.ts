@@ -49,6 +49,13 @@ export interface TestEmailResult {
   sentAtUtc: string;
 }
 
+export interface ScalabilityRuntime {
+  currentPhase: string;
+  enabledControls: string[];
+  nextPhaseTargets: string[];
+  longTermTargets: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminParametersService {
   private readonly baseUrl = `${API_BASE_URL}/admin/parameters`;
@@ -109,5 +116,9 @@ export class AdminParametersService {
 
   sendTestEmail(to: string) {
     return this.http.post<TestEmailResult>(`${this.baseUrl}/test-email`, { to });
+  }
+
+  getScalabilityRuntime() {
+    return this.http.get<ScalabilityRuntime>(`${this.baseUrl}/scalability-runtime`);
   }
 }

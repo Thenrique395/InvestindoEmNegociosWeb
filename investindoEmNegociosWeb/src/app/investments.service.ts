@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import { applyListQuery, ListQuery } from './api-query';
 
-export type InvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
+export type InvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO' | 'IMOVEL' | 'VEICULO';
 export type MovementType = 'APORTE' | 'RESGATE' | 'COMPRA' | 'VENDA' | 'DIVIDENDO' | 'JCP' | 'RENDIMENTO' | 'TAXA';
 
 export type B3ImportStrategy = 'merge' | 'replace';

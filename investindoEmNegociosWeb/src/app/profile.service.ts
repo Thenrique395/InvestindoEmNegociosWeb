@@ -35,6 +35,18 @@ export interface NotificationPreferences {
   daysBeforeDue: number;
 }
 
+export interface PrivacySummary {
+  activeSessions: number;
+  pendingPasswordResetRequests: number;
+  auditEntries: number;
+  dataExportEnabled: boolean;
+  selfServiceDeletionEnabled: boolean;
+  deletionScope: string[];
+  productionControls: string[];
+  scalabilityPhase: string;
+  retentionPolicy: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private readonly baseUrl = `${API_BASE_URL}/profile`;
@@ -82,6 +94,10 @@ export class ProfileService {
 
   updatePreferences(prefs: Preferences) {
     return this.http.put<Preferences>(this.prefsUrl, prefs);
+  }
+
+  getPrivacySummary() {
+    return this.http.get<PrivacySummary>(`${this.prefsUrl}/privacy-summary`);
   }
 
   deleteOwnAccount(payload: { currentPassword: string; confirmationText: string }) {

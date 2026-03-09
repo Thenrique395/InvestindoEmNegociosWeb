@@ -13,6 +13,32 @@
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
     Carregando parâmetros...
   </div>
+  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]" *ngIf="!loading && scalabilityRuntime as runtime">
+    <div class="flex flex-col gap-1">
+      <div class="text-sm font-semibold text-[var(--text)]">Escalabilidade por fases</div>
+      <p class="text-sm text-[var(--text-muted)]">Fase atual: {{ runtime.currentPhase }}</p>
+    </div>
+    <div class="mt-4 grid gap-4 lg:grid-cols-3">
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <strong class="text-sm text-[var(--text)]">Ativo agora</strong>
+        <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+          <li *ngFor="let item of runtime.enabledControls; trackBy: trackByIndex">{{ item }}</li>
+        </ul>
+      </div>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <strong class="text-sm text-[var(--text)]">Próxima fase</strong>
+        <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+          <li *ngFor="let item of runtime.nextPhaseTargets; trackBy: trackByIndex">{{ item }}</li>
+        </ul>
+      </div>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <strong class="text-sm text-[var(--text)]">Longo prazo</strong>
+        <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+          <li *ngFor="let item of runtime.longTermTargets; trackBy: trackByIndex">{{ item }}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
   <div class="grid gap-6 lg:grid-cols-2" *ngIf="!loading">
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
       <div class="text-sm font-semibold text-[var(--text)]">Bandeiras de cartão</div>

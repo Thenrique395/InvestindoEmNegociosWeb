@@ -7,6 +7,28 @@
     </div>
   </div>
 
+  <div class="privacy-strip" *ngIf="privacySummary as privacy; else privacyLoadingState">
+    <div class="privacy-pill">
+      <strong>{{ privacy.activeSessions }}</strong>
+      <span>Sessões ativas</span>
+    </div>
+    <div class="privacy-pill">
+      <strong>{{ privacy.pendingPasswordResetRequests }}</strong>
+      <span>Resets pendentes</span>
+    </div>
+    <div class="privacy-pill">
+      <strong>{{ privacy.auditEntries }}</strong>
+      <span>Eventos auditados</span>
+    </div>
+    <div class="privacy-pill">
+      <strong>{{ privacy.scalabilityPhase }}</strong>
+      <span>Fase operacional</span>
+    </div>
+  </div>
+  <ng-template #privacyLoadingState>
+    <p class="meta" *ngIf="privacyLoading">Carregando centro de privacidade.</p>
+  </ng-template>
+
   <div class="grid">
     <div class="card">
       <h3>Exportar dados</h3>
@@ -41,6 +63,40 @@
       <p class="danger">Atenção: ao marcar “Substituir dados atuais”, os dados existentes da conta serão removidos antes da importação.</p>
       <p class="meta" *ngIf="lastImportAt">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
     </div>
+
+    <div class="card danger-card">
+      <h3>Privacidade e exclusão</h3>
+      <p class="muted" *ngIf="privacySummary as privacy">{{ privacy.retentionPolicy }}</p>
+
+      <div class="scope" *ngIf="privacySummary as privacy">
+        <div *ngFor="let item of privacy.deletionScope">{{ item }}</div>
+      </div>
+
+      <label class="field">
+        <span>Senha atual</span>
+        <input type="password" [(ngModel)]="deletePayload.currentPassword" autocomplete="current-password" />
+      </label>
+
+      <label class="field">
+        <span>Digite EXCLUIR para confirmar</span>
+        <input type="text" [(ngModel)]="deletePayload.confirmationText" autocomplete="off" />
+      </label>
+
+      <button
+        type="button"
+        class="btn btn--danger"
+        [disabled]="deletingAccount || !deletePayload.currentPassword || !deletePayload.confirmationText"
+        (click)="requestDeleteAccount()">
+        {{ deletingAccount ? 'Excluindo...' : 'Excluir minha conta' }}
+      </button>
+
+      <div class="controls" *ngIf="privacySummary as privacy">
+        <strong>Controles ativos</strong>
+        <div class="scope scope--compact">
+          <div *ngFor="let item of privacy.productionControls">{{ item }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <app-confirm-dialog
@@ -54,5 +110,16 @@
     [variant]="replaceExisting ? 'danger' : 'warning'"
     (cancelled)="cancelImportRequest()"
     (confirmed)="importData(fileInput)"
+  ></app-confirm-dialog>
+
+  <app-confirm-dialog
+    *ngIf="confirmDeleteOpen"
+    title="Excluir conta permanentemente"
+    message="Essa ação remove seus dados operacionais, revoga sessões e não pode ser desfeita. Deseja continuar?"
+    [confirmLabel]="deletingAccount ? 'Excluindo...' : 'Excluir conta'"
+    cancelLabel="Cancelar"
+    variant="danger"
+    (cancelled)="cancelDeleteRequest()"
+    (confirmed)="confirmDeleteAccount()"
   ></app-confirm-dialog>
 </section>

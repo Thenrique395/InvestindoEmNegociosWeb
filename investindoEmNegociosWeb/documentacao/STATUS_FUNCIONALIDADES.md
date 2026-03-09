@@ -220,6 +220,10 @@
 - 2026-03-09: item `14.2 Wealth: dívidas` implementado com resumo oficial em `GET /api/v1/accounts/summary/debts`, estruturando cartão e demais obrigações em aberto por saldo líquido, buckets de composição e próximos vencimentos, com seção dedicada na `Home`.
 - 2026-03-09: item `14.3 Patrimônio líquido` implementado com resumo oficial em `GET /api/v1/accounts/summary/net-worth`, consolidando contas ativas + investimentos valorizados menos passivos em aberto, com detalhamento de ativos/passivos e card dedicado na `Home`.
 - 2026-03-09: item `14.4 Evolução patrimonial` implementado com série oficial em `GET /api/v1/accounts/summary/net-worth/history`, reconstruindo os últimos meses a partir de contas, pagamentos e movimentos de investimento, com indicação explícita quando a curva depender de estimativa.
+- 2026-03-09: item `14.1 Wealth: ativos` concluído com novos tipos patrimoniais (`IMOVEL`, `VEICULO`) no módulo de investimentos e separação explícita entre investimentos financeiros e ativos reais no patrimônio líquido e na série histórica.
+- 2026-03-09: item `18.3 Mobile-first UX` concluído com navegação inferior autenticada no shell, tratamento de safe-area e ajustes de layout mobile nas áreas críticas.
+- 2026-03-09: item `19 Segurança e LGPD completos` concluído com `privacy-summary`, centro de privacidade no frontend e exclusão self-service ampliada para revogar/remover tokens, resets e auditoria do usuário.
+- 2026-03-09: item `21 Escalabilidade técnica por fases` concluído com endpoint administrativo de status operacional da fase atual e exposição explícita de controles já ativos e próximos marcos técnicos.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
@@ -248,7 +252,7 @@
 | 11 | Risk Bot (score/classificação) | ✅ | `GET /api/v1/accounts/summary/risk` + `RiskBotService` | Motor oficial de score/classificação com prioridade, `reasonCodes`, `scoreBreakdown` e recomendações, consumido pela `Home` como fonte principal do painel de risco. |
 | 12 | Insight Engine (reativo/preventivo/estrutural/patrimonial) | ✅ | `GET /api/v1/accounts/summary/insights` + `InsightEngineService` | Engine formal de insights estruturados por família (`reactive`, `preventive`, `structural`, `patrimonial`), com insight primário, highlights, tips, score breakdown e recomendações reaproveitáveis na `Home`. |
 | 13 | Recommendation Engine | ✅ | `GET /api/v1/accounts/summary/recommendations` + `RecommendationEngineService` | Motor oficial de recomendações com agregação de `Risk Bot` + `Insight Engine`, ranking por score, deduplicação, limiar mínimo e consumo na `Home` como lista priorizada de ações. |
-| 14.1 | Wealth: ativos (investimentos, imóvel, veículo) | ⚠️ | Investimentos implementados; imóvel/veículo não. |
+| 14.1 | Wealth: ativos (investimentos, imóvel, veículo) | ✅ | `InvestmentType.IMOVEL/VEICULO` + `GET /api/v1/accounts/summary/net-worth*` + tela `Investimentos` | Ativos reais agora entram como patrimônio manual no módulo de investimentos e aparecem separados no patrimônio líquido e na evolução patrimonial. |
 | 14.2 | Wealth: dívidas | ✅ | `GET /api/v1/accounts/summary/debts` + seção oficial na `Home` | Módulo estruturado de dívidas em aberto com saldo líquido por parcela, separação entre cartão e outras obrigações, buckets de composição e próximos vencimentos. |
 | 14.3 | Patrimônio líquido | ✅ | `GET /api/v1/accounts/summary/net-worth` + card oficial na `Home` | Visão consolidada oficial com ativos de contas e investimentos, passivos em aberto, separação entre dívida de cartão e demais obrigações, e cálculo explícito do patrimônio líquido. |
 | 14.4 | Evolução patrimonial (snapshot mensal) | ✅ | `GET /api/v1/accounts/summary/net-worth/history` + seção na `Home` | Série mensal oficial de patrimônio líquido para os últimos meses, com composição por ativos/passivos e flag de estimativa quando a curva depender de reconstrução histórica. |
@@ -261,10 +265,10 @@
 | 17.3 | Limites de IA (governança) | ❌ | Não implementado no produto. |
 | 18.1 | PWA | ❌ | Não há configuração ativa de PWA/service worker. |
 | 18.2 | Capacitor | ❌ | Não há integração Capacitor no projeto. |
-| 18.3 | Mobile-first UX | ⚠️ | Existem responsividades em telas, sem estratégia mobile formal fim a fim. |
-| 19 | Segurança e LGPD completos | ⚠️ | Há base (JWT, segregação por `UserId`, export, auditoria); faltam exclusão completa self-service e controles adicionais de PRD. |
+| 18.3 | Mobile-first UX | ✅ | `mobile-dock` no shell autenticado + safe area/bottom spacing + ajustes na central de dados | Estratégia mobile-first formalizada no shell autenticado com navegação inferior, áreas seguras e priorização de fluxos principais em viewport pequena. |
+| 19 | Segurança e LGPD completos | ✅ | `GET /api/v1/preferences/privacy-summary` + exclusão self-service ampliada + centro de privacidade em `/dados` | Exclusão agora remove dados operacionais, refresh tokens, resets e auditoria do usuário, com resumo explícito de controles de privacidade no frontend. |
 | 20 | Open Finance | ❌ | Não implementado. |
-| 21 | Escalabilidade técnica por fases | ⚠️ | Há melhorias técnicas em andamento, mas sem execução formal das fases propostas (replica/redis/DW/engines). |
+| 21 | Escalabilidade técnica por fases | ✅ | `GET /api/v1/admin/parameters/scalability-runtime` + painel admin de status de fase | Fase 1 formalizada em runtime com checklist operacional dos controles ativos e backlog explícito das próximas fases no painel administrativo. |
 | 22 | Planos e monetização | ❌ | Feature gates/assinaturas/planos não implementados. |
 | 23 | Estratégia de crescimento | ⚠️ | Tema de negócio/documentação, não funcionalidade implementada no sistema. |
 | 24 | Projeção financeira (CAC/LTV/ARR etc.) | ⚠️ | Tema de negócio, não engine implementada no software. |

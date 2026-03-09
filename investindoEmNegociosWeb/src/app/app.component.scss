@@ -23,6 +23,10 @@
   gap: var(--space-1);
 }
 
+.mobile-dock {
+  display: none;
+}
+
 .page {
   position: relative;
   isolation: isolate;
@@ -220,6 +224,44 @@
 
 .global-alert--feedback {
   top: calc(var(--header-h) + 5.25rem);
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom) + 56px) !important;
+  }
+
+  .mobile-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 0 var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+    padding: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .mobile-dock a {
+    min-width: 0;
+    text-decoration: none;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 0.7rem 0.35rem;
+  }
+
+  .mobile-dock a.active {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--primary);
+  }
 }
 
 .brand-green {

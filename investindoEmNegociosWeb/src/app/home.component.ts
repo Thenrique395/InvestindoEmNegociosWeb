@@ -600,6 +600,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.netWorthSummary?.assets.investmentsBalance ?? 0;
   }
 
+  get patrimonioEmAtivosReais(): number {
+    return this.netWorthSummary?.assets.tangibleAssetsBalance ?? 0;
+  }
+
   get patrimonioPassivos(): number {
     return this.netWorthSummary?.liabilities.totalLiabilities ?? this.debtSummary?.totalDebt ?? this.totalDividaCartoes;
   }

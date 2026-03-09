@@ -35,6 +35,25 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.privacy-strip {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.privacy-pill {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 0.85rem 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.privacy-pill strong {
+  font-size: var(--text-lg);
+}
+
 .card {
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -72,6 +91,12 @@
 .btn--ghost {
   background: var(--surface);
   color: var(--text);
+}
+
+.btn--danger {
+  background: #b42318;
+  color: #fff;
+  border-color: transparent;
 }
 
 .btn--inline {
@@ -112,6 +137,44 @@
 .danger {
   color: #b42318;
   font-size: var(--text-sm);
+}
+
+.danger-card {
+  border-color: rgba(180, 35, 24, 0.18);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field input {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 0.7rem 0.8rem;
+  color: var(--text);
+}
+
+.scope {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.scope div {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 0.65rem;
+}
+
+.scope--compact div {
+  border-left-color: rgba(37, 99, 235, 0.4);
+}
+
+.controls {
+  display: grid;
+  gap: 0.5rem;
 }
 
 .meta {

@@ -47,8 +47,9 @@ type RentabilidadeMonthPoint = {
   carteiraAc: number;
   benchmarkAc: number;
 };
+type AllocationInvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
 
-const DEFAULT_TARGET_ALLOCATION: Record<InvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
+const DEFAULT_TARGET_ALLOCATION: Record<AllocationInvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
 
 @Component({
   selector: 'app-investments',
@@ -99,7 +100,7 @@ export class InvestmentsComponent implements OnInit {
   consolidacaoSearchTerm = '';
   showAlocacaoConfig = false;
   private allocationLoadWarned = false;
-  targetAllocation: Record<InvestmentType, number> = { ...DEFAULT_TARGET_ALLOCATION };
+  targetAllocation: Record<AllocationInvestmentType, number> = { ...DEFAULT_TARGET_ALLOCATION };
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
   tabs: Array<{ key: InvestmentsTab; label: string }> = [
@@ -156,7 +157,9 @@ export class InvestmentsComponent implements OnInit {
     { value: 'RF', label: 'Renda Fixa' },
     { value: 'ACOES', label: 'Ações/ETFs' },
     { value: 'FUNDOS', label: 'Fundos' },
-    { value: 'CRIPTO', label: 'Cripto' }
+    { value: 'CRIPTO', label: 'Cripto' },
+    { value: 'IMOVEL', label: 'Imóvel' },
+    { value: 'VEICULO', label: 'Veículo' }
   ];
 
   movimentoTipos: { value: MovementType; label: string }[] = [
@@ -312,6 +315,8 @@ export class InvestmentsComponent implements OnInit {
   }
 
   tipoPapel(pos: InvestmentPosition): string {
+    if (pos.type === 'IMOVEL') return 'Patrimônio';
+    if (pos.type === 'VEICULO') return 'Patrimônio';
     if (pos.type === 'FUNDOS') return 'Cotas';
     const ticker = (pos.asset || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     const match = ticker.match(/(\d{1,2})$/);
@@ -400,7 +405,9 @@ export class InvestmentsComponent implements OnInit {
       RF: '#2563eb',
       ACOES: '#16a34a',
       FUNDOS: '#0ea5a4',
-      CRIPTO: '#f59e0b'
+      CRIPTO: '#f59e0b',
+      IMOVEL: '#8b5cf6',
+      VEICULO: '#ef4444'
     };
     return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
   }
@@ -978,18 +985,22 @@ export class InvestmentsComponent implements OnInit {
 
   get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; alerta: boolean }[] {
     const atualMap = new Map(this.distribuicaoPorTipo.map((i) => [i.key, i.percent]));
-    return this.tipos.map((t) => {
+    return this.allocationTypes.map((t) => {
       const atual = atualMap.get(t.value) || 0;
       const desvio = atual - this.targetAllocation[t.value];
       return { key: t.value, label: t.label, alvo: this.targetAllocation[t.value], atual, desvio, alerta: Math.abs(desvio) >= 7 };
     });
   }
 
+  get allocationTypes(): Array<{ value: AllocationInvestmentType; label: string }> {
+    return this.tipos.filter((t): t is { value: AllocationInvestmentType; label: string } => this.isAllocationType(t.value));
+  }
+
   get targetAllocationTotal(): number {
     return this.targetAllocation.RF + this.targetAllocation.ACOES + this.targetAllocation.FUNDOS + this.targetAllocation.CRIPTO;
   }
 
-  updateTargetAllocation(type: InvestmentType, value: number): void {
+  updateTargetAllocation(type: AllocationInvestmentType, value: number): void {
     const safe = Number.isFinite(value) ? value : 0;
     this.targetAllocation[type] = Math.min(100, Math.max(0, safe));
   }
@@ -1428,7 +1439,7 @@ export class InvestmentsComponent implements OnInit {
       throw new Error('Cabeçalho CSV inválido. Esperado: type,asset,quantity,avgPrice,openedAt,account,category,note');
     }
 
-    const validTypes = new Set<InvestmentType>(['RF', 'ACOES', 'FUNDOS', 'CRIPTO']);
+    const validTypes = new Set<InvestmentType>(['RF', 'ACOES', 'FUNDOS', 'CRIPTO', 'IMOVEL', 'VEICULO']);
     return lines.slice(1).map((line) => {
       const cols = line.split(delimiter).map((c) => c.trim());
       const type = (cols[typeI] || '').toUpperCase() as InvestmentType;
@@ -1518,7 +1529,11 @@ export class InvestmentsComponent implements OnInit {
     return Math.min(100, Math.max(0, parsed));
   }
 
-  private mapTargetAllocationResponse(target: { rf: number; acoes: number; fundos: number; cripto: number }): Record<InvestmentType, number> {
+  private isAllocationType(type: InvestmentType): type is AllocationInvestmentType {
+    return type === 'RF' || type === 'ACOES' || type === 'FUNDOS' || type === 'CRIPTO';
+  }
+
+  private mapTargetAllocationResponse(target: { rf: number; acoes: number; fundos: number; cripto: number }): Record<AllocationInvestmentType, number> {
     return {
       RF: this.normalizeAllocationValue(target.rf, DEFAULT_TARGET_ALLOCATION.RF),
       ACOES: this.normalizeAllocationValue(target.acoes, DEFAULT_TARGET_ALLOCATION.ACOES),

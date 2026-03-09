@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
-import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin, RobotSettings } from '../admin-parameters.service';
+import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin, RobotSettings, ScalabilityRuntime } from '../admin-parameters.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
@@ -37,6 +37,7 @@ export class AdminParametersComponent implements OnInit {
     enabled: true,
     dailyRunTimeUtc: '08:00'
   };
+  scalabilityRuntime: ScalabilityRuntime | null = null;
   loading = false;
   savingKey = '';
   brandFilter = '';
@@ -112,9 +113,15 @@ export class AdminParametersComponent implements OnInit {
           this.uiFeedback.error('Não foi possível carregar as configurações de robôs.');
           return of(null);
         })
+      ),
+      scalability: this.adminParameters.getScalabilityRuntime().pipe(
+        catchError(() => {
+          this.uiFeedback.warning('Não foi possível carregar o status de escalabilidade.');
+          return of(null);
+        })
       )
     }).subscribe({
-      next: ({ brands, methods, institutions, notifications, robots }) => {
+      next: ({ brands, methods, institutions, notifications, robots, scalability }) => {
         this.cardBrands = brands;
         this.paymentMethods = methods;
         this.institutions = institutions;
@@ -124,6 +131,7 @@ export class AdminParametersComponent implements OnInit {
         if (robots) {
           this.robotSettings = robots;
         }
+        this.scalabilityRuntime = scalability;
       },
       error: () => {
         this.uiFeedback.error('Não foi possível carregar os parâmetros.');
