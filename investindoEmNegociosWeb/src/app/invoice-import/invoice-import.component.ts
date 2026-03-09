@@ -259,6 +259,7 @@ export class InvoiceImportComponent implements OnChanges {
         cardId: this.selectedCardId,
         categoryId: this.selectedCategoryId,
         defaultDueDate: this.extract.dueDate || null,
+        importIdempotencyKey: this.buildImportIdempotencyKey(),
         skipDuplicates: true,
         items: this.extract.items
       })
@@ -275,6 +276,18 @@ export class InvoiceImportComponent implements OnChanges {
           this.importing = false;
         }
       });
+  }
+
+  private buildImportIdempotencyKey(): string {
+    const normalizedItems = this.extract.items
+      .map((item) => `${(item.baseDescription || item.description || '').trim().toUpperCase()}|${item.amount || ''}|${item.date || ''}`)
+      .sort();
+    return [
+      this.selectedCardId || 'NO_CARD',
+      this.selectedCategoryId || 'NO_CATEGORY',
+      this.extract.dueDate || 'NO_DUE_DATE',
+      ...normalizedItems
+    ].join('::');
   }
 
   private resolveDisplayTotal(total?: string, totalDebitsBrazil?: string): string | undefined {

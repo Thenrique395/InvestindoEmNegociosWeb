@@ -18,6 +18,35 @@ export type NotificationKind =
   | 'CashflowInsight';
 export type MoneyType = 'Income' | 'Expense';
 
+export interface CashflowInsightRecommendation {
+  id?: string;
+  severity?: 'danger' | 'warn' | 'info';
+  text?: string;
+  actionLabel?: string;
+  route?: string;
+  queryParams?: Record<string, string>;
+  amount?: number;
+  dueDate?: string;
+}
+
+export interface CashflowInsightPayload {
+  scenario?: string;
+  priority?: 'critical' | 'warning' | 'ok';
+  healthScore?: number;
+  riskDay?: string | null;
+  overdueExpenses?: number;
+  overdueIncomes?: number;
+  dueSoonExpensesAmount?: number;
+  currentCoverage?: number;
+  projectedCoverage?: number;
+  projectedBalance?: number;
+  action?: string;
+  reasonCodes?: string[];
+  recommendations?: CashflowInsightRecommendation[];
+  tips?: string[];
+  scoreBreakdown?: string[];
+}
+
 export interface NotificationItem {
   id: string;
   title: string;
@@ -27,32 +56,7 @@ export interface NotificationItem {
   dueDate?: string | null;
   createdAt: string;
   readAt?: string | null;
-  payload?: {
-    scenario?: string;
-    priority?: 'critical' | 'warning' | 'ok';
-    healthScore?: number;
-    riskDay?: string | null;
-    overdueExpenses?: number;
-    overdueIncomes?: number;
-    dueSoonExpensesAmount?: number;
-    currentCoverage?: number;
-    projectedCoverage?: number;
-    projectedBalance?: number;
-    action?: string;
-    reasonCodes?: string[];
-    recommendations?: Array<{
-      id?: string;
-      severity?: 'danger' | 'warn' | 'info';
-      text?: string;
-      actionLabel?: string;
-      route?: string;
-      queryParams?: Record<string, string>;
-      amount?: number;
-      dueDate?: string;
-    }>;
-    tips?: string[];
-    scoreBreakdown?: string[];
-  } | null;
+  payload?: CashflowInsightPayload | null;
 }
 
 @Injectable({ providedIn: 'root' })

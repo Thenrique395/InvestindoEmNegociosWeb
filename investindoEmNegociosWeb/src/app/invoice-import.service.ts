@@ -28,6 +28,7 @@ export type InvoiceImportRequest = {
   cardId?: string | null;
   categoryId?: string | null;
   defaultDueDate?: string | null;
+  importIdempotencyKey?: string | null;
   skipDuplicates: boolean;
   items: InvoiceItem[];
 };
