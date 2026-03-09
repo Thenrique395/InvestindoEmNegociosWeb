@@ -212,6 +212,14 @@
 - 2026-03-09: item `7.2 Score de confiança` implementado com score formal (`0..100`) e faixa (`high/medium/low`) no `CategorizationSuggestionDto`, mantendo compatibilidade com `confidence` decimal no frontend.
 - 2026-03-09: item `7.3 Aprendizado incremental` implementado com memória explícita (`user_categorization_feedback`) e override por item nos fluxos de OFX, CSV e fatura, permitindo que correções manuais retroalimentem sugestões futuras.
 - 2026-03-09: item `8 Recurrence Detector` implementado com `RecurrenceDetectorService`, sugerindo recorrência mensal nos previews quando encontra plano recorrente semelhante, padrão mensal no ledger ou repetição histórica de planos.
+- 2026-03-09: item `9 Saldo Disponível Real (SDR)` implementado com resumo oficial em `accounts/summary/real-balance`, cálculo por período (`month/quarter/year`) usando contas ativas + parcelas pendentes, e consumo do indicador na `Home` com projeção, atraso e vencimentos próximos.
+- 2026-03-09: itens `10.1 Projection Engine` e `10.2 Data provável de risco` implementados com `CashflowProjectionEngine`, endpoint `accounts/summary/projection`, simulação diária até o fim do período e `RiskDate` oficial consumido no painel de risco da `Home`.
+- 2026-03-09: item `11 Risk Bot` implementado com `RiskBotService`, endpoint `accounts/summary/risk` e contrato oficial de score/classificação (`score`, `classification`, `priority`, `reasonCodes`, `scoreBreakdown`, `recommendations`) aplicado na `Home`.
+- 2026-03-09: item `12 Insight Engine` implementado com `InsightEngineService`, endpoint `accounts/summary/insights` e famílias estruturadas de insight (`reactive`, `preventive`, `structural`, `patrimonial`) consumidas pela `Home` quando não houver insight fresco do robô.
+- 2026-03-09: item `13 Recommendation Engine` implementado com `RecommendationEngineService`, endpoint `accounts/summary/recommendations` e governança explícita de recomendações por agregação, ranking, deduplicação e limiar mínimo, aplicada na `Home`.
+- 2026-03-09: item `14.2 Wealth: dívidas` implementado com resumo oficial em `GET /api/v1/accounts/summary/debts`, estruturando cartão e demais obrigações em aberto por saldo líquido, buckets de composição e próximos vencimentos, com seção dedicada na `Home`.
+- 2026-03-09: item `14.3 Patrimônio líquido` implementado com resumo oficial em `GET /api/v1/accounts/summary/net-worth`, consolidando contas ativas + investimentos valorizados menos passivos em aberto, com detalhamento de ativos/passivos e card dedicado na `Home`.
+- 2026-03-09: item `14.4 Evolução patrimonial` implementado com série oficial em `GET /api/v1/accounts/summary/net-worth/history`, reconstruindo os últimos meses a partir de contas, pagamentos e movimentos de investimento, com indicação explícita quando a curva depender de estimativa.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
@@ -234,16 +242,16 @@
 | 7.2 | Score de confiança | ✅ | `CategorizationSuggestionDto.Score` + `ConfidenceBand` no preview de OFX/CSV/fatura | Score formalizado em escala `0..100`, com faixa (`high/medium/low`) e compatibilidade mantida via `confidence` decimal. |
 | 7.3 | Aprendizado incremental | ✅ | `UserCategorizationFeedback` + overrides por item em OFX/CSV/fatura | Correções manuais do usuário passam a retroalimentar o motor por padrão normalizado, com reaproveitamento nas próximas importações. |
 | 8 | Recurrence Detector | ✅ | `RecurrenceDetectorService` + sugestões no preview de OFX/CSV/fatura | Detecta recorrência mensal por plano recorrente já existente, padrão mensal no ledger e histórico de planos semelhantes. |
-| 9 | Saldo Disponível Real (SDR) | ❌ | Não implementado como indicador oficial. |
-| 10.1 | Projection Engine (simulação diária) | ❌ | Não implementado. |
-| 10.2 | Data provável de risco | ❌ | Não implementado. |
-| 11 | Risk Bot (score/classificação) | ❌ | Não implementado. |
-| 12 | Insight Engine (reativo/preventivo/estrutural/patrimonial) | ⚠️ | Existem insights pontuais no produto, sem engine formal completo. |
-| 13 | Recommendation Engine | ⚠️ | Existem recomendações pontuais; sem motor com limiar e governança definidos. |
+| 9 | Saldo Disponível Real (SDR) | ✅ | `GET /api/v1/accounts/summary/real-balance` + card oficial na `Home` | Indicador oficial consolidado com saldo em contas ativas, despesas pendentes, receitas pendentes, projeção, atraso e vencimentos próximos por período (`month/quarter/year`). |
+| 10.1 | Projection Engine (simulação diária) | ✅ | `GET /api/v1/accounts/summary/projection` + `CashflowProjectionEngine` | Motor oficial de simulação diária até o fim do período, agrupando receitas/despesas abertas por dia, consolidando saldo projetado, menor saldo e trajetória diária. |
+| 10.2 | Data provável de risco | ✅ | `CashflowProjectionResponse.RiskDate` + painel de risco na `Home` | Data de risco agora é derivada oficialmente da projeção diária como primeiro dia com saldo negativo e exibida no dashboard. |
+| 11 | Risk Bot (score/classificação) | ✅ | `GET /api/v1/accounts/summary/risk` + `RiskBotService` | Motor oficial de score/classificação com prioridade, `reasonCodes`, `scoreBreakdown` e recomendações, consumido pela `Home` como fonte principal do painel de risco. |
+| 12 | Insight Engine (reativo/preventivo/estrutural/patrimonial) | ✅ | `GET /api/v1/accounts/summary/insights` + `InsightEngineService` | Engine formal de insights estruturados por família (`reactive`, `preventive`, `structural`, `patrimonial`), com insight primário, highlights, tips, score breakdown e recomendações reaproveitáveis na `Home`. |
+| 13 | Recommendation Engine | ✅ | `GET /api/v1/accounts/summary/recommendations` + `RecommendationEngineService` | Motor oficial de recomendações com agregação de `Risk Bot` + `Insight Engine`, ranking por score, deduplicação, limiar mínimo e consumo na `Home` como lista priorizada de ações. |
 | 14.1 | Wealth: ativos (investimentos, imóvel, veículo) | ⚠️ | Investimentos implementados; imóvel/veículo não. |
-| 14.2 | Wealth: dívidas | ❌ | Não implementado como módulo estruturado. |
-| 14.3 | Patrimônio líquido | ❌ | Não implementado como visão consolidada oficial. |
-| 14.4 | Evolução patrimonial (snapshot mensal) | ❌ | Não implementado. |
+| 14.2 | Wealth: dívidas | ✅ | `GET /api/v1/accounts/summary/debts` + seção oficial na `Home` | Módulo estruturado de dívidas em aberto com saldo líquido por parcela, separação entre cartão e outras obrigações, buckets de composição e próximos vencimentos. |
+| 14.3 | Patrimônio líquido | ✅ | `GET /api/v1/accounts/summary/net-worth` + card oficial na `Home` | Visão consolidada oficial com ativos de contas e investimentos, passivos em aberto, separação entre dívida de cartão e demais obrigações, e cálculo explícito do patrimônio líquido. |
+| 14.4 | Evolução patrimonial (snapshot mensal) | ✅ | `GET /api/v1/accounts/summary/net-worth/history` + seção na `Home` | Série mensal oficial de patrimônio líquido para os últimos meses, com composição por ativos/passivos e flag de estimativa quando a curva depender de reconstrução histórica. |
 | 15.1 | LoanContract | ❌ | Não implementado. |
 | 15.2 | LoanInstallment | ❌ | Não implementado. |
 | 15.3 | Simulação de amortização | ❌ | Não implementado. |

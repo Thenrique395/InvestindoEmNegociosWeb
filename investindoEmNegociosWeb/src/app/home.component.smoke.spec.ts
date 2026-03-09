@@ -8,7 +8,7 @@ function createComponent(): HomeComponent {
     { list: () => of([]) } as any,
     { debtTotal: () => of({ total: 0 }) } as any,
     { getStatus: () => of({ step: 0, completed: true }), updateStatus: () => of({}) } as any,
-    { list: () => of([]), resolveDefaultAccountId: () => null } as any,
+    { list: () => of([]), resolveDefaultAccountId: () => null, getRealAvailableBalance: () => of(null), getDebtSummary: () => of(null), getNetWorthSummary: () => of(null), getNetWorthHistory: () => of(null), getProjection: () => of(null), getRiskAssessment: () => of(null), getInsights: () => of(null), getRecommendations: () => of(null) } as any,
     { getRole: () => 'Basic' } as any,
     { getProfile: () => of(null) } as any,
     { list: () => of([]) } as any,

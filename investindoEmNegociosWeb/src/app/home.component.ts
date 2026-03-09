@@ -8,7 +8,7 @@ import { Router, RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
-import { AccountsService, AccountResponse } from './accounts.service';
+import { AccountsService, AccountResponse, CashflowProjectionResponse, DebtSummaryResponse, InsightEngineItemResponse, InsightEngineResponse, NetWorthHistoryResponse, NetWorthSummaryResponse, RealAvailableBalanceResponse, RecommendationEngineResponse, RiskBotAssessmentResponse } from './accounts.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ProfileService } from './profile.service';
@@ -49,6 +49,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subCards?: Subscription;
   private subGoals?: Subscription;
   private subAccounts?: Subscription;
+  private subRealBalance?: Subscription;
+  private subDebtSummary?: Subscription;
+  private subNetWorth?: Subscription;
+  private subNetWorthHistory?: Subscription;
+  private subProjection?: Subscription;
+  private subRiskAssessment?: Subscription;
+  private subInsights?: Subscription;
+  private subRecommendations?: Subscription;
   private subProfile?: Subscription;
   private subNotifications?: Subscription;
   private latestRobotInsight: NotificationItem | null = null;
@@ -67,6 +75,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   cards: StoredCard[] = [];
   totalDividaCartoes = 0;
   accountBalances: AccountResponse[] = [];
+  realBalanceSummary: RealAvailableBalanceResponse | null = null;
+  debtSummary: DebtSummaryResponse | null = null;
+  netWorthSummary: NetWorthSummaryResponse | null = null;
+  netWorthHistory: NetWorthHistoryResponse | null = null;
+  cashflowProjection: CashflowProjectionResponse | null = null;
+  riskAssessment: RiskBotAssessmentResponse | null = null;
+  insightEngine: InsightEngineResponse | null = null;
+  recommendationEngine: RecommendationEngineResponse | null = null;
   expenseCategorySlices: { label: string; total: number; percent: number; color: string }[] = [];
   expenseCategoryTotal = 0;
   expenseCategoryChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
@@ -122,6 +138,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   insightTodoItems: InsightTodoItem[] = [];
   robotInsightTips: string[] = [];
   robotScoreBreakdown: string[] = [];
+  engineInsightTips: string[] = [];
   insightDrillDown = {
     expensesRoute: '/despesas',
     expensesQuery: { focus: 'overdue' as const },
@@ -248,9 +265,25 @@ export class HomeComponent implements OnInit, OnDestroy {
         next: (accounts) => {
           this.accountBalances = (accounts || []).filter((a) => a.isActive);
           this.accountsService.resolveDefaultAccountId(this.accountBalances);
+          this.loadRealAvailableBalance();
+          this.loadDebtSummary();
+          this.loadNetWorthSummary();
+          this.loadNetWorthHistory();
+          this.loadProjection();
+          this.loadRiskAssessment();
+          this.loadInsights();
+          this.loadRecommendations();
         },
         error: () => {
           this.accountBalances = [];
+          this.realBalanceSummary = null;
+          this.debtSummary = null;
+          this.netWorthSummary = null;
+          this.netWorthHistory = null;
+          this.cashflowProjection = null;
+          this.riskAssessment = null;
+          this.insightEngine = null;
+          this.recommendationEngine = null;
         }
       });
     }
@@ -268,6 +301,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subCards?.unsubscribe();
     this.subGoals?.unsubscribe();
     this.subAccounts?.unsubscribe();
+    this.subRealBalance?.unsubscribe();
+    this.subDebtSummary?.unsubscribe();
+    this.subNetWorth?.unsubscribe();
+    this.subNetWorthHistory?.unsubscribe();
+    this.subProjection?.unsubscribe();
+    this.subRiskAssessment?.unsubscribe();
+    this.subInsights?.unsubscribe();
+    this.subRecommendations?.unsubscribe();
     this.subProfile?.unsubscribe();
     this.subNotifications?.unsubscribe();
   }
@@ -302,6 +343,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   get insightTips(): string[] {
     if (this.robotInsightTips.length > 0) {
       return this.robotInsightTips;
+    }
+    if (this.engineInsightTips.length > 0) {
+      return this.engineInsightTips;
     }
     switch (this.insight.tone) {
       case 'danger':
@@ -426,6 +470,60 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
   }
 
+  private applyRiskAssessment(): boolean {
+    if (!this.riskAssessment) return false;
+
+    this.insightPriority =
+      this.riskAssessment.priority === 'critical'
+        ? 'Crítico'
+        : this.riskAssessment.priority === 'warning'
+          ? 'Atenção'
+          : 'Estável';
+
+    this.insightDiagnostics = {
+      ...this.insightDiagnostics,
+      healthScore: this.riskAssessment.score,
+      riskDayLabel: this.riskAssessment.riskDate
+        ? new Date(`${this.riskAssessment.riskDate}T00:00:00`).toLocaleDateString('pt-BR')
+        : null,
+      projectedBalance: this.riskAssessment.projectedBalance,
+      currentCoverage: this.riskAssessment.currentCoverage,
+      projectedCoverage: this.riskAssessment.projectedCoverage
+    };
+
+    this.robotScoreBreakdown = this.riskAssessment.scoreBreakdown || [];
+    this.insightTodoItems = (this.riskAssessment.recommendations || []).map((item) => ({
+      id: item.id,
+      severity: item.severity,
+      text: item.text,
+      actionLabel: item.actionLabel,
+      route: item.route,
+      queryParams: item.queryParams || {}
+    }));
+    return true;
+  }
+
+  private applyStructuredInsight(): boolean {
+    const primary = this.insightEngine?.primaryInsight;
+    if (!primary) return false;
+
+    this.engineInsightTips = primary.tips || [];
+    this.robotScoreBreakdown = primary.scoreBreakdown || this.robotScoreBreakdown;
+    this.insightPriority =
+      primary.priority === 'critical' ? 'Crítico' : primary.priority === 'warning' ? 'Atenção' : 'Estável';
+    this.insightActionSentence = primary.action;
+    this.insightShortGoal = this.resolveInsightShortGoal(primary);
+    this.insightHighlights = primary.highlights || [];
+    this.insightAction = this.resolveInsightAction(primary);
+    this.insightTodoItems = this.resolveRecommendationTodoItems(primary.recommendations || []);
+    this.insight = {
+      title: primary.title,
+      message: primary.message,
+      tone: primary.priority === 'critical' ? 'danger' : primary.priority === 'warning' ? 'warn' : 'ok'
+    };
+    return true;
+  }
+
   get insightHealthToneClass(): string {
     const score = this.insightDiagnostics.healthScore;
     if (score < 45) return 'text-rose-700 bg-rose-500/10 border-rose-300/60';
@@ -476,6 +574,75 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get cardsCount(): number {
     return this.cards.length;
+  }
+
+  get saldoDisponivelReal(): number {
+    return this.realBalanceSummary?.realAvailableBalance ?? (this.totalSaldoContas - this.totalDespesas);
+  }
+
+  get saldoDisponivelProjetado(): number {
+    return this.realBalanceSummary?.projectedAvailableBalance ?? (this.totalSaldoContas - this.totalDespesas + this.totalRendasPendentes);
+  }
+
+  get pendenciasCaixa(): number {
+    return this.realBalanceSummary?.pendingExpensesAmount ?? this.totalDespesas;
+  }
+
+  get patrimonioLiquido(): number {
+    return this.netWorthSummary?.netWorth ?? (this.totalSaldoContas - this.totalDividaCartoes);
+  }
+
+  get patrimonioTotalAtivos(): number {
+    return this.netWorthSummary?.assets.totalAssets ?? this.totalSaldoContas;
+  }
+
+  get patrimonioEmInvestimentos(): number {
+    return this.netWorthSummary?.assets.investmentsBalance ?? 0;
+  }
+
+  get patrimonioPassivos(): number {
+    return this.netWorthSummary?.liabilities.totalLiabilities ?? this.debtSummary?.totalDebt ?? this.totalDividaCartoes;
+  }
+
+  get debtBuckets() {
+    return this.debtSummary?.buckets || [];
+  }
+
+  get debtNextItems() {
+    return this.debtSummary?.nextItems || [];
+  }
+
+  get patrimonioHistoryPoints() {
+    return this.netWorthHistory?.points || [];
+  }
+
+  get patrimonioHistoryMax(): number {
+    return this.patrimonioHistoryPoints.reduce((max, item) => Math.max(max, item.netWorth), 0) || 1;
+  }
+
+  get patrimonioHistoryEstimated(): boolean {
+    return !!this.netWorthHistory?.hasEstimatedPoints;
+  }
+
+  get projectionHighlights(): Array<{
+    dateLabel: string;
+    incomesAmount: number;
+    expensesAmount: number;
+    closingBalance: number;
+    tone: 'danger' | 'warn' | 'ok';
+  }> {
+    return (this.cashflowProjection?.points || []).slice(0, 7).map((point) => {
+      const date = new Date(`${point.date}T00:00:00`);
+      const tone: 'danger' | 'warn' | 'ok' =
+        point.closingBalance < 0 ? 'danger' : point.expensesAmount > point.incomesAmount ? 'warn' : 'ok';
+      return {
+        dateLabel: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        incomesAmount: point.incomesAmount,
+        expensesAmount: point.expensesAmount,
+        closingBalance: point.closingBalance,
+        tone
+      };
+    });
   }
 
   get totalSaldoContas(): number {
@@ -775,9 +942,183 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.totalRendas = this.somarRendasMes(this.incomesRaw);
     this.totalRendasPendentes = this.somarRendasPendentesMes(this.incomesRaw);
     this.atualizarSaldo();
+    this.loadRealAvailableBalance();
+    this.loadDebtSummary();
+    this.loadNetWorthSummary();
+    this.loadNetWorthHistory();
+    this.loadProjection();
+    this.loadRiskAssessment();
+    this.loadInsights();
+    this.loadRecommendations();
     this.updateCategoryCharts();
     this.updateRecentTransactions();
     this.updateInsight();
+  }
+
+  private loadRealAvailableBalance(): void {
+    if (!this.isLogged) {
+      this.realBalanceSummary = null;
+      return;
+    }
+
+    this.subRealBalance?.unsubscribe();
+    this.subRealBalance = this.accountsService
+      .getRealAvailableBalance(this.periodo, this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (summary) => {
+          this.realBalanceSummary = summary;
+          this.updateInsight();
+        },
+        error: () => {
+          this.realBalanceSummary = null;
+          this.updateInsight();
+        }
+      });
+  }
+
+  private loadDebtSummary(): void {
+    if (!this.isLogged) {
+      this.debtSummary = null;
+      return;
+    }
+
+    this.subDebtSummary?.unsubscribe();
+    this.subDebtSummary = this.accountsService
+      .getDebtSummary(this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (summary) => {
+          this.debtSummary = summary;
+          this.totalDividaCartoes = summary?.cardDebt ?? this.totalDividaCartoes;
+        },
+        error: () => {
+          this.debtSummary = null;
+        }
+      });
+  }
+
+  private loadNetWorthSummary(): void {
+    if (!this.isLogged) {
+      this.netWorthSummary = null;
+      return;
+    }
+
+    this.subNetWorth?.unsubscribe();
+    this.subNetWorth = this.accountsService
+      .getNetWorthSummary(this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (summary) => {
+          this.netWorthSummary = summary;
+        },
+        error: () => {
+          this.netWorthSummary = null;
+        }
+      });
+  }
+
+  private loadNetWorthHistory(): void {
+    if (!this.isLogged) {
+      this.netWorthHistory = null;
+      return;
+    }
+
+    this.subNetWorthHistory?.unsubscribe();
+    this.subNetWorthHistory = this.accountsService
+      .getNetWorthHistory(6, this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (history) => {
+          this.netWorthHistory = history;
+        },
+        error: () => {
+          this.netWorthHistory = null;
+        }
+      });
+  }
+
+  private loadProjection(): void {
+    if (!this.isLogged) {
+      this.cashflowProjection = null;
+      return;
+    }
+
+    this.subProjection?.unsubscribe();
+    this.subProjection = this.accountsService
+      .getProjection(this.periodo, this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (projection) => {
+          this.cashflowProjection = projection;
+          this.updateInsight();
+        },
+        error: () => {
+          this.cashflowProjection = null;
+          this.updateInsight();
+        }
+      });
+  }
+
+  private loadRiskAssessment(): void {
+    if (!this.isLogged) {
+      this.riskAssessment = null;
+      return;
+    }
+
+    this.subRiskAssessment?.unsubscribe();
+    this.subRiskAssessment = this.accountsService
+      .getRiskAssessment(this.periodo, this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (assessment) => {
+          this.riskAssessment = assessment;
+          this.updateInsight();
+        },
+        error: () => {
+          this.riskAssessment = null;
+          this.updateInsight();
+        }
+      });
+  }
+
+  private loadInsights(): void {
+    if (!this.isLogged) {
+      this.insightEngine = null;
+      this.engineInsightTips = [];
+      return;
+    }
+
+    this.subInsights?.unsubscribe();
+    this.subInsights = this.accountsService
+      .getInsights(this.periodo, this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (insights) => {
+          this.insightEngine = insights;
+          this.engineInsightTips = insights.primaryInsight?.tips || [];
+          this.updateInsight();
+        },
+        error: () => {
+          this.insightEngine = null;
+          this.engineInsightTips = [];
+          this.updateInsight();
+        }
+      });
+  }
+
+  private loadRecommendations(): void {
+    if (!this.isLogged) {
+      this.recommendationEngine = null;
+      return;
+    }
+
+    this.subRecommendations?.unsubscribe();
+    this.subRecommendations = this.accountsService
+      .getRecommendations(this.periodo, this.toIsoDate(this.dataAtual))
+      .subscribe({
+        next: (recommendations) => {
+          this.recommendationEngine = recommendations;
+          this.updateInsight();
+        },
+        error: () => {
+          this.recommendationEngine = null;
+          this.updateInsight();
+        }
+      });
   }
 
   private sumByMonthKey(
@@ -811,6 +1152,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     const mes = this.dataAtual.getMonth() + 1;
     return { startKey: `${ano}-${String(mes).padStart(2, '0')}`, endKey: `${ano}-${String(mes).padStart(2, '0')}` };
+  }
+
+  private toIsoDate(value: Date): string {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private isWithinRange(key: string, range: { startKey: string; endKey: string }): boolean {
@@ -901,8 +1249,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   private updateInsight(): void {
     if (!this.expensesLoaded && !this.incomesLoaded) return;
     this.updateInsightDiagnostics();
+    this.applyRiskAssessment();
     if (this.isRobotInsightFresh(this.latestRobotInsight)) {
       this.applyRobotInsight(this.latestRobotInsight!);
+      return;
+    }
+    if (this.applyStructuredInsight()) {
       return;
     }
 
@@ -1132,10 +1484,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const dueSoonExpensesAmount = dueSoonExpenses.reduce((sum, expense) => sum + (expense.valor || 0), 0);
     const overdueExpensesAmount = overdueExpenses.reduce((sum, expense) => sum + (expense.valor || 0), 0);
-    const projectedBalance = this.saldoProjetadoComPendencias;
-    const currentCoverage = this.totalDespesas > 0 ? (this.saldoBaseDisponivel / this.totalDespesas) * 100 : 100;
-    const projectedCoverage = this.totalDespesas > 0 ? ((this.saldoBaseDisponivel + this.totalRendasPendentes) / this.totalDespesas) * 100 : 100;
-    const riskDay = this.estimateRiskDayFromCurrentData(startOfToday, range, this.saldoBaseDisponivel, openIncomes, openExpenses);
+    const pendingExpensesAmount =
+      this.realBalanceSummary?.pendingExpensesAmount ?? openExpenses.reduce((sum, expense) => sum + (expense.valor || 0), 0);
+    const pendingIncomesAmount =
+      this.realBalanceSummary?.pendingIncomesAmount ?? openIncomes.reduce((sum, income) => sum + (income.valor || 0), 0);
+    const accountsBalance = this.realBalanceSummary?.activeAccountsBalance ?? this.totalSaldoContas;
+    const projectedBalance = this.realBalanceSummary?.projectedAvailableBalance ?? this.saldoProjetadoComPendencias;
+    const currentCoverage = pendingExpensesAmount > 0 ? (accountsBalance / pendingExpensesAmount) * 100 : 100;
+    const projectedCoverage = pendingExpensesAmount > 0 ? ((accountsBalance + pendingIncomesAmount) / pendingExpensesAmount) * 100 : 100;
+    const riskDay = this.cashflowProjection?.riskDate
+      ? new Date(`${this.cashflowProjection.riskDate}T00:00:00`)
+      : this.estimateRiskDayFromCurrentData(startOfToday, range, accountsBalance, openIncomes, openExpenses);
     const healthScore = this.calculateInsightHealthScore(
       this.totalRendas,
       this.totalRendasPendentes,
@@ -1156,10 +1515,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.insightDiagnostics = {
       healthScore,
       riskDayLabel: riskDay ? riskDay.toLocaleDateString('pt-BR') : null,
-      overdueExpensesCount: overdueExpenses.length,
-      overdueExpensesAmount,
+      overdueExpensesCount: this.realBalanceSummary?.overdueExpensesCount ?? overdueExpenses.length,
+      overdueExpensesAmount: this.realBalanceSummary?.overdueExpensesAmount ?? overdueExpensesAmount,
       overdueIncomesCount: overdueIncomes.length,
-      dueSoonExpensesAmount,
+      dueSoonExpensesAmount: this.realBalanceSummary?.dueSoonExpensesAmount ?? dueSoonExpensesAmount,
       projectedBalance,
       currentCoverage,
       projectedCoverage
@@ -1475,6 +1834,59 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private isExpenseOpen(status?: string): boolean {
     return !status || status === 'OPEN' || status === 'PARTIALLY_PAID';
+  }
+
+  private resolveInsightAction(primary: InsightEngineItemResponse): { label: string; route: string } | null {
+    const firstRecommendation = this.recommendationEngine?.items?.[0] ?? primary.recommendations?.[0];
+    if (firstRecommendation?.actionLabel && firstRecommendation?.route) {
+      return { label: firstRecommendation.actionLabel, route: firstRecommendation.route };
+    }
+    return null;
+  }
+
+  private resolveRecommendationTodoItems(
+    fallbackRecommendations: Array<{
+      id: string;
+      severity: 'danger' | 'warn' | 'info';
+      text: string;
+      actionLabel: string;
+      route: string;
+      queryParams?: Record<string, string>;
+    }>
+  ): InsightTodoItem[] {
+    const ranked = this.recommendationEngine?.items || [];
+    if (ranked.length > 0) {
+      return ranked.slice(0, 4).map((item) => ({
+        id: item.id,
+        severity: item.severity,
+        text: `${item.text} (${item.score}/100)`,
+        actionLabel: item.actionLabel,
+        route: item.route,
+        queryParams: item.queryParams || {}
+      }));
+    }
+
+    return fallbackRecommendations.map((item) => ({
+      id: item.id,
+      severity: item.severity,
+      text: item.text,
+      actionLabel: item.actionLabel,
+      route: item.route,
+      queryParams: item.queryParams || {}
+    }));
+  }
+
+  private resolveInsightShortGoal(primary: InsightEngineItemResponse): string {
+    if (primary.family === 'patrimonial') {
+      return 'Meta de curto prazo: transformar a folga atual em avanço patrimonial.';
+    }
+    if (primary.family === 'structural') {
+      return 'Meta de curto prazo: reduzir a pressão estrutural das despesas recorrentes.';
+    }
+    if (primary.family === 'preventive') {
+      return 'Meta de curto prazo: atravessar a próxima janela de vencimentos sem apertos.';
+    }
+    return 'Meta de curto prazo: estabilizar o caixa antes do próximo fechamento.';
   }
 
   private formatCurrency(value: number): string {
