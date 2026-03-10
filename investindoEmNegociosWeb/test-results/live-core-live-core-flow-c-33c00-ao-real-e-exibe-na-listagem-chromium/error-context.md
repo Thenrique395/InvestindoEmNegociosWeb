@@ -1,0 +1,85 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - img "Investindo em Negócios" [ref=e7]
+      - generic [ref=e8]: Investindo em Negócios
+    - generic [ref=e9]: Menu
+    - navigation [ref=e10]:
+      - link "Dashboard" [ref=e11] [cursor=pointer]:
+        - /url: /dashboard
+        - generic [ref=e14]: Dashboard
+      - link "Despesas" [ref=e15] [cursor=pointer]:
+        - /url: /despesas
+        - generic [ref=e18]: Despesas
+      - link "Receitas" [ref=e19] [cursor=pointer]:
+        - /url: /receitas
+        - generic [ref=e22]: Receitas
+      - link "Calendário" [ref=e23] [cursor=pointer]:
+        - /url: /calendario
+        - generic [ref=e26]: Calendário
+      - link "Cartões" [ref=e27] [cursor=pointer]:
+        - /url: /cartoes
+        - generic [ref=e30]: Cartões
+      - link "Contas" [ref=e31] [cursor=pointer]:
+        - /url: /contas
+        - generic [ref=e34]: Contas
+      - link "Metas" [ref=e35] [cursor=pointer]:
+        - /url: /metas
+        - generic [ref=e39]: Metas
+    - link "Configurações" [ref=e41] [cursor=pointer]:
+      - /url: /preferencias
+      - generic [ref=e45]: Configurações
+  - generic [ref=e46]:
+    - banner [ref=e47]:
+      - generic [ref=e48]: Finanças com clareza, controle e confiança.
+      - generic [ref=e49]:
+        - button "Notificações" [ref=e51] [cursor=pointer]:
+          - generic [ref=e54]: "2"
+        - button "Ativar tema escuro" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56]: 🌙
+        - button "CU Codex Live Usuario ▾" [ref=e58] [cursor=pointer]:
+          - generic [ref=e60]: CU
+          - generic [ref=e61]: Codex Live Usuario
+          - generic [ref=e62]: ▾
+    - main [ref=e63]:
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - paragraph [ref=e68]: Cartões
+            - heading "Meus cartões" [level=2] [ref=e69]
+            - paragraph [ref=e70]: Cartões salvos para o usuário atual.
+          - button "Adicionar cartão" [ref=e71] [cursor=pointer]: Adicionar cartão
+        - generic [ref=e77]:
+          - generic [ref=e78]: 💳
+          - generic [ref=e79]:
+            - paragraph [ref=e80]: Sem cartões cadastrados
+            - paragraph [ref=e81]: Cadastre seu primeiro cartão para acompanhar limites e vencimentos.
+          - button "Adicionar cartão" [ref=e82] [cursor=pointer]
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - heading "Fatura por competência" [level=3] [ref=e86]
+              - paragraph [ref=e87]: Consolidação por ciclo de fechamento e vencimento do cartão.
+            - generic [ref=e88]:
+              - combobox [ref=e89]
+              - spinbutton [ref=e90]: "2026"
+              - combobox [ref=e91]:
+                - option "Todos os meses" [selected]
+                - option "01"
+                - option "02"
+                - option "03"
+                - option "04"
+                - option "05"
+                - option "06"
+                - option "07"
+                - option "08"
+                - option "09"
+                - option "10"
+                - option "11"
+                - option "12"
+              - button "Aplicar" [ref=e92] [cursor=pointer]
+          - paragraph [ref=e93]: Nenhuma fatura encontrada para os filtros.
+```

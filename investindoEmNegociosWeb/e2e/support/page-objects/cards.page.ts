@@ -24,4 +24,9 @@ export class CardsPage {
     await expect(this.page.getByText(`•••• ${last4}`)).toBeVisible({ timeout: 20000 });
     await expect(this.page.getByText('Fatura por competência')).toBeVisible();
   }
+
+  async reloadAndExpectCardVisible(holderName: string, last4: string) {
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
+    await this.expectCardVisible(holderName, last4);
+  }
 }

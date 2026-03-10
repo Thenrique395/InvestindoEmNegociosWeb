@@ -25,4 +25,10 @@ export class PreferencesPage {
     await this.page.getByRole('button', { name: 'Salvar preferências' }).click();
     return response;
   }
+
+  async reloadAndExpectNotifications(emailEnabled: boolean, daysBeforeDue: string) {
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(this.page.getByLabel('Notificações por e-mail')).toHaveJSProperty('checked', emailEnabled);
+    await expect(this.page.getByLabel('Dias antes do vencimento para alerta')).toHaveValue(daysBeforeDue);
+  }
 }

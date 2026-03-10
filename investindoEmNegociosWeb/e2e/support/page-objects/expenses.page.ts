@@ -57,6 +57,10 @@ export class ExpensesPage {
     await expect(row.getByText('Pago')).toBeVisible({ timeout: 20000 });
   }
 
+  async expectStatus(name: string, status: string) {
+    await expect(this.rowByName(name).getByText(status)).toBeVisible({ timeout: 20000 });
+  }
+
   async openEdit(name: string) {
     await this.rowByName(name).getByRole('button', { name: 'Editar' }).click();
     await expect(this.page.getByRole('heading', { level: 3, name: 'Editar lançamento' })).toBeVisible();

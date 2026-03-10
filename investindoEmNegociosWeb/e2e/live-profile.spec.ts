@@ -63,6 +63,7 @@ test.describe('live profile flow', () => {
     const body = await response.json();
     expect(body.notifications?.emailEnabled).toBe(true);
     expect(body.notifications?.daysBeforeDue).toBe(5);
+    await preferencesPage.reloadAndExpectNotifications(true, '5');
   });
 
   test('faz logout real e bloqueia retorno direto ao dashboard', async ({ page }, testInfo) => {

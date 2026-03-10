@@ -23,8 +23,10 @@ test.describe('live write flow', () => {
     await expensesPage.openCreateModal();
     await expensesPage.createExpense(expenseName, categoryName, '12550');
     await expensesPage.reloadAndExpectRow(expenseName);
-    await expect(expensesPage.rowByName(expenseName).getByText('Pendente')).toBeVisible();
+    await expensesPage.expectStatus(expenseName, 'Pendente');
     await expensesPage.markAsPaid(expenseName);
+    await expensesPage.reloadAndExpectRow(expenseName);
+    await expensesPage.expectStatus(expenseName, 'Pago');
   });
 
   test('cria categoria de receita real, lanca receita e marca como recebida', async ({ page }, testInfo) => {
@@ -42,8 +44,10 @@ test.describe('live write flow', () => {
     await incomesPage.openCreateModal();
     await incomesPage.createIncome(incomeName, categoryName, '240000');
     await incomesPage.reloadAndExpectRow(incomeName);
-    await expect(incomesPage.rowByName(incomeName).getByText('Pendente')).toBeVisible();
+    await incomesPage.expectStatus(incomeName, 'Pendente');
     await incomesPage.markAsReceived(incomeName);
+    await incomesPage.reloadAndExpectRow(incomeName);
+    await incomesPage.expectStatus(incomeName, 'Recebido');
   });
 
   test('cria categoria e remove a categoria personalizada real', async ({ page }, testInfo) => {
@@ -148,8 +152,8 @@ test.describe('live write flow', () => {
     await expensesPage.tryReversePaymentExpectRejection();
     await page.waitForTimeout(2500);
     await expensesPage.closeHistoryModal();
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(expensesPage.rowByName(expenseName).getByText('Pago')).toBeVisible({ timeout: 20000 });
+    await expensesPage.reloadAndExpectRow(expenseName);
+    await expensesPage.expectStatus(expenseName, 'Pago');
   });
 
   test('exclui receita real avulsa pela confirmacao simples', async ({ page }, testInfo) => {

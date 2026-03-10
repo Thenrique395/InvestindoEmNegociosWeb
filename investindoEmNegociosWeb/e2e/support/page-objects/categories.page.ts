@@ -24,12 +24,17 @@ export class CategoriesPage {
   }
 
   async removeCategory(name: string) {
+    const deleteResponse = this.page.waitForResponse((response) =>
+      response.request().method() === 'DELETE' && response.url().includes('/categories/')
+    );
     await this.categoryCard(name).getByRole('button', { name: 'Excluir' }).click();
     await expect(this.page.getByRole('heading', { level: 2, name: 'Remover categoria' })).toBeVisible();
     await this.page.getByRole('button', { name: 'Remover' }).click();
+    await expect.poll(async () => (await deleteResponse).ok()).toBeTruthy();
   }
 
   async expectCategoryAbsent(name: string) {
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
     await expect(this.page.getByText(name)).toHaveCount(0, { timeout: 20000 });
   }
 

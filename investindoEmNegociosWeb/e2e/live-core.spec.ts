@@ -21,7 +21,7 @@ test.describe('live core flow', () => {
 
     await cardsPage.goto();
     await cardsPage.createCard(`Cartao Live ${last4}`, last4);
-    await cardsPage.expectCardVisible(`Cartao Live ${last4}`, last4);
+    await cardsPage.reloadAndExpectCardVisible(`Cartao Live ${last4}`, last4);
   });
 
   test('abre o dashboard real e alterna os paineis de periodo e risco', async ({ page }, testInfo) => {
@@ -47,7 +47,7 @@ test.describe('live core flow', () => {
 
     await goalsPage.goto();
     await goalsPage.createGoal(goalName);
-    await goalsPage.expectGoalVisible(goalName);
+    await goalsPage.reloadAndExpectGoalVisible(goalName);
   });
 
   test('exibe a conta principal real e respeita a restricao do plano Basic', async ({ page }, testInfo) => {

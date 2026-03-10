@@ -57,6 +57,10 @@ export class IncomesPage {
     await expect(row.getByText('Recebido')).toBeVisible({ timeout: 20000 });
   }
 
+  async expectStatus(name: string, status: string) {
+    await expect(this.rowByName(name).getByText(status)).toBeVisible({ timeout: 20000 });
+  }
+
   async filterRecurring() {
     await this.page.getByLabel('Tipo').selectOption('recurring');
   }

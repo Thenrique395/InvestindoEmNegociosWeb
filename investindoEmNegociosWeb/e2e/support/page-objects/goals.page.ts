@@ -9,6 +9,9 @@ export class GoalsPage {
   }
 
   async createGoal(name: string) {
+    const createResponse = this.page.waitForResponse((response) =>
+      response.request().method() === 'POST' && response.url().includes('/goals')
+    );
     await this.page.getByRole('button', { name: 'Adicionar meta' }).click();
     await this.page.getByLabel('Nome da meta').fill(name);
     await this.page.getByLabel('Valor da meta (R$)').fill('120000');
@@ -16,9 +19,15 @@ export class GoalsPage {
     await this.page.getByLabel('Data de vencimento (DD/MM/AAAA)').fill('31122026');
     await this.page.getByRole('textbox', { name: 'Ano' }).fill('2026');
     await this.page.getByRole('button', { name: 'Salvar meta' }).click();
+    await expect.poll(async () => (await createResponse).ok()).toBeTruthy();
   }
 
   async expectGoalVisible(name: string) {
     await expect(this.page.getByText(name)).toBeVisible({ timeout: 20000 });
+  }
+
+  async reloadAndExpectGoalVisible(name: string) {
+    await this.page.reload({ waitUntil: 'domcontentloaded' });
+    await this.expectGoalVisible(name);
   }
 }
