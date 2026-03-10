@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { completeLiveOnboarding, openUserMenu } from './support/live-auth';
+import { DataPage } from './support/page-objects/data.page';
+import { PreferencesPage } from './support/page-objects/preferences.page';
+import { ProfilePage } from './support/page-objects/profile.page';
+import { SecurityPage } from './support/page-objects/security.page';
+import { UserMenuComponent } from './support/page-objects/user-menu.component';
+import { completeLiveOnboarding } from './support/live-auth';
 
 test.describe('live profile flow', () => {
   test.skip(!process.env['RUN_LIVE_SERVER_E2E'], 'Live server E2E roda apenas sob demanda.');
@@ -7,50 +12,42 @@ test.describe('live profile flow', () => {
   test('abre preferencias e centro de dados reais', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const preferencesPage = new PreferencesPage(page);
+    const dataPage = new DataPage(page);
 
-    await page.goto('/preferencias', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Configurações pessoais' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Português \+ BRL/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Salvar preferências' })).toBeVisible();
+    await preferencesPage.goto();
+    await preferencesPage.expectLoaded();
 
-    await page.goto('/dados', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Exportar / Importar' })).toBeVisible();
-    await expect(page.getByText('Privacidade e exclusão')).toBeVisible();
+    await dataPage.goto();
+    await dataPage.expectPrivacySectionVisible();
     await expect(page.getByRole('button', { name: 'Exportar dados' })).toBeVisible();
   });
 
   test('abre o perfil real e carrega os dados do usuario', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const profilePage = new ProfilePage(page);
 
-    await page.goto('/perfil', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Dados do usuário' })).toBeVisible();
-    await expect(page.getByLabel('Nome')).toHaveValue('Codex Live Usuario');
-    await expect(page.getByLabel('Cidade')).toHaveValue('Recife');
-    await expect(page.getByLabel('Estado')).toHaveValue('PE');
-    await expect(page.getByLabel('País')).toHaveValue('Brasil');
-    await expect(page.getByLabel('Modo de inteligência')).toHaveValue('B');
+    await profilePage.goto();
+    await profilePage.expectDefaultProfileData();
   });
 
   test('abre a pagina real de seguranca', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const securityPage = new SecurityPage(page);
 
-    await page.goto('/seguranca', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Sessões e login' })).toBeVisible();
-    await expect(page.getByText('Em breve: lista de sessões, logout global, 2FA, últimos logins.')).toBeVisible();
+    await securityPage.goto();
+    await securityPage.expectPlaceholderState();
   });
 
   test('exporta dados reais do usuario', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const dataPage = new DataPage(page);
 
-    await page.goto('/dados', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Exportar / Importar' })).toBeVisible();
-
-    const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Exportar dados' }).click();
-    const download = await downloadPromise;
+    await dataPage.goto();
+    const download = await dataPage.exportData();
 
     expect(download.suggestedFilename().toLowerCase()).toContain('.json');
   });
@@ -58,18 +55,10 @@ test.describe('live profile flow', () => {
   test('salva preferencia real de notificacao', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const preferencesPage = new PreferencesPage(page);
 
-    await page.goto('/preferencias', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Configurações pessoais' })).toBeVisible();
-
-    await page.getByLabel('Notificações por e-mail').check();
-    await page.getByLabel('Dias antes do vencimento para alerta').fill('5');
-
-    const saveResponse = page.waitForResponse((response) =>
-      response.request().method() === 'PUT' && response.url().includes('/preferences')
-    );
-    await page.getByRole('button', { name: 'Salvar preferências' }).click();
-    const response = await saveResponse;
+    await preferencesPage.goto();
+    const response = await preferencesPage.saveNotifications(true, '5');
     await expect(response.status()).toBe(200);
     const body = await response.json();
     expect(body.notifications?.emailEnabled).toBe(true);
@@ -79,10 +68,9 @@ test.describe('live profile flow', () => {
   test('faz logout real e bloqueia retorno direto ao dashboard', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const userMenu = new UserMenuComponent(page);
 
-    await openUserMenu(page);
-    await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible({ timeout: 10000 });
-    await page.getByRole('button', { name: 'Sair' }).click();
+    await userMenu.logout();
 
     await expect(page).toHaveURL(/\/$/i, { timeout: 30000 });
     await expect(page.getByRole('heading', { level: 1, name: /organizar despesas pessoais/i })).toBeVisible();
@@ -94,14 +82,11 @@ test.describe('live profile flow', () => {
   test('exclui a conta descartavel via fluxo lgpd real', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     const user = await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
+    const dataPage = new DataPage(page);
 
-    await page.goto('/dados', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Privacidade e exclusão')).toBeVisible();
-
-    await page.getByLabel('Senha atual').fill(user.password);
-    await page.getByLabel('Digite EXCLUIR para confirmar').fill('EXCLUIR');
-    await page.getByRole('button', { name: 'Excluir minha conta' }).click();
-    await page.getByRole('button', { name: 'Excluir conta' }).click();
+    await dataPage.goto();
+    await dataPage.expectPrivacySectionVisible();
+    await dataPage.deleteAccount(user.password);
 
     await expect(page).toHaveURL(/\/$/i, { timeout: 30000 });
     await expect(page.getByRole('heading', { level: 1, name: /organizar despesas pessoais/i })).toBeVisible();

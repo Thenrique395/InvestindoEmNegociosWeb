@@ -1,4 +1,14 @@
 import { expect, type Page } from '@playwright/test';
+import { LoginPage } from './page-objects/login.page';
+import { UserMenuComponent } from './page-objects/user-menu.component';
+
+export type LiveProfile = 'intermediate' | 'advanced' | 'admin';
+
+export type LiveCredential = {
+  email: string;
+  password: string;
+  fullName?: string;
+};
 
 export function buildLiveUser(workerIndex: number, retry: number) {
   const uniqueSuffix = `${Date.now()}${workerIndex}${retry}`;
@@ -7,6 +17,62 @@ export function buildLiveUser(workerIndex: number, retry: number) {
     password: `Codex@${uniqueSuffix.slice(-8)}`,
     fullName: `Codex Live ${uniqueSuffix.slice(-6)}`
   };
+}
+
+export function getSeededLiveCredential(profile: LiveProfile): LiveCredential | null {
+  const map: Record<LiveProfile, { email: string; password: string; fullName: string }> = {
+    intermediate: {
+      email: process.env['LIVE_INTERMEDIATE_EMAIL'] ?? '',
+      password: process.env['LIVE_INTERMEDIATE_PASSWORD'] ?? '',
+      fullName: 'Codex Intermediate'
+    },
+    advanced: {
+      email: process.env['LIVE_ADVANCED_EMAIL'] ?? '',
+      password: process.env['LIVE_ADVANCED_PASSWORD'] ?? '',
+      fullName: 'Codex Advanced'
+    },
+    admin: {
+      email: process.env['LIVE_ADMIN_EMAIL'] ?? '',
+      password: process.env['LIVE_ADMIN_PASSWORD'] ?? '',
+      fullName: 'Codex Admin'
+    }
+  };
+
+  const credential = map[profile];
+  if (!credential.email || !credential.password) {
+    return null;
+  }
+
+  return credential;
+}
+
+export async function loginWithLiveCredential(page: Page, credential: LiveCredential) {
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+
+  let loggedIn = false;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    await loginPage.login(credential.email, credential.password);
+    loggedIn = await page
+      .waitForURL(/\/(onboarding|dashboard)$/i, { timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
+    if (loggedIn) break;
+    await page.waitForTimeout(2500);
+  }
+
+  await expect(page).toHaveURL(/\/(onboarding|dashboard)$/i, { timeout: 30000 });
+  await expect.poll(async () => page.evaluate(() => !!window.localStorage.getItem('access_token'))).toBeTruthy();
+}
+
+export async function loginWithSeededProfile(page: Page, profile: LiveProfile) {
+  const credential = getSeededLiveCredential(profile);
+  if (!credential) {
+    throw new Error(`Credenciais live ausentes para o perfil ${profile}.`);
+  }
+
+  await loginWithLiveCredential(page, credential);
+  return credential;
 }
 
 export async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
@@ -35,24 +101,7 @@ export async function signUpAndLogin(page: Page, workerIndex: number, retry: num
 
   await expect(page.getByRole('heading', { level: 3, name: 'Crie sua conta gratuita' })).toBeHidden({ timeout: 30000 });
 
-  await page.goto('/login', { waitUntil: 'domcontentloaded' });
-  await expect(page).toHaveURL(/\/login$/);
-
-  let loggedIn = false;
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    await page.getByLabel('Email').fill(user.email);
-    await page.getByLabel('Senha').fill(user.password);
-    await page.locator('form').getByRole('button', { name: 'Entrar' }).click();
-    loggedIn = await page
-      .waitForURL(/\/(onboarding|dashboard)$/i, { timeout: 10000 })
-      .then(() => true)
-      .catch(() => false);
-    if (loggedIn) break;
-    await page.waitForTimeout(2500);
-  }
-
-  await expect(page).toHaveURL(/\/(onboarding|dashboard)$/i, { timeout: 30000 });
-  await expect.poll(async () => page.evaluate(() => !!window.localStorage.getItem('access_token'))).toBeTruthy();
+  await loginWithLiveCredential(page, user);
 
   return user;
 }
@@ -96,7 +145,26 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
 
   await expect(page.getByRole('heading', { level: 2, name: 'Cadastre sua primeira receita e despesa' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Adicionar receita' }).click();
+  const openIncomeModal = async () => {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const button = page.getByRole('button', { name: 'Adicionar receita' });
+      const visible = await button.isVisible().catch(() => false);
+      if (!visible) {
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { level: 2, name: 'Cadastre sua primeira receita e despesa' })).toBeVisible();
+      }
+      await page.getByRole('button', { name: 'Adicionar receita' }).click();
+      const opened = await page
+        .getByRole('heading', { level: 3, name: 'Adicionar receita' })
+        .waitFor({ state: 'visible', timeout: 8000 })
+        .then(() => true)
+        .catch(() => false);
+      if (opened) return;
+      await page.waitForTimeout(1500);
+    }
+  };
+
+  await openIncomeModal();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
   await page.getByLabel('Fonte').fill('Salario teste live');
   await page.locator('select[name="categoria"]').first().selectOption({ index: 1 });
@@ -105,7 +173,20 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
   await page.getByRole('button', { name: 'Salvar receita' }).click();
   await expect(page.getByText('Receita inicial cadastrada.')).toBeVisible({ timeout: 20000 });
 
-  await page.getByRole('button', { name: 'Adicionar despesa' }).click();
+  const openExpenseModal = async () => {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await page.getByRole('button', { name: 'Adicionar despesa' }).click();
+      const opened = await page
+        .getByRole('heading', { level: 3, name: 'Adicionar lançamento' })
+        .waitFor({ state: 'visible', timeout: 8000 })
+        .then(() => true)
+        .catch(() => false);
+      if (opened) return;
+      await page.waitForTimeout(1500);
+    }
+  };
+
+  await openExpenseModal();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
   await page.getByLabel('Nome da despesa').fill('Mercado teste live');
   await page.locator('select[name="categoria"]').last().selectOption({ index: 1 });
@@ -123,17 +204,5 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
 }
 
 export async function openUserMenu(page: Page) {
-  const trigger = page.locator('.user-menu .user-trigger').first();
-  if (await trigger.isVisible().catch(() => false)) {
-    await trigger.click();
-    return;
-  }
-
-  const avatarToggle = page.locator('button').filter({ has: page.locator('img[alt*="Avatar"]') }).first();
-  if (await avatarToggle.isVisible().catch(() => false)) {
-    await avatarToggle.click();
-    return;
-  }
-
-  await page.getByRole('button', { name: /codex live usuario|usuário|▾/i }).first().click();
+  await new UserMenuComponent(page).open();
 }
