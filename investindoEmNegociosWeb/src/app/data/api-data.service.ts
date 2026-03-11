@@ -196,8 +196,8 @@ export class ApiDataService {
     });
   }
 
-  addCard(card: Omit<StoredCard, 'id'>): void {
-    this.cardsApi
+  addCard(card: Omit<StoredCard, 'id'>) {
+    return this.cardsApi
       .create({
         brandId: Number(card.bandeira),
         holderName: card.nome,
@@ -208,14 +208,13 @@ export class ApiDataService {
         statementCloseDay: card.diaFechamento ?? 1,
         dueDay: card.diaVencimento ?? 1
       })
-      .subscribe({
-        next: () => this.refresh(),
-        error: (err) => console.error('Falha ao criar cartão', err)
-      });
+      .pipe(
+        tap(() => this.refresh(true))
+      );
   }
 
-  updateCard(id: string, data: Partial<StoredCard>): void {
-    this.cardsApi
+  updateCard(id: string, data: Partial<StoredCard>) {
+    return this.cardsApi
       .update(id, {
         brandId: data.bandeira ? Number(data.bandeira) : 0,
         holderName: data.nome || '',
@@ -226,10 +225,9 @@ export class ApiDataService {
         statementCloseDay: data.diaFechamento ?? 1,
         dueDay: data.diaVencimento ?? 1
       })
-      .subscribe({
-        next: () => this.refresh(),
-        error: (err) => console.error('Falha ao atualizar cartão', err)
-      });
+      .pipe(
+        tap(() => this.refresh(true))
+      );
   }
 
   removeCard(id: string): void {

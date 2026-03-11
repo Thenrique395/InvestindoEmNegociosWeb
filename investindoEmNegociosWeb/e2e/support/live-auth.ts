@@ -10,6 +10,21 @@ export type LiveCredential = {
   fullName?: string;
 };
 
+const PROFILE_ENV_MAP: Record<LiveProfile, { email: string; password: string }> = {
+  intermediate: {
+    email: 'LIVE_INTERMEDIATE_EMAIL',
+    password: 'LIVE_INTERMEDIATE_PASSWORD'
+  },
+  advanced: {
+    email: 'LIVE_ADVANCED_EMAIL',
+    password: 'LIVE_ADVANCED_PASSWORD'
+  },
+  admin: {
+    email: 'LIVE_ADMIN_EMAIL',
+    password: 'LIVE_ADMIN_PASSWORD'
+  }
+};
+
 export function buildLiveUser(workerIndex: number, retry: number) {
   const uniqueSuffix = `${Date.now()}${workerIndex}${retry}`;
   return {
@@ -44,6 +59,20 @@ export function getSeededLiveCredential(profile: LiveProfile): LiveCredential | 
   }
 
   return credential;
+}
+
+export function getMissingLiveCredentialEnv(profile: LiveProfile) {
+  const required = PROFILE_ENV_MAP[profile];
+  return [required.email, required.password].filter((envName) => !process.env[envName]);
+}
+
+export function getMissingLiveCredentialReason(profile: LiveProfile) {
+  const missing = getMissingLiveCredentialEnv(profile);
+  if (missing.length === 0) {
+    return null;
+  }
+
+  return `Credenciais ${profile} nao configuradas. Defina: ${missing.join(', ')}.`;
 }
 
 export async function loginWithLiveCredential(page: Page, credential: LiveCredential) {

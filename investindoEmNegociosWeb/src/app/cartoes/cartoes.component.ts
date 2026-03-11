@@ -127,7 +127,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (this.diaVencimento < 1 || this.diaVencimento > 31) return;
     if (this.limiteCredito < 0) return;
     this.saving = true;
-    let ok = false;
     const numeroLimpo = this.numero.replace(/\D/g, '').slice(-4);
     const payload = {
       bandeira: this.bandeira,
@@ -139,18 +138,22 @@ export class CartoesComponent implements OnInit, OnDestroy {
       diaVencimento: this.diaVencimento
     };
 
-    if (this.editandoId) {
-      this.db.updateCard(this.editandoId, payload);
-    } else {
-      this.db.addCard(payload);
-    }
+    const request$ = this.editandoId
+      ? this.db.updateCard(this.editandoId, payload)
+      : this.db.addCard(payload);
 
-    ok = true;
-    this.saving = false;
-    if (ok) {
-      this.setAlerta('Cartão salvo com sucesso.', 2500, 'success');
-      this.fecharModal();
-    }
+    request$.subscribe({
+      next: () => {
+        this.setAlerta('Cartão salvo com sucesso.', 2500, 'success');
+        this.fecharModal();
+        this.saving = false;
+      },
+      error: (err) => {
+        console.error('Falha ao salvar cartão', err);
+        this.setAlerta('Falha ao salvar cartão.', 3000, 'error');
+        this.saving = false;
+      }
+    });
   }
 
   abrirModal(): void {

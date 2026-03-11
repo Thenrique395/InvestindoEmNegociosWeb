@@ -5,13 +5,13 @@ import { CategoriesPage } from './support/page-objects/categories.page';
 import { ExpensesPage } from './support/page-objects/expenses.page';
 import { InvestmentsPage } from './support/page-objects/investments.page';
 import { NavigationComponent } from './support/page-objects/navigation.component';
-import { getSeededLiveCredential, loginWithSeededProfile } from './support/live-auth';
+import { getMissingLiveCredentialReason, loginWithSeededProfile } from './support/live-auth';
 
 test.describe('live role profiles', () => {
   test.skip(!process.env['RUN_LIVE_SERVER_E2E'], 'Live server E2E roda apenas sob demanda.');
 
   test('Intermediate exibe menu compatível com o perfil e libera importação de fatura', async ({ page }) => {
-    test.skip(!getSeededLiveCredential('intermediate'), 'Credenciais Intermediate nao configuradas.');
+    test.skip(!!getMissingLiveCredentialReason('intermediate'), getMissingLiveCredentialReason('intermediate')!);
 
     await loginWithSeededProfile(page, 'intermediate');
     const navigation = new NavigationComponent(page);
@@ -31,7 +31,7 @@ test.describe('live role profiles', () => {
   });
 
   test('Intermediate acessa calendario mas nao investimentos nem admin', async ({ page }) => {
-    test.skip(!getSeededLiveCredential('intermediate'), 'Credenciais Intermediate nao configuradas.');
+    test.skip(!!getMissingLiveCredentialReason('intermediate'), getMissingLiveCredentialReason('intermediate')!);
 
     await loginWithSeededProfile(page, 'intermediate');
 
@@ -47,7 +47,7 @@ test.describe('live role profiles', () => {
   });
 
   test('Advanced exibe wealth no menu e carrega ações principais de investimentos', async ({ page }) => {
-    test.skip(!getSeededLiveCredential('advanced'), 'Credenciais Advanced nao configuradas.');
+    test.skip(!!getMissingLiveCredentialReason('advanced'), getMissingLiveCredentialReason('advanced')!);
 
     await loginWithSeededProfile(page, 'advanced');
     const navigation = new NavigationComponent(page);
@@ -64,7 +64,7 @@ test.describe('live role profiles', () => {
   });
 
   test('Advanced acessa investimentos e calendario mas nao admin', async ({ page }) => {
-    test.skip(!getSeededLiveCredential('advanced'), 'Credenciais Advanced nao configuradas.');
+    test.skip(!!getMissingLiveCredentialReason('advanced'), getMissingLiveCredentialReason('advanced')!);
 
     await loginWithSeededProfile(page, 'advanced');
     const investmentsPage = new InvestmentsPage(page);
@@ -81,7 +81,7 @@ test.describe('live role profiles', () => {
   });
 
   test('Admin exibe menus administrativos e carrega módulos críticos', async ({ page }) => {
-    test.skip(!getSeededLiveCredential('admin'), 'Credenciais Admin nao configuradas.');
+    test.skip(!!getMissingLiveCredentialReason('admin'), getMissingLiveCredentialReason('admin')!);
 
     await loginWithSeededProfile(page, 'admin');
     const navigation = new NavigationComponent(page);
@@ -103,7 +103,7 @@ test.describe('live role profiles', () => {
   });
 
   test('Admin acessa telas administrativas reais', async ({ page }) => {
-    test.skip(!getSeededLiveCredential('admin'), 'Credenciais Admin nao configuradas.');
+    test.skip(!!getMissingLiveCredentialReason('admin'), getMissingLiveCredentialReason('admin')!);
 
     await loginWithSeededProfile(page, 'admin');
     const adminUsersPage = new AdminUsersPage(page);

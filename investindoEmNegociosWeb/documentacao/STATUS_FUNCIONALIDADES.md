@@ -43,7 +43,7 @@
 | Gestão de parcelas (listar/pagar/antecipar/excluir) | ✅ | `/api/v1/installments` + `/payments` + `/anticipations` | Cobertura principal da operação financeira. |
 | Parcelamento automático | ✅ | Motor de planos/parcelas | Implementado. |
 | Competência de cartão por closing day | ✅ | `CardStatementCycleCalculator` + testes + front com `Fatura MM/AAAA` | Validado tecnicamente e com checklist manual documentado. |
-| Fatura por competência (engine consolidada de ciclo) | ⚠️ | Campos de competência ativos em parcelas | Há base funcional; falta motor explícito de consolidação de ciclo separado de conta. |
+| Fatura por competência (engine consolidada de ciclo) | ✅ | `GET /api/v1/cards/{id}/statements` + `CardsService.ListStatementCyclesAsync` + tela `Cartões` | Consolidação explícita por ciclo implementada e validada com suíte live/E2E. |
 | Importação automática de fatura/cartão + conciliação | ⚠️ | `InvoiceImportController` (`extract` + `import`) + modal em `Despesas` + `FinanceInputParser` | Importação automática de itens do PDF para lançamentos de despesa já implementada com seleção de cartão/categoria, chave de idempotência, transação no backend, parsing unificado (data/valor) e contrato 400/422. Pendente conciliação avançada e fechamento automatizado. |
 
 ### 1.5 Tela de Receitas
@@ -224,6 +224,7 @@
 - 2026-03-09: item `18.3 Mobile-first UX` concluído com navegação inferior autenticada no shell, tratamento de safe-area e ajustes de layout mobile nas áreas críticas.
 - 2026-03-09: item `19 Segurança e LGPD completos` concluído com `privacy-summary`, centro de privacidade no frontend e exclusão self-service ampliada para revogar/remover tokens, resets e auditoria do usuário.
 - 2026-03-09: item `21 Escalabilidade técnica por fases` concluído com endpoint administrativo de status operacional da fase atual e exposição explícita de controles já ativos e próximos marcos técnicos.
+- 2026-03-10: revisão funcional/documental consolidou `4.3 Fatura por competência` como `✅` também no mapa principal, alinhando o status com a implementação já ativa em `cards/{id}/statements` e com a cobertura live.
 
 ## 4. Gap Analysis (escopo estratégico 2–25)
 
