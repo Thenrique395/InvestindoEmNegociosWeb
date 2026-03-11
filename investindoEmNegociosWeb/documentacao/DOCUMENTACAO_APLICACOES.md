@@ -1,182 +1,83 @@
 # Documentação das Aplicações
 
-## 1. Visão geral
-O ecossistema é composto por:
-- **Frontend web** em Angular SSR (`investindoEmNegociosWeb`).
-- **Backend API** em .NET 9 (`InvestindoEmNegocio`).
-- **Banco de dados** PostgreSQL.
+Visão consolidada da solução, com foco em arquitetura, responsabilidades e operação.
 
-Ambiente atual publicado:
-- Frontend: `http://35.174.50.187:4200`
-- API Docs: `http://35.174.50.187:5059/docs`
-- Health API: `http://35.174.50.187:5059/health/ready`
+## Componentes
 
----
+- Frontend web: `InvestindoEmNegociosWeb/investindoEmNegociosWeb`
+- Backend API: `InvestindoEmNegociosApi/InvestindoEmNegocio`
+- Banco de dados principal: PostgreSQL
 
-## 2. Estrutura de repositórios
+## Stack principal
 
-## 2.1 Frontend
-- Caminho: `InvestindoEmNegociosWeb/investindoEmNegociosWeb`
-- Stack:
-  - Angular 19 (standalone components + lazy loading)
-  - SSR com `@angular/ssr` + Express
-  - Tailwind + SCSS + tokens CSS
-  - Karma/Jasmine para testes unitários
-  - Lighthouse CI para performance
+### Frontend
 
-## 2.2 Backend
-- Caminho: `InvestindoEmNegocio/InvestindoEmNegocio`
-- Stack:
-  - ASP.NET Core 9
-  - EF Core + Npgsql
-  - JWT auth
-  - OpenAPI/Scalar
-  - Serilog + OpenTelemetry
-  - Health checks
+- Angular 19
+- SSR com `@angular/ssr`
+- Tailwind + SCSS
+- Karma/Jasmine para testes unitários
+- Playwright para E2E
 
----
+### Backend
 
-## 3. Arquitetura técnica
+- ASP.NET Core 9
+- EF Core + Npgsql
+- JWT
+- OpenAPI/Scalar
+- Serilog + OpenTelemetry
+- Health checks
+
+## Arquitetura
 
 Fluxo principal:
-1. Usuário acessa frontend.
-2. Frontend consome API via IP/porta do servidor.
-3. Backend persiste/consulta no PostgreSQL.
+
+1. O navegador acessa o frontend.
+2. O frontend autentica e consome a API.
+3. A API aplica regras de negócio e persiste no PostgreSQL.
 
 Camadas do backend:
-- `Controllers` (entrada HTTP)
-- `Application` (regras de negócio, serviços, DTOs)
-- `Domain` (entidades, enums, contratos de repositório)
-- `Infrastructure` (EF, auth, repositórios, logging)
 
----
+- `Controllers`: contrato HTTP e policies
+- `Application`: casos de uso, serviços e DTOs
+- `Domain`: entidades, enums e contratos
+- `Infrastructure`: persistência, autenticação, integrações e observabilidade
 
-## 4. Frontend em detalhes
+## Áreas funcionais principais
 
-## 4.1 Rotas principais
-- Públicas:
-  - `/` (vitrine)
-  - `/login`
-  - `/calculadora`
-- Autenticadas:
-  - `/dashboard`
-  - `/despesas`
-  - `/receitas`
-  - `/cartoes`
-  - `/metas`
-  - `/investimentos`
-  - `/perfil`, `/preferencias`, `/seguranca`, `/dados`
-- Admin:
-  - `/admin/usuarios`
-  - `/admin/parametros`
+- Autenticação, perfil, onboarding e preferências
+- Despesas, receitas, parcelas e pagamentos
+- Cartões, contas, transferências e importações
+- Metas e contribuições
+- Investimentos, benchmarks e patrimônio
+- Administração, parâmetros e robôs
+- Portabilidade de dados e LGPD
 
-## 4.2 Qualidade e performance
-Scripts relevantes (`package.json`):
-- `npm run quality:frontend`
-  - typecheck + testes + build de produção
-- `npm run perf:lighthouse`
-  - build de produção + Lighthouse CI
+## Operação e ambiente
 
-Arquivos-chave:
-- `angular.json` (budgets e configurações de build)
-- `.lighthouserc.json` (thresholds de qualidade)
-- `src/server.ts` (SSR, compressão e cache de assets)
+Informações operacionais de endpoint público podem mudar por ambiente e não devem ser tratadas como fonte de verdade permanente neste arquivo.
 
----
+Use:
 
-## 5. Backend em detalhes
+- variáveis de ambiente locais para base URLs
+- pipelines e arquivos de deploy para endereços publicados
+- health checks e documentação OpenAPI do ambiente ativo para validação operacional
 
-## 5.1 Domínios/funcionalidades cobertas
-Controladores disponíveis:
-- Auth, Profile, Preferences, Onboarding
-- Categories, Cards, Installments, Plans
-- Goals, GoalContributions
-- Investments + Benchmarks/Market Data
-- Notifications
-- DataPortability (export/import)
-- InvoiceImport
-- Admin (users/categories/parameters)
+## Qualidade
 
-## 5.2 Capacidade operacional
-- Health checks:
-  - `/health/live`
-  - `/health/ready`
-- OpenAPI:
-  - `/openapi/v1.json` e `/docs`
-- Logs estruturados (Serilog)
-- Instrumentação OTEL (traços/métricas/logs)
-- Rate limiting configurável
+### Frontend
 
----
+- Unitários: `npm test -- --watch=false`
+- E2E padrão: `npm run test:e2e`
+- E2E live: `RUN_LIVE_SERVER_E2E=1 npm run test:e2e:live`
 
-## 6. Infra e deploy
+### Backend
 
-## 6.1 Containers
-- Frontend: `InvestindoEmNegociosWeb/docker-compose.yml`
-- Backend + Postgres: `InvestindoEmNegocio/docker-compose.yml`
+- Testes: `dotnet test InvestindoEmNegociosApi/InvestindoEmNegocio.sln /p:UseAppHost=false`
+- Smoke e playbooks: ver `InvestindoEmNegociosApi/docs`
 
-## 6.2 Variáveis essenciais
+## Documentos relacionados
 
-Frontend (`InvestindoEmNegociosWeb/.env`):
-- `API_BASE_URL`
-
-Backend (`InvestindoEmNegocio/.env`):
-- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`
-- `DB_CONN`
-- `JWT_SECRET_KEY`
-- `BRAPI_TOKEN`
-- `ASPNETCORE_URLS` (opcional)
-
----
-
-## 7. Testes e validações recomendadas
-
-## 7.1 Frontend
-- `npm run quality:frontend`
-- `npm run perf:lighthouse`
-
-## 7.2 Backend
-- Build:
-  - `dotnet build`
-- Testes:
-  - `dotnet test`
-- Carga (k6):
-  - scripts em `InvestindoEmNegocio/perf/scripts`
-  - configs em `InvestindoEmNegocio/perf/config`
-
-## 7.3 Smoke de produção
-- `curl -I http://35.174.50.187:4200`
-- `curl -I http://35.174.50.187:5059/health/ready`
-- `curl -I http://35.174.50.187:5059/docs`
-
----
-
-## 8. Segurança e boas práticas para PRD
-- Não versionar segredos em repositório.
-- Rotacionar JWT secret e tokens externos.
-- Manter backup diário e teste de restore.
-- Monitorar p95/p99 e taxa de erro.
-- Manter rollback operacional simples.
-- Em produção final, considerar reverse proxy (Nginx) + TLS.
-
----
-
-## 9. Guia rápido de troubleshooting
-
-## 9.1 `docker compose` sem arquivo
-- Executar no diretório correto do projeto.
-
-## 9.2 Erro de variável não definida
-- Conferir `.env` local da VPS.
-- Rodar `docker compose config` para validar interpolação.
-
-## 9.3 API lenta/carga
-- Usar scripts k6 (`perf/` no backend).
-- Verificar p95 por endpoint antes de otimizar.
-
----
-
-## 10. Documentos relacionados
-- `README.md` (frontend)
-- `systemDesigner.md` (design system)
-- `PRD_CUSTOS_E_PROXIMOS_PASSOS.md` (plano de produção)
+- [README.md](./README.md)
+- [STATUS_FUNCIONALIDADES.md](./STATUS_FUNCIONALIDADES.md)
+- [MATRIZ_COBERTURA_TESTES.md](./MATRIZ_COBERTURA_TESTES.md)
+- [../../../InvestindoEmNegociosApi/docs/README.md](../../../InvestindoEmNegociosApi/docs/README.md)

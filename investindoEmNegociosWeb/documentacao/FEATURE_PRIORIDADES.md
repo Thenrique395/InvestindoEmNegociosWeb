@@ -1,141 +1,47 @@
-# Prioridades de Novas Features
+# Backlog Priorizado
 
-## Prioridade 1 - Fluxo financeiro core
-- Recorrência de receitas e despesas.
-- Lembretes reais (push/WhatsApp).
-- Importação de faturas (multi-formato) + conciliação de cartões e faturas em um único fluxo.
-- Calendário financeiro mensal com compromissos e vencimentos.
-- Regra de alertas por faixa de valor (alto impacto no orçamento).
+Este arquivo deve listar apenas trabalho futuro ou ainda parcial.
+Itens já entregues pertencem ao [STATUS_FUNCIONALIDADES.md](./STATUS_FUNCIONALIDADES.md).
 
-## Prioridade 2 - Automação útil
-- Regras automáticas por categoria (reagendar, alertar, marcar status).
-- Sugestões de orçamento mensal.
-- Categorização inteligente por histórico de lançamentos.
-- Projeção de fechamento do mês com base no comportamento atual.
+## Prioridade imediata
 
-## Prioridade 3 - Retenção
-- Metas com "próxima ação" clara.
-- Streak de saúde financeira.
-- Resumo semanal automático.
-- Relatório mensal consolidado (PDF) com evolução e principais desvios.
-- Checklist de rotina financeira (semanal/mensal).
+- Empréstimos:
+  - `15.1 LoanContract`
+  - `15.2 LoanInstallment`
+  - `15.3 Simulação de amortização`
+- Snapshot mensal imutável:
+  - `16 Snapshot mensal imutável`
+- Fechamento de conciliação avançada de fatura
+- Sync B3 real com validação fim a fim
 
-## Prioridade 4 - Dados e confiança
-- Import/export robusto.
-- Detecção de duplicados.
-- Trilha de alterações por item.
-- Backup automático opcional com histórico de versões.
-- Centro de auditoria com filtros por período e ação.
+## Próxima onda
 
-## Prioridade 5 - Monetização
-- Travas por plano no front e API.
-- Tela de upgrade contextual.
-- Comparação dinâmica de benefícios por perfil.
-- Trial guiado com metas de ativação por plano.
-- Upsell contextual para recursos de investimentos e automações.
+- Bloco de IA:
+  - `17.1 IA conversacional`
+  - `17.2 Prompt estruturado com dados pré-calculados`
+  - `17.3 Governança de IA`
+- PWA e mobile nativo:
+  - `18.1 PWA`
+  - `18.2 Capacitor`
+- Open Finance
+- Planos e monetização
 
-## Prioridade 6 - Qualidade técnica
-- Reduzir bundle inicial.
-- Testes E2E dos fluxos críticos (login, importação, despesas, metas).
-- Observabilidade de erro no front.
-- Monitoramento de performance por tela (Core Web Vitals).
-- Testes de carga nos endpoints críticos (faturas, dashboard, investimentos).
-- Backend: endpoint de posições com modo leve (`withMarket=false`) para reduzir p95.
-- Backend: análise de queries críticas com `EXPLAIN ANALYZE` + índices por uso real.
-- Backend: export/import de portabilidade em job assíncrono com status.
-- Backend: rate limit e timeout/circuit breaker para rotas e integrações críticas.
-- Backend: OpenTelemetry com dashboard p50/p95/p99 por endpoint e alertas.
-- Frontend: virtualização de tabelas longas (movimentos, proventos, lançamentos).
-- Frontend: cancelar requests ao trocar aba/filtro e padronizar loading/skeleton.
-- Frontend: gate de performance no CI (Lighthouse + budget de bundle com fail automático).
+## Operação e produto
 
-## Melhorias técnicas (limpeza e padrão de mercado)
-- Remover componente órfão `LandingComponent` sem rota ativa.
-- Limpar CSS legado no `app.component.scss` (blocos antigos de hero/painel não utilizados).
-- Adicionar `trackBy` em listas com `*ngFor` para reduzir re-render desnecessário.
-- Corrigir links placeholder (`href="#"`) para rotas reais ou botões sem navegação.
-- Revisar `AppComponent` e separar responsabilidades em serviços/componentes menores (shell, notificações, menu de usuário, tema).
-- Evitar `refresh()` global em toda navegação logada; aplicar cache/revalidação por feature.
-- Migrar rotas para lazy loading (`loadComponent`) para reduzir bundle inicial.
-- Definir estratégia de budgets por feature e otimização de assets, evitando apenas elevar limite.
+- Envio real de e-mail com validação operacional
+- Segurança e LGPD avançadas de produção
+- Escalabilidade técnica por fases com métricas operacionais fechadas
+- Dashboard patrimonial com composição mais rica de ativos e passivos
 
-## Prioridade 7 - Investimentos (núcleo de expansão)
-Concluído:
-- Dashboard de carteira com rentabilidade diária, mensal e acumulada.
-- Comparação da carteira com benchmarks (CDI, IPCA, Ibovespa, S&P500).
-- Alocação por classe de ativo com alerta de desbalanceamento.
-- Agenda de eventos: dividendos, juros, vencimentos e aportes planejados.
-- Registro de proventos e cálculo de retorno total (preço + renda).
-- Simulador de aportes recorrentes com cenários conservador/base/otimista.
-- Metas de patrimônio com projeção de prazo e esforço de aporte.
-- Importação de posição por CSV/planilha para onboarding rápido.
-- Relatório fiscal básico (resumo de operações e proventos por período).
+## Qualidade técnica
 
-Pendente:
-- Integração direta com APIs da B3 para sincronização automática (depende de credenciais e política oficial de acesso).
+- E2E mobile dedicado para onboarding e Home
+- Mais cenários reais de erro para cartões e importação de fatura
+- Cobertura visual e funcional mais profunda de calendário e wealth
+- Observabilidade de erro no frontend
+- Testes de carga e p95/p99 nos endpoints mais críticos
 
+## Regra de manutenção
 
-# Futuras Features (Frontend)
-
-Este documento lista ideias e pendências discutidas para implementar no futuro.
-
-## Despesas: “Antecipada e Paga”
-Objetivo: indicar que uma despesa foi antecipada **e** depois paga, sem duplicar badges.
-
-Proposta:
-- Criar um status novo no backend: `ANTICIPATED_PAID`.
-- Fluxo:
-  - Ao antecipar: `OPEN` → `ANTICIPATED`.
-  - Ao pagar:
-    - se estava `ANTICIPATED` → `ANTICIPATED_PAID`.
-    - se estava `OPEN` → `PAID`.
-- No front:
-  - Exibir **um** badge: “Antecipada (paga)” com cor própria.
-  - Filtros:
-    - “Pagas” deve incluir `PAID` e `ANTICIPATED_PAID`.
-    - “Antecipadas” deve incluir `ANTICIPATED` e `ANTICIPATED_PAID`.
-  - Relatórios/análises:
-    - Contabilizar antecipações com `ANTICIPATED` + `ANTICIPATED_PAID`.
-
-## Métricas de antecipação (ano/mês)
-Objetivo: relatório de impacto de antecipações.
-
-Ideias:
-- Contar quantas parcelas foram antecipadas por período.
-- Somar valor total antecipado por período.
-- Comparar “economia de juros” (se houver campo de juros/desconto).
-
-## Histórico de antecipações
-Objetivo: saber quando a antecipação ocorreu.
-
-Proposta:
-- Armazenar `anticipationDate` na despesa/parcela.
-- Mostrar no histórico detalhado.
-
-## Investimentos estratégicos (futuro)
-Objetivo: evoluir o produto para decisão financeira, não só registro.
-
-Backlog funcional:
-- Competência mensal configurável (`competenceCarryOverDay`) aplicada nas visões e cálculos.
-- Saldo Disponível Real (SDR) como indicador oficial no resumo financeiro.
-- Simulador de decisão de dívida: amortizar vs investir (com cenários).
-- Projeções futuras (conservador/base/agressivo) para fluxo e patrimônio.
-- Alertas de deterioração de padrão de gasto e risco de liquidez.
-
-## Assistente financeiro (futuro)
-Objetivo: orientar o usuário com recomendações acionáveis.
-
-Backlog funcional:
-- Assistente de diagnóstico mensal (“o que melhorou/piorou e por quê”).
-- Recomendações priorizadas com impacto estimado (curto e médio prazo).
-- Explicação de recomendação baseada nos dados da própria conta.
-- “Próxima melhor ação” semanal com checklist.
-
-## Monetização funcional (futuro)
-Objetivo: preparar produto para planos pagos sem quebrar experiência.
-
-Backlog funcional:
-- Planos Free/Pro com limites por feature no backend e frontend.
-- Trial com onboarding guiado e metas de ativação.
-- Upgrade contextual por uso (feature gates + call-to-action).
-- Gestão de assinatura, status de plano e histórico de cobrança.
+- Quando um item sair deste backlog e virar entrega, mover o status para `STATUS_FUNCIONALIDADES.md`.
+- Não manter aqui ideias já concluídas ou backlog histórico sem dono.
