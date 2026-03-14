@@ -1,0 +1,60 @@
+<section class="checkout-page">
+  <section class="checkout-hero">
+    <div>
+      <p class="eyebrow">Checkout</p>
+      <h1>Confirme seu plano e inicie a contratação</h1>
+      <p class="lead">
+        Você selecionou um plano. O próximo passo é criar sua conta e seguir para ativação dentro do produto.
+      </p>
+    </div>
+    <a class="link-back" routerLink="/planos">Voltar para planos</a>
+  </section>
+
+  <section class="checkout-grid">
+    <article class="checkout-card">
+      <h2>Crie sua conta</h2>
+      <p class="muted">
+        Use o cadastro rápido para iniciar o acesso. Se você já tem conta, entre e finalize a contratação na área de assinatura.
+      </p>
+      <app-signup (signedUp)="handleSignedUp()"></app-signup>
+      <div class="checkout-card__footer">
+        <span>Já possui cadastro?</span>
+        <a routerLink="/login">Entrar para continuar</a>
+      </div>
+    </article>
+
+    <aside class="summary-card">
+      <p class="summary-card__kicker">Resumo da contratação</p>
+      <h2>{{ selectedPlan.name }}</h2>
+      <p class="summary-card__audience">{{ selectedPlan.audience }}</p>
+
+      <div class="summary-price">
+        <strong>{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+        <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+      </div>
+
+      <p class="summary-highlight">{{ selectedPlan.highlight }}</p>
+
+      <div class="summary-section">
+        <h3>Você leva agora</h3>
+        <ul>
+          <li *ngFor="let feature of selectedPlan.features">{{ feature }}</li>
+        </ul>
+      </div>
+
+      <div class="summary-section summary-section--steps">
+        <h3>Próximos passos</h3>
+        <ol>
+          <li>Criar conta com e-mail e senha</li>
+          <li>Entrar na plataforma</li>
+          <li>Concluir ativação da assinatura na área interna</li>
+          <li>Começar onboarding e configuração financeira</li>
+        </ol>
+      </div>
+
+      <div class="summary-note" *ngIf="selectedPlan.code !== 'basic'">
+        Ainda não há cobrança pública automatizada nesta tela. A contratação segue para a área interna após o cadastro.
+      </div>
+    </aside>
+  </section>
+</section>

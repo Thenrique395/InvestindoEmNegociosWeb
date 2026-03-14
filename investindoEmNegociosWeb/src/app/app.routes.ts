@@ -13,6 +13,16 @@ export const routes: Routes = [
     loadComponent: () => import('./product-showcase/product-showcase.component').then((m) => m.ProductShowcaseComponent)
   },
   {
+    path: 'planos',
+    data: { preload: true },
+    loadComponent: () => import('./pricing/pricing.component').then((m) => m.PricingComponent)
+  },
+  {
+    path: 'checkout',
+    data: { preload: true },
+    loadComponent: () => import('./checkout/checkout.component').then((m) => m.CheckoutComponent)
+  },
+  {
     path: 'dashboard',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },
@@ -117,7 +127,7 @@ export const routes: Routes = [
     loadComponent: () => import('./assistant/assistant.component').then((m) => m.AssistantComponent)
   },
   {
-    path: 'planos',
+    path: 'assinatura',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },
     loadComponent: () => import('./subscriptions/subscriptions.component').then((m) => m.SubscriptionsComponent)

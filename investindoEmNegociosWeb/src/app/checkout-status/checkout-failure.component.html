@@ -1,0 +1,21 @@
+<section class="status-page status-page--failure">
+  <div class="status-card">
+    <p class="eyebrow">Falha na contratação</p>
+    <h1>Não foi possível ativar o plano {{ plan.name }}</h1>
+    <p class="lead">{{ message }}</p>
+
+    <div class="status-panel">
+      <h2>Como seguir</h2>
+      <ul>
+        <li>Revise se sua sessão ainda está ativa</li>
+        <li>Tente novamente a contratação</li>
+        <li>Se persistir, finalize pela área de assinatura após o login</li>
+      </ul>
+    </div>
+
+    <div class="status-actions">
+      <a class="btn btn--primary" [routerLink]="['/checkout']" [queryParams]="{ plan: plan.code, cycle: cycle }">Tentar novamente</a>
+      <a class="btn btn--ghost" routerLink="/assinatura">Ir para minha assinatura</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,141 @@
+.checkout-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.checkout-hero,
+.checkout-card,
+.summary-card {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.checkout-hero {
+  padding: clamp(1.1rem, 2vw, 1.7rem);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 14%, transparent), transparent 38%),
+    linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface-2) 88%, var(--primary)));
+}
+
+.checkout-hero h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.lead,
+.muted,
+.summary-highlight,
+.summary-card__audience {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.link-back {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 1rem;
+}
+
+.checkout-card,
+.summary-card {
+  padding: 1.1rem;
+}
+
+.checkout-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.checkout-card h2,
+.summary-card h2,
+.summary-section h3 {
+  margin: 0;
+}
+
+.checkout-card__footer {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.checkout-card__footer a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.summary-card {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 86%, white), var(--surface));
+}
+
+.summary-card__kicker {
+  margin: 0;
+  color: var(--primary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+}
+
+.summary-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.summary-price strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.summary-section {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.summary-section ul,
+.summary-section ol {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+}
+
+.summary-note {
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--warning) 28%, var(--border));
+}
+
+@media (max-width: 980px) {
+  .checkout-hero,
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-hero {
+    align-items: start;
+    flex-direction: column;
+  }
+}

@@ -13,7 +13,8 @@
       </a>
     </div>
     <nav class="menu">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="reloadIfSame('/', $event)">Home</a>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="reloadIfSame('/', $event)">Produto</a>
+      <a routerLink="/planos" routerLinkActive="active">Planos</a>
       <a routerLink="/calculadora" routerLinkActive="active" (click)="reloadIfSame('/calculadora', $event)">Calculadora</a>
     </nav>
     <div class="topbar__actions">
@@ -21,7 +22,7 @@
         <span *ngIf="!isLightTheme">☀️</span>
         <span *ngIf="isLightTheme">🌙</span>
       </button>
-      <button class="signup-link" type="button" (click)="openSignup()">Criar conta</button>
+      <a class="signup-link" routerLink="/checkout" [queryParams]="{ plan: 'intermediate', cycle: 'Monthly' }">Contratar</a>
       <button class="login-link" type="button" (click)="goToLogin()">Entrar</button>
     </div>
   </header>
@@ -291,11 +292,11 @@
             <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Assistente</span>
           </a>
           <a
-            routerLink="/planos"
+            routerLink="/assinatura"
             routerLinkActive="active"
             #plansActive="routerLinkActive"
             *ngIf="hasAccess('Basic')"
-            (click)="reloadIfSame('/planos', $event)"
+            (click)="reloadIfSame('/assinatura', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="plansActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
@@ -304,7 +305,7 @@
                 <path d="M4 7h16M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 7h6m-6 4h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Planos</span>
+            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Minha assinatura</span>
           </a>
           <a
             routerLink="/calculadora"
@@ -524,7 +525,7 @@
           <a routerLink="/despesas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/despesas')">Despesas</a>
           <a routerLink="/contas" *ngIf="hasFeature('categories.access')" [class.active]="isActiveRoute('/contas')">Contas</a>
           <a routerLink="/emprestimos" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/emprestimos')">Empréstimos</a>
-          <a routerLink="/planos" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/planos')">Planos</a>
+          <a routerLink="/assinatura" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/assinatura')">Assinatura</a>
           <a routerLink="/investimentos" *ngIf="hasFeature('investments.access')" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
         </nav>
       </div>

@@ -1,0 +1,65 @@
+<section class="pricing-page">
+  <section class="pricing-hero">
+    <div class="pricing-hero__content">
+      <p class="eyebrow">Planos</p>
+      <h1>Escolha o plano certo para seu momento financeiro</h1>
+      <p class="lead">
+        O produto já cobre controle do mês, cartões, importação de fatura e patrimônio. Aqui a escolha é simples:
+        começar, ganhar previsibilidade ou evoluir para visão patrimonial completa.
+      </p>
+    </div>
+
+    <div class="billing-switch" role="group" aria-label="Periodicidade">
+      <button type="button" class="billing-switch__item" [class.is-active]="cycle === 'Monthly'" (click)="selectCycle('Monthly')">
+        Mensal
+      </button>
+      <button type="button" class="billing-switch__item" [class.is-active]="cycle === 'Yearly'" (click)="selectCycle('Yearly')">
+        Anual
+      </button>
+    </div>
+  </section>
+
+  <section class="pricing-grid">
+    <article class="plan-card" *ngFor="let plan of plans" [class.plan-card--featured]="plan.recommended">
+      <div class="plan-card__top">
+        <div>
+          <p class="plan-card__audience">{{ plan.audience }}</p>
+          <h2>{{ plan.name }}</h2>
+          <p class="plan-card__description">{{ plan.description }}</p>
+        </div>
+        <span class="plan-badge" *ngIf="plan.recommended">Mais escolhido</span>
+      </div>
+
+      <div class="plan-price">
+        <strong>{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+        <span>/ {{ cycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+      </div>
+
+      <p class="plan-highlight">{{ plan.highlight }}</p>
+
+      <div class="plan-section">
+        <h3>Inclui</h3>
+        <ul>
+          <li *ngFor="let feature of plan.features">{{ feature }}</li>
+        </ul>
+      </div>
+
+      <div class="plan-section plan-section--muted">
+        <h3>Observações</h3>
+        <ul>
+          <li *ngFor="let limit of plan.limits">{{ limit }}</li>
+        </ul>
+      </div>
+
+      <div class="plan-actions">
+        <a
+          class="btn btn--primary"
+          [routerLink]="['/checkout']"
+          [queryParams]="{ plan: plan.code, cycle: cycle }">
+          {{ plan.code === 'basic' ? 'Começar grátis' : 'Ir para checkout' }}
+        </a>
+        <a class="btn btn--ghost" routerLink="/">Ver visão do produto</a>
+      </div>
+    </article>
+  </section>
+</section>

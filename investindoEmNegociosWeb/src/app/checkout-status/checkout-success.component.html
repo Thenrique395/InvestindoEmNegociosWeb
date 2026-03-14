@@ -1,0 +1,19 @@
+<section class="status-page status-page--success">
+  <div class="status-card">
+    <p class="eyebrow">Contratação concluída</p>
+    <h1>{{ plan.name }} ativado com sucesso</h1>
+    <p class="lead">
+      Sua assinatura foi atualizada no fluxo atual do sistema. O ciclo selecionado foi <strong>{{ cycle === 'Yearly' ? 'anual' : 'mensal' }}</strong>.
+    </p>
+
+    <div class="status-panel">
+      <h2>Próximo passo</h2>
+      <p>Agora você já pode entrar no produto e continuar sua configuração com o plano ativo.</p>
+    </div>
+
+    <div class="status-actions">
+      <a class="btn btn--primary" routerLink="/dashboard">Ir para o dashboard</a>
+      <a class="btn btn--ghost" routerLink="/assinatura">Ver minha assinatura</a>
+    </div>
+  </div>
+</section>
