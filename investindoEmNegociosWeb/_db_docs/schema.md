@@ -1,11 +1,21 @@
 # Schema do banco de dados
-Ultima atualizacao: 2026-02-06 (deploy trigger)
 
-Este documento descreve as tabelas persistidas pelo `InvestDbContext` e o relacionamento entre elas. O diagrama visual correspondente esta em `schema.svg`.
+Ultima atualizacao manual: `2026-02-06`
 
-Observacoes:
-- As entidades `Income` e `Expense` existem no dominio, mas nao aparecem no `DbContext` atual e, portanto, nao sao persistidas.
-- Alguns relacionamentos sao **logicos** (existem como campos, mas nao ha FK configurada no EF). Estao marcados abaixo.
+Este documento e um mapa textual do schema principal persistido pelo `InvestDbContext`.
+O diagrama visual correspondente continua em `schema.svg`.
+
+## Escopo
+
+- descreve as tabelas mais relevantes para o produto
+- destaca FKs reais e relacionamentos apenas logicos
+- serve como apoio rapido de leitura, nao como fonte unica de migration
+
+## Observacoes
+
+- as entidades `Income` e `Expense` existem no dominio, mas nao sao persistidas diretamente no `DbContext` atual
+- alguns relacionamentos sao apenas logicos e estao marcados abaixo
+- qualquer mudanca estrutural relevante deve ser refletida aqui junto com as migrations correspondentes
 
 ## Entidades principais
 
