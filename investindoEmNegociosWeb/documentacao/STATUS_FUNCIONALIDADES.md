@@ -267,10 +267,10 @@
 | 18.1 | PWA | ✅ | `manifest.webmanifest` + `ngsw-config.json` + `provideServiceWorker` | Base ativa de PWA com manifest, ícones, service worker e link no `index.html`. |
 | 18.2 | Capacitor | ✅ | `capacitor.config.ts` + projetos `android/` e `ios/` + scripts `cap:*` | Base nativa gerada com Android/iOS, sincronização de assets web e comandos operacionais de sync/abertura. |
 | 18.3 | Mobile-first UX | ✅ | `mobile-dock` no shell autenticado + safe area/bottom spacing + ajustes na central de dados | Estratégia mobile-first formalizada no shell autenticado com navegação inferior, áreas seguras e priorização de fluxos principais em viewport pequena. |
-| 19 | Segurança e LGPD completos | ✅ | `GET /api/v1/preferences/privacy-summary` + exclusão self-service ampliada + centro de privacidade em `/dados` | Exclusão agora remove dados operacionais, refresh tokens, resets e auditoria do usuário, com resumo explícito de controles de privacidade no frontend. |
+| 19 | Segurança e LGPD completos | ✅ | `GET /api/v1/preferences/privacy-summary`, `GET /api/v1/preferences/security-summary`, `POST /api/v1/preferences/sessions/revoke` + telas `/dados` e `/seguranca` | Além da exclusão self-service ampliada, o usuário agora vê resumo de segurança, lockout, últimas credenciais e pode revogar sessões ativas sem intervenção manual. |
 | 20 | Open Finance | ❌ | Não implementado. |
 | 21 | Escalabilidade técnica por fases | ✅ | `GET /api/v1/admin/parameters/scalability-runtime` + painel admin de status de fase | Fase 1 formalizada em runtime com checklist operacional dos controles ativos e backlog explícito das próximas fases no painel administrativo. |
-| 22 | Planos e monetização | ❌ | Feature gates/assinaturas/planos não implementados. |
+| 22 | Planos e monetização | ✅ | `GET /api/v1/subscriptions/catalog`, `POST /api/v1/subscriptions/change`, `POST /api/v1/subscriptions/cancel` + tela `/planos` | Catálogo de planos `Basic`/`Intermediate`/`Advanced`, assinatura persistida por usuário, upgrade/downgrade com reemissão imediata de sessão e limites exibidos no frontend. |
 | 23 | Estratégia de crescimento | ⚠️ | Tema de negócio/documentação, não funcionalidade implementada no sistema. |
 | 24 | Projeção financeira (CAC/LTV/ARR etc.) | ⚠️ | Tema de negócio, não engine implementada no software. |
 | 25 | Roadmap 36 meses | ⚠️ | Planejamento estratégico, não funcionalidade de código. |

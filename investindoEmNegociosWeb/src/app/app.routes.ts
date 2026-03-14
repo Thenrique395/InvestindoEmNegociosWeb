@@ -117,6 +117,12 @@ export const routes: Routes = [
     loadComponent: () => import('./assistant/assistant.component').then((m) => m.AssistantComponent)
   },
   {
+    path: 'planos',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: false },
+    loadComponent: () => import('./subscriptions/subscriptions.component').then((m) => m.SubscriptionsComponent)
+  },
+  {
     path: 'perfil',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },

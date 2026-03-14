@@ -1,0 +1,94 @@
+<section class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">Planos</p>
+      <h2>Assinatura e monetização</h2>
+      <p class="muted">Gerencie upgrade, downgrade e limites liberados pelo seu plano.</p>
+    </div>
+    <div class="billing-toggle">
+      <button type="button" class="btn btn--ghost" [class.is-active]="changingCycle === 'Monthly'" (click)="selectCycle('Monthly')">Mensal</button>
+      <button type="button" class="btn btn--ghost" [class.is-active]="changingCycle === 'Yearly'" (click)="selectCycle('Yearly')">Anual</button>
+    </div>
+  </div>
+
+  <p class="muted" *ngIf="loading">Carregando catálogo de planos.</p>
+
+  <ng-container *ngIf="catalog as vm">
+    <div class="privacy-strip">
+      <div class="privacy-pill">
+        <strong>{{ vm.current.planName }}</strong>
+        <span>Plano atual</span>
+      </div>
+      <div class="privacy-pill">
+        <strong>{{ vm.current.role }}</strong>
+        <span>Role efetiva</span>
+      </div>
+      <div class="privacy-pill">
+        <strong>{{ vm.current.autoRenew ? 'Ativa' : 'Cancelada' }}</strong>
+        <span>Renovação</span>
+      </div>
+      <div class="privacy-pill">
+        <strong>{{ vm.current.renewsAt ? (vm.current.renewsAt | date:'dd/MM/yyyy') : '—' }}</strong>
+        <span>Próxima virada</span>
+      </div>
+    </div>
+
+    <div class="plans-grid">
+      <article class="plan-card" *ngFor="let plan of vm.plans" [class.plan-card--current]="plan.current" [class.plan-card--recommended]="plan.recommended">
+        <div class="plan-card__header">
+          <div>
+            <h3>{{ plan.name }}</h3>
+            <p class="muted">{{ plan.description }}</p>
+          </div>
+          <span class="badge" *ngIf="plan.recommended">Recomendado</span>
+        </div>
+
+        <div class="price">
+          <strong>
+            {{
+              (changingCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice)
+                | currency:'BRL':'symbol':'1.2-2':'pt-BR'
+            }}
+          </strong>
+          <span>/ {{ changingCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+        </div>
+
+        <div class="scope scope--compact">
+          <div *ngFor="let feature of plan.features">{{ feature }}</div>
+        </div>
+
+        <div class="limits">
+          <div *ngFor="let limit of plan.limits | keyvalue">
+            <strong>{{ limit.key }}</strong>
+            <span>{{ limit.value }}</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn"
+          [class.btn--primary]="!plan.current"
+          [class.btn--ghost]="plan.current"
+          [disabled]="plan.current || changingPlanCode !== null"
+          (click)="change(plan)">
+          {{ plan.current ? 'Plano atual' : (changingPlanCode === plan.code ? 'Aplicando...' : 'Trocar para este plano') }}
+        </button>
+      </article>
+    </div>
+
+    <div class="card" *ngIf="vm.current.planCode !== 'basic'">
+      <h3>Cancelar renovação</h3>
+      <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
+      <button type="button" class="btn btn--danger" [disabled]="cancelling" (click)="cancel()">
+        {{ cancelling ? 'Cancelando...' : 'Cancelar renovação' }}
+      </button>
+    </div>
+
+    <div class="card">
+      <h3>Notas operacionais</h3>
+      <div class="scope scope--compact">
+        <div *ngFor="let note of vm.notes">{{ note }}</div>
+      </div>
+    </div>
+  </ng-container>
+</section>

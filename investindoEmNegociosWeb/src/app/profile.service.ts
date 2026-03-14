@@ -47,6 +47,21 @@ export interface PrivacySummary {
   retentionPolicy: string;
 }
 
+export interface SecuritySummary {
+  activeSessions: number;
+  failedLoginAttempts: number;
+  isLocked: boolean;
+  lockoutUntil?: string | null;
+  lastLoginAt?: string | null;
+  controls: string[];
+  recommendations: string[];
+}
+
+export interface RevokeSessionsResponse {
+  revokedSessions: number;
+  revokedAtUtc: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private readonly baseUrl = `${API_BASE_URL}/profile`;
@@ -98,6 +113,14 @@ export class ProfileService {
 
   getPrivacySummary() {
     return this.http.get<PrivacySummary>(`${this.prefsUrl}/privacy-summary`);
+  }
+
+  getSecuritySummary() {
+    return this.http.get<SecuritySummary>(`${this.prefsUrl}/security-summary`);
+  }
+
+  revokeOwnSessions() {
+    return this.http.post<RevokeSessionsResponse>(`${this.prefsUrl}/sessions/revoke`, {});
   }
 
   deleteOwnAccount(payload: { currentPassword: string; confirmationText: string }) {

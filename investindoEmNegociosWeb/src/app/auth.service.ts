@@ -101,6 +101,10 @@ export class AuthService {
     return res;
   }
 
+  applySession(res: AuthResponse): AuthResponse {
+    return this.persistSession(res);
+  }
+
   getAccessToken(): string | null {
     if (this.isAccessTokenExpired()) {
       this.clearSession();
