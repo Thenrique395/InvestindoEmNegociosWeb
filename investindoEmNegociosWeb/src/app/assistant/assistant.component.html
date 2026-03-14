@@ -1,0 +1,38 @@
+<section class="page-shell">
+  <header class="card hero">
+    <div>
+      <p class="eyebrow">Assistente financeiro</p>
+      <h1>Assistente</h1>
+      <p class="muted">Conversa guiada com base em SDR, projeção, dívida, patrimônio, risco e recomendações já calculadas.</p>
+    </div>
+  </header>
+
+  <div class="feedback error" *ngIf="error">{{ error }}</div>
+
+  <article class="card" *ngIf="context as c">
+    <div class="summary-grid">
+      <div><span>SDR</span><strong>{{ c.realBalance.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+      <div><span>Dívida</span><strong>{{ c.debts.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+      <div><span>Patrimônio</span><strong>{{ c.netWorth.netWorth | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+      <div><span>Risco</span><strong>{{ c.risk.score }}/100</strong></div>
+    </div>
+    <p class="muted">{{ c.governanceSummary }}</p>
+  </article>
+
+  <article class="card composer">
+    <label>Pergunta
+      <textarea [(ngModel)]="question" rows="4" placeholder="Ex.: Qual é meu maior risco financeiro neste mês?"></textarea>
+    </label>
+    <div class="actions">
+      <button class="btn-primary" type="button" (click)="send()" [disabled]="sending || loading">{{ sending ? 'Respondendo...' : 'Perguntar' }}</button>
+    </div>
+  </article>
+
+  <article class="card conversation" *ngIf="conversation.length">
+    <section class="bubble" *ngFor="let item of conversation">
+      <p class="bubble__q">{{ item.question }}</p>
+      <p class="bubble__a">{{ item.answer }}</p>
+      <p class="bubble__d">{{ item.disclaimer }}</p>
+    </section>
+  </article>
+</section>

@@ -243,6 +243,54 @@
             <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Metas</span>
           </a>
           <a
+            routerLink="/emprestimos"
+            routerLinkActive="active"
+            #loansActive="routerLinkActive"
+            *ngIf="hasAccess('Basic')"
+            (click)="reloadIfSame('/emprestimos', $event)"
+            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            [ngClass]="loansActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
+          >
+            <span class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]" [ngClass]="loansActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--warning)] shadow-[inset_0_0_0_1px_rgba(245,158,11,0.18)]' : ''" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Empréstimos</span>
+          </a>
+          <a
+            routerLink="/snapshots"
+            routerLinkActive="active"
+            #snapshotActive="routerLinkActive"
+            *ngIf="hasAccess('Basic')"
+            (click)="reloadIfSame('/snapshots', $event)"
+            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            [ngClass]="snapshotActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
+          >
+            <span class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]" [ngClass]="snapshotActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]' : ''" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Snapshots</span>
+          </a>
+          <a
+            routerLink="/assistente"
+            routerLinkActive="active"
+            #assistantActive="routerLinkActive"
+            *ngIf="hasAccess('Basic')"
+            (click)="reloadIfSame('/assistente', $event)"
+            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            [ngClass]="assistantActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
+          >
+            <span class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]" [ngClass]="assistantActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--info)] shadow-[inset_0_0_0_1px_rgba(14,165,233,0.18)]' : ''" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Assistente</span>
+          </a>
+          <a
             routerLink="/calculadora"
             routerLinkActive="active"
             #calcActive="routerLinkActive"
@@ -459,6 +507,7 @@
           <a routerLink="/dashboard" [class.active]="isActiveRoute('/dashboard')">Início</a>
           <a routerLink="/despesas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/despesas')">Despesas</a>
           <a routerLink="/contas" *ngIf="hasFeature('categories.access')" [class.active]="isActiveRoute('/contas')">Contas</a>
+          <a routerLink="/emprestimos" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/emprestimos')">Empréstimos</a>
           <a routerLink="/investimentos" *ngIf="hasFeature('investments.access')" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
         </nav>
       </div>

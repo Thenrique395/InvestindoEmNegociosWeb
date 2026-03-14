@@ -1,0 +1,33 @@
+<section class="page-shell">
+  <header class="card hero">
+    <div>
+      <p class="eyebrow">Fechamento mensal</p>
+      <h1>Snapshots mensais</h1>
+      <p class="muted">Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco.</p>
+    </div>
+    <button class="btn-primary" type="button" (click)="generateCurrentMonth()" [disabled]="generating">
+      {{ generating ? 'Gerando...' : 'Gerar snapshot do mês' }}
+    </button>
+  </header>
+
+  <div class="feedback error" *ngIf="error">{{ error }}</div>
+  <article class="card">
+    <p class="muted" *ngIf="loading">Carregando...</p>
+    <p class="muted" *ngIf="!loading && !snapshots.length">Nenhum snapshot gerado.</p>
+    <div class="snapshot-list" *ngIf="snapshots.length">
+      <section class="snapshot" *ngFor="let item of snapshots">
+        <div class="snapshot__head">
+          <h2>{{ item.snapshotLabel }}</h2>
+          <span class="pill">{{ item.riskClassification }} · {{ item.riskScore }}/100</span>
+        </div>
+        <div class="grid">
+          <div><span>SDR</span><strong>{{ item.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Projeção</span><strong>{{ item.projectedBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Dívida</span><strong>{{ item.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Patrimônio</span><strong>{{ item.netWorth | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+        </div>
+        <p class="muted">{{ item.primaryInsight }}</p>
+      </section>
+    </div>
+  </article>
+</section>

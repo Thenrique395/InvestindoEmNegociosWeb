@@ -1,0 +1,80 @@
+<section class="page-shell">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Planejamento de passivos</p>
+      <h1>Empréstimos</h1>
+      <p class="muted">Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização.</p>
+    </div>
+  </header>
+
+  <div class="feedback error" *ngIf="error">{{ error }}</div>
+  <div class="feedback success" *ngIf="success">{{ success }}</div>
+
+  <div class="grid">
+    <article class="card form-card">
+      <h2>Novo contrato</h2>
+      <label>Título<input [(ngModel)]="form.title" /></label>
+      <label>Principal<input type="number" [(ngModel)]="form.principalAmount" /></label>
+      <label>Juros ao ano (%)<input type="number" step="0.01" [(ngModel)]="form.annualInterestRate" /></label>
+      <label>Prazo em meses<input type="number" [(ngModel)]="form.termMonths" /></label>
+      <label>Amortização
+        <select [(ngModel)]="form.amortizationType">
+          <option value="Price">PRICE</option>
+          <option value="Sac">SAC</option>
+        </select>
+      </label>
+      <label>Data inicial<input type="date" [(ngModel)]="form.startDate" /></label>
+      <label>Dia de pagamento<input type="number" min="1" max="28" [(ngModel)]="form.paymentDay" /></label>
+      <div class="actions">
+        <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
+        <button class="btn-primary" type="button" (click)="create()" [disabled]="saving">{{ saving ? 'Salvando...' : 'Criar contrato' }}</button>
+      </div>
+    </article>
+
+    <article class="card" *ngIf="simulation as s">
+      <h2>Simulação</h2>
+      <div class="kpis">
+        <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+        <div><span>Custo total</span><strong>{{ s.totalCost | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+        <div><span>Juros totais</span><strong>{{ s.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of s.installments.slice(0, 6)">
+              <td>{{ item.installmentNo }}</td>
+              <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ item.principalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ item.interestAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ item.totalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ item.endingBalance | currency:'BRL':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <article class="card">
+    <h2>Contratos cadastrados</h2>
+    <p class="muted" *ngIf="loading">Carregando...</p>
+    <p class="muted" *ngIf="!loading && !contracts.length">Nenhum empréstimo cadastrado.</p>
+    <div class="contract-list" *ngIf="contracts.length">
+      <section class="contract" *ngFor="let contract of contracts">
+        <div class="contract__head">
+          <div>
+            <h3>{{ contract.title }}</h3>
+            <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | currency:'BRL':'symbol':'1.2-2' }}</p>
+          </div>
+          <div class="pill">{{ contract.status }}</div>
+        </div>
+        <div class="kpis compact">
+          <div><span>Parcela</span><strong>{{ contract.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Juros totais</span><strong>{{ contract.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
+        </div>
+      </section>
+    </div>
+  </article>
+</section>

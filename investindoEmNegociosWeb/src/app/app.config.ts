@@ -11,6 +11,7 @@ import { authInterceptor } from './auth.interceptor';
 import { NoReuseStrategy } from './no-reuse.strategy';
 import { getInitialLocale } from './utils/locale-settings';
 import { SelectivePreloadingStrategy } from './selective-preloading.strategy';
+import { provideServiceWorker } from '@angular/service-worker';
 
 registerLocaleData(localePt);
 registerLocaleData(localeEn);
@@ -25,6 +26,10 @@ export const appConfig: ApplicationConfig = {
     ),
     provideClientHydration(),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: true,
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
     { provide: RouteReuseStrategy, useClass: NoReuseStrategy },
     { provide: LOCALE_ID, useFactory: () => getInitialLocale() }
   ]

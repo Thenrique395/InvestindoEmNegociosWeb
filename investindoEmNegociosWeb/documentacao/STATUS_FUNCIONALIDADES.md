@@ -257,15 +257,15 @@
 | 14.2 | Wealth: dívidas | ✅ | `GET /api/v1/accounts/summary/debts` + seção oficial na `Home` | Módulo estruturado de dívidas em aberto com saldo líquido por parcela, separação entre cartão e outras obrigações, buckets de composição e próximos vencimentos. |
 | 14.3 | Patrimônio líquido | ✅ | `GET /api/v1/accounts/summary/net-worth` + card oficial na `Home` | Visão consolidada oficial com ativos de contas e investimentos, passivos em aberto, separação entre dívida de cartão e demais obrigações, e cálculo explícito do patrimônio líquido. |
 | 14.4 | Evolução patrimonial (snapshot mensal) | ✅ | `GET /api/v1/accounts/summary/net-worth/history` + seção na `Home` | Série mensal oficial de patrimônio líquido para os últimos meses, com composição por ativos/passivos e flag de estimativa quando a curva depender de reconstrução histórica. |
-| 15.1 | LoanContract | ❌ | Não implementado. |
-| 15.2 | LoanInstallment | ❌ | Não implementado. |
-| 15.3 | Simulação de amortização | ❌ | Não implementado. |
-| 16 | Snapshot mensal imutável | ❌ | Não implementado. |
-| 17.1 | IA conversacional (assistente financeiro) | ❌ | Não implementado. |
-| 17.2 | Prompt estruturado com dados pré-calculados | ❌ | Não implementado. |
-| 17.3 | Limites de IA (governança) | ❌ | Não implementado no produto. |
-| 18.1 | PWA | ❌ | Não há configuração ativa de PWA/service worker. |
-| 18.2 | Capacitor | ❌ | Não há integração Capacitor no projeto. |
+| 15.1 | LoanContract | ✅ | `GET|POST /api/v1/loans` + tela `Empréstimos` | Contrato de empréstimo com principal, taxa anual, prazo, amortização (`PRICE`/`SAC`) e integração com dívida aberta. |
+| 15.2 | LoanInstallment | ✅ | Cronograma persistido em `loan_installments` | Parcelas calculadas e persistidas por contrato, com saldo inicial/final, principal, juros, vencimento e status. |
+| 15.3 | Simulação de amortização | ✅ | `POST /api/v1/loans/simulate` + preview na tela `Empréstimos` | Simulação de cronograma para `PRICE` e `SAC` antes da criação do contrato. |
+| 16 | Snapshot mensal imutável | ✅ | `GET /api/v1/monthlysnapshots` + `POST /api/v1/monthlysnapshots/generate` + tela `Snapshots` | Snapshot mensal congelado por usuário/competência com unicidade por mês e consolidação de SDR, projeção, dívida, patrimônio, risco e insight principal. |
+| 17.1 | IA conversacional (assistente financeiro) | ✅ | `GET /api/v1/financialassistant/context` + `POST /api/v1/financialassistant/chat` + tela `Assistente` | Assistente conversacional orientativo implementado sobre dados financeiros consolidados e resposta contextual por risco, dívida, patrimônio e próximas ações. |
+| 17.2 | Prompt estruturado com dados pré-calculados | ✅ | `FinancialAssistantPromptContextResponse` | Contexto estruturado com SDR, dívida, patrimônio, projeção, risco, insights e recomendações, exposto separadamente do chat. |
+| 17.3 | Limites de IA (governança) | ✅ | Validação de tamanho, bloqueio de comandos executivos e disclaimer obrigatório | O assistente não executa transações, bloqueia pedidos de automação financeira e responde com governança explícita. |
+| 18.1 | PWA | ✅ | `manifest.webmanifest` + `ngsw-config.json` + `provideServiceWorker` | Base ativa de PWA com manifest, ícones, service worker e link no `index.html`. |
+| 18.2 | Capacitor | ✅ | `capacitor.config.ts` + projetos `android/` e `ios/` + scripts `cap:*` | Base nativa gerada com Android/iOS, sincronização de assets web e comandos operacionais de sync/abertura. |
 | 18.3 | Mobile-first UX | ✅ | `mobile-dock` no shell autenticado + safe area/bottom spacing + ajustes na central de dados | Estratégia mobile-first formalizada no shell autenticado com navegação inferior, áreas seguras e priorização de fluxos principais em viewport pequena. |
 | 19 | Segurança e LGPD completos | ✅ | `GET /api/v1/preferences/privacy-summary` + exclusão self-service ampliada + centro de privacidade em `/dados` | Exclusão agora remove dados operacionais, refresh tokens, resets e auditoria do usuário, com resumo explícito de controles de privacidade no frontend. |
 | 20 | Open Finance | ❌ | Não implementado. |
