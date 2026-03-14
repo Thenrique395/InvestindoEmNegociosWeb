@@ -5,6 +5,7 @@ import { ProfilePage } from './support/page-objects/profile.page';
 import { SecurityPage } from './support/page-objects/security.page';
 import { UserMenuComponent } from './support/page-objects/user-menu.component';
 import { completeLiveOnboarding } from './support/live-auth';
+import { liveEndpointAvailable } from './support/live-api';
 
 test.describe('live profile flow', () => {
   test.skip(!process.env['RUN_LIVE_SERVER_E2E'], 'Live server E2E roda apenas sob demanda.');
@@ -34,11 +35,12 @@ test.describe('live profile flow', () => {
 
   test('abre a pagina real de seguranca', async ({ page }, testInfo) => {
     test.setTimeout(120000);
+    test.skip(!(await liveEndpointAvailable('/preferences/security-summary')), 'Servidor remoto ainda não publicou o resumo de segurança.');
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
     const securityPage = new SecurityPage(page);
 
     await securityPage.goto();
-    await securityPage.expectPlaceholderState();
+    await securityPage.expectSummaryLoaded();
   });
 
   test('exporta dados reais do usuario', async ({ page }, testInfo) => {

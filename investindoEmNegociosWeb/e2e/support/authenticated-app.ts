@@ -45,6 +45,56 @@ type Card = {
   updatedAt: string;
 };
 
+type LoanInstallment = {
+  id: string;
+  installmentNo: number;
+  dueDate: string;
+  beginningBalance: number;
+  principalAmount: number;
+  interestAmount: number;
+  totalAmount: number;
+  endingBalance: number;
+  status: string;
+  paidAt?: string | null;
+};
+
+type LoanContract = {
+  id: string;
+  title: string;
+  principalAmount: number;
+  annualInterestRate: number;
+  termMonths: number;
+  amortizationType: string;
+  startDate: string;
+  paymentDay: number;
+  monthlyPayment: number;
+  totalCost: number;
+  totalInterest: number;
+  status: string;
+  openBalance: number;
+  openInstallments: number;
+  createdAt: string;
+  installments: LoanInstallment[];
+};
+
+type MonthlySnapshot = {
+  id: string;
+  year: number;
+  month: number;
+  snapshotLabel: string;
+  realAvailableBalance: number;
+  projectedBalance: number;
+  pendingExpenses: number;
+  pendingIncomes: number;
+  totalDebt: number;
+  netWorth: number;
+  riskScore: number;
+  riskClassification: string;
+  primaryInsight: string;
+  recommendations: string[];
+  createdAt: string;
+};
+
 type ApiFailure = {
   path: string | RegExp;
   method?: string;
@@ -133,6 +183,28 @@ const initialCards: Card[] = [
   }
 ];
 
+const initialLoans: LoanContract[] = [];
+
+const initialSnapshots: MonthlySnapshot[] = [
+  {
+    id: 'snapshot-1',
+    year: 2026,
+    month: 3,
+    snapshotLabel: '03/2026',
+    realAvailableBalance: 6780,
+    projectedBalance: 7730,
+    pendingExpenses: 1800,
+    pendingIncomes: 950,
+    totalDebt: 700,
+    netWorth: 9080,
+    riskScore: 84,
+    riskClassification: 'healthy',
+    primaryInsight: 'Fluxo sob controle',
+    recommendations: ['Separe R$ 300,00 para reforçar a reserva.'],
+    createdAt: '2026-03-09T10:00:00Z'
+  }
+];
+
 const baseCardStatements = [
   {
     statementYear: 2026,
@@ -170,11 +242,64 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     accounts: structuredClone(initialAccounts),
     accountTransactions: structuredClone(initialAccountTransactions),
     cards: structuredClone(initialCards),
+    loans: structuredClone(initialLoans),
+    snapshots: structuredClone(initialSnapshots),
     cardStatements: structuredClone(baseCardStatements),
     role,
     profileName: options.profileName || 'Henrique Santos',
     notifications: structuredClone(options.notifications || []),
     onboardingCompleted: options.onboardingCompleted ?? true,
+    securitySummary: {
+      activeSessions: 2,
+      failedLoginAttempts: 1,
+      isLocked: false,
+      lockoutUntil: null,
+      lastLoginAt: '2026-03-14T10:00:00Z',
+      controls: ['jwt', 'revogação de sessões ativas pelo próprio usuário'],
+      recommendations: ['Revogue sessões se notar acesso suspeito']
+    },
+    subscriptionCatalog: {
+      current: {
+        planCode: 'basic',
+        planName: 'Basic',
+        role: role,
+        status: 'Active',
+        billingCycle: 'Monthly',
+        priceAmount: 0,
+        currency: 'BRL',
+        autoRenew: false,
+        startedAt: '2026-03-01T10:00:00Z',
+        renewsAt: null,
+        cancelledAt: null
+      },
+      plans: [
+        {
+          code: 'basic',
+          name: 'Basic',
+          role: 'Basic',
+          description: 'Plano inicial',
+          monthlyPrice: 0,
+          yearlyPrice: 0,
+          recommended: false,
+          current: true,
+          features: ['Dashboard', 'Contas', 'Cartões'],
+          limits: { contas: '1 conta extra' }
+        },
+        {
+          code: 'intermediate',
+          name: 'Intermediate',
+          role: 'Intermediate',
+          description: 'Plano intermediário',
+          monthlyPrice: 29.9,
+          yearlyPrice: 299,
+          recommended: true,
+          current: false,
+          features: ['Calendário', 'Importação de fatura'],
+          limits: { categorias: 'Ilimitadas' }
+        }
+      ],
+      notes: ['Mudança de plano atualiza a sessão imediatamente.']
+    },
     apiFailures: options.apiFailures || []
   };
 
@@ -193,11 +318,50 @@ async function fulfillApi(route: Route, state: {
   accounts: Account[];
   accountTransactions: Record<string, AccountTransaction[]>;
   cards: Card[];
+  loans: LoanContract[];
+  snapshots: MonthlySnapshot[];
   cardStatements: typeof baseCardStatements;
   role: UserRole;
   profileName: string;
   notifications: unknown[];
   onboardingCompleted: boolean;
+  securitySummary: {
+    activeSessions: number;
+    failedLoginAttempts: number;
+    isLocked: boolean;
+    lockoutUntil: string | null;
+    lastLoginAt: string | null;
+    controls: string[];
+    recommendations: string[];
+  };
+  subscriptionCatalog: {
+    current: {
+      planCode: string;
+      planName: string;
+      role: string;
+      status: string;
+      billingCycle: string;
+      priceAmount: number;
+      currency: string;
+      autoRenew: boolean;
+      startedAt: string;
+      renewsAt: string | null;
+      cancelledAt: string | null;
+    };
+    plans: Array<{
+      code: string;
+      name: string;
+      role: string;
+      description: string;
+      monthlyPrice: number;
+      yearlyPrice: number;
+      recommended: boolean;
+      current: boolean;
+      features: string[];
+      limits: Record<string, string>;
+    }>;
+    notes: string[];
+  };
   apiFailures: ApiFailure[];
 }): Promise<void> {
   const url = new URL(route.request().url());
@@ -527,6 +691,154 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'POST' && path === '/api/v1/loans/simulate') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const principal = Number(payload.principalAmount || 0);
+    const termMonths = Number(payload.termMonths || 1);
+    const annualRate = Number(payload.annualInterestRate || 0);
+    const monthlyRate = annualRate / 12 / 100;
+    const monthlyPayment = Number((principal * (monthlyRate || 1 / Math.max(termMonths, 1))).toFixed(2));
+    await json(route, {
+      monthlyPayment,
+      totalCost: Number((monthlyPayment * termMonths).toFixed(2)),
+      totalInterest: Number((monthlyPayment * termMonths - principal).toFixed(2)),
+      amortizationType: payload.amortizationType,
+      installments: [
+        {
+          id: 'loan-sim-1',
+          installmentNo: 1,
+          dueDate: payload.startDate,
+          beginningBalance: principal,
+          principalAmount: Number((monthlyPayment * 0.8).toFixed(2)),
+          interestAmount: Number((monthlyPayment * 0.2).toFixed(2)),
+          totalAmount: monthlyPayment,
+          endingBalance: Number((principal - monthlyPayment * 0.8).toFixed(2)),
+          status: 'Open',
+          paidAt: null
+        }
+      ]
+    });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/loans') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const createdAt = new Date().toISOString();
+    const created = {
+      id: crypto.randomUUID(),
+      title: payload.title,
+      principalAmount: Number(payload.principalAmount || 0),
+      annualInterestRate: Number(payload.annualInterestRate || 0),
+      termMonths: Number(payload.termMonths || 1),
+      amortizationType: payload.amortizationType || 'Price',
+      startDate: payload.startDate,
+      paymentDay: Number(payload.paymentDay || 10),
+      monthlyPayment: 550,
+      totalCost: 13200,
+      totalInterest: 1200,
+      status: 'Active',
+      openBalance: 13200,
+      openInstallments: Number(payload.termMonths || 1),
+      createdAt,
+      installments: []
+    };
+    state.loans.unshift(created);
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/monthlysnapshots/generate') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const month = Number(payload.month || 1);
+    const year = Number(payload.year || 2026);
+    const created = {
+      id: crypto.randomUUID(),
+      year,
+      month,
+      snapshotLabel: `${String(month).padStart(2, '0')}/${year}`,
+      realAvailableBalance: 6900,
+      projectedBalance: 7800,
+      pendingExpenses: 1600,
+      pendingIncomes: 1000,
+      totalDebt: 700,
+      netWorth: 9200,
+      riskScore: 86,
+      riskClassification: 'healthy',
+      primaryInsight: 'Snapshot gerado com sucesso',
+      recommendations: ['Reforce a reserva'],
+      createdAt: new Date().toISOString()
+    };
+    state.snapshots = [created, ...state.snapshots.filter((item) => item.id !== created.id)];
+    await json(route, created);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/subscriptions/change') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    state.subscriptionCatalog.current = {
+      planCode: payload.planCode,
+      planName: payload.planCode === 'intermediate' ? 'Intermediate' : payload.planCode,
+      role: payload.planCode === 'intermediate' ? 'Intermediate' : 'Basic',
+      status: 'Active',
+      billingCycle: payload.billingCycle,
+      priceAmount: payload.billingCycle === 'Yearly' ? 299 : 29.9,
+      currency: 'BRL',
+      autoRenew: true,
+      startedAt: new Date().toISOString(),
+      renewsAt: '2027-03-01T10:00:00Z',
+      cancelledAt: null
+    };
+    state.subscriptionCatalog.plans = state.subscriptionCatalog.plans.map((plan) => ({
+      ...plan,
+      current: plan.code === payload.planCode
+    }));
+    await json(route, {
+      current: state.subscriptionCatalog.current,
+      session: {
+        userId: '44444444-4444-4444-4444-444444444444',
+        name: state.profileName,
+        email: 'mock@example.com',
+        role: state.subscriptionCatalog.current.role,
+        token: 'jwt',
+        refreshToken: 'refresh',
+        expiresAt: '2026-03-14T11:00:00Z'
+      },
+      notes: state.subscriptionCatalog.notes
+    });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/subscriptions/cancel') {
+    state.subscriptionCatalog.current = {
+      ...state.subscriptionCatalog.current,
+      status: 'Cancelled',
+      autoRenew: false,
+      role: 'Basic',
+      cancelledAt: new Date().toISOString()
+    };
+    await json(route, {
+      current: state.subscriptionCatalog.current,
+      session: {
+        userId: '44444444-4444-4444-4444-444444444444',
+        name: state.profileName,
+        email: 'mock@example.com',
+        role: 'Basic',
+        token: 'jwt-basic',
+        refreshToken: 'refresh-basic',
+        expiresAt: '2026-03-14T11:00:00Z'
+      },
+      notes: state.subscriptionCatalog.notes
+    });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/preferences/sessions/revoke') {
+    const revoked = state.securitySummary.activeSessions;
+    state.securitySummary.activeSessions = 0;
+    await json(route, { revokedSessions: revoked, revokedAtUtc: new Date().toISOString() });
+    return;
+  }
+
   if (method !== 'GET') {
     await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     return;
@@ -767,6 +1079,21 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (path === '/api/v1/loans') {
+    await json(route, state.loans);
+    return;
+  }
+
+  if (path === '/api/v1/monthlysnapshots') {
+    await json(route, state.snapshots);
+    return;
+  }
+
+  if (path === '/api/v1/subscriptions/catalog') {
+    await json(route, state.subscriptionCatalog);
+    return;
+  }
+
   if (path === '/api/v1/cards/debt/total') {
     await json(route, { total: 180 });
     return;
@@ -789,6 +1116,11 @@ async function fulfillApi(route: Route, state: {
 
   if (path === '/api/v1/categories') {
     await json(route, []);
+    return;
+  }
+
+  if (path === '/api/v1/preferences/security-summary') {
+    await json(route, state.securitySummary);
     return;
   }
 

@@ -8,7 +8,17 @@ export class SecurityPage {
     await expect(this.page.getByRole('heading', { level: 2, name: 'Sessões e login' })).toBeVisible();
   }
 
-  async expectPlaceholderState() {
-    await expect(this.page.getByText('Em breve: lista de sessões, logout global, 2FA, últimos logins.')).toBeVisible();
+  async expectSummaryLoaded() {
+    await expect(this.page.getByText('Sessões ativas')).toBeVisible();
+    await expect(this.page.getByText('Tentativas inválidas')).toBeVisible();
+    await expect(this.page.getByRole('button', { name: 'Revogar sessões ativas' })).toBeVisible();
+  }
+
+  async revokeSessions() {
+    await this.page.getByRole('button', { name: 'Revogar sessões ativas' }).click();
+  }
+
+  async expectActiveSessionsCount(value: string) {
+    await expect(this.page.locator('.privacy-pill').filter({ hasText: 'Sessões ativas' }).locator('strong')).toHaveText(value);
   }
 }

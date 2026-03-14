@@ -7,6 +7,15 @@ type ApiOptions = {
   body?: unknown;
 };
 
+export async function liveEndpointAvailable(path: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${LIVE_API_BASE_URL}${path}`, { method: 'GET' });
+    return response.status !== 404;
+  } catch {
+    return false;
+  }
+}
+
 async function accessToken(page: Page) {
   const token = await page.evaluate(() => window.localStorage.getItem('access_token'));
   expect(token).toBeTruthy();

@@ -1,6 +1,6 @@
 # Auditoria da Suíte Live E2E
 
-Data da revisão: `2026-03-10`
+Data da revisão: `2026-03-14`
 
 Observação operacional:
 - os cenários de perfis elevados (`Intermediate`, `Advanced`, `Admin`) dependem de credenciais live carregadas no ambiente
@@ -20,6 +20,20 @@ Classificações:
 - `Acompanhar`: útil como smoke, mas depende de premissa funcional ainda instável
 
 ## Resultado atual por arquivo
+
+### `live-finance-modules.spec.ts`
+- `cria um empréstimo real e persiste o contrato`
+  Classificação: `Bloqueado por ambiente`
+  Motivo: o servidor remoto atual responde `404` para `/api/v1/loans`, então a suíte live faz `skip` explícito para não mascarar deploy incompleto.
+- `gera um snapshot real do mês e exibe na listagem`
+  Classificação: `Bloqueado por ambiente`
+  Motivo: o servidor remoto atual responde `404` para `/api/v1/monthlysnapshots`.
+- `troca o plano real para Intermediate anual e depois cancela a renovação`
+  Classificação: `Bloqueado por ambiente`
+  Motivo: o servidor remoto atual responde `404` para `/api/v1/subscriptions`.
+- `revoga sessões reais e atualiza o resumo de segurança`
+  Classificação: `Bloqueado por ambiente`
+  Motivo: o servidor remoto atual responde `404` para `/api/v1/preferences/security-summary`.
 
 ### `live-core.spec.ts`
 - `conclui onboarding real e entra no dashboard autenticado`
@@ -112,6 +126,7 @@ Classificações:
 - `Robusto`: 32 cenários
 - `Parcial`: 1 cenário
 - `Acompanhar`: 2 cenários
+- `Bloqueado por ambiente`: 4 cenários
 - `Bug real aberto na suíte live`: 0
 
 ## Pendências reais após esta revisão
@@ -119,7 +134,10 @@ Classificações:
 1. Decidir a regra funcional do onboarding sobre provisionamento de categorias.
    Isso afeta os dois cenários classificados como `Acompanhar`.
 
-2. Expandir a cobertura real de `cartões` para remoção/erro com o mesmo padrão de persistência confirmado por API.
+2. Publicar no servidor remoto os módulos `loans`, `monthlysnapshots`, `subscriptions` e `preferences/security-summary`.
+   Enquanto isso não ocorrer, esses cenários devem continuar em `skip` explícito na suíte live.
 
-3. Manter a auditoria sincronizada com a suíte.
+3. Expandir a cobertura real de `cartões` para remoção/erro com o mesmo padrão de persistência confirmado por API.
+
+4. Manter a auditoria sincronizada com a suíte.
    A versão anterior deste documento já estava descolada do estado real do projeto e não deve voltar a ser tratada como fonte de verdade sem rerodada completa.

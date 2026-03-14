@@ -3,7 +3,7 @@
 > Visão objetiva da cobertura atual, com foco no que está validado, no que ainda é parcial e no que hoje representa risco real.
 
 ## Resumo atual
-- Última validação consolidada: `2026-03-10`
+- Última validação consolidada do bloco novo: `2026-03-14`
 - Backend:
   - `343` testes aprovados
   - `0` falhas na suíte completa
@@ -19,6 +19,11 @@
   - `26` testes aprovados e `9` ignorados quando as credenciais elevadas não estão carregadas no ambiente
   - `35` testes aprovados na rodada completa com credenciais de `Intermediate`, `Advanced` e `Admin`
   - comando base: `RUN_LIVE_SERVER_E2E=1 npm run test:e2e:live`
+- Validação focada recente dos módulos `15`, `19`, `22` e conciliação:
+  - backend focado: `26` aprovados
+  - frontend unitário focado: `14` aprovados
+  - frontend E2E autenticado dos módulos novos: `4` aprovados
+  - frontend E2E live desses módulos: `4` ignorados por indisponibilidade de endpoint no servidor remoto atual
 
 ## Leitura rápida
 - `Alta`: regra funcional validada em mais de uma camada, com boa evidência de persistência.
@@ -43,7 +48,11 @@
 | Categorização / score / aprendizado | Alta | Média | Alta indireta via importações | Alta | Falta benchmark automatizado com massa histórica grande. |
 | Recurrence Detector | Média | Média | Alta indireta via importações | Média | Falta suíte maior de falsos positivos/negativos. |
 | Wealth / patrimônio / dívidas / evolução | Alta | Média | Média (`authenticated-shell`, `live-role-profiles`) | Média | Falta E2E dedicado da Home patrimonial com composição mais rica. |
+| Empréstimos / amortização | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/loans`. |
+| Snapshots mensais | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/monthlysnapshots`. |
+| Assinaturas / monetização | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/subscriptions`. |
 | Preferências / LGPD / exportação / exclusão | Alta | Média | Alta (`live-profile`) | Alta | Falta ampliar cenários de falha operacional. |
+| Segurança / sessões / revogação | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/preferences/security-summary`. |
 | Controle de acesso por perfil | Alta | Alta | Alta (`role-regression`, `live-role-profiles`) | Alta | Falta expandir para mais endpoints e overrides específicos. |
 
 ## Falhas abertas hoje
@@ -55,6 +64,7 @@
 Resumo da rodada mais recente:
 - `26 passed`, `9 skipped (13.8m)` sem credenciais elevadas carregadas
 - `35 passed (16.2m)` na rodada completa com credenciais elevadas configuradas
+- `4 skipped` no bloco `live-finance-modules` porque o servidor remoto atual ainda não publicou `loans`, `monthlysnapshots`, `subscriptions` e `preferences/security-summary`
 - sem mocks de API/sessão
 - incluindo perfis `Basic`, `Intermediate`, `Advanced` e `Admin`
 - incluindo escrita real, LGPD, cartões, metas, importação de fatura e fluxos administrativos
