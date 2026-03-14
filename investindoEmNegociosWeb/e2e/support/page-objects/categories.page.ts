@@ -42,4 +42,35 @@ export class CategoriesPage {
     await this.page.getByRole('button', { name: 'Categorias padrão (admin)' }).click();
     await expect(this.page.getByRole('heading', { name: 'Categorias padrão (admin)' })).toBeVisible();
   }
+
+  async createDefaultCategory(name: string, type: 'Income' | 'Expense') {
+    await this.page.getByPlaceholder('Nome da categoria').fill(name);
+    await this.page.locator('.add-card select').nth(0).selectOption('default');
+    await this.page.locator('.add-card select').nth(1).selectOption(type);
+    const createResponse = this.page.waitForResponse((response) =>
+      response.request().method() === 'POST' && response.url().includes('/admin/categories')
+    );
+    await this.page.getByRole('button', { name: 'Adicionar' }).click();
+    await expect.poll(async () => (await createResponse).ok()).toBeTruthy();
+  }
+
+  async expectDefaultCategoryVisible(name: string) {
+    await this.openAdminDefaultCategories();
+    await expect(this.page.getByText(name, { exact: true })).toBeVisible();
+  }
+
+  async expectDuplicateDefaultWarning() {
+    await expect(this.page.getByText('Já existe uma categoria padrão com esse nome e tipo.')).toBeVisible();
+  }
+
+  async editDefaultCategory(currentName: string, nextName: string) {
+    await this.openAdminDefaultCategories();
+    const card = this.page.locator('section.admin-card div.rounded-xl').filter({ hasText: currentName }).first();
+    await card.getByRole('button', { name: 'Editar' }).click();
+    await expect(this.page.getByRole('heading', { level: 2, name: 'Editar categoria padrão' })).toBeVisible();
+    await this.page.locator('.modal__card input[type="text"]').fill(nextName);
+    const response = this.page.waitForResponse((resp) => resp.request().method() === 'PUT' && /\/api\/v1\/admin\/categories\/[^/]+$/.test(new URL(resp.url()).pathname));
+    await this.page.locator('.modal__card').getByRole('button', { name: 'Salvar' }).click();
+    await response;
+  }
 }

@@ -24,6 +24,10 @@
   - frontend unitário focado: `14` aprovados
   - frontend E2E autenticado dos módulos novos: `4` aprovados
   - frontend E2E autenticado de `assistente`, `preferências` e `dados`: `3` aprovados
+  - frontend E2E autenticado de `admin-parameters`, `admin-robots` e `home/wealth`: `5` aprovados
+  - frontend E2E autenticado de `admin-users` e `home fallback`: `4` aprovados
+  - frontend E2E autenticado de `admin-categories`: `2` aprovados
+  - frontend E2E autenticado de `admin error flows`: `6` aprovados
   - frontend E2E live desses módulos: `4` ignorados por indisponibilidade de endpoint no servidor remoto atual
 
 ## Leitura rápida
@@ -37,7 +41,7 @@
 |---|---|---|---|---|---|
 | Acesso / auth / refresh / recovery | Alta | Alta | Alta | Alta | Falta only ampliar sessão expirada em mais rotas críticas. |
 | Onboarding / perfil inicial | Alta | Alta | Alta (`live-core`) | Alta | Falta cenário visual mobile dedicado. |
-| Dashboard / SDR / risco / insights / recomendações | Alta | Média/Alta | Alta (`authenticated-shell`, `live-core`) | Alta | Falta massa de dados mais densa para mês completo. |
+| Dashboard / SDR / risco / insights / recomendações | Alta | Média/Alta | Alta (`authenticated-shell`, `authenticated-home-wealth`, `authenticated-home-fallback`, `live-core`) | Alta | Falta massa de dados mais densa para mês completo. |
 | Despesas / parcelas / pagamento / antecipação | Alta | Média | Alta (`live-writeflows`) | Alta | Faltam mais casos de exceção visual/lote. |
 | Receitas / summary / recorrência | Alta | Alta | Alta (`live-writeflows`, `live-access`) | Alta | Falta E2E visual mensal mais profundo. |
 | Cartões / CRUD / fatura por competência | Alta | Média | Alta (`authenticated-shell`, `live-core`) | Alta | Falta ampliar erro/remoção com persistência confirmada por API. |
@@ -48,7 +52,7 @@
 | Importação de fatura | Alta | Média | Alta (`live-role-writeflows`) | Alta | Falta ampliar massa de fixture e cenários de erro operacional. |
 | Categorização / score / aprendizado | Alta | Média | Alta indireta via importações | Alta | Falta benchmark automatizado com massa histórica grande. |
 | Recurrence Detector | Média | Média | Alta indireta via importações | Média | Falta suíte maior de falsos positivos/negativos. |
-| Wealth / patrimônio / dívidas / evolução | Alta | Média | Média (`authenticated-shell`, `live-role-profiles`) | Média | Falta E2E dedicado da Home patrimonial com composição mais rica. |
+| Wealth / patrimônio / dívidas / evolução | Alta | Média | Alta (`authenticated-shell`, `authenticated-home-wealth`, `authenticated-home-fallback`, `live-role-profiles`) | Alta | Falta ampliar cenários patrimoniais com ativos reais e passivos mais variados. |
 | Empréstimos / amortização | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/loans`. |
 | Snapshots mensais | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/monthlysnapshots`. |
 | Assinaturas / monetização | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/subscriptions`. |
@@ -56,6 +60,7 @@
 | Preferências / LGPD / exportação / exclusão | Alta | Média | Alta (`live-profile`, `authenticated-profile-modules`) | Alta | Falta ampliar cenários de falha operacional. |
 | Segurança / sessões / revogação | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/preferences/security-summary`. |
 | Controle de acesso por perfil | Alta | Alta | Alta (`role-regression`, `live-role-profiles`) | Alta | Falta expandir para mais endpoints e overrides específicos. |
+| Admin / parâmetros / robôs / usuários / categorias | Alta | Alta | Alta (`authenticated-admin-modules`, `authenticated-admin-users`, `authenticated-admin-categories`, `authenticated-admin-error-flows`, `live-role-profiles`) | Alta | Falta ampliar cobertura live administrativa e cenários de falha operacional no servidor remoto. |
 
 ## Falhas abertas hoje
 
@@ -70,6 +75,7 @@ Resumo da rodada mais recente:
 - sem mocks de API/sessão
 - incluindo perfis `Basic`, `Intermediate`, `Advanced` e `Admin`
 - incluindo escrita real, LGPD, cartões, metas, importação de fatura e fluxos administrativos
+- incluindo cobertura autenticada stateful para `admin-users`, `admin-parameters`, `admin-robots`, `admin-categories`, erros administrativos e fallback patrimonial da `Home`
 
 ## Comandos de validação
 
@@ -102,5 +108,5 @@ Para executar a suíte completa de perfis elevados, carregar também as credenci
 ## Próximas melhorias prioritárias
 1. Atualizar a suíte de remoção de cartão para o mesmo padrão rigoroso de persistência usado em criação/edição.
 2. Criar E2E visual dedicado para `onboarding` mobile.
-3. Criar E2E patrimonial da `Home` com massa realista e mais composição de ativos/passivos.
-4. Expandir os cenários reais de erro para `importação de fatura` e `cartões`.
+3. Expandir os cenários reais de erro para `importação de fatura`, `cartões` e módulos administrativos.
+4. Levar os cenários administrativos críticos também para cobertura live quando o servidor remoto suportar.

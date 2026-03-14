@@ -177,6 +177,38 @@ type RobotExecutionLog = {
   error: string | null;
 };
 
+type AdminUserSummary = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: string;
+};
+
+type AdminUserFeatureAccess = {
+  featureKey: string;
+  effectiveEnabled: boolean;
+  enabledByRole: boolean;
+  overrideEnabled: boolean | null;
+};
+
+type Category = {
+  id: string;
+  name: string;
+  appliesTo: 'Income' | 'Expense' | null;
+  isDefault: boolean;
+  isActive?: boolean;
+};
+
+type AdminCategory = {
+  id: string;
+  name: string;
+  appliesTo: 'Income' | 'Expense' | null;
+  isActive: boolean;
+  createdAt: string;
+};
+
 const initialAccounts: Account[] = [
   {
     id: accountPrimaryId,
@@ -355,6 +387,68 @@ const initialAdminRobots = [
   }
 ];
 
+const initialAdminUsers: AdminUserSummary[] = [
+  {
+    id: 'admin-user-1',
+    name: 'Henrique Admin',
+    email: 'admin@example.com',
+    role: 'Admin',
+    isActive: true,
+    createdAt: '2026-01-10T10:00:00Z'
+  },
+  {
+    id: 'user-basic-1',
+    name: 'Maria Basic',
+    email: 'maria.basic@example.com',
+    role: 'Basic',
+    isActive: true,
+    createdAt: '2026-02-15T10:00:00Z'
+  }
+];
+
+const initialAdminUserFeatures: Record<string, AdminUserFeatureAccess[]> = {
+  'admin-user-1': [
+    { featureKey: 'admin.users.manage', effectiveEnabled: true, enabledByRole: true, overrideEnabled: null },
+    { featureKey: 'admin.parameters.manage', effectiveEnabled: true, enabledByRole: true, overrideEnabled: null },
+    { featureKey: 'admin.robots.manage', effectiveEnabled: true, enabledByRole: true, overrideEnabled: null }
+  ],
+  'user-basic-1': [
+    { featureKey: 'investments.access', effectiveEnabled: false, enabledByRole: false, overrideEnabled: null },
+    { featureKey: 'invoice-import.access', effectiveEnabled: false, enabledByRole: false, overrideEnabled: null },
+    { featureKey: 'admin.parameters.manage', effectiveEnabled: false, enabledByRole: false, overrideEnabled: null }
+  ]
+};
+
+const initialCategories: Category[] = [
+  { id: 'cat-default-expense-1', name: 'Mercado', appliesTo: 'Expense', isDefault: true, isActive: true },
+  { id: 'cat-default-income-1', name: 'Salário', appliesTo: 'Income', isDefault: true, isActive: true },
+  { id: 'cat-user-expense-1', name: 'Lanches', appliesTo: 'Expense', isDefault: false, isActive: true }
+];
+
+const initialAdminCategories: AdminCategory[] = [
+  {
+    id: 'admin-cat-1',
+    name: 'Mercado',
+    appliesTo: 'Expense',
+    isActive: true,
+    createdAt: '2026-02-01T10:00:00Z'
+  },
+  {
+    id: 'admin-cat-2',
+    name: 'Salário',
+    appliesTo: 'Income',
+    isActive: true,
+    createdAt: '2026-02-02T10:00:00Z'
+  },
+  {
+    id: 'admin-cat-3',
+    name: 'Assinaturas',
+    appliesTo: 'Expense',
+    isActive: false,
+    createdAt: '2026-02-03T10:00:00Z'
+  }
+];
+
 const baseCardStatements = [
   {
     statementYear: 2026,
@@ -402,6 +496,10 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     adminRobotSettings: structuredClone(initialAdminRobotSettings),
     adminRobotRuns: structuredClone(initialAdminRobotRuns),
     adminRobots: structuredClone(initialAdminRobots),
+    adminUsers: structuredClone(initialAdminUsers),
+    adminUserFeatures: structuredClone(initialAdminUserFeatures),
+    categories: structuredClone(initialCategories),
+    adminCategories: structuredClone(initialAdminCategories),
     role,
     profileName: options.profileName || 'Henrique Santos',
     notifications: structuredClone(options.notifications || []),
@@ -628,6 +726,10 @@ async function fulfillApi(route: Route, state: {
     lastHostName: string | null;
     lastError: string | null;
   }>;
+  adminUsers: AdminUserSummary[];
+  adminUserFeatures: Record<string, AdminUserFeatureAccess[]>;
+  categories: Category[];
+  adminCategories: AdminCategory[];
   role: UserRole;
   profileName: string;
   notifications: unknown[];
@@ -1203,6 +1305,155 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/users\/[^/]+\/role$/)) {
+    const userId = path.split('/')[5];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const user = state.adminUsers.find((item) => item.id === userId);
+    if (!user) {
+      await json(route, { detail: 'Usuário não encontrado.' }, 404);
+      return;
+    }
+    user.role = payload.role ?? user.role;
+    await json(route, user);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/users\/[^/]+\/status$/)) {
+    const userId = path.split('/')[5];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const user = state.adminUsers.find((item) => item.id === userId);
+    if (!user) {
+      await json(route, { detail: 'Usuário não encontrado.' }, 404);
+      return;
+    }
+    user.isActive = !!payload.isActive;
+    await json(route, user);
+    return;
+  }
+
+  if (method === 'DELETE' && path.match(/^\/api\/v1\/admin\/users\/[^/]+$/)) {
+    const userId = path.split('/')[5];
+    state.adminUsers = state.adminUsers.filter((item) => item.id !== userId);
+    delete state.adminUserFeatures[userId];
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/users\/[^/]+\/features\/[^/]+$/)) {
+    const userId = path.split('/')[5];
+    const featureKey = decodeURIComponent(path.split('/')[7] || '');
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const features = state.adminUserFeatures[userId] || [];
+    const feature = features.find((item) => item.featureKey === featureKey);
+    if (feature) {
+      feature.overrideEnabled = !!payload.isEnabled;
+      feature.effectiveEnabled = !!payload.isEnabled;
+    }
+    state.adminUserFeatures[userId] = features;
+    await json(route, features);
+    return;
+  }
+
+  if (method === 'DELETE' && path.match(/^\/api\/v1\/admin\/users\/[^/]+\/features\/[^/]+$/)) {
+    const userId = path.split('/')[5];
+    const featureKey = decodeURIComponent(path.split('/')[7] || '');
+    const features = state.adminUserFeatures[userId] || [];
+    const feature = features.find((item) => item.featureKey === featureKey);
+    if (feature) {
+      feature.overrideEnabled = null;
+      feature.effectiveEnabled = feature.enabledByRole;
+    }
+    state.adminUserFeatures[userId] = features;
+    await json(route, features);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/categories') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const created = {
+      id: crypto.randomUUID(),
+      name: payload.name,
+      appliesTo: payload.appliesTo ?? null,
+      isDefault: false,
+      isActive: true
+    };
+    state.categories.push(created);
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'DELETE' && path.match(/^\/api\/v1\/categories\/[^/]+$/)) {
+    const categoryId = path.split('/')[4];
+    state.categories = state.categories.filter((item) => item.id !== categoryId);
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/admin/categories') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const normalizedName = String(payload.name || '').trim().toLowerCase();
+    const conflict = state.adminCategories.find(
+      (item) => item.name.trim().toLowerCase() === normalizedName && (item.appliesTo === (payload.appliesTo ?? null) || item.appliesTo === null)
+    );
+    if (conflict) {
+      await json(route, { detail: 'Categoria padrão já cadastrada.' }, 409);
+      return;
+    }
+    const created = {
+      id: crypto.randomUUID(),
+      name: payload.name,
+      appliesTo: payload.appliesTo ?? null,
+      isActive: true,
+      createdAt: new Date().toISOString()
+    };
+    state.adminCategories.push(created);
+    state.categories.push({
+      id: created.id,
+      name: created.name,
+      appliesTo: created.appliesTo,
+      isDefault: true,
+      isActive: created.isActive
+    });
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/categories\/[^/]+$/) && !path.endsWith('/status')) {
+    const categoryId = path.split('/')[5];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const category = state.adminCategories.find((item) => item.id === categoryId);
+    if (!category) {
+      await json(route, { detail: 'Categoria padrão não encontrada.' }, 404);
+      return;
+    }
+    category.name = payload.name ?? category.name;
+    category.appliesTo = payload.appliesTo ?? null;
+    const linked = state.categories.find((item) => item.id === categoryId);
+    if (linked) {
+      linked.name = category.name;
+      linked.appliesTo = category.appliesTo;
+    }
+    await json(route, category);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/categories\/[^/]+\/status$/)) {
+    const categoryId = path.split('/')[5];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const category = state.adminCategories.find((item) => item.id === categoryId);
+    if (!category) {
+      await json(route, { detail: 'Categoria padrão não encontrada.' }, 404);
+      return;
+    }
+    category.isActive = !!payload.isActive;
+    const linked = state.categories.find((item) => item.id === categoryId);
+    if (linked) {
+      linked.isActive = category.isActive;
+    }
+    await json(route, category);
+    return;
+  }
+
   if (method === 'POST' && path === '/api/v1/admin/parameters/card-brands') {
     const payload = JSON.parse(route.request().postData() || '{}');
     const created = {
@@ -1622,7 +1873,15 @@ async function fulfillApi(route: Route, state: {
   }
 
   if (path === '/api/v1/categories') {
-    await json(route, []);
+    const type = url.searchParams.get('appliesTo');
+    const filtered = type ? state.categories.filter((item) => item.appliesTo === type) : state.categories;
+    await json(route, filtered);
+    return;
+  }
+
+  if (path === '/api/v1/admin/categories') {
+    const includeInactive = url.searchParams.get('includeInactive') !== 'false';
+    await json(route, includeInactive ? state.adminCategories : state.adminCategories.filter((item) => item.isActive));
     return;
   }
 
@@ -1659,24 +1918,13 @@ async function fulfillApi(route: Route, state: {
   }
 
   if (path === '/api/v1/admin/users') {
-    await json(route, [
-      {
-        id: 'admin-user-1',
-        name: 'Henrique Admin',
-        email: 'admin@example.com',
-        role: 'Admin',
-        isActive: true,
-        createdAt: '2026-01-10T10:00:00Z'
-      }
-    ]);
+    await json(route, state.adminUsers);
     return;
   }
 
   if (path.match(/^\/api\/v1\/admin\/users\/[^/]+\/features$/)) {
-    await json(route, [
-      { featureKey: 'admin.users.manage', effectiveEnabled: true, enabledByRole: true, overrideEnabled: null },
-      { featureKey: 'admin.parameters.manage', effectiveEnabled: true, enabledByRole: true, overrideEnabled: null }
-    ]);
+    const userId = path.split('/')[5];
+    await json(route, state.adminUserFeatures[userId] || []);
     return;
   }
 
