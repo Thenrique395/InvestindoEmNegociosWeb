@@ -23,6 +23,7 @@
   - backend focado: `26` aprovados
   - frontend unitário focado: `14` aprovados
   - frontend E2E autenticado dos módulos novos: `4` aprovados
+  - frontend E2E autenticado de `assistente`, `preferências` e `dados`: `3` aprovados
   - frontend E2E live desses módulos: `4` ignorados por indisponibilidade de endpoint no servidor remoto atual
 
 ## Leitura rápida
@@ -51,7 +52,8 @@
 | Empréstimos / amortização | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/loans`. |
 | Snapshots mensais | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/monthlysnapshots`. |
 | Assinaturas / monetização | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/subscriptions`. |
-| Preferências / LGPD / exportação / exclusão | Alta | Média | Alta (`live-profile`) | Alta | Falta ampliar cenários de falha operacional. |
+| Assistente financeiro | Alta | Média | Alta (`authenticated-profile-modules`) | Alta | Live ainda depende de publicação do módulo no servidor remoto. |
+| Preferências / LGPD / exportação / exclusão | Alta | Média | Alta (`live-profile`, `authenticated-profile-modules`) | Alta | Falta ampliar cenários de falha operacional. |
 | Segurança / sessões / revogação | Alta | Alta | Alta (`authenticated-finance-modules`) | Alta | Live bloqueado até o servidor remoto publicar `/preferences/security-summary`. |
 | Controle de acesso por perfil | Alta | Alta | Alta (`role-regression`, `live-role-profiles`) | Alta | Falta expandir para mais endpoints e overrides específicos. |
 

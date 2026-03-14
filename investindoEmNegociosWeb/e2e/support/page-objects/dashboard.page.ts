@@ -20,6 +20,26 @@ export class DashboardPage {
     await expect(this.page.getByText('Patrimônio líquido').first()).toBeVisible();
   }
 
+  async expectAccountBalancesVisible() {
+    await expect(this.page.getByText('Saldos por conta')).toBeVisible();
+    await expect(this.page.getByText('Conta principal')).toBeVisible();
+  }
+
+  async expectNetWorthHistoryVisible() {
+    await expect(this.page.getByText('Evolução patrimonial')).toBeVisible();
+  }
+
+  async expectDebtMapVisible() {
+    await expect(this.page.getByText('Mapa de dívidas')).toBeVisible();
+  }
+
+  async expectRiskPanelVisible() {
+    await expect(this.page.getByText('Painel de risco')).toBeVisible();
+    await expect(this.page.getByText('Como chegamos nesse score:')).toBeVisible();
+    await expect(this.page.getByText('Simulação diária')).toBeVisible();
+    await expect(this.page.getByText('Menor saldo:')).toBeVisible();
+  }
+
   async openRiskDetails() {
     await this.page.getByRole('button', { name: 'Detalhes' }).click();
     await expect(this.page.getByText('Painel de risco')).toBeVisible();

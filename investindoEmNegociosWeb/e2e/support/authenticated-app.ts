@@ -110,6 +110,73 @@ type SetupAuthenticatedAppOptions = {
   apiFailures?: ApiFailure[];
 };
 
+type AdminCardBrand = {
+  id: number;
+  name: string;
+  code: string;
+  isActive: boolean;
+};
+
+type AdminPaymentMethod = {
+  id: number;
+  name: string;
+  isActive: boolean;
+};
+
+type AdminInstitution = {
+  id: number;
+  name: string;
+  type: 'Bank' | 'Broker';
+  isActive: boolean;
+};
+
+type AdminNotificationSettings = {
+  incomeUpcomingEnabled: boolean;
+  incomeDaysBefore: number;
+  expenseUpcomingEnabled: boolean;
+  expenseDaysBefore: number;
+  expenseOverdueEnabled: boolean;
+  cardCloseSoonEnabled: boolean;
+  cardCloseDaysBefore: number;
+  cardCloseDayEnabled: boolean;
+  monthCloseEnabled: boolean;
+  monthSummaryEnabled: boolean;
+  goalBelowExpectedEnabled: boolean;
+  goalCompletedEnabled: boolean;
+  goalInactivityEnabled: boolean;
+  goalInactivityDays: number;
+};
+
+type AdminRobotSettings = {
+  enabled: boolean;
+  dailyRunTimeUtc: string;
+};
+
+type RobotExecutionMetrics = {
+  itemsGenerated: number;
+  emailsAttempted: number;
+  emailsSent: number;
+  emailsFailed: number;
+  zeroItemsReasonCode: string | null;
+};
+
+type RobotExecutionLog = {
+  id: string;
+  robotName: string;
+  startedAt: string;
+  finishedAt: string;
+  durationMs: number;
+  correlationId: string;
+  hostName: string;
+  triggeredByUserId: string | null;
+  success: boolean;
+  processedCount: number;
+  metrics: RobotExecutionMetrics;
+  wasSkipped: boolean;
+  skipReason: string | null;
+  error: string | null;
+};
+
 const initialAccounts: Account[] = [
   {
     id: accountPrimaryId,
@@ -205,6 +272,89 @@ const initialSnapshots: MonthlySnapshot[] = [
   }
 ];
 
+const initialAdminCardBrands: AdminCardBrand[] = [
+  { id: 1, name: 'Visa', code: 'visa', isActive: true },
+  { id: 2, name: 'Mastercard', code: 'mastercard', isActive: true }
+];
+
+const initialAdminPaymentMethods: AdminPaymentMethod[] = [
+  { id: 1, name: 'PIX', isActive: true },
+  { id: 2, name: 'Boleto', isActive: true }
+];
+
+const initialAdminInstitutions: AdminInstitution[] = [
+  { id: 1, name: 'Banco X', type: 'Bank', isActive: true },
+  { id: 2, name: 'Corretora Alpha', type: 'Broker', isActive: true }
+];
+
+const initialAdminNotificationSettings: AdminNotificationSettings = {
+  incomeUpcomingEnabled: true,
+  incomeDaysBefore: 3,
+  expenseUpcomingEnabled: true,
+  expenseDaysBefore: 3,
+  expenseOverdueEnabled: true,
+  cardCloseSoonEnabled: true,
+  cardCloseDaysBefore: 2,
+  cardCloseDayEnabled: true,
+  monthCloseEnabled: true,
+  monthSummaryEnabled: true,
+  goalBelowExpectedEnabled: true,
+  goalCompletedEnabled: true,
+  goalInactivityEnabled: true,
+  goalInactivityDays: 14
+};
+
+const initialAdminRobotSettings: AdminRobotSettings = {
+  enabled: true,
+  dailyRunTimeUtc: '08:00'
+};
+
+const initialAdminRobotRuns: RobotExecutionLog[] = [
+  {
+    id: 'run-1',
+    robotName: 'CashflowRiskRobot',
+    startedAt: '2026-03-09T08:00:00Z',
+    finishedAt: '2026-03-09T08:00:10Z',
+    durationMs: 10000,
+    correlationId: 'corr-1',
+    hostName: 'ci-runner',
+    triggeredByUserId: null,
+    success: true,
+    processedCount: 4,
+    metrics: { itemsGenerated: 2, emailsAttempted: 1, emailsSent: 1, emailsFailed: 0, zeroItemsReasonCode: null },
+    wasSkipped: false,
+    skipReason: null,
+    error: null
+  }
+];
+
+const initialAdminRobots = [
+  {
+    robotName: 'CashflowRiskRobot',
+    lastStartedAt: '2026-03-09T08:00:00Z',
+    lastFinishedAt: '2026-03-09T08:00:10Z',
+    lastDurationMs: 10000,
+    lastSuccess: true,
+    lastProcessedCount: 4,
+    lastMetrics: { itemsGenerated: 2, emailsAttempted: 1, emailsSent: 1, emailsFailed: 0, zeroItemsReasonCode: null },
+    lastCorrelationId: 'corr-1',
+    lastHostName: 'ci-runner',
+    lastError: null
+  },
+  {
+    robotName: 'NotificationDispatchRobot',
+    lastStartedAt: '2026-03-09T08:05:00Z',
+    lastFinishedAt: '2026-03-09T08:05:09Z',
+    lastDurationMs: 9000,
+    lastSuccess: true,
+    lastProcessedCount: 3,
+    lastMetrics: { itemsGenerated: 0, emailsAttempted: 3, emailsSent: 2, emailsFailed: 1, zeroItemsReasonCode: 'NO_NEW_NOTIFICATIONS' },
+    lastCorrelationId: 'corr-2',
+    lastHostName: 'ci-runner',
+    lastError: null
+  }
+];
+
 const baseCardStatements = [
   {
     statementYear: 2026,
@@ -245,6 +395,13 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     loans: structuredClone(initialLoans),
     snapshots: structuredClone(initialSnapshots),
     cardStatements: structuredClone(baseCardStatements),
+    adminCardBrands: structuredClone(initialAdminCardBrands),
+    adminPaymentMethods: structuredClone(initialAdminPaymentMethods),
+    adminInstitutions: structuredClone(initialAdminInstitutions),
+    adminNotificationSettings: structuredClone(initialAdminNotificationSettings),
+    adminRobotSettings: structuredClone(initialAdminRobotSettings),
+    adminRobotRuns: structuredClone(initialAdminRobotRuns),
+    adminRobots: structuredClone(initialAdminRobots),
     role,
     profileName: options.profileName || 'Henrique Santos',
     notifications: structuredClone(options.notifications || []),
@@ -257,6 +414,138 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
       lastLoginAt: '2026-03-14T10:00:00Z',
       controls: ['jwt', 'revogação de sessões ativas pelo próprio usuário'],
       recommendations: ['Revogue sessões se notar acesso suspeito']
+    },
+    preferences: {
+      currency: 'BRL',
+      locales: ['pt-BR'],
+      notifications: {
+        upcomingEnabled: true,
+        overdueEnabled: true,
+        inAppEnabled: true,
+        emailEnabled: false,
+        daysBeforeDue: 3
+      }
+    },
+    privacySummary: {
+      activeSessions: 2,
+      pendingPasswordResetRequests: 1,
+      auditEntries: 12,
+      dataExportEnabled: true,
+      selfServiceDeletionEnabled: true,
+      deletionScope: ['perfil', 'dados financeiros', 'tokens de sessão, reset de senha e trilha de auditoria'],
+      productionControls: ['segregação por userId', 'exportação em JSON', 'revogação de sessões'],
+      scalabilityPhase: 'Fase 2',
+      retentionPolicy: 'Dados são removidos permanentemente após confirmação do usuário.'
+    },
+    assistantContext: {
+      referenceDate: '2026-03-14',
+      realBalance: {
+        period: 'month',
+        referenceDate: '2026-03-14',
+        periodStart: '2026-03-01',
+        periodEnd: '2026-03-31',
+        activeAccountsBalance: 8580,
+        pendingExpensesAmount: 1800,
+        pendingExpensesCount: 3,
+        pendingIncomesAmount: 950,
+        pendingIncomesCount: 1,
+        realAvailableBalance: 6780,
+        projectedAvailableBalance: 7730,
+        overdueExpensesAmount: 0,
+        overdueExpensesCount: 0,
+        dueSoonExpensesAmount: 600
+      },
+      debts: {
+        referenceDate: '2026-03-14',
+        totalDebt: 700,
+        cardDebt: 300,
+        otherDebt: 400,
+        overdueDebt: 0,
+        dueSoonDebt: 300,
+        openItemsCount: 2,
+        buckets: [],
+        nextItems: []
+      },
+      netWorth: {
+        referenceDate: '2026-03-14',
+        assets: { accountsBalance: 8580, investmentsBalance: 1200, tangibleAssetsBalance: 0, totalAssets: 9780 },
+        liabilities: { cardDebt: 300, otherOpenLiabilities: 400, totalLiabilities: 700 },
+        netWorth: 9080,
+        investmentPositionsCount: 1,
+        openLiabilitiesCount: 2,
+        snapshotLabel: '03/2026'
+      },
+      projection: {
+        period: 'month',
+        referenceDate: '2026-03-14',
+        projectionStart: '2026-03-14',
+        projectionEnd: '2026-03-31',
+        openingBalance: 6780,
+        projectedClosingBalance: 7730,
+        lowestBalance: 6400,
+        lowestBalanceDate: '2026-03-18',
+        riskDate: null,
+        points: []
+      },
+      risk: {
+        period: 'month',
+        referenceDate: '2026-03-14',
+        score: 84,
+        classification: 'healthy',
+        priority: 'warning',
+        riskDate: null,
+        currentCoverage: 78,
+        projectedCoverage: 88,
+        projectedBalance: 7730,
+        reasonCodes: ['healthy_projection'],
+        scoreBreakdown: ['Fluxo positivo'],
+        recommendations: []
+      },
+      insights: {
+        period: 'month',
+        referenceDate: '2026-03-14',
+        primaryInsight: {
+          family: 'preventive',
+          scenario: 'stable',
+          priority: 'ok',
+          title: 'Fluxo sob controle',
+          message: 'Seu caixa cobre as obrigações do mês.',
+          action: 'Mantenha aportes',
+          healthScore: 84,
+          riskDate: null,
+          currentCoverage: 78,
+          projectedCoverage: 88,
+          projectedBalance: 7730,
+          highlights: ['Cartões sem atraso'],
+          tips: ['Reforce a reserva'],
+          reasonCodes: ['healthy_projection'],
+          scoreBreakdown: ['Fluxo positivo'],
+          recommendations: []
+        },
+        insights: []
+      },
+      recommendations: {
+        period: 'month',
+        referenceDate: '2026-03-14',
+        minScoreApplied: 50,
+        items: [
+          {
+            id: 'assistant-rec-1',
+            score: 78,
+            severity: 'warn',
+            source: 'risk',
+            title: 'Reforce a reserva',
+            text: 'Separe R$ 300,00 para a reserva.',
+            actionLabel: 'Ver contas',
+            route: '/contas',
+            queryParams: {},
+            reasonCodes: [],
+            amount: 300,
+            dueDate: null
+          }
+        ]
+      },
+      governanceSummary: 'Assistente apenas resume dados já calculados e não executa ações automáticas.'
     },
     subscriptionCatalog: {
       current: {
@@ -321,6 +610,24 @@ async function fulfillApi(route: Route, state: {
   loans: LoanContract[];
   snapshots: MonthlySnapshot[];
   cardStatements: typeof baseCardStatements;
+  adminCardBrands: AdminCardBrand[];
+  adminPaymentMethods: AdminPaymentMethod[];
+  adminInstitutions: AdminInstitution[];
+  adminNotificationSettings: AdminNotificationSettings;
+  adminRobotSettings: AdminRobotSettings;
+  adminRobotRuns: RobotExecutionLog[];
+  adminRobots: Array<{
+    robotName: string;
+    lastStartedAt: string | null;
+    lastFinishedAt: string | null;
+    lastDurationMs: number;
+    lastSuccess: boolean | null;
+    lastProcessedCount: number;
+    lastMetrics: RobotExecutionMetrics;
+    lastCorrelationId: string | null;
+    lastHostName: string | null;
+    lastError: string | null;
+  }>;
   role: UserRole;
   profileName: string;
   notifications: unknown[];
@@ -334,6 +641,29 @@ async function fulfillApi(route: Route, state: {
     controls: string[];
     recommendations: string[];
   };
+  preferences: {
+    currency: string;
+    locales: string[];
+    notifications: {
+      upcomingEnabled: boolean;
+      overdueEnabled: boolean;
+      inAppEnabled: boolean;
+      emailEnabled: boolean;
+      daysBeforeDue: number;
+    };
+  };
+  privacySummary: {
+    activeSessions: number;
+    pendingPasswordResetRequests: number;
+    auditEntries: number;
+    dataExportEnabled: boolean;
+    selfServiceDeletionEnabled: boolean;
+    deletionScope: string[];
+    productionControls: string[];
+    scalabilityPhase: string;
+    retentionPolicy: string;
+  };
+  assistantContext: any;
   subscriptionCatalog: {
     current: {
       planCode: string;
@@ -839,6 +1169,183 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'PUT' && path === '/api/v1/preferences') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    state.preferences = {
+      currency: payload.currency ?? state.preferences.currency,
+      locales: Array.isArray(payload.locales) && payload.locales.length ? payload.locales : state.preferences.locales,
+      notifications: payload.notifications ?? state.preferences.notifications
+    };
+    await json(route, state.preferences);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/financialassistant/chat') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    await json(route, {
+      allowed: true,
+      question: payload.question,
+      answer: 'Seu maior risco no mês continua sendo concentração de despesas próximas ao fechamento.',
+      disclaimer: 'Resposta baseada apenas nos dados estruturados já calculados.',
+      reasonCode: 'structured_context_only',
+      context: state.assistantContext
+    });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/dataportability/import') {
+    await json(route, { importedRecords: 12 });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/preferences/account/delete') {
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/admin/parameters/card-brands') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const created = {
+      id: Math.max(0, ...state.adminCardBrands.map((item) => item.id)) + 1,
+      name: payload.name,
+      code: payload.code,
+      isActive: true
+    };
+    state.adminCardBrands.push(created);
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/parameters\/card-brands\/\d+\/status$/)) {
+    const id = Number(path.split('/')[6]);
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const brand = state.adminCardBrands.find((item) => item.id === id);
+    if (!brand) {
+      await json(route, { detail: 'Bandeira não encontrada.' }, 404);
+      return;
+    }
+    brand.isActive = !!payload.isActive;
+    await json(route, brand);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/admin/parameters/payment-methods') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const created = {
+      id: Math.max(0, ...state.adminPaymentMethods.map((item) => item.id)) + 1,
+      name: payload.name,
+      isActive: true
+    };
+    state.adminPaymentMethods.push(created);
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/parameters\/payment-methods\/\d+\/status$/)) {
+    const id = Number(path.split('/')[6]);
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const item = state.adminPaymentMethods.find((methodItem) => methodItem.id === id);
+    if (!item) {
+      await json(route, { detail: 'Forma de pagamento não encontrada.' }, 404);
+      return;
+    }
+    item.isActive = !!payload.isActive;
+    await json(route, item);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/admin/parameters/institutions') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const created = {
+      id: Math.max(0, ...state.adminInstitutions.map((item) => item.id)) + 1,
+      name: payload.name,
+      type: payload.type || 'Bank',
+      isActive: true
+    };
+    state.adminInstitutions.push(created);
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/admin\/parameters\/institutions\/\d+\/status$/)) {
+    const id = Number(path.split('/')[6]);
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const item = state.adminInstitutions.find((institution) => institution.id === id);
+    if (!item) {
+      await json(route, { detail: 'Instituição não encontrada.' }, 404);
+      return;
+    }
+    item.isActive = !!payload.isActive;
+    await json(route, item);
+    return;
+  }
+
+  if (method === 'PUT' && path === '/api/v1/admin/parameters/notification-settings') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    state.adminNotificationSettings = { ...state.adminNotificationSettings, ...payload };
+    await json(route, state.adminNotificationSettings);
+    return;
+  }
+
+  if (method === 'PUT' && path === '/api/v1/admin/parameters/robot-settings') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    state.adminRobotSettings = {
+      enabled: payload.enabled ?? state.adminRobotSettings.enabled,
+      dailyRunTimeUtc: payload.dailyRunTimeUtc ?? state.adminRobotSettings.dailyRunTimeUtc
+    };
+    await json(route, state.adminRobotSettings);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/admin/parameters/test-email') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    await json(route, { to: payload.to, sentAtUtc: new Date().toISOString() });
+    return;
+  }
+
+  if (method === 'POST' && path.match(/^\/api\/v1\/admin\/robots\/run\/[^/]+$/)) {
+    const robotName = decodeURIComponent(path.split('/')[6] || '');
+    const run = buildRobotRun(robotName);
+    state.adminRobotRuns = [run, ...state.adminRobotRuns];
+    state.adminRobots = state.adminRobots.map((robot) =>
+      robot.robotName === robotName
+        ? {
+            ...robot,
+            lastStartedAt: run.startedAt,
+            lastFinishedAt: run.finishedAt,
+            lastDurationMs: run.durationMs,
+            lastSuccess: run.success,
+            lastProcessedCount: run.processedCount,
+            lastMetrics: run.metrics,
+            lastCorrelationId: run.correlationId,
+            lastHostName: run.hostName,
+            lastError: run.error
+          }
+        : robot
+    );
+    await json(route, run);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/admin/robots/run-all') {
+    const runs = state.adminRobots.map((robot) => buildRobotRun(robot.robotName));
+    state.adminRobotRuns = [...runs, ...state.adminRobotRuns];
+    state.adminRobots = state.adminRobots.map((robot, index) => ({
+      ...robot,
+      lastStartedAt: runs[index].startedAt,
+      lastFinishedAt: runs[index].finishedAt,
+      lastDurationMs: runs[index].durationMs,
+      lastSuccess: runs[index].success,
+      lastProcessedCount: runs[index].processedCount,
+      lastMetrics: runs[index].metrics,
+      lastCorrelationId: runs[index].correlationId,
+      lastHostName: runs[index].hostName,
+      lastError: runs[index].error
+    }));
+    await json(route, runs);
+    return;
+  }
+
   if (method !== 'GET') {
     await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     return;
@@ -1124,6 +1631,33 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (path === '/api/v1/preferences') {
+    await json(route, state.preferences);
+    return;
+  }
+
+  if (path === '/api/v1/preferences/privacy-summary') {
+    await json(route, state.privacySummary);
+    return;
+  }
+
+  if (path === '/api/v1/financialassistant/context') {
+    await json(route, state.assistantContext);
+    return;
+  }
+
+  if (path === '/api/v1/dataportability/export') {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: {
+        'content-disposition': 'attachment; filename="investindo-export.json"'
+      },
+      body: JSON.stringify({ exportedAt: '2026-03-14T10:00:00Z', records: 12 })
+    });
+    return;
+  }
+
   if (path === '/api/v1/admin/users') {
     await json(route, [
       {
@@ -1147,76 +1681,45 @@ async function fulfillApi(route: Route, state: {
   }
 
   if (path === '/api/v1/admin/parameters/card-brands') {
-    await json(route, [{ id: 1, name: 'Visa', code: 'visa', isActive: true }]);
+    await json(route, state.adminCardBrands);
     return;
   }
 
   if (path === '/api/v1/admin/parameters/payment-methods') {
-    await json(route, [{ id: 1, name: 'PIX', isActive: true }]);
+    await json(route, state.adminPaymentMethods);
     return;
   }
 
   if (path === '/api/v1/admin/parameters/institutions') {
-    await json(route, [{ id: 1, name: 'Banco X', type: 'Bank', isActive: true }]);
+    await json(route, state.adminInstitutions);
     return;
   }
 
   if (path === '/api/v1/admin/parameters/notification-settings') {
-    await json(route, {
-      incomeUpcomingEnabled: true,
-      incomeDaysBefore: 3,
-      expenseUpcomingEnabled: true,
-      expenseDaysBefore: 3,
-      expenseOverdueEnabled: true,
-      cardCloseSoonEnabled: true,
-      cardCloseDaysBefore: 2,
-      cardCloseDayEnabled: true,
-      monthCloseEnabled: true,
-      monthSummaryEnabled: true,
-      goalBelowExpectedEnabled: true,
-      goalCompletedEnabled: true,
-      goalInactivityEnabled: true,
-      goalInactivityDays: 14
-    });
+    await json(route, state.adminNotificationSettings);
     return;
   }
 
   if (path === '/api/v1/admin/parameters/robot-settings') {
-    await json(route, { enabled: true, dailyRunTimeUtc: '08:00:00' });
+    await json(route, state.adminRobotSettings);
+    return;
+  }
+
+  if (path === '/api/v1/admin/parameters/scalability-runtime') {
+    await json(route, {
+      currentPhase: 'Fase 2',
+      enabledControls: ['cache distribuído', 'filas assíncronas para robôs'],
+      nextPhaseTargets: ['particionamento de jobs', 'observabilidade centralizada'],
+      longTermTargets: ['multi-tenant', 'sharding de dados históricos']
+    });
     return;
   }
 
   if (path.startsWith('/api/v1/admin/robots/monitor')) {
     await json(route, {
-      summary24h: {
-        totalRuns: 5,
-        successRuns: 4,
-        failedRuns: 1,
-        successRatePercent: 80,
-        itemsGenerated: 12,
-        emailsAttempted: 8,
-        emailsSent: 7,
-        emailsFailed: 1
-      },
-      robots: [],
-      recentRuns: [
-        {
-          id: 'run-1',
-          robotName: 'CashflowRiskRobot',
-          startedAt: '2026-03-09T08:00:00Z',
-          finishedAt: '2026-03-09T08:00:10Z',
-          durationMs: 10000,
-          correlationId: 'corr-1',
-          hostName: 'ci-runner',
-          triggeredByUserId: null,
-          success: true,
-          processedCount: 4,
-          metrics: { itemsGenerated: 2, emailsAttempted: 1, emailsSent: 1, emailsFailed: 0, zeroItemsReasonCode: null },
-          wasSkipped: false,
-          skipReason: null,
-          error: null
-        }
-      ]
+      summary24h: buildRobotSummary(state.adminRobotRuns),
+      robots: state.adminRobots,
+      recentRuns: state.adminRobotRuns
     });
     return;
   }
@@ -1252,6 +1755,53 @@ async function json(route: Route, body: unknown, status = 200): Promise<void> {
     contentType: 'application/json',
     body: JSON.stringify(body)
   });
+}
+
+function buildRobotRun(robotName: string, triggeredByUserId: string | null = '44444444-4444-4444-4444-444444444444'): RobotExecutionLog {
+  const startedAt = new Date().toISOString();
+  const finishedAt = new Date(Date.now() + 8_000).toISOString();
+  return {
+    id: crypto.randomUUID(),
+    robotName,
+    startedAt,
+    finishedAt,
+    durationMs: 8000,
+    correlationId: `corr-${Math.random().toString(16).slice(2, 10)}`,
+    hostName: 'playwright-auth',
+    triggeredByUserId,
+    success: true,
+    processedCount: 2,
+    metrics: {
+      itemsGenerated: 1,
+      emailsAttempted: 1,
+      emailsSent: 1,
+      emailsFailed: 0,
+      zeroItemsReasonCode: null
+    },
+    wasSkipped: false,
+    skipReason: null,
+    error: null
+  };
+}
+
+function buildRobotSummary(runs: RobotExecutionLog[]) {
+  const totalRuns = runs.length;
+  const successRuns = runs.filter((run) => run.success).length;
+  const failedRuns = totalRuns - successRuns;
+  const itemsGenerated = runs.reduce((sum, run) => sum + (run.metrics.itemsGenerated || 0), 0);
+  const emailsAttempted = runs.reduce((sum, run) => sum + (run.metrics.emailsAttempted || 0), 0);
+  const emailsSent = runs.reduce((sum, run) => sum + (run.metrics.emailsSent || 0), 0);
+  const emailsFailed = runs.reduce((sum, run) => sum + (run.metrics.emailsFailed || 0), 0);
+  return {
+    totalRuns,
+    successRuns,
+    failedRuns,
+    successRatePercent: totalRuns ? Math.round((successRuns / totalRuns) * 100) : 0,
+    itemsGenerated,
+    emailsAttempted,
+    emailsSent,
+    emailsFailed
+  };
 }
 
 function buildJwt(payload: Record<string, unknown>): string {
