@@ -9,9 +9,10 @@ describe('InvoiceImportComponent smoke', () => {
   let service: jasmine.SpyObj<InvoiceImportService>;
 
   beforeEach(async () => {
-    service = jasmine.createSpyObj<InvoiceImportService>('InvoiceImportService', ['extract', 'import']);
+    service = jasmine.createSpyObj<InvoiceImportService>('InvoiceImportService', ['extract', 'import', 'reconcile']);
     service.import.and.returnValue(of({ created: 2, skipped: 1, failed: 0 }));
     service.extract.and.returnValue(of({ items: [], rawText: '' } as any));
+    service.reconcile.and.returnValue(of({ cardId: 'c1', cardName: 'Cartão principal', totalItems: 1, newItems: 1, duplicateItems: 0, items: [], cycles: [] } as any));
 
     await TestBed.configureTestingModule({
       imports: [InvoiceImportComponent],

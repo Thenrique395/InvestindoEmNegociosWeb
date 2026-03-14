@@ -44,7 +44,7 @@
 | Parcelamento automático | ✅ | Motor de planos/parcelas | Implementado. |
 | Competência de cartão por closing day | ✅ | `CardStatementCycleCalculator` + testes + front com `Fatura MM/AAAA` | Validado tecnicamente e com checklist manual documentado. |
 | Fatura por competência (engine consolidada de ciclo) | ✅ | `GET /api/v1/cards/{id}/statements` + `CardsService.ListStatementCyclesAsync` + tela `Cartões` | Consolidação explícita por ciclo implementada e validada com suíte live/E2E. |
-| Importação automática de fatura/cartão + conciliação | ⚠️ | `InvoiceImportController` (`extract` + `import`) + modal em `Despesas` + `FinanceInputParser` | Importação automática de itens do PDF para lançamentos de despesa já implementada com seleção de cartão/categoria, chave de idempotência, transação no backend, parsing unificado (data/valor) e contrato 400/422. Pendente conciliação avançada e fechamento automatizado. |
+| Importação automática de fatura/cartão + conciliação | ✅ | `InvoiceImportController` (`extract` + `reconcile` + `import`) + modal em `Despesas` + `FinanceInputParser` | Fluxo completo com extração do PDF, preview de itens, deduplicação, conciliação por ciclo de fatura, diferença contra total parseado e importação confirmada com idempotência e transação. |
 
 ### 1.5 Tela de Receitas
 
@@ -86,7 +86,7 @@
 | Dados de mercado (cotação/perfil/histórico) | ✅ | `/api/v1/investments/market/*` | Com resiliência HTTP. |
 | Benchmarks | ✅ | `GET /api/v1/investments/benchmarks` | Comparativos disponíveis. |
 | Importação B3 (PDF + confirmação) | ✅ | `/api/v1/investments/import/b3/*` | Fluxo de extração e confirmação implementado. |
-| Sync B3 via consentimento | ⚠️ | `/api/v1/investments/b3/consent` e `/b3/sync` | Existe fluxo mock + sync; validar integração real fim a fim. |
+| Sync B3 via consentimento | 🔮 | `/api/v1/investments/b3/consent` e `/b3/sync` | Existe fluxo base/mockado, mas a integração B3 real foi deliberadamente adiada para backlog de features futuras. |
 
 ### 1.10 Tela de Notificações
 
@@ -212,6 +212,7 @@
 - 2026-03-09: item `7.2 Score de confiança` implementado com score formal (`0..100`) e faixa (`high/medium/low`) no `CategorizationSuggestionDto`, mantendo compatibilidade com `confidence` decimal no frontend.
 - 2026-03-09: item `7.3 Aprendizado incremental` implementado com memória explícita (`user_categorization_feedback`) e override por item nos fluxos de OFX, CSV e fatura, permitindo que correções manuais retroalimentem sugestões futuras.
 - 2026-03-09: item `8 Recurrence Detector` implementado com `RecurrenceDetectorService`, sugerindo recorrência mensal nos previews quando encontra plano recorrente semelhante, padrão mensal no ledger ou repetição histórica de planos.
+- 2026-03-14: conciliação avançada de fatura concluída com endpoint `POST /api/v1/invoice-import/reconcile`, preview por ciclo no modal de importação, detecção de duplicados por chave determinística e sinalização de fechamento automático quando o total parseado fecha com a projeção da fatura.
 - 2026-03-09: item `9 Saldo Disponível Real (SDR)` implementado com resumo oficial em `accounts/summary/real-balance`, cálculo por período (`month/quarter/year`) usando contas ativas + parcelas pendentes, e consumo do indicador na `Home` com projeção, atraso e vencimentos próximos.
 - 2026-03-09: itens `10.1 Projection Engine` e `10.2 Data provável de risco` implementados com `CashflowProjectionEngine`, endpoint `accounts/summary/projection`, simulação diária até o fim do período e `RiskDate` oficial consumido no painel de risco da `Home`.
 - 2026-03-09: item `11 Risk Bot` implementado com `RiskBotService`, endpoint `accounts/summary/risk` e contrato oficial de score/classificação (`score`, `classification`, `priority`, `reasonCodes`, `scoreBreakdown`, `recommendations`) aplicado na `Home`.
@@ -268,7 +269,7 @@
 | 18.2 | Capacitor | ✅ | `capacitor.config.ts` + projetos `android/` e `ios/` + scripts `cap:*` | Base nativa gerada com Android/iOS, sincronização de assets web e comandos operacionais de sync/abertura. |
 | 18.3 | Mobile-first UX | ✅ | `mobile-dock` no shell autenticado + safe area/bottom spacing + ajustes na central de dados | Estratégia mobile-first formalizada no shell autenticado com navegação inferior, áreas seguras e priorização de fluxos principais em viewport pequena. |
 | 19 | Segurança e LGPD completos | ✅ | `GET /api/v1/preferences/privacy-summary`, `GET /api/v1/preferences/security-summary`, `POST /api/v1/preferences/sessions/revoke` + telas `/dados` e `/seguranca` | Além da exclusão self-service ampliada, o usuário agora vê resumo de segurança, lockout, últimas credenciais e pode revogar sessões ativas sem intervenção manual. |
-| 20 | Open Finance | ❌ | Não implementado. |
+| 20 | Open Finance | 🔮 | Backlog futuro | Item explicitamente adiado para uma onda futura; não faz parte da próxima etapa operacional do produto neste momento. |
 | 21 | Escalabilidade técnica por fases | ✅ | `GET /api/v1/admin/parameters/scalability-runtime` + painel admin de status de fase | Fase 1 formalizada em runtime com checklist operacional dos controles ativos e backlog explícito das próximas fases no painel administrativo. |
 | 22 | Planos e monetização | ✅ | `GET /api/v1/subscriptions/catalog`, `POST /api/v1/subscriptions/change`, `POST /api/v1/subscriptions/cancel` + tela `/planos` | Catálogo de planos `Basic`/`Intermediate`/`Advanced`, assinatura persistida por usuário, upgrade/downgrade com reemissão imediata de sessão e limites exibidos no frontend. |
 | 23 | Estratégia de crescimento | ⚠️ | Tema de negócio/documentação, não funcionalidade implementada no sistema. |

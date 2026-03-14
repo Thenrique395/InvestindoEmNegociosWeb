@@ -5,33 +5,26 @@ Itens já entregues pertencem ao [STATUS_FUNCIONALIDADES.md](./STATUS_FUNCIONALI
 
 ## Prioridade imediata
 
-- Empréstimos:
-  - `15.1 LoanContract`
-  - `15.2 LoanInstallment`
-  - `15.3 Simulação de amortização`
-- Snapshot mensal imutável:
-  - `16 Snapshot mensal imutável`
-- Fechamento de conciliação avançada de fatura
-- Sync B3 real com validação fim a fim
+- Hardening de qualidade e E2E dos módulos novos (`15` a `22`)
 
 ## Próxima onda
 
-- Bloco de IA:
-  - `17.1 IA conversacional`
-  - `17.2 Prompt estruturado com dados pré-calculados`
-  - `17.3 Governança de IA`
-- PWA e mobile nativo:
-  - `18.1 PWA`
-  - `18.2 Capacitor`
+- Observabilidade operacional mais forte no frontend e backend
+- Mais cenários reais de erro para cartões, segurança e monetização
+- Dashboard patrimonial com composição mais rica de ativos e passivos
+
+## Features Futuras
+
 - Open Finance
-- Planos e monetização
+- Sync B3 real com validação fim a fim
+- Evolução do assistente financeiro para integrações externas
+- Cobrança real e integração com gateway de pagamento
 
 ## Operação e produto
 
 - Envio real de e-mail com validação operacional
 - Segurança e LGPD avançadas de produção
 - Escalabilidade técnica por fases com métricas operacionais fechadas
-- Dashboard patrimonial com composição mais rica de ativos e passivos
 
 ## Qualidade técnica
 

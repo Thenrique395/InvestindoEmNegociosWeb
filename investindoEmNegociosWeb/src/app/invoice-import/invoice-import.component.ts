@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
-import { InvoiceImportService } from '../invoice-import.service';
+import { InvoiceImportService, InvoiceReconciliationResponse } from '../invoice-import.service';
 import { FormsModule } from '@angular/forms';
 import { StoredCard } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
@@ -87,7 +87,7 @@ type InvoiceExtract = {
             <div class="mt-4 grid gap-3 sm:grid-cols-2">
               <label class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
                 <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Cartão destino</p>
-                <select class="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2 text-[var(--text-sm)] text-[var(--text)]" [(ngModel)]="selectedCardId">
+                <select class="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2 text-[var(--text-sm)] text-[var(--text)]" [(ngModel)]="selectedCardId" (ngModelChange)="onCardChanged()">
                   <option [ngValue]="null">Selecione</option>
                   <option *ngFor="let card of cards; trackBy: trackByCardId" [ngValue]="card.id">
                     {{ card.nome }} · {{ card.numero }}
@@ -184,6 +184,60 @@ type InvoiceExtract = {
                 Dica: se algum valor nao for encontrado, voce pode ajustar manualmente antes de salvar.
               </p>
             </div>
+
+            <div class="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4" *ngIf="extract.items.length">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-sm font-semibold text-[var(--text)]">Conciliação da fatura</p>
+                  <p class="text-xs text-[var(--text-muted)]">Compara itens novos com ciclos já existentes do cartão.</p>
+                </div>
+                <span class="text-xs text-[var(--text-muted)]" *ngIf="reconciling">Recalculando...</span>
+              </div>
+
+              <p *ngIf="reconciliation && !reconciling" class="mt-3 text-xs text-[var(--text-muted)]">
+                {{ reconciliation.newItems }} novo(s), {{ reconciliation.duplicateItems }} duplicado(s), {{ reconciliation.cycles.length }} ciclo(s) afetado(s).
+              </p>
+
+              <div *ngIf="reconciliation?.cycles?.length; else noReconciliationCycles" class="mt-3 overflow-auto rounded-xl border border-[var(--border)]">
+                <table class="w-full text-left text-xs text-[var(--text-muted)]">
+                  <thead class="bg-[var(--surface-2)] text-[var(--text)]">
+                    <tr>
+                      <th class="px-3 py-2">Fatura</th>
+                      <th class="px-3 py-2">Fech.</th>
+                      <th class="px-3 py-2">Venc.</th>
+                      <th class="px-3 py-2 text-right">Atual</th>
+                      <th class="px-3 py-2 text-right">Novos</th>
+                      <th class="px-3 py-2 text-right">Duplicados</th>
+                      <th class="px-3 py-2 text-right">Projetado</th>
+                      <th class="px-3 py-2 text-right">Diferença</th>
+                      <th class="px-3 py-2">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let cycle of reconciliation?.cycles || []; trackBy: trackByStatementReference">
+                      <td class="px-3 py-2">{{ cycle.statementReference }}</td>
+                      <td class="px-3 py-2">{{ cycle.statementCloseDate }}</td>
+                      <td class="px-3 py-2">{{ cycle.statementDueDate }}</td>
+                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.currentTotalAmount) }}</td>
+                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.importedNewAmount) }}</td>
+                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.duplicateAmount) }}</td>
+                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.projectedTotalAmount) }}</td>
+                      <td class="px-3 py-2 text-right">{{ cycle.differenceAmount == null ? '-' : formatMoney(cycle.differenceAmount) }}</td>
+                      <td class="px-3 py-2">
+                        <span *ngIf="cycle.readyToClose; else cycleOpen">Pronto para fechamento automático</span>
+                        <ng-template #cycleOpen>{{ cycle.duplicateItemsCount ? 'Revisar duplicados' : 'Conciliação parcial' }}</ng-template>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <ng-template #noReconciliationCycles>
+                <p class="mt-3 text-xs text-[var(--text-muted)]">
+                  {{ reconciling ? 'Calculando conciliação...' : 'Selecione um cartão e mantenha itens válidos para ver o fechamento por ciclo.' }}
+                </p>
+              </ng-template>
+            </div>
           </div>
 
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
@@ -214,12 +268,14 @@ export class InvoiceImportComponent implements OnChanges {
 
   loading = false;
   importing = false;
+  reconciling = false;
   error = '';
   fileName = '';
   selectedCardId: string | null = null;
   selectedCategoryId: string | null = null;
   rawText = '';
   extract: InvoiceExtract = { items: [] };
+  reconciliation: InvoiceReconciliationResponse | null = null;
 
   private invoiceImport = inject(InvoiceImportService);
 
@@ -269,6 +325,7 @@ export class InvoiceImportComponent implements OnChanges {
           }))
         };
         this.rawText = response.rawText || '';
+        this.refreshReconciliation();
       },
       error: (err) => {
         this.error = err?.error?.detail || err?.error?.title || 'Nao foi possivel ler o PDF.';
@@ -286,6 +343,8 @@ export class InvoiceImportComponent implements OnChanges {
     this.error = '';
     this.importing = false;
     this.extract = { items: [] };
+    this.reconciling = false;
+    this.reconciliation = null;
   }
 
   get canImport(): boolean {
@@ -301,6 +360,8 @@ export class InvoiceImportComponent implements OnChanges {
         cardId: this.selectedCardId,
         categoryId: this.selectedCategoryId,
         defaultDueDate: this.extract.dueDate || null,
+        statementCloseDate: this.extract.closeDate || null,
+        invoiceTotal: this.extract.total || null,
         importIdempotencyKey: this.buildImportIdempotencyKey(),
         skipDuplicates: true,
         items: this.extract.items.map((item) => ({
@@ -391,4 +452,48 @@ export class InvoiceImportComponent implements OnChanges {
     return category.id;
   }
 
+  trackByStatementReference(_index: number, cycle: { statementReference: string }): string {
+    return cycle.statementReference;
+  }
+
+  onCardChanged(): void {
+    this.refreshReconciliation();
+  }
+
+  formatMoney(value: number): string {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  }
+
+  private refreshReconciliation(): void {
+    if (!this.selectedCardId || !this.extract.items.length) {
+      this.reconciliation = null;
+      this.reconciling = false;
+      return;
+    }
+
+    this.reconciling = true;
+    this.invoiceImport.reconcile({
+      cardId: this.selectedCardId,
+      categoryId: this.selectedCategoryId,
+      defaultDueDate: this.extract.dueDate || null,
+      statementCloseDate: this.extract.closeDate || null,
+      invoiceTotal: this.extract.total || null,
+      importIdempotencyKey: this.buildImportIdempotencyKey(),
+      skipDuplicates: true,
+      items: this.extract.items.map((item) => ({
+        ...item,
+        categoryId: item.categoryId || this.selectedCategoryId || item.suggestedCategoryId || null
+      }))
+    }).subscribe({
+      next: (result) => {
+        this.reconciliation = result;
+      },
+      error: () => {
+        this.reconciliation = null;
+      },
+      complete: () => {
+        this.reconciling = false;
+      }
+    });
+  }
 }
