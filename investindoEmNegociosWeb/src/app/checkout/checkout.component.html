@@ -2,9 +2,10 @@
   <section class="checkout-hero">
     <div>
       <p class="eyebrow">Checkout</p>
-      <h1>Confirme seu plano e inicie a contratação</h1>
+      <h1>Confirme o plano, continue sua compra e ative a assinatura</h1>
       <p class="lead">
-        Você selecionou um plano. O próximo passo é criar sua conta e seguir para ativação dentro do produto.
+        O checkout agora mantém a escolha do plano e deixa claro o próximo passo: entrar, confirmar e ativar o acesso
+        certo para o seu momento financeiro.
       </p>
     </div>
     <a class="link-back" routerLink="/planos">Voltar para planos</a>
@@ -12,14 +13,69 @@
 
   <section class="checkout-grid">
     <article class="checkout-card">
-      <h2>Crie sua conta</h2>
-      <p class="muted">
-        Use o cadastro rápido para iniciar o acesso. Se você já tem conta, entre e finalize a contratação na área de assinatura.
-      </p>
-      <app-signup (signedUp)="handleSignedUp()"></app-signup>
-      <div class="checkout-card__footer">
-        <span>Já possui cadastro?</span>
-        <a routerLink="/login">Entrar para continuar</a>
+      <div class="checkout-card__section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">1. Escolha final</p>
+            <h2>Revise ou troque o plano</h2>
+          </div>
+          <div class="billing-switch" role="group" aria-label="Periodicidade">
+            <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Monthly'" (click)="selectCycle('Monthly')">
+              Mensal
+            </button>
+            <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Yearly'" (click)="selectCycle('Yearly')">
+              Anual
+            </button>
+          </div>
+        </div>
+
+        <div class="plan-picker">
+          <button
+            type="button"
+            class="plan-option"
+            *ngFor="let plan of plans"
+            [class.is-active]="plan.code === selectedPlan.code"
+            (click)="selectPlan(plan.code)">
+            <div>
+              <strong>{{ plan.name }}</strong>
+              <span>{{ plan.description }}</span>
+            </div>
+            <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
+          </button>
+        </div>
+      </div>
+
+      <div class="checkout-card__section" *ngIf="!isLogged">
+        <p class="eyebrow">2. Identificação</p>
+        <h2>Crie sua conta para continuar</h2>
+        <p class="muted">
+          A seleção do plano já fica salva. Depois do login, você volta para este checkout e conclui a ativação.
+        </p>
+        <app-signup (signedUp)="handleSignedUp()"></app-signup>
+        <div class="checkout-card__footer">
+          <span>Já possui cadastro?</span>
+          <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
+        </div>
+      </div>
+
+      <div class="checkout-card__section" *ngIf="isLogged">
+        <p class="eyebrow">2. Confirmação</p>
+        <h2>{{ selectedPlan.code === 'basic' ? 'Ative o plano gratuito' : 'Finalize a contratação' }}</h2>
+        <p class="muted">
+          {{ selectedPlan.code === 'basic'
+            ? 'Seu acesso é ativado imediatamente ao confirmar.'
+            : 'Neste ambiente, a contratação é concluída pelo fluxo interno de assinatura já conectado ao backend.' }}
+        </p>
+
+        <div class="activation-panel">
+          <div>
+            <strong>Plano selecionado</strong>
+            <span>{{ selectedPlan.name }} • {{ selectedCycle === 'Yearly' ? 'cobrança anual' : 'cobrança mensal' }}</span>
+          </div>
+          <button type="button" class="btn-primary" [disabled]="processing" (click)="activatePlan()">
+            {{ processing ? 'Processando...' : (selectedPlan.code === 'basic' ? 'Ativar plano' : 'Confirmar e ativar assinatura') }}
+          </button>
+        </div>
       </div>
     </article>
 
@@ -45,15 +101,26 @@
       <div class="summary-section summary-section--steps">
         <h3>Próximos passos</h3>
         <ol>
-          <li>Criar conta com e-mail e senha</li>
-          <li>Entrar na plataforma</li>
-          <li>Concluir ativação da assinatura na área interna</li>
+          <li>Escolher plano e periodicidade</li>
+          <li>{{ isLogged ? 'Confirmar a contratação agora' : 'Criar conta ou entrar para continuar' }}</li>
+          <li>Ativar a assinatura no fluxo interno</li>
           <li>Começar onboarding e configuração financeira</li>
         </ol>
       </div>
 
+      <div class="summary-section">
+        <h3>Termos comerciais</h3>
+        <ul>
+          <li>Cobrança recorrente em {{ selectedCycle === 'Yearly' ? 'base anual' : 'base mensal' }}</li>
+          <li>Renovação automática até cancelamento</li>
+          <li>Falhas de pagamento podem suspender renovação e exigir nova ação</li>
+          <li>Cancelamento e atualização de método de pagamento ficam disponíveis na área de assinatura</li>
+        </ul>
+      </div>
+
       <div class="summary-note" *ngIf="selectedPlan.code !== 'basic'">
-        Ainda não há cobrança pública automatizada nesta tela. A contratação segue para a área interna após o cadastro.
+        O checkout comercial já direciona a contratação até a ativação da assinatura. Se você ainda não estiver logado,
+        sua escolha permanece salva até voltar para concluir.
       </div>
     </aside>
   </section>

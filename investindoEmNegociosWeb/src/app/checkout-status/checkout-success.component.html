@@ -1,14 +1,23 @@
 <section class="status-page status-page--success">
   <div class="status-card">
     <p class="eyebrow">Contratação concluída</p>
-    <h1>{{ plan.name }} ativado com sucesso</h1>
+    <h1>{{ plan.name }} {{ status?.subscriptionActive ? 'ativado com sucesso' : 'em validação final' }}</h1>
     <p class="lead">
-      Sua assinatura foi atualizada no fluxo atual do sistema. O ciclo selecionado foi <strong>{{ cycle === 'Yearly' ? 'anual' : 'mensal' }}</strong>.
+      <ng-container *ngIf="status?.subscriptionActive; else awaitingApproval">
+        Sua assinatura foi confirmada com base no status real do pagamento. O ciclo selecionado foi
+        <strong>{{ cycle === 'Yearly' ? 'anual' : 'mensal' }}</strong>.
+      </ng-container>
+      <ng-template #awaitingApproval>
+        O pagamento voltou do gateway, mas o backend ainda está finalizando a confirmação da assinatura.
+      </ng-template>
     </p>
 
     <div class="status-panel">
       <h2>Próximo passo</h2>
-      <p>Agora você já pode entrar no produto e continuar sua configuração com o plano ativo.</p>
+      <p *ngIf="status?.subscriptionActive; else pendingActivation">Agora você já pode entrar no produto e continuar sua configuração com o plano ativo.</p>
+      <ng-template #pendingActivation>
+        Aguarde alguns segundos e atualize a página, ou abra a área de assinatura para conferir o status mais recente.
+      </ng-template>
     </div>
 
     <div class="status-actions">

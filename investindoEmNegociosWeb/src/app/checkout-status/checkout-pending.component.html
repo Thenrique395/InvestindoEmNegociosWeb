@@ -3,15 +3,15 @@
     <p class="eyebrow">Contratação pendente</p>
     <h1>Falta concluir a ativação do plano {{ plan.name }}</h1>
     <p class="lead">
-      Sua intenção de contratação foi registrada. Entre na conta para continuar a ativação no fluxo atual do produto.
+      Sua cobrança foi registrada e ainda depende de confirmação final do gateway ou de uma nova ação de pagamento.
     </p>
 
     <div class="status-panel">
       <h2>O que falta</h2>
       <ul>
         <li>Entrar na sua conta</li>
-        <li>Retomar o checkout</li>
-        <li>Confirmar a troca para o ciclo {{ cycle === 'Yearly' ? 'anual' : 'mensal' }}</li>
+        <li>Retomar o checkout ou atualizar o método de pagamento</li>
+        <li>Confirmar a contratação para o ciclo {{ cycle === 'Yearly' ? 'anual' : 'mensal' }}</li>
       </ul>
     </div>
 

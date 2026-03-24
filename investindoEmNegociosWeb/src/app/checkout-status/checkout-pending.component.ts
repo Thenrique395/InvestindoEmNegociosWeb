@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { BillingCheckoutStatusResponse, BillingService } from '../billing.service';
 import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../marketing-plans';
 
 @Component({
@@ -13,11 +14,22 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
 export class CheckoutPendingComponent {
   plan: MarketingPlan = findMarketingPlan(null);
   cycle: MarketingBillingCycle = 'Monthly';
+  status: BillingCheckoutStatusResponse | null = null;
 
-  constructor(route: ActivatedRoute) {
+  constructor(route: ActivatedRoute, private readonly billingService: BillingService) {
     route.queryParamMap.subscribe((params) => {
+      const checkoutId = params.get('checkout_id');
       this.plan = findMarketingPlan(params.get('plan'));
       this.cycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
+      if (!checkoutId) return;
+      this.billingService.getCheckoutStatus(checkoutId).subscribe({
+        next: (status) => {
+          this.status = status;
+          this.plan = findMarketingPlan(status.planCode);
+          this.cycle = status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly';
+        },
+        error: () => void 0
+      });
     });
   }
 }

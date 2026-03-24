@@ -77,6 +77,14 @@
     </div>
 
     <div class="card" *ngIf="vm.current.planCode !== 'basic'">
+      <h3>Gerenciar cobrança</h3>
+      <p class="muted">Atualize meio de pagamento, trate cobrança pendente e acompanhe a renovação pelo portal seguro do provedor.</p>
+      <button type="button" class="btn btn--ghost" [disabled]="openingPortal" (click)="openPortal()">
+        {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
+      </button>
+    </div>
+
+    <div class="card" *ngIf="vm.current.planCode !== 'basic'">
       <h3>Cancelar renovação</h3>
       <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
       <button type="button" class="btn btn--danger" [disabled]="cancelling" (click)="cancel()">

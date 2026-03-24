@@ -23,6 +23,21 @@ export const routes: Routes = [
     loadComponent: () => import('./checkout/checkout.component').then((m) => m.CheckoutComponent)
   },
   {
+    path: 'checkout/sucesso',
+    data: { preload: false },
+    loadComponent: () => import('./checkout-status/checkout-success.component').then((m) => m.CheckoutSuccessComponent)
+  },
+  {
+    path: 'checkout/pendente',
+    data: { preload: false },
+    loadComponent: () => import('./checkout-status/checkout-pending.component').then((m) => m.CheckoutPendingComponent)
+  },
+  {
+    path: 'checkout/falha',
+    data: { preload: false },
+    loadComponent: () => import('./checkout-status/checkout-failure.component').then((m) => m.CheckoutFailureComponent)
+  },
+  {
     path: 'dashboard',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },

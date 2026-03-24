@@ -58,10 +58,85 @@
   gap: 1rem;
 }
 
+.checkout-card__section {
+  display: grid;
+  gap: 1rem;
+}
+
 .checkout-card h2,
 .summary-card h2,
 .summary-section h3 {
   margin: 0;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+}
+
+.billing-switch {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  padding: 0.25rem;
+}
+
+.billing-switch__item {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.billing-switch__item.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.plan-picker {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.plan-option {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.plan-option div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.plan-option span {
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.plan-option b {
+  white-space: nowrap;
+  align-self: center;
+}
+
+.plan-option.is-active {
+  border-color: color-mix(in srgb, var(--primary) 48%, var(--border));
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  box-shadow: 0 18px 40px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .checkout-card__footer {
@@ -76,6 +151,35 @@
   color: var(--primary);
   font-weight: 700;
   text-decoration: none;
+}
+
+.text-link {
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+}
+
+.activation-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.activation-panel div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.activation-panel span {
+  color: var(--text-secondary);
 }
 
 .summary-card {
@@ -137,5 +241,12 @@
   .checkout-hero {
     align-items: start;
     flex-direction: column;
+  }
+
+  .section-head,
+  .activation-panel,
+  .plan-option {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

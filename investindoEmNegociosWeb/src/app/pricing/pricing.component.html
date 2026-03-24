@@ -2,20 +2,31 @@
   <section class="pricing-hero">
     <div class="pricing-hero__content">
       <p class="eyebrow">Planos</p>
-      <h1>Escolha o plano certo para seu momento financeiro</h1>
+      <h1>Venda por clareza: comece simples, organize o mês, evolua para patrimônio</h1>
       <p class="lead">
-        O produto já cobre controle do mês, cartões, importação de fatura e patrimônio. Aqui a escolha é simples:
-        começar, ganhar previsibilidade ou evoluir para visão patrimonial completa.
+        A página comercial precisa mostrar o ganho real de cada etapa. O Essencial tira você do improviso, o Controle
+        reduz trabalho manual e o Patrimônio dá visão completa de crescimento financeiro.
       </p>
+      <div class="hero-points">
+        <span>Sem planilha manual</span>
+        <span>Com upgrade imediato</span>
+        <span>Fluxo direto para checkout</span>
+      </div>
     </div>
 
-    <div class="billing-switch" role="group" aria-label="Periodicidade">
-      <button type="button" class="billing-switch__item" [class.is-active]="cycle === 'Monthly'" (click)="selectCycle('Monthly')">
-        Mensal
-      </button>
-      <button type="button" class="billing-switch__item" [class.is-active]="cycle === 'Yearly'" (click)="selectCycle('Yearly')">
-        Anual
-      </button>
+    <div class="pricing-hero__aside">
+      <div class="billing-switch" role="group" aria-label="Periodicidade">
+        <button type="button" class="billing-switch__item" [class.is-active]="cycle === 'Monthly'" (click)="selectCycle('Monthly')">
+          Mensal
+        </button>
+        <button type="button" class="billing-switch__item" [class.is-active]="cycle === 'Yearly'" (click)="selectCycle('Yearly')">
+          Anual
+        </button>
+      </div>
+      <div class="hero-callout">
+        <strong>{{ cycle === 'Yearly' ? 'Anual com melhor previsibilidade' : 'Mensal para começar agora' }}</strong>
+        <span>{{ cycle === 'Yearly' ? 'Reduza o custo equivalente por mês e feche o ano com menos atrito.' : 'Teste o plano ideal com menor compromisso inicial.' }}</span>
+      </div>
     </div>
   </section>
 
@@ -34,6 +45,9 @@
         <strong>{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
         <span>/ {{ cycle === 'Yearly' ? 'ano' : 'mês' }}</span>
       </div>
+      <p class="plan-equivalent" *ngIf="cycle === 'Yearly' && plan.yearlyPrice > 0">
+        equivalente a {{ yearlyEquivalent(plan) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês
+      </p>
 
       <p class="plan-highlight">{{ plan.highlight }}</p>
 
@@ -56,10 +70,42 @@
           class="btn btn--primary"
           [routerLink]="['/checkout']"
           [queryParams]="{ plan: plan.code, cycle: cycle }">
-          {{ plan.code === 'basic' ? 'Começar grátis' : 'Ir para checkout' }}
+          {{ plan.code === 'basic' ? 'Escolher Essencial' : 'Escolher e ir para checkout' }}
         </a>
         <a class="btn btn--ghost" routerLink="/">Ver visão do produto</a>
       </div>
+    </article>
+  </section>
+
+  <section class="comparison-card">
+    <div class="comparison-head">
+      <div>
+        <p class="eyebrow">Comparativo</p>
+        <h2>O que muda na prática entre os planos</h2>
+      </div>
+      <p class="comparison-copy">A decisão comercial fica mais fácil quando a diferença entre cada etapa é objetiva.</p>
+    </div>
+
+    <div class="comparison-table" role="table" aria-label="Comparativo de planos">
+      <div class="comparison-row comparison-row--head" role="row">
+        <div role="columnheader">Recurso</div>
+        <div role="columnheader">Essencial</div>
+        <div role="columnheader">Controle</div>
+        <div role="columnheader">Patrimônio</div>
+      </div>
+      <div class="comparison-row" role="row" *ngFor="let row of comparisonRows">
+        <div role="cell">{{ row.label }}</div>
+        <div role="cell">{{ row.values[0] }}</div>
+        <div role="cell">{{ row.values[1] }}</div>
+        <div role="cell">{{ row.values[2] }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-grid">
+    <article class="faq-card" *ngFor="let item of faqs">
+      <h3>{{ item.question }}</h3>
+      <p>{{ item.answer }}</p>
     </article>
   </section>
 </section>

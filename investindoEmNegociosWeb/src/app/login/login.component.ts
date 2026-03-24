@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService, AuthResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -21,6 +21,7 @@ export class LoginComponent {
   constructor(
     private auth: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private profile: ProfileService,
     private uiFeedback: UiFeedbackService
   ) {}
@@ -44,12 +45,25 @@ export class LoginComponent {
         this.profile.getProfile().subscribe({
           next: (profile) => {
             this.loading = false;
+            const returnTo = this.route.snapshot.queryParamMap.get('returnTo');
+            const plan = this.route.snapshot.queryParamMap.get('plan');
+            const cycle = this.route.snapshot.queryParamMap.get('cycle');
             const incomplete =
               !profile ||
               !profile.document ||
               profile.document.replace(/\D/g, '').length < 11 ||
               !profile.phone ||
               profile.phone.length < 10;
+
+            if (returnTo) {
+              this.router.navigate([returnTo], {
+                queryParams: {
+                  plan: plan || undefined,
+                  cycle: cycle || undefined
+                }
+              });
+              return;
+            }
 
             if (incomplete) {
               this.router.navigateByUrl('/onboarding');
