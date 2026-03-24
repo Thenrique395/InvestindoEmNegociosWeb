@@ -6,7 +6,9 @@
 .pricing-hero,
 .plan-card,
 .comparison-card,
-.faq-card {
+.faq-card,
+.progression-card,
+.trust-card {
   border: 1px solid var(--border);
   border-radius: 22px;
   background: var(--surface);
@@ -106,6 +108,58 @@
   gap: 1rem;
 }
 
+.progression-card,
+.trust-card {
+  padding: 1.1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.progression-grid,
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.progression-step,
+.trust-grid article {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 82%, white), var(--surface));
+}
+
+.progression-step {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.progression-step__index {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.progression-step h3,
+.trust-grid strong {
+  margin: 0;
+}
+
+.progression-step p,
+.trust-grid p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 .plan-card {
   padding: 1.1rem;
   display: grid;
@@ -143,6 +197,25 @@
 .plan-highlight {
   margin: 0;
   color: var(--text-secondary);
+}
+
+.plan-message {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface-2) 84%, white);
+}
+
+.plan-message h3,
+.plan-message p {
+  margin: 0;
+}
+
+.plan-message p {
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 .plan-badge {
@@ -288,7 +361,9 @@
 @media (max-width: 980px) {
   .pricing-hero,
   .comparison-head,
-  .pricing-grid {
+  .pricing-grid,
+  .progression-grid,
+  .trust-grid {
     grid-template-columns: 1fr;
   }
 

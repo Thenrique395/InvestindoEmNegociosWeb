@@ -13,26 +13,44 @@ import { MARKETING_PLANS, MarketingBillingCycle } from '../marketing-plans';
 export class PricingComponent {
   cycle: MarketingBillingCycle = 'Monthly';
   plans = MARKETING_PLANS;
+  commercialSteps = [
+    {
+      title: 'Comecar',
+      copy: 'Use o Essencial para sair do improviso e validar a rotina sem custo.'
+    },
+    {
+      title: 'Prever',
+      copy: 'Suba para Controle quando cartao, vencimentos e saldo real passarem a pesar no seu mes.'
+    },
+    {
+      title: 'Evoluir',
+      copy: 'Vá para Patrimonio quando a sua rotina ja estiver madura e a meta virar crescimento financeiro.'
+    }
+  ];
   comparisonRows = [
+    {
+      label: 'Resultado principal',
+      values: ['Comecar a organizar', 'Operar o mes com previsibilidade', 'Acompanhar patrimonio e evolucao']
+    },
     {
       label: 'Receitas, despesas e metas',
       values: ['Sim', 'Sim', 'Sim']
     },
     {
-      label: 'Cartões e fechamento por competência',
-      values: ['Não', 'Sim', 'Sim']
+      label: 'Cartoes e fechamento por competencia',
+      values: ['Nao', 'Sim', 'Sim']
     },
     {
-      label: 'Importação de fatura em PDF',
-      values: ['Não', 'Sim', 'Sim']
+      label: 'Importacao de fatura em PDF',
+      values: ['Nao', 'Sim', 'Sim']
     },
     {
-      label: 'Contas, saldo real e transferências',
-      values: ['Não', 'Sim', 'Sim']
+      label: 'Contas, saldo real e transferencias',
+      values: ['Nao', 'Sim', 'Sim']
     },
     {
-      label: 'Investimentos e patrimônio',
-      values: ['Não', 'Não', 'Sim']
+      label: 'Investimentos e patrimonio',
+      values: ['Nao', 'Nao', 'Sim']
     }
   ];
   faqs = [
@@ -47,6 +65,10 @@ export class PricingComponent {
     {
       question: 'Quando vale ir para Patrimônio?',
       answer: 'Quando você já controla o mês e quer consolidar investimentos e patrimônio no mesmo painel.'
+    },
+    {
+      question: 'Qual plano e mais indicado para a maioria dos usuarios pagantes?',
+      answer: 'Controle. Ele resolve a dor mais comum de quem usa cartao, precisa prever vencimentos e quer saber o que sobra no fim do mes.'
     }
   ];
 
