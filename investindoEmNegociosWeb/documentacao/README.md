@@ -152,7 +152,7 @@ Leitura prática:
 ## Fonte de verdade
 
 - Status do produto e backlog central: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
-- Design system e padrões visuais: [systemDesigner.md](./systemDesigner.md)
+- Design system e padrões visuais: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
 
 ## Planejamento e produto
 

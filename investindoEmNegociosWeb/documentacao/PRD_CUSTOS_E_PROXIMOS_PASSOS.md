@@ -1,72 +1,106 @@
-# PRD Operacional: Custos e Go-Live
+# Custos e Go-Live
 
-Documento curto para decisão de produção, com foco em custo, pré-requisitos e ordem de execução.
+Documento de referência rápida para custo estimado, gates mínimos de produção e ordem de execução do go-live.
+
+Este arquivo não é o backlog central do projeto.
+
+Use:
+
+- [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md) para pendências ativas, gaps e próximos passos
+- [../../../docs/PRODUCT.md](../../../docs/PRODUCT.md) para oferta, planos e decisões comerciais
+- [../../../docs/BUSINESS_RULES.md](../../../docs/BUSINESS_RULES.md) para regras operacionais do sistema
+
+## Objetivo
+
+Responder três perguntas práticas:
+
+- qual a faixa de custo inicial esperada
+- quais gates mínimos precisam estar atendidos para produção
+- em que ordem o go-live deve acontecer
 
 ## Faixa de custo
 
-### MVP econômico
+### Operação enxuta
 
-- Infra principal: `US$ 15 a US$ 40/mês`
-- Domínio: `US$ 10 a US$ 20/ano` ou `R$ 40 a R$ 60/ano`
-- E-mail, backup e monitoramento: `US$ 0 a US$ 50+/mês`
+- infraestrutura principal: `US$ 15 a US$ 40/mês`
+- domínio: `US$ 10 a US$ 20/ano` ou `R$ 40 a R$ 60/ano`
+- e-mail, backup e monitoramento: `US$ 0 a US$ 50+/mês`
 
-### Produção mais robusta
+### Operação mais robusta
 
-- Infra + banco gerenciado + observabilidade: `US$ 60 a US$ 200+/mês`
+- infraestrutura + banco gerenciado + observabilidade: `US$ 60 a US$ 200+/mês`
 
-## Pré-requisitos técnicos
+## Gates mínimos para produção
+
+### Infraestrutura e segurança
 
 - domínio oficial definido
 - HTTPS com reverse proxy
 - ambientes separados para `staging` e `production`
-- pipeline de deploy com rollback simples
-- backup diário com teste de restore
 - segredos fora do repositório
+- backup diário com teste de restore
+- rollback simples e documentado
 - rate limit e headers de segurança aplicados
 
-## Pré-requisitos de qualidade
+### Qualidade mínima
 
-### Frontend
+#### Frontend
 
-- `npm run quality:frontend`
-- E2E crítico verde
-- monitoramento de Web Vitals ou equivalente
+- `npm run build`
+- fluxo comercial crítico validado
+- E2E crítico verde quando a nova suíte estiver reconstruída
+- monitoramento básico de erro e experiência em produção
 
-### Backend
+#### Backend
 
 - `dotnet test InvestindoEmNegociosApi/InvestindoEmNegocio.sln /p:UseAppHost=false`
 - smoke dos endpoints críticos
-- baseline de carga dos fluxos mais sensíveis
 - health checks validados no deploy
+- billing e autenticação verificados em ambiente publicado
 
-## Pré-requisitos de negócio
+### Operação e negócio
 
-- ICP e proposta de valor definidos
 - política de privacidade e termos prontos
 - pricing inicial definido
-- onboarding e ativação dos primeiros 7 dias desenhados
-- indicadores mínimos definidos:
+- onboarding inicial coerente com a oferta atual
+- indicadores mínimos acompanháveis:
   - ativação
   - retenção
   - conversão
   - churn
   - ticket médio
 
-## Ordem recomendada
+## Ordem recomendada de go-live
 
 1. Estabilização técnica
-   - fechar gaps de performance, backup, observabilidade e rollback
-2. Pré-produção
-   - rodar smoke, carga básica e simular incidente simples
+   - fechar gaps de deploy, observabilidade, backup e rollback
+2. Validação pré-produção
+   - rodar smoke dos fluxos críticos
+   - validar autenticação, billing e importações em ambiente publicado
 3. Go-live controlado
-   - liberar para grupo pequeno, medir por alguns dias e só então escalar
+   - liberar para grupo pequeno
+   - acompanhar por alguns dias
+   - só então ampliar distribuição
 
-## Checklist final
+## Checklist executivo final
 
 - [ ] domínio e TLS válidos
 - [ ] variáveis corretas em produção
 - [ ] backup e restore testados
 - [ ] deploy e rollback funcionando
 - [ ] logs, métricas e alertas ativos
+- [ ] autenticação validada em ambiente publicado
+- [ ] checkout, webhook e portal Stripe validados
 - [ ] testes críticos verdes
-- [ ] documento de incidente e operação disponível
+- [ ] procedimento de incidente disponível
+
+## Limites deste documento
+
+Este arquivo não deve virar:
+
+- lista longa de pendências
+- roadmap de produto
+- status funcional por tela
+- repositório de decisões já consolidadas
+
+Quando um item aqui virar pendência operacional concreta, ele deve ser acompanhado no [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md).
