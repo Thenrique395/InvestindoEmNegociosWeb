@@ -126,19 +126,19 @@ export const routes: Routes = [
   {
     path: 'emprestimos',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./loans/loans.component').then((m) => m.LoansComponent)
   },
   {
     path: 'snapshots',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./monthly-snapshots/monthly-snapshots.component').then((m) => m.MonthlySnapshotsComponent)
   },
   {
     path: 'assistente',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Basic', preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./assistant/assistant.component').then((m) => m.AssistantComponent)
   },
   {

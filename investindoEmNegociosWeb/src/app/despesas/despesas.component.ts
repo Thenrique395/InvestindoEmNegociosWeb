@@ -114,6 +114,10 @@ export class DespesasComponent implements OnInit, OnDestroy {
     return hasAtLeastRole(this.currentRole, 'Intermediate');
   }
 
+  get canAnticipateExpenses(): boolean {
+    return hasAtLeastRole(this.currentRole, 'Intermediate');
+  }
+
   ngOnInit(): void {
     this.sub = this.db.expenses$.subscribe((lista) => {
       this.expensesCache = lista;
@@ -546,6 +550,11 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   anteciparSelecionadas(): void {
+    if (!this.canAnticipateExpenses) {
+      this.setAlerta('Antecipação de despesas está disponível apenas nos planos pagos.', 3000, 'info');
+      return;
+    }
+
     const selecionadas = this.selecionados;
     if (!selecionadas.length) {
       this.setAlerta('Selecione ao menos uma despesa para antecipar.', 2000);

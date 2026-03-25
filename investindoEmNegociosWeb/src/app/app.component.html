@@ -247,7 +247,7 @@
             routerLink="/emprestimos"
             routerLinkActive="active"
             #loansActive="routerLinkActive"
-            *ngIf="hasAccess('Basic')"
+            *ngIf="hasAccess('Intermediate')"
             (click)="reloadIfSame('/emprestimos', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="loansActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -263,7 +263,7 @@
             routerLink="/snapshots"
             routerLinkActive="active"
             #snapshotActive="routerLinkActive"
-            *ngIf="hasAccess('Basic')"
+            *ngIf="hasAccess('Intermediate')"
             (click)="reloadIfSame('/snapshots', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="snapshotActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -279,7 +279,7 @@
             routerLink="/assistente"
             routerLinkActive="active"
             #assistantActive="routerLinkActive"
-            *ngIf="hasAccess('Basic')"
+            *ngIf="hasAccess('Intermediate')"
             (click)="reloadIfSame('/assistente', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="assistantActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -524,7 +524,7 @@
           <a routerLink="/dashboard" [class.active]="isActiveRoute('/dashboard')">Início</a>
           <a routerLink="/despesas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/despesas')">Despesas</a>
           <a routerLink="/contas" *ngIf="hasFeature('categories.access')" [class.active]="isActiveRoute('/contas')">Contas</a>
-          <a routerLink="/emprestimos" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/emprestimos')">Empréstimos</a>
+          <a routerLink="/emprestimos" *ngIf="hasAccess('Intermediate')" [class.active]="isActiveRoute('/emprestimos')">Empréstimos</a>
           <a routerLink="/assinatura" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/assinatura')">Assinatura</a>
           <a routerLink="/investimentos" *ngIf="hasFeature('investments.access')" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
         </nav>

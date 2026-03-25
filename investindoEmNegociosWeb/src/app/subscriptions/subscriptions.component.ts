@@ -89,7 +89,7 @@ export class SubscriptionsComponent {
           plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
           notes: this.catalog?.notes ?? []
         };
-        this.uiFeedback.success('Renovação automática cancelada. O acesso volta para Basic.');
+        this.uiFeedback.success('Renovação automática cancelada. Seu acesso segue ativo até o fim do ciclo atual.');
       },
       error: (err) => {
         this.uiFeedback.error(err?.error?.detail || 'Falha ao cancelar o plano.');

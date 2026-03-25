@@ -168,6 +168,7 @@
       <button
         type="button"
         class="btn-ghost sm"
+        *ngIf="canAnticipateExpenses"
         [disabled]="loadingAntecipar"
         (click)="anteciparSelecionadas()">
         <span *ngIf="loadingAntecipar">Antecipando...</span>
