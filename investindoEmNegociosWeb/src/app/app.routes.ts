@@ -76,6 +76,71 @@ export const routes: Routes = [
     loadComponent: () => import('./calculator/calculator.component').then((m) => m.CalculatorComponent)
   },
   {
+    path: 'design-lab',
+    pathMatch: 'full',
+    redirectTo: 'design-lab/sidebar'
+  },
+  {
+    path: 'design-lab/telas',
+    data: { preload: false, section: 'screens' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/sidebar',
+    data: { preload: false, section: 'sidebar' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/topbar',
+    data: { preload: false, section: 'topbar' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/page-header',
+    data: { preload: false, section: 'page-header' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/kpi-card',
+    data: { preload: false, section: 'kpi-card' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/botoes',
+    data: { preload: false, section: 'buttons' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/forms',
+    data: { preload: false, section: 'forms' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/cards',
+    data: { preload: false, section: 'cards' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/tables',
+    data: { preload: false, section: 'tables' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/states',
+    data: { preload: false, section: 'states' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/modals',
+    data: { preload: false, section: 'modals' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
+    path: 'design-lab/navigation',
+    data: { preload: false, section: 'navigation' },
+    loadComponent: () => import('./design-lab/design-lab.component').then((m) => m.DesignLabComponent)
+  },
+  {
     path: 'cartoes',
     canActivate: [authGuard, roleGuard],
     data: { feature: APP_FEATURE_KEYS.cardsAccess, preload: false },

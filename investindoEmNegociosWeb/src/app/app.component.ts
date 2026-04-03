@@ -170,6 +170,7 @@ export class AppComponent implements OnInit, OnDestroy {
       || current.startsWith('/planos')
       || current.startsWith('/checkout')
       || current.startsWith('/login')
+      || current.startsWith('/design-lab')
       || current.startsWith('/calculadora')
       || current.startsWith('/forgot-password')
       || current.startsWith('/reset-password');

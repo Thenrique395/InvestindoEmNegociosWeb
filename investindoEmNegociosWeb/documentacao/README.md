@@ -153,6 +153,7 @@ Leitura prática:
 
 - Status do produto e backlog central: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
 - Design system e padrões visuais: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+- Exploração visual e comparação de componentes: [systemDesigner.md](./systemDesigner.md)
 
 ## Planejamento e produto
 

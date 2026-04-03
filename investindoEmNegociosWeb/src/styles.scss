@@ -137,6 +137,7 @@ select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 .btn-primary:focus-visible,
+.btn-secondary:focus-visible,
 .btn-danger:focus-visible,
 .btn-edit:focus-visible,
 .ghost:focus-visible {
@@ -154,6 +155,7 @@ button:disabled {
 
 /* Botões - base consistente */
 .btn-primary,
+.btn-secondary,
 .btn-danger,
 .btn-edit,
 .ghost,
@@ -179,6 +181,17 @@ button:disabled {
   background: var(--primary);
   color: var(--on-primary);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.btn-secondary {
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  color: var(--primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface-2));
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border-strong));
 }
 
 .btn-primary:hover {

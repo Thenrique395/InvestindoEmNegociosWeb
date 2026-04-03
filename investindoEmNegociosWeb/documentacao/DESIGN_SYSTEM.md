@@ -22,6 +22,11 @@ Fonte real dos tokens atuais:
 
 - [styles.scss](../src/styles.scss)
 
+Observação importante:
+
+- a direção `Command Premium` existe apenas como exploração no [systemDesigner.md](./systemDesigner.md) e no `Design Lab`
+- ela não substitui os tokens oficiais enquanto não for validada explicitamente
+
 ## Princípios de UI
 
 - clareza primeiro: informação financeira precisa ser fácil de ler
@@ -29,6 +34,61 @@ Fonte real dos tokens atuais:
 - densidade controlada: telas ricas sem poluição visual
 - consistência: mesma linguagem em botões, badges, cards, formulários e navegação
 - acessibilidade: foco visível, contraste suficiente e alvos confortáveis
+
+## Heurísticas de Nielsen
+
+Toda decisão relevante de interface deve ser confrontada com estas 10 heurísticas:
+
+1. visibilidade do status do sistema
+- o usuário precisa entender rapidamente o que está acontecendo
+- telas financeiras devem mostrar atualização, processamento, sucesso, erro e pendência de forma explícita
+
+2. correspondência com o mundo real
+- linguagem deve usar termos financeiros familiares
+- evitar jargão técnico desnecessário, especialmente para `Basic`
+
+3. controle e liberdade do usuário
+- fluxos precisam permitir cancelar, voltar e corrigir
+- ações irreversíveis devem ter recuo claro
+
+4. consistência e padrões
+- o mesmo tipo de informação deve manter o mesmo padrão visual
+- não reinventar shell, tabela, filtro ou card a cada tela
+
+5. prevenção de erros
+- preferir interface que evita erro, em vez de só tratar erro depois
+- exemplos: confirmar exclusão, limitar ações destrutivas, destacar período e contexto antes de confirmar
+
+6. reconhecimento em vez de memorização
+- menus, estados, filtros e ações devem ser autoexplicativos
+- o usuário não deve precisar lembrar regras escondidas para operar o sistema
+
+7. flexibilidade e eficiência de uso
+- o produto deve ser simples para `Basic` e eficiente para `Intermediate` e `Advanced`
+- a mesma base visual precisa suportar diferentes densidades sem mudar a identidade
+
+8. estética e design minimalista
+- minimalista aqui significa essencial e legível, não vazio ou fraco
+- remover ruído visual que não melhora decisão
+
+9. ajudar a reconhecer, diagnosticar e recuperar erros
+- mensagens devem dizer o que falhou, onde falhou e qual o próximo passo
+- nunca usar erro genérico quando o usuário precisa agir
+
+10. ajuda e documentação
+- interfaces mais densas devem oferecer contexto suficiente
+- labels, subtítulos, callouts e empty states fazem parte da ajuda embutida do produto
+
+## Boas práticas obrigatórias
+
+- usar uma base visual única para todos os perfis
+- variar profundidade e densidade por perfil, não identidade
+- priorizar leitura financeira antes de ornamentação
+- limitar cor de destaque a poucos papéis semânticos
+- tratar `Basic` como referência de clareza
+- tratar `Intermediate` e `Advanced` como ampliação de contexto, não como licença para poluir a tela
+- projetar estados `loading`, `empty`, `error` e `success` desde o início
+- validar cada componente em desktop e mobile
 
 ## Tokens oficiais
 

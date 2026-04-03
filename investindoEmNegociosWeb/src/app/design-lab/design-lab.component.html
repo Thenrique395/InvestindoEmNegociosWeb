@@ -1,0 +1,2654 @@
+<section class="design-lab">
+  <header class="lab-hero card">
+    <div>
+      <p class="eyebrow">Reinício guiado</p>
+      <h1>Design Lab</h1>
+      <p class="intro">
+        O laboratório agora começa pela base do produto e usa heurísticas de Nielsen, clareza operacional e consistência visual como régua antes de qualquer decisão estética.
+      </p>
+    </div>
+    <div class="hero-badges">
+      <app-status-badge label="Nielsen first" variant="info"></app-status-badge>
+      <app-status-badge label="Componentes isolados" variant="warning"></app-status-badge>
+    </div>
+  </header>
+
+  <nav class="lab-nav card" aria-label="Seções do design lab">
+    <div class="lab-nav__group" *ngFor="let group of sectionGroups">
+      <div class="lab-nav__group-label">{{ group.label }}</div>
+      <div class="lab-nav__group-items">
+        <a
+          *ngFor="let section of group.items"
+          [routerLink]="section.route"
+          routerLinkActive="is-active"
+          class="lab-nav__item"
+          [class.is-done]="section.status === 'done'"
+          [class.is-next]="section.status === 'next'">
+          <span>{{ section.label }}</span>
+          <small *ngIf="section.status === 'done'">OK</small>
+          <small *ngIf="section.status === 'next'">Próximo</small>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="lab-section" *ngIf="currentSection === 'screens'">
+    <div class="section-heading">
+      <h2>Telas completas</h2>
+      <p>Direções de interface mais maduras para o produto, comparando linguagem, densidade e presença visual.</p>
+    </div>
+    <div class="dual-grid">
+      <article class="card option-card theme-card">
+        <div class="theme-card__header">
+          <div>
+            <p class="eyebrow">Base operacional</p>
+            <h3>Command Center</h3>
+          </div>
+          <app-status-badge label="Mais neutra" variant="info"></app-status-badge>
+        </div>
+        <div class="palette-row">
+          <span style="background:#2563eb"></span>
+          <span style="background:#0ea5e9"></span>
+          <span style="background:#22c55e"></span>
+          <span style="background:#f59e0b"></span>
+          <span style="background:#f8fafc"></span>
+        </div>
+        <p>Mais direta, mais funcional e melhor para consolidar a base do sistema antes de sofisticar a marca.</p>
+        <ul class="theme-points">
+          <li>leitura rápida</li>
+          <li>baixo risco de exagero visual</li>
+          <li>mais simples de espalhar em todas as telas</li>
+        </ul>
+      </article>
+
+      <article class="card option-card theme-card theme-card--premium">
+        <div class="theme-card__header">
+          <div>
+            <p class="eyebrow">Variante em exploração</p>
+            <h3>Command Premium</h3>
+          </div>
+          <app-status-badge label="Mais sofisticada" variant="warning"></app-status-badge>
+        </div>
+        <div class="palette-row">
+          <span style="background:#234b7e"></span>
+          <span style="background:#16365f"></span>
+          <span style="background:#b58d47"></span>
+          <span style="background:#1a7f5c"></span>
+          <span style="background:#f8fafc"></span>
+        </div>
+        <p>Mais refinada para patrimônio, snapshots, assistant e billing de maior valor percebido.</p>
+        <ul class="theme-points">
+          <li>marca mais memorável</li>
+          <li>percepção de ticket mais alto</li>
+          <li>pede mais disciplina para não pesar</li>
+        </ul>
+      </article>
+    </div>
+    <div class="triple-grid">
+      <article class="card option-card theme-card">
+        <div class="theme-card__header">
+          <div>
+            <p class="eyebrow">Direção A</p>
+            <h3>Command Center</h3>
+          </div>
+          <app-status-badge label="Operacional" variant="info"></app-status-badge>
+        </div>
+        <p>Mais direta, pragmática e confiável. Melhor para consolidar a base.</p>
+      </article>
+
+      <article class="card option-card theme-card theme-card--editorial">
+        <div class="theme-card__header">
+          <div>
+            <p class="eyebrow">Direção B</p>
+            <h3>Command Editorial</h3>
+          </div>
+          <app-status-badge label="Mais editorial" variant="warning"></app-status-badge>
+        </div>
+        <p>Mais presença tipográfica, composição mais elegante e ritmo visual mais sofisticado.</p>
+      </article>
+
+      <article class="card option-card theme-card theme-card--signature">
+        <div class="theme-card__header">
+          <div>
+            <p class="eyebrow">Direção C</p>
+            <h3>Command Signature</h3>
+          </div>
+          <app-status-badge label="Mais marcante" variant="info"></app-status-badge>
+        </div>
+        <p>Mais identidade própria, contrastes fortes e sensação de produto memorável.</p>
+      </article>
+    </div>
+    <div class="palette-switcher card">
+      <div>
+        <p class="eyebrow">Prévia controlada</p>
+        <h3>Escolha a paleta para comparar a mesma interface</h3>
+      </div>
+      <div class="switcher-groups">
+        <div class="palette-switcher__group">
+          <small>Direção</small>
+          <div class="palette-switcher__actions">
+            <button
+              *ngFor="let direction of directionOptions"
+              type="button"
+              class="palette-toggle"
+              [class.is-active]="currentDirection === direction.key"
+              (click)="setDirection(direction.key)">
+              {{ direction.label }}
+            </button>
+          </div>
+        </div>
+        <div class="palette-switcher__group">
+          <small>Paleta</small>
+          <div class="palette-switcher__actions">
+            <button
+              *ngFor="let palette of paletteOptions"
+              type="button"
+              class="palette-toggle"
+              [class.is-active]="currentPalette === palette.key"
+              (click)="setPalette(palette.key)">
+              {{ palette.label }}
+            </button>
+          </div>
+        </div>
+        <div class="palette-switcher__group">
+          <small>Tema</small>
+          <div class="palette-switcher__actions">
+            <button
+              *ngFor="let tone of toneOptions"
+              type="button"
+              class="palette-toggle"
+              [class.is-active]="currentTone === tone.key"
+              (click)="setTone(tone.key)">
+              {{ tone.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="palette-preview" [ngClass]="['palette-preview--' + currentPalette, 'palette-preview--' + currentTone, 'direction-preview--' + currentDirection]">
+      <div class="screen-stack">
+      <article class="card option-card screen-card screen-card--featured">
+        <div class="screen-card__header">
+          <div>
+            <p class="eyebrow">Direção escolhida</p>
+            <h3>Finance Command Center</h3>
+          </div>
+          <app-status-badge label="Mais forte" variant="info"></app-status-badge>
+        </div>
+        <p class="screen-summary">
+          Melhor para o momento do produto. Passa clareza operacional, ritmo de tomada de decisão e sensação de sistema sério.
+        </p>
+        <div class="screen-insights">
+          <div class="screen-insights__item">
+            <small>Força</small>
+            <strong>Comando financeiro</strong>
+          </div>
+          <div class="screen-insights__item">
+            <small>Melhor uso</small>
+            <strong>Dashboard e operação diária</strong>
+          </div>
+          <div class="screen-insights__item">
+            <small>Tom visual</small>
+            <strong>Profissional, firme e legível</strong>
+          </div>
+        </div>
+        <div class="mock-screen mock-screen--command">
+          <aside class="mock-screen__side">
+            <div class="brand-stack">
+              <small>Investindo em Negócios</small>
+              <strong>Command Center</strong>
+            </div>
+            <nav class="side-nav">
+              <div class="side-nav__group">
+                <small>Operação</small>
+                <span class="is-active">Dashboard</span>
+                <span>Despesas</span>
+                <span>Receitas</span>
+                <span>Cartões</span>
+                <span>Contas</span>
+                <span>Categorias</span>
+                <span>Metas</span>
+              </div>
+              <div class="side-nav__group">
+                <small>Planejamento e análise</small>
+                <span>Calendário</span>
+                <span>Investimentos</span>
+                <span>Empréstimos</span>
+                <span>Snapshots</span>
+                <span>Assistant</span>
+              </div>
+              <div class="side-nav__group">
+                <small>Conta</small>
+                <span>Assinatura</span>
+                <span>Perfil</span>
+                <span>Preferências</span>
+                <span>Segurança</span>
+                <span>Dados</span>
+              </div>
+              <div class="side-nav__group">
+                <small>Administração</small>
+                <span>Usuários</span>
+                <span>Parâmetros</span>
+                <span>Robôs</span>
+              </div>
+            </nav>
+            <div class="side-pulse">
+              <small>Perfil ativo</small>
+              <strong>Admin / visão completa</strong>
+              <div class="side-pulse__bar"><i></i></div>
+              <p>Todos os módulos visíveis para avaliar a arquitetura completa do menu lateral.</p>
+            </div>
+          </aside>
+          <div class="mock-screen__main">
+            <div class="shell-topbar">
+              <div class="shell-topbar__left">
+                <div class="shell-context">
+                  <small>Workspace pessoal</small>
+                  <strong>Operação financeira</strong>
+                </div>
+              </div>
+              <div class="shell-topbar__right">
+                <button type="button" class="shell-icon shell-icon--badge" aria-label="Notificações">
+                  <span>🔔</span>
+                  <i>9</i>
+                </button>
+                <div class="shell-user">
+                  <div class="shell-user__avatar">HS</div>
+                  <div>
+                    <strong>Henrique Santos</strong>
+                    <small>Plano Controle</small>
+                  </div>
+                </div>
+                <button type="button" class="shell-logout">Sair</button>
+              </div>
+            </div>
+            <div class="mock-screen__top mock-screen__top--rich">
+              <div>
+                <small>Março 2026</small>
+                <strong>Saldo projetado saudável e margem operacional protegida</strong>
+              </div>
+              <div class="mock-chip-row">
+                <span class="mock-chip mock-chip--success">Saldo positivo</span>
+                <span class="mock-chip">Atualizado agora</span>
+                <button type="button" class="btn-primary sm">Fechar mês</button>
+              </div>
+            </div>
+            <div class="mock-screen__kpis">
+              <div class="kpi kpi--income"><small>Receitas</small><strong>R$ 8.450</strong></div>
+              <div class="kpi kpi--expense"><small>Despesas</small><strong>R$ 5.980</strong></div>
+              <div class="kpi kpi--balance"><small>Saldo</small><strong>R$ 2.470</strong></div>
+            </div>
+            <div class="mock-screen__body mock-screen__body--command mock-screen__body--hero">
+              <div class="screen-block screen-block--hero">
+                <div class="screen-block__topline">
+                  <small>Leitura executiva</small>
+                  <span class="signal signal--amber">Atenção moderada</span>
+                </div>
+                <strong>O mês segue controlado, mas a fatura principal subiu acima do ritmo ideal.</strong>
+                <p>Receitas preservam a meta de reserva. O ajuste mais eficiente está em cartão e despesas variáveis.</p>
+                <div class="metric-strip">
+                  <div><small>Reserva</small><strong>72%</strong></div>
+                  <div><small>Cartão</small><strong>R$ 1.280</strong></div>
+                  <div><small>Risco</small><strong>Baixo</strong></div>
+                </div>
+              </div>
+              <div class="screen-chart screen-chart--hero">
+                <div class="chart-header">
+                  <div class="chart-caption">
+                    <small>Tração financeira</small>
+                    <strong>Receita x despesa x saldo</strong>
+                  </div>
+                  <div class="chart-legend">
+                    <span><i class="legend-dot legend-dot--income"></i>Entrada</span>
+                    <span><i class="legend-dot legend-dot--expense"></i>Saída</span>
+                    <span><i class="legend-dot legend-dot--balance"></i>Saldo</span>
+                  </div>
+                </div>
+                <div class="combo-chart">
+                  <div class="combo-chart__axis combo-chart__axis--y">
+                    <span>10k</span>
+                    <span>7k</span>
+                    <span>4k</span>
+                    <span>0</span>
+                  </div>
+                  <div class="combo-chart__plot">
+                    <div class="combo-chart__grid"></div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 84%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 56%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 88%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 62%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 90%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 68%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 92%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 71%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 86%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 58%"></span>
+                    </div>
+                    <div class="combo-chart__line combo-chart__line--balance"></div>
+                    <div class="combo-chart__markers">
+                      <i style="left: 9%; top: 44%"></i>
+                      <i style="left: 28%; top: 39%"></i>
+                      <i style="left: 47%; top: 35%"></i>
+                      <i style="left: 66%; top: 31%"></i>
+                      <i style="left: 85%; top: 40%"></i>
+                    </div>
+                  </div>
+                  <div class="combo-chart__axis combo-chart__axis--x">
+                    <span>Jan</span>
+                    <span>Fev</span>
+                    <span>Mar</span>
+                    <span>Abr</span>
+                    <span>Mai</span>
+                  </div>
+                </div>
+              </div>
+              <div class="screen-list screen-list--dense">
+                <div><span>Fatura principal</span><strong>R$ 1.280</strong></div>
+                <div><span>Meta reserva</span><strong>72%</strong></div>
+                <div><span>Patrimônio</span><strong>+4,2%</strong></div>
+                <div><span>Assinatura</span><strong>Saudável</strong></div>
+              </div>
+            </div>
+            <div class="command-feed">
+              <div class="command-feed__card">
+                <small>Sinal prioritário</small>
+                <strong>Concentre o ajuste em cartão e competência desta semana.</strong>
+              </div>
+              <div class="command-feed__card">
+                <small>Próxima ação</small>
+                <strong>Rever despesa variável antes do fechamento do mês.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      </div>
+
+      <div class="section-heading">
+        <h2>Finance Command Center no produto inteiro</h2>
+        <p>Aplicação da linguagem escolhida em várias telas-chave do sistema.</p>
+      </div>
+
+      <div class="screen-stack">
+        <article class="card option-card screen-card screen-card--featured">
+        <div class="screen-card__header">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h3>Command Center principal</h3>
+          </div>
+          <app-status-badge label="Base recomendada" variant="info"></app-status-badge>
+        </div>
+        <div class="mock-screen mock-screen--command">
+          <aside class="mock-screen__side">
+            <div class="brand-stack">
+              <small>Investindo em Negócios</small>
+              <strong>Dashboard</strong>
+            </div>
+            <nav class="side-nav">
+              <div class="side-nav__group">
+                <small>Operação</small>
+                <span class="is-active">Dashboard</span>
+                <span>Despesas</span>
+                <span>Receitas</span>
+                <span>Metas</span>
+              </div>
+              <div class="side-nav__group">
+                <small>Camadas avançadas</small>
+                <span>Patrimônio</span>
+                <span>Snapshots</span>
+                <span>Assistant</span>
+              </div>
+            </nav>
+            <div class="side-pulse">
+              <small>Assistente da operação</small>
+              <strong>3 sinais ativos</strong>
+              <div class="side-pulse__bar side-pulse__bar--alert"><i></i></div>
+              <p>1 ajuste financeiro, 1 meta em atenção e 1 cobrança futura.</p>
+            </div>
+          </aside>
+          <div class="mock-screen__main">
+            <div class="shell-topbar">
+              <div class="shell-topbar__left">
+                <div class="shell-context">
+                  <small>Painel do usuário</small>
+                  <strong>Workspace de decisão</strong>
+                </div>
+              </div>
+              <div class="shell-topbar__right">
+                <button type="button" class="shell-icon shell-icon--badge" aria-label="Notificações">
+                  <span>🔔</span>
+                  <i>3</i>
+                </button>
+                <div class="shell-user">
+                  <div class="shell-user__avatar">HS</div>
+                  <div>
+                    <strong>Henrique Santos</strong>
+                    <small>Intermediate</small>
+                  </div>
+                </div>
+                <button type="button" class="shell-logout">Logout</button>
+              </div>
+            </div>
+            <div class="mock-screen__top mock-screen__top--rich">
+              <div>
+                <small>Março 2026</small>
+                <strong>Você está operando o mês com boa margem de segurança</strong>
+              </div>
+              <div class="mock-chip-row">
+                <span class="mock-chip mock-chip--success">Operação estável</span>
+                <span class="mock-chip">3 alertas</span>
+                <button type="button" class="btn-primary sm">Fechar mês</button>
+              </div>
+            </div>
+            <div class="dashboard-hero">
+              <div class="dashboard-hero__main">
+                <div class="dashboard-hero__eyebrow">
+                  <small>Centro de comando do mês</small>
+                  <span class="signal signal--success">Mês saudável</span>
+                </div>
+                <strong class="dashboard-hero__headline">Seu caixa segue protegido. O único ponto que exige ação é a pressão do cartão principal.</strong>
+                <p class="dashboard-hero__body">A operação continua estável, a meta principal segue preservada e a melhor decisão agora é reduzir despesa variável antes do fechamento.</p>
+                <div class="dashboard-hero__actions">
+                  <button type="button" class="btn-primary sm">Revisar cartões</button>
+                  <button type="button" class="btn-ghost sm">Ver plano do mês</button>
+                </div>
+              </div>
+              <div class="dashboard-hero__rail">
+                <div class="dashboard-hero__balance">
+                  <small>Saldo projetado</small>
+                  <strong>R$ 2.470</strong>
+                  <span>+18% vs fevereiro</span>
+                </div>
+                <div class="dashboard-hero__microgrid">
+                  <div><small>Receitas</small><strong>R$ 8.450</strong></div>
+                  <div><small>Despesas</small><strong>R$ 5.980</strong></div>
+                  <div><small>Meta</small><strong>72%</strong></div>
+                  <div><small>Faturas</small><strong>2 abertas</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="mock-screen__body mock-screen__body--command mock-screen__body--dashboard">
+              <div class="screen-chart screen-chart--hero">
+                <div class="chart-header">
+                  <div class="chart-caption">
+                    <small>Pulso mensal</small>
+                    <strong>Evolução semanal</strong>
+                  </div>
+                  <div class="chart-legend">
+                    <span><i class="legend-dot legend-dot--income"></i>Entrada</span>
+                    <span><i class="legend-dot legend-dot--expense"></i>Saída</span>
+                    <span><i class="legend-dot legend-dot--balance"></i>Folga</span>
+                  </div>
+                </div>
+                <div class="combo-chart combo-chart--weekly">
+                  <div class="combo-chart__axis combo-chart__axis--y">
+                    <span>9k</span>
+                    <span>6k</span>
+                    <span>3k</span>
+                    <span>0</span>
+                  </div>
+                  <div class="combo-chart__plot">
+                    <div class="combo-chart__grid"></div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 68%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 46%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 76%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 54%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 82%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 61%"></span>
+                    </div>
+                    <div class="combo-chart__group">
+                      <span class="combo-chart__bar combo-chart__bar--income" style="height: 88%"></span>
+                      <span class="combo-chart__bar combo-chart__bar--expense" style="height: 72%"></span>
+                    </div>
+                    <div class="combo-chart__line combo-chart__line--balance"></div>
+                    <div class="combo-chart__markers">
+                      <i style="left: 12%; top: 49%"></i>
+                      <i style="left: 36%; top: 42%"></i>
+                      <i style="left: 60%; top: 34%"></i>
+                      <i style="left: 84%; top: 29%"></i>
+                    </div>
+                  </div>
+                  <div class="combo-chart__axis combo-chart__axis--x">
+                    <span>Sem 1</span>
+                    <span>Sem 2</span>
+                    <span>Sem 3</span>
+                    <span>Sem 4</span>
+                  </div>
+                </div>
+              </div>
+              <div class="screen-block dashboard-panel">
+                <div class="screen-block__topline">
+                  <small>Radar operacional</small>
+                  <span class="signal signal--amber">Ajuste sugerido</span>
+                </div>
+                <strong>Cartão acima do alvo</strong>
+                <p>O desvio do mês está concentrado em cartão. Cortar despesa variável agora preserva sua margem.</p>
+                <div class="metric-strip">
+                  <div><small>Cartão</small><strong>R$ 1.280</strong></div>
+                  <div><small>Margem</small><strong>29%</strong></div>
+                </div>
+              </div>
+              <div class="screen-list screen-list--dense">
+                <div><span>Fatura principal</span><strong>R$ 1.280</strong></div>
+                <div><span>Meta reserva</span><strong>72%</strong></div>
+                <div><span>Patrimônio</span><strong>+4,2%</strong></div>
+                <div><span>Stripe</span><strong>Pagamento em dia</strong></div>
+              </div>
+            </div>
+            <div class="dashboard-strip">
+              <div class="dashboard-strip__item">
+                <small>Radar operacional</small>
+                <strong>Despesa variável acima do alvo</strong>
+              </div>
+              <div class="dashboard-strip__item">
+                <small>Próximo marco</small>
+                <strong>Fechamento em 3 dias</strong>
+              </div>
+              <div class="dashboard-strip__item">
+                <small>Recomendação</small>
+                <strong>Segurar compras não essenciais</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="triple-grid triple-grid--profiles">
+        <article class="card option-card profile-card">
+          <div class="profile-card__header">
+            <div>
+              <p class="eyebrow">Perfil Basic</p>
+              <h3>Clareza e operação essencial</h3>
+            </div>
+            <app-status-badge label="Mais simples" variant="info"></app-status-badge>
+          </div>
+          <div class="profile-preview">
+            <div class="profile-preview__hero">
+              <small>Leitura do mês</small>
+              <strong>Saldo controlado e próxima fatura em atenção.</strong>
+            </div>
+            <div class="profile-preview__kpis">
+              <div><small>Receitas</small><strong>R$ 8.450</strong></div>
+              <div><small>Despesas</small><strong>R$ 5.980</strong></div>
+              <div><small>Saldo</small><strong>R$ 2.470</strong></div>
+            </div>
+            <div class="profile-preview__list">
+              <div><span>Fatura principal</span><strong>R$ 1.280</strong></div>
+              <div><span>Meta reserva</span><strong>72%</strong></div>
+              <div><span>Próxima ação</span><strong>Rever cartão</strong></div>
+            </div>
+          </div>
+          <p class="profile-card__note">Poucos módulos, leitura imediata e foco total em caixa, despesas, metas e cobrança.</p>
+        </article>
+
+        <article class="card option-card profile-card profile-card--recommended">
+          <div class="profile-card__header">
+            <div>
+              <p class="eyebrow">Perfil Intermediate</p>
+              <h3>Operação com contexto e comparativos</h3>
+            </div>
+            <app-status-badge label="Base ideal" variant="warning"></app-status-badge>
+          </div>
+          <div class="profile-preview">
+            <div class="profile-preview__hero profile-preview__hero--rich">
+              <small>Centro de comando</small>
+              <strong>O mês está saudável, mas cartão e despesas variáveis pedem ajuste antes do fechamento.</strong>
+            </div>
+            <div class="profile-preview__chart">
+              <div class="profile-preview__bars">
+                <span style="height: 74%"></span>
+                <span style="height: 82%"></span>
+                <span style="height: 88%"></span>
+                <span style="height: 78%"></span>
+              </div>
+            </div>
+            <div class="profile-preview__list">
+              <div><span>Radar operacional</span><strong>3 sinais</strong></div>
+              <div><span>Meta reserva</span><strong>72%</strong></div>
+              <div><span>Tendência</span><strong>+18% vs fev</strong></div>
+            </div>
+          </div>
+          <p class="profile-card__note">Mantém simplicidade, mas adiciona comparativo, tendência e recomendações úteis.</p>
+        </article>
+
+        <article class="card option-card profile-card">
+          <div class="profile-card__header">
+            <div>
+              <p class="eyebrow">Perfil Advanced</p>
+              <h3>Mais profundidade analítica</h3>
+            </div>
+            <app-status-badge label="Mais denso" variant="info"></app-status-badge>
+          </div>
+          <div class="profile-preview">
+            <div class="profile-preview__hero profile-preview__hero--premium">
+              <small>Camada avançada</small>
+              <strong>Patrimônio, snapshots e assistente ampliam a leitura sem quebrar a base do produto.</strong>
+            </div>
+            <div class="profile-preview__analytics">
+              <div><small>Patrimônio</small><strong>R$ 148.200</strong></div>
+              <div><small>Snapshots</small><strong>6 meses</strong></div>
+              <div><small>Assistant</small><strong>3 insights</strong></div>
+              <div><small>Risco</small><strong>Moderado</strong></div>
+            </div>
+            <div class="profile-preview__list">
+              <div><span>Alocação</span><strong>52 / 18 / 30</strong></div>
+              <div><span>Curva patrimonial</span><strong>Consistente</strong></div>
+              <div><span>Próxima leitura</span><strong>Fechamento mensal</strong></div>
+            </div>
+          </div>
+          <p class="profile-card__note">Aumenta a análise, não a confusão. A identidade visual continua igual à do Basic e Intermediate.</p>
+        </article>
+      </div>
+
+      <div class="dual-grid">
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Despesas</p>
+              <h3>Painel operacional com foco em decisão</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__topbar">
+              <div>
+                <small>Operação financeira</small>
+                <strong>Despesas do mês</strong>
+              </div>
+              <div class="mock-toolbar">
+                <span class="mock-chip">Competência março</span>
+                <button type="button" class="btn-ghost sm">Filtrar</button>
+                <button type="button" class="btn-primary sm">Nova despesa</button>
+              </div>
+            </div>
+            <div class="mock-app-screen__summary">
+              <div><small>Total</small><strong>R$ 5.980</strong></div>
+              <div><small>Fixas</small><strong>R$ 3.420</strong></div>
+              <div><small>Variáveis</small><strong>R$ 2.560</strong></div>
+            </div>
+            <div class="mock-mini-table">
+              <div class="mock-mini-table__row"><span>Aluguel</span><app-status-badge label="Pago"></app-status-badge><strong>R$ 1.800</strong></div>
+              <div class="mock-mini-table__row"><span>Fatura Nubank</span><app-status-badge label="Pendente"></app-status-badge><strong>R$ 1.280</strong></div>
+              <div class="mock-mini-table__row"><span>Supermercado</span><app-status-badge label="Pago"></app-status-badge><strong>R$ 640</strong></div>
+            </div>
+            <div class="insight-callout">
+              <small>Leitura rápida</small>
+              <strong>Cartão concentra o maior desvio do mês.</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Receitas</p>
+              <h3>Leitura simples com confirmação rápida</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__topbar">
+              <div>
+                <small>Entrada de caixa</small>
+                <strong>Receitas previstas</strong>
+              </div>
+              <div class="mock-toolbar">
+                <span class="mock-chip mock-chip--success">92% confirmado</span>
+                <button type="button" class="btn-primary sm">Nova receita</button>
+              </div>
+            </div>
+            <div class="mock-app-screen__summary mock-app-screen__summary--income">
+              <div><small>Recebido</small><strong>R$ 7.800</strong></div>
+              <div><small>Previsto</small><strong>R$ 650</strong></div>
+              <div><small>Total</small><strong>R$ 8.450</strong></div>
+            </div>
+            <div class="mock-card-column">
+              <div class="mock-card-row"><span>Pró-labore</span><strong>R$ 5.500</strong></div>
+              <div class="mock-card-row"><span>Cliente A</span><strong>R$ 1.800</strong></div>
+              <div class="mock-card-row"><span>Receita extra</span><strong>R$ 1.150</strong></div>
+            </div>
+            <div class="sparkline-card">
+              <small>Tração semanal</small>
+              <div class="sparkline">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dual-grid">
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Cartões</p>
+              <h3>Fechamento e competência sem atrito</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-credit-card">
+              <small>Nubank Platinum</small>
+              <strong>R$ 1.280,45</strong>
+              <span>Fecha em 3 dias</span>
+            </div>
+            <div class="mock-card-column">
+              <div class="mock-card-row"><span>Fatura atual</span><strong>R$ 1.280</strong></div>
+              <div class="mock-card-row"><span>Parcelado</span><strong>R$ 820</strong></div>
+              <div class="mock-card-row"><span>Vencimento</span><strong>12/03</strong></div>
+            </div>
+            <div class="insight-callout insight-callout--neutral">
+              <small>Próximo passo</small>
+              <strong>Antecipar parcela perde espaço para revisão do gasto variável.</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Metas</p>
+              <h3>Progresso visual sem parecer gamificação rasa</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="goal-hero">
+              <small>Meta reserva</small>
+              <strong>72% concluída</strong>
+              <div class="goal-bar"><span></span></div>
+            </div>
+            <div class="mock-card-column">
+              <div class="mock-card-row"><span>Valor alvo</span><strong>R$ 10.000</strong></div>
+              <div class="mock-card-row"><span>Aportes</span><strong>R$ 7.200</strong></div>
+              <div class="mock-card-row"><span>Ritmo</span><strong>Dentro do esperado</strong></div>
+            </div>
+            <div class="insight-callout insight-callout--success">
+              <small>Leitura rápida</small>
+              <strong>A meta continua protegida mesmo com pressão do cartão.</strong>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dual-grid">
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Investimentos</p>
+              <h3>Patrimônio dentro da linguagem operacional</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__summary">
+              <div><small>Patrimônio</small><strong>R$ 148.200</strong></div>
+              <div><small>Rentabilidade</small><strong>+12,4%</strong></div>
+              <div><small>Aportes</small><strong>R$ 4.200</strong></div>
+            </div>
+            <div class="chart-surface">
+              <div class="chart-header">
+                <div class="chart-caption">
+                  <small>Composição</small>
+                  <strong>Evolução patrimonial</strong>
+                </div>
+                <div class="chart-legend">
+                  <span><i class="legend-dot legend-dot--income"></i>Patrimônio</span>
+                  <span><i class="legend-dot legend-dot--balance"></i>Aportes</span>
+                </div>
+              </div>
+              <div class="stacked-chart">
+                <div class="stacked-chart__axis">
+                  <span>150k</span>
+                  <span>120k</span>
+                  <span>90k</span>
+                  <span>60k</span>
+                </div>
+                <div class="stacked-chart__plot">
+                  <div class="stacked-chart__grid"></div>
+                  <div class="stacked-chart__column">
+                    <i class="stacked-chart__segment stacked-chart__segment--fixed" style="height: 46%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--funds" style="height: 18%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--equity" style="height: 14%"></i>
+                  </div>
+                  <div class="stacked-chart__column">
+                    <i class="stacked-chart__segment stacked-chart__segment--fixed" style="height: 49%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--funds" style="height: 18%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--equity" style="height: 16%"></i>
+                  </div>
+                  <div class="stacked-chart__column">
+                    <i class="stacked-chart__segment stacked-chart__segment--fixed" style="height: 52%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--funds" style="height: 19%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--equity" style="height: 18%"></i>
+                  </div>
+                  <div class="stacked-chart__column">
+                    <i class="stacked-chart__segment stacked-chart__segment--fixed" style="height: 54%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--funds" style="height: 19%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--equity" style="height: 19%"></i>
+                  </div>
+                  <div class="stacked-chart__column">
+                    <i class="stacked-chart__segment stacked-chart__segment--fixed" style="height: 56%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--funds" style="height: 20%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--equity" style="height: 20%"></i>
+                  </div>
+                  <div class="stacked-chart__column">
+                    <i class="stacked-chart__segment stacked-chart__segment--fixed" style="height: 58%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--funds" style="height: 20%"></i>
+                    <i class="stacked-chart__segment stacked-chart__segment--equity" style="height: 22%"></i>
+                  </div>
+                </div>
+                <div class="stacked-chart__labels">
+                  <span>Out</span><span>Nov</span><span>Dez</span><span>Jan</span><span>Fev</span><span>Mar</span>
+                </div>
+              </div>
+            </div>
+            <div class="allocation-strip">
+              <div><small>Renda fixa</small><strong>52%</strong></div>
+              <div><small>Fundos</small><strong>18%</strong></div>
+              <div><small>Ações</small><strong>30%</strong></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Snapshots mensais</p>
+              <h3>Leitura analítica para perfil Intermediate e Advanced</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__topbar">
+              <div>
+                <small>Comparativo histórico</small>
+                <strong>Saúde mensal e tendência</strong>
+              </div>
+              <div class="mock-toolbar">
+                <span class="mock-chip">Últimos 6 meses</span>
+                <span class="mock-chip mock-chip--success">Tração positiva</span>
+              </div>
+            </div>
+            <div class="analytics-grid">
+              <div class="donut-card">
+                <small>Composição do mês</small>
+                <div class="donut-ring">
+                  <div class="donut-ring__center">
+                    <strong>68%</strong>
+                    <span>saúde</span>
+                  </div>
+                </div>
+              </div>
+              <div class="trend-card">
+                <small>Saldo líquido</small>
+                <div class="bar-comparison bar-comparison--timeline">
+                  <div class="bar-comparison__row"><span>Jan</span><i style="width: 42%"></i></div>
+                  <div class="bar-comparison__row"><span>Fev</span><i style="width: 58%"></i></div>
+                  <div class="bar-comparison__row"><span>Mar</span><i style="width: 72%"></i></div>
+                </div>
+                <strong>+18% vs mês anterior</strong>
+              </div>
+            </div>
+            <div class="timeline-list">
+              <div><span>Jan</span><strong>Saldo baixo</strong><small>Pressão em cartão</small></div>
+              <div><span>Fev</span><strong>Recuperação</strong><small>Receita extra entrou</small></div>
+              <div><span>Mar</span><strong>Controle estável</strong><small>Meta preservada</small></div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dual-grid">
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Assistente financeiro</p>
+              <h3>Camada analítica e recomendação acionável</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__topbar">
+              <div>
+                <small>Radar inteligente</small>
+                <strong>Oportunidades e alertas do ciclo atual</strong>
+              </div>
+              <div class="mock-toolbar">
+                <span class="mock-chip">Perfil avançado</span>
+                <span class="mock-chip mock-chip--success">3 insights úteis</span>
+              </div>
+            </div>
+            <div class="assistant-panel">
+              <div class="assistant-message assistant-message--primary">
+                <small>Insight principal</small>
+                <strong>Seu melhor ajuste de curto prazo é reduzir a despesa variável antes da próxima fatura.</strong>
+              </div>
+              <div class="assistant-columns">
+                <div class="assistant-message">
+                  <small>Relação receita/despesa</small>
+                  <div class="progress-rail"><span style="width: 64%"></span></div>
+                  <strong>Saudável, mas com folga menor do que no último mês.</strong>
+                </div>
+                <div class="assistant-message">
+                  <small>Patrimônio e meta</small>
+                  <div class="progress-rail progress-rail--success"><span style="width: 72%"></span></div>
+                  <strong>Meta principal continua protegida pelo caixa atual.</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Billing</p>
+              <h3>Assinatura tratada como operação séria, não só checkout</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="status-panel status-panel--soft">
+              <small>Plano atual</small>
+              <strong>Controle • Renovação mensal</strong>
+              <p>Próxima cobrança em 12/04/2026. Cartão válido e assinatura saudável.</p>
+            </div>
+            <div class="mock-app-screen__summary">
+              <div><small>Status</small><strong>Ativa</strong></div>
+              <div><small>Ciclo</small><strong>Mensal</strong></div>
+              <div><small>Portal</small><strong>Liberado</strong></div>
+            </div>
+            <div class="actions actions--start">
+              <button type="button" class="btn-ghost sm">Abrir portal</button>
+              <button type="button" class="btn-cancel sm">Cancelar renovação</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dual-grid">
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Patrimônio detalhado</p>
+              <h3>Visão avançada com alocação, risco e performance</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__topbar">
+              <div>
+                <small>Carteira consolidada</small>
+                <strong>Patrimônio e risco da carteira</strong>
+              </div>
+              <div class="mock-toolbar">
+                <span class="mock-chip">Perfil avançado</span>
+                <span class="mock-chip mock-chip--success">Risco controlado</span>
+              </div>
+            </div>
+            <div class="mock-app-screen__summary">
+              <div><small>Patrimônio</small><strong>R$ 148.200</strong></div>
+              <div><small>Volatilidade</small><strong>Moderada</strong></div>
+              <div><small>Performance</small><strong>+12,4%</strong></div>
+            </div>
+            <div class="analytics-grid">
+              <div class="donut-card">
+                <small>Alocação atual</small>
+                <div class="donut-ring donut-ring--portfolio">
+                  <div class="donut-ring__center">
+                    <strong>30%</strong>
+                    <span>ações</span>
+                  </div>
+                </div>
+              </div>
+              <div class="trend-card">
+                <small>Curva patrimonial</small>
+                <div class="range-chart">
+                  <div class="range-chart__row">
+                    <span>Renda fixa</span>
+                    <div><i style="width: 58%"></i></div>
+                    <strong>52%</strong>
+                  </div>
+                  <div class="range-chart__row">
+                    <span>Ações</span>
+                    <div><i style="width: 34%"></i></div>
+                    <strong>30%</strong>
+                  </div>
+                  <div class="range-chart__row">
+                    <span>Fundos</span>
+                    <div><i style="width: 22%"></i></div>
+                    <strong>18%</strong>
+                  </div>
+                  <div class="range-chart__row">
+                    <span>Liquidez</span>
+                    <div><i style="width: 64%"></i></div>
+                    <strong>Alta</strong>
+                  </div>
+                </div>
+                <strong>Ritmo consistente com aporte recorrente.</strong>
+              </div>
+            </div>
+            <div class="allocation-strip allocation-strip--wide">
+              <div><small>Renda fixa</small><strong>52%</strong></div>
+              <div><small>Ações</small><strong>30%</strong></div>
+              <div><small>Fundos</small><strong>18%</strong></div>
+              <div><small>Drawdown</small><strong>-3,1%</strong></div>
+            </div>
+            <div class="risk-matrix">
+              <div><small>Liquidez</small><strong>Alta</strong></div>
+              <div><small>Risco</small><strong>Moderado</strong></div>
+              <div><small>Diversificação</small><strong>Boa</strong></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card option-card screen-card">
+          <div class="screen-card__header">
+            <div>
+              <p class="eyebrow">Fechamento mensal</p>
+              <h3>Snapshot executivo para decisão e memória do ciclo</h3>
+            </div>
+          </div>
+          <div class="mock-app-screen">
+            <div class="mock-app-screen__topbar">
+              <div>
+                <small>Resumo consolidado</small>
+                <strong>Snapshot de março 2026</strong>
+              </div>
+              <div class="mock-toolbar">
+                <span class="mock-chip">Fechado</span>
+                <button type="button" class="btn-ghost sm">Exportar</button>
+              </div>
+            </div>
+            <div class="snapshot-banner">
+              <small>Resultado do ciclo</small>
+              <strong>Março fechou com saldo positivo e avanço de meta, mas com pressão maior em cartão.</strong>
+            </div>
+            <div class="snapshot-grid">
+              <div class="snapshot-metric">
+                <small>Receitas</small>
+                <strong>R$ 8.450</strong>
+                <span>Dentro do previsto</span>
+              </div>
+              <div class="snapshot-metric">
+                <small>Despesas</small>
+                <strong>R$ 5.980</strong>
+                <span>Acima do alvo em cartão</span>
+              </div>
+              <div class="snapshot-metric">
+                <small>Saldo</small>
+                <strong>R$ 2.470</strong>
+                <span>Melhor que fevereiro</span>
+              </div>
+            </div>
+            <div class="comparison-board">
+              <div class="comparison-board__header">
+                <small>Comparativo do ciclo</small>
+                <strong>Fechamento consolidado</strong>
+              </div>
+              <div class="bar-comparison bar-comparison--wide">
+                <div class="bar-comparison__row"><span>Receitas</span><i style="width: 84%"></i></div>
+                <div class="bar-comparison__row"><span>Despesas</span><i style="width: 60%"></i></div>
+                <div class="bar-comparison__row"><span>Saldo</span><i style="width: 38%"></i></div>
+              </div>
+            </div>
+            <div class="timeline-list">
+              <div><span>Saldo</span><strong>Positivo</strong><small>+18% vs fev</small></div>
+              <div><span>Meta</span><strong>72%</strong><small>Preservada</small></div>
+              <div><span>Ação</span><strong>Rever cartão</strong><small>Próximo ciclo</small></div>
+            </div>
+          </div>
+        </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'sidebar'">
+    <div class="section-heading">
+      <h2>AppSidebar</h2>
+      <p>Decisão isolada da barra lateral. Aqui a avaliação é só estrutura, agrupamento, navegação e estado ativo.</p>
+    </div>
+    <article class="card option-card shell-component">
+      <div class="shell-component__header">
+        <div>
+          <p class="eyebrow">Componente isolado</p>
+          <h3>Sidebar</h3>
+        </div>
+        <app-status-badge label="Base estrutural" variant="info"></app-status-badge>
+      </div>
+      <div class="shell-component__preview shell-component__preview--sidebar">
+        <div class="sidebar-showcase">
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Light</div>
+            <aside class="mock-screen__side mock-screen__side--isolated">
+              <div class="side-brand">
+                <img
+                  class="side-brand__logo"
+                  src="assets/logoHeaderInvestindoemNegocios2.png"
+                  alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <nav class="side-nav">
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dashboard'" (click)="setActiveSidebarItem('Dashboard')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Despesas'" (click)="setActiveSidebarItem('Despesas')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Receitas'" (click)="setActiveSidebarItem('Receitas')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Calendário'" (click)="setActiveSidebarItem('Calendário')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Cartões'" (click)="setActiveSidebarItem('Cartões')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Contas'" (click)="setActiveSidebarItem('Contas')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Categorias'" (click)="setActiveSidebarItem('Categorias')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Investimentos'" (click)="setActiveSidebarItem('Investimentos')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Metas'" (click)="setActiveSidebarItem('Metas')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Empréstimos'" (click)="setActiveSidebarItem('Empréstimos')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Snapshots'" (click)="setActiveSidebarItem('Snapshots')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assistant'" (click)="setActiveSidebarItem('Assistant')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assinatura'" (click)="setActiveSidebarItem('Assinatura')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2.5"></rect><path d="M8 8.5h8"></path><path d="M8 12h6"></path><path d="m11.5 15.5 1.2.8-.4-1.4 1.1-.9h-1.4l-.5-1.3-.4 1.3H9.7l1.1.9-.4 1.4Z"></path></svg></i><em>Assinatura</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Perfil'" (click)="setActiveSidebarItem('Perfil')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Preferências'" (click)="setActiveSidebarItem('Preferências')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.1-1.1l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.8a7.8 7.8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .7.1 1.1l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.9 1.1l.3 2.8h4.6l.3-2.8a7.8 7.8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.6c.1-.4.1-.7.1-1.1Z"></path></svg></i><em>Preferências</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Segurança'" (click)="setActiveSidebarItem('Segurança')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dados'" (click)="setActiveSidebarItem('Dados')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="6.5" ry="2.5"></ellipse><path d="M5.5 6.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path><path d="M5.5 11.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path></svg></i><em>Exportações e dados</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Usuários'" (click)="setActiveSidebarItem('Usuários')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"></circle><circle cx="17" cy="10" r="2.5"></circle><path d="M4.5 19c1.4-2.6 3.4-4 6-4"></path><path d="M13.5 19c.8-1.8 2.1-2.8 3.8-3.2"></path></svg></i><em>Usuários</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Parâmetros'" (click)="setActiveSidebarItem('Parâmetros')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h8"></path><path d="M16 7h4"></path><circle cx="14" cy="7" r="2"></circle><path d="M4 12h4"></path><path d="M12 12h8"></path><circle cx="10" cy="12" r="2"></circle><path d="M4 17h10"></path><path d="M18 17h2"></path><circle cx="16" cy="17" r="2"></circle></svg></i><em>Configuração do sistema</em>
+                </button>
+                <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Robôs'" (click)="setActiveSidebarItem('Robôs')">
+                  <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="9" rx="2.5"></rect><path d="M12 4.5v3"></path><circle cx="9.5" cy="12.5" r="1"></circle><circle cx="14.5" cy="12.5" r="1"></circle><path d="M9 16h6"></path></svg></i><em>Robôs</em>
+                </button>
+              </nav>
+            </aside>
+          </div>
+
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Dark</div>
+            <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-dark">
+              <div class="side-brand">
+                <img
+                  class="side-brand__logo"
+                  src="assets/logoHeaderInvestindoemNegocios.png"
+                  alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <div class="side-title">Menu</div>
+              <nav class="side-nav">
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dashboard'" (click)="setActiveSidebarItem('Dashboard')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Despesas'" (click)="setActiveSidebarItem('Despesas')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Receitas'" (click)="setActiveSidebarItem('Receitas')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Calendário'" (click)="setActiveSidebarItem('Calendário')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Cartões'" (click)="setActiveSidebarItem('Cartões')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Contas'" (click)="setActiveSidebarItem('Contas')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Categorias'" (click)="setActiveSidebarItem('Categorias')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Investimentos'" (click)="setActiveSidebarItem('Investimentos')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Metas'" (click)="setActiveSidebarItem('Metas')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Empréstimos'" (click)="setActiveSidebarItem('Empréstimos')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Snapshots'" (click)="setActiveSidebarItem('Snapshots')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assistant'" (click)="setActiveSidebarItem('Assistant')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assinatura'" (click)="setActiveSidebarItem('Assinatura')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2.5"></rect><path d="M8 8.5h8"></path><path d="M8 12h6"></path><path d="m11.5 15.5 1.2.8-.4-1.4 1.1-.9h-1.4l-.5-1.3-.4 1.3H9.7l1.1.9-.4 1.4Z"></path></svg></i><em>Assinatura</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Perfil'" (click)="setActiveSidebarItem('Perfil')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Preferências'" (click)="setActiveSidebarItem('Preferências')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.1-1.1l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.8a7.8 7.8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .7.1 1.1l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.9 1.1l.3 2.8h4.6l.3-2.8a7.8 7.8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.6c.1-.4.1-.7.1-1.1Z"></path></svg></i><em>Preferências</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Segurança'" (click)="setActiveSidebarItem('Segurança')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dados'" (click)="setActiveSidebarItem('Dados')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="6.5" ry="2.5"></ellipse><path d="M5.5 6.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path><path d="M5.5 11.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path></svg></i><em>Exportações e dados</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Usuários'" (click)="setActiveSidebarItem('Usuários')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"></circle><circle cx="17" cy="10" r="2.5"></circle><path d="M4.5 19c1.4-2.6 3.4-4 6-4"></path><path d="M13.5 19c.8-1.8 2.1-2.8 3.8-3.2"></path></svg></i><em>Usuários</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Parâmetros'" (click)="setActiveSidebarItem('Parâmetros')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h8"></path><path d="M16 7h4"></path><circle cx="14" cy="7" r="2"></circle><path d="M4 12h4"></path><path d="M12 12h8"></path><circle cx="10" cy="12" r="2"></circle><path d="M4 17h10"></path><path d="M18 17h2"></path><circle cx="16" cy="17" r="2"></circle></svg></i><em>Configuração do sistema</em>
+            </button>
+            <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Robôs'" (click)="setActiveSidebarItem('Robôs')">
+              <i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="9" rx="2.5"></rect><path d="M12 4.5v3"></path><circle cx="9.5" cy="12.5" r="1"></circle><circle cx="14.5" cy="12.5" r="1"></circle><path d="M9 16h6"></path></svg></i><em>Robôs</em>
+            </button>
+          </nav>
+        </aside>
+      </div>
+
+      <div class="sidebar-showcase__variant">
+        <div class="sidebar-showcase__label">Light + Heurísticas</div>
+        <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-practices-light">
+          <div class="side-brand">
+            <img
+              class="side-brand__logo"
+              src="assets/logoHeaderInvestindoemNegocios2.png"
+              alt="Logo Investindo em Negócios" />
+            <div class="side-brand__text">
+              <strong>Investindo em</strong>
+              <strong>Negócios</strong>
+            </div>
+          </div>
+          <div class="side-divider"></div>
+          <div class="side-title">Menu</div>
+          <nav class="side-nav side-nav--grouped">
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Operação</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dashboard'" (click)="setActiveSidebarItem('Dashboard')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Despesas'" (click)="setActiveSidebarItem('Despesas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Receitas'" (click)="setActiveSidebarItem('Receitas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Calendário'" (click)="setActiveSidebarItem('Calendário')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Cartões'" (click)="setActiveSidebarItem('Cartões')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Contas'" (click)="setActiveSidebarItem('Contas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Categorias'" (click)="setActiveSidebarItem('Categorias')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+            </div>
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Análise e evolução</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Investimentos'" (click)="setActiveSidebarItem('Investimentos')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Metas'" (click)="setActiveSidebarItem('Metas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Empréstimos'" (click)="setActiveSidebarItem('Empréstimos')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Snapshots'" (click)="setActiveSidebarItem('Snapshots')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assistant'" (click)="setActiveSidebarItem('Assistant')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+            </div>
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Conta</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assinatura'" (click)="setActiveSidebarItem('Assinatura')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2.5"></rect><path d="M8 8.5h8"></path><path d="M8 12h6"></path><path d="m11.5 15.5 1.2.8-.4-1.4 1.1-.9h-1.4l-.5-1.3-.4 1.3H9.7l1.1.9-.4 1.4Z"></path></svg></i><em>Assinatura</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Perfil'" (click)="setActiveSidebarItem('Perfil')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Preferências'" (click)="setActiveSidebarItem('Preferências')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.1-1.1l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.8a7.8 7.8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .7.1 1.1l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.9 1.1l.3 2.8h4.6l.3-2.8a7.8 7.8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.6c.1-.4.1-.7.1-1.1Z"></path></svg></i><em>Preferências</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Segurança'" (click)="setActiveSidebarItem('Segurança')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dados'" (click)="setActiveSidebarItem('Dados')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="6.5" ry="2.5"></ellipse><path d="M5.5 6.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path><path d="M5.5 11.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path></svg></i><em>Exportações e dados</em></button>
+            </div>
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Gestão do sistema</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Usuários'" (click)="setActiveSidebarItem('Usuários')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"></circle><circle cx="17" cy="10" r="2.5"></circle><path d="M4.5 19c1.4-2.6 3.4-4 6-4"></path><path d="M13.5 19c.8-1.8 2.1-2.8 3.8-3.2"></path></svg></i><em>Usuários</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Parâmetros'" (click)="setActiveSidebarItem('Parâmetros')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h8"></path><path d="M16 7h4"></path><circle cx="14" cy="7" r="2"></circle><path d="M4 12h4"></path><path d="M12 12h8"></path><circle cx="10" cy="12" r="2"></circle><path d="M4 17h10"></path><path d="M18 17h2"></path><circle cx="16" cy="17" r="2"></circle></svg></i><em>Configuração do sistema</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Robôs'" (click)="setActiveSidebarItem('Robôs')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="9" rx="2.5"></rect><path d="M12 4.5v3"></path><circle cx="9.5" cy="12.5" r="1"></circle><circle cx="14.5" cy="12.5" r="1"></circle><path d="M9 16h6"></path></svg></i><em>Robôs</em></button>
+            </div>
+          </nav>
+        </aside>
+      </div>
+
+      <div class="sidebar-showcase__variant">
+        <div class="sidebar-showcase__label">Dark + Heurísticas</div>
+        <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-dark mock-screen__side--isolated-practices">
+          <div class="side-brand">
+            <img
+              class="side-brand__logo"
+              src="assets/logoHeaderInvestindoemNegocios.png"
+              alt="Logo Investindo em Negócios" />
+            <div class="side-brand__text">
+              <strong>Investindo em</strong>
+              <strong>Negócios</strong>
+            </div>
+          </div>
+          <div class="side-divider"></div>
+          <div class="side-title">Menu</div>
+          <nav class="side-nav side-nav--grouped">
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Operação</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dashboard'" (click)="setActiveSidebarItem('Dashboard')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Despesas'" (click)="setActiveSidebarItem('Despesas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Receitas'" (click)="setActiveSidebarItem('Receitas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Calendário'" (click)="setActiveSidebarItem('Calendário')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Cartões'" (click)="setActiveSidebarItem('Cartões')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Contas'" (click)="setActiveSidebarItem('Contas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Categorias'" (click)="setActiveSidebarItem('Categorias')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+            </div>
+
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Análise e evolução</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Investimentos'" (click)="setActiveSidebarItem('Investimentos')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Metas'" (click)="setActiveSidebarItem('Metas')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Empréstimos'" (click)="setActiveSidebarItem('Empréstimos')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Snapshots'" (click)="setActiveSidebarItem('Snapshots')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assistant'" (click)="setActiveSidebarItem('Assistant')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+            </div>
+
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Conta</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Assinatura'" (click)="setActiveSidebarItem('Assinatura')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2.5"></rect><path d="M8 8.5h8"></path><path d="M8 12h6"></path><path d="m11.5 15.5 1.2.8-.4-1.4 1.1-.9h-1.4l-.5-1.3-.4 1.3H9.7l1.1.9-.4 1.4Z"></path></svg></i><em>Assinatura</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Perfil'" (click)="setActiveSidebarItem('Perfil')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Preferências'" (click)="setActiveSidebarItem('Preferências')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.1-1.1l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.8a7.8 7.8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .7.1 1.1l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.9 1.1l.3 2.8h4.6l.3-2.8a7.8 7.8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.6c.1-.4.1-.7.1-1.1Z"></path></svg></i><em>Preferências</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Segurança'" (click)="setActiveSidebarItem('Segurança')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Dados'" (click)="setActiveSidebarItem('Dados')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="6.5" ry="2.5"></ellipse><path d="M5.5 6.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path><path d="M5.5 11.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path></svg></i><em>Exportações e dados</em></button>
+            </div>
+
+            <div class="side-nav__section">
+              <div class="side-nav__section-title">Gestão do sistema</div>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Usuários'" (click)="setActiveSidebarItem('Usuários')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"></circle><circle cx="17" cy="10" r="2.5"></circle><path d="M4.5 19c1.4-2.6 3.4-4 6-4"></path><path d="M13.5 19c.8-1.8 2.1-2.8 3.8-3.2"></path></svg></i><em>Usuários</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Parâmetros'" (click)="setActiveSidebarItem('Parâmetros')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h8"></path><path d="M16 7h4"></path><circle cx="14" cy="7" r="2"></circle><path d="M4 12h4"></path><path d="M12 12h8"></path><circle cx="10" cy="12" r="2"></circle><path d="M4 17h10"></path><path d="M18 17h2"></path><circle cx="16" cy="17" r="2"></circle></svg></i><em>Configuração do sistema</em></button>
+              <button type="button" class="side-nav__item" [class.is-active]="activeSidebarItem === 'Robôs'" (click)="setActiveSidebarItem('Robôs')"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="9" rx="2.5"></rect><path d="M12 4.5v3"></path><circle cx="9.5" cy="12.5" r="1"></circle><circle cx="14.5" cy="12.5" r="1"></circle><path d="M9 16h6"></path></svg></i><em>Robôs</em></button>
+            </div>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </div>
+      <p class="shell-component__note">Aqui a sidebar está no cenário mais completo possível, usando perfil Admin para validar a arquitetura total do menu. Os nomes mais ambíguos foram trazidos para uma linguagem mais clara de produto.</p>
+
+      <div class="sidebar-subsection">
+        <div class="section-heading section-heading--compact">
+          <h3>Hierarquia por perfil</h3>
+          <p>Os quatro níveis abaixo deixam claro para o designer como a mesma linguagem escala sem virar uma navegação diferente a cada plano.</p>
+        </div>
+        <div class="profile-sidebar-showcase">
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Basic</div>
+            <aside class="mock-screen__side mock-screen__side--isolated profile-sidebar profile-sidebar--basic">
+              <div class="side-brand">
+                <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <div class="side-title">Menu</div>
+              <nav class="side-nav">
+                <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em></button>
+                <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+              </nav>
+            </aside>
+            <p class="profile-sidebar-showcase__note">Mais respiro e só operação essencial.</p>
+          </div>
+
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Intermediate</div>
+            <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-practices-light profile-sidebar">
+              <div class="side-brand">
+                <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <nav class="side-nav side-nav--grouped">
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Operação</div>
+                  <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Evolução</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                </div>
+              </nav>
+            </aside>
+            <p class="profile-sidebar-showcase__note">Mesma base, com um segundo bloco leve de evolução.</p>
+          </div>
+
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Advanced</div>
+            <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-practices-light profile-sidebar">
+              <div class="side-brand">
+                <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <nav class="side-nav side-nav--grouped">
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Operação</div>
+                  <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Análise e evolução</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+                </div>
+              </nav>
+            </aside>
+            <p class="profile-sidebar-showcase__note">Mais análise e leitura, sem virar uma sidebar de admin.</p>
+          </div>
+
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Admin</div>
+            <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-practices-light profile-sidebar profile-sidebar--admin">
+              <div class="side-brand">
+                <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <nav class="side-nav side-nav--grouped">
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Operação</div>
+                  <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Análise e evolução</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Conta</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2.5"></rect><path d="M8 8.5h8"></path><path d="M8 12h6"></path><path d="m11.5 15.5 1.2.8-.4-1.4 1.1-.9h-1.4l-.5-1.3-.4 1.3H9.7l1.1.9-.4 1.4Z"></path></svg></i><em>Minha assinatura</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.1-1.1l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.9-1.1L14.3 3h-4.6l-.3 2.8a7.8 7.8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .7.1 1.1l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.9 1.1l.3 2.8h4.6l.3-2.8a7.8 7.8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.6c.1-.4.1-.7.1-1.1Z"></path></svg></i><em>Preferências</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="6.5" ry="2.5"></ellipse><path d="M5.5 6.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path><path d="M5.5 11.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path></svg></i><em>Exportações e dados</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Gestão do sistema</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"></circle><circle cx="17" cy="10" r="2.5"></circle><path d="M4.5 19c1.4-2.6 3.4-4 6-4"></path><path d="M13.5 19c.8-1.8 2.1-2.8 3.8-3.2"></path></svg></i><em>Usuários</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h8"></path><path d="M16 7h4"></path><circle cx="14" cy="7" r="2"></circle><path d="M4 12h4"></path><path d="M12 12h8"></path><circle cx="10" cy="12" r="2"></circle><path d="M4 17h10"></path><path d="M18 17h2"></path><circle cx="16" cy="17" r="2"></circle></svg></i><em>Configuração do sistema</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="9" rx="2.5"></rect><path d="M12 4.5v3"></path><circle cx="9.5" cy="12.5" r="1"></circle><circle cx="14.5" cy="12.5" r="1"></circle><path d="M9 16h6"></path></svg></i><em>Robôs</em></button>
+                </div>
+              </nav>
+            </aside>
+            <p class="profile-sidebar-showcase__note">A mesma sidebar com camadas extras e administração claramente separada.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-subsection">
+        <div class="section-heading section-heading--compact">
+          <h3>Versão colapsável e mobile</h3>
+          <p>O menu precisa se adaptar no web por largura e abrir como drawer no mobile, sem perder reconhecimento.</p>
+        </div>
+        <div class="sidebar-adaptations">
+          <article class="sidebar-adaptations__card sidebar-adaptations__card--adaptive">
+            <div class="sidebar-adaptations__header">
+              <strong>Web adaptativo</strong>
+            </div>
+            <div class="sidebar-showcase sidebar-showcase--triple sidebar-showcase--adaptive">
+              <div class="sidebar-showcase__variant">
+                <div class="sidebar-showcase__label">Só ícones</div>
+                <p class="sidebar-showcase__description">Use quando a largura estiver bem restrita no web, mantendo navegação rápida com tooltip e clique direto.</p>
+                <div class="sidebar-rail sidebar-rail--standalone">
+                  <div class="sidebar-rail__brand" data-tooltip="Investindo em Negócios">
+                    <img src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                  </div>
+                  <button
+                    type="button"
+                    class="sidebar-rail__item"
+                    *ngFor="let item of collapsibleSidebarItems"
+                    [class.is-active]="activeCollapsibleItem === item.label"
+                    (click)="setActiveCollapsibleItem(item.label)"
+                    [attr.aria-label]="item.label"
+                    [attr.title]="item.label"
+                    [attr.data-tooltip]="item.label">
+                    <ng-container [ngSwitch]="item.label">
+                      <svg *ngSwitchCase="'Dashboard'" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg>
+                      <svg *ngSwitchCase="'Despesas'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg>
+                      <svg *ngSwitchCase="'Receitas'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg>
+                      <svg *ngSwitchCase="'Cartões'" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg>
+                      <svg *ngSwitchCase="'Investimentos'" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg>
+                      <svg *ngSwitchCase="'Metas'" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg>
+                    </ng-container>
+                  </button>
+                  <div class="sidebar-rail__admin" data-tooltip="Administração">ADM</div>
+                </div>
+              </div>
+
+              <div class="sidebar-showcase__variant">
+                <div class="sidebar-showcase__label">Ícone + nome</div>
+                <p class="sidebar-showcase__description">Use no estado intermediário, quando já existe espaço para clareza maior sem abrir todos os grupos.</p>
+                <aside class="mock-screen__side mock-screen__side--isolated profile-sidebar profile-sidebar--compact">
+                  <div class="side-brand">
+                    <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                    <div class="side-brand__text">
+                      <strong>Investindo em</strong>
+                      <strong>Negócios</strong>
+                    </div>
+                  </div>
+                  <div class="side-divider"></div>
+                  <nav class="side-nav">
+                    <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                    <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                    <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                    <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em></button>
+                    <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                    <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                    <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+                    <div class="side-nav__section side-nav__section--compact-admin">
+                      <div class="side-nav__section-title">Administração</div>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 6 6v5c0 3.8 2.2 7.2 6 9.5 3.8-2.3 6-5.7 6-9.5V6l-6-2.5Z"></path><path d="M12 8v6"></path><path d="M12 14h3"></path></svg></i><em>Administração</em></button>
+                    </div>
+                  </nav>
+                </aside>
+              </div>
+
+              <div class="sidebar-showcase__variant">
+                <div class="sidebar-showcase__label">Completa com grupos</div>
+                <p class="sidebar-showcase__description">Use quando a largura permitir a navegação completa, com seções abertas e maior profundidade por perfil.</p>
+                <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-practices-light profile-sidebar">
+                  <div class="side-brand">
+                    <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                    <div class="side-brand__text">
+                      <strong>Investindo em</strong>
+                      <strong>Negócios</strong>
+                    </div>
+                  </div>
+                  <div class="side-divider"></div>
+                  <nav class="side-nav side-nav--grouped">
+                    <div class="side-nav__section">
+                      <div class="side-nav__section-title">Operação</div>
+                      <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                    </div>
+                    <div class="side-nav__section">
+                      <div class="side-nav__section-title">Análise e evolução</div>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                    </div>
+                    <div class="side-nav__section">
+                      <div class="side-nav__section-title">Administração</div>
+                      <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 6 6v5c0 3.8 2.2 7.2 6 9.5 3.8-2.3 6-5.7 6-9.5V6l-6-2.5Z"></path><path d="M12 8v6"></path><path d="M12 14h3"></path></svg></i><em>Usuários e sistema</em></button>
+                    </div>
+                  </nav>
+                </aside>
+              </div>
+            </div>
+          </article>
+
+          <article class="sidebar-adaptations__card">
+            <div class="sidebar-adaptations__header">
+              <strong>Mobile e web menor</strong>
+              <button type="button" class="sidebar-adaptations__action" (click)="toggleMobileDrawer()">
+                {{ isMobileDrawerOpen ? 'Fechar drawer' : 'Abrir drawer' }}
+              </button>
+            </div>
+            <div class="mobile-sidebar-shell">
+              <div class="mobile-sidebar-shell__screen">
+                <div class="mobile-sidebar-shell__topbar">
+                  <button type="button" class="mobile-sidebar-shell__menu" (click)="toggleMobileDrawer()" aria-label="Abrir menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </button>
+                  <div class="mobile-sidebar-shell__actions">
+                    <button type="button" class="mobile-sidebar-shell__icon mobile-sidebar-shell__icon--badge" aria-label="Notificações">
+                      <i aria-hidden="true">20</i>
+                    </button>
+                    <button type="button" class="mobile-sidebar-shell__icon" aria-label="Alternar tema"></button>
+                    <div class="mobile-sidebar-shell__user">
+                      <span>TS</span>
+                      <strong>Thiago Henrique</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="mobile-sidebar-shell__content">
+                  <small>Resumo financeiro</small>
+                  <h4>Visão geral de março de 2026</h4>
+                  <p>Combine receitas, despesas e cartões para saber o quanto pode gastar.</p>
+                  <div class="mobile-sidebar-shell__cards">
+                    <div><strong>Saldo disponível real</strong><span>R$ 0,00</span></div>
+                    <div><strong>Patrimônio líquido</strong><span>R$ 0,00</span></div>
+                    <div><strong>Total receitas</strong><span>R$ 0,00</span></div>
+                    <div><strong>Total despesas</strong><span>R$ 0,00</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="mobile-sidebar-shell__backdrop" *ngIf="isMobileDrawerOpen" (click)="toggleMobileDrawer()"></div>
+              <div class="mobile-sidebar" [class.is-open]="isMobileDrawerOpen">
+                <div class="mobile-sidebar__top mobile-sidebar__top--drawer">
+                  <div class="mobile-sidebar__brandline">
+                    <img src="assets/logoHeaderInvestindoemNegocios2.png" alt="Logo Investindo em Negócios" />
+                    <div class="mobile-sidebar__brandtext">
+                      <strong>Investindo em Negócios</strong>
+                    </div>
+                  </div>
+                  <button type="button" class="mobile-sidebar__close mobile-sidebar__close--icon" (click)="toggleMobileDrawer()" aria-label="Fechar menu">
+                    <span></span>
+                    <span></span>
+                  </button>
+                </div>
+                <div class="side-divider"></div>
+                <div class="mobile-sidebar__nav">
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Dashboard'" (click)="setActiveMobileItem('Dashboard'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Despesas'" (click)="setActiveMobileItem('Despesas'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Receitas'" (click)="setActiveMobileItem('Receitas'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Calendário'" (click)="setActiveMobileItem('Calendário'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M7 3.5v4"></path><path d="M17 3.5v4"></path><path d="M3.5 9.5h17"></path><path d="M8 13h3"></path><path d="M13 13h3"></path><path d="M8 17h3"></path></svg></i><em>Calendário</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Cartões'" (click)="setActiveMobileItem('Cartões'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Contas e carteiras'" (click)="setActiveMobileItem('Contas e carteiras'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Categorias'" (click)="setActiveMobileItem('Categorias'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></i><em>Categorias</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Investimentos'" (click)="setActiveMobileItem('Investimentos'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Metas'" (click)="setActiveMobileItem('Metas'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M15.5 8.5 20 4"></path><path d="M16 4h4v4"></path></svg></i><em>Metas</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Empréstimos'" (click)="setActiveMobileItem('Empréstimos'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14" rx="2.5"></rect><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></i><em>Empréstimos</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Fechamento mensal'" (click)="setActiveMobileItem('Fechamento mensal'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Assistente financeiro'" (click)="setActiveMobileItem('Assistente financeiro'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Minha assinatura'" (click)="setActiveMobileItem('Minha assinatura'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2.5"></rect><path d="M8 8.5h8"></path><path d="M8 12h6"></path><path d="m11.5 15.5 1.2.8-.4-1.4 1.1-.9h-1.4l-.5-1.3-.4 1.3H9.7l1.1.9-.4 1.4Z"></path></svg></i><em>Minha assinatura</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Calculadoras'" (click)="setActiveMobileItem('Calculadoras'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><path d="M9 7.5h6"></path><path d="M9 11.5h2"></path><path d="M13 11.5h2"></path><path d="M9 15.5h2"></path><path d="M13 15.5h2"></path></svg></i><em>Calculadoras</em></button>
+                  <button type="button" class="side-nav__item" [class.is-active]="activeMobileItem === 'Admin'" (click)="setActiveMobileItem('Admin'); toggleMobileDrawer()"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 6 6v5c0 3.8 2.2 7.2 6 9.5 3.8-2.3 6-5.7 6-9.5V6l-6-2.5Z"></path><path d="M12 8v6"></path><path d="M12 14h3"></path></svg></i><em>Admin</em></button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="sidebar-subsection">
+        <div class="section-heading section-heading--compact">
+          <h3>Dark refinada</h3>
+          <p>Aqui a base dark fica menos pesada, com mais respiro, melhor separação e uma administração mais discreta para perfis raros.</p>
+        </div>
+        <div class="sidebar-showcase sidebar-showcase--double">
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Dark + Heurísticas</div>
+            <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-dark mock-screen__side--isolated-practices">
+              <div class="side-brand">
+                <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios.png" alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <nav class="side-nav side-nav--grouped">
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Operação</div>
+                  <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Análise e evolução</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Conta</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em></button>
+                </div>
+              </nav>
+            </aside>
+          </div>
+
+          <div class="sidebar-showcase__variant">
+            <div class="sidebar-showcase__label">Dark elegante</div>
+            <aside class="mock-screen__side mock-screen__side--isolated mock-screen__side--isolated-dark-elegant mock-screen__side--isolated-practices">
+              <div class="side-brand">
+                <img class="side-brand__logo" src="assets/logoHeaderInvestindoemNegocios.png" alt="Logo Investindo em Negócios" />
+                <div class="side-brand__text">
+                  <strong>Investindo em</strong>
+                  <strong>Negócios</strong>
+                </div>
+              </div>
+              <div class="side-divider"></div>
+              <nav class="side-nav side-nav--grouped">
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Operação</div>
+                  <button type="button" class="side-nav__item is-active"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="10" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="16" width="7" height="4" rx="2"></rect></svg></i><em>Dashboard</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15"></path><path d="m6.5 13.5 5.5 5.5 5.5-5.5"></path></svg></i><em>Despesas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20V5"></path><path d="m6.5 10.5 5.5-5.5 5.5 5.5"></path></svg></i><em>Receitas</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6.5" width="17" height="11" rx="2.5"></rect><path d="M3.5 10.5h17"></path><path d="M7 14h4"></path></svg></i><em>Cartões</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h12a3 3 0 0 1 3 3v4a2.5 2.5 0 0 1-2.5 2.5h-10A2.5 2.5 0 0 1 4.5 15.5Z"></path><path d="M4.5 8.5V7A2.5 2.5 0 0 1 7 4.5h7.5"></path><path d="M15 12.5h4.5"></path></svg></i><em>Contas e carteiras</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Análise e evolução</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17.5h16"></path><path d="m6 14 4-4 3 3 5-6"></path><path d="M18 7h3v3"></path></svg></i><em>Investimentos</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5h14"></path><path d="M7.5 15.5V11"></path><path d="M12 15.5V7.5"></path><path d="M16.5 15.5V9.5"></path><path d="M6 6.5h12"></path></svg></i><em>Fechamento mensal</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 7.5h12a2.5 2.5 0 0 1 2.5 2.5v5A2.5 2.5 0 0 1 18 17.5h-6l-4 3v-3H6A2.5 2.5 0 0 1 3.5 15v-5A2.5 2.5 0 0 1 6 7.5Z"></path><path d="m14.5 9.5.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"></path></svg></i><em>Assistente financeiro</em></button>
+                </div>
+                <div class="side-nav__section">
+                  <div class="side-nav__section-title">Conta</div>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c1.7-3 4-4.5 7-4.5s5.3 1.5 7 4.5"></path></svg></i><em>Perfil</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 10V7.8a4.5 4.5 0 1 1 9 0V10"></path><rect x="5" y="10" width="14" height="10" rx="2.5"></rect><path d="M12 13.5v3"></path></svg></i><em>Segurança</em></button>
+                  <button type="button" class="side-nav__item"><i aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="6.5" ry="2.5"></ellipse><path d="M5.5 6.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path><path d="M5.5 11.5v5c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5v-5"></path></svg></i><em>Exportações e dados</em></button>
+                </div>
+                <div class="side-nav__section side-nav__section--compact-admin">
+                  <div class="side-nav__section-title">Gestão do sistema</div>
+                  <div class="side-nav__admin-pill">3 módulos restritos a perfis administrativos</div>
+                </div>
+              </nav>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'topbar'">
+    <div class="section-heading">
+      <h2>AppTopbar</h2>
+      <p>Decisão isolada do topo do shell. Aqui a avaliação é contexto, notificações, identificação do usuário e saída.</p>
+    </div>
+    <article class="card option-card shell-component">
+      <div class="shell-component__header">
+        <div>
+          <p class="eyebrow">Componente isolado</p>
+          <h3>Topbar</h3>
+        </div>
+        <app-status-badge label="Shell principal" variant="warning"></app-status-badge>
+      </div>
+      <div class="shell-component__preview shell-component__preview--topbar">
+        <div class="topbar-showcase">
+          <div class="topbar-showcase__variant">
+            <div class="topbar-showcase__label">Light</div>
+            <div class="shell-topbar shell-topbar--isolated">
+              <div class="shell-topbar__left">
+                <div class="shell-context">
+                  <small>Resumo financeiro</small>
+                  <strong>Visão geral de março de 2026</strong>
+                </div>
+              </div>
+              <div class="shell-topbar__right">
+                <div class="shell-notification-menu">
+                  <button type="button" class="shell-icon shell-icon--badge" aria-label="Sem notificações" aria-haspopup="dialog" [attr.aria-expanded]="activeTopbarNotifications === 'light'" aria-controls="topbar-notifications-light" (click)="toggleTopbarNotifications('light')">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 17.5H9A2.5 2.5 0 0 1 6.5 15v-.5c0-1.3.5-2.5 1.4-3.4l.6-.6V9a3.5 3.5 0 1 1 7 0v1.5l.6.6c.9.9 1.4 2.1 1.4 3.4v.5A2.5 2.5 0 0 1 15 17.5Z"></path><path d="M10 19a2 2 0 0 0 4 0"></path></svg>
+                  </button>
+                  <div id="topbar-notifications-light" class="shell-notification-dropdown" role="dialog" aria-label="Central de notificações" *ngIf="activeTopbarNotifications === 'light'">
+                    <div class="shell-notification-dropdown__header">
+                      <strong>Notificações</strong>
+                      <small>Nada novo por agora</small>
+                    </div>
+                    <div class="shell-notification-dropdown__divider"></div>
+                    <div class="shell-notification-item shell-notification-item--empty">
+                      <strong>Inbox em dia</strong>
+                      <small>Quando surgir um alerta, ele aparece aqui.</small>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="shell-icon shell-icon--theme" aria-label="Alternar tema" (click)="toggleTopbarTheme('light')">
+                  <svg *ngIf="!isLightPreviewDarkMode" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 14.5A6.5 6.5 0 1 1 9.5 6a5.5 5.5 0 0 0 8.5 8.5Z"></path></svg>
+                  <svg *ngIf="isLightPreviewDarkMode" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v2.2"></path><path d="M12 18.3v2.2"></path><path d="m5.7 5.7 1.6 1.6"></path><path d="m16.7 16.7 1.6 1.6"></path><path d="M3.5 12h2.2"></path><path d="M18.3 12h2.2"></path><path d="m5.7 18.3 1.6-1.6"></path><path d="m16.7 7.3 1.6-1.6"></path><circle cx="12" cy="12" r="3.7"></circle></svg>
+                </button>
+                <div class="shell-user-menu">
+                  <button type="button" class="shell-user" aria-label="Abrir menu do usuário" aria-haspopup="menu" [attr.aria-expanded]="activeTopbarMenu === 'light'" aria-controls="topbar-user-menu-light" (click)="toggleTopbarUserMenu('light')">
+                    <div class="shell-user__avatar">HS</div>
+                    <div>
+                      <strong>Henrique Santos</strong>
+                      <small>Plano Controle</small>
+                    </div>
+                    <span class="shell-user__chevron" aria-hidden="true"></span>
+                  </button>
+                  <div id="topbar-user-menu-light" class="shell-user-dropdown" role="menu" aria-label="Menu do usuário" *ngIf="activeTopbarMenu === 'light'">
+                    <div class="shell-user-dropdown__header">
+                      <strong>Henrique Santos</strong>
+                      <small>henrique&#64;investindo.com</small>
+                    </div>
+                    <div class="shell-user-dropdown__divider"></div>
+                    <button type="button" role="menuitem">Perfil</button>
+                    <button type="button" role="menuitem">Preferências</button>
+                    <button type="button" role="menuitem">Segurança</button>
+                    <div class="shell-user-dropdown__divider"></div>
+                    <button type="button" role="menuitem" class="is-danger">Sair</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="topbar-showcase__description">Sem alertas pendentes. Estado base para navegação diária sem ruído visual.</p>
+          </div>
+
+          <div class="topbar-showcase__variant">
+            <div class="topbar-showcase__label">Dark</div>
+            <div class="shell-topbar shell-topbar--isolated shell-topbar--dark">
+              <div class="shell-topbar__left">
+                <div class="shell-context">
+                  <small>Resumo financeiro</small>
+                  <strong>Visão geral de março de 2026</strong>
+                </div>
+              </div>
+              <div class="shell-topbar__right">
+                <div class="shell-notification-menu">
+                  <button type="button" class="shell-icon shell-icon--badge shell-icon--has-notification" aria-label="Notificações" aria-haspopup="dialog" [attr.aria-expanded]="activeTopbarNotifications === 'dark'" aria-controls="topbar-notifications-dark" (click)="toggleTopbarNotifications('dark')">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 17.5H9A2.5 2.5 0 0 1 6.5 15v-.5c0-1.3.5-2.5 1.4-3.4l.6-.6V9a3.5 3.5 0 1 1 7 0v1.5l.6.6c.9.9 1.4 2.1 1.4 3.4v.5A2.5 2.5 0 0 1 15 17.5Z"></path><path d="M10 19a2 2 0 0 0 4 0"></path></svg>
+                    <i>3</i>
+                  </button>
+                  <div id="topbar-notifications-dark" class="shell-notification-dropdown shell-notification-dropdown--dark" role="dialog" aria-label="Central de notificações" *ngIf="activeTopbarNotifications === 'dark'">
+                    <div class="shell-notification-dropdown__header">
+                      <strong>Notificações</strong>
+                      <small>3 pendências importantes</small>
+                    </div>
+                    <div class="shell-notification-dropdown__divider"></div>
+                    <div class="shell-notification-item">
+                      <strong>Fechamento mensal aguardando revisão</strong>
+                      <small>Há 12 min</small>
+                    </div>
+                    <div class="shell-notification-item">
+                      <strong>Receita pendente acima da meta</strong>
+                      <small>Hoje, 08:24</small>
+                    </div>
+                    <div class="shell-notification-item">
+                      <strong>Cartão Itaú vence amanhã</strong>
+                      <small>Alerta financeiro</small>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="shell-icon shell-icon--theme" aria-label="Alternar tema" (click)="toggleTopbarTheme('dark')">
+                  <svg *ngIf="!isDarkPreviewDarkMode" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 14.5A6.5 6.5 0 1 1 9.5 6a5.5 5.5 0 0 0 8.5 8.5Z"></path></svg>
+                  <svg *ngIf="isDarkPreviewDarkMode" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v2.2"></path><path d="M12 18.3v2.2"></path><path d="m5.7 5.7 1.6 1.6"></path><path d="m16.7 16.7 1.6 1.6"></path><path d="M3.5 12h2.2"></path><path d="M18.3 12h2.2"></path><path d="m5.7 18.3 1.6-1.6"></path><path d="m16.7 7.3 1.6-1.6"></path><circle cx="12" cy="12" r="3.7"></circle></svg>
+                </button>
+                <div class="shell-user-menu">
+                  <button type="button" class="shell-user" aria-label="Abrir menu do usuário" aria-haspopup="menu" [attr.aria-expanded]="activeTopbarMenu === 'dark'" aria-controls="topbar-user-menu-dark" (click)="toggleTopbarUserMenu('dark')">
+                    <div class="shell-user__avatar">HS</div>
+                    <div>
+                      <strong>Henrique Santos</strong>
+                      <small>Plano Controle</small>
+                    </div>
+                    <span class="shell-user__chevron" aria-hidden="true"></span>
+                  </button>
+                  <div id="topbar-user-menu-dark" class="shell-user-dropdown" role="menu" aria-label="Menu do usuário" *ngIf="activeTopbarMenu === 'dark'">
+                    <div class="shell-user-dropdown__header">
+                      <strong>Henrique Santos</strong>
+                      <small>henrique&#64;investindo.com</small>
+                    </div>
+                    <div class="shell-user-dropdown__divider"></div>
+                    <button type="button" role="menuitem">Perfil</button>
+                    <button type="button" role="menuitem">Preferências</button>
+                    <button type="button" role="menuitem">Segurança</button>
+                    <div class="shell-user-dropdown__divider"></div>
+                    <button type="button" role="menuitem" class="is-danger">Sair</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="topbar-showcase__description">Com alerta ativo. O badge chama atenção sem competir com o contexto e o acesso do usuário.</p>
+          </div>
+
+          <div class="topbar-showcase__variant">
+            <div class="topbar-showcase__label">Web e Mobile</div>
+            <div class="topbar-responsive-showcase">
+              <div class="topbar-responsive-card">
+                <div class="topbar-responsive-card__label">Web menor</div>
+                <div class="shell-topbar shell-topbar--isolated shell-topbar--compact">
+                  <button type="button" class="shell-icon shell-icon--menu" aria-label="Abrir navegação">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+                  </button>
+                  <div class="shell-topbar__right shell-topbar__right--compact">
+                    <button type="button" class="shell-icon shell-icon--badge shell-icon--has-notification" aria-label="Notificações">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 17.5H9A2.5 2.5 0 0 1 6.5 15v-.5c0-1.3.5-2.5 1.4-3.4l.6-.6V9a3.5 3.5 0 1 1 7 0v1.5l.6.6c.9.9 1.4 2.1 1.4 3.4v.5A2.5 2.5 0 0 1 15 17.5Z"></path><path d="M10 19a2 2 0 0 0 4 0"></path></svg>
+                      <i>3</i>
+                    </button>
+                    <button type="button" class="shell-icon shell-icon--theme" aria-label="Alternar tema">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 14.5A6.5 6.5 0 1 1 9.5 6a5.5 5.5 0 0 0 8.5 8.5Z"></path></svg>
+                    </button>
+                    <button type="button" class="shell-user shell-user--compact" aria-label="Abrir menu do usuário">
+                      <div class="shell-user__avatar">HS</div>
+                      <span class="shell-user__chevron" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <p class="topbar-showcase__description">Quando a largura cai, a navegação vira hambúrguer e o topo preserva só ações essenciais.</p>
+              </div>
+
+              <div class="topbar-responsive-card">
+                <div class="topbar-responsive-card__label">Mobile</div>
+                <div class="shell-topbar shell-topbar--isolated shell-topbar--compact shell-topbar--mobile">
+                  <button type="button" class="shell-icon shell-icon--menu" aria-label="Abrir navegação">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+                  </button>
+                  <div class="shell-topbar__right shell-topbar__right--compact">
+                    <button type="button" class="shell-icon shell-icon--badge shell-icon--has-notification" aria-label="Notificações">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 17.5H9A2.5 2.5 0 0 1 6.5 15v-.5c0-1.3.5-2.5 1.4-3.4l.6-.6V9a3.5 3.5 0 1 1 7 0v1.5l.6.6c.9.9 1.4 2.1 1.4 3.4v.5A2.5 2.5 0 0 1 15 17.5Z"></path><path d="M10 19a2 2 0 0 0 4 0"></path></svg>
+                      <i>3</i>
+                    </button>
+                    <button type="button" class="shell-user shell-user--compact" aria-label="Abrir menu do usuário">
+                      <div class="shell-user__avatar">HS</div>
+                    </button>
+                  </div>
+                </div>
+                <p class="topbar-showcase__description">No mobile o shell fica mínimo: menu, notificações e entrada para conta do usuário.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="shell-component__note">Aqui o objetivo é parecer produto maduro, não toolbar de sistema administrativo nem landing page.</p>
+    </article>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'page-header'">
+    <div class="section-heading">
+      <h2>PageHeader</h2>
+      <p>Decisão isolada do cabeçalho da página. Aqui a avaliação é contexto, status e principal ação do ciclo.</p>
+    </div>
+    <article class="card option-card shell-component">
+      <div class="shell-component__header">
+        <div>
+          <p class="eyebrow">Componente isolado</p>
+          <h3>Page Header</h3>
+        </div>
+        <app-status-badge label="Leitura do contexto" variant="info"></app-status-badge>
+      </div>
+      <div class="shell-component__preview">
+        <div class="mock-screen__top mock-screen__top--rich mock-screen__top--isolated">
+          <div>
+            <small>Março 2026</small>
+            <strong>Saldo projetado saudável e margem operacional protegida</strong>
+          </div>
+          <div class="mock-chip-row">
+            <span class="mock-chip mock-chip--success">Saldo positivo</span>
+            <span class="mock-chip">Atualizado agora</span>
+            <button type="button" class="btn-primary sm">Fechar mês</button>
+          </div>
+        </div>
+      </div>
+      <p class="shell-component__note">Esse bloco precisa contextualizar a página rápido e abrir a principal decisão do ciclo sem carregar a tela.</p>
+    </article>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'kpi-card'">
+    <div class="section-heading">
+      <h2>KPI Card</h2>
+      <p>Decisão isolada da camada de métricas. Aqui a avaliação é legibilidade, hierarquia e estabilidade para o perfil Basic.</p>
+    </div>
+    <article class="card option-card shell-component">
+      <div class="shell-component__header">
+        <div>
+          <p class="eyebrow">Componente isolado</p>
+          <h3>KPI Card</h3>
+        </div>
+        <app-status-badge label="Densidade base" variant="warning"></app-status-badge>
+      </div>
+      <div class="shell-component__preview">
+        <div class="mock-screen__kpis mock-screen__kpis--isolated">
+          <div class="kpi kpi--income"><small>Receitas</small><strong>R$ 8.450</strong></div>
+          <div class="kpi kpi--expense"><small>Despesas</small><strong>R$ 5.980</strong></div>
+          <div class="kpi kpi--balance"><small>Saldo</small><strong>R$ 2.470</strong></div>
+        </div>
+      </div>
+      <p class="shell-component__note">Os KPIs são a base do Basic. Se eles não estiverem claros e estáveis, o resto do dashboard não sustenta bem os perfis.</p>
+    </article>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'buttons'">
+    <div class="section-heading">
+      <h2>Botões</h2>
+      <p>Inventário real do sistema atual. Aqui ficam só as variantes que já aparecem no produto, organizadas com hierarquia e consistência.</p>
+    </div>
+    <div class="triple-grid">
+      <article class="card option-card option-card--recommended button-card">
+        <div class="button-card__header">
+          <div>
+            <p class="eyebrow">Hoje no sistema</p>
+            <h3>Ações textuais</h3>
+          </div>
+          <app-status-badge label="Base oficial" variant="success"></app-status-badge>
+        </div>
+        <p>
+          Os fluxos atuais usam uma família principal de botões com texto. O objetivo é deixar explícito o papel de cada um e evitar variantes soltas.
+        </p>
+        <div class="button-stack">
+          <div class="button-showcase-row">
+            <div class="button-showcase-row__meta">
+              <strong>Primário</strong>
+              <small>Salvar, criar, confirmar, avançar</small>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="btn-primary">Salvar</button>
+              <button type="button" class="btn-primary sm">Fechar mês</button>
+              <button type="button" class="btn-primary">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none" focusable="false">
+                    <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Nova meta
+              </button>
+            </div>
+          </div>
+          <div class="button-showcase-row">
+            <div class="button-showcase-row__meta">
+              <strong>Secundário</strong>
+              <small>Edição, apoio e gerenciamento</small>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="btn-secondary">Gerenciar</button>
+              <button type="button" class="btn-edit">Editar registro</button>
+              <button type="button" class="btn-ghost">Editar</button>
+              <button type="button" class="ghost">Detalhes</button>
+              <button type="button" class="btn-cancel">Cancelar</button>
+            </div>
+          </div>
+          <div class="button-showcase-row">
+            <div class="button-showcase-row__meta">
+              <strong>Crítico</strong>
+              <small>Alerta, revisão e remoção</small>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="btn-warning">Revisar alerta</button>
+              <button type="button" class="btn-danger">Remover</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card option-card button-card">
+        <div class="button-card__header">
+          <div>
+            <p class="eyebrow">Hoje no sistema</p>
+            <h3>Estados e tamanhos</h3>
+          </div>
+          <app-status-badge label="Uso recorrente" variant="info"></app-status-badge>
+        </div>
+        <p>Os estados atuais precisam continuar previsíveis. Disabled, loading e tamanho `sm` aparecem bastante em modais, listagens e confirmações.</p>
+        <div class="button-state-grid">
+          <div class="button-state-card">
+            <small>Default</small>
+            <button type="button" class="btn-primary">Salvar</button>
+          </div>
+          <div class="button-state-card">
+            <small>Compacto</small>
+            <button type="button" class="btn-primary sm">Aplicar</button>
+          </div>
+          <div class="button-state-card">
+            <small>Disabled</small>
+            <button type="button" class="btn-primary" disabled>Salvar</button>
+          </div>
+          <div class="button-state-card">
+            <small>Loading</small>
+            <button type="button" class="btn-primary" disabled>
+              <span class="button-loading-dot" aria-hidden="true"></span>
+              Salvando...
+            </button>
+          </div>
+          <div class="button-state-card">
+            <small>Ghost</small>
+            <button type="button" class="btn-ghost sm">Fechar</button>
+          </div>
+          <div class="button-state-card">
+            <small>Warning</small>
+            <button type="button" class="btn-warning sm">Pausar</button>
+          </div>
+        </div>
+        <div class="inline-alert">Boa prática: o mesmo tipo de ação deve manter ordem, texto e estado previsíveis em cadastro, tabela e modal.</div>
+      </article>
+
+      <article class="card option-card button-card">
+        <div class="button-card__header">
+          <div>
+            <p class="eyebrow">Hoje no sistema</p>
+            <h3>Ícones e contexto</h3>
+          </div>
+          <app-status-badge label="Listas e cards" variant="warning"></app-status-badge>
+        </div>
+        <p>
+          Os ícones atuais ficam em listas e cards. Eles servem para ações rápidas, mas o fluxo principal continua apoiado em botões com texto.
+        </p>
+        <div class="button-showcase-row">
+          <div class="button-showcase-row__meta">
+            <strong>Ações de ícone</strong>
+            <small>Editar, informação e remoção contextual</small>
+          </div>
+          <div class="button-grid">
+            <button type="button" class="icon-action" aria-label="Ação padrão">⋯</button>
+            <button type="button" class="icon-action icon-action--edit" aria-label="Editar">✏️</button>
+            <button type="button" class="icon-action icon-action--info" aria-label="Mais informações">i</button>
+            <button type="button" class="icon-action icon-action--danger" aria-label="Excluir">🗑</button>
+          </div>
+        </div>
+        <div class="button-showcase-row">
+          <div class="button-showcase-row__meta">
+            <strong>CTA comercial</strong>
+            <small>Aparece em assinatura, pricing e checkout</small>
+          </div>
+          <div class="button-grid">
+            <button type="button" class="btn-primary">Assinar agora</button>
+            <button type="button" class="ghost">Voltar ao checkout</button>
+          </div>
+        </div>
+        <div class="button-principles">
+          <div><strong>Visibilidade:</strong> um CTA dominante por bloco.</div>
+          <div><strong>Consistência:</strong> `ghost` e `btn-ghost` precisam convergir visualmente.</div>
+          <div><strong>Prevenção de erro:</strong> destrutivo sempre separado do primário.</div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-heading section-heading--compact">
+      <h3>Versão dark</h3>
+      <p>Mesma hierarquia, com contraste adaptado para fundo escuro e o mesmo sistema de decisão da versão light.</p>
+    </div>
+    <div class="triple-grid">
+      <article class="card option-card option-card--recommended button-card button-card--dark">
+        <div class="button-card__header">
+          <div>
+            <p class="eyebrow">Hoje no sistema</p>
+            <h3>Ações textuais</h3>
+          </div>
+          <app-status-badge label="Base oficial" variant="success"></app-status-badge>
+        </div>
+        <p>
+          No dark, a hierarquia atual precisa se manter. O ganho aqui é adaptar contraste sem criar um segundo sistema de botões.
+        </p>
+        <div class="button-stack">
+          <div class="button-showcase-row button-showcase-row--dark">
+            <div class="button-showcase-row__meta">
+              <strong>Primário</strong>
+              <small>Salvar, criar, confirmar, avançar</small>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="btn-primary">Salvar</button>
+              <button type="button" class="btn-primary sm">Fechar mês</button>
+              <button type="button" class="btn-primary">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none" focusable="false">
+                    <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                Nova meta
+              </button>
+            </div>
+          </div>
+          <div class="button-showcase-row button-showcase-row--dark">
+            <div class="button-showcase-row__meta">
+              <strong>Secundário</strong>
+              <small>Edição, apoio e gerenciamento</small>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="btn-secondary">Gerenciar</button>
+              <button type="button" class="btn-edit">Editar registro</button>
+              <button type="button" class="btn-ghost">Editar</button>
+              <button type="button" class="ghost">Detalhes</button>
+              <button type="button" class="btn-cancel">Cancelar</button>
+            </div>
+          </div>
+          <div class="button-showcase-row button-showcase-row--dark">
+            <div class="button-showcase-row__meta">
+              <strong>Crítico</strong>
+              <small>Alerta, revisão e remoção</small>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="btn-warning">Revisar alerta</button>
+              <button type="button" class="btn-danger">Remover</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card option-card button-card button-card--dark">
+        <div class="button-card__header">
+          <div>
+            <p class="eyebrow">Hoje no sistema</p>
+            <h3>Estados e tamanhos</h3>
+          </div>
+          <app-status-badge label="Uso recorrente" variant="info"></app-status-badge>
+        </div>
+        <p>No dark, os estados atuais continuam precisando de leitura clara. Disabled e loading não podem sumir, e o `sm` precisa seguir legível.</p>
+        <div class="button-state-grid">
+          <div class="button-state-card button-state-card--dark">
+            <small>Default</small>
+            <button type="button" class="btn-primary">Salvar</button>
+          </div>
+          <div class="button-state-card button-state-card--dark">
+            <small>Compacto</small>
+            <button type="button" class="btn-primary sm">Aplicar</button>
+          </div>
+          <div class="button-state-card button-state-card--dark">
+            <small>Disabled</small>
+            <button type="button" class="btn-primary" disabled>Salvar</button>
+          </div>
+          <div class="button-state-card button-state-card--dark">
+            <small>Loading</small>
+            <button type="button" class="btn-primary" disabled>
+              <span class="button-loading-dot" aria-hidden="true"></span>
+              Salvando...
+            </button>
+          </div>
+          <div class="button-state-card button-state-card--dark">
+            <small>Ghost</small>
+            <button type="button" class="btn-ghost sm">Fechar</button>
+          </div>
+          <div class="button-state-card button-state-card--dark">
+            <small>Warning</small>
+            <button type="button" class="btn-warning sm">Pausar</button>
+          </div>
+        </div>
+        <div class="inline-alert inline-alert--dark">Boa prática: manter a mesma ordem e semântica do light evita erro quando o usuário alterna de tema.</div>
+      </article>
+
+      <article class="card option-card button-card button-card--dark">
+        <div class="button-card__header">
+          <div>
+            <p class="eyebrow">Hoje no sistema</p>
+            <h3>Ícones e contexto</h3>
+          </div>
+          <app-status-badge label="Listas e cards" variant="warning"></app-status-badge>
+        </div>
+        <p>Os mesmos botões de ícone precisam sobreviver no dark com borda, volume e contraste controlados. O CTA comercial continua excepcional.</p>
+        <div class="button-showcase-row button-showcase-row--dark">
+          <div class="button-showcase-row__meta">
+            <strong>Ações de ícone</strong>
+            <small>Editar, informação e remoção contextual</small>
+          </div>
+          <div class="button-grid">
+            <button type="button" class="icon-action" aria-label="Ação padrão">⋯</button>
+            <button type="button" class="icon-action icon-action--edit" aria-label="Editar">✏️</button>
+            <button type="button" class="icon-action icon-action--info" aria-label="Mais informações">i</button>
+            <button type="button" class="icon-action icon-action--danger" aria-label="Excluir">🗑</button>
+          </div>
+        </div>
+        <div class="button-showcase-row button-showcase-row--dark">
+          <div class="button-showcase-row__meta">
+            <strong>CTA comercial</strong>
+            <small>Usado em assinatura, pricing e checkout</small>
+          </div>
+          <div class="button-grid">
+            <button type="button" class="btn-primary">Assinar agora</button>
+            <button type="button" class="ghost">Voltar ao checkout</button>
+          </div>
+        </div>
+        <div class="button-principles button-principles--dark">
+          <div><strong>Visibilidade:</strong> um CTA dominante por bloco.</div>
+          <div><strong>Consistência:</strong> `ghost` e `btn-ghost` precisam convergir visualmente.</div>
+          <div><strong>Prevenção de erro:</strong> o destrutivo continua isolado.</div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-heading section-heading--compact">
+      <h3>Onde usar no produto</h3>
+      <p>Guia rápido para manter a mesma hierarquia em dashboard, operações, configurações e checkout.</p>
+    </div>
+    <div class="button-usage-grid">
+      <article class="card option-card button-usage-card">
+        <p class="eyebrow">Operação</p>
+        <h3>Dashboard e lançamentos</h3>
+        <div class="button-usage-list">
+          <div><strong>Primário:</strong> `Nova despesa`, `Nova receita`, `Fechar mês`, `Salvar`.</div>
+          <div><strong>Ghost / cancel:</strong> `Ver detalhes`, `Gerenciar contas`, `Fechar`, `Cancelar`.</div>
+          <div><strong>Ícone info:</strong> ajuda contextual em cards e módulos analíticos.</div>
+        </div>
+      </article>
+
+      <article class="card option-card button-usage-card">
+        <p class="eyebrow">Gestão</p>
+        <h3>Contas, cartões, categorias, metas</h3>
+        <div class="button-usage-list">
+          <div><strong>Primário:</strong> criar e salvar registro.</div>
+          <div><strong>Secondary / edit:</strong> `Gerenciar`, `Editar registro`, `Registrar aporte`.</div>
+          <div><strong>Danger / warning:</strong> `Excluir`, `Pausar`, `Revisar alerta`, `Excluir recorrência`.</div>
+        </div>
+      </article>
+
+      <article class="card option-card button-usage-card">
+        <p class="eyebrow">Listas</p>
+        <h3>Tabelas, cards e linhas</h3>
+        <div class="button-usage-list">
+          <div><strong>Icon action:</strong> usar para editar, abrir informação e remover item.</div>
+          <div><strong>Não usar:</strong> ícone sozinho como CTA principal do fluxo.</div>
+          <div><strong>Regra:</strong> destrutivo sempre separado do primário.</div>
+        </div>
+      </article>
+
+      <article class="card option-card button-usage-card">
+        <p class="eyebrow">Comercial</p>
+        <h3>Assinatura, pricing e checkout</h3>
+        <div class="button-usage-list">
+          <div><strong>Primário:</strong> `Assinar agora`, `Continuar`, `Concluir`.</div>
+          <div><strong>Ghost:</strong> `Voltar ao checkout`, `Ver planos`.</div>
+          <div><strong>Regra:</strong> só nessas áreas o CTA pode ter energia comercial mais alta.</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'forms'">
+    <div class="section-heading">
+      <h2>Inputs e filtros</h2>
+      <p>O ganho aqui vem mais do agrupamento do que do campo isolado.</p>
+    </div>
+    <div class="triple-grid">
+      <article class="card option-card">
+        <p class="eyebrow">Opção A</p>
+        <h3>Compacta</h3>
+        <p>Boa para listas e análises. Mais rápida, menos confortável para cadastro longo.</p>
+        <div class="filter-bar">
+          <input type="text" placeholder="Buscar lançamento" />
+          <select><option>Status</option></select>
+          <button type="button" class="btn-primary sm">Filtrar</button>
+        </div>
+      </article>
+
+      <article class="card option-card option-card--recommended">
+        <p class="eyebrow">Opção B</p>
+        <h3>Equilibrada</h3>
+        <p>Boa para o app atual: confortável o suficiente em cadastro e enxuta o bastante em filtros.</p>
+        <div class="form-grid">
+          <label><span>Descrição</span><input type="text" placeholder="Ex.: Fatura cartão principal" /></label>
+          <label><span>Categoria</span><select><option>Cartão</option></select></label>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn-cancel">Cancelar</button>
+          <button type="button" class="btn-primary">Salvar</button>
+        </div>
+      </article>
+
+      <article class="card option-card">
+        <p class="eyebrow">Opção C</p>
+        <h3>Painel</h3>
+        <p>Mais container e mais contexto. Boa para admin e configurações, pesada para uso repetitivo.</p>
+        <div class="form-stack">
+          <label><span>Instituição</span><input type="text" placeholder="Nome da instituição" /></label>
+          <label><span>Tipo</span><select><option>Banco</option></select></label>
+          <button type="button" class="btn-primary sm">Adicionar</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'cards'">
+    <div class="section-heading">
+      <h2>Cards e painéis</h2>
+      <p>Três linguagens possíveis para leitura do produto.</p>
+    </div>
+    <div class="triple-grid">
+      <article class="card option-card">
+        <p class="eyebrow">Opção A</p>
+        <h3>Card limpo</h3>
+        <strong class="metric">R$ 8.420,14</strong>
+        <p>Boa para leitura financeira neutra.</p>
+      </article>
+
+      <article class="panel option-card option-card--recommended">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Opção B</p>
+            <h3>Painel com header</h3>
+          </div>
+          <button type="button" class="btn-ghost sm">Editar</button>
+        </div>
+        <p>Melhor para preferências, segurança, LGPD e blocos administrativos.</p>
+      </article>
+
+      <article class="status-panel option-card">
+        <p class="eyebrow">Opção C</p>
+        <h3>Status enfatizado</h3>
+        <p>Funciona muito bem para billing, pendência e mensagens de jornada.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'tables'">
+    <div class="section-heading">
+      <h2>Tabelas e listas</h2>
+      <p>Separadas por tipo de leitura, não só por estética.</p>
+    </div>
+    <div class="dual-grid">
+      <article class="card option-card option-card--recommended">
+        <p class="eyebrow">Opção A</p>
+        <h3>Operacional padrão</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Lançamento</th>
+                <th>Status</th>
+                <th>Valor</th>
+                <th class="actions-col">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of rows">
+                <td>{{ row.name }}</td>
+                <td><app-status-badge [label]="row.status"></app-status-badge></td>
+                <td>{{ row.amount }}</td>
+                <td class="actions-col">
+                  <button type="button" class="icon-action icon-action--edit" aria-label="Editar">✏️</button>
+                  <button type="button" class="icon-action icon-action--danger" aria-label="Excluir">🗑</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card option-card">
+        <p class="eyebrow">Opção B</p>
+        <h3>Lista em blocos</h3>
+        <div class="list-stack">
+          <div class="list-item" *ngFor="let row of rows">
+            <div>
+              <strong>{{ row.name }}</strong>
+              <small>{{ row.amount }}</small>
+            </div>
+            <app-status-badge [label]="row.status"></app-status-badge>
+          </div>
+        </div>
+        <p class="list-note">Melhor no mobile, pior para comparar muitas colunas.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'states'">
+    <div class="section-heading">
+      <h2>Estados</h2>
+      <p>O produto precisa comunicar vazio, sucesso, pendência e erro sem ruído.</p>
+    </div>
+    <div class="triple-grid">
+      <article class="card state-card">
+        <app-empty-state
+          title="Nenhuma posição encontrada"
+          description="Comece importando uma planilha ou cadastrando manualmente."
+          ctaLabel="Criar posição"
+          icon="📈"></app-empty-state>
+      </article>
+
+      <article class="card state-card">
+        <div class="inline-alert success">
+          Tudo certo. O padrão visual desta família já está consistente.
+        </div>
+      </article>
+
+      <article class="card state-card">
+        <div class="inline-alert error">
+          Não foi possível concluir a importação. Revise o arquivo e tente novamente.
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'modals'">
+    <div class="section-heading">
+      <h2>Modais</h2>
+      <p>Separar modais curtos de decisão e modais de jornada maior.</p>
+    </div>
+    <article class="card option-card">
+      <div class="button-grid">
+        <button type="button" class="btn-danger" (click)="showConfirmModal = true">Confirmação destrutiva</button>
+        <button type="button" class="btn-primary" (click)="showSignupStyleModal = true">Modal de jornada</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="lab-section" *ngIf="currentSection === 'navigation'">
+    <div class="section-heading">
+      <h2>Navegação e shell</h2>
+      <p>Dois contextos claros: shell desktop e navegação mobile.</p>
+    </div>
+    <div class="dual-grid">
+      <article class="card shell-card option-card option-card--recommended">
+        <p class="eyebrow">Opção A</p>
+        <h3>Shell desktop atual</h3>
+        <div class="shell-preview">
+          <aside class="shell-preview__sidebar">
+            <div class="shell-preview__brand">Investindo</div>
+            <nav class="shell-preview__nav">
+              <a class="is-active">Dashboard</a>
+              <a>Despesas</a>
+              <a>Receitas</a>
+              <a>Metas</a>
+              <a>Investimentos</a>
+            </nav>
+          </aside>
+          <div class="shell-preview__content">
+            <div class="shell-preview__topbar">
+              <strong>Dashboard</strong>
+              <span>Março 2026</span>
+            </div>
+            <div class="shell-preview__surface">
+              <div class="shell-preview__metric"></div>
+              <div class="shell-preview__metric"></div>
+              <div class="shell-preview__metric"></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card shell-card option-card">
+        <p class="eyebrow">Opção B</p>
+        <h3>Navegação mobile destacada</h3>
+        <div class="mobile-nav-preview">
+          <div class="mobile-nav-preview__screen">
+            <div class="mobile-nav-preview__content"></div>
+            <div class="mobile-nav-preview__bar">
+              <span class="is-active">Home</span>
+              <span>Despesas</span>
+              <span>Receitas</span>
+              <span>Perfil</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</section>
+
+<div class="modal__backdrop" *ngIf="showConfirmModal" (click)="showConfirmModal = false">
+  <div class="modal__card modal__card--compact" (click)="$event.stopPropagation()">
+    <p class="eyebrow">Confirmação destrutiva</p>
+    <h3>Remover lançamento?</h3>
+    <p>Use este padrão para decisões irreversíveis com texto curto e ações muito claras.</p>
+    <div class="actions">
+      <button type="button" class="btn-cancel" (click)="showConfirmModal = false">Cancelar</button>
+      <button type="button" class="btn-danger" (click)="showConfirmModal = false">Remover</button>
+    </div>
+  </div>
+</div>
+
+<div class="signup-modal" *ngIf="showSignupStyleModal">
+  <div class="signup-modal__backdrop" (click)="showSignupStyleModal = false"></div>
+  <div class="signup-modal__dialog">
+    <div class="signup-modal__left">
+      <p class="eyebrow">Modal de jornada</p>
+      <h3>Ative o plano Controle</h3>
+      <p>Use este padrão quando a experiência precisar de contexto, benefícios e CTA principal mais forte.</p>
+      <ul class="signup-modal__benefits">
+        <li>Menos improviso no mês</li>
+        <li>Mais previsibilidade operacional</li>
+        <li>Leitura mais clara do saldo real</li>
+      </ul>
+    </div>
+    <div class="signup-modal__right">
+      <div class="signup-modal__right-header">
+        <strong>Resumo da contratação</strong>
+      </div>
+      <div class="modal-form">
+        <label>
+          <span>E-mail</span>
+          <input type="email" placeholder="voce@empresa.com" />
+        </label>
+        <label>
+          <span>Ciclo</span>
+          <select>
+            <option>Mensal</option>
+            <option>Anual</option>
+          </select>
+        </label>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-cancel" (click)="showSignupStyleModal = false">Fechar</button>
+        <button type="button" class="btn-primary" (click)="showSignupStyleModal = false">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
