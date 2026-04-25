@@ -143,13 +143,13 @@ export const routes: Routes = [
   {
     path: 'cartoes',
     canActivate: [authGuard, roleGuard],
-    data: { feature: APP_FEATURE_KEYS.cardsAccess, preload: false },
+    data: { feature: APP_FEATURE_KEYS.cardsRead, preload: false },
     loadComponent: () => import('./cartoes/cartoes.component').then((m) => m.CartoesComponent)
   },
   {
     path: 'contas',
     canActivate: [authGuard, roleGuard],
-    data: { feature: APP_FEATURE_KEYS.accountsAccess, preload: false },
+    data: { feature: APP_FEATURE_KEYS.accountsRead, preload: false },
     loadComponent: () => import('./contas/contas.component').then((m) => m.ContasComponent)
   },
   {
@@ -179,7 +179,7 @@ export const routes: Routes = [
   {
     path: 'categorias',
     canActivate: [authGuard, roleGuard],
-    data: { feature: APP_FEATURE_KEYS.categoriesAccess, preload: false },
+    data: { feature: APP_FEATURE_KEYS.categoriesRead, preload: false },
     loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent)
   },
   {
