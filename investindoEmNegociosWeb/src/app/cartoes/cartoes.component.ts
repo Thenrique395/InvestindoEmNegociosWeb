@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UpperCasePipe, DatePipe, DecimalPipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
-import { LookupsService, CardBrandLookup, InstitutionLookup } from '../lookups.service';
+import { CardBrandLookup, InstitutionLookup } from '../lookups.service';
+import { LookupsStore } from '../lookups.store';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatCurrencyValue } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -66,10 +67,22 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   constructor(
     private db: ApiDataService,
-    private lookups: LookupsService,
+    private lookupsStore: LookupsStore,
     private uiFeedback: UiFeedbackService,
     private cardsService: CardsService
-  ) {}
+  ) {
+    effect(() => {
+      const activeBrands = this.lookupsStore.cardBrands().filter((b) => b.isActive !== false);
+      this.brands = activeBrands;
+      if (!this.bandeira && this.brands.length) {
+        this.bandeira = String(this.brands[0].id);
+      }
+    });
+
+    effect(() => {
+      this.institutions = this.lookupsStore.institutions('Bank');
+    });
+  }
 
   ngOnInit(): void {
     this.sub = this.db.cards$.subscribe((lista) => {
@@ -88,26 +101,8 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.expensesSub = this.db.expenses$.subscribe((lista) => {
       this.expenses = lista;
     });
-    this.lookups.cardBrands().subscribe({
-      next: (brands) => {
-        const list = Array.isArray(brands) ? brands : [];
-        const active = list.filter((b) => b.isActive !== false);
-        this.brands = active;
-        this.bandeira = this.brands.length ? String(this.brands[0].id) : '';
-      },
-      error: () => {
-        this.brands = [];
-        this.uiFeedback.error('Falha ao carregar bandeiras.');
-      }
-    });
-    this.lookups.institutions('Bank').subscribe({
-      next: (items) => {
-        this.institutions = items || [];
-      },
-      error: () => {
-        this.institutions = [];
-      }
-    });
+    this.lookupsStore.loadCardBrands();
+    this.lookupsStore.loadInstitutions('Bank');
   }
 
   ngOnDestroy(): void {
@@ -148,8 +143,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
         this.fecharModal();
         this.saving = false;
       },
-      error: (err) => {
-        console.error('Falha ao salvar cartão', err);
+      error: () => {
         this.setAlerta('Falha ao salvar cartão.', 3000, 'error');
         this.saving = false;
       }
