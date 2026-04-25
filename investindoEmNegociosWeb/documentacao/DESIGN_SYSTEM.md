@@ -466,6 +466,30 @@ Regra:
 - [ ] não usa `window.confirm`
 - [ ] mantém semântica financeira consistente
 
+## Regra crítica de implementação
+
+O código fonte da verdade do design system é:
+
+- `src/styles.scss`
+
+Este documento descreve os padrões, mas o que está implementado no código prevalece.
+
+### O que NÃO fazer
+
+- Criar novos tokens sem atualizar o `styles.scss`
+- Criar cores hardcoded em componentes
+- Criar variações locais de botão, card ou input sem padronizar
+- Duplicar estilos já existentes
+- Usar o `systemDesigner.md` como padrão aprovado de implementação
+
+### O que SEMPRE fazer
+
+- Reutilizar tokens existentes (`--primary`, `--space-*`, `--surface`, etc.)
+- Consultar `styles.scss` antes de criar qualquer estilo novo
+- Padronizar componentes antes de reutilizar em múltiplas telas
+- Atualizar este documento ao criar novos padrões oficiais
+- Validar se uma proposta do `systemDesigner.md` já foi promovida para este documento antes de implementar
+
 ## Quando atualizar este documento
 
 - quando um novo token visual oficial for criado
