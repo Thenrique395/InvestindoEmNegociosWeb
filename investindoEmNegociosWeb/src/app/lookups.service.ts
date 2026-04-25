@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, shareReplay } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 
 export interface PaymentMethodLookup {
@@ -25,19 +25,48 @@ export interface InstitutionLookup {
 @Injectable({ providedIn: 'root' })
 export class LookupsService {
   private readonly baseUrl = `${API_BASE_URL}/lookups`;
+  private paymentMethodsCache$?: Observable<PaymentMethodLookup[]>;
+  private cardBrandsCache$?: Observable<CardBrandLookup[]>;
+  private readonly institutionsCache = new Map<string, Observable<InstitutionLookup[]>>();
 
   constructor(private http: HttpClient) {}
 
   paymentMethods(): Observable<PaymentMethodLookup[]> {
-    return this.http.get<PaymentMethodLookup[]>(`${this.baseUrl}/payment-methods`);
+    if (!this.paymentMethodsCache$) {
+      this.paymentMethodsCache$ = this.http.get<PaymentMethodLookup[]>(`${this.baseUrl}/payment-methods`).pipe(
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+    }
+    return this.paymentMethodsCache$;
   }
 
   cardBrands(): Observable<CardBrandLookup[]> {
-    return this.http.get<CardBrandLookup[]>(`${this.baseUrl}/card-brands`);
+    if (!this.cardBrandsCache$) {
+      this.cardBrandsCache$ = this.http.get<CardBrandLookup[]>(`${this.baseUrl}/card-brands`).pipe(
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+    }
+    return this.cardBrandsCache$;
   }
 
   institutions(type?: 'Bank' | 'Broker'): Observable<InstitutionLookup[]> {
-    const query = type ? `?type=${type}` : '';
-    return this.http.get<InstitutionLookup[]>(`${this.baseUrl}/institutions${query}`);
+    const cacheKey = type ?? 'all';
+    const cached = this.institutionsCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const options = type ? { params: new HttpParams().set('type', type) } : undefined;
+    const request$ = this.http.get<InstitutionLookup[]>(`${this.baseUrl}/institutions`, options).pipe(
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
+    this.institutionsCache.set(cacheKey, request$);
+    return request$;
+  }
+
+  invalidateCache(): void {
+    this.paymentMethodsCache$ = undefined;
+    this.cardBrandsCache$ = undefined;
+    this.institutionsCache.clear();
   }
 }
