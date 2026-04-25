@@ -11,6 +11,7 @@ import { formatCurrencyValue } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
 import { CardsStore } from '../cards.store';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
 
 @Component({
   selector: 'app-cartoes',
@@ -26,7 +27,8 @@ import { CardsStore } from '../cards.store';
     NgSwitchCase,
     NgSwitchDefault,
     CartoesListagemComponent,
-    DigitOnlyDirective
+    DigitOnlyDirective,
+    SectionCardComponent
   ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
