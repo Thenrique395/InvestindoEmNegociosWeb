@@ -47,7 +47,7 @@ export interface GoalContributionRequest {
 
 @Injectable({ providedIn: 'root' })
 export class GoalsService {
-  private baseUrl = `${API_BASE_URL}/goals`;
+  private readonly baseUrl = `${API_BASE_URL}/goals`;
 
   constructor(private http: HttpClient) {}
 
