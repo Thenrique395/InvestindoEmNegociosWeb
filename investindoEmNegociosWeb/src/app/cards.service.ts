@@ -73,8 +73,8 @@ export class CardsService {
     return this.http.put<CardDto>(`${this.baseUrl}/${id}`, payload);
   }
 
-  delete(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   debtTotal(): Observable<{ total: number }> {
