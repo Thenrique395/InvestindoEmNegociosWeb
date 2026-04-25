@@ -1,4 +1,4 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, finalize, map, shareReplay, throwError } from 'rxjs';
 import { API_BASE_URL } from './api.config';
@@ -19,6 +19,13 @@ export interface RegisterPayload {
   email: string;
   senha: string;
 }
+
+type ProblemDetailsLike = {
+  title?: string;
+  detail?: string;
+  status?: number;
+  errors?: Record<string, string[] | string>;
+};
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -45,13 +52,13 @@ export class AuthService {
 
     const token = refreshToken || this.getRefreshToken();
     if (!token) {
-      return throwError(() => new Error('Refresh token ausente.'));
+      return throwError(() => new Error('Sessão expirada. Faça login novamente.'));
     }
     const request$ = this.http
       .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken: token })
       .pipe(
         map((res) => this.persistSession(res)),
-        catchError((err) => this.wrapError(err, 'Sessão expirada. Faça login novamente.', false)),
+        catchError((err) => this.wrapError(err, 'Sessão expirada. Faça login novamente.', false, false)),
         finalize(() => {
           this.refreshInFlight$ = undefined;
         }),
@@ -79,7 +86,7 @@ export class AuthService {
 
     return this.http
       .post<void>(`${this.baseUrl}/forgot-password`, body)
-      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível enviar o e-mail de recuperação.', false)));
+      .pipe(catchError((err) => this.wrapError(err, 'Se o e-mail estiver cadastrado, enviaremos as instruções de recuperação.', false, false)));
   }
 
   resetPassword(token: string, newPassword: string) {
@@ -90,7 +97,7 @@ export class AuthService {
 
     return this.http
       .post<void>(`${this.baseUrl}/reset-password`, body)
-      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível redefinir a senha.', false)));
+      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível redefinir a senha. Verifique o link e tente novamente.', false, false)));
   }
 
   private persistSession(res: AuthResponse): AuthResponse {
@@ -209,35 +216,53 @@ export class AuthService {
     }
   }
 
-  private wrapError(err: unknown, fallback: string, mapUnauthorizedToLogin = true) {
-    if (isDevMode()) {
-      console.error('AuthService error', err);
-    }
-
+  private wrapError(
+    err: unknown,
+    fallback: string,
+    mapUnauthorizedToLogin = true,
+    exposeProblemDetails = true
+  ) {
     let message = fallback;
     let code: string | undefined;
 
     const httpErr = err as HttpErrorResponse;
-    const payload = httpErr?.error;
-    const detail = typeof payload === 'string' ? payload : payload?.detail || payload?.title;
+    const status = Number(httpErr?.status) || 0;
+    const detail = this.extractSafeProblemDetailsMessage(httpErr);
 
-    if (detail) {
+    if (status === 401 && mapUnauthorizedToLogin) {
+      message = 'E-mail ou senha inválidos.';
+      code = 'unauthorized';
+    } else if (status === 409 || (typeof detail === 'string' && detail.includes('E-mail já está em uso'))) {
+      code = 'emailInUse';
+      message = 'E-mail já está em uso.';
+    } else if (status >= 500) {
+      message = fallback;
+    } else if (exposeProblemDetails && detail) {
       message = detail;
     }
 
-    if (httpErr?.status === 401 && mapUnauthorizedToLogin) {
-      message = 'E-mail ou senha inválidos.';
-      code = 'unauthorized';
-    }
-
-    if (httpErr?.status === 409 || (typeof detail === 'string' && detail.includes('E-mail já está em uso'))) {
-      code = 'emailInUse';
-      message = detail || 'E-mail já está em uso.';
-    }
-
-    const error = new Error(message) as Error & { code?: string };
+    const error = new Error(message) as Error & { code?: string; status?: number };
     if (code) error.code = code;
+    if (status) error.status = status;
     return throwError(() => error);
+  }
+
+  private extractSafeProblemDetailsMessage(err: HttpErrorResponse): string | null {
+    const payload = err?.error as ProblemDetailsLike | string | null | undefined;
+
+    if (typeof payload === 'string') {
+      return payload.trim() || null;
+    }
+
+    if (!payload || typeof payload !== 'object') {
+      return null;
+    }
+
+    const firstValidationMessage = Object.values(payload.errors ?? {})
+      .flatMap((value) => Array.isArray(value) ? value : [value])
+      .find((message) => typeof message === 'string' && message.trim());
+
+    return payload.detail?.trim() || firstValidationMessage || payload.title?.trim() || null;
   }
 
   private getStorageItem(key: string): string | null {
