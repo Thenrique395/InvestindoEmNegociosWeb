@@ -9,7 +9,8 @@ import { LookupsStore } from '../lookups.store';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { formatCurrencyValue } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
-import { CardStatementCycleDto, CardsService } from '../cards.service';
+import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
+import { CardsStore } from '../cards.store';
 
 @Component({
   selector: 'app-cartoes',
@@ -62,14 +63,13 @@ export class CartoesComponent implements OnInit, OnDestroy {
     const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
     return current?.name || '';
   }
-  private sub?: Subscription;
   private expensesSub?: Subscription;
 
   constructor(
     private db: ApiDataService,
     private lookupsStore: LookupsStore,
-    private uiFeedback: UiFeedbackService,
-    private cardsService: CardsService
+    private cardsStore: CardsStore,
+    private uiFeedback: UiFeedbackService
   ) {
     effect(() => {
       const activeBrands = this.lookupsStore.cardBrands().filter((b) => b.isActive !== false);
@@ -82,31 +82,38 @@ export class CartoesComponent implements OnInit, OnDestroy {
     effect(() => {
       this.institutions = this.lookupsStore.institutions('Bank');
     });
+
+    effect(() => {
+      const mappedCards = this.cardsStore.cards().map((card) => this.mapCardDto(card));
+      this.cards = mappedCards;
+      const selectedId = this.cardsStore.selectedCardId();
+      this.statementCardId = selectedId;
+
+      if (!mappedCards.length) {
+        this.statementCycles = [];
+      }
+    });
+
+    effect(() => {
+      this.statementCycles = this.cardsStore.statements();
+      this.statementLoading = this.cardsStore.statementsLoading();
+      const error = this.cardsStore.statementsError();
+      if (error) {
+        this.uiFeedback.error(error);
+      }
+    });
   }
 
   ngOnInit(): void {
-    this.sub = this.db.cards$.subscribe((lista) => {
-      this.cards = lista;
-      if (!this.cards.length) {
-        this.statementCardId = null;
-        this.statementCycles = [];
-        return;
-      }
-
-      if (!this.statementCardId || !this.cards.some((c) => c.id === this.statementCardId)) {
-        this.statementCardId = this.cards[0].id;
-      }
-      this.loadStatementCycles();
-    });
     this.expensesSub = this.db.expenses$.subscribe((lista) => {
       this.expenses = lista;
     });
     this.lookupsStore.loadCardBrands();
     this.lookupsStore.loadInstitutions('Bank');
+    this.cardsStore.load(undefined, true);
   }
 
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
     this.expensesSub?.unsubscribe();
   }
 
@@ -122,32 +129,30 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (this.diaVencimento < 1 || this.diaVencimento > 31) return;
     if (this.limiteCredito < 0) return;
     this.saving = true;
-    const numeroLimpo = this.numero.replace(/\D/g, '').slice(-4);
-    const payload = {
-      bandeira: this.bandeira,
-      numero: numeroLimpo,
-      nome: this.nome,
-      banco: this.banco,
-      limiteCredito: this.limiteCredito,
-      diaFechamento: this.diaFechamento,
-      diaVencimento: this.diaVencimento
+
+    const payload: CardPayload = {
+      brandId: Number(this.bandeira),
+      holderName: this.nome,
+      nickname: this.nome,
+      last4: this.numero.replace(/\D/g, '').slice(-4),
+      bank: this.banco || null,
+      creditLimit: this.limiteCredito,
+      statementCloseDay: this.diaFechamento,
+      dueDay: this.diaVencimento
     };
 
-    const request$ = this.editandoId
-      ? this.db.updateCard(this.editandoId, payload)
-      : this.db.addCard(payload);
+    const done = () => {
+      this.setAlerta('Cartão salvo com sucesso.', 2500, 'success');
+      this.fecharModal();
+      this.saving = false;
+    };
 
-    request$.subscribe({
-      next: () => {
-        this.setAlerta('Cartão salvo com sucesso.', 2500, 'success');
-        this.fecharModal();
-        this.saving = false;
-      },
-      error: () => {
-        this.setAlerta('Falha ao salvar cartão.', 3000, 'error');
-        this.saving = false;
-      }
-    });
+    if (this.editandoId) {
+      this.cardsStore.update(this.editandoId, payload, done);
+      return;
+    }
+
+    this.cardsStore.create(payload, done);
   }
 
   abrirModal(): void {
@@ -179,7 +184,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
       this.uiFeedback.error('Não é possível remover este cartão; existem despesas vinculadas a ele.');
       return;
     }
-    this.db.removeCard(id);
+    this.cardsStore.delete(id, () => this.setAlerta('Cartão removido com sucesso.', 2500, 'success'));
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
@@ -283,27 +288,15 @@ export class CartoesComponent implements OnInit, OnDestroy {
   loadStatementCycles(): void {
     if (!this.statementCardId) {
       this.statementCycles = [];
+      this.cardsStore.selectCard(null);
       return;
     }
 
-    this.statementLoading = true;
-    this.cardsService
-      .statements(this.statementCardId, {
-        year: this.statementYear || undefined,
-        month: this.statementMonth || undefined
-      })
-      .subscribe({
-        next: (cycles) => {
-          this.statementCycles = cycles || [];
-        },
-        error: () => {
-          this.statementCycles = [];
-          this.uiFeedback.error('Falha ao carregar faturas por competência.');
-        },
-        complete: () => {
-          this.statementLoading = false;
-        }
-      });
+    this.cardsStore.selectCard(this.statementCardId);
+    this.cardsStore.loadStatements(this.statementCardId, {
+      year: this.statementYear || undefined,
+      month: this.statementMonth || undefined
+    });
   }
 
   statementMonthLabel(month: number): string {
@@ -315,6 +308,20 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
   trackByIndex(index: number): number {
     return index;
+  }
+
+  private mapCardDto(card: CardDto): StoredCard {
+    return {
+      id: card.id,
+      bandeira: String(card.brandId),
+      numero: card.last4,
+      nome: card.nickname || card.holderName,
+      banco: card.bank ?? null,
+      limiteCredito: card.creditLimit ?? 0,
+      diaFechamento: card.statementCloseDay ?? 1,
+      diaVencimento: card.dueDay ?? 1,
+      userId: ''
+    };
   }
 
 }
