@@ -58,7 +58,7 @@ export class CategoriesService {
     );
   }
 
-  private invalidateCache(): void {
+  invalidateCache(): void {
     this.listCache.clear();
   }
 
