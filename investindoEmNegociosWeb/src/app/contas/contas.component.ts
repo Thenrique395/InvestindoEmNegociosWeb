@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -7,12 +7,12 @@ import {
   AccountTransferRequest,
   AccountTransactionResponse,
   AccountType,
-  AccountsService,
   CsvExtractResponse,
   OfxExtractResponse,
   OfxTransactionPreview
 } from '../accounts.service';
 import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
+import { AccountsStore } from '../accounts.store';
 
 @Component({
   selector: 'app-contas',
@@ -59,8 +59,23 @@ export class ContasComponent implements OnInit {
   readonly accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
 
   constructor(
-    private readonly accountsService: AccountsService,
-    private readonly categoriesService: CategoriesService) {}
+    private readonly accountsStore: AccountsStore,
+    private readonly categoriesService: CategoriesService
+  ) {
+    effect(() => {
+      this.accounts = this.accountsStore.accounts();
+      this.loading = this.accountsStore.loading();
+      this.error = this.accountsStore.error() || this.error;
+      this.selectedAccountId = this.accountsStore.selectedAccountId();
+      this.syncTransferDefaults();
+    });
+
+    effect(() => {
+      this.transactions = this.accountsStore.transactions();
+      this.loadingTransactions = this.accountsStore.transactionsLoading();
+      this.error = this.accountsStore.transactionsError() || this.error;
+    });
+  }
 
   ngOnInit(): void {
     this.loadAccounts();
@@ -76,24 +91,8 @@ export class ContasComponent implements OnInit {
   }
 
   loadAccounts(): void {
-    this.loading = true;
     this.error = '';
-    this.accountsService.list().subscribe({
-      next: (items) => {
-        this.accounts = items || [];
-        this.syncTransferDefaults();
-        if (this.selectedAccountId && !this.accounts.some((a) => a.id === this.selectedAccountId)) {
-          this.selectedAccountId = null;
-          this.transactions = [];
-        }
-      },
-      error: () => {
-        this.error = 'Falha ao carregar contas.';
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    });
+    this.accountsStore.load(true);
   }
 
   startCreate(): void {
@@ -112,6 +111,7 @@ export class ContasComponent implements OnInit {
   }
 
   save(): void {
+    if (this.saving) return;
     this.saving = true;
     this.error = '';
 
@@ -122,43 +122,32 @@ export class ContasComponent implements OnInit {
       isActive: !!this.form.isActive
     };
 
-    const request$ = this.editingId
-      ? this.accountsService.update(this.editingId, payload)
-      : this.accountsService.create(payload);
+    const done = () => {
+      this.startCreate();
+      this.saving = false;
+    };
 
-    request$.subscribe({
-      next: () => {
-        this.startCreate();
-        this.loadAccounts();
-      },
-      error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao salvar conta.';
-      },
-      complete: () => {
-        this.saving = false;
-      }
-    });
+    if (this.editingId) {
+      this.accountsStore.update(this.editingId, payload, done);
+      return;
+    }
+
+    this.accountsStore.create(payload, done);
   }
 
   remove(account: AccountResponse): void {
     if (!confirm(`Remover a conta "${account.name}"?`)) return;
 
-    this.accountsService.delete(account.id).subscribe({
-      next: () => {
-        if (this.selectedAccountId === account.id) {
-          this.selectedAccountId = null;
-          this.transactions = [];
-        }
-        this.loadAccounts();
-      },
-      error: () => {
-        this.error = 'Falha ao remover conta.';
+    this.accountsStore.delete(account.id, () => {
+      if (this.selectedAccountId === account.id) {
+        this.selectedAccountId = null;
+        this.transactions = [];
       }
     });
   }
 
   selectAccount(accountId: string): void {
-    this.selectedAccountId = accountId;
+    this.accountsStore.selectAccount(accountId);
     this.loadTransactions();
   }
 
@@ -168,23 +157,10 @@ export class ContasComponent implements OnInit {
       return;
     }
 
-    this.loadingTransactions = true;
-    this.accountsService
-      .listTransactions(this.selectedAccountId, {
-        fromUtc: this.fromInput ? new Date(this.fromInput).toISOString() : undefined,
-        toUtc: this.toInput ? new Date(this.toInput).toISOString() : undefined
-      })
-      .subscribe({
-        next: (items) => {
-          this.transactions = items || [];
-        },
-        error: () => {
-          this.error = 'Falha ao carregar extrato da conta.';
-        },
-        complete: () => {
-          this.loadingTransactions = false;
-        }
-      });
+    this.accountsStore.loadTransactions(this.selectedAccountId, {
+      fromUtc: this.fromInput ? new Date(this.fromInput).toISOString() : undefined,
+      toUtc: this.toInput ? new Date(this.toInput).toISOString() : undefined
+    });
   }
 
   transfer(): void {
@@ -213,22 +189,11 @@ export class ContasComponent implements OnInit {
       occurredAt: this.transferOccurredAtInput ? new Date(this.transferOccurredAtInput).toISOString() : null
     };
 
-    this.accountsService.transfer(payload).subscribe({
-      next: () => {
-        this.transferAmount = null;
-        this.transferDescription = '';
-        this.transferOccurredAtInput = '';
-        this.loadAccounts();
-        if (this.selectedAccountId === this.transferFromAccountId || this.selectedAccountId === this.transferToAccountId) {
-          this.loadTransactions();
-        }
-      },
-      error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao transferir entre contas.';
-      },
-      complete: () => {
-        this.transferring = false;
-      }
+    this.accountsStore.transfer(payload, () => {
+      this.transferAmount = null;
+      this.transferDescription = '';
+      this.transferOccurredAtInput = '';
+      this.transferring = false;
     });
   }
 
@@ -256,7 +221,7 @@ export class ContasComponent implements OnInit {
     this.ofxRawText = '';
     this.ofxExtract = { items: [], rawText: '' };
 
-    this.accountsService.extractOfx(file, this.selectedAccountId).subscribe({
+    this.accountsStore.extractOfx(file, this.selectedAccountId).subscribe({
       next: (result) => {
         this.ofxExtract = {
           ...result,
@@ -283,7 +248,7 @@ export class ContasComponent implements OnInit {
 
     this.importingOfx = true;
     this.error = '';
-    this.accountsService.importOfx({
+    this.accountsStore.importOfx({
       accountId: this.selectedAccountId,
       skipDuplicates: this.ofxSkipDuplicates,
       items: this.ofxExtract.items.map((item) => ({
@@ -296,18 +261,9 @@ export class ContasComponent implements OnInit {
         type: item.type ?? null,
         categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
       }))
-    }).subscribe({
-      next: () => {
-        this.loadAccounts();
-        this.loadTransactions();
-        this.clearOfxState();
-      },
-      error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao importar OFX.';
-      },
-      complete: () => {
-        this.importingOfx = false;
-      }
+    }, () => {
+      this.clearOfxState();
+      this.importingOfx = false;
     });
   }
 
@@ -341,7 +297,7 @@ export class ContasComponent implements OnInit {
     this.csvRawText = '';
     this.csvExtract = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
 
-    this.accountsService.extractCsv(file, this.selectedAccountId).subscribe({
+    this.accountsStore.extractCsv(file, this.selectedAccountId).subscribe({
       next: (result) => {
         this.csvExtract = {
           ...result,
@@ -368,7 +324,7 @@ export class ContasComponent implements OnInit {
 
     this.importingCsv = true;
     this.error = '';
-    this.accountsService.importCsv({
+    this.accountsStore.importCsv({
       accountId: this.selectedAccountId,
       skipDuplicates: this.csvSkipDuplicates,
       items: this.csvExtract.items.map((item) => ({
@@ -381,18 +337,9 @@ export class ContasComponent implements OnInit {
         type: item.type ?? null,
         categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
       }))
-    }).subscribe({
-      next: () => {
-        this.loadAccounts();
-        this.loadTransactions();
-        this.clearCsvState();
-      },
-      error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao importar CSV.';
-      },
-      complete: () => {
-        this.importingCsv = false;
-      }
+    }, () => {
+      this.clearCsvState();
+      this.importingCsv = false;
     });
   }
 
