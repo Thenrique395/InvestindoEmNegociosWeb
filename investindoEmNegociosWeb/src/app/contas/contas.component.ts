@@ -13,11 +13,12 @@ import {
 } from '../accounts.service';
 import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
 import { AccountsStore } from '../accounts.store';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormFieldComponent],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
