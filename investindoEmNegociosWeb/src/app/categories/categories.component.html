@@ -1,4 +1,4 @@
-<section class="categories-page">
+<section class="categories-page responsive-page">
   <header class="page-header">
     <div>
       <p class="eyebrow">Gerenciar categorias</p>
@@ -8,7 +8,7 @@
   </header>
 
   <app-filter-bar>
-    <div filter-left>
+    <div filter-left class="responsive-toolbar">
       <input type="text" placeholder="Buscar categoria..." [(ngModel)]="buscaNome" />
 
       <select [(ngModel)]="filtroTipo" (change)="carregar()">
@@ -17,12 +17,12 @@
       </select>
     </div>
 
-    <div filter-right>
+    <div filter-right class="responsive-actions">
       <button class="btn-primary" type="button" (click)="abrirModal()">Nova categoria</button>
     </div>
   </app-filter-bar>
 
-  <section class="metrics" *ngIf="!isAdmin || activeView === 'user'">
+  <section class="metrics responsive-grid responsive-grid--compact" *ngIf="!isAdmin || activeView === 'user'">
     <article class="metric-card">
       <small>Total visíveis</small>
       <strong>{{ userMetrics.total }}</strong>
@@ -37,7 +37,7 @@
     </article>
   </section>
 
-  <section class="metrics" *ngIf="isAdmin && activeView === 'admin'">
+  <section class="metrics responsive-grid responsive-grid--compact" *ngIf="isAdmin && activeView === 'admin'">
     <article class="metric-card">
       <small>Total visíveis</small>
       <strong>{{ adminMetrics.total }}</strong>
@@ -56,7 +56,7 @@
     <div class="add-card__header">
       <h3>Adicionar nova categoria</h3>
     </div>
-    <div class="add-card__form">
+    <div class="add-card__form responsive-grid">
       <app-form-field
         label="Nome da categoria"
         [error]="categoryForm.error('name')"
@@ -91,7 +91,7 @@
         </select>
       </app-form-field>
 
-      <button class="btn-primary" type="button" [disabled]="saving" (click)="adicionar()">
+      <button class="btn-primary self-end max-md:w-full" type="button" [disabled]="saving" (click)="adicionar()">
         <span class="btn-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" focusable="false" role="presentation">
             <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -129,16 +129,16 @@
           <span class="text-sm font-semibold text-[var(--text-muted)]">({{ categoriasPorTipo('Income').length }})</span>
         </div>
         <div class="grid gap-3">
-          <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let c of categoriasPorTipo('Income'); trackBy: trackByIndex">
+          <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 max-md:grid-cols-[auto_1fr] max-md:items-start max-md:gap-3" *ngFor="let c of categoriasPorTipo('Income'); trackBy: trackByIndex">
             <div class="grid h-9 w-9 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
               {{ iconForCategory(c.name, 'Income') }}
             </div>
-            <div>
-              <div class="font-semibold text-[var(--text)]">{{ c.name }}</div>
+            <div class="min-w-0">
+              <div class="break-words font-semibold text-[var(--text)]">{{ c.name }}</div>
               <div class="text-sm text-[var(--text-muted)]">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
             </div>
-            <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Receita</span>
-            <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
+            <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 max-md:col-span-2 max-md:w-fit">Receita</span>
+            <button *ngIf="!c.isDefault" type="button" class="btn-danger sm max-md:col-span-2 max-md:w-full" (click)="remover(c)">Excluir</button>
           </div>
           <div *ngIf="categoriasPorTipo('Income').length === 0" class="text-sm text-[var(--text-muted)]">Sem categorias de receita. Crie uma nova acima.</div>
         </div>
@@ -150,16 +150,16 @@
           <span class="text-sm font-semibold text-[var(--text-muted)]">({{ categoriasPorTipo('Expense').length }})</span>
         </div>
         <div class="grid gap-3">
-          <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let c of categoriasPorTipo('Expense'); trackBy: trackByIndex">
+          <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 max-md:grid-cols-[auto_1fr] max-md:items-start max-md:gap-3" *ngFor="let c of categoriasPorTipo('Expense'); trackBy: trackByIndex">
             <div class="grid h-9 w-9 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
               {{ iconForCategory(c.name, 'Expense') }}
             </div>
-            <div>
-              <div class="font-semibold text-[var(--text)]">{{ c.name }}</div>
+            <div class="min-w-0">
+              <div class="break-words font-semibold text-[var(--text)]">{{ c.name }}</div>
               <div class="text-sm text-[var(--text-muted)]">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
             </div>
-            <span class="inline-flex items-center rounded-full border border-rose-200 bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-700">Despesa</span>
-            <button *ngIf="!c.isDefault" type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
+            <span class="inline-flex items-center rounded-full border border-rose-200 bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-700 max-md:col-span-2 max-md:w-fit">Despesa</span>
+            <button *ngIf="!c.isDefault" type="button" class="btn-danger sm max-md:col-span-2 max-md:w-full" (click)="remover(c)">Excluir</button>
           </div>
           <div *ngIf="categoriasPorTipo('Expense').length === 0" class="text-sm text-[var(--text-muted)]">Sem categorias de despesa. Crie uma nova acima.</div>
         </div>
@@ -168,7 +168,7 @@
   </ng-container>
 
   <section class="card admin-card" *ngIf="isAdmin && activeView === 'admin'">
-    <div class="admin-header">
+    <div class="admin-header responsive-toolbar">
       <div>
         <h3>Categorias padrão (admin)</h3>
         <p class="muted">Ative, edite ou desative as categorias globais do sistema.</p>
@@ -205,9 +205,9 @@
             </span>
           </div>
         </div>
-        <div class="flex flex-wrap items-center justify-start gap-2 md:justify-end">
-          <button type="button" class="btn-ghost sm" (click)="openAdminEdit(c)">Editar</button>
-          <button type="button" class="btn-ghost sm" (click)="toggleDefaultStatus(c)">
+        <div class="flex flex-wrap items-center justify-start gap-2 md:justify-end max-md:flex-col max-md:items-stretch">
+          <button type="button" class="btn-ghost sm max-md:w-full" (click)="openAdminEdit(c)">Editar</button>
+          <button type="button" class="btn-ghost sm max-md:w-full" (click)="toggleDefaultStatus(c)">
             {{ c.isActive ? 'Desativar' : 'Ativar' }}
           </button>
         </div>
@@ -233,7 +233,7 @@
           <option value="Expense">Despesas</option>
         </select>
       </label>
-      <div class="modal__actions">
+      <div class="modal__actions responsive-actions">
         <button type="button" class="btn-cancel" (click)="closeAdminModal()">Cancelar</button>
         <button type="button" class="btn-primary" (click)="saveAdmin()" [disabled]="adminSaving">
           <span class="btn-icon" aria-hidden="true">
@@ -255,7 +255,7 @@
       <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text)]">
         {{ deleteTarget?.name || 'Categoria' }}
       </div>
-      <div class="modal__actions">
+      <div class="modal__actions responsive-actions">
         <button type="button" class="btn-cancel" (click)="fecharDeleteModal()">Cancelar</button>
         <button type="button" class="btn-danger" (click)="confirmarRemocao()">Remover</button>
       </div>
