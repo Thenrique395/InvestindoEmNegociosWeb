@@ -12,6 +12,10 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
 import { CardsStore } from '../cards.store';
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { FormState } from '../utils/form-state';
+
+type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
 @Component({
   selector: 'app-cartoes',
@@ -28,7 +32,8 @@ import { SectionCardComponent } from '../shared/section-card/section-card.compon
     NgSwitchDefault,
     CartoesListagemComponent,
     DigitOnlyDirective,
-    SectionCardComponent
+    SectionCardComponent,
+    FormFieldComponent
   ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
@@ -56,6 +61,11 @@ export class CartoesComponent implements OnInit, OnDestroy {
   statementMonth: number | null = null;
   statementLoading = false;
   statementCycles: CardStatementCycleDto[] = [];
+
+  readonly cardForm = new FormState<CardFormField>(
+    ['brand', 'number', 'name', 'limit', 'closingDay', 'dueDay'],
+    () => this.validateCardForm()
+  );
 
   get bandeiraCode(): string {
     const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
@@ -126,10 +136,13 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   salvar(): void {
     if (this.saving) return;
-    if (!this.numero || !this.nome || !this.bandeira) return;
-    if (this.diaFechamento < 1 || this.diaFechamento > 31) return;
-    if (this.diaVencimento < 1 || this.diaVencimento > 31) return;
-    if (this.limiteCredito < 0) return;
+    this.cardForm.submit();
+
+    if (!this.cardForm.isValid()) {
+      this.uiFeedback.warning('Revise os campos destacados antes de salvar.');
+      return;
+    }
+
     this.saving = true;
 
     const payload: CardPayload = {
@@ -161,6 +174,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (!this.bandeira && this.brands.length) {
       this.bandeira = this.brands[0].id.toString();
     }
+    this.cardForm.reset();
     this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
     this.mostrarModal = true;
   }
@@ -170,6 +184,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.mostrarModal = false;
     this.mostrarNumero = false;
     this.editandoId = null;
+    this.cardForm.reset();
     this.bandeira = this.brands[0]?.id ? String(this.brands[0].id) : '';
     this.numero = '';
     this.nome = '';
@@ -209,6 +224,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   editar(card: StoredCard): void {
+    this.cardForm.reset();
     this.editandoId = card.id;
     this.mostrarModal = true;
     this.bandeira = card.bandeira;
@@ -223,6 +239,42 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   toggleNumero(): void {
     this.mostrarNumero = !this.mostrarNumero;
+  }
+
+  private validateCardForm(): Partial<Record<CardFormField, string>> {
+    const errors: Partial<Record<CardFormField, string>> = {};
+    const digits = this.numero.replace(/\D/g, '');
+    const name = this.nome.trim();
+
+    if (!this.bandeira) {
+      errors.brand = 'Selecione a bandeira do cartão.';
+    }
+
+    if (!digits) {
+      errors.number = 'Informe o número do cartão.';
+    } else if (digits.length < 13 || digits.length > 19) {
+      errors.number = 'O número do cartão deve ter entre 13 e 19 dígitos.';
+    }
+
+    if (!name) {
+      errors.name = 'Informe o nome impresso no cartão.';
+    } else if (name.length < 2) {
+      errors.name = 'O nome precisa ter pelo menos 2 caracteres.';
+    }
+
+    if (!Number.isFinite(this.limiteCredito) || this.limiteCredito < 0) {
+      errors.limit = 'Informe um limite de crédito válido.';
+    }
+
+    if (!Number.isFinite(this.diaFechamento) || this.diaFechamento < 1 || this.diaFechamento > 31) {
+      errors.closingDay = 'Informe um dia de fechamento entre 1 e 31.';
+    }
+
+    if (!Number.isFinite(this.diaVencimento) || this.diaVencimento < 1 || this.diaVencimento > 31) {
+      errors.dueDay = 'Informe um dia de vencimento entre 1 e 31.';
+    }
+
+    return errors;
   }
 
   private formatarNumeroParaDisplay(numero: string): string {
