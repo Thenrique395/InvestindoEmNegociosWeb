@@ -8,6 +8,7 @@ import { hasAtLeastRole } from '../roles';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { CategoriesStore } from '../categories.store';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { FormState } from '../utils/form-state';
 
 type CategoryFormField = 'name' | 'scope' | 'type';
@@ -15,7 +16,7 @@ type CategoryFormField = 'name' | 'scope' | 'type';
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormFieldComponent],
+  imports: [CommonModule, FormsModule, FormFieldComponent, FilterBarComponent],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss']
 })
