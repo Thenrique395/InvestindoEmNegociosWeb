@@ -34,23 +34,23 @@ export class StatusBadgeComponent {
 
   private toneClass(): string {
     switch (this.tone()) {
-      case 'success': return 'border-emerald-200 bg-emerald-100 text-emerald-700';
-      case 'danger': return 'border-rose-200 bg-rose-100 text-rose-700';
-      case 'warning': return 'border-amber-200 bg-amber-100 text-amber-700';
-      case 'info': return 'border-sky-200 bg-sky-100 text-sky-700';
-      case 'muted': return 'border-slate-200 bg-slate-100 text-slate-600';
-      default: return 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)]';
+      case 'success': return 'border-[var(--color-success-soft)] bg-[var(--color-success-weak)] text-[var(--color-success)]';
+      case 'danger': return 'border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] text-[var(--color-danger)]';
+      case 'warning': return 'border-[var(--color-warning-soft)] bg-[var(--color-warning-weak)] text-[var(--color-warning)]';
+      case 'info': return 'border-[var(--color-info-soft)] bg-[var(--color-info-weak)] text-[var(--color-info)]';
+      case 'muted': return 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]';
+      default: return 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]';
     }
   }
 
   private dotToneClass(): string {
     switch (this.tone()) {
-      case 'success': return 'bg-emerald-500';
-      case 'danger': return 'bg-rose-500';
-      case 'warning': return 'bg-amber-500';
-      case 'info': return 'bg-sky-500';
-      case 'muted': return 'bg-slate-400';
-      default: return 'bg-[var(--text-muted)]';
+      case 'success': return 'bg-[var(--color-success)]';
+      case 'danger': return 'bg-[var(--color-danger)]';
+      case 'warning': return 'bg-[var(--color-warning)]';
+      case 'info': return 'bg-[var(--color-info)]';
+      case 'muted': return 'bg-[var(--color-text-muted)]';
+      default: return 'bg-[var(--color-text-muted)]';
     }
   }
 }
