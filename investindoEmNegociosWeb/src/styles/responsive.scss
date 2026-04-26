@@ -1,0 +1,162 @@
+/*
+ * Global responsive hardening
+ * Applies safe defaults across all pages without changing business logic.
+ */
+
+html,
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+/* Prevent cards/grids from forcing horizontal overflow on mobile */
+.grid,
+.flex,
+section,
+article,
+main,
+header,
+footer,
+aside,
+nav {
+  min-width: 0;
+}
+
+/* Tables remain usable on small screens */
+.table-responsive,
+.overflow-x-auto {
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overflow-x-auto table {
+  min-width: 720px;
+}
+
+/* Better tap targets on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  [role='button'],
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
+
+/* Global mobile page rhythm */
+@media (max-width: 768px) {
+  :root {
+    --text-xl: 18px;
+    --text-2xl: 22px;
+    --text-3xl: 26px;
+    --space-3: 18px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --control-h: 44px;
+  }
+
+  .shell {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .main,
+  main {
+    width: 100%;
+    min-width: 0;
+    padding-inline: clamp(12px, 4vw, 18px) !important;
+  }
+
+  section,
+  article,
+  .card,
+  .section-card,
+  app-section-card {
+    min-width: 0;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: clamp(1.1rem, 5vw, 1.4rem);
+    line-height: 1.2;
+  }
+
+  p {
+    overflow-wrap: anywhere;
+  }
+
+  /* Forms stack naturally on mobile */
+  form,
+  .form-grid,
+  .filters,
+  .toolbar,
+  .actions {
+    min-width: 0;
+  }
+
+  .toolbar,
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .toolbar > *,
+  .actions > * {
+    min-width: 0;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100%;
+  }
+
+  button.icon,
+  .icon button,
+  .theme-toggle {
+    width: auto;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 420px) {
+  .main,
+  main {
+    padding-inline: 12px !important;
+  }
+
+  .rounded-2xl {
+    border-radius: 16px;
+  }
+
+  .p-4 {
+    padding: 0.85rem !important;
+  }
+}
