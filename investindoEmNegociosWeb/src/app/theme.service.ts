@@ -15,23 +15,23 @@ export class ThemeService {
   init(): AppTheme {
     const saved = this.getSavedTheme();
     if (saved) {
-      this.apply(saved);
+      this.apply(saved, false);
       return saved;
     }
 
     const preferred = this.getPreferredTheme();
-    this.apply(preferred);
+    this.apply(preferred, false);
     return preferred;
   }
 
   toggle(): AppTheme {
     const next: AppTheme = this.current() === 'dark' ? 'light' : 'dark';
-    this.apply(next);
+    this.apply(next, true);
     return next;
   }
 
   set(theme: AppTheme): void {
-    this.apply(theme);
+    this.apply(theme, true);
   }
 
   current(): AppTheme {
@@ -42,20 +42,24 @@ export class ThemeService {
       : 'light';
   }
 
-  isLight(): boolean {
-    return this.current() === 'light';
-  }
-
-  private apply(theme: AppTheme): void {
+  private apply(theme: AppTheme, animate: boolean): void {
     if (!this.isBrowser || typeof document === 'undefined') return;
+
+    if (animate) {
+      document.documentElement.classList.add('theme-transition');
+    }
 
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.classList.toggle('theme-dark', theme === 'dark');
 
     try {
       window.localStorage.setItem(this.storageKey, theme);
-    } catch {
-      // Ignore storage errors in restricted browser contexts.
+    } catch {}
+
+    if (animate) {
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transition');
+      }, 300);
     }
   }
 
