@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 
 export type UiFeedbackType = 'success' | 'error' | 'info' | 'warning';
 
@@ -14,14 +14,23 @@ export class UiFeedbackService {
   private readonly messagesSubject = new BehaviorSubject<UiFeedbackMessage[]>([]);
   readonly messages$ = this.messagesSubject.asObservable();
 
+  /**
+   * Compatibilidade temporária com componentes antigos que ainda esperam uma única mensagem.
+   * Novos componentes devem preferir `messages$`.
+   */
+  readonly message$ = this.messages$.pipe(map((messages) => messages.at(-1) ?? null));
+
   private idCounter = 0;
 
   show(type: UiFeedbackType, text: string, durationMs = 3500): void {
+    const normalizedText = text?.trim();
+    if (!normalizedText) return;
+
     const id = ++this.idCounter;
-    const message: UiFeedbackMessage = { id, type, text };
+    const message: UiFeedbackMessage = { id, type, text: normalizedText };
 
     const current = this.messagesSubject.value;
-    this.messagesSubject.next([...current, message]);
+    this.messagesSubject.next([...current, message].slice(-4));
 
     if (durationMs > 0) {
       setTimeout(() => this.dismiss(id), durationMs);
