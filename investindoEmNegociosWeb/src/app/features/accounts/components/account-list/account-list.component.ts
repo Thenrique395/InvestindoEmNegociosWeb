@@ -1,0 +1,41 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AccountResponse, AccountType } from '../../models/account.models';
+import { StatusBadgeComponent } from '../../../../shared/status-badge/status-badge.component';
+import { EmptyStateComponent } from '../../../../empty-state/empty-state.component';
+import { UiStateComponent } from '../../../../ui-state/ui-state.component';
+
+@Component({
+  selector: 'app-account-list',
+  standalone: true,
+  imports: [CommonModule, StatusBadgeComponent, EmptyStateComponent, UiStateComponent],
+  templateUrl: './account-list.component.html'
+})
+export class AccountListComponent {
+  @Input() accounts: AccountResponse[] = [];
+  @Input() loading = false;
+
+  @Output() refresh = new EventEmitter<void>();
+  @Output() create = new EventEmitter<void>();
+  @Output() selectAccount = new EventEmitter<string>();
+  @Output() edit = new EventEmitter<AccountResponse>();
+  @Output() remove = new EventEmitter<AccountResponse>();
+
+  get hasAccounts(): boolean {
+    return this.accounts.length > 0;
+  }
+
+  accountTypeLabel(type: AccountType): string {
+    switch (type) {
+      case 'Checking': return 'Conta corrente';
+      case 'Savings': return 'Poupança';
+      case 'DigitalWallet': return 'Carteira digital';
+      case 'Cash': return 'Dinheiro';
+      default: return 'Outro';
+    }
+  }
+
+  trackByAccountId(_: number, account: AccountResponse): string {
+    return account.id;
+  }
+}
