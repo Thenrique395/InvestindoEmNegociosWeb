@@ -10,18 +10,17 @@ type FormFieldTone = 'default' | 'danger' | 'success';
   template: `
     <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
       <span class="flex items-center justify-between gap-2">
-        <span>{{ label() }}</span>
+        <span class="inline-flex items-center gap-1">
+          {{ label() }}
+          <span *ngIf="required()" class="text-[var(--danger)]" aria-hidden="true">*</span>
+        </span>
         <small *ngIf="hint()" class="font-medium text-[var(--text-muted)]">{{ hint() }}</small>
       </span>
 
       <ng-content></ng-content>
 
-      <span *ngIf="description() && !error()" class="text-xs font-medium text-[var(--text-muted)]">
-        {{ description() }}
-      </span>
-
-      <span *ngIf="error()" [class]="messageClass()">
-        {{ error() }}
+      <span *ngIf="descriptionToShow()" [class]="messageClass()" [attr.role]="error() ? 'alert' : null">
+        {{ descriptionToShow() }}
       </span>
     </label>
   `
@@ -31,7 +30,10 @@ export class FormFieldComponent {
   readonly hint = input<string>('');
   readonly description = input<string>('');
   readonly error = input<string>('');
+  readonly required = input<boolean>(false);
   readonly tone = input<FormFieldTone>('default');
+
+  readonly descriptionToShow = computed(() => this.error() || this.description());
 
   readonly messageClass = computed(() => {
     const tone = this.error() ? 'danger' : this.tone();
