@@ -4,21 +4,27 @@ import { BehaviorSubject } from 'rxjs';
 export type UiFeedbackType = 'success' | 'error' | 'info' | 'warning';
 
 export interface UiFeedbackMessage {
+  id: number;
   type: UiFeedbackType;
   text: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class UiFeedbackService {
-  private readonly messageSubject = new BehaviorSubject<UiFeedbackMessage | null>(null);
-  readonly message$ = this.messageSubject.asObservable();
-  private dismissTimer?: ReturnType<typeof setTimeout>;
+  private readonly messagesSubject = new BehaviorSubject<UiFeedbackMessage[]>([]);
+  readonly messages$ = this.messagesSubject.asObservable();
+
+  private idCounter = 0;
 
   show(type: UiFeedbackType, text: string, durationMs = 3500): void {
-    this.messageSubject.next({ type, text });
-    if (this.dismissTimer) clearTimeout(this.dismissTimer);
+    const id = ++this.idCounter;
+    const message: UiFeedbackMessage = { id, type, text };
+
+    const current = this.messagesSubject.value;
+    this.messagesSubject.next([...current, message]);
+
     if (durationMs > 0) {
-      this.dismissTimer = setTimeout(() => this.clear(), durationMs);
+      setTimeout(() => this.dismiss(id), durationMs);
     }
   }
 
@@ -38,11 +44,12 @@ export class UiFeedbackService {
     this.show('warning', text, durationMs);
   }
 
+  dismiss(id: number): void {
+    const current = this.messagesSubject.value;
+    this.messagesSubject.next(current.filter((m) => m.id !== id));
+  }
+
   clear(): void {
-    if (this.dismissTimer) {
-      clearTimeout(this.dismissTimer);
-      this.dismissTimer = undefined;
-    }
-    this.messageSubject.next(null);
+    this.messagesSubject.next([]);
   }
 }
