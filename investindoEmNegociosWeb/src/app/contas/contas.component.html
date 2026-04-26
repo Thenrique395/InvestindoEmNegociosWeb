@@ -8,30 +8,27 @@
     <h2 class="mb-3 text-lg font-semibold text-[var(--text)]">{{ editingId ? 'Editar conta' : 'Nova conta' }}</h2>
 
     <div class="grid gap-3 md:grid-cols-4">
-      <label class="grid gap-1 text-sm text-[var(--text)]">
-        Nome
+      <app-form-field label="Nome da conta">
         <input
           type="text"
           [(ngModel)]="form.name"
           class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm"
           placeholder="Ex.: Nubank" />
-      </label>
+      </app-form-field>
 
-      <label class="grid gap-1 text-sm text-[var(--text)]">
-        Tipo
+      <app-form-field label="Tipo">
         <select [(ngModel)]="form.type" class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm">
           <option *ngFor="let t of accountTypes" [value]="t">{{ accountTypeLabel(t) }}</option>
         </select>
-      </label>
+      </app-form-field>
 
-      <label class="grid gap-1 text-sm text-[var(--text)]">
-        Saldo inicial
+      <app-form-field label="Saldo inicial">
         <input
           type="number"
           step="0.01"
           [(ngModel)]="form.initialBalance"
           class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm" />
-      </label>
+      </app-form-field>
 
       <label class="mt-6 inline-flex items-center gap-2 text-sm text-[var(--text)]">
         <input type="checkbox" [(ngModel)]="form.isActive" />
