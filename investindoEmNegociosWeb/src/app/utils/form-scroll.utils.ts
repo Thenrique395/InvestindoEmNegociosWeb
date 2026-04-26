@@ -4,10 +4,12 @@ export type ScrollToInvalidFieldOptions = {
   behavior?: ScrollBehavior;
   focusDelayMs?: number;
   autoDetectHeader?: boolean;
+  scrollContainer?: HTMLElement | null;
 };
 
 const DEFAULT_HEADER_OFFSET = 96;
 const HEADER_SAFE_GAP = 16;
+const CONTAINER_SAFE_GAP = 16;
 
 export function scrollToFirstInvalidFormField(options: ScrollToInvalidFieldOptions = {}): boolean {
   const {
@@ -15,12 +17,33 @@ export function scrollToFirstInvalidFormField(options: ScrollToInvalidFieldOptio
     offsetTop,
     behavior = 'smooth',
     focusDelayMs = 250,
-    autoDetectHeader = true
+    autoDetectHeader = true,
+    scrollContainer
   } = options;
 
   const element = root.querySelector('.form-field--invalid') as HTMLElement | null;
   if (!element) return false;
 
+  const container = scrollContainer ?? findScrollableContainer(element);
+
+  if (container) {
+    scrollElementIntoContainer(element, container, behavior);
+  } else {
+    scrollElementIntoWindow(element, offsetTop, autoDetectHeader, behavior);
+  }
+
+  const focusable = element.querySelector('input, select, textarea, button') as HTMLElement | null;
+  window.setTimeout(() => focusable?.focus?.({ preventScroll: true }), focusDelayMs);
+
+  return true;
+}
+
+function scrollElementIntoWindow(
+  element: HTMLElement,
+  offsetTop: number | undefined,
+  autoDetectHeader: boolean,
+  behavior: ScrollBehavior
+): void {
   const resolvedOffsetTop = offsetTop ?? (autoDetectHeader ? detectFixedHeaderOffset() : DEFAULT_HEADER_OFFSET);
   const elementTop = element.getBoundingClientRect().top + window.scrollY;
   const targetTop = Math.max(elementTop - resolvedOffsetTop, 0);
@@ -29,11 +52,44 @@ export function scrollToFirstInvalidFormField(options: ScrollToInvalidFieldOptio
     top: targetTop,
     behavior
   });
+}
 
-  const focusable = element.querySelector('input, select, textarea, button') as HTMLElement | null;
-  window.setTimeout(() => focusable?.focus?.({ preventScroll: true }), focusDelayMs);
+function scrollElementIntoContainer(
+  element: HTMLElement,
+  container: HTMLElement,
+  behavior: ScrollBehavior
+): void {
+  const elementRect = element.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
 
-  return true;
+  const currentScrollTop = container.scrollTop;
+  const relativeTop = elementRect.top - containerRect.top + currentScrollTop;
+  const targetTop = Math.max(relativeTop - CONTAINER_SAFE_GAP, 0);
+
+  container.scrollTo({
+    top: targetTop,
+    behavior
+  });
+}
+
+function findScrollableContainer(element: HTMLElement): HTMLElement | null {
+  let current = element.parentElement;
+
+  while (current && current !== document.body && current !== document.documentElement) {
+    if (isScrollable(current)) {
+      return current;
+    }
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
+function isScrollable(element: HTMLElement): boolean {
+  const style = window.getComputedStyle(element);
+  const overflowY = style.overflowY;
+  const canScroll = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+  return canScroll && element.scrollHeight > element.clientHeight;
 }
 
 function detectFixedHeaderOffset(): number {
