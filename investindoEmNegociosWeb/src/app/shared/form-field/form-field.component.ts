@@ -1,16 +1,39 @@
 import { Component, computed, input } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 
 type FormFieldTone = 'default' | 'danger' | 'success';
 
 @Component({
   selector: 'app-form-field',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgClass, NgIf],
+  host: {
+    '[class.form-field--invalid]': 'hasError()'
+  },
+  styles: [`
+    :host {
+      display: block;
+    }
+
+    :host(.form-field--invalid) ::ng-deep input,
+    :host(.form-field--invalid) ::ng-deep select,
+    :host(.form-field--invalid) ::ng-deep textarea {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+      outline: none;
+    }
+
+    :host(.form-field--invalid) ::ng-deep input:focus,
+    :host(.form-field--invalid) ::ng-deep select:focus,
+    :host(.form-field--invalid) ::ng-deep textarea:focus {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+  `],
   template: `
     <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
       <span class="flex items-center justify-between gap-2">
-        <span class="inline-flex items-center gap-1">
+        <span class="inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--danger)]' : ''">
           {{ label() }}
           <span *ngIf="required()" class="text-[var(--danger)]" aria-hidden="true">*</span>
         </span>
@@ -19,7 +42,7 @@ type FormFieldTone = 'default' | 'danger' | 'success';
 
       <ng-content></ng-content>
 
-      <span *ngIf="descriptionToShow()" [class]="messageClass()" [attr.role]="error() ? 'alert' : null">
+      <span *ngIf="descriptionToShow()" [class]="messageClass()" [attr.role]="hasError() ? 'alert' : null">
         {{ descriptionToShow() }}
       </span>
     </label>
@@ -33,10 +56,11 @@ export class FormFieldComponent {
   readonly required = input<boolean>(false);
   readonly tone = input<FormFieldTone>('default');
 
+  readonly hasError = computed(() => !!this.error()?.trim());
   readonly descriptionToShow = computed(() => this.error() || this.description());
 
   readonly messageClass = computed(() => {
-    const tone = this.error() ? 'danger' : this.tone();
+    const tone = this.hasError() ? 'danger' : this.tone();
     if (tone === 'danger') return 'text-xs font-medium text-[var(--danger)]';
     if (tone === 'success') return 'text-xs font-medium text-[var(--success)]';
     return 'text-xs font-medium text-[var(--text-muted)]';
