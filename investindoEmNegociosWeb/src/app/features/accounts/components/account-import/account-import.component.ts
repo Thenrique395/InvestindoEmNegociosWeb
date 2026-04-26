@@ -3,8 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SectionCardComponent } from '../../../../shared/section-card/section-card.component';
 import { CsvExtractResponse, OfxExtractResponse, OfxTransactionPreview } from '../../../accounts/data-access/accounts.service';
+import { CategoryDto } from '../../../../categories.service';
 
 type AiConfidenceTone = 'success' | 'warning' | 'muted';
+type ImportSource = 'OFX' | 'CSV';
+
+export interface CategoryLearningCandidate {
+  description: string;
+  amount: number;
+  kind: 'Credit' | 'Debit';
+  previousCategoryId?: string | null;
+  selectedCategoryId?: string | null;
+  suggestedCategoryName?: string | null;
+  confidence?: number | null;
+  source: ImportSource;
+}
 
 @Component({
   selector: 'app-account-import',
@@ -18,6 +31,7 @@ export class AccountImportComponent {
   @Input() importingOfx = false;
   @Input() ofxExtract: OfxExtractResponse = { items: [], rawText: '' };
   @Input() duplicateCount = 0;
+  @Input() categories: CategoryDto[] = [];
 
   @Input() extractingCsv = false;
   @Input() importingCsv = false;
@@ -29,6 +43,7 @@ export class AccountImportComponent {
   @Output() clearOfx = new EventEmitter<void>();
   @Output() clearCsv = new EventEmitter<void>();
   @Output() csvSkipDuplicatesChange = new EventEmitter<boolean>();
+  @Output() categoryChanged = new EventEmitter<CategoryLearningCandidate>();
 
   get ofxAiSuggestedCount(): number {
     return this.ofxExtract.items.filter((item) => !!item.suggestedCategory?.categoryName || !!item.categoryId).length;
@@ -49,6 +64,27 @@ export class AccountImportComponent {
   onCsvSkipDuplicatesChange(value: boolean): void {
     this.csvSkipDuplicates = value;
     this.csvSkipDuplicatesChange.emit(value);
+  }
+
+  onCategoryChange(item: OfxTransactionPreview, selectedCategoryId: string | null, source: ImportSource): void {
+    const previousCategoryId = item.categoryId ?? item.suggestedCategory?.categoryId ?? null;
+    item.categoryId = selectedCategoryId;
+
+    this.categoryChanged.emit({
+      description: item.description,
+      amount: item.amount,
+      kind: item.kind,
+      previousCategoryId,
+      selectedCategoryId,
+      suggestedCategoryName: item.suggestedCategory?.categoryName ?? null,
+      confidence: item.suggestedCategory?.score ?? item.suggestedCategory?.confidence ?? null,
+      source
+    });
+  }
+
+  categoriesForItem(item: OfxTransactionPreview): CategoryDto[] {
+    const appliesTo = item.kind === 'Credit' ? 'Income' : 'Expense';
+    return this.categories.filter((category) => category.appliesTo === appliesTo || category.appliesTo === null);
   }
 
   categorySuggestionLabel(item: OfxTransactionPreview): string {
