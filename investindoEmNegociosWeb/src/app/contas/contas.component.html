@@ -42,5 +42,104 @@
     </app-account-list>
   </section>
 
-  <!-- restante mantido igual -->
+  <app-section-card
+    *ngIf="selectedAccount"
+    [title]="'Extrato: ' + selectedAccount.name"
+    description="Acompanhe movimentações, filtros e importações de extrato">
+    <div card-actions class="flex flex-wrap items-end gap-2">
+      <label class="grid gap-1 text-xs text-[var(--text-muted)]">
+        De
+        <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
+      </label>
+      <label class="grid gap-1 text-xs text-[var(--text-muted)]">
+        Até
+        <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
+      </label>
+      <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
+    </div>
+
+    <app-section-card
+      title="Motor de importação de extrato"
+      description="Importe OFX ou CSV para esta conta com deduplicação unificada."
+      surface="muted">
+      <div card-actions class="flex flex-wrap gap-2">
+        <label class="btn-primary sm cursor-pointer">
+          <input type="file" accept=".ofx,application/x-ofx,text/plain,application/octet-stream" class="hidden" (change)="onOfxSelected($event)" />
+          Escolher OFX
+        </label>
+        <label class="btn-ghost sm cursor-pointer">
+          <input type="file" accept=".csv,text/csv,application/vnd.ms-excel,text/plain" class="hidden" (change)="onCsvSelected($event)" />
+          Escolher CSV
+        </label>
+        <button type="button" class="btn-ghost sm" (click)="clearOfxState()" [disabled]="extractingOfx || importingOfx || !ofxExtract.items.length">
+          Limpar OFX
+        </button>
+      </div>
+
+      <div class="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div class="grid gap-3">
+          <div class="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-4 text-sm text-[var(--text-muted)]">
+            <p class="font-semibold text-[var(--text)]">{{ ofxFileName || 'Nenhum arquivo OFX selecionado' }}</p>
+            <p *ngIf="extractingOfx">Processando arquivo OFX...</p>
+            <p *ngIf="!extractingOfx && ofxExtract.items.length">
+              {{ ofxExtract.items.length }} movimentação(ões) encontradas.
+              <span *ngIf="duplicateCount()"> {{ duplicateCount() }} marcada(s) como duplicada(s).</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </app-section-card>
+
+    <app-section-card
+      title="Importação CSV"
+      description="Aceita colunas como data, descrição, valor, crédito/débito e tipo."
+      surface="muted">
+      <button card-actions type="button" class="btn-ghost sm" (click)="clearCsvState()" [disabled]="extractingCsv || importingCsv || !csvExtract.items.length">
+        Limpar CSV
+      </button>
+
+      <div class="mt-3 grid gap-3" *ngIf="csvExtract.items.length">
+        <label class="inline-flex items-center gap-2 text-sm text-[var(--text)]">
+          <input type="checkbox" [(ngModel)]="csvSkipDuplicates" />
+          Ignorar movimentações já importadas
+        </label>
+      </div>
+    </app-section-card>
+
+    <app-ui-state *ngIf="loadingTransactions" type="loading" title="Carregando extrato..."></app-ui-state>
+    <app-empty-state
+      *ngIf="!loadingTransactions && !transactions.length"
+      title="Nenhuma movimentação"
+      description="Tente alterar o filtro ou importar um extrato.">
+    </app-empty-state>
+
+    <div class="overflow-x-auto" *ngIf="!loadingTransactions && transactions.length">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+            <th class="py-2 pr-4">Data</th>
+            <th class="py-2 pr-4">Tipo</th>
+            <th class="py-2 pr-4">Descrição</th>
+            <th class="py-2 pr-4">Origem</th>
+            <th class="py-2 text-right">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of transactions" class="border-b border-[var(--border)]/60 text-[var(--text)]">
+            <td class="py-2 pr-4">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="py-2 pr-4">
+              <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
+              </span>
+            </td>
+            <td class="py-2 pr-4">{{ tx.description }}</td>
+            <td class="py-2 pr-4">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</td>
+            <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </app-section-card>
 </section>
