@@ -1,6 +1,6 @@
 <app-section-card
   title="Motor de importação com IA"
-  description="Sugestões automáticas de categoria e recorrência antes de importar"
+  description="Sugestões automáticas de categoria e recorrência antes de importar. Quando você corrige uma categoria, o sistema registra um candidato de aprendizado."
   surface="muted">
 
   <div card-actions class="flex flex-wrap gap-2">
@@ -37,7 +37,6 @@
     </div>
   </div>
 
-  <!-- 🔥 PREVIEW IA -->
   <div *ngIf="hasOfxPreview" class="mt-4 overflow-x-auto">
     <table class="min-w-full text-sm">
       <thead>
@@ -45,7 +44,8 @@
           <th class="py-2 px-3">Data</th>
           <th class="py-2 px-3">Descrição</th>
           <th class="py-2 px-3">Valor</th>
-          <th class="py-2 px-3">Categoria (IA)</th>
+          <th class="py-2 px-3">Categoria sugerida</th>
+          <th class="py-2 px-3">Corrigir / ensinar</th>
           <th class="py-2 px-3">Confiança</th>
           <th class="py-2 px-3">Recorrência</th>
         </tr>
@@ -56,6 +56,17 @@
           <td class="py-2 px-3">{{ item.description }}</td>
           <td class="py-2 px-3">{{ signedAmount(item) }}</td>
           <td class="py-2 px-3">{{ categorySuggestionLabel(item) }}</td>
+          <td class="py-2 px-3">
+            <select
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
+              [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
+              (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
+              <option [ngValue]="null">Sem categoria</option>
+              <option *ngFor="let category of categoriesForItem(item)" [ngValue]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+          </td>
           <td class="py-2 px-3">
             <span [ngClass]="{
               'text-green-600': confidenceTone(item) === 'success',
