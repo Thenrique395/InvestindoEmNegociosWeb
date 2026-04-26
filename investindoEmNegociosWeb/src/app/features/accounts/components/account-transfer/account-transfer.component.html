@@ -1,0 +1,72 @@
+<section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+  <h2 class="mb-3 text-lg font-semibold text-[var(--text)]">Transferência entre contas</h2>
+  <p class="mb-3 text-sm text-[var(--text-muted)]">
+    Registra débito na conta de origem e crédito na conta de destino em uma operação única.
+  </p>
+
+  <p *ngIf="!canTransfer" class="text-sm text-[var(--text-muted)]">
+    Você precisa de pelo menos duas contas ativas para transferir.
+  </p>
+
+  <div class="grid gap-3 md:grid-cols-5" *ngIf="canTransfer">
+    <label class="grid gap-1 text-sm text-[var(--text)]">
+      Conta origem
+      <select
+        [ngModel]="value.fromAccountId"
+        (ngModelChange)="update('fromAccountId', $event)"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm">
+        <option *ngFor="let account of accounts" [ngValue]="account.id" [disabled]="!account.isActive">
+          {{ account.name }}
+        </option>
+      </select>
+    </label>
+
+    <label class="grid gap-1 text-sm text-[var(--text)]">
+      Conta destino
+      <select
+        [ngModel]="value.toAccountId"
+        (ngModelChange)="update('toAccountId', $event)"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm">
+        <option *ngFor="let account of accounts" [ngValue]="account.id" [disabled]="!account.isActive || account.id === value.fromAccountId">
+          {{ account.name }}
+        </option>
+      </select>
+    </label>
+
+    <label class="grid gap-1 text-sm text-[var(--text)]">
+      Valor
+      <input
+        type="number"
+        min="0.01"
+        step="0.01"
+        [ngModel]="value.amount"
+        (ngModelChange)="update('amount', $event)"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm" />
+    </label>
+
+    <label class="grid gap-1 text-sm text-[var(--text)]">
+      Data/hora (opcional)
+      <input
+        type="datetime-local"
+        [ngModel]="value.occurredAtInput"
+        (ngModelChange)="update('occurredAtInput', $event)"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm" />
+    </label>
+
+    <label class="grid gap-1 text-sm text-[var(--text)]">
+      Descrição (opcional)
+      <input
+        type="text"
+        [ngModel]="value.description"
+        (ngModelChange)="update('description', $event)"
+        placeholder="Ex.: Reserva do mês"
+        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm" />
+    </label>
+  </div>
+
+  <div class="mt-4" *ngIf="canTransfer">
+    <button type="button" class="btn-primary sm" [disabled]="transferring" (click)="submitTransfer.emit()">
+      {{ transferring ? 'Transferindo...' : 'Transferir agora' }}
+    </button>
+  </div>
+</section>
