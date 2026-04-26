@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FormFieldComponent } from '../../../shared/form-field/form-field.component';
+import { FormFieldComponent } from '../../../../shared/form-field/form-field.component';
 
 @Component({
   selector: 'app-account-form',
@@ -24,10 +24,9 @@ export class AccountFormComponent {
 
   @Output() save = new EventEmitter<void>();
   @Output() clear = new EventEmitter<void>();
-
   @Output() touchField = new EventEmitter<string>();
 
-  onSave() { this.save.emit(); }
-  onClear() { this.clear.emit(); }
-  onTouch(field: string) { this.touchField.emit(field); }
+  onSave(): void { this.save.emit(); }
+  onClear(): void { this.clear.emit(); }
+  onTouch(field: string): void { this.touchField.emit(field); }
 }
