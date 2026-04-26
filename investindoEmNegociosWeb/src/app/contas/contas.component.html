@@ -41,16 +41,16 @@
     *ngIf="selectedAccount"
     [title]="'Extrato: ' + selectedAccount.name"
     description="Acompanhe movimentações, filtros e importações de extrato">
-    <div card-actions class="flex flex-wrap items-end gap-2">
-      <label class="grid gap-1 text-xs text-[var(--text-muted)]">
+    <div card-actions class="flex flex-wrap items-end gap-2 max-md:flex-col max-md:items-stretch">
+      <label class="grid gap-1 text-xs text-[var(--text-muted)] max-md:w-full">
         De
-        <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
+        <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm max-md:h-11 max-md:w-full" />
       </label>
-      <label class="grid gap-1 text-xs text-[var(--text-muted)]">
+      <label class="grid gap-1 text-xs text-[var(--text-muted)] max-md:w-full">
         Até
-        <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
+        <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm max-md:h-11 max-md:w-full" />
       </label>
-      <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
+      <button type="button" class="btn-primary sm max-md:w-full" (click)="loadTransactions()">Filtrar</button>
     </div>
 
     <app-account-import
@@ -79,7 +79,8 @@
       description="Tente alterar o filtro ou importar um extrato.">
     </app-empty-state>
 
-    <div class="overflow-x-auto" *ngIf="!loadingTransactions && transactions.length">
+    <!-- Desktop: tabela analítica -->
+    <div class="overflow-x-auto max-md:hidden" *ngIf="!loadingTransactions && transactions.length">
       <table class="min-w-full text-sm">
         <thead>
           <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
@@ -106,6 +107,39 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile: cards sem scroll lateral -->
+    <div class="hidden gap-3 max-md:grid" *ngIf="!loadingTransactions && transactions.length">
+      <article
+        *ngFor="let tx of transactions"
+        class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-xs text-[var(--text-muted)]">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</p>
+            <h3 class="mt-1 break-words text-sm font-semibold text-[var(--text)]">{{ tx.description }}</h3>
+          </div>
+          <strong
+            class="shrink-0 text-sm"
+            [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+            {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+            <span class="block text-[var(--text-muted)]">Tipo</span>
+            <span class="mt-1 block font-semibold" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
+            </span>
+          </div>
+
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+            <span class="block text-[var(--text-muted)]">Origem</span>
+            <span class="mt-1 block break-words font-semibold text-[var(--text)]">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</span>
+          </div>
+        </div>
+      </article>
     </div>
   </app-section-card>
 </section>
