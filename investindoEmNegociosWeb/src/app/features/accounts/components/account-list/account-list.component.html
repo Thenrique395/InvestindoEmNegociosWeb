@@ -1,0 +1,29 @@
+<section>
+  <div class="mb-3 flex items-center justify-between">
+    <h2>Minhas contas</h2>
+    <button (click)="refresh.emit()">Atualizar</button>
+  </div>
+
+  <app-ui-state *ngIf="loading" type="loading" title="Carregando contas..."></app-ui-state>
+
+  <app-empty-state
+    *ngIf="!loading && !hasAccounts"
+    title="Nenhuma conta cadastrada"
+    description="Crie sua primeira conta"
+    ctaLabel="Criar conta"
+    (action)="create.emit()">
+  </app-empty-state>
+
+  <div *ngIf="!loading && hasAccounts" class="grid gap-3 md:grid-cols-2">
+    <article *ngFor="let account of accounts; trackBy: trackByAccountId">
+      <h3>{{ account.name }}</h3>
+      <p>{{ accountTypeLabel(account.type) }}</p>
+
+      <p>Saldo: {{ account.currentBalance }}</p>
+
+      <button (click)="selectAccount.emit(account.id)">Extrato</button>
+      <button (click)="edit.emit(account)">Editar</button>
+      <button (click)="remove.emit(account)">Remover</button>
+    </article>
+  </div>
+</section>
