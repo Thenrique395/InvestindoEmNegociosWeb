@@ -7,11 +7,15 @@ import { AuthService } from '../auth.service';
 import { hasAtLeastRole } from '../roles';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { CategoriesStore } from '../categories.store';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { FormState } from '../utils/form-state';
+
+type CategoryFormField = 'name' | 'scope' | 'type';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormFieldComponent],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss']
 })
@@ -43,6 +47,11 @@ export class CategoriesComponent implements OnInit {
     { id: 'Expense' as CategoryType, label: 'Despesa' },
     { id: 'Income' as CategoryType, label: 'Receita' }
   ];
+
+  readonly categoryForm = new FormState<CategoryFormField>(
+    ['name', 'scope', 'type'],
+    () => this.validateCategoryForm()
+  );
 
   constructor(
     private categoriesStore: CategoriesStore,
@@ -153,8 +162,7 @@ export class CategoriesComponent implements OnInit {
 
   abrirModal(): void {
     this.showModal = true;
-    this.nome = '';
-    this.tipo = 'Expense';
+    this.resetCategoryForm();
   }
 
   fecharModal(): void {
@@ -163,11 +171,14 @@ export class CategoriesComponent implements OnInit {
   }
 
   adicionar(): void {
-    const nomeLimpo = this.nome.trim();
-    if (!nomeLimpo) {
-      this.uiFeedback.warning('Informe o nome da categoria.');
+    this.categoryForm.submit();
+
+    if (!this.categoryForm.isValid()) {
+      this.uiFeedback.warning('Revise os campos destacados antes de salvar.');
       return;
     }
+
+    const nomeLimpo = this.nome.trim();
     const conflito = this.findConflict(nomeLimpo, this.tipo, this.escopo);
     if (conflito === 'default') {
       this.uiFeedback.info('Essa categoria já existe no padrão do sistema. Use a categoria padrão para evitar duplicidade.');
@@ -189,8 +200,7 @@ export class CategoriesComponent implements OnInit {
         .create({ name: nomeLimpo, appliesTo: this.tipo })
         .subscribe({
           next: () => {
-            this.nome = '';
-            this.escopo = 'user';
+            this.resetCategoryForm();
             this.loadAdmin();
             this.categoriesService.invalidateCache();
             this.categoriesStore.refresh();
@@ -209,7 +219,7 @@ export class CategoriesComponent implements OnInit {
       next: (cat) => {
         this.categorias = [...this.categorias, cat];
         this.categoriesStore.refresh();
-        this.nome = '';
+        this.resetCategoryForm();
         this.showModal = false;
         this.uiFeedback.success('Categoria adicionada com sucesso.');
       },
@@ -312,6 +322,34 @@ export class CategoriesComponent implements OnInit {
     this.activeView = view;
   }
 
+  private validateCategoryForm(): Partial<Record<CategoryFormField, string>> {
+    const errors: Partial<Record<CategoryFormField, string>> = {};
+    const nomeLimpo = this.nome.trim();
+
+    if (!nomeLimpo) {
+      errors.name = 'Informe o nome da categoria.';
+    } else if (nomeLimpo.length < 2) {
+      errors.name = 'O nome precisa ter pelo menos 2 caracteres.';
+    }
+
+    if (!this.tipo) {
+      errors.type = 'Selecione o tipo da categoria.';
+    }
+
+    if (this.isAdmin && !this.escopo) {
+      errors.scope = 'Selecione o escopo da categoria.';
+    }
+
+    return errors;
+  }
+
+  private resetCategoryForm(): void {
+    this.nome = '';
+    this.tipo = 'Expense';
+    this.escopo = 'user';
+    this.categoryForm.reset();
+  }
+
   private matchSearch(name: string): boolean {
     if (!this.buscaNome.trim()) return true;
     return this.normalizeText(name).includes(this.normalizeText(this.buscaNome));
@@ -352,5 +390,4 @@ export class CategoriesComponent implements OnInit {
   trackByIndex(index: number): number {
     return index;
   }
-
 }
