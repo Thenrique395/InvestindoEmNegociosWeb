@@ -73,10 +73,11 @@ export class FormFieldComponent {
   readonly error = input<string>('');
   readonly required = input<boolean>(false);
   readonly submitted = input<boolean>(false);
+  readonly animate = input<boolean>(true);
   readonly tone = input<FormFieldTone>('default');
 
   readonly hasError = computed(() => !!this.error()?.trim());
-  readonly shouldAnimate = computed(() => this.hasError() && this.submitted());
+  readonly shouldAnimate = computed(() => this.hasError() && this.submitted() && this.animate());
   readonly descriptionToShow = computed(() => this.error() || this.description());
 
   readonly messageClass = computed(() => {
