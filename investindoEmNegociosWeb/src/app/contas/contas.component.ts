@@ -19,13 +19,14 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AccountFormComponent } from '../features/accounts/components/account-form/account-form.component';
 import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
+import { AccountTransferComponent, AccountTransferFormValue } from '../features/accounts/components/account-transfer/account-transfer.component';
 
 type AccountFormField = 'name' | 'type' | 'initialBalance';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, SectionCardComponent, StatusBadgeComponent, EmptyStateComponent, UiStateComponent],
+  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, SectionCardComponent, StatusBadgeComponent, EmptyStateComponent, UiStateComponent],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
@@ -102,6 +103,16 @@ export class ContasComponent implements OnInit {
 
   get hasAccounts(): boolean {
     return this.accounts.length > 0;
+  }
+
+  get transferForm(): AccountTransferFormValue {
+    return {
+      fromAccountId: this.transferFromAccountId,
+      toAccountId: this.transferToAccountId,
+      amount: this.transferAmount,
+      occurredAtInput: this.transferOccurredAtInput,
+      description: this.transferDescription
+    };
   }
 
   get accountNameError(): string {
@@ -234,6 +245,14 @@ export class ContasComponent implements OnInit {
       fromUtc: this.fromInput ? new Date(this.fromInput).toISOString() : undefined,
       toUtc: this.toInput ? new Date(this.toInput).toISOString() : undefined
     });
+  }
+
+  onTransferChange(value: AccountTransferFormValue): void {
+    this.transferFromAccountId = value.fromAccountId;
+    this.transferToAccountId = value.toAccountId;
+    this.transferAmount = value.amount;
+    this.transferOccurredAtInput = value.occurredAtInput;
+    this.transferDescription = value.description;
   }
 
   transfer(): void {
