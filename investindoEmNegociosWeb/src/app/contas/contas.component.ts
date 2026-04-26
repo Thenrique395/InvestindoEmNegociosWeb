@@ -47,11 +47,7 @@ export class ContasComponent implements OnInit {
 
   fromInput = '';
   toInput = '';
-  transferFromAccountId: string | null = null;
-  transferToAccountId: string | null = null;
-  transferAmount: number | null = null;
-  transferDescription = '';
-  transferOccurredAtInput = '';
+  transferForm: AccountTransferFormValue = this.createEmptyTransferForm();
   transferring = false;
   importingOfx = false;
   extractingOfx = false;
@@ -102,16 +98,6 @@ export class ContasComponent implements OnInit {
 
   get hasAccounts(): boolean {
     return this.accounts.length > 0;
-  }
-
-  get transferForm(): AccountTransferFormValue {
-    return {
-      fromAccountId: this.transferFromAccountId,
-      toAccountId: this.transferToAccountId,
-      amount: this.transferAmount,
-      occurredAtInput: this.transferOccurredAtInput,
-      description: this.transferDescription
-    };
   }
 
   get accountNameError(): string {
@@ -247,24 +233,20 @@ export class ContasComponent implements OnInit {
   }
 
   onTransferChange(value: AccountTransferFormValue): void {
-    this.transferFromAccountId = value.fromAccountId;
-    this.transferToAccountId = value.toAccountId;
-    this.transferAmount = value.amount;
-    this.transferOccurredAtInput = value.occurredAtInput;
-    this.transferDescription = value.description;
+    this.transferForm = value;
   }
 
   transfer(): void {
     if (this.transferring) return;
-    if (!this.transferFromAccountId || !this.transferToAccountId) {
+    if (!this.transferForm.fromAccountId || !this.transferForm.toAccountId) {
       this.error = 'Selecione conta de origem e destino.';
       return;
     }
-    if (this.transferFromAccountId === this.transferToAccountId) {
+    if (this.transferForm.fromAccountId === this.transferForm.toAccountId) {
       this.error = 'Origem e destino precisam ser contas diferentes.';
       return;
     }
-    const amount = Number(this.transferAmount || 0);
+    const amount = Number(this.transferForm.amount || 0);
     if (!Number.isFinite(amount) || amount <= 0) {
       this.error = 'Informe um valor de transferência válido.';
       return;
@@ -273,17 +255,20 @@ export class ContasComponent implements OnInit {
     this.transferring = true;
     this.error = '';
     const payload: AccountTransferRequest = {
-      fromAccountId: this.transferFromAccountId,
-      toAccountId: this.transferToAccountId,
+      fromAccountId: this.transferForm.fromAccountId,
+      toAccountId: this.transferForm.toAccountId,
       amount,
-      description: this.transferDescription?.trim() || null,
-      occurredAt: this.transferOccurredAtInput ? new Date(this.transferOccurredAtInput).toISOString() : null
+      description: this.transferForm.description?.trim() || null,
+      occurredAt: this.transferForm.occurredAtInput ? new Date(this.transferForm.occurredAtInput).toISOString() : null
     };
 
     this.accountsStore.transfer(payload, () => {
-      this.transferAmount = null;
-      this.transferDescription = '';
-      this.transferOccurredAtInput = '';
+      this.transferForm = {
+        ...this.transferForm,
+        amount: null,
+        description: '',
+        occurredAtInput: ''
+      };
       this.transferring = false;
     });
   }
@@ -491,20 +476,43 @@ export class ContasComponent implements OnInit {
     };
   }
 
+  private createEmptyTransferForm(): AccountTransferFormValue {
+    return {
+      fromAccountId: null,
+      toAccountId: null,
+      amount: null,
+      occurredAtInput: '',
+      description: ''
+    };
+  }
+
   private syncTransferDefaults(): void {
     const active = this.accounts.filter((a) => a.isActive);
     if (active.length < 2) {
-      this.transferFromAccountId = active[0]?.id ?? null;
-      this.transferToAccountId = null;
+      this.transferForm = {
+        ...this.transferForm,
+        fromAccountId: active[0]?.id ?? null,
+        toAccountId: null
+      };
       return;
     }
 
-    if (!this.transferFromAccountId || !active.some((a) => a.id === this.transferFromAccountId)) {
-      this.transferFromAccountId = active[0].id;
+    let fromAccountId = this.transferForm.fromAccountId;
+    let toAccountId = this.transferForm.toAccountId;
+
+    if (!fromAccountId || !active.some((a) => a.id === fromAccountId)) {
+      fromAccountId = active[0].id;
     }
-    if (!this.transferToAccountId || !active.some((a) => a.id === this.transferToAccountId) || this.transferToAccountId === this.transferFromAccountId) {
-      this.transferToAccountId = active.find((a) => a.id !== this.transferFromAccountId)?.id ?? null;
+
+    if (!toAccountId || !active.some((a) => a.id === toAccountId) || toAccountId === fromAccountId) {
+      toAccountId = active.find((a) => a.id !== fromAccountId)?.id ?? null;
     }
+
+    this.transferForm = {
+      ...this.transferForm,
+      fromAccountId,
+      toAccountId
+    };
   }
 
   private loadCategories(): void {
