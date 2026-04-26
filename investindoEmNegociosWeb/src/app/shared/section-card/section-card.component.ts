@@ -13,10 +13,10 @@ type SectionCardSurface = 'default' | 'muted';
     <section [class]="cardClass()">
       <header *ngIf="title() || description() || hasHeaderActions()" class="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div class="min-w-0 space-y-1">
-          <h2 *ngIf="title()" class="m-0 text-base font-semibold text-[var(--text)]">
+          <h2 *ngIf="title()" class="m-0 text-base font-semibold text-[var(--color-text)]">
             {{ title() }}
           </h2>
-          <p *ngIf="description()" class="m-0 text-sm text-[var(--text-muted)]">
+          <p *ngIf="description()" class="m-0 text-sm text-[var(--color-text-muted)]">
             {{ description() }}
           </p>
         </div>
@@ -40,20 +40,20 @@ export class SectionCardComponent {
   readonly cardClass = computed(() => {
     const paddingClass = this.resolvePaddingClass(this.padding());
     const surfaceClass = this.surface() === 'muted'
-      ? 'bg-[var(--surface-2)]'
-      : 'bg-[var(--surface)]';
+      ? 'bg-[var(--color-surface-muted)]'
+      : 'bg-[var(--color-surface)]';
 
-    return `rounded-2xl border border-[var(--border)] ${surfaceClass} ${paddingClass} shadow-[var(--shadow-sm)]`;
+    return `rounded-[var(--radius-xl)] border border-[var(--color-border)] ${surfaceClass} ${paddingClass} shadow-[var(--shadow-elevation-sm)]`;
   });
 
   private resolvePaddingClass(padding: SectionCardPadding): string {
     switch (padding) {
       case 'sm':
-        return 'p-3';
+        return 'p-[var(--spacing-3)]';
       case 'lg':
-        return 'p-6';
+        return 'p-[var(--spacing-6)]';
       default:
-        return 'p-4';
+        return 'p-[var(--spacing-4)]';
     }
   }
 }
