@@ -39,7 +39,53 @@ main,
 header,
 footer,
 aside,
-nav {
+nav,
+app-section-card,
+app-account-form,
+app-account-list,
+app-account-transfer,
+app-account-import,
+app-empty-state,
+app-ui-state {
+  min-width: 0;
+}
+
+/* Layout helpers used by multiple pages */
+.responsive-page {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.responsive-grid--compact {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+}
+
+.responsive-toolbar,
+.responsive-actions,
+.toolbar,
+.actions,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.responsive-toolbar > *,
+.responsive-actions > *,
+.toolbar > *,
+.actions > *,
+.filters > * {
   min-width: 0;
 }
 
@@ -47,11 +93,25 @@ nav {
 .table-responsive,
 .overflow-x-auto {
   max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
   -webkit-overflow-scrolling: touch;
 }
 
-.overflow-x-auto table {
+.overflow-x-auto table,
+.table-responsive table {
   min-width: 720px;
+}
+
+.table-responsive::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-muted) 28%, transparent);
 }
 
 /* Better tap targets on touch devices */
@@ -98,6 +158,14 @@ nav {
     min-width: 0;
   }
 
+  header,
+  section,
+  article,
+  .card,
+  .section-card {
+    overflow-wrap: anywhere;
+  }
+
   h1 {
     font-size: clamp(1.25rem, 6vw, 1.75rem);
     line-height: 1.15;
@@ -117,17 +185,27 @@ nav {
   .form-grid,
   .filters,
   .toolbar,
-  .actions {
+  .actions,
+  .responsive-toolbar,
+  .responsive-actions {
     min-width: 0;
   }
 
   .toolbar,
-  .actions {
-    flex-wrap: wrap;
+  .actions,
+  .filters,
+  .responsive-toolbar,
+  .responsive-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .toolbar > *,
-  .actions > * {
+  .actions > *,
+  .filters > *,
+  .responsive-toolbar > *,
+  .responsive-actions > * {
+    width: 100%;
     min-width: 0;
   }
 
@@ -140,8 +218,41 @@ nav {
 
   button.icon,
   .icon button,
-  .theme-toggle {
+  .theme-toggle,
+  .btn-icon {
     width: auto;
+  }
+
+  /* Tailwind grid fallbacks for common page patterns */
+  .md\:grid-cols-2,
+  .md\:grid-cols-3,
+  .md\:grid-cols-4,
+  .md\:grid-cols-5,
+  .lg\:grid-cols-2,
+  .lg\:grid-cols-3,
+  .lg\:grid-cols-4,
+  .xl\:grid-cols-2,
+  .xl\:grid-cols-3,
+  .xl\:grid-cols-4 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Financial cards become comfortable touch cards */
+  .rounded-2xl,
+  .rounded-xl {
+    scroll-margin-top: 80px;
+  }
+
+  /* Tables should not compress text until unreadable */
+  th,
+  td {
+    white-space: nowrap;
+  }
+
+  td:nth-child(3),
+  th:nth-child(3) {
+    white-space: normal;
+    min-width: 180px;
   }
 }
 
@@ -158,5 +269,10 @@ nav {
 
   .p-4 {
     padding: 0.85rem !important;
+  }
+
+  .overflow-x-auto table,
+  .table-responsive table {
+    min-width: 640px;
   }
 }
