@@ -20,13 +20,14 @@ import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AccountFormComponent } from '../features/accounts/components/account-form/account-form.component';
 import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
 import { AccountTransferComponent, AccountTransferFormValue } from '../features/accounts/components/account-transfer/account-transfer.component';
+import { AccountImportComponent } from '../features/accounts/components/account-import/account-import.component';
 
 type AccountFormField = 'name' | 'type' | 'initialBalance';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, SectionCardComponent, StatusBadgeComponent, EmptyStateComponent, UiStateComponent],
+  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, StatusBadgeComponent, EmptyStateComponent, UiStateComponent],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
