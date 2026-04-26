@@ -18,6 +18,8 @@ import { SectionCardComponent } from '../shared/section-card/section-card.compon
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 
+type AccountFormField = 'name' | 'type' | 'initialBalance';
+
 @Component({
   selector: 'app-contas',
   standalone: true,
@@ -30,6 +32,11 @@ export class ContasComponent implements OnInit {
   saving = false;
   error = '';
   formSubmitted = false;
+  accountFormTouched: Record<AccountFormField, boolean> = {
+    name: false,
+    type: false,
+    initialBalance: false
+  };
 
   accounts: AccountResponse[] = [];
   selectedAccountId: string | null = null;
@@ -96,7 +103,7 @@ export class ContasComponent implements OnInit {
   }
 
   get accountNameError(): string {
-    if (!this.formSubmitted) return '';
+    if (!this.shouldShowAccountFieldError('name')) return '';
     const name = (this.form.name || '').trim();
     if (!name) return 'Informe o nome da conta.';
     if (name.length < 2) return 'O nome precisa ter pelo menos 2 caracteres.';
@@ -104,15 +111,20 @@ export class ContasComponent implements OnInit {
   }
 
   get accountTypeError(): string {
-    if (!this.formSubmitted) return '';
+    if (!this.shouldShowAccountFieldError('type')) return '';
     return this.form.type ? '' : 'Selecione o tipo da conta.';
   }
 
   get initialBalanceError(): string {
-    if (!this.formSubmitted) return '';
+    if (!this.shouldShowAccountFieldError('initialBalance')) return '';
     const balance = Number(this.form.initialBalance);
     if (!Number.isFinite(balance)) return 'Informe um saldo inicial válido.';
     return '';
+  }
+
+  get firstAccountFormErrorField(): AccountFormField | null {
+    const fields: AccountFormField[] = ['name', 'type', 'initialBalance'];
+    return fields.find((field) => !!this.getAccountFieldError(field)) ?? null;
   }
 
   get isAccountFormValid(): boolean {
@@ -129,12 +141,14 @@ export class ContasComponent implements OnInit {
   startCreate(): void {
     this.editingId = null;
     this.formSubmitted = false;
+    this.accountFormTouched = this.createEmptyTouchedState();
     this.error = '';
     this.form = this.createEmptyForm();
   }
 
   startEdit(account: AccountResponse): void {
     this.formSubmitted = false;
+    this.accountFormTouched = this.createEmptyTouchedState();
     this.error = '';
     this.editingId = account.id;
     this.form = {
@@ -145,9 +159,22 @@ export class ContasComponent implements OnInit {
     };
   }
 
+  markAccountFieldTouched(field: AccountFormField): void {
+    this.accountFormTouched[field] = true;
+  }
+
+  shouldAnimateAccountField(field: AccountFormField): boolean {
+    return this.formSubmitted && this.firstAccountFormErrorField === field;
+  }
+
   save(): void {
     if (this.saving) return;
     this.formSubmitted = true;
+    this.accountFormTouched = {
+      name: true,
+      type: true,
+      initialBalance: true
+    };
     this.error = '';
 
     if (!this.isAccountFormValid) {
@@ -466,12 +493,40 @@ export class ContasComponent implements OnInit {
     return this.csvExtract.items.filter((item) => !item.isDuplicate).length;
   }
 
+  private getAccountFieldError(field: AccountFormField): string {
+    const name = (this.form.name || '').trim();
+    const balance = Number(this.form.initialBalance);
+
+    switch (field) {
+      case 'name':
+        if (!name) return 'Informe o nome da conta.';
+        if (name.length < 2) return 'O nome precisa ter pelo menos 2 caracteres.';
+        return '';
+      case 'type':
+        return this.form.type ? '' : 'Selecione o tipo da conta.';
+      case 'initialBalance':
+        return Number.isFinite(balance) ? '' : 'Informe um saldo inicial válido.';
+    }
+  }
+
+  private shouldShowAccountFieldError(field: AccountFormField): boolean {
+    return this.formSubmitted || this.accountFormTouched[field];
+  }
+
   private createEmptyForm(): AccountRequest {
     return {
       name: '',
       type: 'Checking',
       initialBalance: 0,
       isActive: true
+    };
+  }
+
+  private createEmptyTouchedState(): Record<AccountFormField, boolean> {
+    return {
+      name: false,
+      type: false,
+      initialBalance: false
     };
   }
 
