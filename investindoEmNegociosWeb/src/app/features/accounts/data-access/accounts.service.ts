@@ -6,19 +6,123 @@ import {
   AccountRequest,
   AccountResponse,
   AccountBalanceResponse,
+  AccountTransactionKind,
   AccountTransactionResponse,
   AccountTransferRequest,
   AccountTransferResponse
 } from '../models/account.models';
 
+export interface OfxTransactionPreview {
+  postedAt: string;
+  amount: number;
+  kind: AccountTransactionKind;
+  description: string;
+  memo?: string | null;
+  externalId?: string | null;
+  type?: string | null;
+  isDuplicate: boolean;
+  categoryId?: string | null;
+  suggestedCategory?: {
+    categoryId?: string | null;
+    categoryName?: string | null;
+    confidence?: number | null;
+    score?: number | null;
+    confidenceBand?: string | null;
+    reasonCode?: string | null;
+  } | null;
+  suggestedRecurrence?: {
+    isRecurringCandidate?: boolean;
+    frequency?: string | null;
+    score?: number | null;
+    confidenceBand?: string | null;
+    reasonCode?: string | null;
+    evidenceLabel?: string | null;
+  } | null;
+}
+
+export interface OfxExtractResponse {
+  bankId?: string | null;
+  branchId?: string | null;
+  accountNumber?: string | null;
+  accountType?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  ledgerBalance?: number | null;
+  items: OfxTransactionPreview[];
+  rawText: string;
+}
+
+export interface CsvExtractResponse {
+  delimiter: string;
+  detectedColumns: string[];
+  items: OfxTransactionPreview[];
+  rawText: string;
+}
+
+export interface OfxImportItemRequest {
+  postedAt: string;
+  amount: number;
+  kind: AccountTransactionKind;
+  description: string;
+  memo?: string | null;
+  externalId?: string | null;
+  type?: string | null;
+  categoryId?: string | null;
+}
+
+export interface OfxImportRequest {
+  accountId: string;
+  skipDuplicates: boolean;
+  items: OfxImportItemRequest[];
+}
+
+export interface OfxImportResult {
+  created: number;
+  skipped: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AccountsService {
   private readonly baseUrl = `${API_BASE_URL}/accounts`;
+  private readonly defaultAccountStorageKey = 'default_account_id';
 
   constructor(private http: HttpClient) {}
 
   list(): Observable<AccountResponse[]> {
     return this.http.get<AccountResponse[]>(this.baseUrl);
+  }
+
+  getDefaultAccountId(): string | null {
+    const storage = this.safeStorage();
+    return storage?.getItem(this.defaultAccountStorageKey) ?? null;
+  }
+
+  setDefaultAccountId(accountId: string | null): void {
+    const storage = this.safeStorage();
+    if (!storage) return;
+
+    if (!accountId) {
+      storage.removeItem(this.defaultAccountStorageKey);
+      return;
+    }
+
+    storage.setItem(this.defaultAccountStorageKey, accountId);
+  }
+
+  resolveDefaultAccountId(accounts: AccountResponse[]): string | null {
+    if (!accounts.length) {
+      this.setDefaultAccountId(null);
+      return null;
+    }
+
+    const stored = this.getDefaultAccountId();
+    if (stored && accounts.some((a) => a.id === stored && a.isActive)) {
+      return stored;
+    }
+
+    const fallback = accounts.find((a) => a.isActive)?.id ?? accounts[0].id;
+    this.setDefaultAccountId(fallback);
+    return fallback;
   }
 
   create(payload: AccountRequest): Observable<AccountResponse> {
@@ -46,5 +150,32 @@ export class AccountsService {
 
   transfer(payload: AccountTransferRequest): Observable<AccountTransferResponse> {
     return this.http.post<AccountTransferResponse>(`${this.baseUrl}/transfers`, payload);
+  }
+
+  extractOfx(file: File, accountId?: string | null): Observable<OfxExtractResponse> {
+    const data = new FormData();
+    data.append('file', file);
+    if (accountId) data.append('accountId', accountId);
+    return this.http.post<OfxExtractResponse>(`${this.baseUrl}/ofx/extract`, data);
+  }
+
+  importOfx(payload: OfxImportRequest): Observable<OfxImportResult> {
+    return this.http.post<OfxImportResult>(`${this.baseUrl}/ofx/import`, payload);
+  }
+
+  extractCsv(file: File, accountId?: string | null): Observable<CsvExtractResponse> {
+    const data = new FormData();
+    data.append('file', file);
+    if (accountId) data.append('accountId', accountId);
+    return this.http.post<CsvExtractResponse>(`${this.baseUrl}/csv/extract`, data);
+  }
+
+  importCsv(payload: OfxImportRequest): Observable<OfxImportResult> {
+    return this.http.post<OfxImportResult>(`${this.baseUrl}/csv/import`, payload);
+  }
+
+  private safeStorage(): Storage | null {
+    if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return null;
+    return window.localStorage;
   }
 }
