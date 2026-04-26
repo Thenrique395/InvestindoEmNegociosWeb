@@ -1,0 +1,58 @@
+<app-section-card
+  title="Motor de importação de extrato"
+  description="Importe OFX ou CSV para esta conta com deduplicação unificada."
+  surface="muted">
+
+  <div card-actions class="flex flex-wrap gap-2">
+    <label class="btn-primary sm cursor-pointer">
+      <input type="file" accept=".ofx" class="hidden" (change)="ofxSelected.emit($event)" />
+      Escolher OFX
+    </label>
+
+    <label class="btn-ghost sm cursor-pointer">
+      <input type="file" accept=".csv" class="hidden" (change)="csvSelected.emit($event)" />
+      Escolher CSV
+    </label>
+
+    <button
+      type="button"
+      class="btn-ghost sm"
+      (click)="clearOfx.emit()"
+      [disabled]="extractingOfx || importingOfx || !ofxExtract.items.length">
+      Limpar OFX
+    </button>
+  </div>
+
+  <div class="mt-3">
+    <p class="text-sm">{{ ofxFileName || 'Nenhum arquivo OFX selecionado' }}</p>
+    <p *ngIf="extractingOfx">Processando OFX...</p>
+    <p *ngIf="ofxExtract.items.length">
+      {{ ofxExtract.items.length }} itens ({{ duplicateCount }} duplicados)
+    </p>
+  </div>
+
+  <app-section-card
+    title="Importação CSV"
+    description="Importe CSV simples"
+    surface="muted">
+
+    <button
+      card-actions
+      type="button"
+      class="btn-ghost sm"
+      (click)="clearCsv.emit()"
+      [disabled]="extractingCsv || importingCsv || !csvExtract.items.length">
+      Limpar CSV
+    </button>
+
+    <div *ngIf="csvExtract.items.length">
+      <label class="inline-flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          [ngModel]="csvSkipDuplicates"
+          (ngModelChange)="onCsvSkipDuplicatesChange($event)" />
+        Ignorar duplicados
+      </label>
+    </div>
+  </app-section-card>
+</app-section-card>
