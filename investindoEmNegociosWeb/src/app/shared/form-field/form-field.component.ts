@@ -8,14 +8,15 @@ type FormFieldTone = 'default' | 'danger' | 'success';
   standalone: true,
   imports: [NgClass, NgIf],
   host: {
-    '[class.form-field--invalid]': 'hasError()'
+    '[class.form-field--invalid]': 'hasError()',
+    '[class.form-field--animate]': 'shouldAnimate()'
   },
   styles: [`
     :host {
       display: block;
     }
 
-    :host(.form-field--invalid) {
+    :host(.form-field--animate) {
       animation: form-field-shake 180ms ease-in-out;
     }
 
@@ -42,7 +43,7 @@ type FormFieldTone = 'default' | 'danger' | 'success';
     }
 
     @media (prefers-reduced-motion: reduce) {
-      :host(.form-field--invalid) {
+      :host(.form-field--animate) {
         animation: none;
       }
     }
@@ -71,9 +72,11 @@ export class FormFieldComponent {
   readonly description = input<string>('');
   readonly error = input<string>('');
   readonly required = input<boolean>(false);
+  readonly submitted = input<boolean>(false);
   readonly tone = input<FormFieldTone>('default');
 
   readonly hasError = computed(() => !!this.error()?.trim());
+  readonly shouldAnimate = computed(() => this.hasError() && this.submitted());
   readonly descriptionToShow = computed(() => this.error() || this.description());
 
   readonly messageClass = computed(() => {
