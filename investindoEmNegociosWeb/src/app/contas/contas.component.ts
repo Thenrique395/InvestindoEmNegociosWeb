@@ -15,11 +15,13 @@ import { CategoriesService, CategoryDto, CategoryType } from '../categories.serv
 import { AccountsStore } from '../accounts.store';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormFieldComponent, SectionCardComponent],
+  imports: [CommonModule, FormsModule, FormFieldComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
