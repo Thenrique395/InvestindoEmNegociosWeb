@@ -15,6 +15,10 @@ type FormFieldTone = 'default' | 'danger' | 'success';
       display: block;
     }
 
+    :host(.form-field--invalid) {
+      animation: form-field-shake 180ms ease-in-out;
+    }
+
     :host(.form-field--invalid) ::ng-deep input,
     :host(.form-field--invalid) ::ng-deep select,
     :host(.form-field--invalid) ::ng-deep textarea {
@@ -28,6 +32,19 @@ type FormFieldTone = 'default' | 'danger' | 'success';
     :host(.form-field--invalid) ::ng-deep textarea:focus {
       border-color: var(--danger) !important;
       box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+
+    @keyframes form-field-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :host(.form-field--invalid) {
+        animation: none;
+      }
     }
   `],
   template: `
