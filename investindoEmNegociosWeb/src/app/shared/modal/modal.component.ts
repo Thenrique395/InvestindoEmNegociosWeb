@@ -14,15 +14,26 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
       role="dialog"
       aria-modal="true"
       [attr.aria-label]="title()">
-      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="handleBackdropClick()"></div>
 
+      <!-- backdrop -->
+      <div
+        class="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] backdrop-blur-sm"
+        (click)="handleBackdropClick()"></div>
+
+      <!-- modal card -->
       <section [class]="modalClass()">
-        <header *ngIf="title() || subtitle() || showCloseButton()" class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-6 py-4">
+
+        <header *ngIf="title() || subtitle() || showCloseButton()"
+          class="flex items-start justify-between gap-4 border-b border-[var(--color-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]">
+
           <div class="min-w-0 space-y-1">
-            <h2 *ngIf="title()" class="m-0 text-lg font-semibold text-[var(--text)]">
+            <h2 *ngIf="title()"
+              class="m-0 text-lg font-semibold text-[var(--color-text)]">
               {{ title() }}
             </h2>
-            <p *ngIf="subtitle()" class="m-0 text-sm text-[var(--text-muted)]">
+
+            <p *ngIf="subtitle()"
+              class="m-0 text-sm text-[var(--color-text-muted)]">
               {{ subtitle() }}
             </p>
           </div>
@@ -30,21 +41,23 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
           <button
             *ngIf="showCloseButton()"
             type="button"
-            class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+            class="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-pill)] border border-[var(--color-border)] text-[var(--color-text-muted)] transition hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
             aria-label="Fechar modal"
             (click)="close.emit()">
             ✕
           </button>
         </header>
 
-        <div class="max-h-[calc(100vh-14rem)] overflow-y-auto px-6 py-4">
+        <div class="max-h-[calc(100vh-14rem)] overflow-y-auto px-[var(--spacing-4)] py-[var(--spacing-3)]">
           <ng-content></ng-content>
           <ng-content select="[modal-body]"></ng-content>
         </div>
 
-        <footer *ngIf="hasFooter()" class="flex flex-wrap justify-end gap-2 border-t border-[var(--border)] px-6 py-4">
+        <footer *ngIf="hasFooter()"
+          class="flex flex-wrap justify-end gap-[var(--spacing-2)] border-t border-[var(--color-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]">
           <ng-content select="[modal-footer]"></ng-content>
         </footer>
+
       </section>
     </div>
   `
@@ -62,7 +75,13 @@ export class ModalComponent {
 
   readonly modalClass = computed(() => {
     const sizeClass = this.resolveSizeClass(this.size());
-    return `relative w-full ${sizeClass} rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]`;
+    return `
+      relative w-full ${sizeClass}
+      rounded-[var(--radius-xl)]
+      border border-[var(--color-border)]
+      bg-[var(--color-surface)]
+      shadow-[var(--shadow-elevation-lg)]
+    `;
   });
 
   handleBackdropClick(): void {
