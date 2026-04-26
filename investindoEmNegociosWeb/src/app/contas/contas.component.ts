@@ -8,13 +8,11 @@ import {
   AccountTransactionResponse,
   AccountType,
   CsvExtractResponse,
-  OfxExtractResponse,
-  OfxTransactionPreview
+  OfxExtractResponse
 } from '../accounts.service';
-import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
+import { CategoriesService, CategoryDto } from '../categories.service';
 import { AccountsStore } from '../accounts.store';
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
-import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AccountFormComponent } from '../features/accounts/components/account-form/account-form.component';
@@ -27,7 +25,7 @@ type AccountFormField = 'name' | 'type' | 'initialBalance';
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, StatusBadgeComponent, EmptyStateComponent, UiStateComponent],
+  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
@@ -442,20 +440,6 @@ export class ContasComponent implements OnInit {
     this.csvExtract = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
   }
 
-  accountTypeLabel(type: AccountType): string {
-    switch (type) {
-      case 'Checking': return 'Conta corrente';
-      case 'Savings': return 'Poupança';
-      case 'DigitalWallet': return 'Carteira digital';
-      case 'Cash': return 'Dinheiro';
-      default: return 'Outro';
-    }
-  }
-
-  canTransfer(): boolean {
-    return this.accounts.filter((a) => a.isActive).length >= 2;
-  }
-
   sourceTypeLabel(sourceType?: string | null, sourceLabel?: string | null): string {
     if (sourceLabel?.trim()) return sourceLabel.trim();
     const raw = (sourceType || '').trim();
@@ -464,57 +448,6 @@ export class ContasComponent implements OnInit {
 
   duplicateCount(): number {
     return this.ofxExtract.items.filter((item) => item.isDuplicate).length;
-  }
-
-  importableCount(): number {
-    if (!this.ofxSkipDuplicates) return this.ofxExtract.items.length;
-    return this.ofxExtract.items.filter((item) => !item.isDuplicate).length;
-  }
-
-  trackOfxItem(index: number, item: OfxTransactionPreview): string {
-    return `${item.externalId || item.description}-${item.postedAt}-${index}`;
-  }
-
-  categoriesForItem(kind: 'Credit' | 'Debit'): CategoryDto[] {
-    const type: CategoryType = kind === 'Credit' ? 'Income' : 'Expense';
-    return this.categories.filter((category) => category.appliesTo === type || category.appliesTo === null);
-  }
-
-  confidenceLabel(score?: number | null, band?: string | null, value?: number | null): string {
-    const resolvedScore = score ?? (value == null ? null : Math.round(value * 100));
-    const resolvedBand = band || (resolvedScore == null
-      ? null
-      : resolvedScore >= 95
-        ? 'high'
-        : resolvedScore >= 85
-          ? 'medium'
-          : 'low');
-    if (resolvedScore == null) return '';
-    if (resolvedBand === 'high') return `Alta (${resolvedScore}/100)`;
-    if (resolvedBand === 'medium') return `Boa (${resolvedScore}/100)`;
-    return `Inicial (${resolvedScore}/100)`;
-  }
-
-  recurrenceLabel(frequency?: string | null): string {
-    if (!frequency) return 'Recorrente';
-    if (frequency === 'Monthly') return 'Recorrente mensal';
-    return `Recorrente ${frequency.toLowerCase()}`;
-  }
-
-  recurrenceScoreLabel(score?: number | null, band?: string | null): string {
-    if (score == null) return '';
-    if (band === 'high') return `Alta (${score}/100)`;
-    if (band === 'medium') return `Boa (${score}/100)`;
-    return `Inicial (${score}/100)`;
-  }
-
-  csvDuplicateCount(): number {
-    return this.csvExtract.items.filter((item) => item.isDuplicate).length;
-  }
-
-  csvImportableCount(): number {
-    if (!this.csvSkipDuplicates) return this.csvExtract.items.length;
-    return this.csvExtract.items.filter((item) => !item.isDuplicate).length;
   }
 
   onImportCategoryChanged(event: unknown): void {
