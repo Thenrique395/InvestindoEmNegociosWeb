@@ -6,10 +6,18 @@ import {
   AccountRequest,
   AccountResponse,
   AccountBalanceResponse,
+  CashflowProjectionResponse,
   AccountTransactionKind,
   AccountTransactionResponse,
   AccountTransferRequest,
-  AccountTransferResponse
+  AccountTransferResponse,
+  DebtSummaryResponse,
+  InsightEngineResponse,
+  NetWorthHistoryResponse,
+  NetWorthSummaryResponse,
+  RealAvailableBalanceResponse,
+  RecommendationEngineResponse,
+  RiskBotAssessmentResponse,
 } from '../models/account.models';
 
 export interface OfxTransactionPreview {
@@ -139,6 +147,80 @@ export class AccountsService {
 
   getBalance(id: string): Observable<AccountBalanceResponse> {
     return this.http.get<AccountBalanceResponse>(`${this.baseUrl}/${id}/balance`);
+  }
+
+  getRealAvailableBalance(
+    period: 'month' | 'quarter' | 'year',
+    referenceDate?: string,
+  ): Observable<RealAvailableBalanceResponse> {
+    let params = new HttpParams().set('period', period);
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<RealAvailableBalanceResponse>(`${this.baseUrl}/summary/real-balance`, {
+      params,
+    });
+  }
+
+  getDebtSummary(referenceDate?: string): Observable<DebtSummaryResponse> {
+    let params = new HttpParams();
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<DebtSummaryResponse>(`${this.baseUrl}/summary/debts`, { params });
+  }
+
+  getNetWorthSummary(referenceDate?: string): Observable<NetWorthSummaryResponse> {
+    let params = new HttpParams();
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<NetWorthSummaryResponse>(`${this.baseUrl}/summary/net-worth`, { params });
+  }
+
+  getNetWorthHistory(months = 12, referenceDate?: string): Observable<NetWorthHistoryResponse> {
+    let params = new HttpParams().set('months', months);
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<NetWorthHistoryResponse>(`${this.baseUrl}/summary/net-worth/history`, {
+      params,
+    });
+  }
+
+  getProjection(
+    period: 'month' | 'quarter' | 'year',
+    referenceDate?: string,
+  ): Observable<CashflowProjectionResponse> {
+    let params = new HttpParams().set('period', period);
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<CashflowProjectionResponse>(`${this.baseUrl}/summary/projection`, {
+      params,
+    });
+  }
+
+  getRiskAssessment(
+    period: 'month' | 'quarter' | 'year',
+    referenceDate?: string,
+  ): Observable<RiskBotAssessmentResponse> {
+    let params = new HttpParams().set('period', period);
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<RiskBotAssessmentResponse>(`${this.baseUrl}/summary/risk`, {
+      params,
+    });
+  }
+
+  getInsights(
+    period: 'month' | 'quarter' | 'year',
+    referenceDate?: string,
+  ): Observable<InsightEngineResponse> {
+    let params = new HttpParams().set('period', period);
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<InsightEngineResponse>(`${this.baseUrl}/summary/insights`, { params });
+  }
+
+  getRecommendations(
+    period: 'month' | 'quarter' | 'year',
+    referenceDate?: string,
+  ): Observable<RecommendationEngineResponse> {
+    let params = new HttpParams().set('period', period);
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<RecommendationEngineResponse>(
+      `${this.baseUrl}/summary/recommendations`,
+      { params },
+    );
   }
 
   listTransactions(id: string, options: { fromUtc?: string; toUtc?: string } = {}): Observable<AccountTransactionResponse[]> {

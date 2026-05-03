@@ -6,10 +6,12 @@ import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
 import { FocusArea, IntelligenceMode } from './onboarding.types';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { AuthService } from '../auth.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
 import { CardDto, CardsService } from '../cards.service';
 import { CreatePlanPayload, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
+import { hasAtLeastRole, UserRole } from '../roles';
 import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
 import { ReceitasFormComponent } from '../receitas/receitas-form.component';
 import { DespesasFormComponent } from '../despesas/despesas-form.component';
@@ -29,23 +31,28 @@ export class OnboardingComponent implements OnInit {
   creatingAccount = false;
   savingEntries = false;
   liveMessage = '';
+  readonly totalSteps = 4;
   readonly minBirthDate = '1900-01-01';
   readonly maxBirthDate = this.todayIso();
   step = 0;
   focus: FocusArea | null = null;
-  intelligenceMode: IntelligenceMode = 'B';
+  intelligenceMode: IntelligenceMode | null = null;
   carryOverDay = 1;
   readonly carryOverDayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
-  readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string }[] = [
+  readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string; tooltip: string; icon: 'balance' | 'shield' }[] = [
     {
       id: 'B',
       title: 'Balanceado',
-      description: 'Orientações objetivas para manter equilíbrio entre controle e crescimento.'
+      description: 'Orientações objetivas para manter equilíbrio entre controle, organização e crescimento.',
+      tooltip: 'Ideal para quem quer começar com orientação prática, sem excesso de alertas e sem perder visão de evolução financeira.',
+      icon: 'balance'
     },
     {
       id: 'C',
       title: 'Conservador',
-      description: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.'
+      description: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.',
+      tooltip: 'Indicado para quem prefere um início mais cauteloso, com atenção maior ao caixa, estabilidade e prevenção de imprevistos.',
+      icon: 'shield'
     }
   ];
   focusOptions: { id: FocusArea; title: string; description: string; tooltip: string; icon: 'growth' | 'debt' | 'invest' | 'shield' }[] = [
@@ -53,28 +60,28 @@ export class OnboardingComponent implements OnInit {
       id: 'vida-financeira',
       title: 'Melhorar vida financeira',
       description: 'Criar rotina para gastar melhor e ter mais controle no mês.',
-      tooltip: 'Você vai priorizar organização geral: entradas, saídas e previsibilidade do mês.',
+      tooltip: 'Essa direção ajuda a organizar a rotina financeira do mês, com mais clareza sobre entradas, saídas, orçamento e previsibilidade.',
       icon: 'growth'
     },
     {
       id: 'sair-dividas',
       title: 'Sair das dívidas',
       description: 'Priorizar pagamentos e reduzir pressão financeira.',
-      tooltip: 'Foco em reduzir dívidas atuais, controlar juros e acompanhar progresso de quitação.',
+      tooltip: 'Essa escolha prioriza quitar dívidas com mais estratégia, acompanhando juros, parcelas e evolução da quitação.',
       icon: 'debt'
     },
     {
       id: 'comecar-investir',
       title: 'Começar a investir',
       description: 'Organizar sobra mensal para iniciar aportes com consistência.',
-      tooltip: 'Objetivo voltado para criar sobra recorrente e transformar em aportes mensais.',
+      tooltip: 'Essa direção ajuda a gerar sobra recorrente no mês para transformar parte do dinheiro em aportes com constância.',
       icon: 'invest'
     },
     {
       id: 'reserva-emergencia',
       title: 'Criar reserva de emergência',
       description: 'Montar segurança para imprevistos antes de assumir mais risco.',
-      tooltip: 'Prioridade em construir proteção financeira para imprevistos sem depender de crédito.',
+      tooltip: 'Essa opção foca em construir uma proteção financeira para imprevistos, reduzindo a dependência de crédito em momentos de aperto.',
       icon: 'shield'
     }
   ];
@@ -119,6 +126,7 @@ export class OnboardingComponent implements OnInit {
     private router: Router,
     private onboarding: OnboardingService,
     private uiFeedback: UiFeedbackService,
+    private authService: AuthService,
     private accountsService: AccountsService,
     private cardsService: CardsService,
     private plansService: PlansService,
@@ -143,11 +151,11 @@ export class OnboardingComponent implements OnInit {
           this.router.navigateByUrl('/dashboard');
           return;
         }
-        this.step = Math.min(Math.max(status.step || 0, 0), 2);
-        this.loadProfile(this.step > 0);
+        this.step = Math.min(Math.max(status.step || 0, 0), this.totalSteps - 1);
+        this.loadProfile(true);
       },
       error: () => {
-        this.loadProfile(false);
+        this.loadProfile(true);
       }
     });
 
@@ -202,6 +210,12 @@ export class OnboardingComponent implements OnInit {
       return;
     }
 
+    if (!this.intelligenceMode) {
+      this.uiFeedback.warning('Selecione o estilo inicial dos insights.');
+      this.announce('Selecione o estilo inicial dos insights para continuar.');
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.uiFeedback.warning('Revise os campos.');
@@ -214,7 +228,7 @@ export class OnboardingComponent implements OnInit {
     this.profile.upsert(payload).subscribe({
       next: () => {
         this.loading = false;
-        this.uiFeedback.success('Dados e objetivo salvos. Vamos para o próximo passo.');
+        this.uiFeedback.success('Dados do perfil salvos. Vamos para a conta e os primeiros lançamentos.');
         this.announce('Dados e objetivo salvos com sucesso.');
         this.nextStep();
       },
@@ -233,7 +247,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   nextStep(): void {
-    if (this.step >= 2) {
+    if (this.step >= this.totalSteps - 1) {
       this.finishOnboarding();
       return;
     }
@@ -252,6 +266,22 @@ export class OnboardingComponent implements OnInit {
   }
 
   continueFromFocus(): void {
+    if (!this.focus) {
+      this.uiFeedback.warning('Selecione seu objetivo inicial.');
+      this.announce('Selecione um objetivo inicial para continuar.');
+      return;
+    }
+    this.nextStep();
+  }
+
+  continueFromPreferences(): void {
+    if (!this.intelligenceMode) {
+      this.uiFeedback.warning('Selecione o estilo inicial dos insights.');
+      this.announce('Selecione o estilo inicial dos insights para continuar.');
+      return;
+    }
+    this.uiFeedback.success('Preferências iniciais definidas. Vamos para seus dados básicos.');
+    this.announce('Preferências iniciais definidas.');
     this.nextStep();
   }
 
@@ -259,7 +289,7 @@ export class OnboardingComponent implements OnInit {
     if (!this.accountReady) {
       this.uiFeedback.warning('Crie uma conta para concluir o cadastro.');
       this.announce('Crie uma conta ativa para concluir o cadastro.');
-      this.step = 1;
+      this.step = this.totalSteps - 1;
       return;
     }
     this.persistStep(true);
@@ -268,7 +298,7 @@ export class OnboardingComponent implements OnInit {
 
   skipOnboarding(): void {
     this.uiFeedback.warning('Para concluir, crie ao menos uma conta.');
-    this.step = 1;
+    this.step = this.totalSteps - 1;
   }
 
   createAccount(): void {
@@ -305,7 +335,7 @@ export class OnboardingComponent implements OnInit {
     if (!this.accountReady) {
       this.uiFeedback.warning('Crie uma conta antes de cadastrar receita e despesa.');
       this.announce('Crie uma conta antes de cadastrar receita e despesa.');
-      this.step = 1;
+      this.step = this.totalSteps - 1;
       return;
     }
     if (!this.hasInitialIncome || !this.hasInitialExpense) {
@@ -670,8 +700,8 @@ export class OnboardingComponent implements OnInit {
       country: (raw.country as string).trim(),
       financialGoal: this.focus ?? '',
       language: 'pt-BR',
-      carryOverDay: this.carryOverDay,
-      intelligenceMode: this.intelligenceMode
+      carryOverDay: this.canEditCarryOverDay ? this.carryOverDay : 1,
+      intelligenceMode: this.intelligenceMode as IntelligenceMode
     };
   }
 
@@ -766,6 +796,18 @@ export class OnboardingComponent implements OnInit {
     return this.step > stepIndex;
   }
 
+  get currentRole(): UserRole | null {
+    return this.authService.getRole();
+  }
+
+  get canEditCarryOverDay(): boolean {
+    return hasAtLeastRole(this.currentRole, 'Intermediate');
+  }
+
+  get showStep4ContextPanels(): boolean {
+    return this.currentRole !== 'Basic';
+  }
+
   private todayIso(): string {
     return new Date().toISOString().slice(0, 10);
   }
@@ -831,8 +873,10 @@ export class OnboardingComponent implements OnInit {
           this.intelligenceMode = savedMode as IntelligenceMode;
         }
         const savedCarryOver = Number((data as { carryOverDay?: number }).carryOverDay);
-        if (Number.isInteger(savedCarryOver) && savedCarryOver >= 1 && savedCarryOver <= 31) {
+        if (this.canEditCarryOverDay && Number.isInteger(savedCarryOver) && savedCarryOver >= 1 && savedCarryOver <= 31) {
           this.carryOverDay = savedCarryOver;
+        } else if (!this.canEditCarryOverDay) {
+          this.carryOverDay = 1;
         }
 
         if (!prefillForm) return;

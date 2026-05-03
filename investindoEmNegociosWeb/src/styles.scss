@@ -1,8 +1,8 @@
+@use './styles/design-tokens';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './styles/design-tokens.scss';
 
 * {
   box-sizing: border-box;
@@ -20,15 +20,15 @@
   --text: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-md: 16px;
-  --text-lg: 18px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-  --text-3xl: 30px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 22px;
+  --text-2xl: 26px;
+  --text-3xl: 32px;
+  --text-4xl: 40px;
+  --text-5xl: 52px;
   --primary: #2563eb;
   --on-primary: #f8fafc;
   --success: #22c55e;
@@ -43,7 +43,7 @@
   --space-6: 48px;
   --radius-lg: 16px;
   --radius-md: 12px;
-  --control-h: 48px;
+  --control-h: 52px;
   --control-pad: var(--space-1) var(--space-2);
   --shadow-sm: 0 10px 20px rgba(15, 23, 42, 0.08);
   --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.12);

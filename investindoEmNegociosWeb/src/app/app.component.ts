@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
-import { AppFeatureKey, hasFeatureForRole } from './features';
+import { APP_FEATURE_KEYS, AppFeatureKey, hasFeatureForRole } from './features';
 import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 import { NotificationsService, NotificationItem } from './notifications.service';
@@ -25,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Investindo em Negócios';
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
+  readonly features = APP_FEATURE_KEYS;
   isLoginRoute = false;
   isReceitasRoute = false;
   isLightTheme = false;

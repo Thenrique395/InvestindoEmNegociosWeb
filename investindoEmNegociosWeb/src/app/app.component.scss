@@ -1,5 +1,5 @@
 :host {
-  --header-h: 64px;
+  --header-h: 68px;
 
   display: block;
   color: var(--text);
@@ -14,6 +14,102 @@
   align-items: center;
   padding: 0 clamp(var(--space-3), 2.5vw, var(--space-6));
   box-shadow: var(--shadow-sm);
+}
+
+.shell {
+  grid-template-columns: 280px minmax(0, 1fr) !important;
+}
+
+.sidebar {
+  gap: 1rem;
+  padding: 1.75rem 1.4rem !important;
+}
+
+.sidebar__nav {
+  gap: 0.45rem !important;
+}
+
+.sidebar__nav a,
+.sidebar__settings {
+  min-height: 60px !important;
+  padding: 0.8rem 1rem !important;
+  border-radius: 18px !important;
+  gap: 0.95rem !important;
+}
+
+.sidebar__nav .nav-icon,
+.sidebar__settings .nav-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 16px !important;
+}
+
+.sidebar__nav .nav-text,
+.sidebar__settings .nav-text {
+  font-size: 1rem !important;
+  line-height: 1.25 !important;
+}
+
+.sidebar__brand {
+  gap: 0.85rem;
+  padding-bottom: 1.1rem;
+}
+
+.sidebar__logo {
+  height: 38px;
+  width: auto;
+}
+
+.sidebar__title {
+  font-size: 1.18rem;
+  line-height: 1.15;
+}
+
+.sidebar__label {
+  font-size: 0.88rem;
+  letter-spacing: 0.16em;
+}
+
+.sidebar__nav a,
+.sidebar__settings {
+  min-height: 54px;
+  padding: 0.65rem 1rem !important;
+  border-radius: 16px;
+}
+
+.nav-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.nav-text {
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.topbar__slogan {
+  font-size: 0.95rem;
+}
+
+.notif-trigger,
+.theme-toggle {
+  width: 44px;
+  height: 44px;
+}
+
+.topbar {
+  padding-inline: clamp(1.4rem, 2vw, 2.2rem);
+}
+
+.user-trigger {
+  min-height: 44px;
+  padding: 0.45rem 0.7rem;
+}
+
+.user-name,
+.caret {
+  font-size: 0.95rem;
 }
 
 .topbar__actions {
@@ -31,6 +127,10 @@
   position: relative;
   isolation: isolate;
   padding: calc(var(--header-h) + var(--space-3)) clamp(var(--space-3), 2.5vw, var(--space-6)) var(--space-3);
+}
+
+.page--login {
+  padding: 0;
 }
 
 .page--logged {

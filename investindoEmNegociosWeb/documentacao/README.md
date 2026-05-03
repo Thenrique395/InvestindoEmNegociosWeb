@@ -11,6 +11,17 @@ Este arquivo existe para:
 - reduzir duplicação entre status funcional, testes, design system e backlog local
 - deixar claro quando consultar cada documento deste diretório
 
+## Agente local
+
+Este diretório também abriga o agente operacional local do frontend:
+
+- [Agent.md](./Agent.md)
+
+Regra:
+
+- esse agente governa a execução do Codex no frontend web
+- a documentação deste diretório continua governando o conteúdo funcional, visual e operacional especializado da aplicação
+
 ## Leitura rápida
 
 Use este diretório quando a dúvida for sobre:
@@ -151,6 +162,7 @@ Leitura prática:
 
 ## Fonte de verdade
 
+- Execução operacional do frontend: [Agent.md](./Agent.md)
 - Status do produto e backlog central: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
 - Design system e padrões visuais: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
 - Exploração visual e comparação de componentes: [systemDesigner.md](./systemDesigner.md)

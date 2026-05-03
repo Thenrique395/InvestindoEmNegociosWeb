@@ -1,5 +1,5 @@
-<div class="page" [class.page--logged]="isLogged">
-  <header class="header" *ngIf="showPublicExperience">
+<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isLoginRoute">
+  <header class="header" *ngIf="showPublicExperience && !isLoginRoute">
     <div class="brand">
       <a routerLink="/" (click)="reloadIfSame('/', $event)">
         <img
@@ -28,15 +28,15 @@
   </header>
 
   <ng-container *ngIf="isLogged">
-    <div class="shell relative grid min-h-screen grid-cols-[260px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] max-md:grid-cols-1">
+    <div class="shell relative grid min-h-screen grid-cols-[300px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] max-md:grid-cols-1">
       <div class="sidebar-backdrop fixed inset-0 z-30 bg-[rgba(15,23,42,0.4)] backdrop-blur-[2px]" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
       <aside
-        class="sidebar grid min-h-screen content-start gap-[0.9rem] border-r border-[var(--border)] bg-[var(--sidebar)] p-[var(--space-3)] max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:w-[min(78vw,320px)] max-md:-translate-x-full max-md:transform max-md:transition-transform max-md:shadow-[var(--shadow-md)] max-md:p-[var(--space-2)] max-md:pt-[calc(var(--space-2)+env(safe-area-inset-top))]"
+        class="sidebar grid min-h-screen content-start gap-[1rem] border-r border-[var(--border)] bg-[var(--sidebar)] p-[calc(var(--space-3)+4px)] max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:w-[min(82vw,340px)] max-md:-translate-x-full max-md:transform max-md:transition-transform max-md:shadow-[var(--shadow-md)] max-md:p-[var(--space-2)] max-md:pt-[calc(var(--space-2)+env(safe-area-inset-top))]"
         [ngClass]="sidebarOpen ? 'max-md:translate-x-0' : ''"
       >
         <div class="sidebar__brand flex items-center gap-3 border-b border-[var(--border)] px-[var(--space-1)] pb-[var(--space-2)]">
           <img
-            class="sidebar__logo block h-[34px] w-auto max-md:h-[28px]"
+          class="sidebar__logo block h-[40px] w-auto max-md:h-[32px]"
             [src]="isLightTheme ? '/assets/logoHeaderInvestindoemNegocios2.png' : '/assets/logoHeaderInvestindoemNegocios.png'"
           [alt]="brandName"
           width="34"
@@ -51,13 +51,13 @@
             routerLink="/dashboard"
             routerLinkActive="active"
             #dashActive="routerLinkActive"
-            *ngIf="hasFeature('cards.access')"
+            *ngIf="hasFeature(features.cardsRead)"
             (click)="reloadIfSame('/dashboard', $event)"
-            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            class="group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
             [ngClass]="dashActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
             <span
-              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              class="nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]"
               [ngClass]="dashActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]' : ''"
               aria-hidden="true"
             >
@@ -67,19 +67,19 @@
                   fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Dashboard</span>
+            <span class="nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]">Dashboard</span>
           </a>
           <a
             routerLink="/despesas"
             routerLinkActive="active"
             #despActive="routerLinkActive"
-            class="expense group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            class="expense group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
             *ngIf="hasAccess('Basic')"
             (click)="reloadIfSame('/despesas', $event)"
             [ngClass]="despActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
             <span
-              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              class="nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]"
               [ngClass]="despActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--danger)] shadow-[inset_0_0_0_1px_rgba(239,68,68,0.18)]' : ''"
               aria-hidden="true"
             >
@@ -88,19 +88,19 @@
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Despesas</span>
+            <span class="nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]">Despesas</span>
           </a>
           <a
             routerLink="/receitas"
             routerLinkActive="active"
             #recActive="routerLinkActive"
-            class="income group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            class="income group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
             *ngIf="hasAccess('Basic')"
             (click)="reloadIfSame('/receitas', $event)"
             [ngClass]="recActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
             <span
-              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              class="nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]"
               [ngClass]="recActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--success)] shadow-[inset_0_0_0_1px_rgba(34,197,94,0.18)]' : ''"
               aria-hidden="true"
             >
@@ -109,19 +109,19 @@
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Receitas</span>
+            <span class="nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]">Receitas</span>
           </a>
           <a
             routerLink="/calendario"
             routerLinkActive="active"
             #calActive="routerLinkActive"
-            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
-            *ngIf="hasFeature('accounts.access')"
+            class="group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
+            *ngIf="hasFeature(features.accountsRead)"
             (click)="reloadIfSame('/calendario', $event)"
             [ngClass]="calActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
             <span
-              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              class="nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]"
               [ngClass]="calActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]' : ''"
               aria-hidden="true"
             >
@@ -129,7 +129,7 @@
                 <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Calendário</span>
+            <span class="nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]">Calendário</span>
           </a>
           <a
             routerLink="/cartoes"
@@ -137,11 +137,11 @@
             #cartActive="routerLinkActive"
             *ngIf="hasAccess('Basic')"
             (click)="reloadIfSame('/cartoes', $event)"
-            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            class="group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
             [ngClass]="cartActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
             <span
-              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              class="nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]"
               [ngClass]="cartActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]' : ''"
               aria-hidden="true"
             >
@@ -152,13 +152,13 @@
                   stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Cartões</span>
+            <span class="nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]">Cartões</span>
           </a>
           <a
             routerLink="/contas"
             routerLinkActive="active"
             #accountsActive="routerLinkActive"
-            *ngIf="hasFeature('categories.access')"
+            *ngIf="hasFeature(features.accountsRead)"
             (click)="reloadIfSame('/contas', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="accountsActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -201,7 +201,7 @@
             routerLink="/investimentos"
             routerLinkActive="active"
             #invActive="routerLinkActive"
-            *ngIf="hasFeature('investments.access')"
+            *ngIf="hasFeature(features.investmentsAccess)"
             (click)="reloadIfSame('/investimentos', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="invActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -335,7 +335,7 @@
             routerLink="/admin/usuarios"
             routerLinkActive="active"
             #adminUsersActive="routerLinkActive"
-            *ngIf="hasFeature('admin.users.manage')"
+            *ngIf="hasFeature(features.adminUsersManage)"
             (click)="reloadIfSame('/admin/usuarios', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="adminUsersActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -360,7 +360,7 @@
             routerLink="/admin/parametros"
             routerLinkActive="active"
             #adminParamsActive="routerLinkActive"
-            *ngIf="hasFeature('admin.parameters.manage')"
+            *ngIf="hasFeature(features.adminParametersManage)"
             (click)="reloadIfSame('/admin/parametros', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="adminParamsActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -381,7 +381,7 @@
             routerLink="/admin/robots"
             routerLinkActive="active"
             #adminRobotsActive="routerLinkActive"
-            *ngIf="hasFeature('admin.robots.manage')"
+            *ngIf="hasFeature(features.adminRobotsManage)"
             (click)="reloadIfSame('/admin/robots', $event)"
             class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
             [ngClass]="adminRobotsActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -423,8 +423,8 @@
       </aside>
 
       <div class="content min-w-0 grid min-h-[calc(100vh-2rem)] gap-4 bg-transparent" [ngClass]="isReceitasRoute ? 'gap-0' : ''">
-        <header class="topbar flex items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--surface)] max-md:flex-wrap max-md:gap-[var(--space-2)]">
-          <button class="sidebar-toggle hidden h-10 w-10 flex-col items-center justify-center gap-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] max-md:inline-flex" type="button" (click)="toggleSidebar()" aria-label="Abrir menu">
+        <header class="topbar flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)] max-md:flex-wrap max-md:gap-[var(--space-2)]">
+          <button class="sidebar-toggle hidden h-11 w-11 flex-col items-center justify-center gap-1 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] max-md:inline-flex" type="button" (click)="toggleSidebar()" aria-label="Abrir menu">
             <span class="block h-[2px] w-[18px] rounded-full bg-current"></span>
             <span class="block h-[2px] w-[18px] rounded-full bg-current"></span>
             <span class="block h-[2px] w-[18px] rounded-full bg-current"></span>
@@ -432,7 +432,7 @@
           <div class="topbar__slogan hidden text-[var(--text-sm)] font-medium text-[var(--text-muted)] xl:block">{{ brandSlogan }}</div>
           <div class="topbar__actions flex min-w-0 flex-1 items-center justify-end gap-[var(--space-2)] max-sm:flex-wrap">
             <div class="notifications relative" [class.open]="notificationsOpen">
-              <button class="notif-trigger relative grid h-10 w-10 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleNotifications()" aria-label="Notificações">
+              <button class="notif-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleNotifications()" aria-label="Notificações">
                 <svg viewBox="0 0 24 24" role="presentation" focusable="false">
                   <path
                     d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
@@ -466,18 +466,18 @@
                 </div>
               </div>
             </div>
-            <button class="theme-toggle icon grid h-10 w-10 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-lg)] text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleTheme()" [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
+            <button class="theme-toggle icon grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleTheme()" [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
               <span *ngIf="!isLightTheme">☀️</span>
               <span *ngIf="isLightTheme">🌙</span>
             </button>
             <div class="user-menu relative" [class.open]="userMenuOpen">
-              <button class="user-trigger inline-flex min-w-0 max-w-[min(280px,72vw)] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-1)] py-[var(--space-1)] font-semibold text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleUserMenu()">
-                <span class="avatar grid h-8 w-8 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
+              <button class="user-trigger inline-flex min-w-0 max-w-[min(320px,72vw)] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[12px] py-[8px] font-semibold text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleUserMenu()">
+                <span class="avatar grid h-9 w-9 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
                   <img class="h-full w-full rounded-full object-cover" *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar" />
                   <span *ngIf="!avatarUrl">{{ userInitials }}</span>
                 </span>
-                <span class="user-name min-w-0 max-w-[170px] truncate text-[var(--text-sm)]">{{ displayName }}</span>
-                <span class="caret text-[var(--text-sm)] opacity-70">▾</span>
+                <span class="user-name min-w-0 max-w-[190px] truncate text-[var(--text-md)]">{{ displayName }}</span>
+                <span class="caret text-[var(--text-md)] opacity-70">▾</span>
               </button>
               <div class="user-dropdown absolute right-0 z-30 mt-3 grid min-w-[260px] gap-3 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[0_18px_40px_rgba(15,23,42,0.18)]" *ngIf="userMenuOpen">
                 <div class="flex items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-2)] py-[var(--space-1)]">
@@ -523,10 +523,10 @@
         <nav class="mobile-dock" *ngIf="isLogged" aria-label="Navegação rápida">
           <a routerLink="/dashboard" [class.active]="isActiveRoute('/dashboard')">Início</a>
           <a routerLink="/despesas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/despesas')">Despesas</a>
-          <a routerLink="/contas" *ngIf="hasFeature('categories.access')" [class.active]="isActiveRoute('/contas')">Contas</a>
+          <a routerLink="/contas" *ngIf="hasFeature(features.accountsRead)" [class.active]="isActiveRoute('/contas')">Contas</a>
           <a routerLink="/emprestimos" *ngIf="hasAccess('Intermediate')" [class.active]="isActiveRoute('/emprestimos')">Empréstimos</a>
           <a routerLink="/assinatura" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/assinatura')">Assinatura</a>
-          <a routerLink="/investimentos" *ngIf="hasFeature('investments.access')" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
+          <a routerLink="/investimentos" *ngIf="hasFeature(features.investmentsAccess)" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
         </nav>
       </div>
     </div>

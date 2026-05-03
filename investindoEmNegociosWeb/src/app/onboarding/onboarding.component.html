@@ -1,331 +1,593 @@
-<div class="grid min-h-[70vh] place-items-center px-3 py-4 sm:px-[var(--space-3)] sm:py-[var(--space-4)]">
-  <div class="w-full max-w-[720px] min-w-0 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)] sm:p-[clamp(1.5rem,2.5vw,2rem)]">
-    <p class="sr-only" aria-live="polite" role="status">{{ liveMessage }}</p>
-    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="step-chips">
-        <span class="step-chip" [class.step-chip--active]="isStepActive(0)" [class.step-chip--done]="isStepDone(0)">1</span>
-        <span class="step-chip" [class.step-chip--active]="isStepActive(1)" [class.step-chip--done]="isStepDone(1)">2</span>
-        <span class="step-chip" [class.step-chip--active]="isStepActive(2)" [class.step-chip--done]="isStepDone(2)">3</span>
+<section class="onboarding-shell">
+  <div class="onboarding-shell__aura onboarding-shell__aura--left" aria-hidden="true"></div>
+  <div class="onboarding-shell__aura onboarding-shell__aura--right" aria-hidden="true"></div>
+
+  <p class="sr-only" aria-live="polite" role="status">{{ liveMessage }}</p>
+
+  <div class="onboarding-layout" [attr.data-step]="step">
+    <aside class="onboarding-rail">
+      <div class="onboarding-rail__intro">
+        <p class="onboarding-rail__eyebrow">Configuração inicial</p>
+
+        <ng-container [ngSwitch]="step">
+          <ng-container *ngSwitchCase="0">
+            <h1 class="onboarding-rail__title">Escolha a direção do seu controle financeiro.</h1>
+            <p class="onboarding-rail__desc">
+              Vamos definir qual foco deve orientar suas primeiras recomendações e prioridades no dashboard.
+            </p>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="1">
+            <h1 class="onboarding-rail__title">Ajuste como o sistema vai orientar você.</h1>
+            <p class="onboarding-rail__desc">
+              Escolha o estilo dos insights e, nos planos elegíveis, personalize o início da sua competência mensal.
+            </p>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="2">
+            <h1 class="onboarding-rail__title">Complete os dados que personalizam sua experiência.</h1>
+            <p class="onboarding-rail__desc">
+              Essas informações organizam seu perfil e deixam a conta inicial pronta para uso.
+            </p>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="3">
+            <h1 class="onboarding-rail__title">Finalize sua estrutura inicial.</h1>
+            <p class="onboarding-rail__desc">
+              Crie a conta principal e registre os primeiros lançamentos para começar com o dashboard pronto.
+            </p>
+          </ng-container>
+        </ng-container>
       </div>
-      <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">Passo {{ step + 1 }} de 3</p>
-    </div>
 
-    <div *ngIf="step === 0">
-      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Boas-vindas</p>
-      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Vamos configurar seu perfil</h2>
-      <p class="mt-2 text-[var(--text-muted)]">Preencha seus dados básicos e escolha seu foco financeiro inicial.</p>
+      <div class="onboarding-rail__steps" aria-label="Etapas do onboarding">
+        <article class="onboarding-step" [class.onboarding-step--active]="isStepActive(0)" [class.onboarding-step--done]="isStepDone(0)">
+          <div class="onboarding-step__index">1</div>
+          <div>
+            <strong>Objetivo inicial</strong>
+            <span>Definir a prioridade que vai orientar seus próximos passos.</span>
+          </div>
+        </article>
 
-      <div class="mt-4 grid gap-3">
-        <p class="m-0 text-sm font-semibold text-[var(--text)]">Qual seu objetivo principal agora?</p>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <label
-            class="group relative flex min-h-[96px] cursor-pointer flex-col justify-between rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] text-left text-[var(--text)] transition hover:border-[rgba(37,99,235,0.45)] focus-within:border-[rgba(37,99,235,0.85)] focus-within:ring-2 focus-within:ring-[rgba(37,99,235,0.35)] sm:min-h-[118px]"
-            *ngFor="let item of focusOptions; trackBy: trackByIndex"
-            [ngClass]="focus === item.id
-              ? 'border-[rgba(37,99,235,0.75)] bg-[rgba(37,99,235,0.18)] ring-2 ring-[rgba(37,99,235,0.35)] shadow-[0_0_0_1px_rgba(37,99,235,0.25)]'
-              : ''"
-          >
-            <span class="absolute right-2 top-2 inline-flex">
-              <span
-                class="peer inline-flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[11px] font-bold text-[var(--text-muted)]"
-                tabindex="0"
-                [attr.aria-label]="item.tooltip">
-                ?
+        <article class="onboarding-step" [class.onboarding-step--active]="isStepActive(1)" [class.onboarding-step--done]="isStepDone(1)">
+          <div class="onboarding-step__index">2</div>
+          <div>
+            <strong>Preferências iniciais</strong>
+            <span>Escolher como o sistema apresenta insights e organiza sua rotina.</span>
+          </div>
+        </article>
+
+        <article class="onboarding-step" [class.onboarding-step--active]="isStepActive(2)" [class.onboarding-step--done]="isStepDone(2)">
+          <div class="onboarding-step__index">3</div>
+          <div>
+            <strong>Dados básicos</strong>
+            <span>Salvar os dados essenciais para personalizar seu perfil.</span>
+          </div>
+        </article>
+
+        <article class="onboarding-step" [class.onboarding-step--active]="isStepActive(3)" [class.onboarding-step--done]="isStepDone(3)">
+          <div class="onboarding-step__index">4</div>
+          <div>
+            <strong>Conta e lançamentos</strong>
+            <span>Criar a conta principal e registrar os primeiros lançamentos.</span>
+          </div>
+        </article>
+      </div>
+
+    </aside>
+
+    <main class="onboarding-main">
+      <div class="onboarding-main__hero">
+        <div class="onboarding-main__copy">
+          <p class="onboarding-main__eyebrow">Passo {{ step + 1 }} de {{ totalSteps }}</p>
+
+          <ng-container [ngSwitch]="step">
+            <ng-container *ngSwitchCase="0">
+              <h2>Vamos definir seu foco inicial</h2>
+              <p>
+                Escolha o objetivo que melhor representa sua situação atual para começar a configuração com clareza.
+              </p>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="1">
+              <h2>Escolha suas preferências</h2>
+              <p>
+                Defina o estilo inicial dos insights e o dia que marca o início da sua competência mensal.
+              </p>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="2">
+              <h2>Dados Básicos</h2>
+              <p>
+                Essas informações fecham a base do seu perfil e preparam a conta principal e os primeiros lançamentos.
+              </p>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>
+              <h2>Ative sua conta<br />e seus primeiros movimentos</h2>
+              <p>
+                Crie sua conta principal e registre os primeiros lançamentos para começar com o dashboard pronto para uso.
+              </p>
+            </ng-container>
+          </ng-container>
+        </div>
+
+        <section class="onboarding-progress" aria-label="Progresso atual">
+          <div class="onboarding-progress__head">
+            <strong>Progresso atual</strong>
+            <span>{{ (((step + 1) / totalSteps) * 100) | number:'1.0-0' }}%</span>
+          </div>
+          <div class="onboarding-progress__bar" aria-hidden="true">
+            <span [style.width.%]="((step + 1) / totalSteps) * 100"></span>
+          </div>
+          <p>
+            <ng-container [ngSwitch]="step">
+              <span *ngSwitchCase="0">Escolha um objetivo para liberar a próxima etapa.</span>
+              <span *ngSwitchCase="1">Ajuste as preferências para liberar os dados do perfil.</span>
+              <span *ngSwitchCase="2">Preencha seu perfil para seguir para conta e lançamentos.</span>
+              <span *ngSwitchDefault>Último passo: criar a conta principal e registrar os primeiros lançamentos.</span>
+            </ng-container>
+          </p>
+        </section>
+      </div>
+
+      <div *ngIf="step === 0" class="onboarding-step-shell">
+        <section class="onboarding-panel onboarding-panel--accent">
+          <div class="onboarding-panel__header">
+            <strong>Qual seu objetivo principal agora?</strong>
+            <span>Escolha a direção que melhor representa seu momento atual.</span>
+          </div>
+
+          <div class="onboarding-focus-grid">
+            <label
+              class="onboarding-focus-card"
+              *ngFor="let item of focusOptions; trackBy: trackByIndex"
+              [class.onboarding-focus-card--selected]="focus === item.id"
+              (click)="selectFocus(item.id)">
+              <span class="onboarding-focus-card__tooltip-anchor">
+                <span
+                  class="onboarding-focus-card__tooltip-trigger"
+                  tabindex="0"
+                  [attr.aria-label]="item.tooltip">
+                  ?
+                </span>
+                <span class="onboarding-focus-card__tooltip">{{ item.tooltip }}</span>
               </span>
-              <span
-                class="pointer-events-none absolute right-0 top-[calc(100%+8px)] z-10 hidden w-56 rounded-[8px] border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-[11px] font-medium leading-snug text-[var(--text-muted)] shadow-[var(--shadow-md)] peer-hover:block peer-focus:block">
-                {{ item.tooltip }}
-              </span>
-            </span>
-            <input
-              class="sr-only"
-              type="radio"
-              name="focusGoal"
-              [value]="item.id"
-              [(ngModel)]="focus"
-              [ngModelOptions]="{ standalone: true }" />
-            <div class="flex items-start gap-3">
-              <div class="flex items-center gap-2">
-                <span class="grid h-8 w-8 place-items-center rounded-[10px] border border-[var(--border)] bg-[var(--surface)] text-[var(--primary)]"
-                  [ngClass]="focus === item.id ? 'border-[rgba(37,99,235,0.6)] bg-[rgba(37,99,235,0.14)] text-[var(--primary)]' : ''">
+
+              <input
+                class="sr-only"
+                type="radio"
+                name="focusGoal"
+                [value]="item.id"
+                [(ngModel)]="focus"
+                [ngModelOptions]="{ standalone: true }" />
+
+              <div class="onboarding-focus-card__head">
+                <span class="onboarding-focus-card__icon" aria-hidden="true">
                   <ng-container [ngSwitch]="item.icon">
-                    <svg *ngSwitchCase="'growth'" viewBox="0 0 24 24" role="presentation" focusable="false" class="h-4 w-4">
-                      <path d="M4 16l5-5 4 4 7-7M15 8h5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <svg *ngSwitchCase="'growth'" viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M4.5 9.5h11a2 2 0 0 1 2 2v5.5H6.5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M15.5 9.5V8.4a1.9 1.9 0 0 0-1.9-1.9H8.9A1.9 1.9 0 0 0 7 8.4v1.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M8 13h4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                     </svg>
-                    <svg *ngSwitchCase="'debt'" viewBox="0 0 24 24" role="presentation" focusable="false" class="h-4 w-4">
-                      <path d="M4 8h16M4 12h8M4 16h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    <svg *ngSwitchCase="'debt'" viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M8.5 12h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M12 8.5v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".35" />
                     </svg>
-                    <svg *ngSwitchCase="'invest'" viewBox="0 0 24 24" role="presentation" focusable="false" class="h-4 w-4">
-                      <path d="M5 16l4-4 3 3 7-7M16 8h3v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <svg *ngSwitchCase="'invest'" viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M5 17.5V7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M5 17.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M7.5 14.5 11 11l2.8 2.8L18.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M15.8 9H18.5v2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" role="presentation" focusable="false" class="h-4 w-4">
+                    <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" role="presentation" focusable="false">
                       <path d="M12 3l7 3v5c0 4.4-2.8 7.6-7 10-4.2-2.4-7-5.6-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path d="M12 8.2v6.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M9.3 11.3h5.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                     </svg>
                   </ng-container>
                 </span>
-                <h4 class="m-0 text-[var(--text-lg)] font-semibold leading-tight"
-                  [ngClass]="focus === item.id ? 'text-[var(--primary)]' : 'text-[var(--text)]'">{{ item.title }}</h4>
+                <strong>{{ item.title }}</strong>
               </div>
+              <p>{{ item.description }}</p>
+            </label>
+          </div>
+
+          <div class="onboarding-actions onboarding-actions--footer">
+            <div class="onboarding-actions__meta">
+              <strong>Escolha uma direção</strong>
+              <span>Selecione o objetivo que melhor representa seu momento para seguir para preferências.</span>
             </div>
-            <p class="mt-2 text-[13px] leading-snug text-[var(--text-muted)]">{{ item.description }}</p>
-          </label>
+            <div class="onboarding-actions__group onboarding-actions__group--footer">
+              <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" (click)="continueFromFocus()">
+                Continuar para preferências
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div *ngIf="step === 1" class="onboarding-step-shell">
+        <div class="onboarding-split">
+          <section class="onboarding-panel">
+            <div class="onboarding-panel__header">
+              <strong>Como você prefere os insights financeiros?</strong>
+              <span>Escolha a intensidade de orientação inicial.</span>
+            </div>
+            <div class="onboarding-mode-grid">
+              <label
+                class="onboarding-focus-card"
+                *ngFor="let mode of intelligenceModeOptions; trackBy: trackByIndex"
+                [class.onboarding-focus-card--selected]="intelligenceMode === mode.id">
+                <span class="onboarding-focus-card__tooltip-anchor">
+                <span
+                  class="onboarding-focus-card__tooltip-trigger"
+                  tabindex="0"
+                  [attr.aria-label]="mode.tooltip">
+                    ?
+                </span>
+                  <span class="onboarding-focus-card__tooltip">{{ mode.tooltip }}</span>
+                </span>
+                <input
+                  class="sr-only"
+                  type="radio"
+                  name="intelligenceMode"
+                  [value]="mode.id"
+                  [(ngModel)]="intelligenceMode"
+                  [ngModelOptions]="{ standalone: true }" />
+                <div class="onboarding-focus-card__head">
+                  <span class="onboarding-focus-card__icon" aria-hidden="true">
+                    <ng-container [ngSwitch]="mode.icon">
+                      <svg *ngSwitchCase="'balance'" viewBox="0 0 24 24" role="presentation" focusable="false">
+                        <path d="M12 5.5v13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M7 9h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M9 9 6.5 13h5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M17.5 9 15 13h5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      </svg>
+                      <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" role="presentation" focusable="false">
+                        <path d="M12 3l7 3v5c0 4.4-2.8 7.6-7 10-4.2-2.4-7-5.6-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M9 12h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      </svg>
+                    </ng-container>
+                  </span>
+                  <strong>{{ mode.title }}</strong>
+                </div>
+                <p>{{ mode.description }}</p>
+              </label>
+            </div>
+          </section>
+
+          <section class="onboarding-panel">
+            <div class="onboarding-panel__header">
+              <strong>Dia de início da competência</strong>
+              <span *ngIf="canEditCarryOverDay">Defina o recorte mensal que melhor acompanha sua rotina.</span>
+              <span *ngIf="!canEditCarryOverDay">No plano Basic, a competência usa o mês calendário padrão.</span>
+            </div>
+
+            <div *ngIf="canEditCarryOverDay" class="onboarding-field onboarding-field--compact">
+              <select [(ngModel)]="carryOverDay" [ngModelOptions]="{ standalone: true }">
+                <option *ngFor="let day of carryOverDayOptions; trackBy: trackByIndex" [ngValue]="day">Dia {{ day }}</option>
+              </select>
+              <small>Ex.: dia 10 considera a competência de 10 até o dia 9 do mês seguinte.</small>
+            </div>
+
+            <div *ngIf="!canEditCarryOverDay" class="onboarding-status onboarding-status--info">
+              O sistema vai considerar <strong>Dia 1</strong> como início da competência, usando o mês calendário padrão.
+            </div>
+          </section>
+        </div>
+
+        <div class="onboarding-actions onboarding-actions--footer">
+          <div class="onboarding-actions__meta">
+            <strong>Preferências prontas</strong>
+            <span>Confirme o estilo inicial e o recorte mensal para seguir para os dados do perfil.</span>
+          </div>
+          <div class="onboarding-actions__group onboarding-actions__group--footer">
+            <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="prevStep()">Voltar</button>
+            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" (click)="continueFromPreferences()">
+              Continuar para dados básicos
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="mt-4 grid gap-3">
-        <p class="m-0 text-sm font-semibold text-[var(--text)]">Como você prefere os insights financeiros?</p>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <label
-            class="flex cursor-pointer flex-col gap-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]"
-            *ngFor="let mode of intelligenceModeOptions; trackBy: trackByIndex"
-            [ngClass]="intelligenceMode === mode.id ? 'border-[rgba(37,99,235,0.75)] bg-[rgba(37,99,235,0.18)] ring-2 ring-[rgba(37,99,235,0.35)]' : ''">
-            <input
-              class="sr-only"
-              type="radio"
-              name="intelligenceMode"
-              [value]="mode.id"
-              [(ngModel)]="intelligenceMode"
-              [ngModelOptions]="{ standalone: true }" />
-            <span class="text-sm font-semibold text-[var(--text)]">{{ mode.title }}</span>
-            <span class="text-[13px] leading-snug text-[var(--text-muted)]">{{ mode.description }}</span>
-          </label>
+      <div *ngIf="step === 2" class="onboarding-step-shell">
+        <form class="onboarding-panel onboarding-form-panel" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="onboarding-panel__header">
+            <strong>Informações do perfil</strong>
+            <span>Preencha os campos essenciais para continuar.</span>
+          </div>
+
+          <div class="onboarding-form-grid">
+            <label class="onboarding-field onboarding-field--full">
+              <span>Nome completo</span>
+              <input type="text" formControlName="fullName" placeholder="Nome Completo" />
+              <small class="onboarding-field__error" *ngIf="getControlError('fullName') as err">{{ err }}</small>
+            </label>
+
+            <label class="onboarding-field">
+              <span>CPF</span>
+              <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
+              <small class="onboarding-field__error" *ngIf="getControlError('document') as err">{{ err }}</small>
+            </label>
+
+            <label class="onboarding-field">
+              <span>Telefone</span>
+              <input type="tel" formControlName="phone" placeholder="(81) 91234-1234" (input)="onPhoneInput($event)" />
+              <small class="onboarding-field__error" *ngIf="getControlError('phone') as err">{{ err }}</small>
+            </label>
+
+            <label class="onboarding-field">
+              <span>Data de nascimento</span>
+              <input type="date" [min]="minBirthDate" [max]="maxBirthDate" formControlName="birthDate" />
+              <small class="onboarding-field__error" *ngIf="getControlError('birthDate') as err">{{ err }}</small>
+            </label>
+
+            <label class="onboarding-field">
+              <span>Cidade</span>
+              <input type="text" formControlName="city" placeholder="Ex: Recife" />
+              <small class="onboarding-field__error" *ngIf="getControlError('city') as err">{{ err }}</small>
+            </label>
+
+            <label class="onboarding-field">
+              <span>Estado (UF)</span>
+              <input type="text" formControlName="state" placeholder="Ex: PE" maxlength="2" />
+              <small class="onboarding-field__error" *ngIf="getControlError('state') as err">{{ err }}</small>
+            </label>
+
+            <label class="onboarding-field">
+              <span>País</span>
+              <input type="text" formControlName="country" placeholder="Ex: Brasil" />
+              <small class="onboarding-field__error" *ngIf="getControlError('country') as err">{{ err }}</small>
+            </label>
+          </div>
+
+          <div class="onboarding-actions onboarding-actions--footer">
+            <div class="onboarding-actions__meta">
+              <strong>Quase pronto</strong>
+              <span>Salve seus dados para avançar para conta e primeiros lançamentos.</span>
+            </div>
+            <div class="onboarding-actions__group onboarding-actions__group--footer">
+              <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="prevStep()">Voltar</button>
+              <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="submit" [disabled]="loading || !focus || form.invalid">
+                {{ loading ? 'Salvando...' : 'Salvar e continuar para conta e lançamentos' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div *ngIf="step === 3" class="onboarding-step-shell">
+        <section class="onboarding-panel">
+          <div class="onboarding-panel__header">
+            <strong>Sua conta principal</strong>
+            <span>Crie a conta que será usada como base para acompanhar saldo, receitas e despesas.</span>
+          </div>
+
+          <div *ngIf="!accountReady" class="onboarding-form-grid onboarding-form-grid--three">
+            <label class="onboarding-field">
+              <span>Nome da conta</span>
+              <input type="text" [(ngModel)]="accountForm.name" placeholder="Ex.: Nubank" />
+            </label>
+
+            <label class="onboarding-field">
+              <span>Tipo</span>
+              <select [(ngModel)]="accountForm.type">
+                <option *ngFor="let t of accountTypes; trackBy: trackByIndex" [value]="t">{{ accountTypeLabel(t) }}</option>
+              </select>
+            </label>
+
+            <label class="onboarding-field">
+              <span>Saldo inicial</span>
+              <input type="number" step="0.01" [(ngModel)]="accountForm.initialBalance" />
+            </label>
+          </div>
+
+          <div *ngIf="accountReady" class="onboarding-status onboarding-status--success">
+            <span class="onboarding-status__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M8.7 12.4 11 14.7l4.6-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="onboarding-status__content">Conta principal criada. Agora você já pode registrar os primeiros lançamentos.</span>
+          </div>
+        </section>
+
+        <div *ngIf="showStep4ContextPanels" class="onboarding-split onboarding-split--narrow">
+          <section class="onboarding-panel">
+            <div class="onboarding-panel__header">
+              <strong>Por que isso importa</strong>
+              <span>A conta principal ativa a base operacional do sistema e melhora a leitura do saldo real.</span>
+            </div>
+
+            <div class="onboarding-bullet-list">
+              <div class="onboarding-bullet">Permite registrar receitas e despesas com impacto real no caixa.</div>
+              <div class="onboarding-bullet">Dá contexto para análises futuras sem depender de ajustes manuais.</div>
+              <div class="onboarding-bullet">Cria uma base mínima consistente para o dashboard e os relatórios.</div>
+            </div>
+          </section>
+
+          <section class="onboarding-panel">
+            <div class="onboarding-panel__header">
+              <strong>Pronto para avançar</strong>
+              <span>Depois da conta criada, seguimos para receita, despesa e cartão opcional.</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="onboarding-panel">
+          <div class="onboarding-panel__header">
+            <strong>Primeiros lançamentos</strong>
+            <span>Adicione uma receita e uma despesa para começar com o dashboard refletindo sua realidade.</span>
+          </div>
+
+          <div class="onboarding-entry-grid">
+            <article
+              class="onboarding-entry-card"
+              [class.onboarding-entry-card--done]="hasInitialIncome"
+              [class.onboarding-entry-card--pending]="!hasInitialIncome">
+              <div class="onboarding-entry-card__header">
+                <div class="onboarding-entry-card__header-main">
+                  <span class="onboarding-entry-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M5 18h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M7.5 15.5 11 12l2.6 2.6L18.5 9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M16 9.5h2.5V12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <strong>Receita inicial</strong>
+                </div>
+                <div class="onboarding-entry-card__header-meta">
+                  <span class="onboarding-entry-card__status">{{ hasInitialIncome ? 'Configurada' : 'Pendente' }}</span>
+                  <span class="onboarding-entry-card__tooltip-anchor">
+                    <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma entrada real do mês, como salário, comissão ou recebimento recorrente.">?</span>
+                    <span class="onboarding-entry-card__tooltip">Registre uma entrada real do mês, como salário, comissão ou recebimento recorrente.</span>
+                  </span>
+                </div>
+              </div>
+              <p *ngIf="!hasInitialIncome">Nenhuma receita registrada ainda.</p>
+              <p *ngIf="hasInitialIncome">
+                {{ initialIncome.source }} • {{ initialIncome.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </p>
+              <small *ngIf="hasInitialIncome">Data: {{ initialIncome.receivedOn }}</small>
+              <button class="btn-primary onboarding-btn onboarding-btn--inline" type="button" (click)="openIncomeModal()">
+                {{ hasInitialIncome ? 'Editar receita inicial' : 'Adicionar receita' }}
+              </button>
+            </article>
+
+            <article
+              class="onboarding-entry-card"
+              [class.onboarding-entry-card--done]="hasInitialExpense"
+              [class.onboarding-entry-card--pending]="!hasInitialExpense">
+              <div class="onboarding-entry-card__header">
+                <div class="onboarding-entry-card__header-main">
+                  <span class="onboarding-entry-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M5 18h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M7 8.5h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M15.5 11 12 14.5 8.5 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <strong>Despesa inicial</strong>
+                </div>
+                <div class="onboarding-entry-card__header-meta">
+                  <span class="onboarding-entry-card__status">{{ hasInitialExpense ? 'Configurada' : 'Pendente' }}</span>
+                  <span class="onboarding-entry-card__tooltip-anchor">
+                    <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.">?</span>
+                    <span class="onboarding-entry-card__tooltip">Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.</span>
+                  </span>
+                </div>
+              </div>
+              <p *ngIf="!hasInitialExpense">Nenhuma despesa registrada ainda.</p>
+              <p *ngIf="hasInitialExpense">
+                {{ initialExpense.name }} • {{ initialExpense.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </p>
+              <small *ngIf="hasInitialExpense">Data: {{ initialExpense.dueDate }}</small>
+              <button class="btn-primary onboarding-btn onboarding-btn--inline" type="button" (click)="openExpenseModal()">
+                {{ hasInitialExpense ? 'Editar despesa inicial' : 'Adicionar despesa' }}
+              </button>
+            </article>
+
+            <article
+              class="onboarding-entry-card onboarding-entry-card--optional"
+              [class.onboarding-entry-card--done]="hasInitialCard">
+              <div class="onboarding-entry-card__header">
+                <div class="onboarding-entry-card__header-main">
+                  <span class="onboarding-entry-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <rect x="4" y="7" width="16" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M4 10.5h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <strong>Cartão (opcional)</strong>
+                </div>
+                <div class="onboarding-entry-card__header-meta">
+                  <span class="onboarding-entry-card__status">{{ hasInitialCard ? 'Configurado' : 'Opcional' }}</span>
+                  <span class="onboarding-entry-card__tooltip-anchor">
+                    <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="No plano Basic, o cartão é opcional. Cadastre quando quiser acompanhar compras no crédito.">?</span>
+                    <span class="onboarding-entry-card__tooltip">No plano Basic, o cartão é opcional. Cadastre quando quiser acompanhar compras no crédito.</span>
+                  </span>
+                </div>
+              </div>
+              <p *ngIf="!hasInitialCard">Nenhum cartão cadastrado.</p>
+              <p *ngIf="hasInitialCard">{{ cardsCount }} cartão(ões) cadastrado(s).</p>
+              <small>Você pode concluir sem cartão. Cadastre um depois se quiser lançar compras no crédito.</small>
+              <button class="ghost onboarding-btn onboarding-btn--inline" type="button" (click)="openCardsPage()">
+                {{ hasInitialCard ? 'Gerenciar cartões' : 'Cadastrar cartão agora' }}
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <div class="onboarding-actions onboarding-actions--footer">
+          <div class="onboarding-actions__meta">
+            <strong>Último passo</strong>
+            <span>Finalize com sua conta principal e os primeiros lançamentos para entrar no dashboard com dados reais.</span>
+          </div>
+          <div class="onboarding-actions__group onboarding-actions__group--footer">
+            <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="prevStep()">Voltar</button>
+            <button class="ghost onboarding-btn" type="button" *ngIf="!accountReady" [disabled]="creatingAccount" (click)="createAccount()">
+              {{ creatingAccount ? 'Criando conta...' : 'Criar conta' }}
+            </button>
+            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" [disabled]="!canFinishWithInitialEntries" (click)="saveInitialEntriesAndFinish()">
+              {{ savingEntries ? 'Salvando...' : 'Concluir onboarding' }}
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="mt-4 grid gap-2">
-        <p class="m-0 text-sm font-semibold text-[var(--text)]">Dia de início da competência</p>
-        <div class="grid gap-2 md:max-w-[280px]">
-          <select
-            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            [(ngModel)]="carryOverDay"
-            [ngModelOptions]="{ standalone: true }">
-            <option *ngFor="let day of carryOverDayOptions; trackBy: trackByIndex" [ngValue]="day">Dia {{ day }}</option>
-          </select>
-          <small class="text-[var(--text-muted)]">
-            Ex.: dia 10 considera a competência de 10 até o dia 9 do mês seguinte.
-          </small>
-        </div>
-      </div>
+      <app-receitas-form
+        [mostrarForm]="showIncomeModal"
+        [novaRenda]="modalIncome"
+        [categorias]="incomeCategories"
+        [valorInput]="modalIncomeAmountInput"
+        [recebimentoInput]="modalIncomeDateInput"
+        [erroData]="modalIncomeDateError"
+        [erroCategoria]="modalIncomeCategoryError"
+        [valorSugestao]="null"
+        [editandoId]="null"
+        [resumoTexto]="''"
+        [saving]="savingIncomeModal"
+        (valorChange)="onIncomeAmountChange($event)"
+        (recebimentoChange)="onIncomeDateChange($event)"
+        (fonteChange)="onIncomeSourceChange($event)"
+        (fixaChange)="onIncomeFixaChange($event)"
+        (salvarForm)="saveIncomeModal()"
+        (fechar)="closeIncomeModal()">
+      </app-receitas-form>
 
-      <form class="mt-4 grid gap-4 md:grid-cols-2" [formGroup]="form" (ngSubmit)="submit()">
-        <label class="md:col-span-2 grid gap-2 font-semibold text-[var(--text)]">
-          <span>Nome completo</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="text" formControlName="fullName" placeholder="Seu nome completo" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('fullName') as err">{{ err }}</small>
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>CPF</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('document') as err">{{ err }}</small>
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Telefone</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="tel" formControlName="phone" placeholder="(81) 1234-1234" (input)="onPhoneInput($event)" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('phone') as err">{{ err }}</small>
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Data de nascimento</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="date" [min]="minBirthDate" [max]="maxBirthDate" formControlName="birthDate" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('birthDate') as err">{{ err }}</small>
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Cidade</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="text" formControlName="city" placeholder="Ex.: Recife" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('city') as err">{{ err }}</small>
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Estado (UF)</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="text" formControlName="state" placeholder="Ex.: PE" maxlength="2" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('state') as err">{{ err }}</small>
-        </label>
-
-        <label class="md:col-span-2 grid gap-2 font-semibold text-[var(--text)]">
-          <span>País</span>
-          <input class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="text" formControlName="country" placeholder="Ex.: Brasil" />
-          <small class="text-[var(--danger)]" *ngIf="getControlError('country') as err">{{ err }}</small>
-        </label>
-
-        <div class="md:col-span-2">
-          <button class="btn-primary w-full min-h-[46px] text-base sm:min-h-[42px] sm:text-sm" type="submit" [disabled]="loading || !focus || form.invalid">
-            {{ loading ? 'Salvando...' : 'Salvar e continuar para conta' }}
-          </button>
-        </div>
-
-      </form>
-    </div>
-
-    <div *ngIf="step === 1" class="grid gap-4">
-      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Conta inicial</p>
-      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Crie sua primeira conta</h2>
-      <p class="text-[var(--text-muted)]">
-        Para registrar movimentações com saldo real, você precisa de pelo menos uma conta ativa.
-      </p>
-
-      <div *ngIf="!accountReady" class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] md:grid-cols-3">
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Nome da conta</span>
-          <input
-            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="text"
-            [(ngModel)]="accountForm.name"
-            placeholder="Ex.: Nubank" />
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Tipo</span>
-          <select
-            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            [(ngModel)]="accountForm.type">
-            <option *ngFor="let t of accountTypes; trackBy: trackByIndex" [value]="t">{{ accountTypeLabel(t) }}</option>
-          </select>
-        </label>
-
-        <label class="grid gap-2 font-semibold text-[var(--text)]">
-          <span>Saldo inicial</span>
-          <input
-            class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] focus:border-[rgba(37,99,235,0.45)] focus:bg-[var(--surface-2)] focus:outline-none"
-            type="number"
-            step="0.01"
-            [(ngModel)]="accountForm.initialBalance" />
-        </label>
-      </div>
-
-      <div *ngIf="accountReady" class="rounded-[12px] border border-emerald-400/40 bg-emerald-500/10 p-[var(--space-2)] text-[var(--text)]">
-        Conta ativa configurada. Você já pode concluir o onboarding.
-      </div>
-
-      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <button class="ghost min-h-[44px] w-full sm:w-auto" type="button" (click)="prevStep()">Voltar</button>
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-          <button class="ghost min-h-[44px] w-full sm:w-auto" type="button" *ngIf="!accountReady" [disabled]="creatingAccount" (click)="createAccount()">
-            {{ creatingAccount ? 'Criando conta...' : 'Criar conta' }}
-          </button>
-          <button class="btn-primary min-h-[46px] w-full text-base sm:min-h-[42px] sm:w-auto sm:text-sm" type="button" [disabled]="!accountReady" (click)="nextStep()">Continuar para receita e despesa</button>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="step === 2" class="grid gap-4">
-      <p class="text-[var(--text-sm)] tracking-[0.12em] text-[var(--success)]">Primeiros lançamentos</p>
-      <h2 class="m-0 text-[var(--text-2xl)] font-semibold text-[var(--text)]">Cadastre sua primeira receita e despesa</h2>
-      <p class="text-[var(--text-muted)]">
-        Use os mesmos modais das telas principais para manter o mesmo padrão de cadastro.
-      </p>
-
-      <div class="grid gap-3 md:grid-cols-3">
-        <article class="rounded-[12px] border p-[var(--space-2)]"
-          [ngClass]="hasInitialIncome ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-[var(--border)] bg-[var(--surface-2)]'">
-          <p class="m-0 text-sm font-semibold text-[var(--text)]">Receita inicial</p>
-          <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="!hasInitialIncome">Ainda não cadastrada.</p>
-          <p class="mt-1 text-sm text-[var(--text)]" *ngIf="hasInitialIncome">
-            {{ initialIncome.source }} • {{ initialIncome.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
-          </p>
-          <p class="mt-1 text-xs text-[var(--text-muted)]" *ngIf="hasInitialIncome">Data: {{ initialIncome.receivedOn }}</p>
-          <button class="mt-3 btn-primary min-h-[42px] w-full sm:w-auto" type="button" (click)="openIncomeModal()">
-            {{ hasInitialIncome ? 'Editar receita inicial' : 'Adicionar receita' }}
-          </button>
-        </article>
-
-        <article class="rounded-[12px] border p-[var(--space-2)]"
-          [ngClass]="hasInitialExpense ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-[var(--border)] bg-[var(--surface-2)]'">
-          <p class="m-0 text-sm font-semibold text-[var(--text)]">Despesa inicial</p>
-          <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="!hasInitialExpense">Ainda não cadastrada.</p>
-          <p class="mt-1 text-sm text-[var(--text)]" *ngIf="hasInitialExpense">
-            {{ initialExpense.name }} • {{ initialExpense.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
-          </p>
-          <p class="mt-1 text-xs text-[var(--text-muted)]" *ngIf="hasInitialExpense">Data: {{ initialExpense.dueDate }}</p>
-          <button class="mt-3 btn-primary min-h-[42px] w-full sm:w-auto" type="button" (click)="openExpenseModal()">
-            {{ hasInitialExpense ? 'Editar despesa inicial' : 'Adicionar despesa' }}
-          </button>
-        </article>
-
-        <article class="rounded-[12px] border p-[var(--space-2)]"
-          [ngClass]="hasInitialCard ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-amber-400/40 bg-amber-500/10'">
-          <p class="m-0 text-sm font-semibold text-[var(--text)]">Cartão (opcional)</p>
-          <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="!hasInitialCard">
-            Nenhum cartão cadastrado.
-          </p>
-          <p class="mt-1 text-sm text-[var(--text)]" *ngIf="hasInitialCard">
-            {{ cardsCount }} cartão(ões) cadastrado(s).
-          </p>
-          <p class="mt-2 text-xs text-[var(--text-muted)]">
-            Você pode concluir sem cartão. Para lançar despesas no crédito, cadastre um cartão quando quiser.
-          </p>
-          <button class="mt-3 ghost min-h-[42px] w-full sm:w-auto" type="button" (click)="openCardsPage()">
-            {{ hasInitialCard ? 'Gerenciar cartões' : 'Cadastrar cartão agora' }}
-          </button>
-        </article>
-      </div>
-
-      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <button class="ghost min-h-[44px] w-full sm:w-auto" type="button" (click)="prevStep()">Voltar</button>
-        <button class="btn-primary min-h-[46px] w-full text-base sm:min-h-[42px] sm:w-auto sm:text-sm" type="button" [disabled]="!canFinishWithInitialEntries" (click)="saveInitialEntriesAndFinish()">
-          {{ savingEntries ? 'Salvando...' : 'Concluir onboarding' }}
-        </button>
-      </div>
-    </div>
-
-    <app-receitas-form
-      [mostrarForm]="showIncomeModal"
-      [novaRenda]="modalIncome"
-      [categorias]="incomeCategories"
-      [valorInput]="modalIncomeAmountInput"
-      [recebimentoInput]="modalIncomeDateInput"
-      [erroData]="modalIncomeDateError"
-      [erroCategoria]="modalIncomeCategoryError"
-      [valorSugestao]="null"
-      [editandoId]="null"
-      [resumoTexto]="''"
-      [saving]="savingIncomeModal"
-      (valorChange)="onIncomeAmountChange($event)"
-      (recebimentoChange)="onIncomeDateChange($event)"
-      (fonteChange)="onIncomeSourceChange($event)"
-      (fixaChange)="onIncomeFixaChange($event)"
-      (salvarForm)="saveIncomeModal()"
-      (fechar)="closeIncomeModal()">
-    </app-receitas-form>
-
-    <app-despesas-form
-      [mostrarForm]="showExpenseModal"
-      [categorias]="expenseCategories"
-      [cartoes]="modalExpenseCartoes"
-      [novaDespesa]="modalExpense"
-      [valorInput]="modalExpenseAmountInput"
-      [valorParcelaLabel]="modalExpenseParcelValueLabel"
-      [vencimentoInput]="modalExpenseDateInput"
-      [erroData]="modalExpenseDateError"
-      [erroCategoria]="modalExpenseCategoryError"
-      [formaPagamento]="modalExpenseFormaPagamento"
-      [parcelar]="modalExpenseParcelar"
-      [parcelasCount]="modalExpenseParcelas"
-      [fixa]="modalExpenseFixa"
-      [fixaMeses]="modalExpenseFixaMeses"
-      [saving]="savingExpenseModal"
-      [cartaoSelecionadoId]="modalExpenseCartaoId"
-      [cartaoSelecionadoLabel]="''"
-      [isEdit]="false"
-      (valorChange)="onExpenseAmountChange($event)"
-      (vencimentoChange)="onExpenseDateChange($event)"
-      (formaPagamentoChange)="onExpenseFormaPagamentoChange($event)"
-      (parcelarChange)="onExpenseParcelarChange($event)"
-      (parcelasChange)="onExpenseParcelasChange($event)"
-      (cartaoChange)="modalExpenseCartaoId = $event"
-      (fixaChange)="onExpenseFixaChange($event)"
-      (fixaMesesChange)="onExpenseFixaMesesChange($event)"
-      (submitForm)="saveExpenseModal()"
-      (cancel)="closeExpenseModal()">
-    </app-despesas-form>
+      <app-despesas-form
+        [mostrarForm]="showExpenseModal"
+        [categorias]="expenseCategories"
+        [cartoes]="modalExpenseCartoes"
+        [novaDespesa]="modalExpense"
+        [valorInput]="modalExpenseAmountInput"
+        [valorParcelaLabel]="modalExpenseParcelValueLabel"
+        [vencimentoInput]="modalExpenseDateInput"
+        [erroData]="modalExpenseDateError"
+        [erroCategoria]="modalExpenseCategoryError"
+        [formaPagamento]="modalExpenseFormaPagamento"
+        [parcelar]="modalExpenseParcelar"
+        [parcelasCount]="modalExpenseParcelas"
+        [fixa]="modalExpenseFixa"
+        [fixaMeses]="modalExpenseFixaMeses"
+        [saving]="savingExpenseModal"
+        [cartaoSelecionadoId]="modalExpenseCartaoId"
+        [cartaoSelecionadoLabel]="''"
+        [isEdit]="false"
+        (valorChange)="onExpenseAmountChange($event)"
+        (vencimentoChange)="onExpenseDateChange($event)"
+        (formaPagamentoChange)="onExpenseFormaPagamentoChange($event)"
+        (parcelarChange)="onExpenseParcelarChange($event)"
+        (parcelasChange)="onExpenseParcelasChange($event)"
+        (cartaoChange)="modalExpenseCartaoId = $event"
+        (fixaChange)="onExpenseFixaChange($event)"
+        (fixaMesesChange)="onExpenseFixaMesesChange($event)"
+        (submitForm)="saveExpenseModal()"
+        (cancel)="closeExpenseModal()">
+      </app-despesas-form>
+    </main>
   </div>
-</div>
+</section>

@@ -3,72 +3,85 @@
   <div class="login-shell__aura login-shell__aura--right" aria-hidden="true"></div>
 
   <div class="login-card">
-    <aside class="login-card__hero">
-      <p class="login-card__eyebrow">INVESTINDO EM NEGÓCIOS</p>
-      <h2>Seu mês financeiro organizado, sem planilha manual.</h2>
-      <p class="login-card__desc">
-        Centralize receitas, despesas, metas e investimentos em um único fluxo com visão diária e decisões objetivas.
-      </p>
+    <aside class="login-visual">
+      <img
+        class="login-visual__image"
+        src="assets/login/office-portrait.jpg"
+        alt="Profissional em ambiente corporativo, reforçando confiança e clareza no acesso à conta" />
+      <div class="login-visual__overlay" aria-hidden="true"></div>
 
-      <div class="login-card__feature-list">
-        <div class="login-card__feature"><span></span>Fechamento mensal com visão de saldo real</div>
-        <div class="login-card__feature"><span></span>Metas por tipo: despesas, receitas e investimentos</div>
-        <div class="login-card__feature"><span></span>Importação de faturas e lançamentos em minutos</div>
-      </div>
+      <div class="login-visual__content">
+        <div class="login-visual__brand">
+          <p class="login-visual__eyebrow">INVESTINDO EM NEGÓCIOS</p>
+          <strong>Controle o mês, as contas e a evolução financeira em um só lugar.</strong>
+          <p class="login-visual__summary">
+            Receitas, despesas, cartões, metas e investimentos com leitura clara para decidir melhor.
+          </p>
+        </div>
 
-      <div class="login-card__kpis">
-        <article>
-          <strong>+12</strong>
-          <small>visões do negócio pessoal</small>
-        </article>
-        <article>
-          <strong>3 perfis</strong>
-          <small>Basic, Intermediate e Advanced</small>
-        </article>
+        <div class="login-visual__footer">
+          <span>Receitas</span>
+          <span>Despesas</span>
+          <span>Contas</span>
+          <span>Cartões</span>
+          <span>Metas</span>
+          <span>Investimentos</span>
+        </div>
       </div>
     </aside>
 
-    <main class="login-card__form-wrap">
-      <div class="login-card__head">
-        <p class="login-card__eyebrow">ENTRAR</p>
-        <h1>Bem-vindo de volta</h1>
-        <p>Acesse sua conta e continue seu planejamento.</p>
-      </div>
-
-      <form class="login-form" (ngSubmit)="onSubmit()">
-        <label>
-          Email
-          <input
-            [(ngModel)]="email"
-            name="email"
-            type="email"
-            placeholder="E-mail"
-            required />
-        </label>
-
-        <label>
-          Senha
-          <input
-            [(ngModel)]="password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            required />
-        </label>
-
-        <div class="login-form__meta">
-          <span>Use seu email cadastrado.</span>
-          <a routerLink="/forgot-password">Esqueci minha senha</a>
+    <main class="login-main">
+      <div class="login-main__inner">
+        <div class="login-main__topline">
+          <a routerLink="/" class="login-main__site-link">
+            <span>Voltar para o site</span>
+            <span class="login-main__site-link-arrow" aria-hidden="true">→</span>
+          </a>
         </div>
 
-        <button type="submit" class="btn-primary login-form__submit" [disabled]="loading">
-          {{ loading ? 'Autenticando...' : 'Entrar' }}
-        </button>
-      </form>
+        <div class="login-main__head">
+          <h1>Acesse sua conta</h1>
+          <p>
+            Ainda não tem uma conta no Investindo em Negócios? <a routerLink="/register">Abrir conta agora.</a>
+          </p>
+        </div>
 
-      <div class="login-card__cta">
-        Ainda não tem conta?
-        <span>Crie sua conta no topo.</span>
+        <form class="login-form login-form--editorial" (ngSubmit)="onSubmit()">
+          <label class="login-form__field">
+            <span>E-mail</span>
+            <div class="login-form__input-shell">
+              <input
+                [(ngModel)]="email"
+                name="email"
+                type="email"
+                placeholder="Digite seu e-mail"
+                autocomplete="email"
+                required />
+            </div>
+          </label>
+
+          <label class="login-form__field">
+            <span>Senha</span>
+            <div class="login-form__input-shell login-form__input-shell--with-action">
+              <input
+                [(ngModel)]="password"
+                name="password"
+                type="password"
+                placeholder="Digite sua senha"
+                autocomplete="current-password"
+                required />
+              <span class="login-form__trailing" aria-hidden="true">👁</span>
+            </div>
+          </label>
+
+          <a class="login-form__forgot" routerLink="/forgot-password">Esqueci minha senha</a>
+
+          <button type="submit" class="btn-primary login-form__submit login-form__submit--editorial" [disabled]="loading">
+            {{ loading ? 'Autenticando...' : 'Entrar' }}
+          </button>
+        </form>
+
+        <div class="login-main__help">Precisa de ajuda?</div>
       </div>
     </main>
   </div>

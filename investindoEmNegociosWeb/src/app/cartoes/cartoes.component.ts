@@ -11,8 +11,6 @@ import { formatCurrencyValue } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
 import { CardsStore } from '../cards.store';
-import { SectionCardComponent } from '../shared/section-card/section-card.component';
-import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { FormState } from '../utils/form-state';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
@@ -31,9 +29,7 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     NgSwitchCase,
     NgSwitchDefault,
     CartoesListagemComponent,
-    DigitOnlyDirective,
-    SectionCardComponent,
-    FormFieldComponent
+    DigitOnlyDirective
   ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
