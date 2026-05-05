@@ -727,6 +727,126 @@ export class HomeComponent implements OnInit, OnDestroy {
     return 'Receitas, despesas e cartões já estão compondo a leitura principal do seu mês.';
   }
 
+  get basicDashboardNextActionLabel(): string {
+    if (!this.incomeEntriesCount) {
+      return 'Cadastrar receita';
+    }
+    if (!this.expenseEntriesCount) {
+      return 'Cadastrar despesa';
+    }
+    if (!this.hasCardEntries) {
+      return 'Revisar cartões';
+    }
+    return 'Revisar despesas';
+  }
+
+  get basicDashboardNextActionLink(): string {
+    if (!this.incomeEntriesCount) {
+      return '/receitas';
+    }
+    if (!this.expenseEntriesCount) {
+      return '/despesas';
+    }
+    if (!this.hasCardEntries) {
+      return '/cartoes';
+    }
+    return '/despesas';
+  }
+
+  get basicDashboardInsightTitle(): string {
+    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
+      return 'Faltam os primeiros lançamentos';
+    }
+    if (!this.incomeEntriesCount) {
+      return 'Registre a primeira receita';
+    }
+    if (!this.expenseEntriesCount) {
+      return 'Registre a primeira despesa';
+    }
+    if (this.saldoDisponivelReal < 0) {
+      return 'Seu saldo está negativo';
+    }
+    if (this.totalRendasPendentes > 0) {
+      return 'Existem receitas pendentes';
+    }
+    return 'Seu mês está no caminho certo';
+  }
+
+  get basicDashboardInsightMessage(): string {
+    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
+      return 'Sem receita e despesa registradas, o dashboard ainda não reflete sua rotina real.';
+    }
+    if (!this.incomeEntriesCount) {
+      return 'Sem entrada registrada, o valor que sobra no mês pode parecer menor do que realmente é.';
+    }
+    if (!this.expenseEntriesCount) {
+      return 'Sem a primeira saída, o saldo ainda não mostra o custo real do seu mês.';
+    }
+    if (this.saldoDisponivelReal < 0) {
+      return 'As saídas já superaram as entradas e o período pede ajuste imediato para evitar aperto no caixa.';
+    }
+    if (this.totalRendasPendentes > 0) {
+      return 'Confirme o que já entrou para o saldo do período ficar mais fiel à sua realidade.';
+    }
+    return 'Receitas e despesas principais já estão registradas e o saldo do período está mais confiável.';
+  }
+
+  get basicDashboardInsightTone(): 'danger' | 'warn' | 'ok' {
+    if (!this.incomeEntriesCount || !this.expenseEntriesCount || this.saldoDisponivelReal < 0) {
+      return 'danger';
+    }
+    if (this.totalRendasPendentes > 0 || !this.hasCardEntries) {
+      return 'warn';
+    }
+    return 'ok';
+  }
+
+  get basicDashboardInsightBadge(): string {
+    if (this.basicDashboardInsightTone === 'danger') {
+      return 'Ação necessária';
+    }
+    if (this.basicDashboardInsightTone === 'warn') {
+      return 'Atenção';
+    }
+    return 'Tudo certo';
+  }
+
+  get basicDashboardSummaryTone(): 'danger' | 'warn' | 'ok' {
+    if (this.saldoDisponivelReal < 0) {
+      return 'danger';
+    }
+    if (this.totalRendasPendentes > 0) {
+      return 'warn';
+    }
+    return 'ok';
+  }
+
+  get basicDashboardSummaryStatus(): string {
+    if (this.basicDashboardSummaryTone === 'danger') {
+      return 'Mês apertado';
+    }
+    if (this.basicDashboardSummaryTone === 'warn') {
+      return 'Atenção ao saldo';
+    }
+    return 'Mês confortável';
+  }
+
+  get basicDashboardPendingReceivablesLabel(): string {
+    if (this.totalRendasPendentes <= 0) {
+      return 'Sem pendências';
+    }
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(this.totalRendasPendentes);
+  }
+
+  get basicDashboardRecentTransactions(): typeof this.recentTransactions {
+    return this.recentTransactions.slice(0, 4);
+  }
+
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
   }

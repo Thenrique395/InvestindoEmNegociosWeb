@@ -4,7 +4,7 @@
       <div class="basic-home-hero">
         <div class="basic-home-hero__copy">
           <p class="basic-home-hero__eyebrow">Dashboard basic</p>
-          <h1 class="basic-home-hero__title">Seu mês em clareza</h1>
+          <h1 class="basic-home-hero__title">Seu mês com clareza</h1>
           <p class="basic-home-hero__text">
             Acompanhe o que entrou, o que saiu e o que ainda precisa da sua ação em {{ mesAtualLabel }}.
           </p>
@@ -45,6 +45,9 @@
             <span class="basic-home-guidance__chip">{{ mesAtualLabel }}</span>
           </div>
           <p class="basic-home-guidance__text">{{ basicDashboardNextMessage }}</p>
+          <a [routerLink]="basicDashboardNextActionLink" class="basic-home-guidance__cta">
+            {{ basicDashboardNextActionLabel }}
+          </a>
         </article>
       </div>
 
@@ -108,75 +111,131 @@
         </article>
       </div>
 
-      <section class="basic-home-actions">
-        <div class="basic-home-actions__copy">
-          <p class="basic-home-actions__eyebrow">Ações do mês</p>
-          <h2 class="basic-home-actions__title">Faça o básico bem feito</h2>
-          <p class="basic-home-actions__text">
-            Registre as entradas e saídas principais para manter o dashboard útil desde a primeira visita.
+      <section class="basic-home-month">
+        <div class="basic-home-month__copy">
+          <p class="basic-home-month__eyebrow">Situação do mês</p>
+          <h2 class="basic-home-month__title">Entenda o que precisa da sua atenção agora</h2>
+          <p class="basic-home-month__text">
+            Use este resumo para decidir sua próxima ação e manter o dashboard útil durante o mês.
           </p>
         </div>
 
-        <div class="basic-home-actions__grid">
-          <article class="basic-home-action-card basic-home-action-card--income">
-            <div class="basic-home-action-card__head">
-              <span class="basic-home-action-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <span class="basic-home-action-card__status" [ngClass]="incomeEntriesCount ? 'basic-home-action-card__status--done' : 'basic-home-action-card__status--pending'">
-                {{ incomeEntriesCount ? 'Registrada' : 'Pendente' }}
-              </span>
+        <div class="basic-home-month__grid">
+          <article class="basic-home-insight-card" [ngClass]="{
+            'basic-home-insight-card--danger': basicDashboardInsightTone === 'danger',
+            'basic-home-insight-card--warn': basicDashboardInsightTone === 'warn',
+            'basic-home-insight-card--ok': basicDashboardInsightTone === 'ok'
+          }">
+            <div class="basic-home-insight-card__head">
+              <div>
+                <p class="basic-home-insight-card__eyebrow">Insight principal</p>
+                <h3 class="basic-home-insight-card__title">{{ basicDashboardInsightTitle }}</h3>
+              </div>
+              <span class="basic-home-insight-card__badge">{{ basicDashboardInsightBadge }}</span>
             </div>
-            <h3 class="basic-home-action-card__title">Receita do período</h3>
-            <p class="basic-home-action-card__text">
-              {{ incomeEntriesCount ? (totalRendas | currency: 'BRL':'symbol':'1.2-2') + ' já entrou neste período.' : 'Adicione sua principal entrada para começar a leitura do mês.' }}
-            </p>
-            <a routerLink="/receitas" class="basic-home-action-card__cta">
-              {{ incomeEntriesCount ? 'Revisar receitas' : 'Cadastrar receita' }}
+            <p class="basic-home-insight-card__text">{{ basicDashboardInsightMessage }}</p>
+            <a [routerLink]="basicDashboardNextActionLink" class="basic-home-insight-card__cta">
+              {{ basicDashboardNextActionLabel }}
             </a>
           </article>
 
-          <article class="basic-home-action-card basic-home-action-card--expense">
-            <div class="basic-home-action-card__head">
-              <span class="basic-home-action-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <span class="basic-home-action-card__status" [ngClass]="expenseEntriesCount ? 'basic-home-action-card__status--done' : 'basic-home-action-card__status--pending'">
-                {{ expenseEntriesCount ? 'Registrada' : 'Pendente' }}
+          <article class="basic-home-summary-card">
+            <div class="basic-home-summary-card__head">
+              <div>
+                <p class="basic-home-summary-card__eyebrow">Resumo rápido</p>
+                <h3 class="basic-home-summary-card__title">Como o mês está ficando</h3>
+                <p class="basic-home-summary-card__period">{{ mesAtualLabel }}</p>
+              </div>
+              <span class="basic-home-summary-card__status" [ngClass]="{
+                'basic-home-summary-card__status--ok': basicDashboardSummaryTone === 'ok',
+                'basic-home-summary-card__status--warn': basicDashboardSummaryTone === 'warn',
+                'basic-home-summary-card__status--danger': basicDashboardSummaryTone === 'danger'
+              }">
+                {{ basicDashboardSummaryStatus }}
               </span>
             </div>
-            <h3 class="basic-home-action-card__title">Despesa do período</h3>
-            <p class="basic-home-action-card__text">
-              {{ expenseEntriesCount ? (totalDespesas | currency: 'BRL':'symbol':'1.2-2') + ' já saiu neste período.' : 'Registre a primeira despesa para saber o que já compromete o caixa.' }}
-            </p>
-            <a routerLink="/despesas" class="basic-home-action-card__cta">
-              {{ expenseEntriesCount ? 'Revisar despesas' : 'Cadastrar despesa' }}
-            </a>
+            <div class="basic-home-summary-card__rows">
+              <div class="basic-home-summary-card__row basic-home-summary-card__row--income">
+                <span>Entrou</span>
+                <strong>{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              </div>
+              <div class="basic-home-summary-card__row basic-home-summary-card__row--expense">
+                <span>Saiu</span>
+                <strong>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              </div>
+              <div class="basic-home-summary-card__row basic-home-summary-card__row--available">
+                <span>Sobra hoje</span>
+                <strong>{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              </div>
+              <div class="basic-home-summary-card__row basic-home-summary-card__row--pending">
+                <span>Pendente a receber</span>
+                <strong>{{ basicDashboardPendingReceivablesLabel }}</strong>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="basic-home-month__grid basic-home-month__grid--secondary">
+          <article class="basic-home-recent-card">
+            <div class="basic-home-recent-card__head">
+              <div>
+                <p class="basic-home-recent-card__eyebrow">Últimos movimentos</p>
+                <h3 class="basic-home-recent-card__title">Movimentos recentes do período</h3>
+              </div>
+              <a routerLink="/despesas" class="basic-home-recent-card__link">Ver tudo</a>
+            </div>
+            <div class="basic-home-recent-card__list" *ngIf="basicDashboardRecentTransactions.length; else basicSemMovimentos">
+              <div class="basic-home-recent-card__item" *ngFor="let item of basicDashboardRecentTransactions; trackBy: trackByIndex">
+                <span class="basic-home-recent-card__icon" [ngClass]="item.type === 'income' ? 'basic-home-recent-card__icon--income' : 'basic-home-recent-card__icon--expense'" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path *ngIf="item.type === 'income'" d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    <path *ngIf="item.type === 'expense'" d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <div class="basic-home-recent-card__item-main">
+                  <strong>{{ item.title }}</strong>
+                  <span>
+                    {{ item.type === 'income' ? 'Receita' : 'Despesa' }}
+                    <ng-container *ngIf="item.status"> • {{ item.status }}</ng-container>
+                    • {{ item.date }}
+                  </span>
+                </div>
+                <strong [ngClass]="item.type === 'income' ? 'basic-home-recent-card__amount--income' : 'basic-home-recent-card__amount--expense'">
+                  {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+                </strong>
+              </div>
+            </div>
+            <ng-template #basicSemMovimentos>
+              <p class="basic-home-recent-card__empty">Sem movimentos recentes. Cadastre uma receita ou despesa para começar.</p>
+            </ng-template>
           </article>
 
-          <article class="basic-home-action-card basic-home-action-card--optional">
-            <div class="basic-home-action-card__head">
-              <span class="basic-home-action-card__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <span class="basic-home-action-card__status basic-home-action-card__status--optional">
-                Opcional
-              </span>
+          <article class="basic-home-todos">
+            <div class="basic-home-todos__head">
+              <div>
+                <p class="basic-home-todos__eyebrow">Pendências e revisões</p>
+                <h3 class="basic-home-todos__title">O que merece sua atenção agora</h3>
+              </div>
             </div>
-            <h3 class="basic-home-action-card__title">Cartões e crédito</h3>
-            <p class="basic-home-action-card__text">
-              {{ hasCardEntries || totalDividaCartoes ? 'Use esta área para acompanhar compras no crédito e parcelas em aberto.' : 'Se você usa cartão, pode cadastrar depois para incluir compras parceladas.' }}
-            </p>
-            <a routerLink="/cartoes" class="basic-home-action-card__cta">
-              {{ hasCardEntries || totalDividaCartoes ? 'Ver cartões' : 'Cadastrar cartão' }}
-            </a>
+            <div class="basic-home-todos__list" *ngIf="insightTodoItems.length; else basicSemPendencias">
+              <div
+                class="basic-home-todos__item"
+                *ngFor="let item of insightTodoItems; trackBy: trackByIndex"
+                [ngClass]="{
+                  'basic-home-todos__item--danger': item.severity === 'danger',
+                  'basic-home-todos__item--warn': item.severity === 'warn',
+                  'basic-home-todos__item--info': item.severity === 'info'
+                }"
+              >
+                <p class="basic-home-todos__text">{{ item.text }}</p>
+                <a [routerLink]="item.route" [queryParams]="item.queryParams" class="basic-home-todos__button">
+                  {{ item.actionLabel }}
+                </a>
+              </div>
+            </div>
+            <ng-template #basicSemPendencias>
+              <p class="basic-home-todos__empty">Sem pendências abertas agora. Seu mês está com a base principal em ordem.</p>
+            </ng-template>
           </article>
         </div>
       </section>
@@ -439,7 +498,7 @@
 
   <section
     class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]"
-    *ngIf="!isLoadingDashboard"
+    *ngIf="!isBasicProfile && !isLoadingDashboard"
     [ngClass]="insight.tone === 'warn'
       ? 'border-amber-400/40 border-l-amber-400 bg-amber-500/10'
       : insight.tone === 'danger'
@@ -477,7 +536,7 @@
     <button class="ghost sm" type="button" (click)="openInsightDetails()">Detalhes</button>
   </section>
 
-  <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]" *ngIf="showInsightDetails">
+  <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]" *ngIf="!isBasicProfile && showInsightDetails">
     <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 sm:pb-[var(--space-3)]">
       <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
         ×
@@ -639,7 +698,7 @@
     </div>
   </div>
 
-  <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]" *ngIf="metasResumo.total">
+  <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]" *ngIf="!isBasicProfile && metasResumo.total">
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
         <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
@@ -757,7 +816,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1" *ngIf="!isLoadingDashboard">
+  <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1" *ngIf="!isBasicProfile && !isLoadingDashboard">
     <div class="grid gap-3">
       <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
       <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
