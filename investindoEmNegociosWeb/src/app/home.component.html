@@ -1,44 +1,229 @@
 <section class="grid gap-4" *ngIf="isLogged">
-  <header class="flex flex-wrap items-start justify-between gap-3">
-    <div class="max-w-[560px]">
-      <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
-      <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
-        Visão geral de {{ mesAtualLabel }}
-      </h1>
-      <p class="mt-1 text-[12px] text-[var(--text-muted)]">
-        Combine receitas, despesas e cartões para saber o quanto pode gastar.
-      </p>
-    </div>
-    <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
-      <button
-        type="button"
-        class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
-        [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-        (click)="setPeriodo('month')"
-      >
-        Mensal
-      </button>
-      <button
-        type="button"
-        class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
-        [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-        (click)="setPeriodo('quarter')"
-      >
-        Trimestral
-      </button>
-      <button
-        type="button"
-        class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
-        [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-        (click)="setPeriodo('year')"
-      >
-        Anual
-      </button>
-    </div>
-  </header>
+  <ng-container *ngIf="isBasicProfile; else advancedDashboardIntro">
+    <section class="basic-home-shell" *ngIf="!isLoadingDashboard; else loadingSummary">
+      <div class="basic-home-hero">
+        <div class="basic-home-hero__copy">
+          <p class="basic-home-hero__eyebrow">Dashboard basic</p>
+          <h1 class="basic-home-hero__title">Seu mês em clareza</h1>
+          <p class="basic-home-hero__text">
+            Acompanhe o que entrou, o que saiu e o que ainda precisa da sua ação em {{ mesAtualLabel }}.
+          </p>
+          <div class="basic-home-periods">
+            <button
+              type="button"
+              class="basic-home-periods__button"
+              [ngClass]="periodo === 'month' ? 'basic-home-periods__button--active' : ''"
+              (click)="setPeriodo('month')"
+            >
+              Mensal
+            </button>
+            <button
+              type="button"
+              class="basic-home-periods__button"
+              [ngClass]="periodo === 'quarter' ? 'basic-home-periods__button--active' : ''"
+              (click)="setPeriodo('quarter')"
+            >
+              Trimestral
+            </button>
+            <button
+              type="button"
+              class="basic-home-periods__button"
+              [ngClass]="periodo === 'year' ? 'basic-home-periods__button--active' : ''"
+              (click)="setPeriodo('year')"
+            >
+              Anual
+            </button>
+          </div>
+        </div>
 
-  <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3" *ngIf="!isLoadingDashboard; else loadingSummary">
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+        <article class="basic-home-guidance">
+          <div class="basic-home-guidance__head">
+            <div>
+              <p class="basic-home-guidance__label">Próximo passo do mês</p>
+              <h2 class="basic-home-guidance__title">{{ basicDashboardNextTitle }}</h2>
+            </div>
+            <span class="basic-home-guidance__chip">{{ mesAtualLabel }}</span>
+          </div>
+          <p class="basic-home-guidance__text">{{ basicDashboardNextMessage }}</p>
+        </article>
+      </div>
+
+      <div class="basic-home-kpis">
+        <article class="basic-home-kpi basic-home-kpi--primary">
+          <div class="basic-home-kpi__head">
+            <span class="basic-home-kpi__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="basic-home-kpi__title-wrap">
+              <p class="basic-home-kpi__eyebrow">Quanto sobra</p>
+              <h2 class="basic-home-kpi__title">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            </div>
+            <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre quanto sobra agora">
+              ?
+              <span class="basic-home-tooltip__content">Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.</span>
+            </button>
+          </div>
+          <p class="basic-home-kpi__support">Em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }} · Pendências: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}</p>
+        </article>
+
+        <article class="basic-home-kpi basic-home-kpi--income">
+          <div class="basic-home-kpi__head">
+            <span class="basic-home-kpi__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="basic-home-kpi__title-wrap">
+              <p class="basic-home-kpi__eyebrow">Quanto entrou</p>
+              <h2 class="basic-home-kpi__title">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            </div>
+            <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre entradas do mês">
+              ?
+              <span class="basic-home-tooltip__content">Entradas do mês: considera só receitas já recebidas dentro do período selecionado.</span>
+            </button>
+          </div>
+          <p class="basic-home-kpi__support">Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+        </article>
+
+        <article class="basic-home-kpi basic-home-kpi--expense">
+          <div class="basic-home-kpi__head">
+            <span class="basic-home-kpi__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="basic-home-kpi__title-wrap">
+              <p class="basic-home-kpi__eyebrow">Quanto saiu</p>
+              <h2 class="basic-home-kpi__title">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            </div>
+            <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre saídas do mês">
+              ?
+              <span class="basic-home-tooltip__content">Saídas do mês: soma de despesas com vencimento dentro do período selecionado.</span>
+            </button>
+          </div>
+          <p class="basic-home-kpi__support">Cartões em aberto: {{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+        </article>
+      </div>
+
+      <section class="basic-home-actions">
+        <div class="basic-home-actions__copy">
+          <p class="basic-home-actions__eyebrow">Ações do mês</p>
+          <h2 class="basic-home-actions__title">Faça o básico bem feito</h2>
+          <p class="basic-home-actions__text">
+            Registre as entradas e saídas principais para manter o dashboard útil desde a primeira visita.
+          </p>
+        </div>
+
+        <div class="basic-home-actions__grid">
+          <article class="basic-home-action-card basic-home-action-card--income">
+            <div class="basic-home-action-card__head">
+              <span class="basic-home-action-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="basic-home-action-card__status" [ngClass]="incomeEntriesCount ? 'basic-home-action-card__status--done' : 'basic-home-action-card__status--pending'">
+                {{ incomeEntriesCount ? 'Registrada' : 'Pendente' }}
+              </span>
+            </div>
+            <h3 class="basic-home-action-card__title">Receita do período</h3>
+            <p class="basic-home-action-card__text">
+              {{ incomeEntriesCount ? (totalRendas | currency: 'BRL':'symbol':'1.2-2') + ' já entrou neste período.' : 'Adicione sua principal entrada para começar a leitura do mês.' }}
+            </p>
+            <a routerLink="/receitas" class="basic-home-action-card__cta">
+              {{ incomeEntriesCount ? 'Revisar receitas' : 'Cadastrar receita' }}
+            </a>
+          </article>
+
+          <article class="basic-home-action-card basic-home-action-card--expense">
+            <div class="basic-home-action-card__head">
+              <span class="basic-home-action-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="basic-home-action-card__status" [ngClass]="expenseEntriesCount ? 'basic-home-action-card__status--done' : 'basic-home-action-card__status--pending'">
+                {{ expenseEntriesCount ? 'Registrada' : 'Pendente' }}
+              </span>
+            </div>
+            <h3 class="basic-home-action-card__title">Despesa do período</h3>
+            <p class="basic-home-action-card__text">
+              {{ expenseEntriesCount ? (totalDespesas | currency: 'BRL':'symbol':'1.2-2') + ' já saiu neste período.' : 'Registre a primeira despesa para saber o que já compromete o caixa.' }}
+            </p>
+            <a routerLink="/despesas" class="basic-home-action-card__cta">
+              {{ expenseEntriesCount ? 'Revisar despesas' : 'Cadastrar despesa' }}
+            </a>
+          </article>
+
+          <article class="basic-home-action-card basic-home-action-card--optional">
+            <div class="basic-home-action-card__head">
+              <span class="basic-home-action-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="basic-home-action-card__status basic-home-action-card__status--optional">
+                Opcional
+              </span>
+            </div>
+            <h3 class="basic-home-action-card__title">Cartões e crédito</h3>
+            <p class="basic-home-action-card__text">
+              {{ hasCardEntries || totalDividaCartoes ? 'Use esta área para acompanhar compras no crédito e parcelas em aberto.' : 'Se você usa cartão, pode cadastrar depois para incluir compras parceladas.' }}
+            </p>
+            <a routerLink="/cartoes" class="basic-home-action-card__cta">
+              {{ hasCardEntries || totalDividaCartoes ? 'Ver cartões' : 'Cadastrar cartão' }}
+            </a>
+          </article>
+        </div>
+      </section>
+    </section>
+  </ng-container>
+
+  <ng-template #advancedDashboardIntro>
+    <header class="flex flex-wrap items-start justify-between gap-3">
+      <div class="max-w-[560px]">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
+        <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
+          Visão geral de {{ mesAtualLabel }}
+        </h1>
+        <p class="mt-1 text-[12px] text-[var(--text-muted)]">
+          Combine receitas, despesas e cartões para saber o quanto pode gastar.
+        </p>
+      </div>
+      <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
+        <button
+          type="button"
+          class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+          [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+          (click)="setPeriodo('month')"
+        >
+          Mensal
+        </button>
+        <button
+          type="button"
+          class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+          [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+          (click)="setPeriodo('quarter')"
+        >
+          Trimestral
+        </button>
+        <button
+          type="button"
+          class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+          [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+          (click)="setPeriodo('year')"
+        >
+          Anual
+        </button>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3" *ngIf="!isLoadingDashboard; else loadingSummary">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
       <div class="mb-2 flex items-center gap-3">
         <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(37,99,235,0.16)] text-[var(--primary)]" aria-hidden="true">
           <svg viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -150,7 +335,8 @@
       <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
       <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
     </div>
-  </div>
+    </div>
+  </ng-template>
 
   <ng-template #loadingSummary>
     <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">

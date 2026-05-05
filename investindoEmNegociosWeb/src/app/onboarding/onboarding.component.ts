@@ -99,6 +99,7 @@ export class OnboardingComponent implements OnInit {
   showExpenseModal = false;
   savingIncomeModal = false;
   savingExpenseModal = false;
+  showStep4Validation = false;
   modalIncome: StoredIncome = this.createIncomeDraft();
   modalIncomeAmountInput = '';
   modalIncomeDateInput = '';
@@ -333,16 +334,19 @@ export class OnboardingComponent implements OnInit {
 
   saveInitialEntriesAndFinish(): void {
     if (!this.accountReady) {
+      this.showStep4Validation = true;
       this.uiFeedback.warning('Crie uma conta antes de cadastrar receita e despesa.');
       this.announce('Crie uma conta antes de cadastrar receita e despesa.');
       this.step = this.totalSteps - 1;
       return;
     }
     if (!this.hasInitialIncome || !this.hasInitialExpense) {
+      this.showStep4Validation = true;
       this.uiFeedback.warning('Cadastre uma receita e uma despesa para concluir.');
       this.announce('Cadastre uma receita e uma despesa para concluir o onboarding.');
       return;
     }
+    this.showStep4Validation = false;
     this.finishOnboarding();
   }
 
@@ -441,6 +445,26 @@ export class OnboardingComponent implements OnInit {
 
   get canFinishWithInitialEntries(): boolean {
     return this.accountReady && this.hasInitialIncome && this.hasInitialExpense && !this.savingEntries;
+  }
+
+  get showStep4ValidationMessage(): boolean {
+    return this.showStep4Validation && (!this.accountReady || !this.hasInitialIncome || !this.hasInitialExpense);
+  }
+
+  get step4ValidationMessage(): string {
+    if (!this.accountReady) {
+      return 'Crie sua conta principal antes de concluir o onboarding.';
+    }
+
+    const missing: string[] = [];
+    if (!this.hasInitialIncome) missing.push('receita inicial');
+    if (!this.hasInitialExpense) missing.push('despesa inicial');
+
+    if (missing.length === 2) {
+      return 'Cadastre a receita inicial e a despesa inicial para concluir o onboarding.';
+    }
+
+    return `Cadastre a ${missing[0]} para concluir o onboarding.`;
   }
 
   get hasInitialCard(): boolean {

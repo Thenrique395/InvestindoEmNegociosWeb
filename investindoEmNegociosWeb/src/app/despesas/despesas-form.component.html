@@ -195,11 +195,11 @@
         </p>
       </div>
 
-      <div class="flex items-center justify-end gap-3 pt-2">
-        <button type="button" class="btn-cancel sm" [disabled]="saving" (click)="fechar()">↩ Cancelar</button>
+      <div class="modal-actions">
+        <button type="button" class="modal-actions__secondary" [disabled]="saving" (click)="fechar()">Cancelar</button>
         <button
           type="submit"
-          class="btn-primary sm"
+          class="modal-actions__primary"
           [disabled]="saving || !novaDespesa.categoryId || semCartaoNoCredito">
           {{ saving ? (isEdit ? 'Atualizando...' : 'Salvando...') : (isEdit ? 'Editar despesa' : 'Salvar despesa') }}
         </button>

@@ -165,6 +165,7 @@ Leitura prática:
 - Execução operacional do frontend: [Agent.md](./Agent.md)
 - Status do produto e backlog central: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
 - Design system e padrões visuais: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+- Padrão visual aprovado de onboarding, cards, tooltips e CTA: ver seção `Padrão aprovado do onboarding` em [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
 - Exploração visual e comparação de componentes: [systemDesigner.md](./systemDesigner.md)
 
 ## Planejamento e produto

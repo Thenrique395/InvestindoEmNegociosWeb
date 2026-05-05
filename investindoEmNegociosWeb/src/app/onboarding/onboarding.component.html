@@ -448,17 +448,16 @@
                 </div>
               </div>
               <p *ngIf="!hasInitialIncome">Nenhuma receita registrada ainda.</p>
-              <p *ngIf="hasInitialIncome">
-                {{ initialIncome.source }} • {{ initialIncome.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              <p *ngIf="hasInitialIncome" class="onboarding-entry-card__summary">
+                {{ initialIncome.source }} • {{ initialIncome.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} • {{ initialIncome.receivedOn }}
               </p>
-              <small *ngIf="hasInitialIncome">Data: {{ initialIncome.receivedOn }}</small>
               <button class="btn-primary onboarding-btn onboarding-btn--inline" type="button" (click)="openIncomeModal()">
                 {{ hasInitialIncome ? 'Editar receita inicial' : 'Adicionar receita' }}
               </button>
             </article>
 
             <article
-              class="onboarding-entry-card"
+              class="onboarding-entry-card onboarding-entry-card--expense"
               [class.onboarding-entry-card--done]="hasInitialExpense"
               [class.onboarding-entry-card--pending]="!hasInitialExpense">
               <div class="onboarding-entry-card__header">
@@ -473,7 +472,7 @@
                   <strong>Despesa inicial</strong>
                 </div>
                 <div class="onboarding-entry-card__header-meta">
-                  <span class="onboarding-entry-card__status">{{ hasInitialExpense ? 'Configurada' : 'Pendente' }}</span>
+                  <span class="onboarding-entry-card__status">{{ hasInitialExpense ? 'Registrada' : 'Pendente' }}</span>
                   <span class="onboarding-entry-card__tooltip-anchor">
                     <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.">?</span>
                     <span class="onboarding-entry-card__tooltip">Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.</span>
@@ -481,10 +480,9 @@
                 </div>
               </div>
               <p *ngIf="!hasInitialExpense">Nenhuma despesa registrada ainda.</p>
-              <p *ngIf="hasInitialExpense">
-                {{ initialExpense.name }} • {{ initialExpense.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              <p *ngIf="hasInitialExpense" class="onboarding-entry-card__summary">
+                {{ initialExpense.name }} • {{ initialExpense.amount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} • {{ initialExpense.dueDate }}
               </p>
-              <small *ngIf="hasInitialExpense">Data: {{ initialExpense.dueDate }}</small>
               <button class="btn-primary onboarding-btn onboarding-btn--inline" type="button" (click)="openExpenseModal()">
                 {{ hasInitialExpense ? 'Editar despesa inicial' : 'Adicionar despesa' }}
               </button>
@@ -525,13 +523,14 @@
           <div class="onboarding-actions__meta">
             <strong>Último passo</strong>
             <span>Finalize com sua conta principal e os primeiros lançamentos para entrar no dashboard com dados reais.</span>
+            <span *ngIf="showStep4ValidationMessage" class="onboarding-actions__validation">{{ step4ValidationMessage }}</span>
           </div>
           <div class="onboarding-actions__group onboarding-actions__group--footer">
             <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="prevStep()">Voltar</button>
             <button class="ghost onboarding-btn" type="button" *ngIf="!accountReady" [disabled]="creatingAccount" (click)="createAccount()">
               {{ creatingAccount ? 'Criando conta...' : 'Criar conta' }}
             </button>
-            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" [disabled]="!canFinishWithInitialEntries" (click)="saveInitialEntriesAndFinish()">
+            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" [disabled]="savingEntries" (click)="saveInitialEntriesAndFinish()">
               {{ savingEntries ? 'Salvando...' : 'Concluir onboarding' }}
             </button>
           </div>

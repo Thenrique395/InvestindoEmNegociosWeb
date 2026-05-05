@@ -126,13 +126,13 @@
         <p class="mt-1 text-[var(--text)]">{{ resumoTexto }}</p>
       </div>
 
-      <div class="flex items-center justify-end gap-3 pt-2">
-        <button type="button" class="btn-cancel sm" [disabled]="saving" (click)="fecharModal()">
-          ↩ Cancelar
+      <div class="modal-actions">
+        <button type="button" class="modal-actions__secondary" [disabled]="saving" (click)="fecharModal()">
+          Cancelar
         </button>
         <button
           type="submit"
-          class="btn-primary sm"
+          class="modal-actions__primary"
           [disabled]="saving || !novaRenda.categoryId">
           {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar receita') }}
         </button>

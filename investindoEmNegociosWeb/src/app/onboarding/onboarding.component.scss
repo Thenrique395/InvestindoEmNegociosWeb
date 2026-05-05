@@ -697,9 +697,28 @@
   border-color: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
+.onboarding-entry-card--expense.onboarding-entry-card--pending {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #ef4444 7%, transparent),
+    color-mix(in srgb, #ef4444 2.5%, transparent)
+  );
+  border-color: color-mix(in srgb, #ef4444 14%, transparent);
+}
+
 .onboarding-entry-card--done {
   border-color: color-mix(in srgb, var(--success) 26%, transparent);
   background: color-mix(in srgb, var(--success) 10%, transparent);
+}
+
+.onboarding-entry-card--expense.onboarding-entry-card--done {
+  border-color: color-mix(in srgb, #ef4444 18%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #ef4444 5%, transparent),
+    color-mix(in srgb, var(--surface) 96%, white)
+  );
+  box-shadow: 0 12px 28px color-mix(in srgb, #ef4444 6%, transparent);
 }
 
 .onboarding-entry-card--optional {
@@ -824,9 +843,19 @@
   color: color-mix(in srgb, var(--primary) 85%, var(--text));
 }
 
+.onboarding-entry-card--expense.onboarding-entry-card--pending .onboarding-entry-card__status {
+  background: color-mix(in srgb, #ef4444 12%, white);
+  color: color-mix(in srgb, #b91c1c 84%, var(--text));
+}
+
 .onboarding-entry-card--done .onboarding-entry-card__status {
   background: color-mix(in srgb, var(--success) 12%, white);
   color: color-mix(in srgb, var(--success) 78%, var(--text));
+}
+
+.onboarding-entry-card--expense.onboarding-entry-card--done .onboarding-entry-card__status {
+  background: color-mix(in srgb, #ef4444 10%, white);
+  color: color-mix(in srgb, #b91c1c 82%, var(--text));
 }
 
 .onboarding-entry-card--optional .onboarding-entry-card__status {
@@ -850,9 +879,25 @@
   max-width: 56ch;
 }
 
+.onboarding-entry-card__summary {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .onboarding-entry-card--done .onboarding-entry-card__icon {
   background: color-mix(in srgb, var(--success) 12%, white);
   color: color-mix(in srgb, var(--success) 78%, var(--text));
+}
+
+.onboarding-entry-card--expense .onboarding-entry-card__icon {
+  background: color-mix(in srgb, #ef4444 10%, white);
+  color: color-mix(in srgb, #b91c1c 82%, var(--text));
+}
+
+.onboarding-entry-card--expense.onboarding-entry-card--done .onboarding-entry-card__icon {
+  background: color-mix(in srgb, #ef4444 14%, white);
+  color: color-mix(in srgb, #b91c1c 86%, var(--text));
 }
 
 .onboarding-entry-card--optional .onboarding-entry-card__icon {
@@ -900,6 +945,11 @@
   font-size: 0.88rem;
   line-height: 1.5;
   color: var(--text-muted);
+}
+
+.onboarding-actions__validation {
+  color: color-mix(in srgb, var(--warning) 68%, var(--text));
+  font-weight: 600;
 }
 
 .onboarding-actions--footer {
@@ -1056,5 +1106,9 @@
   .onboarding-btn,
   .onboarding-btn--primary {
     width: 100%;
+  }
+
+  .onboarding-entry-card__summary {
+    white-space: normal;
   }
 }

@@ -679,6 +679,54 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.authService.getRole();
   }
 
+  get isBasicProfile(): boolean {
+    return this.currentRole === 'Basic';
+  }
+
+  get incomeEntriesCount(): number {
+    return this.incomesRaw.length;
+  }
+
+  get expenseEntriesCount(): number {
+    return this.expensesRaw.length;
+  }
+
+  get hasCardEntries(): boolean {
+    return this.cards.length > 0;
+  }
+
+  get basicDashboardNextTitle(): string {
+    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
+      return 'Comece pelos primeiros lançamentos';
+    }
+    if (!this.incomeEntriesCount) {
+      return 'Registre a primeira receita do período';
+    }
+    if (!this.expenseEntriesCount) {
+      return 'Registre a primeira despesa do período';
+    }
+    if (!this.hasCardEntries) {
+      return 'Opcional: revise seus cartões';
+    }
+    return 'Base do mês configurada';
+  }
+
+  get basicDashboardNextMessage(): string {
+    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
+      return 'Cadastre uma receita e uma despesa para começar com o dashboard refletindo sua rotina real.';
+    }
+    if (!this.incomeEntriesCount) {
+      return 'Sem receitas registradas ainda. Adicione uma entrada para acompanhar o que realmente entrou no caixa.';
+    }
+    if (!this.expenseEntriesCount) {
+      return 'Sem despesas registradas ainda. Lance a primeira saída para o saldo do mês ficar mais confiável.';
+    }
+    if (!this.hasCardEntries) {
+      return 'Você já consegue operar normalmente. Se usar cartão, pode cadastrar depois para acompanhar compras no crédito.';
+    }
+    return 'Receitas, despesas e cartões já estão compondo a leitura principal do seu mês.';
+  }
+
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
   }

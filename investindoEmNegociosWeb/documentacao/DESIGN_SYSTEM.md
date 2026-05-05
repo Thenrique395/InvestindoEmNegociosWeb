@@ -101,15 +101,15 @@ Toda decisão relevante de interface deve ser confrontada com estas 10 heurísti
 
 Escala oficial:
 
-- `--text-xs`: `12px`
-- `--text-sm`: `14px`
-- `--text-md`: `16px`
-- `--text-lg`: `18px`
-- `--text-xl`: `20px`
-- `--text-2xl`: `24px`
-- `--text-3xl`: `30px`
-- `--text-4xl`: `36px`
-- `--text-5xl`: `48px`
+- `--text-xs`: `13px`
+- `--text-sm`: `15px`
+- `--text-md`: `17px`
+- `--text-lg`: `20px`
+- `--text-xl`: `22px`
+- `--text-2xl`: `26px`
+- `--text-3xl`: `32px`
+- `--text-4xl`: `40px`
+- `--text-5xl`: `52px`
 
 Regra prática:
 
@@ -288,6 +288,95 @@ Regra:
 - preferir uma dessas famílias já existentes antes de criar novo container visual
 - manter borda, superfície e espaçamento coerentes com os tokens globais
 - cards de leitura devem privilegiar contraste e organização, não enfeite visual
+
+### Padrão aprovado do onboarding
+
+O onboarding agora é a referência visual aprovada para:
+
+- hero de etapa
+- cards de escolha
+- cards de status semântico
+- tooltips contextuais
+- rodapé com CTA principal
+
+#### Hero de etapa
+
+Regras:
+
+- usar `eyebrow` curta em caixa alta para indicar progresso do fluxo
+- título principal deve ter hierarquia forte, mas permanecer legível em uma ou duas linhas controladas
+- descrição deve ser curta e orientada à ação do sistema
+- o card de progresso deve ser compacto, sem competir com o hero
+
+Padrão visual:
+
+- `h2` entre `--text-4xl` e `--text-5xl`, com `letter-spacing` negativo
+- descrição em `--text-xl` ou equivalente visual próximo
+- largura do progresso fixa no desktop, sem variar por tamanho do texto
+
+#### Cards de escolha
+
+Regras:
+
+- usar sempre ícone semântico, título curto e descrição direta
+- o estado selecionado deve ser comunicado por borda, fundo e sombra, sem depender de selo textual
+- o conteúdo interno precisa manter altura estável, independente da quantidade de texto
+- `tooltip` contextual deve aparecer no canto superior direito com o mesmo padrão em todos os cards interativos
+
+Padrão visual:
+
+- raio alto (`20px+`)
+- sombra suave
+- fundo neutro para estado padrão
+- fundo com nuance de `primary` para estado ativo
+- `success`, `danger` e `warning` usados como nuance semântica, nunca como fundo agressivo
+
+#### Cards de status e lançamentos
+
+Regras:
+
+- `Receita` deve puxar leitura positiva ou neutra
+- `Despesa` deve puxar leitura de saída com nuance sutil de `danger`
+- `Cartão opcional` deve usar nuance de `warning`
+- estados `Pendente`, `Configurado` e `Opcional` devem ser identificáveis com badge, mas sem parecer erro
+
+Padrão visual:
+
+- receita: `primary`/neutro
+- despesa: `danger` suave
+- opcional: `warning` suave
+- concluído: `success` suave
+
+#### Tooltips
+
+Regras:
+
+- gatilho `?` visível, mas discreto
+- caixa de tooltip com largura estável e texto curto
+- tooltip deve explicar a decisão ou o impacto do card, não repetir o título
+- mesmo comportamento visual em onboarding, cards e módulos futuros
+
+Padrão visual:
+
+- trigger circular
+- borda suave
+- hover/focus visível
+- fundo claro com sombra média
+
+#### Rodapé de ação
+
+Regras:
+
+- cada etapa deve terminar com uma faixa de fechamento padronizada
+- à esquerda: resumo curto do que falta ou do próximo passo
+- à direita: ação secundária (`Voltar`) e CTA principal
+- CTA principal deve usar preenchimento sólido com `--primary` e alto contraste
+
+Padrão visual:
+
+- `Voltar` sempre secundário ou `ghost`
+- CTA principal sempre com cor de ação e peso visual evidente
+- não deixar CTA solto dentro do conteúdo sem ancoragem de rodapé
 
 ### Modais e confirmações
 
