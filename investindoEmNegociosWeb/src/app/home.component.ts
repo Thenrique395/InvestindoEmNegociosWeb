@@ -64,6 +64,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private incomesLoaded = false;
 
   dataAtual = new Date();
+  basicDashboardInsightIndex = 0;
   private expensesRaw: StoredExpense[] = [];
   private incomesRaw: StoredIncome[] = [];
   totalRendas = 0;
@@ -754,6 +755,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get basicDashboardInsightTitle(): string {
+    if (this.basicDashboardActiveTodo) {
+      return this.resolveBasicDashboardInsightTodoTitle(this.basicDashboardActiveTodo);
+    }
     if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
       return 'Faltam os primeiros lançamentos';
     }
@@ -773,6 +777,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get basicDashboardInsightMessage(): string {
+    if (this.basicDashboardActiveTodo) {
+      return this.basicDashboardActiveTodo.text;
+    }
     if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
       return 'Sem receita e despesa registradas, o dashboard ainda não reflete sua rotina real.';
     }
@@ -792,6 +799,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get basicDashboardInsightTone(): 'danger' | 'warn' | 'ok' {
+    if (this.basicDashboardActiveTodo) {
+      return this.basicDashboardActiveTodo.severity === 'danger'
+        ? 'danger'
+        : this.basicDashboardActiveTodo.severity === 'warn'
+          ? 'warn'
+          : 'ok';
+    }
     if (!this.incomeEntriesCount || !this.expenseEntriesCount || this.saldoDisponivelReal < 0) {
       return 'danger';
     }
@@ -802,6 +816,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get basicDashboardInsightBadge(): string {
+    if (this.basicDashboardActiveTodo) {
+      if (this.basicDashboardActiveTodo.severity === 'danger') {
+        return 'Crítico';
+      }
+      if (this.basicDashboardActiveTodo.severity === 'warn') {
+        return 'Atenção';
+      }
+      return 'Revisar';
+    }
     if (this.basicDashboardInsightTone === 'danger') {
       return 'Ação necessária';
     }
@@ -845,6 +868,80 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get basicDashboardRecentTransactions(): typeof this.recentTransactions {
     return this.recentTransactions.slice(0, 4);
+  }
+
+  get basicDashboardActiveTodo(): InsightTodoItem | null {
+    if (!this.insightTodoItems.length) return null;
+    return this.insightTodoItems[this.currentBasicDashboardInsightIndex] ?? this.insightTodoItems[0];
+  }
+
+  get basicDashboardInsightCount(): number {
+    return this.insightTodoItems.length || 1;
+  }
+
+  get basicDashboardInsightPosition(): number {
+    return this.insightTodoItems.length ? this.currentBasicDashboardInsightIndex + 1 : 1;
+  }
+
+  get basicDashboardHasInsightPagination(): boolean {
+    return this.insightTodoItems.length > 1;
+  }
+
+  get basicDashboardInsightExtraLabel(): string | null {
+    return null;
+  }
+
+  get basicDashboardCurrentActionLink(): string {
+    return this.basicDashboardActiveTodo?.route ?? this.basicDashboardNextActionLink;
+  }
+
+  get basicDashboardCurrentActionQueryParams(): Record<string, string> | null {
+    return this.basicDashboardActiveTodo?.queryParams ?? null;
+  }
+
+  get basicDashboardCurrentActionLabel(): string {
+    return this.basicDashboardActiveTodo?.actionLabel ?? this.basicDashboardNextActionLabel;
+  }
+
+  previousBasicDashboardInsight(): void {
+    if (!this.insightTodoItems.length) return;
+    this.basicDashboardInsightIndex =
+      (this.currentBasicDashboardInsightIndex - 1 + this.insightTodoItems.length) % this.insightTodoItems.length;
+  }
+
+  nextBasicDashboardInsight(): void {
+    if (!this.insightTodoItems.length) return;
+    this.basicDashboardInsightIndex =
+      (this.currentBasicDashboardInsightIndex + 1) % this.insightTodoItems.length;
+  }
+
+  private get currentBasicDashboardInsightIndex(): number {
+    if (!this.insightTodoItems.length) return 0;
+    return Math.max(0, Math.min(this.basicDashboardInsightIndex, this.insightTodoItems.length - 1));
+  }
+
+  private resolveBasicDashboardInsightTodoTitle(todo: InsightTodoItem): string {
+    const route = todo.route || '';
+    const focus = todo.queryParams?.['focus'] || '';
+    const text = todo.text.toLowerCase();
+
+    if (todo.id === 'pending-income' || route === '/receitas' || focus === 'pending' || text.includes('receita')) {
+      return 'Receitas pendentes';
+    }
+
+    if (todo.id === 'overdue-expenses' || focus === 'overdue' || text.includes('vencida')) {
+      return 'Despesas vencidas';
+    }
+
+    if (todo.id === 'due-soon-expenses' || focus === 'upcoming' || text.includes('próxima') || text.includes('proxima')) {
+      return 'Despesas próximas do vencimento';
+    }
+
+    if (route === '/cartoes' || text.includes('cartão') || text.includes('cartao')) {
+      return 'Cartões para revisar';
+    }
+
+    return 'Alerta do mês';
   }
 
   hasAccess(minRole: UserRole): boolean {

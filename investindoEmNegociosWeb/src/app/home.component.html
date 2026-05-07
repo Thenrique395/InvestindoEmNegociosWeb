@@ -131,11 +131,25 @@
                 <p class="basic-home-insight-card__eyebrow">Insight principal</p>
                 <h3 class="basic-home-insight-card__title">{{ basicDashboardInsightTitle }}</h3>
               </div>
-              <span class="basic-home-insight-card__badge">{{ basicDashboardInsightBadge }}</span>
+              <div class="basic-home-insight-card__meta">
+                <span class="basic-home-insight-card__badge">{{ basicDashboardInsightBadge }}</span>
+                <div class="basic-home-insight-card__nav" *ngIf="basicDashboardHasInsightPagination">
+                  <button type="button" class="basic-home-insight-card__nav-button" (click)="previousBasicDashboardInsight()" aria-label="Insight anterior">
+                    ‹
+                  </button>
+                  <span class="basic-home-insight-card__nav-counter">{{ basicDashboardInsightPosition }} de {{ basicDashboardInsightCount }}</span>
+                  <button type="button" class="basic-home-insight-card__nav-button" (click)="nextBasicDashboardInsight()" aria-label="Próximo insight">
+                    ›
+                  </button>
+                </div>
+              </div>
             </div>
             <p class="basic-home-insight-card__text">{{ basicDashboardInsightMessage }}</p>
-            <a [routerLink]="basicDashboardNextActionLink" class="basic-home-insight-card__cta">
-              {{ basicDashboardNextActionLabel }}
+            <p class="basic-home-insight-card__support" *ngIf="basicDashboardInsightExtraLabel">
+              {{ basicDashboardInsightExtraLabel }}
+            </p>
+            <a [routerLink]="basicDashboardCurrentActionLink" [queryParams]="basicDashboardCurrentActionQueryParams" class="basic-home-insight-card__cta">
+              {{ basicDashboardCurrentActionLabel }}
             </a>
           </article>
 
@@ -175,7 +189,7 @@
           </article>
         </div>
 
-        <div class="basic-home-month__grid basic-home-month__grid--secondary">
+        <div class="basic-home-month__grid basic-home-month__grid--single">
           <article class="basic-home-recent-card">
             <div class="basic-home-recent-card__head">
               <div>
@@ -207,34 +221,6 @@
             </div>
             <ng-template #basicSemMovimentos>
               <p class="basic-home-recent-card__empty">Sem movimentos recentes. Cadastre uma receita ou despesa para começar.</p>
-            </ng-template>
-          </article>
-
-          <article class="basic-home-todos">
-            <div class="basic-home-todos__head">
-              <div>
-                <p class="basic-home-todos__eyebrow">Pendências e revisões</p>
-                <h3 class="basic-home-todos__title">O que merece sua atenção agora</h3>
-              </div>
-            </div>
-            <div class="basic-home-todos__list" *ngIf="insightTodoItems.length; else basicSemPendencias">
-              <div
-                class="basic-home-todos__item"
-                *ngFor="let item of insightTodoItems; trackBy: trackByIndex"
-                [ngClass]="{
-                  'basic-home-todos__item--danger': item.severity === 'danger',
-                  'basic-home-todos__item--warn': item.severity === 'warn',
-                  'basic-home-todos__item--info': item.severity === 'info'
-                }"
-              >
-                <p class="basic-home-todos__text">{{ item.text }}</p>
-                <a [routerLink]="item.route" [queryParams]="item.queryParams" class="basic-home-todos__button">
-                  {{ item.actionLabel }}
-                </a>
-              </div>
-            </div>
-            <ng-template #basicSemPendencias>
-              <p class="basic-home-todos__empty">Sem pendências abertas agora. Seu mês está com a base principal em ordem.</p>
             </ng-template>
           </article>
         </div>
