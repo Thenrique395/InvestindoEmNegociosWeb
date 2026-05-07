@@ -3,7 +3,7 @@
     <section class="basic-home-shell" *ngIf="!isLoadingDashboard; else loadingSummary">
       <div class="basic-home-hero">
         <div class="basic-home-hero__copy">
-          <p class="basic-home-hero__eyebrow">Dashboard basic</p>
+          <p class="basic-home-hero__eyebrow">Resumo do mês</p>
           <h1 class="basic-home-hero__title">Seu mês com clareza</h1>
           <p class="basic-home-hero__text">
             Acompanhe o que entrou, o que saiu e o que ainda precisa da sua ação em {{ mesAtualLabel }}.
@@ -69,7 +69,7 @@
               <span class="basic-home-tooltip__content">Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.</span>
             </button>
           </div>
-          <p class="basic-home-kpi__support">Em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }} · Pendências: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}</p>
+          <p class="basic-home-kpi__support">Disponível em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }} · Pendências do mês: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}</p>
         </article>
 
         <article class="basic-home-kpi basic-home-kpi--income">
@@ -88,7 +88,7 @@
               <span class="basic-home-tooltip__content">Entradas do mês: considera só receitas já recebidas dentro do período selecionado.</span>
             </button>
           </div>
-          <p class="basic-home-kpi__support">Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+          <p class="basic-home-kpi__support">Ainda a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}</p>
         </article>
 
         <article class="basic-home-kpi basic-home-kpi--expense">
@@ -107,7 +107,7 @@
               <span class="basic-home-tooltip__content">Saídas do mês: soma de despesas com vencimento dentro do período selecionado.</span>
             </button>
           </div>
-          <p class="basic-home-kpi__support">Cartões em aberto: {{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+          <p class="basic-home-kpi__support">Compras no cartão: {{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</p>
         </article>
       </div>
 
@@ -196,7 +196,7 @@
                 <p class="basic-home-recent-card__eyebrow">Últimos movimentos</p>
                 <h3 class="basic-home-recent-card__title">Movimentos recentes do período</h3>
               </div>
-              <a routerLink="/despesas" class="basic-home-recent-card__link">Ver tudo</a>
+              <a routerLink="/calendario" class="basic-home-recent-card__link">Abrir calendário</a>
             </div>
             <div class="basic-home-recent-card__list" *ngIf="basicDashboardRecentTransactions.length; else basicSemMovimentos">
               <div class="basic-home-recent-card__item" *ngFor="let item of basicDashboardRecentTransactions; trackBy: trackByIndex">
