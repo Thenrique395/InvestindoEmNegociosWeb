@@ -1,1 +1,187 @@
-/* Tailwind utilities handle layout for this view. Keep file empty for overrides. */
+.expenses-table {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.expenses-table__scroll {
+  overflow-x: auto;
+}
+
+.expenses-table__table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.94rem;
+}
+
+.expenses-table__head {
+  background: color-mix(in srgb, var(--surface-2) 70%, white);
+  color: var(--text);
+
+  tr {
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.expenses-table__cell {
+  padding: 1rem 1.15rem;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.expenses-table__cell--checkbox {
+  width: 52px;
+}
+
+.expenses-table__cell--value,
+.expenses-table__cell--actions {
+  text-align: right;
+}
+
+.expenses-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text);
+}
+
+.expenses-table__sort-dir {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.expenses-table__body {
+  tr + tr td {
+    border-top: 1px solid var(--border);
+  }
+}
+
+.expenses-table__row {
+  transition: background 160ms ease;
+}
+
+.expenses-table__row:hover {
+  background: color-mix(in srgb, var(--surface-2) 62%, white);
+}
+
+.expenses-table__item {
+  padding: 1rem 1.15rem;
+  vertical-align: middle;
+}
+
+.expenses-table__item--checkbox {
+  width: 52px;
+}
+
+.expenses-table__item--name {
+  font-weight: 650;
+  color: var(--text);
+}
+
+.expenses-table__item--muted {
+  color: var(--text-muted);
+}
+
+.expenses-table__item--value {
+  text-align: right;
+  font-weight: 700;
+}
+
+.expenses-table__item--actions {
+  text-align: right;
+}
+
+.expenses-table__amount {
+  color: var(--text);
+}
+
+.expenses-table__recurrence {
+  margin-inline-start: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.expenses-table__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.expenses-table__icon-action {
+  position: relative;
+  inline-size: 42px;
+  block-size: 42px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 76%, white);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+
+  svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+}
+
+.expenses-table__icon-action:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--primary) 22%, transparent);
+  background: color-mix(in srgb, var(--surface) 92%, white);
+  color: var(--primary);
+}
+
+.expenses-table__icon-action::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--text) 90%, white);
+  color: white;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+  z-index: 8;
+}
+
+.expenses-table__icon-action:hover::after,
+.expenses-table__icon-action:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.expenses-table__check {
+  inline-size: 16px;
+  block-size: 16px;
+  accent-color: var(--primary);
+}
+
+.expenses-table__empty {
+  padding: 1.6rem;
+}
+
+@media (max-width: 900px) {
+  .expenses-table__table {
+    min-width: 880px;
+  }
+}

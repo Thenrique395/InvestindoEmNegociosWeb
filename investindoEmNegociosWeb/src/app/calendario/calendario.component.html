@@ -1,8 +1,11 @@
 <section class="calendar-page">
   <header class="calendar-head">
-    <div>
+    <div class="calendar-head__copy">
       <p class="eyebrow">Calendário financeiro</p>
-      <p class="muted">Acompanhe vencimentos, receitas e compromissos do mês em uma visão diária.</p>
+      <h1>Calendário de {{ monthTitle }}</h1>
+      <p class="calendar-head__lede">
+        Acompanhe vencimentos, receitas e compromissos do mês em uma visão diária e organizada.
+      </p>
     </div>
     <div class="calendar-head__actions">
       <button type="button" class="ghost" (click)="previousMonth()">Mês anterior</button>
@@ -12,48 +15,90 @@
   </header>
 
   <div class="calendar-toolbar">
-    <strong>{{ monthTitle }}</strong>
-    <label><input type="checkbox" [(ngModel)]="showExpenses" /> Despesas</label>
-    <label><input type="checkbox" [(ngModel)]="showIncomes" /> Receitas</label>
-    <label><input type="checkbox" [(ngModel)]="showCardDue" /> Cartões</label>
-    <label>
-      Categoria
-      <select [(ngModel)]="selectedCategory">
+    <div class="calendar-toolbar__group">
+      <span class="calendar-toolbar__label">Mostrar</span>
+      <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showExpenses" /> Despesas</label>
+      <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showIncomes" /> Receitas</label>
+      <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showCardDue" /> Cartões</label>
+    </div>
+    <div class="calendar-toolbar__group">
+      <label class="calendar-toolbar__field">
+        <span class="calendar-toolbar__label">Categoria</span>
+        <select [(ngModel)]="selectedCategory">
         <option value="all">Todas</option>
         <option *ngFor="let category of categoryOptions" [value]="category">{{ category }}</option>
-      </select>
-    </label>
-    <label>
-      Status
-      <select [(ngModel)]="selectedStatus">
+        </select>
+      </label>
+      <label class="calendar-toolbar__field">
+        <span class="calendar-toolbar__label">Status</span>
+        <select [(ngModel)]="selectedStatus">
         <option value="all">Todos</option>
         <option *ngFor="let status of statusOptions" [value]="status">{{ statusLabel(status) }}</option>
-      </select>
-    </label>
+        </select>
+      </label>
+    </div>
   </div>
 
   <section class="summary-grid">
     <article class="summary-card">
-      <p class="summary-card__label">Receitas do mês</p>
+      <div class="summary-card__head">
+        <span class="summary-card__icon summary-card__icon--income">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="summary-card__label">Receitas do mês</p>
+      </div>
       <strong class="summary-card__value">{{ formatCurrency(monthIncomeTotal) }}</strong>
+      <p class="summary-card__note">Entradas previstas para {{ monthTitle }}.</p>
     </article>
     <article class="summary-card">
-      <p class="summary-card__label">Despesas do mês</p>
+      <div class="summary-card__head">
+        <span class="summary-card__icon summary-card__icon--expense">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="summary-card__label">Despesas do mês</p>
+      </div>
       <strong class="summary-card__value">{{ formatCurrency(monthExpenseTotal) }}</strong>
+      <p class="summary-card__note">Saídas registradas para o período atual.</p>
     </article>
     <article class="summary-card">
-      <p class="summary-card__label">Saldo previsto</p>
+      <div class="summary-card__head">
+        <span class="summary-card__icon summary-card__icon--balance">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 16c1.5 2 3.5 3 6 3 3.5 0 6-2 6-6 0-3.2-2.3-5.5-5.7-5.5H6.5M6 16V9m0 7h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="summary-card__label">Saldo previsto</p>
+      </div>
       <strong class="summary-card__value">{{ formatCurrency(monthProjectedBalance) }}</strong>
+      <p class="summary-card__note">Diferença entre o que entra e o que sai.</p>
     </article>
     <article class="summary-card">
-      <p class="summary-card__label">Pendências abertas</p>
+      <div class="summary-card__head">
+        <span class="summary-card__icon summary-card__icon--warning">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <p class="summary-card__label">Pendências abertas</p>
+      </div>
       <strong class="summary-card__value">{{ monthOpenCount }}</strong>
-      <p class="muted">Próximos 7 dias: {{ upcomingDueCount }}</p>
+      <p class="summary-card__note">Próximos 7 dias: {{ upcomingDueCount }}</p>
     </article>
   </section>
 
   <div class="calendar-layout">
     <section class="calendar-grid-wrap">
+      <div class="calendar-grid-wrap__head">
+        <div>
+          <p class="eyebrow">Visão do mês</p>
+          <h2>{{ monthTitle }}</h2>
+        </div>
+        <p class="muted">Selecione um dia para ver receitas, despesas e vencimentos.</p>
+      </div>
       <div class="weekdays">
         <span *ngFor="let day of weekdays">{{ day }}</span>
       </div>
@@ -80,6 +125,7 @@
     </section>
 
     <aside class="day-panel">
+      <p class="eyebrow">Dia selecionado</p>
       <h2>Compromissos do dia</h2>
       <p class="muted">{{ selectedDateLabel }}</p>
 

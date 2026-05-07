@@ -1,97 +1,97 @@
-<div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]" [class.opacity-60]="!rendas.length">
-  <div class="overflow-x-auto">
-    <table class="min-w-full text-sm">
-      <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
-        <tr class="border-b border-[var(--border)]">
-          <th class="px-5 py-4">
+<div class="receitas-table" [class.opacity-60]="!rendas.length">
+  <div class="receitas-table__scroll">
+    <table class="receitas-table__table">
+      <thead class="receitas-table__head">
+        <tr>
+          <th class="receitas-table__cell receitas-table__cell--checkbox">
             <input
-              class="h-4 w-4 accent-[var(--primary)]"
+              class="receitas-table__check"
               type="checkbox"
               [checked]="selectableCount > 0 && selectedSelectableCount === selectableCount"
               [indeterminate]="selectedSelectableCount > 0 && selectedSelectableCount < selectableCount"
               (change)="selecionarTodos.emit($any($event.target)?.checked ?? false)"
               aria-label="Selecionar todas" />
           </th>
-          <th class="px-5 py-4 font-semibold">
+          <th class="receitas-table__cell">
             <button
               type="button"
-              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              class="receitas-table__sort"
               (click)="ordenarPor('fonte')">
               Fonte
-              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'fonte'">
+              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'fonte'">
                 {{ sortDir === 1 ? '↑' : '↓' }}
               </span>
             </button>
           </th>
-          <th class="px-5 py-4 font-semibold">
+          <th class="receitas-table__cell">
             <button
               type="button"
-              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              class="receitas-table__sort"
               (click)="ordenarPor('categoria')">
               Categoria
-              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'categoria'">
+              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'categoria'">
                 {{ sortDir === 1 ? '↑' : '↓' }}
               </span>
             </button>
           </th>
-          <th class="px-5 py-4 font-semibold text-center">
+          <th class="receitas-table__cell receitas-table__cell--value">
             <button
               type="button"
-              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              class="receitas-table__sort"
               (click)="ordenarPor('valor')">
               Valor
-              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'valor'">
+              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'valor'">
                 {{ sortDir === 1 ? '↑' : '↓' }}
               </span>
             </button>
           </th>
-          <th class="px-5 py-4 font-semibold">
+          <th class="receitas-table__cell">
             <button
               type="button"
-              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              class="receitas-table__sort"
               (click)="ordenarPor('recebimento')">
               Recebimento
-              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'recebimento'">
+              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'recebimento'">
                 {{ sortDir === 1 ? '↑' : '↓' }}
               </span>
             </button>
           </th>
-          <th class="px-5 py-4 font-semibold">
+          <th class="receitas-table__cell">
             <button
               type="button"
-              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              class="receitas-table__sort"
               (click)="ordenarPor('tipo')">
               Tipo
-              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'tipo'">
+              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'tipo'">
                 {{ sortDir === 1 ? '↑' : '↓' }}
               </span>
             </button>
           </th>
-          <th *ngIf="showStatus" class="px-5 py-4 font-semibold">
+          <th *ngIf="showStatus" class="receitas-table__cell">
             <button
               type="button"
-              class="inline-flex items-center gap-1 text-[var(--text)] hover:text-[var(--text)]"
+              class="receitas-table__sort"
               (click)="ordenarPor('status')">
               Status
-              <span class="text-[10px] text-[var(--text-muted)]" *ngIf="sortBy === 'status'">
+              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'status'">
                 {{ sortDir === 1 ? '↑' : '↓' }}
               </span>
             </button>
           </th>
-          <th class="px-5 py-4 text-center font-semibold">Ações</th>
+          <th class="receitas-table__cell receitas-table__cell--actions">Ações</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--border)]">
+      <tbody class="receitas-table__body">
         <tr *ngIf="loading">
-          <td class="px-5 py-6" [attr.colspan]="showStatus ? 8 : 7">
-            <div class="flex items-center justify-center gap-2 text-[13px] text-[var(--text-muted)]">
-              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)]"></span>
+          <td class="receitas-table__empty" [attr.colspan]="showStatus ? 8 : 7">
+            <div class="receitas-table__loading">
+              <span class="receitas-table__spinner"></span>
               Carregando receitas do mês...
             </div>
           </td>
         </tr>
         <tr *ngIf="!loading && !rendas.length">
-          <td class="px-5 py-6" [attr.colspan]="showStatus ? 8 : 7">
+          <td class="receitas-table__empty" [attr.colspan]="showStatus ? 8 : 7">
             <app-empty-state
               [title]="emptyTitle"
               [description]="emptyDescription"
@@ -100,28 +100,52 @@
               (action)="emptyAction.emit()"></app-empty-state>
           </td>
         </tr>
-        <tr *ngFor="let r of rendas; trackBy: trackByIndex" class="hover:bg-[var(--surface-2)]">
-          <td class="px-5 py-4 align-middle">
+        <tr *ngFor="let r of rendas; trackBy: trackByIndex" class="receitas-table__row">
+          <td class="receitas-table__item receitas-table__item--checkbox">
             <input
-              class="h-4 w-4 accent-[var(--primary)]"
+              class="receitas-table__check"
               type="checkbox"
               [checked]="isSelecionado(r.id)"
               [disabled]="r.status === 'PAID' || r.status === 'CANCELED'"
               (change)="selecionar.emit({ id: r.id!, checked: $any($event.target)?.checked ?? false })"
               aria-label="Selecionar receita" />
           </td>
-          <td class="px-5 py-4 font-medium text-[var(--text)]">{{ r.fonte }}</td>
-          <td class="px-5 py-4 text-[var(--text-muted)]">{{ r.categoria || 'Sem categoria' }}</td>
-          <td class="px-5 py-4 text-right font-semibold">R$ {{ r.valor | number:'1.2-2' }}</td>
-          <td class="px-5 py-4 text-[var(--text-muted)]">{{ r.recebimento || '—' }}</td>
-          <td class="px-5 py-4 text-[var(--text-muted)]">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>
-          <td *ngIf="showStatus" class="px-5 py-4">
+          <td class="receitas-table__item receitas-table__item--name">{{ r.fonte }}</td>
+          <td class="receitas-table__item receitas-table__item--muted">{{ r.categoria || 'Sem categoria' }}</td>
+          <td class="receitas-table__item receitas-table__item--value">
+            <span class="receitas-table__amount">R$ {{ r.valor | number:'1.2-2' }}</span>
+          </td>
+          <td class="receitas-table__item receitas-table__item--muted">{{ r.recebimento || '—' }}</td>
+          <td class="receitas-table__item receitas-table__item--muted">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>
+          <td *ngIf="showStatus" class="receitas-table__item">
             <app-status-badge [status]="r.status" [label]="statusLabel(r)"></app-status-badge>
           </td>
-          <td class="px-5 py-4">
-            <div class="flex items-center justify-end gap-2">
-              <button type="button" class="icon-action icon-action--edit" (click)="onEditar(r.id!)" aria-label="Editar" title="Editar">✏️</button>
-              <button type="button" class="icon-action icon-action--danger" (click)="onRemover(r.planId, r.id)" aria-label="Excluir" title="Excluir">🗑</button>
+          <td class="receitas-table__item receitas-table__item--actions">
+            <div class="receitas-table__actions">
+              <button
+                type="button"
+                class="receitas-table__icon-action"
+                (click)="onEditar(r.id!)"
+                aria-label="Editar"
+                [attr.data-tooltip]="'Editar'">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="receitas-table__icon-action receitas-table__icon-action--danger"
+                (click)="onRemover(r.planId, r.id)"
+                aria-label="Excluir"
+                [attr.data-tooltip]="'Excluir'">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M4 7h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M9 7V5h6v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </button>
             </div>
           </td>
         </tr>

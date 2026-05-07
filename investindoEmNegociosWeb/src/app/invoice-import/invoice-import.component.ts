@@ -47,217 +47,762 @@ type InvoiceExtract = {
   imports: [NgIf, NgFor, FormsModule],
   providers: [InvoiceImportService],
   template: `
-    <div *ngIf="open" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="close.emit()"></div>
-      <div class="relative w-full max-w-[980px] rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <p class="eyebrow">Fatura do cartao</p>
-            <h2 class="text-[var(--text-xl)]">Importar fatura (PDF)</h2>
-            <p class="muted text-sm">Os dados sao extraidos no servidor para validacao antes de salvar.</p>
+    <div *ngIf="open" class="invoice-import-modal">
+      <div class="invoice-import-modal__backdrop" (click)="close.emit()"></div>
+
+      <div class="invoice-import-modal__dialog">
+        <header class="invoice-import-modal__header">
+          <div class="invoice-import-modal__header-copy">
+            <p class="invoice-import-modal__eyebrow">Fatura do cartao</p>
+            <h2 class="invoice-import-modal__title">Importar fatura em PDF</h2>
+            <p class="invoice-import-modal__subtitle">
+              Envie a fatura para extrair lancamentos, validar os dados e salvar com o cartao correto.
+            </p>
           </div>
-          <button type="button" class="btn-ghost sm" (click)="close.emit()">Fechar</button>
-        </div>
 
-        <div class="mt-4 grid gap-3 lg:grid-cols-[1fr_280px]">
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p class="text-sm font-semibold text-[var(--text)]">Selecionar PDF</p>
-                <p class="text-xs text-[var(--text-muted)]">
-                  Envie a fatura em PDF para extrair total, datas e itens.
-                </p>
-              </div>
-              <div class="flex items-center gap-2">
-                <label class="btn-primary sm cursor-pointer">
-                  <input type="file" accept="application/pdf" class="hidden" (change)="onFileSelected($event)" />
-                  Escolher arquivo
-                </label>
-                <button type="button" class="btn-ghost sm" (click)="clear()" [disabled]="loading">Limpar</button>
-              </div>
-            </div>
+          <button type="button" class="invoice-import-modal__close" (click)="close.emit()" aria-label="Fechar modal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M6 6 18 18"></path>
+              <path d="M18 6 6 18"></path>
+            </svg>
+          </button>
+        </header>
 
-            <div class="mt-4 rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-6 text-center text-sm text-[var(--text-muted)]">
-              <p class="font-semibold text-[var(--text)]">{{ fileName || 'Nenhum arquivo selecionado' }}</p>
-              <p *ngIf="loading">Enviando e processando o PDF...</p>
-              <p *ngIf="error" class="text-[var(--danger)]">{{ error }}</p>
-              <p *ngIf="!loading && !error">Formatos suportados: PDF</p>
-            </div>
-
-            <div class="mt-4 grid gap-3 sm:grid-cols-2">
-              <label class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
-                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Cartão destino</p>
-                <select class="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2 text-[var(--text-sm)] text-[var(--text)]" [(ngModel)]="selectedCardId" (ngModelChange)="onCardChanged()">
-                  <option [ngValue]="null">Selecione</option>
-                  <option *ngFor="let card of cards; trackBy: trackByCardId" [ngValue]="card.id">
-                    {{ card.nome }} · {{ card.numero }}
-                  </option>
-                </select>
-              </label>
-              <label class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
-                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Categoria padrão</p>
-                <select class="mt-2 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2 text-[var(--text-sm)] text-[var(--text)]" [(ngModel)]="selectedCategoryId">
-                  <option [ngValue]="null">Sem categoria</option>
-                  <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
-                    {{ category.name }}
-                  </option>
-                </select>
-              </label>
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
-                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Total</p>
-                <p class="text-[var(--text-lg)] font-semibold text-[var(--text)]">{{ extract.total || 'Nao identificado' }}</p>
-              </div>
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
-                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Vencimento</p>
-                <p class="text-[var(--text-lg)] font-semibold text-[var(--text)]">{{ extract.dueDate || 'Nao identificado' }}</p>
-              </div>
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
-                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Fechamento</p>
-                <p class="text-[var(--text-lg)] font-semibold text-[var(--text)]">{{ extract.closeDate || 'Nao identificado' }}</p>
-              </div>
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
-                <p class="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Cartao / Banco</p>
-                <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">
-                  {{ extract.cardName || 'Cartao' }} · {{ extract.bankName || 'Banco' }}
-                </p>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-[var(--text)]">Itens encontrados</p>
-                <span class="text-xs text-[var(--text-muted)]">{{ extract.items.length }} item(s)</span>
-              </div>
-              <div class="mt-2 max-h-[260px] overflow-auto rounded-xl border border-[var(--border)]">
-                <table class="w-full text-left text-xs text-[var(--text-muted)]">
-                  <thead class="sticky top-0 bg-[var(--surface-2)] text-[var(--text)]">
-                    <tr>
-                      <th class="px-3 py-2">Data</th>
-                      <th class="px-3 py-2">Descricao</th>
-                      <th class="px-3 py-2">Parcela</th>
-                      <th class="px-3 py-2">Categoria</th>
-                      <th class="px-3 py-2">Recorrência</th>
-                      <th class="px-3 py-2 text-right">Valor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngIf="!extract.items.length">
-                      <td class="px-3 py-3" colspan="6">Nenhum item identificado.</td>
-                    </tr>
-                    <tr *ngFor="let item of extract.items; trackBy: trackByIndex">
-                      <td class="px-3 py-2">{{ item.date || '-' }}</td>
-                      <td class="px-3 py-2">{{ item.baseDescription || item.description }}</td>
-                      <td class="px-3 py-2">
-                        <span *ngIf="item.isInstallment && item.installmentCurrent && item.installmentTotal; else noInstallment">
-                          {{ item.installmentCurrent }}/{{ item.installmentTotal }}
-                        </span>
-                        <ng-template #noInstallment>-</ng-template>
-                      </td>
-                      <td class="px-3 py-2">
-                        <select
-                          class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
-                          [(ngModel)]="item.categoryId">
-                          <option [ngValue]="null">Sem categoria</option>
-                          <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
-                            {{ category.name }}
-                          </option>
-                        </select>
-                        <small class="block pt-1 text-[10px] opacity-70" *ngIf="item.suggestedCategoryName">
-                          Sugestão: {{ item.suggestedCategoryName }} · {{ confidenceLabel(item.suggestedCategoryScore, item.suggestedCategoryConfidenceBand, item.suggestedCategoryConfidence) }}
-                        </small>
-                      </td>
-                      <td class="px-3 py-2">
-                        <span *ngIf="item.suggestedRecurrence?.isRecurringCandidate; else noRecurrence">
-                          {{ recurrenceLabel(item.suggestedRecurrence?.frequency) }}
-                          <small class="block text-[10px] opacity-70">
-                            {{ recurrenceScoreLabel(item.suggestedRecurrence?.score, item.suggestedRecurrence?.confidenceBand) }}
-                          </small>
-                        </span>
-                        <ng-template #noRecurrence>-</ng-template>
-                      </td>
-                      <td class="px-3 py-2 text-right">{{ item.amount || '-' }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="mt-2 text-[11px] text-[var(--text-muted)]">
-                Dica: se algum valor nao for encontrado, voce pode ajustar manualmente antes de salvar.
-              </p>
-            </div>
-
-            <div class="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4" *ngIf="extract.items.length">
-              <div class="flex items-center justify-between gap-3">
+        <div class="invoice-import-modal__layout">
+          <section class="invoice-import-modal__main">
+            <section class="invoice-import-modal__section">
+              <div class="invoice-import-modal__section-head">
                 <div>
-                  <p class="text-sm font-semibold text-[var(--text)]">Conciliação da fatura</p>
-                  <p class="text-xs text-[var(--text-muted)]">Compara itens novos com ciclos já existentes do cartão.</p>
+                  <h3 class="invoice-import-modal__section-title">Arquivo da fatura</h3>
+                  <p class="invoice-import-modal__section-text">
+                    Selecione um PDF para extrair total, datas, itens e sugerir categorias.
+                  </p>
                 </div>
-                <span class="text-xs text-[var(--text-muted)]" *ngIf="reconciling">Recalculando...</span>
+
+                <input #pdfInput type="file" accept="application/pdf" class="invoice-import-modal__file-input" (change)="onFileSelected($event)" />
+                <div class="invoice-import-modal__actions-inline">
+                  <button
+                    type="button"
+                    class="invoice-import-modal__button invoice-import-modal__button--primary invoice-import-modal__button--upload"
+                    (click)="pdfInput.click()">
+                    Escolher arquivo
+                  </button>
+                  <button type="button" class="invoice-import-modal__button invoice-import-modal__button--ghost" (click)="clear()" [disabled]="loading">
+                    Limpar
+                  </button>
+                </div>
               </div>
 
-              <p *ngIf="reconciliation && !reconciling" class="mt-3 text-xs text-[var(--text-muted)]">
+              <div class="invoice-import-dropzone" [class.invoice-import-dropzone--error]="!!error">
+                <p class="invoice-import-dropzone__title">{{ fileName || 'Nenhum arquivo selecionado' }}</p>
+                <p class="invoice-import-dropzone__text" *ngIf="loading">Enviando e processando o PDF...</p>
+                <p class="invoice-import-dropzone__error" *ngIf="error">{{ error }}</p>
+                <p class="invoice-import-dropzone__text" *ngIf="!loading && !error">Formatos suportados: PDF · Limite de 15MB</p>
+              </div>
+            </section>
+
+            <section class="invoice-import-modal__section">
+              <div class="invoice-import-modal__section-head">
+                <div>
+                  <h3 class="invoice-import-modal__section-title">Destino e leitura inicial</h3>
+                  <p class="invoice-import-modal__section-text">
+                    Defina o cartao de destino e revise as informacoes extraidas antes de salvar.
+                  </p>
+                </div>
+              </div>
+
+              <div class="invoice-import-grid invoice-import-grid--selectors">
+                <label class="invoice-field">
+                  <span class="invoice-field__label">Cartao destino</span>
+                  <select class="invoice-field__control" [(ngModel)]="selectedCardId" (ngModelChange)="onCardChanged()">
+                    <option [ngValue]="null">Selecione</option>
+                    <option *ngFor="let card of cards; trackBy: trackByCardId" [ngValue]="card.id">
+                      {{ card.nome }} · {{ card.numero }}
+                    </option>
+                  </select>
+                </label>
+
+                <label class="invoice-field">
+                  <span class="invoice-field__label">Categoria padrao</span>
+                  <select class="invoice-field__control" [(ngModel)]="selectedCategoryId">
+                    <option [ngValue]="null">Sem categoria</option>
+                    <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
+                      {{ category.name }}
+                    </option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="invoice-import-grid invoice-import-grid--summary">
+                <div class="invoice-summary-card">
+                  <p class="invoice-summary-card__label">Total</p>
+                  <p class="invoice-summary-card__value">{{ extract.total || 'Nao identificado' }}</p>
+                </div>
+
+                <div class="invoice-summary-card">
+                  <p class="invoice-summary-card__label">Vencimento</p>
+                  <p class="invoice-summary-card__value">{{ extract.dueDate || 'Nao identificado' }}</p>
+                </div>
+
+                <div class="invoice-summary-card">
+                  <p class="invoice-summary-card__label">Fechamento</p>
+                  <p class="invoice-summary-card__value">{{ extract.closeDate || 'Nao identificado' }}</p>
+                </div>
+
+                <div class="invoice-summary-card">
+                  <p class="invoice-summary-card__label">Cartao / Banco</p>
+                  <p class="invoice-summary-card__value invoice-summary-card__value--small">
+                    {{ extract.cardName || 'Cartao' }} · {{ extract.bankName || 'Banco' }}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section class="invoice-import-modal__section">
+              <div class="invoice-import-modal__section-head">
+                <div>
+                  <h3 class="invoice-import-modal__section-title">Itens encontrados</h3>
+                  <p class="invoice-import-modal__section-text">
+                    Revise a data, parcela, categoria e recorrencia antes de importar.
+                  </p>
+                </div>
+                <span class="invoice-import-modal__meta">{{ extract.items.length }} item(s)</span>
+              </div>
+
+              <div class="invoice-table-card">
+                <div class="invoice-table-card__scroll">
+                  <table class="invoice-table">
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Descricao</th>
+                        <th>Parcela</th>
+                        <th>Categoria</th>
+                        <th>Recorrencia</th>
+                        <th class="invoice-table__numeric">Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngIf="!extract.items.length">
+                        <td colspan="6" class="invoice-table__empty">Nenhum item identificado.</td>
+                      </tr>
+                      <tr *ngFor="let item of extract.items; trackBy: trackByIndex">
+                        <td>{{ item.date || '-' }}</td>
+                        <td>{{ item.baseDescription || item.description }}</td>
+                        <td>
+                          <span *ngIf="item.isInstallment && item.installmentCurrent && item.installmentTotal; else noInstallment">
+                            {{ item.installmentCurrent }}/{{ item.installmentTotal }}
+                          </span>
+                          <ng-template #noInstallment>-</ng-template>
+                        </td>
+                        <td>
+                          <select class="invoice-field__control invoice-field__control--table" [(ngModel)]="item.categoryId">
+                            <option [ngValue]="null">Sem categoria</option>
+                            <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
+                              {{ category.name }}
+                            </option>
+                          </select>
+                          <small class="invoice-table__hint" *ngIf="item.suggestedCategoryName">
+                            Sugestao: {{ item.suggestedCategoryName }} · {{ confidenceLabel(item.suggestedCategoryScore, item.suggestedCategoryConfidenceBand, item.suggestedCategoryConfidence) }}
+                          </small>
+                        </td>
+                        <td>
+                          <span *ngIf="item.suggestedRecurrence?.isRecurringCandidate; else noRecurrence">
+                            {{ recurrenceLabel(item.suggestedRecurrence?.frequency) }}
+                            <small class="invoice-table__hint">
+                              {{ recurrenceScoreLabel(item.suggestedRecurrence?.score, item.suggestedRecurrence?.confidenceBand) }}
+                            </small>
+                          </span>
+                          <ng-template #noRecurrence>-</ng-template>
+                        </td>
+                        <td class="invoice-table__numeric">{{ item.amount || '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="invoice-table-card__footnote">
+                  Dica: se algum valor nao for encontrado, voce pode ajustar manualmente antes de salvar.
+                </p>
+              </div>
+            </section>
+
+            <section class="invoice-import-modal__section" *ngIf="extract.items.length">
+              <div class="invoice-import-modal__section-head">
+                <div>
+                  <h3 class="invoice-import-modal__section-title">Conciliação da fatura</h3>
+                  <p class="invoice-import-modal__section-text">
+                    Compare os itens novos com ciclos existentes do cartao antes de consolidar a importacao.
+                  </p>
+                </div>
+                <span class="invoice-import-modal__meta" *ngIf="reconciling">Recalculando...</span>
+              </div>
+
+              <p *ngIf="reconciliation && !reconciling" class="invoice-import-modal__context-line">
                 {{ reconciliation.newItems }} novo(s), {{ reconciliation.duplicateItems }} duplicado(s), {{ reconciliation.cycles.length }} ciclo(s) afetado(s).
               </p>
 
-              <div *ngIf="reconciliation?.cycles?.length; else noReconciliationCycles" class="mt-3 overflow-auto rounded-xl border border-[var(--border)]">
-                <table class="w-full text-left text-xs text-[var(--text-muted)]">
-                  <thead class="bg-[var(--surface-2)] text-[var(--text)]">
-                    <tr>
-                      <th class="px-3 py-2">Fatura</th>
-                      <th class="px-3 py-2">Fech.</th>
-                      <th class="px-3 py-2">Venc.</th>
-                      <th class="px-3 py-2 text-right">Atual</th>
-                      <th class="px-3 py-2 text-right">Novos</th>
-                      <th class="px-3 py-2 text-right">Duplicados</th>
-                      <th class="px-3 py-2 text-right">Projetado</th>
-                      <th class="px-3 py-2 text-right">Diferença</th>
-                      <th class="px-3 py-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let cycle of reconciliation?.cycles || []; trackBy: trackByStatementReference">
-                      <td class="px-3 py-2">{{ cycle.statementReference }}</td>
-                      <td class="px-3 py-2">{{ cycle.statementCloseDate }}</td>
-                      <td class="px-3 py-2">{{ cycle.statementDueDate }}</td>
-                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.currentTotalAmount) }}</td>
-                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.importedNewAmount) }}</td>
-                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.duplicateAmount) }}</td>
-                      <td class="px-3 py-2 text-right">{{ formatMoney(cycle.projectedTotalAmount) }}</td>
-                      <td class="px-3 py-2 text-right">{{ cycle.differenceAmount == null ? '-' : formatMoney(cycle.differenceAmount) }}</td>
-                      <td class="px-3 py-2">
-                        <span *ngIf="cycle.readyToClose; else cycleOpen">Pronto para fechamento automático</span>
-                        <ng-template #cycleOpen>{{ cycle.duplicateItemsCount ? 'Revisar duplicados' : 'Conciliação parcial' }}</ng-template>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div *ngIf="reconciliation?.cycles?.length; else noReconciliationCycles" class="invoice-table-card">
+                <div class="invoice-table-card__scroll">
+                  <table class="invoice-table">
+                    <thead>
+                      <tr>
+                        <th>Fatura</th>
+                        <th>Fech.</th>
+                        <th>Venc.</th>
+                        <th class="invoice-table__numeric">Atual</th>
+                        <th class="invoice-table__numeric">Novos</th>
+                        <th class="invoice-table__numeric">Duplicados</th>
+                        <th class="invoice-table__numeric">Projetado</th>
+                        <th class="invoice-table__numeric">Diferenca</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let cycle of reconciliation?.cycles || []; trackBy: trackByStatementReference">
+                        <td>{{ cycle.statementReference }}</td>
+                        <td>{{ cycle.statementCloseDate }}</td>
+                        <td>{{ cycle.statementDueDate }}</td>
+                        <td class="invoice-table__numeric">{{ formatMoney(cycle.currentTotalAmount) }}</td>
+                        <td class="invoice-table__numeric">{{ formatMoney(cycle.importedNewAmount) }}</td>
+                        <td class="invoice-table__numeric">{{ formatMoney(cycle.duplicateAmount) }}</td>
+                        <td class="invoice-table__numeric">{{ formatMoney(cycle.projectedTotalAmount) }}</td>
+                        <td class="invoice-table__numeric">{{ cycle.differenceAmount == null ? '-' : formatMoney(cycle.differenceAmount) }}</td>
+                        <td>
+                          <span *ngIf="cycle.readyToClose; else cycleOpen">Pronto para fechamento automatico</span>
+                          <ng-template #cycleOpen>{{ cycle.duplicateItemsCount ? 'Revisar duplicados' : 'Conciliação parcial' }}</ng-template>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               <ng-template #noReconciliationCycles>
-                <p class="mt-3 text-xs text-[var(--text-muted)]">
-                  {{ reconciling ? 'Calculando conciliação...' : 'Selecione um cartão e mantenha itens válidos para ver o fechamento por ciclo.' }}
-                </p>
+                <div class="invoice-import-note">
+                  {{ reconciling ? 'Calculando conciliação...' : 'Selecione um cartao e mantenha itens válidos para ver o fechamento por ciclo.' }}
+                </div>
               </ng-template>
-            </div>
-          </div>
+            </section>
+          </section>
 
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-            <p class="text-sm font-semibold text-[var(--text)]">Texto extraido</p>
-            <p class="text-xs text-[var(--text-muted)]">Use para validar se os dados batem com a fatura.</p>
-            <div class="mt-3 max-h-[420px] overflow-auto rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-[11px] text-[var(--text)]">
-              <pre class="whitespace-pre-wrap">{{ rawText || 'Nenhum texto extraido.' }}</pre>
-            </div>
-          </div>
+          <aside class="invoice-import-modal__sidebar">
+            <section class="invoice-import-modal__sidecard">
+              <h3 class="invoice-import-modal__section-title">Texto extraido</h3>
+              <p class="invoice-import-modal__section-text">Use este painel para conferir se os dados batem com a fatura original.</p>
+              <div class="invoice-import-modal__rawtext">
+                <pre>{{ rawText || 'Nenhum texto extraido.' }}</pre>
+              </div>
+            </section>
+          </aside>
         </div>
 
-        <div class="mt-4 flex flex-wrap items-center justify-end gap-2">
-          <button type="button" class="btn-cancel" (click)="close.emit()">Fechar</button>
-          <button type="button" class="btn-primary" (click)="salvarImportacao()" [disabled]="!canImport || importing">
-            {{ importing ? 'Importando...' : 'Salvar fatura' }}
-          </button>
-        </div>
+        <footer class="invoice-import-modal__footer">
+          <div class="invoice-import-modal__footer-copy">
+            <p class="invoice-import-modal__footer-title">Revisao final</p>
+            <p class="invoice-import-modal__footer-text">Confirme o cartao, ajuste categorias se necessario e salve a fatura para registrar os itens.</p>
+          </div>
+          <div class="invoice-import-modal__footer-actions">
+            <button type="button" class="invoice-import-modal__button invoice-import-modal__button--ghost" (click)="close.emit()">Fechar</button>
+            <button type="button" class="invoice-import-modal__button invoice-import-modal__button--primary" (click)="salvarImportacao()" [disabled]="!canImport || importing">
+              {{ importing ? 'Importando...' : 'Salvar fatura' }}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .invoice-import-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .invoice-import-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgb(15 23 42 / 0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .invoice-import-modal__dialog {
+      position: relative;
+      width: min(1120px, 100%);
+      max-height: min(92vh, 1100px);
+      overflow: auto;
+      font-family: var(--font-sans, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .invoice-import-modal__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .invoice-import-modal__header-copy {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .invoice-import-modal__eyebrow {
+      margin: 0;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .invoice-import-modal__title {
+      margin: 0;
+      font-size: clamp(2rem, 2.5vw, 2.7rem);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .invoice-import-modal__subtitle {
+      max-width: 58ch;
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    .invoice-import-modal__close {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-soft);
+      transition: transform .18s ease, border-color .18s ease, color .18s ease, background-color .18s ease;
+    }
+
+    .invoice-import-modal__close:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--brand) 20%, var(--border));
+      color: var(--brand);
+      background: color-mix(in srgb, var(--brand) 5%, white);
+    }
+
+    .invoice-import-modal__close svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .invoice-import-modal__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem 0;
+    }
+
+    .invoice-import-modal__main {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .invoice-import-modal__sidebar {
+      display: block;
+    }
+
+    .invoice-import-modal__section,
+    .invoice-import-modal__sidecard {
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 3%, white), var(--surface));
+      padding: 1.25rem;
+    }
+
+    .invoice-import-modal__section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .invoice-import-modal__section-head > :first-child {
+      flex: 1 1 320px;
+    }
+
+    .invoice-import-modal__section-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .invoice-import-modal__section-text {
+      margin: 0.35rem 0 0;
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .invoice-import-modal__actions-inline {
+      display: flex;
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .invoice-import-modal__button {
+      border: 1px solid transparent;
+      min-height: 48px;
+      padding: 0 1.15rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+    }
+
+    .invoice-import-modal__button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .invoice-import-modal__button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .invoice-import-modal__button--primary {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      box-shadow: 0 18px 30px rgb(37 99 235 / 0.22);
+    }
+
+    .invoice-import-modal__button--ghost {
+      border: 1px solid color-mix(in srgb, var(--brand) 12%, var(--border));
+      background: color-mix(in srgb, var(--brand) 4%, white);
+      color: var(--text);
+    }
+
+    .invoice-import-modal__button--upload {
+      min-width: 188px;
+    }
+
+    .invoice-import-modal__file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .invoice-import-dropzone {
+      border: 1px dashed color-mix(in srgb, var(--brand) 16%, var(--border));
+      border-radius: 24px;
+      background: var(--surface);
+      padding: 2rem 1.25rem;
+      text-align: center;
+    }
+
+    .invoice-import-dropzone--error {
+      border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+      background: color-mix(in srgb, var(--danger) 5%, white);
+    }
+
+    .invoice-import-dropzone__title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .invoice-import-dropzone__text,
+    .invoice-import-dropzone__error {
+      margin: 0.45rem 0 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .invoice-import-dropzone__error {
+      color: var(--danger);
+    }
+
+    .invoice-import-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .invoice-import-grid--selectors,
+    .invoice-import-grid--summary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .invoice-field,
+    .invoice-summary-card {
+      display: grid;
+      gap: 0.55rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--surface);
+    }
+
+    .invoice-field__label,
+    .invoice-summary-card__label {
+      margin: 0;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .invoice-field__control {
+      min-height: 56px;
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      padding: 0 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .invoice-field__control--table {
+      min-height: 38px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      padding: 0 0.75rem;
+      background: var(--surface);
+    }
+
+    .invoice-summary-card__value {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .invoice-summary-card__value--small {
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .invoice-table-card {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .invoice-table-card__scroll {
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    .invoice-table-card__footnote {
+      margin: 0;
+      padding: 0.9rem 1rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      text-align: left;
+    }
+
+    .invoice-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--surface-2);
+    }
+
+    .invoice-table th {
+      padding: 0.9rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    .invoice-table td {
+      padding: 0.95rem 1rem;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text);
+      vertical-align: top;
+      border-top: 1px solid var(--border);
+    }
+
+    .invoice-table__numeric {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .invoice-table__hint {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .invoice-table__empty {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 1.25rem 1rem;
+    }
+
+    .invoice-import-modal__meta,
+    .invoice-import-modal__context-line,
+    .invoice-import-note {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    .invoice-import-modal__rawtext {
+      margin-top: 1rem;
+      max-height: 540px;
+      overflow: auto;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      padding: 1rem;
+    }
+
+    .invoice-import-modal__rawtext pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .invoice-import-modal__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.5rem 2rem 2rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1.5rem;
+    }
+
+    .invoice-import-modal__footer-copy {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .invoice-import-modal__footer-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .invoice-import-modal__footer-text {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      max-width: 52ch;
+    }
+
+    .invoice-import-modal__footer-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .invoice-import-modal__layout {
+        grid-template-columns: 1fr;
+      }
+
+      .invoice-import-modal__rawtext {
+        max-height: 260px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .invoice-import-modal__header,
+      .invoice-import-modal__layout,
+      .invoice-import-modal__footer {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+      }
+
+      .invoice-import-modal__header {
+        padding-top: 1.25rem;
+      }
+
+      .invoice-import-modal__actions-inline {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+
+      .invoice-import-modal__actions-inline .invoice-import-modal__button {
+        width: 100%;
+      }
+
+      .invoice-import-grid--selectors,
+      .invoice-import-grid--summary {
+        grid-template-columns: 1fr;
+      }
+
+      .invoice-import-modal__footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .invoice-import-modal__footer-actions {
+        width: 100%;
+      }
+
+      .invoice-import-modal__footer-actions .invoice-import-modal__button {
+        width: 100%;
+      }
+    }
+  `]
 })
 export class InvoiceImportComponent implements OnChanges {
   @Input() open = false;

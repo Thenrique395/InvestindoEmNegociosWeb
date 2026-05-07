@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, NgClass, DecimalPipe } from '@angular/common';
+import { NgIf, NgFor, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { StoredIncome } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
@@ -9,7 +9,7 @@ import { DigitOnlyDirective } from '../utils/digit-only.directive';
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, NgIf, NgFor, NgClass, DecimalPipe, DigitOnlyDirective, RouterLink],
+  imports: [FormsModule, NgIf, NgFor, DecimalPipe, DigitOnlyDirective, RouterLink],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })

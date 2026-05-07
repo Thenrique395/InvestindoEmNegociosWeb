@@ -1,132 +1,150 @@
-<div *ngIf="mostrarForm" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-  <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharModal()"></div>
-  <div class="relative w-full max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-lg)]">
-    <div class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-6 py-5">
-      <div class="space-y-1">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Nova receita</p>
-        <h3 class="text-xl font-semibold text-[var(--text)]">
-          {{ editandoId ? 'Editar receita' : 'Adicionar receita' }}
+<div *ngIf="mostrarForm" class="income-form-modal">
+  <div class="income-form-modal__backdrop" (click)="fecharModal()"></div>
+
+  <div
+    class="income-form-modal__dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="editandoId ? 'income-form-title-edit' : 'income-form-title-new'">
+    <header class="income-form-modal__header">
+      <div class="income-form-modal__title-wrap">
+        <p class="income-form-modal__eyebrow">{{ editandoId ? 'Editar receita' : 'Nova receita' }}</p>
+        <h3 class="income-form-modal__title" [id]="editandoId ? 'income-form-title-edit' : 'income-form-title-new'">
+          {{ editandoId ? 'Atualize este recebimento' : 'Adicionar receita' }}
         </h3>
-        <p class="text-sm text-[var(--text-muted)]">Cadastre o valor e a recorrência deste recebimento.</p>
+        <p class="income-form-modal__subtitle">
+          {{ editandoId
+            ? 'Revise os dados para manter o período atualizado e os relatórios consistentes.'
+            : 'Preencha os dados essenciais para registrar a entrada no período correto.' }}
+        </p>
       </div>
+
       <button
-        class="grid h-10 w-10 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition hover:text-[var(--text)]"
+        class="income-form-modal__close"
         type="button"
         (click)="fecharModal()"
         aria-label="Fechar modal">
-        ✕
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </button>
-    </div>
+    </header>
 
-    <form class="grid gap-4 px-6 py-6" (ngSubmit)="salvar()" autocomplete="off">
-      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-        Fonte
-        <input
-          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-          type="text"
-          [(ngModel)]="novaRenda.fonte"
-          name="fonte"
-          (ngModelChange)="onFonteChange($event)"
-          placeholder="Ex: Salário, PLR, Freela"
-          required />
-      </label>
-
-      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-        Categoria
-        <select
-          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-          [(ngModel)]="novaRenda.categoryId"
-          name="categoria">
-          <option [ngValue]="null" disabled>Selecione</option>
-          <option *ngIf="!categorias.length" [ngValue]="null" disabled>Sem categorias cadastradas</option>
-          <option *ngFor="let cat of categorias; trackBy: trackByIndex" [value]="cat.id">{{ cat.name }}</option>
-        </select>
-        <div *ngIf="erroCategoria" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroCategoria }}</div>
-      </label>
-
-      <div
-        class="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200"
-        *ngIf="!categorias.length">
-        Nenhuma categoria de receita ativa encontrada.
-        <a class="font-semibold text-amber-100 underline underline-offset-2" routerLink="/categorias" (click)="fecharModal()">
-          Cadastrar categorias
-        </a>
-      </div>
-
-      <div
-        class="flex items-center justify-between gap-4 rounded-xl border px-4 py-3 transition"
-        [ngClass]="
-          novaRenda.fixa
-            ? 'border-[var(--primary)] bg-[var(--primary)]/10'
-            : 'border-[var(--border)] bg-[var(--surface-2)]'
-        ">
-        <div>
-          <p class="text-sm font-semibold" [ngClass]="novaRenda.fixa ? 'text-[var(--primary)]' : 'text-[var(--text)]'">Recorrência</p>
-          <p class="text-xs text-[var(--text-muted)]">Repete todo mês automaticamente.</p>
+    <form class="income-form-modal__form" (ngSubmit)="salvar()" autocomplete="off">
+      <section class="income-form-modal__section">
+        <div class="income-form-modal__section-head">
+          <h4 class="income-form-modal__section-title">Dados principais</h4>
+          <p class="income-form-modal__section-text">Defina a fonte da receita, a categoria, o valor e a data de recebimento.</p>
         </div>
-        <label class="relative inline-flex items-center" aria-label="Receita recorrente mensal">
-          <input
-            class="peer sr-only"
-            type="checkbox"
-            [(ngModel)]="novaRenda.fixa"
-            name="fixa"
-            (ngModelChange)="onFixaChange($event)" />
-          <span
-            class="h-6 w-11 rounded-full border border-[var(--border)] bg-[var(--surface-3)] transition peer-checked:border-[var(--primary)] peer-checked:bg-[var(--primary)]">
-          </span>
-          <span
-            class="pointer-events-none absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-5">
-          </span>
-        </label>
-      </div>
 
-      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-        Valor (R$)
-        <input
-          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-          type="text"
-          inputmode="decimal"
-          placeholder="R$ 0,00"
-          [ngModel]="valorInput"
-          digitOnly
-          (ngModelChange)="onValorChange($event)"
-          name="valor"
-          required />
-      </label>
+        <div class="income-form-modal__grid income-form-modal__grid--main">
+          <label class="income-field income-field--full">
+            <span class="income-field__label">Fonte</span>
+            <input
+              class="income-field__control"
+              type="text"
+              [(ngModel)]="novaRenda.fonte"
+              name="fonte"
+              (ngModelChange)="onFonteChange($event)"
+              placeholder="Ex: Salário, PLR, Freela"
+              required />
+          </label>
 
-      <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-        Data de recebimento (DD/MM/AAAA)
-        <input
-          class="h-12 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base font-medium text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-          type="text"
-          inputmode="numeric"
-          placeholder="05/09/2024"
-          maxlength="10"
-          [ngModel]="recebimentoInput"
-          digitOnly
-          (ngModelChange)="onRecebimentoChange($event)"
-          name="recebimento"
-          required />
-        <div *ngIf="erroData" class="text-sm font-medium text-rose-400" aria-live="polite">{{ erroData }}</div>
-      </label>
+          <label class="income-field">
+            <span class="income-field__label">Categoria</span>
+            <select
+              class="income-field__control"
+              [(ngModel)]="novaRenda.categoryId"
+              name="categoria">
+              <option [ngValue]="null" disabled>Selecione</option>
+              <option *ngIf="!categorias.length" [ngValue]="null" disabled>Sem categorias cadastradas</option>
+              <option *ngFor="let cat of categorias; trackBy: trackByIndex" [value]="cat.id">{{ cat.name }}</option>
+            </select>
+            <div *ngIf="erroCategoria" class="income-field__error" aria-live="polite">{{ erroCategoria }}</div>
+          </label>
 
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="valorSugestao">
-        Valor anterior para esta fonte:
-        <strong class="text-[var(--text)]">R$ {{ valorSugestao | number:'1.2-2' }}</strong>
-        <button
-          type="button"
-          class="ml-3 inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
-          (click)="usarSugestao()">
-          Usar valor fixo
-        </button>
-      </div>
+          <label class="income-field">
+            <span class="income-field__label">Valor (R$)</span>
+            <input
+              class="income-field__control"
+              type="text"
+              inputmode="decimal"
+              placeholder="R$ 0,00"
+              [ngModel]="valorInput"
+              digitOnly
+              (ngModelChange)="onValorChange($event)"
+              name="valor"
+              required />
+          </label>
 
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm" *ngIf="resumoTexto">
-        <span class="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Resumo</span>
-        <p class="mt-1 text-[var(--text)]">{{ resumoTexto }}</p>
-      </div>
+          <label class="income-field income-field--full">
+            <span class="income-field__label">Data de recebimento</span>
+            <input
+              class="income-field__control"
+              type="text"
+              inputmode="numeric"
+              placeholder="05/09/2024"
+              maxlength="10"
+              [ngModel]="recebimentoInput"
+              digitOnly
+              (ngModelChange)="onRecebimentoChange($event)"
+              name="recebimento"
+              required />
+            <div *ngIf="erroData" class="income-field__error" aria-live="polite">{{ erroData }}</div>
+          </label>
+        </div>
 
-      <div class="modal-actions">
+        <div class="income-form-modal__warning" *ngIf="!categorias.length">
+          <p class="income-form-modal__warning-title">Crie uma categoria antes de continuar.</p>
+          <a class="income-form-modal__warning-link" routerLink="/categorias" (click)="fecharModal()">Abrir categorias</a>
+        </div>
+      </section>
+
+      <section class="income-form-modal__section">
+        <div class="income-form-modal__section-head">
+          <h4 class="income-form-modal__section-title">Comportamento da receita</h4>
+          <p class="income-form-modal__section-text">Defina se o recebimento deve reaparecer automaticamente nos próximos meses.</p>
+        </div>
+
+        <div class="income-form-modal__stack">
+          <label class="income-toggle-card">
+            <div class="income-toggle-card__copy">
+              <span class="income-toggle-card__title">Receita recorrente</span>
+              <small class="income-toggle-card__text">Use quando essa entrada se repete todo mês automaticamente.</small>
+            </div>
+            <span class="income-toggle-card__switch">
+              <input
+                class="peer sr-only"
+                type="checkbox"
+                [(ngModel)]="novaRenda.fixa"
+                name="fixa"
+                (ngModelChange)="onFixaChange($event)" />
+              <span class="income-toggle-card__track"></span>
+              <span class="income-toggle-card__thumb"></span>
+            </span>
+          </label>
+
+          <div class="income-form-modal__hint-card" *ngIf="valorSugestao">
+            <div class="income-form-modal__hint-copy">
+              <span class="income-form-modal__hint-title">Último valor usado para esta fonte</span>
+              <p class="income-form-modal__hint-text">R$ {{ valorSugestao | number:'1.2-2' }}</p>
+            </div>
+            <button
+              type="button"
+              class="income-form-modal__hint-action"
+              (click)="usarSugestao()">
+              Usar valor sugerido
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="income-form-modal__summary" *ngIf="resumoTexto">
+        <p class="income-form-modal__summary-eyebrow">Resumo</p>
+        <p class="income-form-modal__summary-text">{{ resumoTexto }}</p>
+      </section>
+
+      <footer class="modal-actions">
         <button type="button" class="modal-actions__secondary" [disabled]="saving" (click)="fecharModal()">
           Cancelar
         </button>
@@ -136,7 +154,7 @@
           [disabled]="saving || !novaRenda.categoryId">
           {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar receita') }}
         </button>
-      </div>
+      </footer>
     </form>
   </div>
 </div>

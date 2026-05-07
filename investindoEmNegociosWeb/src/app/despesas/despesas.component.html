@@ -1,237 +1,240 @@
-<div class="grid gap-3 md:grid-cols-3">
-  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-    <div class="mb-2 flex items-center gap-3">
-      <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(251,191,36,0.18)] text-[var(--warning)]">
-        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
-        </svg>
-      </span>
-      <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pendentes</p>
-      <button
-        type="button"
-        class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-        aria-label="Mais informacoes sobre despesas pendentes">
-        i
-        <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-          Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas.
+<div class="expenses-page">
+  <section class="expenses-summary-grid">
+    <article class="expenses-summary-card expenses-summary-card--warning">
+      <div class="expenses-summary-card__head">
+        <span class="expenses-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+          </svg>
         </span>
-        <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-      </button>
-    </div>
-    <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">
-      R$ {{ totalPendentes | number:'1.2-2' }}
-    </p>
-  </div>
-  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-    <div class="mb-2 flex items-center gap-3">
-      <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(56,189,248,0.18)] text-[var(--info)]">
-        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M6 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Antecipadas</p>
-      <button
-        type="button"
-        class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-        aria-label="Mais informacoes sobre despesas antecipadas">
-        i
-        <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-          Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período.
-        </span>
-        <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-      </button>
-    </div>
-    <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">
-      R$ {{ totalAntecipadas | number:'1.2-2' }}
-    </p>
-  </div>
-  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-    <div class="mb-2 flex items-center gap-3">
-      <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(34,197,94,0.18)] text-[var(--success)]">
-        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Pagas</p>
-      <button
-        type="button"
-        class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-        aria-label="Mais informacoes sobre despesas pagas">
-        i
-        <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-          Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações.
-        </span>
-        <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-      </button>
-    </div>
-    <p class="text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">
-      R$ {{ totalPagas | number:'1.2-2' }}
-    </p>
-  </div>
-</div>
+        <div class="expenses-summary-card__copy">
+          <p class="expenses-summary-card__eyebrow">Pendentes</p>
+          <h3 class="expenses-summary-card__title">R$ {{ totalPendentes | number:'1.2-2' }}</h3>
+        </div>
+        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre despesas pendentes">
+          ?
+          <span class="ui-tooltip__panel">
+            Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas.
+          </span>
+          <span class="ui-tooltip__arrow"></span>
+        </button>
+      </div>
+      <p class="expenses-summary-card__note">Contas abertas para o período atual.</p>
+    </article>
 
-<section class="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-  <div class="flex flex-wrap items-start justify-between gap-6">
-    <div class="space-y-2">
-      <h2 class="text-xl font-semibold text-[var(--text)]">Despesas {{ mesAtualLabel | titlecase }}</h2>
-      <p class="text-[12px] text-[var(--text-muted)]">Veja as despesas do mês atual ou navegue para meses anterior/próximo.</p>
-      <div class="flex flex-wrap gap-2" *ngIf="previousComparison as comparison">
-        <span class="relative inline-flex items-center gap-2 overflow-visible rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] font-semibold text-[var(--text-muted)]">
-          Comparativo com {{ comparison.month }}:
-          <button
-            type="button"
-            class="group relative inline-flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[10px] text-[var(--text-secondary)]"
-            aria-label="Mais informacoes sobre comparativo de despesas">
-            i
-            <span class="pointer-events-none absolute bottom-full right-0 z-50 mb-2 hidden min-w-[220px] rounded-[10px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[10px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-              Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução.
+    <article class="expenses-summary-card expenses-summary-card--info">
+      <div class="expenses-summary-card__head">
+        <span class="expenses-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="expenses-summary-card__copy">
+          <p class="expenses-summary-card__eyebrow">Antecipadas</p>
+          <h3 class="expenses-summary-card__title">R$ {{ totalAntecipadas | number:'1.2-2' }}</h3>
+        </div>
+        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre despesas antecipadas">
+          ?
+          <span class="ui-tooltip__panel">
+            Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período.
+          </span>
+          <span class="ui-tooltip__arrow"></span>
+        </button>
+      </div>
+      <p class="expenses-summary-card__note">Pagamentos feitos antes do vencimento.</p>
+    </article>
+
+    <article class="expenses-summary-card expenses-summary-card--success">
+      <div class="expenses-summary-card__head">
+        <span class="expenses-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="expenses-summary-card__copy">
+          <p class="expenses-summary-card__eyebrow">Pagas</p>
+          <h3 class="expenses-summary-card__title">R$ {{ totalPagas | number:'1.2-2' }}</h3>
+        </div>
+        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre despesas pagas">
+          ?
+          <span class="ui-tooltip__panel">
+            Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações.
+          </span>
+          <span class="ui-tooltip__arrow"></span>
+        </button>
+      </div>
+      <p class="expenses-summary-card__note">Saídas já liquidadas neste período.</p>
+    </article>
+  </section>
+
+  <section class="expenses-shell">
+    <div class="expenses-hero">
+      <div class="expenses-hero__main">
+        <p class="expenses-hero__eyebrow">Despesas do período</p>
+        <h2 class="expenses-hero__title">Despesas de {{ mesAtualLabel | titlecase }}</h2>
+        <p class="expenses-hero__text">
+          Veja o que já saiu, compare com o mês anterior e registre novas despesas sem perder o contexto do período.
+        </p>
+
+        <div class="expenses-hero__toolbar">
+          <div class="expenses-hero__comparison" *ngIf="previousComparison as comparison">
+            <span class="expenses-comparison-pill">
+              <span class="expenses-comparison-pill__label">Comparado a {{ comparison.month }}</span>
+              <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de despesas">
+                ?
+                <span class="ui-tooltip__panel">
+                  Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução.
+                </span>
+                <span class="ui-tooltip__arrow"></span>
+              </button>
+              <span
+                class="expenses-comparison-pill__delta"
+                [ngClass]="comparison.trend === 'up'
+                  ? 'expenses-comparison-pill__delta--up'
+                  : comparison.trend === 'down'
+                    ? 'expenses-comparison-pill__delta--down'
+                    : 'expenses-comparison-pill__delta--flat'">
+                <ng-container *ngIf="comparison.isNew; else diffValue">Sem base anterior</ng-container>
+                <ng-template #diffValue>
+                  {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
+                  ({{ comparison.percent | number:'1.0-0' }}%)
+                </ng-template>
+              </span>
             </span>
-            <span class="pointer-events-none absolute bottom-full right-2 z-50 mb-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-          </button>
-          <span
-            class="font-semibold"
-            [ngClass]="comparison.trend === 'up'
-              ? 'text-[var(--danger)]'
-              : comparison.trend === 'down'
-                ? 'text-[var(--success)]'
-                : 'text-[var(--text-muted)]'">
-            <ng-container *ngIf="comparison.isNew; else diffValue">Novo</ng-container>
-            <ng-template #diffValue>
-              {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
-              ({{ comparison.percent | number:'1.0-0' }}%)
-            </ng-template>
-          </span>
-        </span>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <button
-          type="button"
-          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
-          (click)="mesAnterior()">
-          ◀ Mês anterior
-        </button>
-        <button
-          type="button"
-          class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[12px] font-semibold text-[var(--text)] transition hover:border-[var(--primary)]/40"
-          (click)="proximoMes()">
-          Próximo mês ▶
-        </button>
-        <button type="button" class="btn-ghost sm" (click)="abrirImportFatura()">
-          <span class="grid h-5 w-5 place-items-center rounded-full bg-[var(--surface-3)]" aria-hidden="true">📄</span>
-          Importar fatura
-        </button>
-      </div>
-    </div>
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-right">
-      <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Total do mês</span>
-      <strong class="mt-2 block text-[clamp(1.2rem,1.6vw,1.6rem)] font-semibold text-[var(--text)]">R$ {{ totalMes() | number:'1.2-2' }}</strong>
-      <div class="mt-3 flex flex-wrap items-center justify-end gap-2">
-        <button
-          type="button"
-          class="btn-primary sm"
-          (click)="abrirModal()">
-          <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          Adicionar despesa
-        </button>
-      </div>
-    </div>
-  </div>
+          </div>
 
-  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-[12px] text-[var(--text-muted)]" *ngIf="selecionados.length">
-    <div class="flex flex-wrap items-center gap-3">
-      <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
-      <label class="inline-flex items-center gap-2 text-[12px] text-[var(--text-muted)]" *ngIf="canChooseAccount">
-        <span>Conta de baixa</span>
-        <select
-          class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-[12px] text-[var(--text)]"
-          [(ngModel)]="contaBaixaId">
-          <option *ngFor="let conta of contas; trackBy: trackByIndex" [ngValue]="conta.id">
-            {{ conta.name }}
-          </option>
+          <div class="expenses-hero__nav">
+            <button type="button" class="expenses-hero__nav-btn" (click)="mesAnterior()">
+              <span aria-hidden="true">←</span>
+              <span>Mês anterior</span>
+            </button>
+            <button type="button" class="expenses-hero__nav-btn" (click)="proximoMes()">
+              <span>Próximo mês</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="expenses-total-card">
+        <p class="expenses-total-card__eyebrow">Total do mês</p>
+        <strong class="expenses-total-card__value">R$ {{ totalMes() | number:'1.2-2' }}</strong>
+        <p class="expenses-total-card__text">Soma das despesas pagas, antecipadas e pendentes registradas neste período.</p>
+        <div class="expenses-total-card__actions">
+          <button type="button" class="expenses-total-card__action expenses-total-card__action--ghost" (click)="abrirImportFatura()">
+            <span class="expenses-total-card__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M14 3v6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="expenses-total-card__action-copy">
+              <strong>Importar fatura</strong>
+              <small>Trazer lançamentos do cartão para este período.</small>
+            </span>
+          </button>
+          <button type="button" class="expenses-total-card__action expenses-total-card__action--primary" (click)="abrirModal()">
+            <span class="expenses-total-card__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="expenses-total-card__action-copy">
+              <strong>Adicionar despesa</strong>
+              <small>Registrar uma nova saída manualmente.</small>
+            </span>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="expenses-bulk" *ngIf="selecionados.length">
+      <div class="expenses-bulk__meta">
+        <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
+        <label class="expenses-bulk__account" *ngIf="canChooseAccount">
+          <span>Conta de baixa</span>
+          <select [(ngModel)]="contaBaixaId">
+            <option *ngFor="let conta of contas; trackBy: trackByIndex" [ngValue]="conta.id">
+              {{ conta.name }}
+            </option>
+          </select>
+        </label>
+      </div>
+      <div class="expenses-bulk__actions">
+        <button
+          type="button"
+          class="expenses-bulk__button expenses-bulk__button--primary"
+          [disabled]="loadingPagar"
+          (click)="pagarSelecionadas()">
+          <span *ngIf="loadingPagar">Processando...</span>
+          <span *ngIf="!loadingPagar">Marcar como pago</span>
+        </button>
+        <button
+          type="button"
+          class="expenses-bulk__button expenses-bulk__button--ghost"
+          *ngIf="canAnticipateExpenses"
+          [disabled]="loadingAntecipar"
+          (click)="anteciparSelecionadas()">
+          <span *ngIf="loadingAntecipar">Antecipando...</span>
+          <span *ngIf="!loadingAntecipar">Solicitar antecipação</span>
+        </button>
+        <button
+          type="button"
+          class="expenses-bulk__button expenses-bulk__button--danger"
+          (click)="excluirSelecionadas()">
+          Excluir
+        </button>
+      </div>
+    </div>
+
+    <div class="expenses-filters">
+      <label class="expenses-filter">
+        <span class="expenses-filter__label">Status</span>
+        <select [(ngModel)]="filtroStatus">
+          <option value="ALL">Todos</option>
+          <option value="OPEN">{{ statusLabel('OPEN') }}</option>
+          <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
+          <option value="PAID">{{ statusLabel('PAID') }}</option>
+          <option value="ANTICIPATED">{{ statusLabel('ANTICIPATED') }}</option>
+          <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
         </select>
       </label>
+      <label class="expenses-filter">
+        <span class="expenses-filter__label">Categoria</span>
+        <select [(ngModel)]="filtroCategoria">
+          <option value="ALL">Todas</option>
+          <option *ngIf="!categorias.length" value="" disabled>Sem categorias cadastradas</option>
+          <option *ngFor="let c of categorias; trackBy: trackByIndex" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </label>
+      <label class="expenses-filter expenses-filter--search">
+        <span class="expenses-filter__label">Buscar</span>
+        <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
+      </label>
     </div>
-    <div class="flex flex-wrap items-center gap-2">
-      <button
-        type="button"
-        class="btn-primary sm"
-        [disabled]="loadingPagar"
-        (click)="pagarSelecionadas()">
-        <span *ngIf="loadingPagar">Processando...</span>
-        <span *ngIf="!loadingPagar">Marcar como pago</span>
-      </button>
-      <button
-        type="button"
-        class="btn-ghost sm"
-        *ngIf="canAnticipateExpenses"
-        [disabled]="loadingAntecipar"
-        (click)="anteciparSelecionadas()">
-        <span *ngIf="loadingAntecipar">Antecipando...</span>
-        <span *ngIf="!loadingAntecipar">Solicitar antecipação</span>
-      </button>
-      <button type="button" class="btn-danger sm" (click)="excluirSelecionadas()">Excluir</button>
+
+    <div class="expenses-list-wrap">
+      <app-despesas-lista
+        [despesas]="despesasFiltradas"
+        emptyTitle="Sem despesas no período"
+        emptyDescription="Adicione sua primeira despesa para acompanhar os vencimentos."
+        emptyCtaLabel="Adicionar despesa"
+        [sortBy]="sortBy"
+        [sortDir]="sortDir"
+        [pagamentoLabelFn]="pagamentoLabel.bind(this)"
+        [cardLabelFn]="cardLabel.bind(this)"
+        [selectedIds]="selecionados"
+        (ordenar)="ordenarPor($event)"
+        (editar)="editarDespesaPorId($event)"
+        (remover)="openRemocaoPorId($event)"
+        (pagar)="pagarDespesaPorId($event)"
+        (historico)="abrirHistorico($event)"
+        (selecionar)="toggleSelecionar($event.id, $event.checked)"
+        (selecionarTodos)="toggleSelecionarTodos($event)"
+        (emptyAction)="abrirModal()"></app-despesas-lista>
     </div>
-  </div>
-
-  <div class="mt-5 grid gap-4 md:grid-cols-3">
-    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
-      Status
-      <select
-        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-        [(ngModel)]="filtroStatus">
-        <option value="ALL">Todos</option>
-        <option value="OPEN">{{ statusLabel('OPEN') }}</option>
-        <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
-        <option value="PAID">{{ statusLabel('PAID') }}</option>
-        <option value="ANTICIPATED">{{ statusLabel('ANTICIPATED') }}</option>
-        <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
-      </select>
-    </label>
-    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
-      Categoria
-      <select
-        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-        [(ngModel)]="filtroCategoria">
-        <option value="ALL">Todas</option>
-        <option *ngIf="!categorias.length" value="" disabled>Sem categorias cadastradas</option>
-        <option *ngFor="let c of categorias; trackBy: trackByIndex" [value]="c.id">{{ c.name }}</option>
-      </select>
-    </label>
-    <label class="grid gap-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.2em]">
-      Buscar
-      <input
-        class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-[12px] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-        type="text"
-        [(ngModel)]="filtroNome"
-        placeholder="Nome da despesa" />
-    </label>
-  </div>
-
-  <div class="mt-4">
-    <app-despesas-lista
-      [despesas]="despesasFiltradas"
-      emptyTitle="Sem despesas no período"
-      emptyDescription="Adicione sua primeira despesa para acompanhar os vencimentos."
-      emptyCtaLabel="Adicionar despesa"
-      [sortBy]="sortBy"
-      [sortDir]="sortDir"
-      [pagamentoLabelFn]="pagamentoLabel.bind(this)"
-      [cardLabelFn]="cardLabel.bind(this)"
-      [selectedIds]="selecionados"
-      (ordenar)="ordenarPor($event)"
-      (editar)="editarDespesaPorId($event)"
-      (remover)="openRemocaoPorId($event)"
-      (pagar)="pagarDespesaPorId($event)"
-      (historico)="abrirHistorico($event)"
-      (selecionar)="toggleSelecionar($event.id, $event.checked)"
-      (selecionarTodos)="toggleSelecionarTodos($event)"
-      (emptyAction)="abrirModal()" />
-  </div>
+  </section>
 
   <app-despesas-form
     [mostrarForm]="mostrarForm"
@@ -325,64 +328,82 @@
     </div>
   </div>
 
-  <div *ngIf="historicoAberto" class="fixed inset-0 z-50 flex items-center justify-end">
-    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharHistorico()"></div>
-    <div class="relative h-full w-full max-w-xl overflow-y-auto border-l border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-      <div class="flex items-start justify-between gap-4">
-        <div class="space-y-1">
-          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Histórico</p>
-          <h3 class="text-xl font-semibold text-[var(--text)]">{{ historicoTitulo }}</h3>
+  <div *ngIf="historicoAberto" class="expenses-history-drawer">
+    <div class="expenses-history-drawer__backdrop" (click)="fecharHistorico()"></div>
+    <aside class="expenses-history-drawer__panel">
+      <div class="expenses-history-drawer__header">
+        <div class="expenses-history-drawer__heading">
+          <p class="expenses-history-drawer__eyebrow">Histórico</p>
+          <h3 class="expenses-history-drawer__title">{{ historicoTitulo }}</h3>
         </div>
-        <button type="button" class="btn-ghost sm" (click)="fecharHistorico()">✕</button>
+        <button type="button" class="expenses-history-drawer__close" (click)="fecharHistorico()" aria-label="Fechar histórico">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
       </div>
 
-      <div class="mt-6 space-y-3">
-        <h4 class="text-sm font-semibold text-[var(--text)]">Pagas</h4>
-        <div *ngIf="historicoPagas.length; else semPagas" class="space-y-3">
-          <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm" *ngFor="let h of historicoPagas; trackBy: trackByIndex">
-            <div>
-              <div class="font-semibold text-[var(--text)]">{{ h.nome }}</div>
-              <small class="text-[var(--text-muted)]" *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
+      <section class="expenses-history-group">
+        <div class="expenses-history-group__head">
+          <h4 class="expenses-history-group__title">Pagas</h4>
+          <p class="expenses-history-group__note">Parcelas já liquidadas neste ciclo.</p>
+        </div>
+        <div *ngIf="historicoPagas.length; else semPagas" class="expenses-history-group__list">
+          <article class="expenses-history-item expenses-history-item--paid" *ngFor="let h of historicoPagas; trackBy: trackByIndex">
+            <div class="expenses-history-item__main">
+              <div class="expenses-history-item__title-row">
+                <strong class="expenses-history-item__name">{{ h.nome }}</strong>
+                <span class="expenses-history-item__status expenses-history-item__status--paid">{{ statusLabel('PAID') }}</span>
+              </div>
+              <div class="expenses-history-item__meta">
+                <span *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
+                <span>Vencimento {{ h.vencimento }}</span>
+              </div>
             </div>
-            <div class="text-[var(--text-muted)]">Venc.: {{ h.vencimento }}</div>
-            <div class="inline-flex w-fit rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-              {{ statusLabel('PAID') }}
-            </div>
-            <div class="font-semibold text-[var(--text)]">R$ {{ h.valor | number:'1.2-2' }}</div>
-            <div>
+            <div class="expenses-history-item__value-col">
+              <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
               <button
                 type="button"
-                class="btn-ghost sm"
+                class="expenses-history-item__action"
                 [disabled]="isReversing(h.id)"
                 (click)="estornarDespesa(h)">
                 <span *ngIf="!isReversing(h.id)">Estornar pagamento</span>
                 <span *ngIf="isReversing(h.id)">Estornando...</span>
               </button>
             </div>
-          </div>
+          </article>
         </div>
-        <ng-template #semPagas><p class="text-sm text-[var(--text-muted)]">Nenhuma parcela paga.</p></ng-template>
-      </div>
+        <ng-template #semPagas><p class="expenses-history-group__empty">Nenhuma parcela paga.</p></ng-template>
+      </section>
 
-      <div class="mt-6 space-y-3">
-        <h4 class="text-sm font-semibold text-[var(--text)]">Pendentes / Antecipadas</h4>
-        <div *ngIf="historicoPendentes.length; else semPendentes" class="space-y-3">
-          <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm" *ngFor="let h of historicoPendentes; trackBy: trackByIndex">
-            <div>
-              <div class="font-semibold text-[var(--text)]">{{ h.nome }}</div>
-              <small class="text-[var(--text-muted)]" *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</small>
-            </div>
-            <div class="text-[var(--text-muted)]">Venc.: {{ h.vencimento }}</div>
-            <div
-              class="inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold"
-              [ngClass]="h.status === 'ANTICIPATED' ? 'border border-sky-200 bg-sky-100 text-sky-700' : 'border border-amber-200 bg-amber-100 text-amber-700'">
-              {{ statusLabel(h.status) }}
-            </div>
-            <div class="font-semibold text-[var(--text)]">R$ {{ h.valor | number:'1.2-2' }}</div>
-          </div>
+      <section class="expenses-history-group">
+        <div class="expenses-history-group__head">
+          <h4 class="expenses-history-group__title">Pendentes / Antecipadas</h4>
+          <p class="expenses-history-group__note">Próximas parcelas ainda em aberto ou pagas antes do vencimento.</p>
         </div>
-        <ng-template #semPendentes><p class="text-sm text-[var(--text-muted)]">Nenhuma parcela pendente.</p></ng-template>
-      </div>
-    </div>
+        <div *ngIf="historicoPendentes.length; else semPendentes" class="expenses-history-group__list">
+          <article class="expenses-history-item" *ngFor="let h of historicoPendentes; trackBy: trackByIndex">
+            <div class="expenses-history-item__main">
+              <div class="expenses-history-item__title-row">
+                <strong class="expenses-history-item__name">{{ h.nome }}</strong>
+                <span
+                  class="expenses-history-item__status"
+                  [ngClass]="h.status === 'ANTICIPATED' ? 'expenses-history-item__status--anticipated' : 'expenses-history-item__status--pending'">
+                  {{ statusLabel(h.status) }}
+                </span>
+              </div>
+              <div class="expenses-history-item__meta">
+                <span *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
+                <span>Vencimento {{ h.vencimento }}</span>
+              </div>
+            </div>
+            <div class="expenses-history-item__value-col">
+              <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
+            </div>
+          </article>
+        </div>
+        <ng-template #semPendentes><p class="expenses-history-group__empty">Nenhuma parcela pendente.</p></ng-template>
+      </section>
+    </aside>
   </div>
-</section>
+</div>
