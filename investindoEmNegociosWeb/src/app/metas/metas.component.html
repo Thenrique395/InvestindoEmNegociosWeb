@@ -1,205 +1,322 @@
-<section class="metas">
-  <header class="header">
-    <div>
-      <p class="eyebrow">Metas</p>
-      <h2>Metas anuais</h2>
-      <p class="muted">Cadastre e acompanhe suas metas anuais seguindo o mesmo padrão de Despesas/Receitas.</p>
+<section class="goals-page">
+  <section class="goals-summary-grid">
+    <article class="goals-summary-card goals-summary-card--primary">
+      <div class="goals-summary-card__head">
+        <span class="goals-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <path d="M12 2v4M12 18v4M2 12h4M18 12h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+        <div class="goals-summary-card__copy">
+          <p class="goals-summary-card__eyebrow">Meta total</p>
+          <h3 class="goals-summary-card__title">R$ {{ totalMetaAmount | number : '1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="goals-summary-card__note">Valor planejado nas metas filtradas.</p>
+    </article>
+
+    <article class="goals-summary-card goals-summary-card--success">
+      <div class="goals-summary-card__head">
+        <span class="goals-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="goals-summary-card__copy">
+          <p class="goals-summary-card__eyebrow">Acumulado</p>
+          <h3 class="goals-summary-card__title">R$ {{ totalCurrentAmount | number : '1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="goals-summary-card__note">{{ averageProgress }}% de progresso médio.</p>
+    </article>
+
+    <article class="goals-summary-card goals-summary-card--warning">
+      <div class="goals-summary-card__head">
+        <span class="goals-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="goals-summary-card__copy">
+          <p class="goals-summary-card__eyebrow">Ativas</p>
+          <h3 class="goals-summary-card__title">{{ totalMetasAtivas }}</h3>
+        </div>
+      </div>
+      <p class="goals-summary-card__note">{{ completedGoals }} concluída(s) no filtro atual.</p>
+    </article>
+  </section>
+
+  <section class="goals-shell">
+    <div class="goals-hero">
+      <div class="goals-hero__main">
+        <p class="goals-hero__eyebrow">Metas financeiras</p>
+        <h2 class="goals-hero__title">Acompanhe seus objetivos com clareza</h2>
+        <p class="goals-hero__text">
+          Organize metas anuais, acompanhe o avanço de cada uma e registre aportes sem perder o contexto.
+        </p>
+      </div>
+
+      <aside class="goals-action-card">
+        <p class="goals-action-card__eyebrow">Próxima ação</p>
+        <strong class="goals-action-card__title">Criar ou atualizar uma meta</strong>
+        <p class="goals-action-card__text">Use metas para transformar objetivos financeiros em acompanhamento real.</p>
+        <button type="button" class="goals-action-card__button" (click)="abrirModal()">
+          <span class="goals-action-card__button-icon" aria-hidden="true">+</span>
+          <span class="goals-action-card__button-copy">
+            <strong>Adicionar meta</strong>
+            <small>Definir objetivo, valor e prazo para acompanhar evolução.</small>
+          </span>
+        </button>
+      </aside>
     </div>
-    <button type="button" class="btn-primary" (click)="abrirModal()">
-      <span class="btn-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      Adicionar meta
-    </button>
-  </header>
 
-  <div class="filters">
-    <label>
-      Ano
-      <select [(ngModel)]="filtroAno" (change)="aplicarFiltros()">
-        <option [ngValue]="'ALL'">Todos</option>
-        <option *ngFor="let ano of anos; trackBy: trackByIndex" [ngValue]="ano">{{ ano }}</option>
-      </select>
-    </label>
-    <label>
-      Status
-      <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
-        <option [ngValue]="'ALL'">Todos</option>
-        <option *ngFor="let st of statusLista; trackBy: trackByIndex" [ngValue]="st.id">{{ st.label }}</option>
-      </select>
-    </label>
-    <label>
-      Tipo
-      <select [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
-        <option [ngValue]="'ALL'">Todos</option>
-        <option *ngFor="let tipo of metaTipos; trackBy: trackByIndex" [ngValue]="tipo.id">{{ tipo.label }}</option>
-      </select>
-    </label>
-  </div>
-
-  <div class="section-summary" *ngIf="!loading && metas.length">
-    <span>{{ metas.length }} meta(s) no filtro atual</span>
-    <span>{{ totalMetasAtivas }} ativa(s)</span>
-  </div>
-
-  <div class="content">
-    <div *ngIf="loading" class="placeholder">
-      <p class="muted">Carregando metas...</p>
+    <div class="goals-filters">
+      <label class="goals-filter">
+        <span class="goals-filter__label">Ano</span>
+        <select [(ngModel)]="filtroAno" (change)="aplicarFiltros()">
+          <option [ngValue]="'ALL'">Todos</option>
+          <option *ngFor="let ano of anos; trackBy: trackByIndex" [ngValue]="ano">{{ ano }}</option>
+        </select>
+      </label>
+      <label class="goals-filter">
+        <span class="goals-filter__label">Status</span>
+        <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+          <option [ngValue]="'ALL'">Todos</option>
+          <option *ngFor="let st of statusLista; trackBy: trackByIndex" [ngValue]="st.id">{{ st.label }}</option>
+        </select>
+      </label>
+      <label class="goals-filter">
+        <span class="goals-filter__label">Tipo</span>
+        <select [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
+          <option [ngValue]="'ALL'">Todos</option>
+          <option *ngFor="let tipo of metaTipos; trackBy: trackByIndex" [ngValue]="tipo.id">{{ tipo.label }}</option>
+        </select>
+      </label>
     </div>
+
+    <div class="goals-state" *ngIf="loading">
+      <p>Carregando metas...</p>
+    </div>
+
     <div *ngIf="!loading && metas.length === 0">
       <app-empty-state
         title="Sem metas cadastradas"
-        description="Crie sua primeira meta anual para acompanhar o progresso."
+        description="Crie sua primeira meta anual para acompanhar progresso, aporte e prazo."
         ctaLabel="Adicionar meta"
         icon="🎯"
         (action)="abrirModal()"></app-empty-state>
     </div>
 
-    <div class="sections" *ngIf="!loading && metas.length">
-      <section class="meta-section" *ngFor="let section of metasPorSecao; trackBy: trackBySection">
-        <header class="meta-section__header">
+    <div class="goals-sections" *ngIf="!loading && metas.length">
+      <section class="goals-section" *ngFor="let section of metasPorSecao; trackBy: trackBySection">
+        <header class="goals-section__header">
           <div>
+            <p class="goals-section__eyebrow">{{ section.kind }}</p>
             <h3>{{ section.label }}</h3>
-            <p class="muted">{{ section.subtitle }}</p>
+            <p>{{ section.subtitle }}</p>
           </div>
-          <span class="meta-section__count">{{ section.metas.length }}</span>
+          <span class="goals-section__count">{{ section.metas.length }} meta(s)</span>
         </header>
 
-        <div class="grid gap-4 md:grid-cols-2">
-      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]" *ngFor="let meta of section.metas; trackBy: trackByGoal">
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <p class="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-1 text-xs font-semibold text-[var(--text-muted)]">{{ meta.year }}</p>
-            <p class="mt-2 inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-0.5 text-[11px] font-semibold text-[var(--text-muted)]">{{ tipoMetaLabel(meta) }}</p>
-            <h3 class="mt-2 text-lg font-semibold text-[var(--text)]">{{ meta.title }}</h3>
-            <p class="mt-1 text-sm text-[var(--text-muted)]" *ngIf="descricaoMeta(meta)">{{ descricaoMeta(meta) }}</p>
-          </div>
-          <span
-            class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
-            [ngClass]="{
-              'border border-emerald-200 bg-emerald-100 text-emerald-700': statusClass(meta.status) === 'ok',
-              'border border-amber-200 bg-amber-100 text-amber-700': statusClass(meta.status) === 'warn',
-              'border border-rose-200 bg-rose-100 text-rose-700': statusClass(meta.status) === 'danger',
-              'border border-slate-200 bg-slate-100 text-slate-600': statusClass(meta.status) === 'neutral'
-            }">
-            <span class="inline-flex h-2 w-2 rounded-full bg-current/70"></span>
-            {{ statusLabel(meta.status) }}
-          </span>
-        </div>
-        <div class="mt-4">
-          <div class="h-2 w-full rounded-full bg-[var(--surface-2)]">
-            <span class="block h-2 rounded-full bg-[var(--primary)]" [style.width.%]="progresso(meta)"></span>
-          </div>
-        <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
-          <span>{{ progresso(meta) }}% concluída</span>
-          <span>Falta R$ {{ (meta.targetAmount - meta.currentAmount) | number : '1.2-2' }}</span>
-          <span
-            class="text-[var(--text-muted)]"
-            *ngIf="contribResumo[meta.id]"
-            [attr.title]="aporteTooltip(meta.id)"
-            (click)="abrirHistorico(meta)"
-            role="button"
-            tabindex="0"
-          >
-            Aportes: {{ contribResumo[meta.id].total }} · Meses: {{ contribResumo[meta.id].meses }}
-          </span>
-        </div>
-        </div>
-        <div class="mt-4 grid gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-3">
-          <div>
-            <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Valor da meta</p>
-            <p class="text-sm font-semibold text-[var(--text)]">R$ {{ meta.targetAmount | number : '1.2-2' }}</p>
-          </div>
-          <div>
-            <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Acumulado</p>
-            <p class="text-sm font-semibold text-[var(--text)]">R$ {{ meta.currentAmount | number : '1.2-2' }}</p>
-          </div>
-          <div *ngIf="meta.expectedMonthly">
-            <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Aporte previsto/mês</p>
-            <p class="text-sm font-semibold text-[var(--text)]">R$ {{ meta.expectedMonthly | number : '1.2-2' }}</p>
-          </div>
-        </div>
-        <div class="mt-4 flex flex-wrap justify-end gap-2">
-          <button type="button" class="ghost sm" (click)="abrirModalEditar(meta)">Editar</button>
-          <button type="button" class="ghost sm" *ngIf="!isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
-          <button
-            type="button"
-            class="btn-cancel sm"
-            *ngIf="!isCanceled(meta)"
-            (click)="cancelarMeta(meta)"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="ghost sm ok"
-            *ngIf="isCanceled(meta)"
-            (click)="reativarMeta(meta)"
-          >
-            Reativar
-          </button>
-        </div>
-      </article>
+        <div class="goals-grid">
+          <article class="goal-card" *ngFor="let meta of section.metas; trackBy: trackByGoal" [ngClass]="'goal-card--' + goalTone(meta)">
+            <header class="goal-card__header">
+              <div class="goal-card__identity">
+                <span class="goal-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M5 19V5M5 19h14M9 16v-4M13 16V8M17 16v-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <div>
+                  <p class="goal-card__eyebrow">{{ tipoMetaLabel(meta) }} · {{ meta.year }}</p>
+                  <h4>{{ meta.title }}</h4>
+                </div>
+              </div>
+              <span class="goal-card__status" [ngClass]="'goal-card__status--' + statusClass(meta.status)">
+                {{ statusLabel(meta.status) }}
+              </span>
+            </header>
+
+            <p class="goal-card__description" *ngIf="descricaoMeta(meta); else semDescricao">{{ descricaoMeta(meta) }}</p>
+            <ng-template #semDescricao>
+              <p class="goal-card__description">Meta criada para acompanhar seu avanço financeiro no período.</p>
+            </ng-template>
+
+            <div class="goal-card__progress">
+              <div class="goal-card__progress-head">
+                <span>{{ progresso(meta) }}% concluída</span>
+                <strong>Falta R$ {{ goalRemaining(meta) | number : '1.2-2' }}</strong>
+              </div>
+              <div class="goal-card__bar">
+                <span [style.width.%]="progresso(meta)"></span>
+              </div>
+            </div>
+
+            <div class="goal-card__metrics">
+              <div>
+                <span>Valor da meta</span>
+                <strong>R$ {{ meta.targetAmount | number : '1.2-2' }}</strong>
+              </div>
+              <div>
+                <span>Acumulado</span>
+                <strong>R$ {{ meta.currentAmount | number : '1.2-2' }}</strong>
+              </div>
+              <div>
+                <span>Aporte previsto</span>
+                <strong *ngIf="meta.expectedMonthly; else semPrevisao">R$ {{ meta.expectedMonthly | number : '1.2-2' }}</strong>
+                <ng-template #semPrevisao>
+                  <strong>Sem previsão</strong>
+                </ng-template>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="goal-card__history"
+              *ngIf="contribResumo[meta.id]"
+              [attr.title]="aporteTooltip(meta.id)"
+              (click)="abrirHistorico(meta)"
+            >
+              Aportes registrados: {{ contribResumo[meta.id].total }} · {{ contribResumo[meta.id].meses }} mês(es)
+            </button>
+
+            <footer class="goal-card__actions">
+              <button type="button" class="goal-card__button goal-card__button--ghost" (click)="abrirModalEditar(meta)">Editar</button>
+              <button type="button" class="goal-card__button goal-card__button--primary" *ngIf="!isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
+              <button type="button" class="goal-card__button goal-card__button--danger" *ngIf="!isCanceled(meta)" (click)="cancelarMeta(meta)">Cancelar</button>
+              <button type="button" class="goal-card__button goal-card__button--success" *ngIf="isCanceled(meta)" (click)="reativarMeta(meta)">Reativar</button>
+            </footer>
+          </article>
         </div>
       </section>
     </div>
-  </div>
+  </section>
 
-  <div class="modal" *ngIf="mostrarModal">
-    <div class="modal__backdrop" (click)="fecharModal()"></div>
-    <div class="modal__content">
-      <div class="modal__header">
-        <div>
-          <p class="eyebrow">Cadastrar meta</p>
-          <h3>Nova meta anual</h3>
+  <div class="goals-modal" *ngIf="mostrarModal">
+    <div class="goals-modal__backdrop" (click)="fecharModal()"></div>
+
+    <div class="goals-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="goal-modal-title">
+      <header class="goals-modal__header">
+        <div class="goals-modal__title-wrap">
+          <p class="goals-modal__eyebrow">{{ editando ? 'Editar meta' : 'Cadastrar meta' }}</p>
+          <h3 id="goal-modal-title" class="goals-modal__title">{{ editando ? 'Atualizar meta anual' : 'Nova meta anual' }}</h3>
+          <p class="goals-modal__subtitle">Defina o objetivo, o prazo e o valor esperado para acompanhar a evolução da meta.</p>
         </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharModal()">✕</button>
-      </div>
-
-      <div class="form">
-        <label>
-          Tipo da meta
-          <select [(ngModel)]="metaTipo">
-            <option *ngFor="let tipo of metaTipos; trackBy: trackByIndex" [ngValue]="tipo.id">{{ tipo.label }}</option>
-          </select>
-        </label>
-        <label>
-          Nome da meta
-          <input type="text" [(ngModel)]="metaNome" placeholder="Ex.: Fundo de emergência" />
-        </label>
-        <label>
-          Valor da meta (R$)
-          <input type="text" [(ngModel)]="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric"
-            pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
-        </label>
-        <label>
-          Aporte mensal previsto (R$)
-          <input type="text" [(ngModel)]="metaMensal" digitOnly (input)="formatarMensal()" inputmode="numeric"
-            pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
-        </label>
-        <label>
-          Data de vencimento (DD/MM/AAAA)
-          <input type="text" [(ngModel)]="metaVencimento" digitOnly (input)="formatarVencimento()" inputmode="numeric"
-            pattern="[0-9]*" placeholder="Ex.: 31/12/2026" />
-        </label>
-        <label>
-          Ano
-          <input type="text" [(ngModel)]="metaAno" digitOnly (input)="formatarAno()" inputmode="numeric" pattern="[0-9]*"
-            maxlength="4" />
-        </label>
-        <label>
-          Descrição (opcional)
-          <textarea [(ngModel)]="metaDescricao" rows="3" placeholder="Notas ou critérios da meta"></textarea>
-        </label>
-      </div>
-
-      <div class="modal__actions">
-        <button type="button" class="btn-cancel" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
-        <button type="button" class="btn-primary" [disabled]="saving" (click)="salvar()">
-          {{ saving ? 'Salvando...' : 'Salvar meta' }}
+        <button class="goals-modal__close" type="button" [disabled]="saving" (click)="fecharModal()" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
         </button>
+      </header>
+
+      <div class="goals-modal__body">
+        <form class="goals-modal__form" (ngSubmit)="salvar()">
+          <section class="goals-modal__section">
+            <div class="goals-modal__section-head">
+              <h4 class="goals-modal__section-title">Identidade da meta</h4>
+              <p class="goals-modal__section-text">Escolha o tipo e dê um nome claro para reconhecer essa meta rapidamente.</p>
+            </div>
+
+            <div class="goals-modal__grid goals-modal__grid--identity">
+              <label class="goals-field">
+                <span class="goals-field__label">Tipo da meta</span>
+                <select class="goals-field__control" [(ngModel)]="metaTipo" name="metaTipo">
+                  <option *ngFor="let tipo of metaTipos; trackBy: trackByIndex" [ngValue]="tipo.id">{{ tipo.label }}</option>
+                </select>
+              </label>
+
+              <label class="goals-field">
+                <span class="goals-field__label">Nome da meta</span>
+                <input class="goals-field__control" type="text" [(ngModel)]="metaNome" name="metaNome" placeholder="Ex.: Fundo de emergência" />
+              </label>
+
+              <label class="goals-field goals-field--full">
+                <span class="goals-field__label">Descrição (opcional)</span>
+                <textarea class="goals-field__control goals-field__control--textarea" [(ngModel)]="metaDescricao" name="metaDescricao" rows="3" placeholder="Notas ou critérios da meta"></textarea>
+              </label>
+            </div>
+          </section>
+
+          <section class="goals-modal__section">
+            <div class="goals-modal__section-head">
+              <h4 class="goals-modal__section-title">Planejamento financeiro</h4>
+              <p class="goals-modal__section-text">Informe o valor total, uma previsão mensal e o prazo que orienta o acompanhamento.</p>
+            </div>
+
+            <div class="goals-modal__grid goals-modal__grid--financial">
+              <label class="goals-field">
+                <span class="goals-field__label">Valor da meta</span>
+                <input class="goals-field__control" type="text" [(ngModel)]="metaValor" name="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
+              </label>
+
+              <label class="goals-field">
+                <span class="goals-field__label">Aporte mensal previsto</span>
+                <input class="goals-field__control" type="text" [(ngModel)]="metaMensal" name="metaMensal" digitOnly (input)="formatarMensal()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
+              </label>
+
+              <label class="goals-field">
+                <span class="goals-field__label">Data de vencimento</span>
+                <input class="goals-field__control" type="text" [(ngModel)]="metaVencimento" name="metaVencimento" digitOnly (input)="formatarVencimento()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 31/12/2026" />
+              </label>
+
+              <label class="goals-field">
+                <span class="goals-field__label">Ano</span>
+                <input class="goals-field__control" type="text" [(ngModel)]="metaAno" name="metaAno" digitOnly (input)="formatarAno()" inputmode="numeric" pattern="[0-9]*" maxlength="4" />
+              </label>
+            </div>
+          </section>
+
+          <footer class="goals-modal__actions">
+            <button type="button" class="goals-modal__secondary" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
+            <button type="submit" class="goals-modal__primary" [disabled]="saving">
+              {{ saving ? 'Salvando...' : 'Salvar meta' }}
+            </button>
+          </footer>
+        </form>
+
+        <aside class="goals-preview" aria-label="Prévia da meta">
+          <div class="goals-preview__card">
+            <div class="goals-preview__top">
+              <span class="goals-preview__chip">Meta</span>
+              <span class="goals-preview__kind">{{ metaTipoLabel }}</span>
+            </div>
+
+            <div>
+              <span class="goals-preview__label">Objetivo</span>
+              <strong class="goals-preview__name">{{ metaPreviewNome }}</strong>
+            </div>
+
+            <strong class="goals-preview__amount">{{ metaPreviewValor }}</strong>
+
+            <div class="goals-preview__footer">
+              <div>
+                <span class="goals-preview__label">Prazo</span>
+                <strong>{{ metaPreviewPrazo }}</strong>
+              </div>
+              <div class="goals-preview__tail">
+                <span class="goals-preview__label">Ano</span>
+                <strong>{{ metaAno || '2026' }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="goals-preview__meta">
+            <div class="goals-preview__meta-item">
+              <span>Aporte previsto</span>
+              <strong>{{ metaPreviewMensal }}</strong>
+            </div>
+            <div class="goals-preview__meta-item">
+              <span>Tipo da meta</span>
+              <strong>{{ metaTipoLabel }}</strong>
+            </div>
+            <div class="goals-preview__meta-item">
+              <span>Status inicial</span>
+              <strong>{{ editando ? 'Atualização' : 'Planejada' }}</strong>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   </div>
@@ -209,31 +326,31 @@
     <div class="modal__content">
       <div class="modal__header">
         <div>
-          <p class="eyebrow">Registrar aporte</p>
+          <p class="modal__eyebrow">Registrar aporte</p>
           <h3>{{ metaSelecionada?.title }}</h3>
+          <p>Informe o valor aplicado para atualizar o progresso da meta.</p>
         </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharAporte()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharAporte()" aria-label="Fechar">×</button>
       </div>
 
-
-      <div class="form">
+      <div class="form form--single">
         <label>
-          Valor (R$)
+          <span>Valor (R$)</span>
           <input type="text" [(ngModel)]="aporteValor" digitOnly (input)="formatarAporte()" inputmode="numeric" placeholder="Ex.: 1.500,00" />
         </label>
         <label>
-          Data
+          <span>Data</span>
           <input type="date" [(ngModel)]="aporteData" />
         </label>
         <label>
-          Nota (opcional)
+          <span>Nota (opcional)</span>
           <textarea [(ngModel)]="aporteNota" rows="3" placeholder="Detalhes do aporte"></textarea>
         </label>
       </div>
 
       <div class="modal__actions">
-        <button type="button" class="btn-cancel" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
-        <button type="button" class="btn-primary" [disabled]="saving" (click)="salvarAporte()">
+        <button type="button" class="modal__button modal__button--ghost" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
+        <button type="button" class="modal__button modal__button--primary" [disabled]="saving" (click)="salvarAporte()">
           {{ saving ? 'Salvando...' : 'Salvar aporte' }}
         </button>
       </div>
@@ -245,19 +362,19 @@
     <div class="modal__content">
       <div class="modal__header">
         <div>
-          <p class="eyebrow">{{ confirmModal.mode === 'cancel' ? 'Cancelar meta' : 'Reativar meta' }}</p>
+          <p class="modal__eyebrow">{{ confirmModal.mode === 'cancel' ? 'Cancelar meta' : 'Reativar meta' }}</p>
           <h3>{{ confirmModal.goal?.title }}</h3>
+          <p>
+            {{ confirmModal.mode === 'cancel'
+              ? 'A meta ficará como cancelada, mas continuará no histórico.'
+              : 'A meta voltará para o acompanhamento ativo.' }}
+          </p>
         </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharConfirm()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharConfirm()" aria-label="Fechar">×</button>
       </div>
-      <p class="muted">
-        {{ confirmModal.mode === 'cancel'
-          ? 'A meta ficará como cancelada, mas não será apagada.'
-          : 'A meta voltará o status para planejada.' }}
-      </p>
       <div class="modal__actions">
-        <button type="button" class="ghost" [disabled]="saving" (click)="fecharConfirm()">Fechar</button>
-        <button type="button" class="btn-primary" [disabled]="saving" (click)="confirmarAcao()">
+        <button type="button" class="modal__button modal__button--ghost" [disabled]="saving" (click)="fecharConfirm()">Fechar</button>
+        <button type="button" class="modal__button modal__button--primary" [disabled]="saving" (click)="confirmarAcao()">
           {{ saving ? 'Processando...' : (confirmModal.mode === 'cancel' ? 'Confirmar cancelamento' : 'Reativar meta') }}
         </button>
       </div>
@@ -269,25 +386,26 @@
     <div class="modal__content">
       <div class="modal__header">
         <div>
-          <p class="eyebrow">Histórico de aportes</p>
+          <p class="modal__eyebrow">Histórico de aportes</p>
           <h3>{{ historicoMeta?.title }}</h3>
+          <p>Confira os registros que formam o acumulado desta meta.</p>
         </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharHistorico()">✕</button>
+        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharHistorico()" aria-label="Fechar">×</button>
       </div>
 
       <div *ngIf="historicoMeta && contribDetalhes[historicoMeta.id]?.length; else semAporte" class="history">
         <div class="history__row" *ngFor="let c of contribDetalhes[historicoMeta.id]; trackBy: trackByIndex">
           <span>{{ c.date | date:'dd/MM/yyyy' }}</span>
-          <span>R$ {{ c.amount | number:'1.2-2' }}</span>
-          <span class="muted" *ngIf="c.note">{{ c.note }}</span>
+          <strong>R$ {{ c.amount | number:'1.2-2' }}</strong>
+          <span *ngIf="c.note">{{ c.note }}</span>
         </div>
       </div>
       <ng-template #semAporte>
-        <p class="muted">Nenhum aporte registrado para esta meta.</p>
+        <p class="goals-state">Nenhum aporte registrado para esta meta.</p>
       </ng-template>
 
       <div class="modal__actions">
-        <button type="button" class="ghost" (click)="fecharHistorico()">Fechar</button>
+        <button type="button" class="modal__button modal__button--ghost" (click)="fecharHistorico()">Fechar</button>
       </div>
     </div>
   </div>

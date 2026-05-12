@@ -1,7 +1,9 @@
 import { computed, Injectable, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import { CardDto, CardPayload, CardStatementCycleDto, CardsService } from './cards.service';
 import { ListQuery } from './api-query';
+import { extractApiErrorMessage } from './utils/api-error.utils';
 
 type CardsState = {
   data: CardDto[];
@@ -56,6 +58,7 @@ export class CardsStore {
   });
 
   readonly statements = computed(() => this.statementsState().data);
+  readonly statementsCardId = computed(() => this.statementsState().cardId);
   readonly statementsLoading = computed(() => this.statementsState().loading);
   readonly statementsError = computed(() => this.statementsState().error);
 
@@ -92,25 +95,42 @@ export class CardsStore {
     }
   }
 
-  create(payload: CardPayload, onSuccess?: (card: CardDto) => void): void {
+  create(
+    payload: CardPayload,
+    onSuccess?: (card: CardDto) => void,
+    onError?: (message: string, error: HttpErrorResponse) => void
+  ): void {
     this.patchCards({ error: null });
     this.cardsService.create(payload).subscribe({
       next: (card) => {
         this.refresh();
         onSuccess?.(card);
       },
-      error: () => this.patchCards({ error: 'Falha ao salvar cartão.' })
+      error: (error: HttpErrorResponse) => {
+        const message = this.mapCardSaveErrorMessage(error);
+        this.patchCards({ error: message });
+        onError?.(message, error);
+      }
     });
   }
 
-  update(id: string, payload: CardPayload, onSuccess?: (card: CardDto) => void): void {
+  update(
+    id: string,
+    payload: CardPayload,
+    onSuccess?: (card: CardDto) => void,
+    onError?: (message: string, error: HttpErrorResponse) => void
+  ): void {
     this.patchCards({ error: null });
     this.cardsService.update(id, payload).subscribe({
       next: (card) => {
         this.refresh();
         onSuccess?.(card);
       },
-      error: () => this.patchCards({ error: 'Falha ao salvar cartão.' })
+      error: (error: HttpErrorResponse) => {
+        const message = this.mapCardSaveErrorMessage(error);
+        this.patchCards({ error: message });
+        onError?.(message, error);
+      }
     });
   }
 
@@ -168,5 +188,22 @@ export class CardsStore {
     if (!nextSelected) {
       this.statementsState.set(initialStatementsState());
     }
+  }
+
+  private mapCardSaveErrorMessage(error: HttpErrorResponse): string {
+    const message = extractApiErrorMessage(error, 'Falha ao salvar cartão.');
+    const normalized = message.trim().toLowerCase();
+
+    if (
+      error.status === 409 &&
+      (
+        normalized.includes('cartão já existe') ||
+        normalized.includes('já existe um cartão com esse nome/apelido')
+      )
+    ) {
+      return 'Já existe um cartão com esse nome. Escolha outro apelido para diferenciar este cartão.';
+    }
+
+    return message;
   }
 }

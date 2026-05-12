@@ -1,54 +1,70 @@
-<div class="space-y-4">
-  <div *ngIf="cards.length; else emptyCards" class="grid gap-3 md:grid-cols-2">
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]" *ngFor="let c of cards; trackBy: trackByIndex">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex min-w-0 items-start gap-3">
-          <div class="flex h-10 w-14 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text)]">
-            <ng-container *ngIf="!isMastercard(brandCode(c)); else mcBadge">
+<div class="cards-list">
+  <div *ngIf="cards.length; else emptyCards" class="cards-list__grid">
+    <article class="cards-list__card" [ngClass]="cardToneClass(c)" *ngFor="let c of cards; trackBy: trackByIndex">
+      <div class="cards-list__top">
+        <div class="cards-list__identity">
+          <div class="cards-list__brand" [ngClass]="'cards-list__brand--' + brandCode(c)" aria-hidden="true">
+            <ng-container *ngIf="!isMastercard(brandCode(c)); else mastercardBadge">
               {{ brandName(c) }}
             </ng-container>
-            <ng-template #mcBadge>
-              <span class="inline-flex h-5 w-9 rounded-full border border-[var(--border)] bg-[var(--surface-2)]"></span>
+            <ng-template #mastercardBadge>
+              <span class="cards-list__mastercard">
+                <span></span>
+                <span></span>
+              </span>
+              <span class="cards-list__mastercard-label">mastercard</span>
             </ng-template>
           </div>
-
-          <div class="min-w-0">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">Cartão</p>
-            <p class="text-[13px] font-semibold tracking-[0.18em] text-[var(--text)]">{{ numeroProtegido(c.numero) }}</p>
-            <p class="mt-1 truncate text-[12px] text-[var(--text)]">{{ c.nome }}</p>
-            <p class="text-[11px] text-[var(--text-muted)]">{{ c.banco || '-' }}</p>
-          </div>
+          <span class="cards-list__bank-tag">{{ c.banco || 'Banco não informado' }}</span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button type="button" class="icon-action icon-action--edit" (click)="onEditar(c)" aria-label="Editar" title="Editar">✏️</button>
-          <button type="button" class="icon-action icon-action--danger" (click)="onRemover(c.id)" aria-label="Remover" title="Remover">🗑</button>
+        <div class="cards-list__actions">
+          <button type="button" class="cards-list__action" (click)="onEditar(c)" aria-label="Editar cartão" title="Editar cartão">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="cards-list__action cards-list__action--danger" (click)="onRemover(c.id)" aria-label="Remover cartão" title="Remover cartão">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M8 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
         </div>
       </div>
 
-      <div class="mt-3 grid gap-2 text-[11px] text-[var(--text-muted)] sm:grid-cols-3">
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2">
-          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Final</span>
-          <p class="text-[var(--text)]">•••• {{ finalCartao(c.numero) }}</p>
+      <div class="cards-list__copy">
+        <p class="cards-list__eyebrow">Cartão ativo</p>
+        <h3 class="cards-list__title">{{ c.nome }}</h3>
+        <p class="cards-list__masked-inline">{{ numeroProtegido(c.numero) }}</p>
+      </div>
+
+      <div class="cards-list__summary">
+        <div class="cards-list__summary-chip">
+          <span class="cards-list__summary-label">Limite</span>
+          <strong class="cards-list__summary-value">R$ {{ c.limiteCredito | number:'1.2-2' }}</strong>
         </div>
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2">
-          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Limite</span>
-          <p class="text-[var(--text)]">R$ {{ c.limiteCredito | number:'1.2-2' }}</p>
-        </div>
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-2">
-          <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Fechamento</span>
-          <p class="text-[var(--text)]">Dia {{ c.diaFechamento }} · Vence {{ c.diaVencimento }}</p>
+        <div class="cards-list__summary-chip">
+          <span class="cards-list__summary-label">Ciclo</span>
+          <strong class="cards-list__summary-value">Fecha {{ c.diaFechamento }} · Vence {{ c.diaVencimento }}</strong>
         </div>
       </div>
     </article>
   </div>
 
   <ng-template #emptyCards>
-    <app-empty-state
-      [title]="emptyTitle"
-      [description]="emptyDescription"
-      [ctaLabel]="emptyCtaLabel"
-      icon="💳"
-      (action)="emptyAction.emit()"></app-empty-state>
+    <section class="cards-list__empty">
+      <div class="cards-list__empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+          <rect x="3" y="6" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7" />
+          <path d="M3 10h18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </svg>
+      </div>
+      <div class="cards-list__empty-copy">
+        <h3>{{ emptyTitle }}</h3>
+        <p>{{ emptyDescription }}</p>
+      </div>
+      <button type="button" class="cards-list__empty-cta" (click)="emptyAction.emit()">{{ emptyCtaLabel }}</button>
+    </section>
   </ng-template>
 </div>

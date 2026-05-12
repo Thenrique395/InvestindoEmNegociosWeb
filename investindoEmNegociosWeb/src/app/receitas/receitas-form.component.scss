@@ -260,11 +260,23 @@
   padding: 0.95rem 1rem;
 }
 
+.income-form-modal__warning-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
 .income-form-modal__warning-title {
   margin: 0;
   font-size: 0.92rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.income-form-modal__warning-text {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
 }
 
 .income-form-modal__warning-link {

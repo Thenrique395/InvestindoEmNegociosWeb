@@ -50,6 +50,15 @@
   min-width: 0;
 }
 
+.receitas-summary-card__title {
+  margin: 0.15rem 0 0;
+  font-size: clamp(2rem, 3vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
 .receitas-summary-card__eyebrow {
   margin: 0;
   font-size: 11px;
@@ -65,14 +74,6 @@
   font-size: 1.02rem;
   line-height: 1.55;
   max-inline-size: 28ch;
-}
-
-.receitas-summary-card__value {
-  margin: 0;
-  font-size: clamp(2rem, 3vw, 2.35rem);
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
 }
 
 .receitas-summary-card__meta {
@@ -112,6 +113,7 @@
 }
 
 .receitas-summary-card__delta {
+  display: inline;
   font-size: 0.82rem;
   font-weight: 700;
 }

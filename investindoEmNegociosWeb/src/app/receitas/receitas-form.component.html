@@ -95,7 +95,10 @@
         </div>
 
         <div class="income-form-modal__warning" *ngIf="!categorias.length">
-          <p class="income-form-modal__warning-title">Crie uma categoria antes de continuar.</p>
+          <div class="income-form-modal__warning-copy">
+            <p class="income-form-modal__warning-title">Crie uma categoria antes de continuar.</p>
+            <p class="income-form-modal__warning-text">Sem categoria, a receita entra no período, mas perde organização nos relatórios e comparativos.</p>
+          </div>
           <a class="income-form-modal__warning-link" routerLink="/categorias" (click)="fecharModal()">Abrir categorias</a>
         </div>
       </section>

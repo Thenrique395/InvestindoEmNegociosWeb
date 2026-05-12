@@ -57,11 +57,63 @@ export class CartoesComponent implements OnInit, OnDestroy {
   statementMonth: number | null = null;
   statementLoading = false;
   statementCycles: CardStatementCycleDto[] = [];
+  private autoLoadedStatementCardId: string | null = null;
 
   readonly cardForm = new FormState<CardFormField>(
     ['brand', 'number', 'name', 'limit', 'closingDay', 'dueDay'],
     () => this.validateCardForm()
   );
+
+  get totalCards(): number {
+    return this.cards.length;
+  }
+
+  get totalLimit(): number {
+    return this.cards.reduce((sum, card) => sum + (card.limiteCredito || 0), 0);
+  }
+
+  get nextClosingDay(): number | null {
+    if (!this.cards.length) return null;
+    return this.cards
+      .map((card) => Number(card.diaFechamento) || 31)
+      .sort((a, b) => a - b)[0] ?? null;
+  }
+
+  get nextDueDay(): number | null {
+    if (!this.cards.length || this.nextClosingDay == null) return null;
+    const sameDayCard = this.cards.find((card) => Number(card.diaFechamento) === this.nextClosingDay);
+    return sameDayCard ? Number(sameDayCard.diaVencimento) || null : null;
+  }
+
+  get totalOpenStatements(): number {
+    return this.statementCycles.reduce((sum, cycle) => sum + (cycle.totalOpen || 0), 0);
+  }
+
+  get selectedCardExpenses(): StoredExpense[] {
+    if (!this.statementCardId) return [];
+
+    return this.expenses
+      .filter((expense) => {
+        if (expense.cartao !== this.statementCardId) return false;
+
+        if (this.statementYear && expense.statementYear && expense.statementYear !== this.statementYear) {
+          return false;
+        }
+
+        if (this.statementMonth && expense.statementMonth && expense.statementMonth !== this.statementMonth) {
+          return false;
+        }
+
+        if ((!expense.statementYear || !expense.statementMonth) && this.statementYear) {
+          const date = this.parseLocaleDate(expense.vencimento);
+          if (!date || date.getFullYear() !== this.statementYear) return false;
+          if (this.statementMonth && date.getMonth() + 1 !== this.statementMonth) return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => this.sortExpenseByDateDesc(a, b));
+  }
 
   get bandeiraCode(): string {
     const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
@@ -95,10 +147,30 @@ export class CartoesComponent implements OnInit, OnDestroy {
       const mappedCards = this.cardsStore.cards().map((card) => this.mapCardDto(card));
       this.cards = mappedCards;
       const selectedId = this.cardsStore.selectedCardId();
-      this.statementCardId = selectedId;
+      const nextStatementCardId = selectedId || mappedCards[0]?.id || null;
+      const statementCardChanged = this.statementCardId !== nextStatementCardId;
+      const loadedStatementCardId = this.cardsStore.statementsCardId();
+      const statementsLoading = this.cardsStore.statementsLoading();
+      this.statementCardId = nextStatementCardId;
 
       if (!mappedCards.length) {
         this.statementCycles = [];
+        this.autoLoadedStatementCardId = null;
+        return;
+      }
+
+      if (
+        nextStatementCardId &&
+        !statementsLoading &&
+        (statementCardChanged || loadedStatementCardId !== nextStatementCardId) &&
+        this.autoLoadedStatementCardId !== nextStatementCardId
+      ) {
+        this.autoLoadedStatementCardId = nextStatementCardId;
+        queueMicrotask(() => {
+          if (this.statementCardId === nextStatementCardId) {
+            this.loadStatementCycles();
+          }
+        });
       }
     });
 
@@ -154,16 +226,25 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
     const done = () => {
       this.setAlerta('Cartão salvo com sucesso.', 2500, 'success');
-      this.fecharModal();
       this.saving = false;
+      this.fecharModal();
+    };
+
+    const fail = (message: string, error?: { status?: number }) => {
+      this.saving = false;
+      if (error?.status === 409) {
+        this.uiFeedback.warning(message);
+        return;
+      }
+      this.uiFeedback.error(message);
     };
 
     if (this.editandoId) {
-      this.cardsStore.update(this.editandoId, payload, done);
+      this.cardsStore.update(this.editandoId, payload, done, fail);
       return;
     }
 
-    this.cardsStore.create(payload, done);
+    this.cardsStore.create(payload, done, fail);
   }
 
   abrirModal(): void {
@@ -338,10 +419,12 @@ export class CartoesComponent implements OnInit, OnDestroy {
   loadStatementCycles(): void {
     if (!this.statementCardId) {
       this.statementCycles = [];
+      this.autoLoadedStatementCardId = null;
       this.cardsStore.selectCard(null);
       return;
     }
 
+    this.autoLoadedStatementCardId = this.statementCardId;
     this.cardsStore.selectCard(this.statementCardId);
     this.cardsStore.loadStatements(this.statementCardId, {
       year: this.statementYear || undefined,
@@ -351,6 +434,25 @@ export class CartoesComponent implements OnInit, OnDestroy {
 
   statementMonthLabel(month: number): string {
     return String(month).padStart(2, '0');
+  }
+
+  cardExpenseInstallmentLabel(expense: StoredExpense): string {
+    if (expense.parcelasTotal && expense.parcelaNumero) {
+      return `${expense.parcelaNumero}/${expense.parcelasTotal}`;
+    }
+
+    return '1/1';
+  }
+
+  cardExpenseStatusLabel(expense: StoredExpense): string {
+    switch ((expense.status || '').toUpperCase()) {
+      case 'PAID':
+        return 'Paga';
+      case 'ANTICIPATED':
+        return 'Antecipada';
+      default:
+        return 'Pendente';
+    }
   }
 
   trackByStatement(index: number): number {
@@ -372,6 +474,19 @@ export class CartoesComponent implements OnInit, OnDestroy {
       diaVencimento: card.dueDay ?? 1,
       userId: ''
     };
+  }
+
+  private parseLocaleDate(value: string): Date | null {
+    const [day, month, year] = (value || '').split('/').map((part) => Number(part));
+    if (!day || !month || !year) return null;
+    const date = new Date(year, month - 1, day);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  private sortExpenseByDateDesc(a: StoredExpense, b: StoredExpense): number {
+    const dateA = this.parseLocaleDate(a.vencimento)?.getTime() ?? 0;
+    const dateB = this.parseLocaleDate(b.vencimento)?.getTime() ?? 0;
+    return dateB - dateA;
   }
 
 }

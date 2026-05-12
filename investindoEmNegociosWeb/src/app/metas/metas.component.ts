@@ -106,6 +106,44 @@ export class MetasComponent implements OnInit {
     return this.metas.filter((meta) => meta.status !== 'Canceled').length;
   }
 
+  get totalMetaAmount(): number {
+    return this.metas.reduce((total, meta) => total + (meta.targetAmount || 0), 0);
+  }
+
+  get totalCurrentAmount(): number {
+    return this.metas.reduce((total, meta) => total + (meta.currentAmount || 0), 0);
+  }
+
+  get averageProgress(): number {
+    if (!this.metas.length) return 0;
+    const total = this.metas.reduce((sum, meta) => sum + this.progresso(meta), 0);
+    return Math.round(total / this.metas.length);
+  }
+
+  get completedGoals(): number {
+    return this.metas.filter((meta) => meta.status === 'Completed').length;
+  }
+
+  get metaTipoLabel(): string {
+    return this.metaTipos.find((tipo) => tipo.id === this.metaTipo)?.label ?? 'Geral';
+  }
+
+  get metaPreviewNome(): string {
+    return this.metaNome.trim() || 'Nome da meta';
+  }
+
+  get metaPreviewValor(): string {
+    return this.metaValor ? `R$ ${this.metaValor}` : 'R$ 0,00';
+  }
+
+  get metaPreviewMensal(): string {
+    return this.metaMensal ? `R$ ${this.metaMensal}` : 'Não definido';
+  }
+
+  get metaPreviewPrazo(): string {
+    return this.metaVencimento || 'Sem prazo definido';
+  }
+
   get metasPorSecao(): GoalSection[] {
     const grouped = new Map<Exclude<GoalKind, 'ALL'>, Goal[]>();
     const order: Exclude<GoalKind, 'ALL'>[] = ['DESPESA', 'RECEITA', 'INVESTIMENTO', 'GERAL'];
@@ -304,6 +342,17 @@ export class MetasComponent implements OnInit {
   progresso(meta: Goal): number {
     if (!meta.targetAmount) return 0;
     return Math.min(100, Math.round((meta.currentAmount / meta.targetAmount) * 100));
+  }
+
+  goalRemaining(meta: Goal): number {
+    return Math.max((meta.targetAmount || 0) - (meta.currentAmount || 0), 0);
+  }
+
+  goalTone(meta: Goal): string {
+    if (meta.status === 'Completed') return 'success';
+    if (meta.status === 'Canceled') return 'danger';
+    if (meta.status === 'InProgress') return 'warning';
+    return 'primary';
   }
 
   cancelarMeta(meta: Goal): void {

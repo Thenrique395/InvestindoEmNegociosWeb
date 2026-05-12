@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DecimalPipe, NgFor, NgIf } from '@angular/common';
+import { DecimalPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe, EmptyStateComponent],
+  imports: [NgFor, NgIf, NgClass, DecimalPipe],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })
@@ -41,11 +40,31 @@ export class CartoesListagemComponent {
     return this.brandLookup(card.bandeira)?.name || card.bandeira || 'Sem bandeira';
   }
 
+  cardToneClass(card: StoredCard): string {
+    const code = this.brandCode(card);
+
+    switch (code) {
+      case 'visa':
+        return 'cards-list__card--visa';
+      case 'mastercard':
+        return 'cards-list__card--mastercard';
+      case 'elo':
+        return 'cards-list__card--elo';
+      case 'amex':
+      case 'american-express':
+        return 'cards-list__card--amex';
+      default:
+        return 'cards-list__card--default';
+    }
+  }
+
   numeroProtegido(numero: string): string {
-    const digits = (numero || '').replace(/\s+/g, '');
-    const padded = digits.padEnd(16, '•').slice(0, 16);
-    const masked = `${padded.slice(0, 12)}••••`;
-    return masked.match(/.{1,4}/g)?.join(' ') || '•••• •••• •••• ••••';
+    const digits = (numero || '').replace(/\D/g, '');
+    if (!digits) return '•••• •••• •••• ••••';
+
+    const first = digits.slice(0, 4).padEnd(4, '•');
+    const last = digits.slice(-4).padStart(4, '•');
+    return `${first} •••• •••• ${last}`;
   }
 
   isMastercard(code: string): boolean {
@@ -65,8 +84,8 @@ export class CartoesListagemComponent {
   onRemover(id: string): void {
     this.remover.emit(id);
   }
+
   trackByIndex(index: number): number {
     return index;
   }
-
 }

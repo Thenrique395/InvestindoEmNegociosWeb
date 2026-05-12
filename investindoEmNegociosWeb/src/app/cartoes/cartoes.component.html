@@ -1,212 +1,391 @@
-<section class="grid gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-  <div class="flex flex-wrap items-center justify-between gap-4">
-    <div class="space-y-2">
-      <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Cartões</p>
-      <h2 class="text-xl font-semibold text-[var(--text)]">Meus cartões</h2>
-      <p class="text-[12px] text-[var(--text-muted)]">Cartões salvos para o usuário atual.</p>
-    </div>
-    <button
-      class="btn-primary sm"
-      type="button"
-      (click)="abrirModal()">
-      <span class="grid h-5 w-5 place-items-center rounded-full bg-white/15" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false" role="presentation" class="h-3 w-3">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      Adicionar cartão
-    </button>
-  </div>
-
-  <app-cartoes-listagem
-    [cards]="cards"
-    [brands]="brands"
-    emptyTitle="Sem cartões cadastrados"
-    emptyDescription="Cadastre seu primeiro cartão para acompanhar limites e vencimentos."
-    emptyCtaLabel="Adicionar cartão"
-    (remover)="remover($event)"
-    (editar)="editar($event)"
-    (emptyAction)="abrirModal()"></app-cartoes-listagem>
-
-  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-    <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h3 class="text-base font-semibold text-[var(--text)]">Fatura por competência</h3>
-        <p class="text-xs text-[var(--text-muted)]">Consolidação por ciclo de fechamento e vencimento do cartão.</p>
-      </div>
-      <div class="grid gap-2 sm:grid-cols-4">
-        <select class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm" [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
-          <option *ngFor="let c of cards; trackBy: trackByIndex" [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
-        </select>
-        <input
-          type="number"
-          min="2000"
-          max="2100"
-          class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm"
-          [(ngModel)]="statementYear" />
-        <select class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm" [(ngModel)]="statementMonth">
-          <option [ngValue]="null">Todos os meses</option>
-          <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">{{ statementMonthLabel(m) }}</option>
-        </select>
-        <button class="btn-ghost sm" type="button" (click)="loadStatementCycles()">Aplicar</button>
-      </div>
-    </div>
-
-    <p *ngIf="statementLoading" class="text-sm text-[var(--text-muted)]">Carregando faturas...</p>
-    <p *ngIf="!statementLoading && !statementCycles.length" class="text-sm text-[var(--text-muted)]">Nenhuma fatura encontrada para os filtros.</p>
-
-    <div class="grid gap-3" *ngIf="!statementLoading && statementCycles.length">
-      <article class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3" *ngFor="let cycle of statementCycles; trackBy: trackByStatement">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="text-sm font-semibold text-[var(--text)]">
-            Ciclo {{ statementMonthLabel(cycle.statementMonth) }}/{{ cycle.statementYear }} • fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} • vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}
-          </div>
-          <div class="text-xs text-[var(--text-muted)]">{{ cycle.itemsCount }} lançamento(s)</div>
+<div class="cards-page">
+  <section class="cards-summary-grid">
+    <article class="cards-summary-card cards-summary-card--primary">
+      <div class="cards-summary-card__head">
+        <span class="cards-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <rect x="3" y="6" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7" />
+            <path d="M3 10h18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+        </span>
+        <div class="cards-summary-card__copy">
+          <p class="cards-summary-card__eyebrow">Cartões ativos</p>
+          <h3 class="cards-summary-card__title">{{ totalCards }}</h3>
         </div>
-        <div class="mt-2 grid gap-2 text-sm sm:grid-cols-3">
-          <div>Total: <strong>R$ {{ cycle.totalAmount | number:'1.2-2' }}</strong></div>
-          <div class="text-[var(--success)]">Pago: <strong>R$ {{ cycle.totalPaid | number:'1.2-2' }}</strong></div>
-          <div class="text-[var(--danger)]">Em aberto: <strong>R$ {{ cycle.totalOpen | number:'1.2-2' }}</strong></div>
+        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre cartões ativos">
+          ?
+          <span class="ui-tooltip__panel">Quantidade de cartões cadastrados e disponíveis para acompanhar limite e fatura.</span>
+          <span class="ui-tooltip__arrow"></span>
+        </button>
+      </div>
+      <p class="cards-summary-card__note">Base disponível para registrar compras e acompanhar vencimentos.</p>
+    </article>
+
+    <article class="cards-summary-card cards-summary-card--success">
+      <div class="cards-summary-card__head">
+        <span class="cards-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="cards-summary-card__copy">
+          <p class="cards-summary-card__eyebrow">Limite total</p>
+          <h3 class="cards-summary-card__title">R$ {{ totalLimit | number:'1.2-2' }}</h3>
         </div>
-      </article>
-    </div>
+        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre limite total">
+          ?
+          <span class="ui-tooltip__panel">Soma do limite de crédito de todos os cartões cadastrados para o usuário atual.</span>
+          <span class="ui-tooltip__arrow"></span>
+        </button>
+      </div>
+      <p class="cards-summary-card__note">Visão consolidada do potencial de compra disponível nos cartões.</p>
+    </article>
+
+    <article class="cards-summary-card cards-summary-card--info">
+      <div class="cards-summary-card__head">
+        <span class="cards-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+          </svg>
+        </span>
+        <div class="cards-summary-card__copy">
+          <p class="cards-summary-card__eyebrow">Próximo fechamento</p>
+          <h3 class="cards-summary-card__title">{{ nextClosingDay ? ('Dia ' + nextClosingDay) : '—' }}</h3>
+        </div>
+        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre próximo fechamento">
+          ?
+          <span class="ui-tooltip__panel">Mostra o menor dia de fechamento entre os cartões cadastrados e a referência de vencimento vinculada a ele.</span>
+          <span class="ui-tooltip__arrow"></span>
+        </button>
+      </div>
+      <p class="cards-summary-card__note" *ngIf="nextDueDay; else noCycleInfo">Vencimento associado no dia {{ nextDueDay }}.</p>
+      <ng-template #noCycleInfo>
+        <p class="cards-summary-card__note">Cadastre um cartão para acompanhar ciclo de fechamento e vencimento.</p>
+      </ng-template>
+    </article>
   </section>
 
-  <div *ngIf="mostrarModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="fecharModal()"></div>
-    <div class="relative w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-      <div class="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Incluir cartão</p>
-          <h3 class="text-xl font-semibold text-[var(--text)]">Cadastre e visualize em tempo real</h3>
-        </div>
-        <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="fecharModal()">✕</button>
+  <section class="cards-shell">
+    <div class="cards-hero">
+      <div class="cards-hero__main">
+        <p class="cards-hero__eyebrow">Cartões do período</p>
+        <h2 class="cards-hero__title">Seus cartões e ciclos de fatura</h2>
+        <p class="cards-hero__text">
+          Cadastre cartões, acompanhe o limite somado e veja como as faturas estão se organizando por competência.
+        </p>
       </div>
 
-      <div class="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <form class="grid gap-4" (ngSubmit)="salvar()">
-          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-            Bandeira
-            <select class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="bandeira" name="bandeira">
-              <option *ngFor="let b of brands; trackBy: trackByIndex" [ngValue]="b.id.toString()">{{ b.name }}</option>
+      <aside class="cards-total-card">
+        <p class="cards-total-card__eyebrow">Visão consolidada</p>
+        <strong class="cards-total-card__value">R$ {{ totalOpenStatements | number:'1.2-2' }}</strong>
+        <p class="cards-total-card__text">Total em aberto nas faturas carregadas para o cartão selecionado.</p>
+        <div class="cards-total-card__actions">
+          <button type="button" class="cards-total-card__action cards-total-card__action--primary" (click)="abrirModal()">
+            <span class="cards-total-card__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="cards-total-card__action-copy">
+              <strong>Adicionar cartão</strong>
+              <small>Registrar um novo cartão com limite e ciclo.</small>
+            </span>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <app-cartoes-listagem
+      [cards]="cards"
+      [brands]="brands"
+      emptyTitle="Sem cartões cadastrados"
+      emptyDescription="Cadastre seu primeiro cartão para acompanhar limite, fechamento e vencimento sem sair do fluxo atual."
+      emptyCtaLabel="Adicionar cartão"
+      (remover)="remover($event)"
+      (editar)="editar($event)"
+      (emptyAction)="abrirModal()"></app-cartoes-listagem>
+
+    <section class="cards-statements">
+      <div class="cards-statements__header">
+        <div>
+          <p class="cards-statements__eyebrow">Faturas do cartão</p>
+          <h3 class="cards-statements__title">Como suas compras entram na fatura</h3>
+          <p class="cards-statements__text">Escolha o cartão, o ano e o mês para ver fechamento, vencimento e total de cada fatura.</p>
+        </div>
+        <div class="cards-statements__filters">
+          <label class="cards-filter">
+            <span class="cards-filter__label">Cartão</span>
+            <select [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
+              <option *ngFor="let c of cards; trackBy: trackByIndex" [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
             </select>
           </label>
+          <label class="cards-filter">
+            <span class="cards-filter__label">Ano</span>
+            <input type="number" min="2000" max="2100" [(ngModel)]="statementYear" />
+          </label>
+          <label class="cards-filter">
+            <span class="cards-filter__label">Mês</span>
+            <select [(ngModel)]="statementMonth">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">{{ statementMonthLabel(m) }}</option>
+            </select>
+          </label>
+          <button type="button" class="cards-statements__apply" (click)="loadStatementCycles()">Aplicar filtros</button>
+        </div>
+      </div>
 
-          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-            Número do cartão
-            <div class="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
-              <input
-                class="flex-1 bg-transparent text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none"
-                type="{{ mostrarNumero ? 'text' : 'password' }}"
-                [(ngModel)]="numero"
-                name="numero"
-                maxlength="19"
-                inputmode="numeric"
-                pattern="[0-9 ]*"
-                (input)="onNumeroInput($event)"
-                placeholder="**** **** **** ****"
-                required />
-              <button
-                type="button"
-                class="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--text)]"
-                (click)="toggleNumero()"
-                aria-label="Mostrar número">
-                {{ mostrarNumero ? '🙈' : '👁️' }}
-              </button>
+      <p *ngIf="statementLoading" class="cards-statements__feedback">Carregando faturas...</p>
+      <p *ngIf="!statementLoading && !statementCycles.length" class="cards-statements__feedback">Nenhuma fatura encontrada para os filtros selecionados.</p>
+
+      <div class="cards-statements__list" *ngIf="!statementLoading && statementCycles.length">
+        <article class="cards-statements__item" *ngFor="let cycle of statementCycles; trackBy: trackByStatement">
+          <div class="cards-statements__item-head">
+            <div>
+              <h4 class="cards-statements__item-title">Ciclo {{ statementMonthLabel(cycle.statementMonth) }}/{{ cycle.statementYear }}</h4>
+              <p class="cards-statements__item-copy">Fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} · vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}</p>
             </div>
-          </label>
-
-          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-            Nome impresso no cartão
-            <input class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="nome" name="nome" placeholder="FULANO DA SILVA" required />
-          </label>
-
-          <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-            Banco (opcional)
-            <input class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40" [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
-            <datalist id="bankOptions">
-              <option *ngFor="let inst of institutions; trackBy: trackByIndex" [value]="inst.name"></option>
-            </datalist>
-          </label>
-
-          <div class="grid gap-4 md:grid-cols-3">
-            <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-              Limite de crédito
-              <input
-                class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-                type="text"
-                inputmode="decimal"
-                [(ngModel)]="limiteCreditoInput"
-                digitOnly
-                (ngModelChange)="onLimiteChange($event)"
-                name="limiteCredito" />
-            </label>
-            <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-              Dia do fechamento
-              <input
-                class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                maxlength="2"
-                [ngModel]="diaFechamento"
-                (ngModelChange)="onDiaChange($event, 'fechamento')"
-                (input)="onDiaInput($event, 'fechamento')"
-                name="diaFechamento" />
-            </label>
-            <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
-              Dia do vencimento
-              <input
-                class="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 text-base text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                maxlength="2"
-                [ngModel]="diaVencimento"
-                (ngModelChange)="onDiaChange($event, 'vencimento')"
-                (input)="onDiaInput($event, 'vencimento')"
-                name="diaVencimento" />
-            </label>
+            <span class="cards-statements__item-badge">{{ cycle.itemsCount }} lançamento(s)</span>
           </div>
 
-          <div class="flex items-center justify-end gap-3 pt-2">
-            <button type="button" class="btn-cancel sm" [disabled]="saving" (click)="fecharModal()">↩ Cancelar</button>
-            <button type="submit" class="btn-primary sm" [disabled]="saving">
+          <div class="cards-statements__metrics">
+            <div class="cards-statements__metric">
+              <span>Total</span>
+              <strong>R$ {{ cycle.totalAmount | number:'1.2-2' }}</strong>
+            </div>
+            <div class="cards-statements__metric cards-statements__metric--success">
+              <span>Pago</span>
+              <strong>R$ {{ cycle.totalPaid | number:'1.2-2' }}</strong>
+            </div>
+            <div class="cards-statements__metric cards-statements__metric--danger">
+              <span>Em aberto</span>
+              <strong>R$ {{ cycle.totalOpen | number:'1.2-2' }}</strong>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <section class="cards-purchases">
+        <div class="cards-purchases__header">
+          <div>
+            <p class="cards-purchases__eyebrow">Compras do cartão</p>
+            <h4 class="cards-purchases__title">Compras registradas neste cartão</h4>
+            <p class="cards-purchases__subtitle">Consulte descrição, parcela, valor e vencimento sem misturar com outros cartões.</p>
+          </div>
+          <span class="cards-purchases__count">{{ selectedCardExpenses.length }} lançamento(s)</span>
+        </div>
+
+        <p *ngIf="!selectedCardExpenses.length" class="cards-purchases__empty">
+          Nenhuma compra encontrada para este cartão nos filtros atuais.
+        </p>
+
+        <div class="cards-purchases__list" *ngIf="selectedCardExpenses.length">
+          <article class="cards-purchases__row" *ngFor="let expense of selectedCardExpenses; trackBy: trackByIndex">
+            <span class="cards-purchases__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M6 8h12M7 13h7M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v11A2.5 2.5 0 0 1 16.5 20h-9A2.5 2.5 0 0 1 5 17.5v-11Z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="cards-purchases__main">
+              <strong>{{ expense.nome }}</strong>
+              <span>{{ expense.categoria || 'Sem categoria' }}</span>
+            </div>
+            <span class="cards-purchases__pill">Parcela {{ cardExpenseInstallmentLabel(expense) }}</span>
+            <span class="cards-purchases__pill cards-purchases__pill--status">{{ cardExpenseStatusLabel(expense) }}</span>
+            <strong class="cards-purchases__amount">R$ {{ expense.valor | number:'1.2-2' }}</strong>
+            <span class="cards-purchases__date">Vence {{ expense.vencimento }}</span>
+          </article>
+        </div>
+      </section>
+    </section>
+  </section>
+
+  <div *ngIf="mostrarModal" class="cards-modal">
+    <div class="cards-modal__backdrop" (click)="fecharModal()"></div>
+
+    <div class="cards-modal__dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="editandoId ? 'card-form-title-edit' : 'card-form-title-new'">
+      <header class="cards-modal__header">
+        <div class="cards-modal__title-wrap">
+          <p class="cards-modal__eyebrow">{{ editandoId ? 'Editar cartão' : 'Novo cartão' }}</p>
+          <h3 class="cards-modal__title" [id]="editandoId ? 'card-form-title-edit' : 'card-form-title-new'">
+            {{ editandoId ? 'Atualize os dados do cartão' : 'Adicionar cartão' }}
+          </h3>
+          <p class="cards-modal__subtitle">
+            {{ editandoId
+              ? 'Revise limite, ciclo e identificação para manter os lançamentos e faturas consistentes.'
+              : 'Cadastre o cartão, informe o limite e deixe fechamento e vencimento prontos para o acompanhamento.' }}
+          </p>
+        </div>
+
+        <button class="cards-modal__close" type="button" (click)="fecharModal()" aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="cards-modal__body">
+        <form class="cards-modal__form" (ngSubmit)="salvar()">
+          <section class="cards-modal__section">
+            <div class="cards-modal__section-head">
+              <h4 class="cards-modal__section-title">Identidade do cartão</h4>
+              <p class="cards-modal__section-text">Defina bandeira, número protegido, nome exibido e banco vinculado.</p>
+            </div>
+
+            <div class="cards-modal__grid cards-modal__grid--identity">
+              <label class="cards-field">
+                <span class="cards-field__label">Bandeira</span>
+                <select class="cards-field__control" [(ngModel)]="bandeira" name="bandeira">
+                  <option *ngFor="let b of brands; trackBy: trackByIndex" [ngValue]="b.id.toString()">{{ b.name }}</option>
+                </select>
+              </label>
+
+              <label class="cards-field cards-field--full">
+                <span class="cards-field__label">Número do cartão</span>
+                <div class="cards-field__control cards-field__control--inline">
+                  <input
+                    class="cards-field__input"
+                    [type]="mostrarNumero ? 'text' : 'password'"
+                    [(ngModel)]="numero"
+                    name="numero"
+                    maxlength="19"
+                    inputmode="numeric"
+                    pattern="[0-9 ]*"
+                    (input)="onNumeroInput($event)"
+                    placeholder="0000 0000 0000 0000"
+                    required />
+                  <button type="button" class="cards-field__ghost" (click)="toggleNumero()" [attr.aria-label]="mostrarNumero ? 'Ocultar número' : 'Mostrar número'">
+                    <svg *ngIf="!mostrarNumero" viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" fill="none" stroke="currentColor" stroke-width="1.7" />
+                      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7" />
+                    </svg>
+                    <svg *ngIf="mostrarNumero" viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M3 3l18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                      <path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M9.9 5.2A11.7 11.7 0 0 1 12 5c6.5 0 10 7 10 7a16.2 16.2 0 0 1-4.1 4.8M6.2 6.2C3.7 8 2 12 2 12s3.5 6 10 6c1.1 0 2.1-.1 3-.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </label>
+
+              <label class="cards-field">
+                <span class="cards-field__label">Nome do cartão</span>
+                <input class="cards-field__control" [(ngModel)]="nome" name="nome" placeholder="Ex.: Cartão principal" required />
+              </label>
+
+              <label class="cards-field">
+                <span class="cards-field__label">Banco</span>
+                <input class="cards-field__control" [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
+                <datalist id="bankOptions">
+                  <option *ngFor="let inst of institutions; trackBy: trackByIndex" [value]="inst.name"></option>
+                </datalist>
+              </label>
+            </div>
+          </section>
+
+          <section class="cards-modal__section">
+            <div class="cards-modal__section-head">
+              <h4 class="cards-modal__section-title">Configuração financeira</h4>
+              <p class="cards-modal__section-text">Informe limite e defina os dias que organizam fechamento e vencimento da fatura.</p>
+            </div>
+
+            <div class="cards-modal__grid cards-modal__grid--financial">
+              <label class="cards-field">
+                <span class="cards-field__label">Limite de crédito</span>
+                <input
+                  class="cards-field__control"
+                  type="text"
+                  inputmode="decimal"
+                  [(ngModel)]="limiteCreditoInput"
+                  digitOnly
+                  (ngModelChange)="onLimiteChange($event)"
+                  name="limiteCredito"
+                  placeholder="R$ 0,00" />
+              </label>
+
+              <label class="cards-field">
+                <span class="cards-field__label">Dia do fechamento</span>
+                <input
+                  class="cards-field__control"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="2"
+                  [ngModel]="diaFechamento"
+                  (ngModelChange)="onDiaChange($event, 'fechamento')"
+                  (input)="onDiaInput($event, 'fechamento')"
+                  name="diaFechamento" />
+              </label>
+
+              <label class="cards-field">
+                <span class="cards-field__label">Dia do vencimento</span>
+                <input
+                  class="cards-field__control"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="2"
+                  [ngModel]="diaVencimento"
+                  (ngModelChange)="onDiaChange($event, 'vencimento')"
+                  (input)="onDiaInput($event, 'vencimento')"
+                  name="diaVencimento" />
+              </label>
+            </div>
+          </section>
+
+          <footer class="cards-modal__actions">
+            <button type="button" class="cards-modal__secondary" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
+            <button type="submit" class="cards-modal__primary" [disabled]="saving">
               {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar cartão') }}
             </button>
-          </div>
+          </footer>
         </form>
 
-        <div class="flex items-center justify-center">
-          <div class="grid h-[160px] w-[260px] grid-rows-[auto_auto_1fr] gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-[var(--text)] shadow-[var(--shadow-sm)]">
-            <div class="flex items-center justify-between">
-              <div class="h-7 w-10 rounded-md bg-gradient-to-br from-[var(--surface-3)] to-[var(--border-strong)]"></div>
-              <div class="flex items-center justify-end gap-2" [ngSwitch]="bandeiraCode">
-                <div *ngSwitchCase="'mastercard'" class="relative h-7 w-12" aria-label="Mastercard">
-                  <span class="absolute left-0 top-0 h-7 w-7 rounded-full bg-rose-400/80"></span>
-                  <span class="absolute right-0 top-0 h-7 w-7 rounded-full bg-amber-300/80 mix-blend-multiply"></span>
+        <aside class="cards-preview">
+          <div class="cards-preview__card">
+            <div class="cards-preview__top">
+              <div class="cards-preview__chip"></div>
+              <div class="cards-preview__brand" [ngSwitch]="bandeiraCode">
+                <div *ngSwitchCase="'mastercard'" class="cards-preview__mastercard" aria-label="Mastercard">
+                  <span></span>
+                  <span></span>
                 </div>
-                <span *ngSwitchCase="'visa'" class="text-[12px] font-extrabold tracking-widest">VISA</span>
-                <span *ngSwitchCase="'elo'" class="text-[12px] font-extrabold tracking-widest">ELO</span>
-                <span *ngSwitchCase="'amex'" class="text-[12px] font-extrabold tracking-widest">AMEX</span>
-                <span *ngSwitchCase="'hipercard'" class="text-[12px] font-extrabold tracking-widest">HIPER</span>
-                <span *ngSwitchDefault class="text-[12px] font-extrabold tracking-widest">{{ bandeiraNome || 'BANDEIRA' | uppercase }}</span>
+                <span *ngSwitchCase="'visa'">VISA</span>
+                <span *ngSwitchCase="'elo'">ELO</span>
+                <span *ngSwitchCase="'amex'">AMEX</span>
+                <span *ngSwitchCase="'hipercard'">HIPER</span>
+                <span *ngSwitchDefault>{{ (bandeiraNome || 'Bandeira') | uppercase }}</span>
               </div>
             </div>
-            <p class="text-[14px] font-semibold tracking-[0.22em]">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</p>
-            <div class="flex items-end justify-between text-[10px] text-[var(--text-muted)]">
+
+            <div class="cards-preview__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</div>
+
+            <div class="cards-preview__footer">
               <div>
-                <span class="block font-semibold uppercase tracking-[0.2em]">Nome</span>
-                <p class="text-[11px] font-semibold text-[var(--text)]">{{ nome || 'SEU NOME' }}</p>
+                <span class="cards-preview__label">Nome</span>
+                <strong>{{ nome || 'SEU CARTÃO' }}</strong>
               </div>
-              <div class="text-right">
-                <span class="block font-semibold uppercase tracking-[0.2em]">Final</span>
-                <p class="text-[11px] font-semibold text-[var(--text)]">•••• {{ finalCartao(numero) }}</p>
+              <div class="cards-preview__tail">
+                <span class="cards-preview__label">Final</span>
+                <strong>•••• {{ finalCartao(numero) }}</strong>
               </div>
             </div>
           </div>
-        </div>
+
+          <div class="cards-preview__meta">
+            <div class="cards-preview__meta-item">
+              <span>Limite informado</span>
+              <strong>{{ limiteCreditoInput || 'R$ 0,00' }}</strong>
+            </div>
+            <div class="cards-preview__meta-item">
+              <span>Fechamento</span>
+              <strong>Dia {{ diaFechamento }}</strong>
+            </div>
+            <div class="cards-preview__meta-item">
+              <span>Vencimento</span>
+              <strong>Dia {{ diaVencimento }}</strong>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   </div>
-</section>
+</div>

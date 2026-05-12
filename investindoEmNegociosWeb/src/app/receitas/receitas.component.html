@@ -9,7 +9,7 @@
         </span>
         <div class="receitas-summary-card__copy">
           <p class="receitas-summary-card__eyebrow">Recebidas</p>
-          <p class="receitas-summary-card__note">Entradas já confirmadas neste período.</p>
+          <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</h3>
         </div>
         <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas recebidas">
           ?
@@ -19,8 +19,10 @@
           <span class="ui-tooltip__arrow"></span>
         </button>
       </div>
-      <p class="receitas-summary-card__value">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</p>
-      <span class="receitas-summary-card__meta">{{ statusResumo.pagos }} lançamento(s)</span>
+      <p class="receitas-summary-card__note">
+        Entradas já confirmadas neste período.
+        <span class="receitas-summary-card__meta">· {{ statusResumo.pagos }} lançamento(s)</span>
+      </p>
     </article>
 
     <article class="receitas-summary-card receitas-summary-card--warning">
@@ -33,7 +35,7 @@
         </span>
         <div class="receitas-summary-card__copy">
           <p class="receitas-summary-card__eyebrow">Pendentes</p>
-          <p class="receitas-summary-card__note">Valores previstos que ainda não entraram.</p>
+          <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</h3>
         </div>
         <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas pendentes">
           ?
@@ -43,8 +45,10 @@
           <span class="ui-tooltip__arrow"></span>
         </button>
       </div>
-      <p class="receitas-summary-card__value">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</p>
-      <span class="receitas-summary-card__meta">{{ statusResumo.pendentes }} lançamento(s)</span>
+      <p class="receitas-summary-card__note">
+        Valores previstos que ainda não entraram.
+        <span class="receitas-summary-card__meta">· {{ statusResumo.pendentes }} lançamento(s)</span>
+      </p>
     </article>
 
     <article class="receitas-summary-card receitas-summary-card--info">
@@ -56,7 +60,15 @@
         </span>
         <div class="receitas-summary-card__copy">
           <p class="receitas-summary-card__eyebrow">Comparativo</p>
-          <p class="receitas-summary-card__note">Como este mês está ficando frente ao anterior.</p>
+          <h3 class="receitas-summary-card__title">
+            {{
+              previousComparison.isNew
+                ? 'Novo'
+                : (previousComparison.delta > 0 ? '+' : previousComparison.delta < 0 ? '-' : '') +
+                  'R$ ' +
+                  (previousComparison.deltaAbs | number:'1.2-2')
+            }}
+          </h3>
         </div>
         <button type="button" class="ui-tooltip" aria-label="Mais informações sobre comparativo de receitas">
           ?
@@ -66,26 +78,20 @@
           <span class="ui-tooltip__arrow"></span>
         </button>
       </div>
-      <p class="receitas-summary-card__value">
-        {{
-          previousComparison.isNew
-            ? 'Novo'
-            : (previousComparison.delta > 0 ? '+' : previousComparison.delta < 0 ? '-' : '') +
-              'R$ ' +
-              (previousComparison.deltaAbs | number:'1.2-2')
-        }}
+      <p class="receitas-summary-card__note">
+        Como este mês está ficando frente ao anterior.
+        <span
+          class="receitas-summary-card__delta"
+          [ngClass]="previousComparison.trend === 'up'
+            ? 'receitas-summary-card__delta--up'
+            : previousComparison.trend === 'down'
+              ? 'receitas-summary-card__delta--down'
+              : 'receitas-summary-card__delta--flat'">
+          · {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
+          <span *ngIf="!previousComparison.isNew">({{ previousComparison.percent | number:'1.0-0' }}%)</span>
+          · {{ previousComparison.monthLabel }}
+        </span>
       </p>
-      <span
-        class="receitas-summary-card__delta"
-        [ngClass]="previousComparison.trend === 'up'
-          ? 'receitas-summary-card__delta--up'
-          : previousComparison.trend === 'down'
-            ? 'receitas-summary-card__delta--down'
-            : 'receitas-summary-card__delta--flat'">
-        {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
-        <span *ngIf="!previousComparison.isNew">({{ previousComparison.percent | number:'1.0-0' }}%)</span>
-        · {{ previousComparison.monthLabel }}
-      </span>
     </article>
   </section>
 
