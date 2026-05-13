@@ -210,11 +210,14 @@ Regras:
 - ação destrutiva deve usar `.btn-danger`
 - ação primária deve usar `.btn-primary`
 - ação secundária discreta deve usar `.btn-ghost` ou `.ghost`
+- CTAs de página podem usar um bloco com ícone + título + descrição, desde que mantenham altura proporcional ao card onde vivem
+- botões destrutivos devem ser contidos e explícitos; evitar preenchimento vermelho pesado fora de uma confirmação final
 
 Evitar:
 
 - criar nova classe de botão sem documentar aqui
 - usar botão visualmente primário para ação secundária
+- usar botão gigante para ação simples de lista ou formulário
 
 Padrão para ações compactas em listas:
 
@@ -268,6 +271,8 @@ Padrão esperado:
 - fundo neutro
 - hierarquia clara entre label, valor e observação
 - sem uso agressivo de cor semântica no fundo de cards de leitura geral
+- altura estável entre cards do mesmo grupo
+- largura e alinhamento coerentes quando aparecem lado a lado
 
 Padrões que já aparecem no frontend:
 
@@ -288,6 +293,104 @@ Regra:
 - preferir uma dessas famílias já existentes antes de criar novo container visual
 - manter borda, superfície e espaçamento coerentes com os tokens globais
 - cards de leitura devem privilegiar contraste e organização, não enfeite visual
+- cards irmãos devem ter o mesmo peso visual, salvo decisão de produto explicitamente aprovada
+- evitar área vazia grande quando o conteúdo é curto; compacte o card ou reorganize a informação
+
+### Padrão aprovado para telas autenticadas
+
+Este padrão foi consolidado nas telas de `Dashboard`, `Despesas`, `Receitas`, `Cartões`, `Metas` e `Configurações`.
+
+#### Estrutura de página
+
+Regras:
+
+- topo com até três KPIs principais, sempre alinhados e com tamanho equivalente
+- abaixo dos KPIs, usar um `hero shell` com eyebrow, título, descrição e, quando necessário, um card lateral de ação
+- filtros, listas e detalhes devem ficar dentro de cards maiores com borda suave
+- CTAs importantes devem ficar ancorados em card lateral, rodapé de seção ou footer de modal
+- evitar módulos que só repetem onboarding ou confirmam algo que o usuário já sabe
+
+Padrão visual:
+
+- superfície branca ou quase branca com radial gradient sutil
+- bordas em `--border` ou variações semânticas suaves
+- raio entre `20px` e `28px` para cards principais
+- sombra baixa ou média, sem criar aparência flutuante pesada
+
+#### Hero de telas principais
+
+Regras:
+
+- eyebrow curta em caixa alta: exemplo `DESPESAS DO PERÍODO`
+- título forte, mas controlado; telas operacionais não devem competir com o onboarding em escala
+- copy curta, preferencialmente uma ou duas linhas
+- frases devem comunicar valor operacional, não marketing genérico
+
+Exemplos de direção:
+
+- `Despesas de Maio de 2026`
+- `Receitas de maio de 2026`
+- `Seus cartões e ciclos de fatura`
+- `Preferências`
+
+#### KPIs e cards de resumo
+
+Regras:
+
+- três KPIs lado a lado devem ter a mesma altura e largura relativa
+- ícone semântico à esquerda e tooltip no canto superior direito
+- valor financeiro deve ser a informação dominante
+- texto auxiliar explica o cálculo ou contexto
+- não aumentar um KPI isolado sem necessidade real de produto
+
+Semântica:
+
+- entrada/receita: nuance `success`
+- saída/despesa: nuance `danger`
+- pendência/atenção: nuance `warning`
+- leitura neutra ou saldo: nuance `primary` ou neutra
+- comparativo/informação: nuance `info`
+
+#### Cards de ação
+
+Regras:
+
+- CTA principal em azul deve ter contraste alto e peso claro
+- quando o CTA tiver ícone, o ícone deve ficar em bloco quadrado/circular com fundo translúcido
+- texto do CTA deve explicar a ação; descrição curta só quando agrega contexto
+- ação secundária usa superfície clara e borda suave
+- ação destrutiva usa nuance `danger`, mas não deve parecer CTA principal da tela
+
+#### Listas e tabelas operacionais
+
+Regras:
+
+- linhas devem mostrar a informação principal em uma leitura rápida
+- quando possível, manter composição em uma linha: `nome · status · data · valor`
+- ações por linha devem usar `icon-action` com tooltip ou `title` acessível
+- evitar ícones quebrados ou sem significado financeiro claro
+- listas vazias devem explicar a ausência e indicar próxima ação
+
+#### Modais
+
+Regras:
+
+- cabeçalho com eyebrow, título forte e descrição curta
+- formulário agrupado em card interno quando houver muitos campos
+- campos devem seguir o mesmo tamanho, raio e foco das telas operacionais
+- footer fixo visualmente separado com `Cancelar` secundário e CTA primário à direita
+- modais de histórico ou detalhes devem ser mais compactos que modais de cadastro
+- modal não deve parecer tela nova; deve resolver uma ação específica
+
+#### Perfil Basic
+
+Regras:
+
+- esconder menus e módulos que não geram valor para `Basic`
+- evitar telas de gestão avançada quando o perfil usa defaults do sistema
+- manter o mesmo padrão visual dos demais perfis, mudando apenas densidade e disponibilidade
+- remover informações repetidas, principalmente quando já foram configuradas no onboarding
+- cards devem responder a decisões simples: `o que entrou`, `o que saiu`, `o que falta revisar`
 
 ### Padrão aprovado do onboarding
 

@@ -9,6 +9,26 @@ Este documento define os componentes reutilizáveis do frontend, quando usar cad
 - Facilitar manutenção e evolução.
 - Reduzir divergência entre páginas novas e antigas.
 
+## Padrão visual atual
+
+As telas autenticadas devem seguir o padrão consolidado em Dashboard, Despesas, Receitas, Cartões, Metas e Configurações.
+
+Regras de composição:
+
+- usar KPIs equivalentes quando houver resumo no topo
+- usar hero com eyebrow, título forte e descrição curta
+- manter CTAs principais em card lateral, rodapé de seção ou footer de modal
+- manter cards irmãos com altura e peso visual equivalentes
+- usar nuances semânticas suaves: receita/sucesso, despesa/perigo, pendência/atenção, informação/azul
+- para `Basic`, esconder gestão avançada e remover módulos sem valor operacional imediato
+
+Regras de modais:
+
+- cabeçalho com eyebrow, título e descrição
+- formulário dentro de card interno quando houver agrupamento de campos
+- `Cancelar` secundário e ação principal azul no footer
+- ações destrutivas devem ser claras, mas visualmente contidas
+
 ## Componentes reutilizáveis
 
 ### PageHeaderComponent
