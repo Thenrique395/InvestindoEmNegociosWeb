@@ -1,125 +1,195 @@
-<section class="panel">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">Preferências</p>
-      <h2>Configurações pessoais</h2>
-      <p class="muted">Defina moeda e localizações preferidas para formatação.</p>
-    </div>
-  </div>
-  <div class="form">
-    <label>
-      Moeda
-      <select [(ngModel)]="moedaSelecionada">
-        <option *ngFor="let m of moedas; trackBy: trackByIndex" [value]="m">{{ m }}</option>
-      </select>
-    </label>
-    <label>
-      Idioma da aplicação
-      <select [(ngModel)]="linguaSelecionada" (ngModelChange)="onLanguageChange($event)">
-        <option *ngFor="let l of linguas; trackBy: trackByIndex" [value]="l.id">{{ l.label }}</option>
-      </select>
-    </label>
-    <div class="full quick">
-      <span class="muted">Configuração rápida</span>
-      <div class="preset-row">
-        <button type="button" class="ghost sm" (click)="applyPreset('pt-BR', 'BRL')">🇧🇷 Português + BRL</button>
-        <button type="button" class="ghost sm" (click)="applyPreset('en-US', 'USD')">🇺🇸 English + USD</button>
+<section class="preferences-page">
+  <section class="settings-shell">
+    <div class="settings-hero">
+      <div class="settings-hero__copy">
+        <p class="eyebrow">Configurações</p>
+        <h1>Preferências</h1>
+        <p>
+          Ajuste idioma, moeda e alertas usados na sua rotina financeira.
+        </p>
       </div>
     </div>
-    <div class="full">
-      <label>
-        Localizações preferidas
-        <div class="chips">
-          <span class="chip" *ngFor="let loc of localizacoes; let i = index; trackBy: trackByIndex">
-            {{ loc }}
-            <button type="button" (click)="removerLocalizacao(i)">✕</button>
-          </span>
+
+    <div class="settings-grid">
+      <section class="settings-card settings-card--main">
+        <div class="settings-card__header">
+          <div>
+            <p class="eyebrow">Formato regional</p>
+            <h2>Moeda e idioma</h2>
+            <p class="muted">Essas escolhas controlam como valores, datas e números aparecem na aplicação.</p>
+          </div>
         </div>
-      </label>
-      <div class="inline">
-        <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: pt-BR ou en-US" />
-        <button type="button" class="btn-primary sm" (click)="adicionarLocalizacao()">
-          <span class="btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          Adicionar
-        </button>
-      </div>
-    </div>
-    <div class="full preview">
-      <div>
-        <p class="muted">Pré-visualização</p>
+
+        <div class="form-grid">
+          <label>
+            Moeda
+            <select [(ngModel)]="moedaSelecionada">
+              <option *ngFor="let m of moedas; trackBy: trackByIndex" [value]="m">{{ m }}</option>
+            </select>
+          </label>
+
+          <label>
+            Idioma da aplicação
+            <select [(ngModel)]="linguaSelecionada" (ngModelChange)="onLanguageChange($event)">
+              <option *ngFor="let l of linguas; trackBy: trackByIndex" [value]="l.id">{{ l.label }}</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="preset-panel">
+          <div>
+            <p class="preset-panel__title">Configuração rápida</p>
+            <p class="muted">Aplique um conjunto comum de idioma e moeda.</p>
+          </div>
+          <div class="preset-row">
+            <button type="button" class="soft-action" (click)="applyPreset('pt-BR', 'BRL')">Português + BRL</button>
+            <button type="button" class="soft-action" (click)="applyPreset('en-US', 'USD')">English + USD</button>
+          </div>
+        </div>
+
+        <div class="locale-panel">
+          <div>
+            <p class="preset-panel__title">Localizações preferidas</p>
+            <p class="muted">Mantenha a principal em primeiro lugar e adicione alternativas se precisar.</p>
+          </div>
+
+          <div class="chips" *ngIf="localizacoes.length">
+            <span class="chip" *ngFor="let loc of localizacoes; let i = index; trackBy: trackByIndex">
+              {{ loc }}
+              <button type="button" [attr.aria-label]="'Remover ' + loc" (click)="removerLocalizacao(i)">×</button>
+            </span>
+          </div>
+
+          <div class="inline">
+            <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: pt-BR ou en-US" />
+            <button type="button" class="secondary-action" (click)="adicionarLocalizacao()">
+              <span aria-hidden="true">+</span>
+              Adicionar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card__header">
+          <div>
+            <p class="eyebrow">Pré-visualização</p>
+            <h2>Como os dados vão aparecer</h2>
+            <p class="muted">Use esta prévia para confirmar se o formato está correto antes de salvar.</p>
+          </div>
+        </div>
+
         <div class="preview-grid">
           <div class="preview-card">
-            <span class="muted">Data</span>
+            <span>Data</span>
             <strong>{{ previewDate }}</strong>
           </div>
           <div class="preview-card">
-            <span class="muted">Número</span>
+            <span>Número</span>
             <strong>{{ previewNumber }}</strong>
           </div>
           <div class="preview-card">
-            <span class="muted">Moeda</span>
+            <span>Moeda</span>
             <strong>{{ previewCurrency }}</strong>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="full notifications">
-      <p class="muted">Notificações</p>
-      <div class="notify-grid">
-        <label class="toggle-row">
-          <span>Lembrete de vencimento próximo</span>
-          <input type="checkbox" [(ngModel)]="notifyUpcoming" />
+      </section>
+
+      <section class="settings-card settings-card--main">
+        <div class="settings-card__header">
+          <div>
+            <p class="eyebrow">Notificações</p>
+            <h2>Lembretes financeiros</h2>
+            <p class="muted">Defina quais avisos o sistema deve priorizar para vencimentos e atrasos.</p>
+          </div>
+        </div>
+
+        <div class="notify-grid">
+          <label class="toggle-row">
+            <span>
+              <strong>Vencimento próximo</strong>
+              <small>Avisa antes de uma conta vencer.</small>
+            </span>
+            <input type="checkbox" [(ngModel)]="notifyUpcoming" />
+          </label>
+
+          <label class="toggle-row">
+            <span>
+              <strong>Vencimento em atraso</strong>
+              <small>Destaca pendências já vencidas.</small>
+            </span>
+            <input type="checkbox" [(ngModel)]="notifyOverdue" />
+          </label>
+
+          <label class="toggle-row">
+            <span>
+              <strong>Notificações no app</strong>
+              <small>Mostra alertas dentro do sistema.</small>
+            </span>
+            <input type="checkbox" [(ngModel)]="notifyInApp" />
+          </label>
+
+          <label class="toggle-row">
+            <span>
+              <strong>Notificações por e-mail</strong>
+              <small>Envia lembretes fora da aplicação.</small>
+            </span>
+            <input type="checkbox" [(ngModel)]="notifyEmail" />
+          </label>
+        </div>
+
+        <label class="days-before-due">
+          Dias antes do vencimento para alerta
+          <input type="number" min="0" max="60" [(ngModel)]="notifyDaysBeforeDue" />
         </label>
-        <label class="toggle-row">
-          <span>Alerta de vencimento em atraso</span>
-          <input type="checkbox" [(ngModel)]="notifyOverdue" />
-        </label>
-        <label class="toggle-row">
-          <span>Notificações no app</span>
-          <input type="checkbox" [(ngModel)]="notifyInApp" />
-        </label>
-        <label class="toggle-row">
-          <span>Notificações por e-mail</span>
-          <input type="checkbox" [(ngModel)]="notifyEmail" />
-        </label>
-      </div>
-      <label class="days-before-due">
-        Dias antes do vencimento para alerta
-        <input type="number" min="0" max="60" [(ngModel)]="notifyDaysBeforeDue" />
-      </label>
-      <p class="muted">Configure os canais e o prazo de antecedência dos lembretes.</p>
+      </section>
+
+      <section class="settings-card danger-card">
+        <div class="settings-card__header">
+          <div>
+            <p class="eyebrow">Zona sensível</p>
+            <h2>Excluir conta</h2>
+            <p class="muted">Remove permanentemente seu usuário e seus dados financeiros. Essa ação não pode ser desfeita.</p>
+          </div>
+        </div>
+
+        <div class="danger-grid">
+          <label>
+            Senha atual
+            <input type="password" [(ngModel)]="deletePassword" placeholder="Digite sua senha" />
+          </label>
+          <label>
+            Confirmação
+            <input type="text" [(ngModel)]="deleteConfirmation" placeholder="Digite EXCLUIR" />
+          </label>
+        </div>
+
+        <div class="danger-actions">
+          <button type="button" class="danger-action" [disabled]="deletingAccount" (click)="excluirConta()">
+            <span class="danger-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M6 7h12M10 11v6M14 11v6M9 7l1-2h4l1 2M8 7l1 13h6l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span>{{ deletingAccount ? 'Excluindo...' : 'Excluir conta' }}</span>
+          </button>
+        </div>
+      </section>
     </div>
 
-    <div class="full account-danger-zone">
-      <p class="danger-title">Excluir conta (LGPD self-service)</p>
-      <p class="muted">
-        Esta ação remove permanentemente seus dados financeiros e seu usuário. Não é possível desfazer.
-      </p>
-      <div class="danger-grid">
-        <label>
-          Senha atual
-          <input type="password" [(ngModel)]="deletePassword" placeholder="Digite sua senha" />
-        </label>
-        <label>
-          Confirmação
-          <input type="text" [(ngModel)]="deleteConfirmation" placeholder="Digite EXCLUIR" />
-        </label>
+    <footer class="settings-footer">
+      <div>
+        <strong>Salvar preferências</strong>
+        <span>Confirme as mudanças para aplicar formatos e lembretes no sistema.</span>
       </div>
-      <div class="danger-actions">
-        <button type="button" class="btn-danger" [disabled]="deletingAccount" (click)="excluirConta()">
-          {{ deletingAccount ? 'Excluindo...' : 'Excluir minha conta' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel__actions">
-    <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPreferencias()">
-      {{ loading ? 'Salvando...' : 'Salvar preferências' }}
-    </button>
-  </div>
+      <button type="button" class="primary-action" [disabled]="loading" (click)="salvarPreferencias()">
+        <span class="primary-action__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+            <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span>{{ loading ? 'Salvando...' : 'Salvar preferências' }}</span>
+      </button>
+    </footer>
+  </section>
 </section>

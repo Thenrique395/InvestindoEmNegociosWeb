@@ -317,6 +317,19 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  goToPreferences(event?: Event): void {
+    event?.preventDefault();
+    this.closeSidebar();
+
+    const currentPath = this.router.url.split('?')[0];
+    if (currentPath === '/preferencias') {
+      this.apiDataService.refresh();
+      return;
+    }
+
+    this.router.navigateByUrl('/preferencias');
+  }
+
   private ensureUserContext(): void {
     if (!this.profileSub) {
       this.profileSub = this.profileService.profile$.subscribe((profile) => {
