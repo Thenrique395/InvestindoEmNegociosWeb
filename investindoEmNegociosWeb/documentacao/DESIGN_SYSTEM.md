@@ -79,6 +79,59 @@ Toda decisão relevante de interface deve ser confrontada com estas 10 heurísti
 - interfaces mais densas devem oferecer contexto suficiente
 - labels, subtítulos, callouts e empty states fazem parte da ajuda embutida do produto
 
+## Heurísticas de UX do produto
+
+Além das heurísticas de Nielsen, cada tela autenticada deve passar por este checklist antes de ser considerada pronta.
+
+1. ação principal evidente
+- a tela precisa deixar claro o que o usuário deve fazer agora
+- CTAs devem explicar resultado, não apenas ação técnica
+- se não houver próxima ação, a tela deve assumir postura de leitura ou consulta
+
+2. hierarquia em 3 segundos
+- o usuário deve entender onde está, qual dado importa e qual próximo passo
+- hero, KPIs e CTA não devem competir pela mesma atenção
+- o dado financeiro principal deve ser mais fácil de encontrar que ações secundárias
+
+3. informação sem repetição
+- hero, card lateral, rodapé e empty state não devem repetir a mesma mensagem
+- cada bloco precisa ter função própria: contexto, dado, ação, validação ou ajuda
+- se dois textos dizem a mesma coisa, remover ou especializar um deles
+
+4. feedback e validação explícitos
+- ação bloqueada precisa explicar motivo e correção
+- formulários devem indicar campo, erro e próximo passo
+- sucesso precisa confirmar impacto real, não apenas dizer que algo foi salvo
+
+5. consistência operacional
+- cards irmãos devem ter altura, peso e comportamento equivalentes
+- botões iguais devem executar papéis iguais em todas as telas
+- modais de cadastro e edição devem manter estrutura, footer e hierarquia
+
+6. redução de carga cognitiva por perfil
+- `Basic` deve mostrar apenas o que gera valor imediato
+- `Intermediate` e `Advanced` podem adicionar densidade sem mudar a identidade visual
+- menus e módulos devem respeitar a fronteira comercial e funcional do perfil
+
+7. prevenção de erro antes da recuperação
+- preferir bloquear ou orientar antes da falha
+- exclusão, importação, conclusão e ações financeiras precisam deixar impacto claro
+- estados vazios devem orientar o primeiro registro sem parecer erro
+
+8. visibilidade de estado financeiro
+- pendente, pago, vencido, opcional, configurado e concluído precisam ser visíveis sem interpretação
+- cores devem reforçar significado financeiro e nunca decorar
+- listas e cards devem mostrar período, valor e status quando isso muda a decisão
+
+Checklist rápido antes de alterar uma tela:
+
+- qual é a decisão principal desta tela?
+- o usuário sabe o que fazer em seguida?
+- existe texto repetido?
+- `Basic` está vendo só o necessário?
+- toda ação bloqueada tem mensagem útil?
+- o estado financeiro está claro sem ler tudo?
+
 ## Boas práticas obrigatórias
 
 - usar uma base visual única para todos os perfis

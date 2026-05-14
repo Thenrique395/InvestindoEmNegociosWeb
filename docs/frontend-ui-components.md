@@ -22,6 +22,16 @@ Regras de composição:
 - usar nuances semânticas suaves: receita/sucesso, despesa/perigo, pendência/atenção, informação/azul
 - para `Basic`, esconder gestão avançada e remover módulos sem valor operacional imediato
 
+Checklist de UX antes de alterar uma tela:
+
+- usar as heurísticas de UX do produto definidas em `documentacao/DESIGN_SYSTEM.md`
+- identificar o que o usuário deve entender em até 3 segundos
+- definir uma ação principal clara ou assumir uma tela de consulta
+- remover textos repetidos entre hero, cards, rodapés e empty states
+- garantir feedback útil para ações bloqueadas, erro, vazio e sucesso
+- validar se `Basic` está recebendo apenas informação útil e operacional
+- manter tamanho, CTA, modal, card e cor semântica consistentes com as telas já ajustadas
+
 Regras de modais:
 
 - cabeçalho com eyebrow, título e descrição
