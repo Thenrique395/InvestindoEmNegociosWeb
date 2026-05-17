@@ -4,20 +4,20 @@ test.describe('app shell', () => {
   test('abre a home comercial e navega para login', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: /organizar despesas pessoais/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /sair do caos financeiro/i })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Começar agora' }).click();
+    await page.getByRole('button', { name: 'Entrar' }).click();
 
     await expect(page).toHaveURL(/\/login$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Bem-vindo de volta' })).toBeVisible();
-    await expect(page.locator('form').getByRole('button', { name: 'Entrar' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Acesse sua conta' })).toBeVisible();
+    await expect(page.locator('form').getByRole('button', { name: /Entrar no dashboard/i })).toBeVisible();
   });
 
   test('redireciona rota privada para login quando nao ha sessao', async ({ page }) => {
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveURL(/\/login$/);
-    await expect(page.getByRole('link', { name: /Esqueci minha senha/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Esqueci minha senha/i })).toBeVisible();
   });
 
   test('acessa a calculadora publica pelo menu principal', async ({ page }) => {
@@ -33,10 +33,10 @@ test.describe('app shell', () => {
   test('abre a recuperacao de senha a partir do login', async ({ page }) => {
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('link', { name: /Esqueci minha senha/i }).click();
+    await page.getByRole('button', { name: /Esqueci minha senha/i }).click();
 
-    await expect(page).toHaveURL(/\/forgot-password$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Esqueci minha senha' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Enviar link de recuperação/i })).toBeVisible();
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole('heading', { level: 2, name: 'Esqueci minha senha' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Enviar link/i })).toBeVisible();
   });
 });
