@@ -362,6 +362,8 @@ Regras:
 - filtros, listas e detalhes devem ficar dentro de cards maiores com borda suave
 - CTAs importantes devem ficar ancorados em card lateral, rodapé de seção ou footer de modal
 - evitar módulos que só repetem onboarding ou confirmam algo que o usuário já sabe
+- dropdowns do header devem ficar sempre acima do conteúdo da página; nunca podem ser cobertos por cards, heros ou overlays internos
+- quando um dropdown do header abre, dropdowns concorrentes devem fechar para evitar sobreposição visual
 
 Padrão visual:
 
@@ -413,6 +415,8 @@ Regras:
 - texto do CTA deve explicar a ação; descrição curta só quando agrega contexto
 - ação secundária usa superfície clara e borda suave
 - ação destrutiva usa nuance `danger`, mas não deve parecer CTA principal da tela
+- botões irmãos no mesmo card devem manter alinhamento visual, independentemente do tamanho do texto acima
+- se uma ação não entrega valor claro ao usuário, ela deve ser removida ou reposicionada antes de ganhar peso visual
 
 #### Listas e tabelas operacionais
 
@@ -444,6 +448,17 @@ Regras:
 - manter o mesmo padrão visual dos demais perfis, mudando apenas densidade e disponibilidade
 - remover informações repetidas, principalmente quando já foram configuradas no onboarding
 - cards devem responder a decisões simples: `o que entrou`, `o que saiu`, `o que falta revisar`
+- menu lateral do `Basic` deve priorizar módulos operacionais do dia a dia; itens de conta, assinatura e preferências ficam no menu do usuário quando fizerem mais sentido como configuração pessoal
+
+#### Header e sessão autenticada
+
+Regras:
+
+- menu do usuário deve concentrar perfil, assinatura, preferências, segurança, dados da conta e saída
+- notificações e menu do usuário devem ter camada visual maior que o conteúdo principal
+- perda de sessão em rota protegida deve redirecionar para login; nunca deixar tela branca
+- timeout por inatividade deve avisar o usuário e limpar estado local antes de navegar
+- o topo não deve competir visualmente com os módulos principais; ele serve para orientação, sessão e ações globais
 
 ### Padrão aprovado do onboarding
 

@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 
@@ -12,16 +12,24 @@ import { UiFeedbackService } from '../ui-feedback.service';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit {
   email = '';
   loading = false;
   success = false;
   formError = '';
 
   constructor(
+    private router: Router,
     private auth: AuthService,
     private uiFeedback: UiFeedbackService
   ) {}
+
+  ngOnInit(): void {
+    this.router.navigate(['/login'], {
+      queryParams: { forgotPassword: '1' },
+      replaceUrl: true
+    });
+  }
 
   onSubmit(): void {
     if (this.loading) return;

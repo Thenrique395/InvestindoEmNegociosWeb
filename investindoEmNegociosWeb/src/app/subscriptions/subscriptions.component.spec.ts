@@ -2,7 +2,7 @@ import { of, throwError } from 'rxjs';
 import { SubscriptionsComponent } from './subscriptions.component';
 
 describe('SubscriptionsComponent', () => {
-  function createComponent(overrides?: { subscriptionsService?: any; authService?: any; uiFeedback?: any }) {
+  function createComponent(overrides?: { subscriptionsService?: any; authService?: any; billingService?: any; router?: any; uiFeedback?: any }) {
     const subscriptionsService = overrides?.subscriptionsService ?? {
       getCatalog: jasmine.createSpy().and.returnValue(of({
         current: {
@@ -98,12 +98,16 @@ describe('SubscriptionsComponent', () => {
       }))
     };
     const authService = overrides?.authService ?? { applySession: jasmine.createSpy() };
+    const billingService = overrides?.billingService ?? { createPortalSession: jasmine.createSpy().and.returnValue(of({ url: 'https://billing.test' })) };
+    const router = overrides?.router ?? { navigate: jasmine.createSpy() };
     const uiFeedback = overrides?.uiFeedback ?? { success: jasmine.createSpy(), error: jasmine.createSpy() };
 
     return {
-      component: new SubscriptionsComponent(subscriptionsService, authService, uiFeedback),
+      component: new SubscriptionsComponent(subscriptionsService, authService, billingService, router, uiFeedback),
       subscriptionsService,
       authService,
+      billingService,
+      router,
       uiFeedback
     };
   }

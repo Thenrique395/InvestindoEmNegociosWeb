@@ -1,93 +1,113 @@
-import { of, throwError } from 'rxjs';
+import { signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 import { ContasComponent } from './contas.component';
-import { AccountResponse, AccountsService } from '../accounts.service';
+import { AccountResponse } from '../accounts.service';
+import { AccountsStore } from '../accounts.store';
 import { CategoriesService } from '../categories.service';
 
-class AccountsServiceMock {
-  list = jasmine.createSpy().and.returnValue(of([]));
-  create = jasmine.createSpy().and.returnValue(of({}));
-  update = jasmine.createSpy().and.returnValue(of({}));
-  delete = jasmine.createSpy().and.returnValue(of(void 0));
-  getBalance = jasmine.createSpy().and.returnValue(of({}));
-  listTransactions = jasmine.createSpy().and.returnValue(of([]));
-  transfer = jasmine.createSpy().and.returnValue(of({}));
-  extractOfx = jasmine.createSpy().and.returnValue(of({ items: [], rawText: '' }));
-  importOfx = jasmine.createSpy().and.returnValue(of({ created: 1, skipped: 0 }));
-  extractCsv = jasmine.createSpy().and.returnValue(of({ delimiter: ';', detectedColumns: [], items: [], rawText: '' }));
-  importCsv = jasmine.createSpy().and.returnValue(of({ created: 1, skipped: 0 }));
+class AccountsStoreMock {
+  accountsState = signal<AccountResponse[]>([]);
+  loadingState = signal(false);
+  errorState = signal<string | null>(null);
+  selectedAccountIdState = signal<string | null>(null);
+  transactionsState = signal<any[]>([]);
+  transactionsLoadingState = signal(false);
+  transactionsErrorState = signal<string | null>(null);
+
+  accounts = this.accountsState.asReadonly();
+  loading = this.loadingState.asReadonly();
+  error = this.errorState.asReadonly();
+  selectedAccountId = this.selectedAccountIdState.asReadonly();
+  transactions = this.transactionsState.asReadonly();
+  transactionsLoading = this.transactionsLoadingState.asReadonly();
+  transactionsError = this.transactionsErrorState.asReadonly();
+
+  load = jasmine.createSpy('load').and.callFake(() => {
+    const firstAccountId = this.accountsState()[0]?.id ?? null;
+    if (!this.selectedAccountIdState()) {
+      this.selectedAccountIdState.set(firstAccountId);
+    }
+  });
+  create = jasmine.createSpy('create');
+  update = jasmine.createSpy('update');
+  delete = jasmine.createSpy('delete');
+  selectAccount = jasmine.createSpy('selectAccount').and.callFake((accountId: string) => {
+    this.selectedAccountIdState.set(accountId);
+  });
+  loadTransactions = jasmine.createSpy('loadTransactions');
+  transfer = jasmine.createSpy('transfer').and.callFake((_payload: any, done?: () => void) => done?.());
+  extractOfx = jasmine.createSpy('extractOfx').and.returnValue(of({ items: [], rawText: '' }));
+  importOfx = jasmine.createSpy('importOfx').and.callFake((_payload: any, done?: () => void) => done?.());
+  extractCsv = jasmine.createSpy('extractCsv').and.returnValue(of({ delimiter: ';', detectedColumns: [], items: [], rawText: '' }));
+  importCsv = jasmine.createSpy('importCsv').and.callFake((_payload: any, done?: () => void) => done?.());
 }
 
 class CategoriesServiceMock {
-  list = jasmine.createSpy().and.returnValue(of([]));
+  list = jasmine.createSpy('list').and.returnValue(of([]));
 }
 
 describe('ContasComponent smoke', () => {
   let component: ContasComponent;
-  let service: AccountsServiceMock;
+  let store: AccountsStoreMock;
   let categoriesService: CategoriesServiceMock;
 
   beforeEach(() => {
-    service = new AccountsServiceMock();
+    store = new AccountsStoreMock();
     categoriesService = new CategoriesServiceMock();
-    component = new ContasComponent(service as unknown as AccountsService, categoriesService as unknown as CategoriesService);
+    component = TestBed.runInInjectionContext(() =>
+      new ContasComponent(store as unknown as AccountsStore, categoriesService as unknown as CategoriesService)
+    );
   });
 
-  it('deve carregar contas no init e sincronizar defaults de transferência', () => {
-    const accounts: AccountResponse[] = [
-      { id: 'a1', name: 'Conta A', type: 'Checking', initialBalance: 0, currentBalance: 100, isActive: true, createdAt: '', updatedAt: '' },
-      { id: 'a2', name: 'Conta B', type: 'Savings', initialBalance: 0, currentBalance: 50, isActive: true, createdAt: '', updatedAt: '' }
-    ];
-    service.list.and.returnValue(of(accounts));
+  it('deve carregar contas e categorias no init', () => {
+    store.accountsState.set([
+      createAccount('a1', 'Conta A'),
+      createAccount('a2', 'Conta B')
+    ]);
 
     component.ngOnInit();
 
-    expect(component.accounts.length).toBe(2);
-    expect(component.transferFromAccountId).toBeTruthy();
-    expect(component.transferToAccountId).toBeTruthy();
+    expect(store.load).toHaveBeenCalledWith(true);
+    expect(categoriesService.list).toHaveBeenCalled();
   });
 
-  it('deve bloquear transferência inválida (mesma conta)', () => {
-    component.accounts = [
-      { id: 'a1', name: 'Conta A', type: 'Checking', initialBalance: 0, currentBalance: 100, isActive: true, createdAt: '', updatedAt: '' },
-      { id: 'a2', name: 'Conta B', type: 'Savings', initialBalance: 0, currentBalance: 50, isActive: true, createdAt: '', updatedAt: '' }
-    ];
-    component.transferFromAccountId = 'a1';
-    component.transferToAccountId = 'a1';
-    component.transferAmount = 10;
+  it('deve bloquear transferência inválida entre a mesma conta', () => {
+    store.accountsState.set([
+      createAccount('a1', 'Conta A'),
+      createAccount('a2', 'Conta B')
+    ]);
+    component.onTransferChange({
+      fromAccountId: 'a1',
+      toAccountId: 'a1',
+      amount: 10,
+      occurredAtInput: '',
+      description: ''
+    });
 
     component.transfer();
 
-    expect(service.transfer).not.toHaveBeenCalled();
+    expect(store.transfer).not.toHaveBeenCalled();
     expect(component.error).toContain('diferentes');
   });
 
-  it('deve enviar transferência válida', () => {
-    component.accounts = [
-      { id: 'a1', name: 'Conta A', type: 'Checking', initialBalance: 0, currentBalance: 100, isActive: true, createdAt: '', updatedAt: '' },
-      { id: 'a2', name: 'Conta B', type: 'Savings', initialBalance: 0, currentBalance: 50, isActive: true, createdAt: '', updatedAt: '' }
-    ];
-    component.transferFromAccountId = 'a1';
-    component.transferToAccountId = 'a2';
-    component.transferAmount = 25;
+  it('deve enviar transferência válida ao store', () => {
+    component.onTransferChange({
+      fromAccountId: 'a1',
+      toAccountId: 'a2',
+      amount: 25,
+      occurredAtInput: '',
+      description: 'Reserva'
+    });
 
     component.transfer();
 
-    expect(service.transfer).toHaveBeenCalled();
-  });
-
-  it('deve capturar erro da API ao transferir', () => {
-    service.transfer.and.returnValue(throwError(() => ({ error: { detail: 'Falha teste' } })));
-    component.accounts = [
-      { id: 'a1', name: 'Conta A', type: 'Checking', initialBalance: 0, currentBalance: 100, isActive: true, createdAt: '', updatedAt: '' },
-      { id: 'a2', name: 'Conta B', type: 'Savings', initialBalance: 0, currentBalance: 50, isActive: true, createdAt: '', updatedAt: '' }
-    ];
-    component.transferFromAccountId = 'a1';
-    component.transferToAccountId = 'a2';
-    component.transferAmount = 25;
-
-    component.transfer();
-
-    expect(component.error).toContain('Falha teste');
+    expect(store.transfer).toHaveBeenCalled();
+    expect(store.transfer.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({
+      fromAccountId: 'a1',
+      toAccountId: 'a2',
+      amount: 25
+    }));
   });
 
   it('deve bloquear seleção de OFX sem conta escolhida', () => {
@@ -98,7 +118,7 @@ describe('ContasComponent smoke', () => {
     component.selectedAccountId = null;
     component.onOfxSelected({ target: input } as unknown as Event);
 
-    expect(service.extractOfx).not.toHaveBeenCalled();
+    expect(store.extractOfx).not.toHaveBeenCalled();
     expect(component.error).toContain('Selecione uma conta');
   });
 
@@ -122,7 +142,7 @@ describe('ContasComponent smoke', () => {
 
     component.importOfx();
 
-    expect(service.importOfx).toHaveBeenCalled();
+    expect(store.importOfx).toHaveBeenCalled();
   });
 
   it('deve enviar importação CSV para a conta selecionada', () => {
@@ -147,6 +167,19 @@ describe('ContasComponent smoke', () => {
 
     component.importCsv();
 
-    expect(service.importCsv).toHaveBeenCalled();
+    expect(store.importCsv).toHaveBeenCalled();
   });
 });
+
+function createAccount(id: string, name: string): AccountResponse {
+  return {
+    id,
+    name,
+    type: 'Checking',
+    initialBalance: 0,
+    currentBalance: 100,
+    isActive: true,
+    createdAt: '',
+    updatedAt: ''
+  };
+}

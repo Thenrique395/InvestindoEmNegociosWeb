@@ -1,59 +1,141 @@
-<div
-  class="flex min-w-0 flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] text-[var(--text)] shadow-[var(--shadow-md)]">
-  <p class="eyebrow">Cadastro rápido</p>
-  <h3 class="m-0 text-[var(--text-2xl)]">Crie sua conta gratuita</h3>
-  <p class="m-0 text-[var(--text-muted)]">
-    Comece com o módulo de Despesas e Receitas, e evolua para Cartões e Investimentos.
-  </p>
+<section class="signup-shell" [class.signup-shell--page]="isRoutePage">
+  <div class="signup-card">
+    <aside class="signup-visual" *ngIf="isRoutePage">
+      <img class="signup-visual__logo" src="/assets/logoHeaderInvestindoemNegocios.png" alt="Investindo em Negócios" />
 
-  <form class="mt-2 flex flex-col gap-4" (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
-    <label class="flex flex-col gap-1 font-semibold text-[var(--text)]">
-      <span>Nome completo</span>
-      <input
-        class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:bg-[var(--surface-2)] focus:ring-1 focus:ring-[var(--primary)]"
-        type="text"
-        formControlName="nome"
-        placeholder="Ex.: Ana Souza" />
-      <small class="text-[var(--danger)]" *ngIf="hasError('nome', 'required')">Informe seu nome.</small>
-      <small class="text-[var(--danger)]" *ngIf="hasError('nome', 'minlength')">Use ao menos 2 caracteres.</small>
-    </label>
+      <div class="signup-visual__content">
+        <p class="signup-eyebrow signup-eyebrow--light">Conta gratuita</p>
+        <h2>Sua rotina financeira começa aqui</h2>
+        <p>
+          Monte seu primeiro painel e acompanhe o mês com decisões mais simples, visuais e
+          consistentes.
+        </p>
+      </div>
 
-    <label class="flex flex-col gap-1 font-semibold text-[var(--text)]">
-      <span>E-mail</span>
-      <input
-        class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:bg-[var(--surface-2)] focus:ring-1 focus:ring-[var(--primary)]"
-        type="email"
-        formControlName="email"
-        placeholder="voce@email.com" />
-      <small class="text-[var(--danger)]" *ngIf="hasError('email', 'required')">Informe um e-mail.</small>
-      <small class="text-[var(--danger)]" *ngIf="hasError('email', 'email')">Digite um e-mail válido.</small>
-      <small class="text-[var(--danger)]" *ngIf="hasError('email', 'emailInUse')">E-mail já está em uso.</small>
-    </label>
+      <div class="signup-visual__dock" aria-label="Etapas iniciais">
+        <span>Perfil</span>
+        <span>Contas</span>
+        <span>Dashboard</span>
+      </div>
+    </aside>
 
-    <label class="flex flex-col gap-1 font-semibold text-[var(--text)]">
-      <span>Senha</span>
-      <input
-        class="w-full rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-[var(--space-2)] py-[var(--space-2)] text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:bg-[var(--surface-2)] focus:ring-1 focus:ring-[var(--primary)]"
-        type="password"
-        formControlName="senha"
-        placeholder="Mínimo 6 caracteres" />
-      <small class="text-[var(--danger)]" *ngIf="hasError('senha', 'required')">Informe uma senha.</small>
-      <small class="text-[var(--danger)]" *ngIf="hasError('senha', 'minlength')">Use ao menos 6 caracteres.</small>
-    </label>
+    <main class="signup-panel">
+      <section class="signup-panel__card" aria-labelledby="signup-title">
+        <div class="signup-panel__topline">
+          <a routerLink="/" class="signup-panel__site-link">
+            <span aria-hidden="true">←</span>
+            <span>Voltar para o site</span>
+          </a>
+        </div>
 
-    <label class="flex items-center gap-2 text-[var(--text-sm)] font-medium text-[var(--text-muted)]">
-      <input type="checkbox" formControlName="aceitarTermos" />
-      <span>Li e aceito os termos de uso e a política de privacidade.</span>
-    </label>
-    <small class="text-[var(--danger)]" *ngIf="hasError('aceitarTermos', 'required')">Aceite os termos para continuar.</small>
+        <div class="signup-panel__head">
+          <p class="signup-eyebrow">Primeiro acesso</p>
+          <h1 id="signup-title">Vamos começar</h1>
+          <p>
+            Informe seus dados de acesso. Depois disso, o onboarding guia a criação da sua base
+            financeira.
+          </p>
+        </div>
 
-    <button class="btn-primary" type="submit" [disabled]="loading">
-      {{ loading ? 'Criando conta...' : 'Criar conta e entrar' }}
-    </button>
+        <form class="signup-form" (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
+          <label class="signup-form__field">
+            <span>Nome completo</span>
+            <input
+              class="signup-form__input"
+              [class.signup-form__input--invalid]="hasControlError('nome')"
+              [attr.aria-invalid]="hasControlError('nome')"
+              type="text"
+              formControlName="nome"
+              placeholder="Digite seu nome completo"
+              autocomplete="name" />
+            <small class="signup-form__error" *ngIf="hasError('nome', 'required')">Informe seu nome.</small>
+            <small class="signup-form__error" *ngIf="hasError('nome', 'minlength')">Use ao menos 2 caracteres.</small>
+          </label>
 
-    <p class="m-0 text-[var(--text-sm)] text-[var(--text-muted)]">
-      Já possui acesso? Use o botão de login no topo ou a área de “Login”.
-    </p>
+          <label class="signup-form__field">
+            <span>E-mail</span>
+            <input
+              class="signup-form__input"
+              [class.signup-form__input--invalid]="hasControlError('email')"
+              [attr.aria-invalid]="hasControlError('email')"
+              type="email"
+              formControlName="email"
+              placeholder="Digite seu e-mail"
+              autocomplete="email" />
+            <small class="signup-form__error" *ngIf="hasError('email', 'required')">Informe um e-mail.</small>
+            <small class="signup-form__error" *ngIf="hasError('email', 'email')">Digite um e-mail válido.</small>
+            <small class="signup-form__error" *ngIf="hasError('email', 'emailInUse')">E-mail já está em uso.</small>
+          </label>
 
-  </form>
-</div>
+          <label class="signup-form__field">
+            <span>Senha</span>
+            <div class="signup-form__input-shell" [class.signup-form__input-shell--invalid]="hasControlError('senha')">
+              <input
+                class="signup-form__input"
+                [attr.aria-invalid]="hasControlError('senha')"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="senha"
+                placeholder="Digite sua senha"
+                autocomplete="new-password" />
+              <button
+                class="signup-form__toggle"
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            <small class="signup-form__error" *ngIf="hasError('senha', 'required')">Informe uma senha.</small>
+            <small class="signup-form__error" *ngIf="hasError('senha', 'minlength')">Use ao menos 6 caracteres.</small>
+          </label>
+
+          <label class="signup-form__field">
+            <span>Confirmar senha</span>
+            <div
+              class="signup-form__input-shell"
+              [class.signup-form__input-shell--invalid]="hasControlError('confirmarSenha') || hasPasswordMismatch()">
+              <input
+                class="signup-form__input"
+                [attr.aria-invalid]="hasControlError('confirmarSenha') || hasPasswordMismatch()"
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                formControlName="confirmarSenha"
+                placeholder="Confirme sua senha"
+                autocomplete="new-password" />
+              <button
+                class="signup-form__toggle"
+                type="button"
+                (click)="toggleConfirmPasswordVisibility()"
+                [attr.aria-label]="showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'">
+                {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            <small class="signup-form__error" *ngIf="hasError('confirmarSenha', 'required')">Confirme sua senha.</small>
+            <small class="signup-form__error" *ngIf="hasPasswordMismatch()">As senhas precisam ser iguais.</small>
+          </label>
+
+          <label class="signup-form__terms" [class.signup-form__terms--invalid]="hasControlError('aceitarTermos')">
+            <input type="checkbox" formControlName="aceitarTermos" />
+            <span>Li e aceito os termos de uso e a política de privacidade.</span>
+          </label>
+          <small class="signup-form__error" *ngIf="hasError('aceitarTermos', 'required')">
+            Aceite os termos para continuar.
+          </small>
+
+          <button
+            class="signup-form__submit"
+            type="submit"
+            [disabled]="loading"
+            [attr.aria-disabled]="loading || form.invalid">
+            <span aria-hidden="true">{{ loading ? '...' : '→' }}</span>
+            {{ loading ? 'Criando conta...' : 'Criar conta agora' }}
+          </button>
+
+          <p class="signup-form__login">
+            Já tem conta?
+            <a routerLink="/login">Entrar.</a>
+          </p>
+        </form>
+      </section>
+    </main>
+  </div>
+</section>

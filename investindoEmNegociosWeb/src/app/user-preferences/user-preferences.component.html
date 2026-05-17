@@ -5,7 +5,7 @@
         <p class="eyebrow">Configurações</p>
         <h1>Preferências</h1>
         <p>
-          Ajuste idioma, moeda e alertas usados na sua rotina financeira.
+          Defina como valores, datas e lembretes aparecem em todas as telas.
         </p>
       </div>
     </div>
@@ -16,7 +16,7 @@
           <div>
             <p class="eyebrow">Formato regional</p>
             <h2>Moeda e idioma</h2>
-            <p class="muted">Essas escolhas controlam como valores, datas e números aparecem na aplicação.</p>
+            <p class="muted">Use para manter números, datas e valores alinhados ao seu país.</p>
           </div>
         </div>
 
@@ -75,7 +75,7 @@
           <div>
             <p class="eyebrow">Pré-visualização</p>
             <h2>Como os dados vão aparecer</h2>
-            <p class="muted">Use esta prévia para confirmar se o formato está correto antes de salvar.</p>
+            <p class="muted">Confira o resultado antes de aplicar a mudança.</p>
           </div>
         </div>
 
@@ -100,7 +100,7 @@
           <div>
             <p class="eyebrow">Notificações</p>
             <h2>Lembretes financeiros</h2>
-            <p class="muted">Defina quais avisos o sistema deve priorizar para vencimentos e atrasos.</p>
+            <p class="muted">Escolha como o sistema deve avisar sobre vencimentos e atrasos.</p>
           </div>
         </div>
 
@@ -148,7 +148,7 @@
         <div class="settings-card__header">
           <div>
             <p class="eyebrow">Zona sensível</p>
-            <h2>Excluir conta</h2>
+            <h2>Excluir conta permanentemente</h2>
             <p class="muted">Remove permanentemente seu usuário e seus dados financeiros. Essa ação não pode ser desfeita.</p>
           </div>
         </div>
@@ -161,6 +161,7 @@
           <label>
             Confirmação
             <input type="text" [(ngModel)]="deleteConfirmation" placeholder="Digite EXCLUIR" />
+            <small>Use exatamente a palavra EXCLUIR para liberar a ação.</small>
           </label>
         </div>
 
@@ -179,8 +180,8 @@
 
     <footer class="settings-footer">
       <div>
-        <strong>Salvar preferências</strong>
-        <span>Confirme as mudanças para aplicar formatos e lembretes no sistema.</span>
+        <strong>Aplicar mudanças</strong>
+        <span>Salva moeda, idioma, localização e lembretes para as próximas telas.</span>
       </div>
       <button type="button" class="primary-action" [disabled]="loading" (click)="salvarPreferencias()">
         <span class="primary-action__icon" aria-hidden="true">
@@ -188,7 +189,7 @@
             <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
-        <span>{{ loading ? 'Salvando...' : 'Salvar preferências' }}</span>
+        <span>{{ loading ? 'Salvando...' : 'Salvar alterações' }}</span>
       </button>
     </footer>
   </section>

@@ -3,50 +3,44 @@
   <div class="login-shell__aura login-shell__aura--right" aria-hidden="true"></div>
 
   <div class="login-card">
-    <aside class="login-visual">
+    <aside class="login-visual" aria-label="Resumo do sistema Investindo em Negócios">
       <img
-        class="login-visual__image"
-        src="assets/login/office-portrait.jpg"
-        alt="Profissional em ambiente corporativo, reforçando confiança e clareza no acesso à conta" />
-      <div class="login-visual__overlay" aria-hidden="true"></div>
+        class="login-visual__logo"
+        src="assets/logoHeaderInvestindoemNegocios.png"
+        alt="Investindo em Negócios" />
 
       <div class="login-visual__content">
-        <div class="login-visual__brand">
-          <p class="login-visual__eyebrow">INVESTINDO EM NEGÓCIOS</p>
-          <strong>Controle o mês, as contas e a evolução financeira em um só lugar.</strong>
-          <p class="login-visual__summary">
-            Receitas, despesas, cartões, metas e investimentos com leitura clara para decidir melhor.
-          </p>
-        </div>
+        <h2>Controle seu dinheiro com clareza.</h2>
+        <p>
+          Uma visão objetiva para acompanhar entradas, saídas, cartões e metas sem perder o
+          contexto do mês.
+        </p>
+      </div>
 
-        <div class="login-visual__footer">
-          <span>Receitas</span>
-          <span>Despesas</span>
-          <span>Contas</span>
-          <span>Cartões</span>
-          <span>Metas</span>
-          <span>Investimentos</span>
-        </div>
+      <div class="login-visual__proof">
+        <span>Painel financeiro pessoal</span>
+        <strong>Receitas, despesas, cartões e metas conectados em um só lugar.</strong>
       </div>
     </aside>
 
     <main class="login-main">
-      <div class="login-main__inner">
+      <section class="login-panel" aria-labelledby="login-title">
         <div class="login-main__topline">
           <a routerLink="/" class="login-main__site-link">
+            <span aria-hidden="true">←</span>
             <span>Voltar para o site</span>
-            <span class="login-main__site-link-arrow" aria-hidden="true">→</span>
           </a>
         </div>
 
         <div class="login-main__head">
-          <h1>Acesse sua conta</h1>
+          <p class="login-eyebrow">LOGIN</p>
+          <h1 id="login-title">Acesse sua conta</h1>
           <p>
-            Ainda não tem uma conta no Investindo em Negócios? <a routerLink="/register">Abrir conta agora.</a>
+            Use seu e-mail e senha para voltar ao dashboard e continuar sua organização financeira.
           </p>
         </div>
 
-        <form class="login-form login-form--editorial" (ngSubmit)="onSubmit()">
+        <form class="login-form" (ngSubmit)="onSubmit()">
           <label class="login-form__field">
             <span>E-mail</span>
             <div class="login-form__input-shell">
@@ -66,23 +60,85 @@
               <input
                 [(ngModel)]="password"
                 name="password"
-                type="password"
+                [type]="showPassword ? 'text' : 'password'"
                 placeholder="Digite sua senha"
                 autocomplete="current-password"
                 required />
-              <span class="login-form__trailing" aria-hidden="true">👁</span>
+              <button
+                class="login-form__toggle"
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+              </button>
             </div>
           </label>
 
-          <a class="login-form__forgot" routerLink="/forgot-password">Esqueci minha senha</a>
+          <div class="login-form__links">
+            <button type="button" (click)="openForgotPasswordModal($event)">Esqueci minha senha</button>
+          </div>
 
-          <button type="submit" class="btn-primary login-form__submit login-form__submit--editorial" [disabled]="loading">
-            {{ loading ? 'Autenticando...' : 'Entrar' }}
+          <button type="submit" class="login-form__submit" [disabled]="loading">
+            <span class="login-form__submit-icon" aria-hidden="true">→</span>
+            <span>{{ loading ? 'Autenticando...' : 'Entrar no dashboard' }}</span>
           </button>
         </form>
 
-        <div class="login-main__help">Precisa de ajuda?</div>
-      </div>
+        <p class="login-main__register">
+          Ainda não tem uma conta?
+          <a routerLink="/register">Criar conta agora.</a>
+        </p>
+      </section>
     </main>
+  </div>
+
+  <div class="login-modal" *ngIf="showForgotPasswordModal" role="presentation" (click)="closeForgotPasswordModal()">
+    <section
+      class="login-modal__card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="forgot-title"
+      (click)="$event.stopPropagation()">
+      <button
+        class="login-modal__close"
+        type="button"
+        aria-label="Fechar recuperação de senha"
+        [disabled]="forgotLoading"
+        (click)="closeForgotPasswordModal()">
+        ×
+      </button>
+
+      <p class="login-eyebrow">Recuperação de senha</p>
+      <h2 id="forgot-title">Esqueci minha senha</h2>
+      <p>
+        Informe o e-mail da sua conta. Se ele estiver cadastrado, enviaremos um link de redefinição.
+      </p>
+
+      <div class="login-modal__success" *ngIf="forgotSuccess">
+        Enviamos as instruções para o e-mail informado.
+      </div>
+
+      <form class="login-form login-form--modal" (ngSubmit)="submitForgotPassword()" *ngIf="!forgotSuccess">
+        <label class="login-form__field">
+          <span>E-mail</span>
+          <div class="login-form__input-shell">
+            <input
+              [(ngModel)]="forgotEmail"
+              name="forgotEmail"
+              type="email"
+              placeholder="Digite seu e-mail"
+              autocomplete="email"
+              required />
+          </div>
+        </label>
+
+        <p class="login-modal__error" *ngIf="forgotError">{{ forgotError }}</p>
+
+        <button type="submit" class="login-form__submit" [disabled]="forgotLoading">
+          <span class="login-form__submit-icon" aria-hidden="true">→</span>
+          <span>{{ forgotLoading ? 'Enviando...' : 'Enviar link' }}</span>
+        </button>
+      </form>
+    </section>
   </div>
 </section>

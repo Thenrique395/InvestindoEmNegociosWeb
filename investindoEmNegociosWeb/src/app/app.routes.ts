@@ -54,6 +54,11 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
   },
   {
+    path: 'register',
+    data: { preload: false },
+    loadComponent: () => import('./signup/signup.component').then((m) => m.SignupComponent),
+  },
+  {
     path: 'forgot-password',
     data: { preload: false },
     loadComponent: () =>
@@ -192,7 +197,7 @@ export const routes: Routes = [
   {
     path: 'categorias',
     canActivate: [authGuard, roleGuard],
-    data: { feature: APP_FEATURE_KEYS.categoriesRead, preload: false },
+    data: { minRole: 'Intermediate', preload: false },
     loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent),
   },
   {

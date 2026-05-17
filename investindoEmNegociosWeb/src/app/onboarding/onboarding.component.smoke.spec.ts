@@ -19,6 +19,10 @@ class UiFeedbackServiceMock {
   info = jasmine.createSpy();
 }
 
+class AuthServiceMock {
+  getRole = jasmine.createSpy().and.returnValue('Basic');
+}
+
 class AccountsServiceMock {
   list = jasmine.createSpy().and.returnValue(of([]));
   create = jasmine.createSpy().and.returnValue(of({ id: 'acc-1' }));
@@ -46,6 +50,7 @@ function createComponent() {
   const profile = new ProfileServiceMock();
   const onboarding = new OnboardingServiceMock();
   const ui = new UiFeedbackServiceMock();
+  const auth = new AuthServiceMock();
   const accounts = new AccountsServiceMock();
   const cards = new CardsServiceMock();
   const plans = new PlansServiceMock();
@@ -58,13 +63,14 @@ function createComponent() {
     router as any,
     onboarding as any,
     ui as any,
+    auth as any,
     accounts as any,
     cards as any,
     plans as any,
     categories as any
   );
 
-  return { component, profile, onboarding, ui, accounts, cards, plans, categories, router };
+  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, router };
 }
 
 describe('OnboardingComponent smoke', () => {
@@ -117,7 +123,7 @@ describe('OnboardingComponent smoke', () => {
     expect(payload.fullName).toBe('Tiago Teste');
     expect(payload.financialGoal).toBe('vida-financeira');
     expect(payload.intelligenceMode).toBe('C');
-    expect(payload.carryOverDay).toBe(15);
+    expect(payload.carryOverDay).toBe(1);
     expect(ctx.component.step).toBe(1);
     expect(ctx.onboarding.updateStatus).toHaveBeenCalledWith({ step: 1, completed: false });
   });
@@ -125,6 +131,7 @@ describe('OnboardingComponent smoke', () => {
   it('deve tratar erro 401 no submit redirecionando para login', () => {
     const ctx = createComponent();
     ctx.component.selectFocus('sair-dividas');
+    ctx.component.intelligenceMode = 'B';
     ctx.component.form.patchValue({
       fullName: 'Tiago Teste',
       document: '015.876.104-93',
@@ -161,7 +168,7 @@ describe('OnboardingComponent smoke', () => {
     ctx.component.saveInitialEntriesAndFinish();
 
     expect(ctx.ui.warning).toHaveBeenCalled();
-    expect(ctx.component.step).toBe(1);
+    expect(ctx.component.step).toBe(3);
     expect(ctx.router.navigateByUrl).not.toHaveBeenCalledWith('/dashboard');
   });
 

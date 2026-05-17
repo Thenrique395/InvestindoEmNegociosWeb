@@ -51,7 +51,7 @@
             routerLink="/dashboard"
             routerLinkActive="active"
             #dashActive="routerLinkActive"
-            *ngIf="hasFeature(features.cardsRead)"
+            *ngIf="hasAccess('Basic')"
             (click)="reloadIfSame('/dashboard', $event)"
             class="group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
             [ngClass]="dashActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
@@ -224,11 +224,11 @@
             #metaActive="routerLinkActive"
             *ngIf="hasAccess('Basic')"
             (click)="reloadIfSame('/metas', $event)"
-            class="group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]"
+            class="group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]"
             [ngClass]="metaActive.isActive ? 'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]' : ''"
           >
             <span
-              class="nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]"
+              class="nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]"
               [ngClass]="metaActive.isActive ? 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]' : ''"
               aria-hidden="true"
             >
@@ -241,7 +241,7 @@
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
-            <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Metas</span>
+            <span class="nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]">Metas</span>
           </a>
           <a
             routerLink="/emprestimos"
@@ -455,7 +455,13 @@
               <span *ngIf="isLightTheme">🌙</span>
             </button>
             <div class="user-menu relative" [class.open]="userMenuOpen">
-              <button class="user-trigger inline-flex min-w-0 max-w-[min(320px,72vw)] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[12px] py-[8px] font-semibold text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleUserMenu()">
+              <button
+                class="user-trigger inline-flex min-w-0 max-w-[min(320px,72vw)] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[12px] py-[8px] font-semibold text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
+                type="button"
+                aria-haspopup="menu"
+                aria-controls="user-menu-dropdown"
+                [attr.aria-expanded]="userMenuOpen"
+                (click)="toggleUserMenu()">
                 <span class="avatar grid h-9 w-9 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
                   <img class="h-full w-full rounded-full object-cover" *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar" />
                   <span *ngIf="!avatarUrl">{{ userInitials }}</span>
@@ -463,54 +469,75 @@
                 <span class="user-name min-w-0 max-w-[190px] truncate text-[var(--text-md)]">{{ displayName }}</span>
                 <span class="caret text-[var(--text-md)] opacity-70">▾</span>
               </button>
-              <div class="user-dropdown absolute right-0 z-30 mt-3 grid min-w-[260px] gap-3 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[0_18px_40px_rgba(15,23,42,0.18)]" *ngIf="userMenuOpen">
-                <div class="flex items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--space-2)] py-[var(--space-1)]">
-                  <div class="grid h-10 w-10 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-semibold">
+              <div
+                id="user-menu-dropdown"
+                class="user-dropdown absolute right-0 z-30 mt-3 grid min-w-[320px] gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
+                role="menu"
+                aria-label="Menu do usuário"
+                *ngIf="userMenuOpen">
+                <div class="user-dropdown__summary flex items-center gap-3 rounded-[16px] border border-[var(--border)] bg-[linear-gradient(135deg,rgba(37,99,235,0.10),rgba(255,255,255,0.92))] px-4 py-3">
+                  <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-bold text-[var(--primary)]">
                     {{ userInitials }}
                   </div>
                   <div class="min-w-0">
-                    <p class="m-0 truncate text-[var(--text-sm)] font-semibold">{{ displayName }}</p>
-                    <p class="m-0 text-[12px] text-[var(--text-muted)]">Nível: {{ currentRole || 'Basic' }}</p>
+                    <p class="m-0 truncate text-[var(--text-md)] font-bold text-[var(--text)]">{{ displayName }}</p>
+                    <p class="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Perfil {{ currentRole || 'Basic' }}</p>
                   </div>
                 </div>
-                <div class="section grid gap-1">
-                  <p class="section-title m-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Perfil</p>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/perfil" (click)="reloadIfSame('/perfil', $event)">Editar perfil</button>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/assinatura" (click)="reloadIfSame('/assinatura', $event)">Minha assinatura</button>
-                </div>
-                <div class="section grid gap-1">
-                  <p class="section-title m-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Preferências</p>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/preferencias" (click)="reloadIfSame('/preferencias', $event)">Moeda/Locale</button>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/preferencias" (click)="reloadIfSame('/preferencias', $event)">Página inicial padrão</button>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/preferencias" (click)="reloadIfSame('/preferencias', $event)">Notificações & lembretes</button>
-                </div>
-                <div class="section grid gap-1">
-                  <p class="section-title m-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Segurança</p>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/seguranca" (click)="reloadIfSame('/seguranca', $event)">Sessões ativas</button>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/seguranca" (click)="reloadIfSame('/seguranca', $event)">2FA / Últimos logins</button>
-                </div>
-                <div class="section grid gap-1">
-                  <p class="section-title m-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dados</p>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/dados" (click)="reloadIfSame('/dados', $event)">Exportar/Importar</button>
-                  <button type="button" class="w-full rounded-[10px] px-[var(--space-1)] py-[var(--space-1)] text-left text-[var(--text-sm)] font-semibold hover:bg-[var(--surface-2)]" routerLink="/dados" (click)="reloadIfSame('/dados', $event)">Backup / Apagar conta</button>
+                <div class="user-dropdown__actions grid gap-1">
+                  <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/perfil" (click)="reloadIfSame('/perfil', $event)">
+                    <span class="user-dropdown__icon" aria-hidden="true">U</span>
+                    <span>
+                      <strong>Perfil</strong>
+                      <small>Nome, foto e dados pessoais</small>
+                    </span>
+                  </button>
+                  <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/assinatura" (click)="reloadIfSame('/assinatura', $event)">
+                    <span class="user-dropdown__icon" aria-hidden="true">$</span>
+                    <span>
+                      <strong>Minha assinatura</strong>
+                      <small>Plano, cobrança e acesso</small>
+                    </span>
+                  </button>
+                  <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/preferencias" (click)="reloadIfSame('/preferencias', $event)">
+                    <span class="user-dropdown__icon" aria-hidden="true">P</span>
+                    <span>
+                      <strong>Preferências</strong>
+                      <small>Moeda, idioma e alertas</small>
+                    </span>
+                  </button>
+                  <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/seguranca" (click)="reloadIfSame('/seguranca', $event)">
+                    <span class="user-dropdown__icon" aria-hidden="true">S</span>
+                    <span>
+                      <strong>Segurança</strong>
+                      <small>Sessões, acessos e proteção</small>
+                    </span>
+                  </button>
+                  <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/dados" (click)="reloadIfSame('/dados', $event)">
+                    <span class="user-dropdown__icon" aria-hidden="true">D</span>
+                    <span>
+                      <strong>Dados da conta</strong>
+                      <small>Exportação, backup e exclusão</small>
+                    </span>
+                  </button>
                 </div>
                 <div class="section">
-                  <button type="button" class="logout w-full rounded-[8px] px-[var(--space-1)] py-[var(--space-1)] text-left font-semibold !text-[var(--danger)] hover:bg-[var(--surface-2)]" (click)="logout()">Sair</button>
+                  <button type="button" class="logout user-dropdown__logout" role="menuitem" (click)="logout()">Sair da conta</button>
                 </div>
               </div>
             </div>
           </div>
         </header>
 
-        <main class="main relative z-[1] flex flex-col gap-8 p-[var(--space-3)]" [ngClass]="isReceitasRoute ? 'gap-4 px-[var(--space-3)] pb-[var(--space-3)] pt-0 -mt-12' : ''">
+        <main class="main relative z-0 flex flex-col gap-8 p-[var(--space-3)]" [ngClass]="isReceitasRoute ? 'gap-4 px-[var(--space-3)] pb-[var(--space-3)] pt-0 -mt-12' : ''">
           <router-outlet />
         </main>
         <nav class="mobile-dock" *ngIf="isLogged" aria-label="Navegação rápida">
           <a routerLink="/dashboard" [class.active]="isActiveRoute('/dashboard')">Início</a>
           <a routerLink="/despesas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/despesas')">Despesas</a>
-          <a routerLink="/contas" *ngIf="hasAccess('Intermediate')" [class.active]="isActiveRoute('/contas')">Contas</a>
-          <a routerLink="/emprestimos" *ngIf="hasAccess('Intermediate')" [class.active]="isActiveRoute('/emprestimos')">Empréstimos</a>
-          <a routerLink="/investimentos" *ngIf="hasFeature(features.investmentsAccess)" [class.active]="isActiveRoute('/investimentos')">Wealth</a>
+          <a routerLink="/receitas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/receitas')">Receitas</a>
+          <a routerLink="/cartoes" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/cartoes')">Cartões</a>
+          <a routerLink="/metas" *ngIf="hasAccess('Basic')" [class.active]="isActiveRoute('/metas')">Metas</a>
         </nav>
       </div>
     </div>
