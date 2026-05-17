@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+test-results
+.angular
+.vscode
+*.log
+npm-debug.log*

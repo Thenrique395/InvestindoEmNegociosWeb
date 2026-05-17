@@ -24,12 +24,8 @@ jobs:
           cache: npm
           cache-dependency-path: investindoEmNegociosWeb/package-lock.json
 
-      - name: Validate frontend (test + build)
-        working-directory: ./investindoEmNegociosWeb
-        run: |
-          npm ci
-          npm run test -- --watch=false --browsers=ChromeHeadless
-          npm run build
+      - name: Validate frontend quality gate
+        run: bash ./scripts/quality-frontend.sh
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
