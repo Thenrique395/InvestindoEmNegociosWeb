@@ -63,16 +63,3 @@
   /* Typography */
   --font-family-sans: var(--font-sans, 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
 }
-
-.theme-dark,
-[data-theme='dark'] {
-  --color-bg: var(--bg, #0b1220);
-  --color-surface: var(--surface, #111827);
-  --color-surface-muted: var(--surface-2, #0f172a);
-  --color-surface-raised: var(--surface-3, #1f2937);
-  --color-text: var(--text, #e5e7eb);
-  --color-text-secondary: var(--text-secondary, #94a3b8);
-  --color-text-muted: var(--text-muted, #64748b);
-  --color-border: var(--border, #1f2937);
-  --color-border-strong: var(--border-strong, #334155);
-}

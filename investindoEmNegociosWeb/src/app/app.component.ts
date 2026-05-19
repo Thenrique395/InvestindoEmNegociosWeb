@@ -250,11 +250,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return hasFeatureForRole(this.currentRole, featureKey);
   }
 
-  toggleTheme(): void {
-    const theme = this.themeService.toggle();
-    this.isLightTheme = theme === 'light';
-  }
-
   toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
     if (this.userMenuOpen) {

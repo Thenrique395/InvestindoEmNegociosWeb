@@ -19,14 +19,6 @@
         <a routerLink="/calculadora" routerLinkActive="active" (click)="reloadIfSame('/calculadora', $event)">Calculadora</a>
       </nav>
       <div class="topbar__actions">
-        <button class="theme-toggle icon grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[16px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleTheme()" [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
-          @if (!isLightTheme) {
-            <span>☀️</span>
-          }
-          @if (isLightTheme) {
-            <span>🌙</span>
-          }
-        </button>
         <a class="signup-link" routerLink="/checkout" [queryParams]="{ plan: 'intermediate', cycle: 'Monthly' }">Contratar</a>
         <button class="login-link" type="button" (click)="goToLogin()">Entrar</button>
       </div>
@@ -484,14 +476,6 @@
                 </div>
               }
             </div>
-            <button class="theme-toggle icon grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="toggleTheme()" [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
-              @if (!isLightTheme) {
-                <span>☀️</span>
-              }
-              @if (isLightTheme) {
-                <span>🌙</span>
-              }
-            </button>
             <div class="user-menu relative" [class.open]="userMenuOpen">
               <button
                 class="user-trigger inline-flex min-w-0 max-w-[min(320px,72vw)] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[12px] py-[8px] font-semibold text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"

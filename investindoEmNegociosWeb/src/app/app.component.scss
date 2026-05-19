@@ -96,8 +96,7 @@
   color: var(--text);
 }
 
-.notif-trigger,
-.theme-toggle {
+.notif-trigger {
   width: 44px;
   height: 44px;
 }
@@ -269,14 +268,12 @@
 }
 
 .page--logged .notif-trigger,
-.page--logged .theme-toggle,
 .page--logged .user-trigger {
   border-radius: 16px !important;
   box-shadow: none !important;
 }
 
 .page--logged .notif-trigger:hover,
-.page--logged .theme-toggle:hover,
 .page--logged .user-trigger:hover {
   border-color: color-mix(in srgb, var(--primary) 34%, var(--border)) !important;
 }
