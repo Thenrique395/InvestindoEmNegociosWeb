@@ -18,9 +18,11 @@
               class="expenses-table__sort"
               (click)="ordenarPor('nome')">
               Nome
-              <span class="expenses-table__sort-dir" *ngIf="sortBy === 'nome'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'nome') {
+                <span class="expenses-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="expenses-table__cell">
@@ -29,9 +31,11 @@
               class="expenses-table__sort"
               (click)="ordenarPor('categoria')">
               Categoria
-              <span class="expenses-table__sort-dir" *ngIf="sortBy === 'categoria'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'categoria') {
+                <span class="expenses-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="expenses-table__cell">
@@ -40,9 +44,11 @@
               class="expenses-table__sort"
               (click)="ordenarPor('pagamento')">
               Pagamento
-              <span class="expenses-table__sort-dir" *ngIf="sortBy === 'pagamento'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'pagamento') {
+                <span class="expenses-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="expenses-table__cell">
@@ -51,9 +57,11 @@
               class="expenses-table__sort"
               (click)="ordenarPor('status')">
               Status
-              <span class="expenses-table__sort-dir" *ngIf="sortBy === 'status'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'status') {
+                <span class="expenses-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="expenses-table__cell">
@@ -62,9 +70,11 @@
               class="expenses-table__sort"
               (click)="ordenarPor('vencimento')">
               Vencimento
-              <span class="expenses-table__sort-dir" *ngIf="sortBy === 'vencimento'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'vencimento') {
+                <span class="expenses-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="expenses-table__cell expenses-table__cell--value">
@@ -73,73 +83,81 @@
               class="expenses-table__sort"
               (click)="ordenarPor('valor')">
               Valor
-              <span class="expenses-table__sort-dir" *ngIf="sortBy === 'valor'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'valor') {
+                <span class="expenses-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="expenses-table__cell expenses-table__cell--actions">Ações</th>
         </tr>
       </thead>
       <tbody class="expenses-table__body">
-        <tr *ngIf="!despesas.length">
-          <td class="expenses-table__empty" colspan="8">
-            <app-empty-state
-              [title]="emptyTitle"
-              [description]="emptyDescription"
-              [ctaLabel]="emptyCtaLabel"
-              icon="🧾"
+        @if (!despesas.length) {
+          <tr>
+            <td class="expenses-table__empty" colspan="8">
+              <app-empty-state
+                [title]="emptyTitle"
+                [description]="emptyDescription"
+                [ctaLabel]="emptyCtaLabel"
+                icon="🧾"
               (action)="emptyAction.emit()"></app-empty-state>
-          </td>
-        </tr>
-        <tr *ngFor="let d of despesas; trackBy: trackByIndex" class="expenses-table__row">
-          <td class="expenses-table__item expenses-table__item--checkbox">
-            <input
-              class="expenses-table__check"
-              type="checkbox"
-              [checked]="isSelecionado(d.id)"
-              [disabled]="d.status === 'PAID' || d.status === 'CANCELED'"
-              (change)="selecionar.emit({ id: d.id!, checked: $any($event.target)?.checked ?? false })"
-              aria-label="Selecionar despesa" />
-          </td>
-          <td class="expenses-table__item expenses-table__item--name">{{ d.nome }}</td>
-          <td class="expenses-table__item expenses-table__item--muted">{{ d.categoria || 'Sem categoria' }}</td>
-          <td class="expenses-table__item expenses-table__item--muted">{{ pagamentoLabel(d) }}</td>
-          <td class="expenses-table__item">
-            <app-status-badge [status]="d.status" [label]="statusLabel(d.status)"></app-status-badge>
-          </td>
-          <td class="expenses-table__item expenses-table__item--muted">{{ d.vencimento || '—' }}</td>
-          <td class="expenses-table__item expenses-table__item--value">
-            <span class="expenses-table__amount">R$ {{ d.valor | number:'1.2-2' }}</span>
-            <small *ngIf="d.parcelasTotal" class="expenses-table__recurrence">{{ d.parcelaNumero }}/{{ d.parcelasTotal }}</small>
-          </td>
-          <td class="expenses-table__item expenses-table__item--actions">
-            <div class="expenses-table__actions">
-              <button
-                type="button"
-                class="expenses-table__icon-action"
-                (click)="historico.emit(d.id!)"
-                aria-label="Histórico"
-                [attr.data-tooltip]="'Histórico'">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
-                  <path d="M12 10v6M12 7h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                class="expenses-table__icon-action"
-                (click)="editar.emit(d.id!)"
-                aria-label="Editar"
-                [attr.data-tooltip]="'Editar'">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        }
+        @for (d of despesas; track trackByIndex($index, d)) {
+          <tr class="expenses-table__row">
+            <td class="expenses-table__item expenses-table__item--checkbox">
+              <input
+                class="expenses-table__check"
+                type="checkbox"
+                [checked]="isSelecionado(d.id)"
+                [disabled]="d.status === 'PAID' || d.status === 'CANCELED'"
+                (change)="selecionar.emit({ id: d.id!, checked: $any($event.target)?.checked ?? false })"
+                aria-label="Selecionar despesa" />
+            </td>
+            <td class="expenses-table__item expenses-table__item--name">{{ d.nome }}</td>
+            <td class="expenses-table__item expenses-table__item--muted">{{ d.categoria || 'Sem categoria' }}</td>
+            <td class="expenses-table__item expenses-table__item--muted">{{ pagamentoLabel(d) }}</td>
+            <td class="expenses-table__item">
+              <app-status-badge [status]="d.status" [label]="statusLabel(d.status)"></app-status-badge>
+            </td>
+            <td class="expenses-table__item expenses-table__item--muted">{{ d.vencimento || '—' }}</td>
+            <td class="expenses-table__item expenses-table__item--value">
+              <span class="expenses-table__amount">R$ {{ d.valor | number:'1.2-2' }}</span>
+              @if (d.parcelasTotal) {
+                <small class="expenses-table__recurrence">{{ d.parcelaNumero }}/{{ d.parcelasTotal }}</small>
+              }
+            </td>
+            <td class="expenses-table__item expenses-table__item--actions">
+              <div class="expenses-table__actions">
+                <button
+                  type="button"
+                  class="expenses-table__icon-action"
+                  (click)="historico.emit(d.id!)"
+                  aria-label="Histórico"
+                  [attr.data-tooltip]="'Histórico'">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+                    <path d="M12 10v6M12 7h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="expenses-table__icon-action"
+                  (click)="editar.emit(d.id!)"
+                  aria-label="Editar"
+                  [attr.data-tooltip]="'Editar'">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>

@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { NgIf } from '@angular/common';
+
 
 type StatusBadgeTone = 'default' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
 type StatusBadgeSize = 'sm' | 'md';
@@ -7,14 +7,18 @@ type StatusBadgeSize = 'sm' | 'md';
 @Component({
   selector: 'app-status-badge',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
   template: `
     <span [class]="badgeClass()">
-      <span *ngIf="dot()" [class]="dotClass()" aria-hidden="true"></span>
+      @if (dot()) {
+        <span [class]="dotClass()" aria-hidden="true"></span>
+      }
       <ng-content></ng-content>
-      <span *ngIf="label()">{{ label() }}</span>
+      @if (label()) {
+        <span>{{ label() }}</span>
+      }
     </span>
-  `
+    `
 })
 export class StatusBadgeComponent {
   readonly tone = input<StatusBadgeTone>('default');

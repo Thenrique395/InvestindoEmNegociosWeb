@@ -42,6 +42,8 @@ export class AccountImportComponent {
   @Output() csvSelected = new EventEmitter<Event>();
   @Output() clearOfx = new EventEmitter<void>();
   @Output() clearCsv = new EventEmitter<void>();
+  @Output() importOfx = new EventEmitter<void>();
+  @Output() importCsv = new EventEmitter<void>();
   @Output() csvSkipDuplicatesChange = new EventEmitter<boolean>();
   @Output() categoryChanged = new EventEmitter<CategoryLearningCandidate>();
 

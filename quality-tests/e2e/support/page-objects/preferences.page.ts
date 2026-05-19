@@ -5,12 +5,12 @@ export class PreferencesPage {
 
   async goto() {
     await this.page.goto('/preferencias', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Configurações pessoais' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 1, name: 'Preferências' })).toBeVisible();
   }
 
   async expectLoaded() {
     await expect(this.page.getByRole('button', { name: /Português \+ BRL/i })).toBeVisible();
-    await expect(this.page.getByRole('button', { name: 'Salvar preferências' })).toBeVisible();
+    await expect(this.page.getByRole('button', { name: 'Salvar alterações' })).toBeVisible();
   }
 
   async saveNotifications(emailEnabled: boolean, daysBeforeDue: string) {
@@ -22,7 +22,7 @@ export class PreferencesPage {
     }
     await this.page.getByLabel('Dias antes do vencimento para alerta').fill(daysBeforeDue);
     const response = this.page.waitForResponse((res) => res.request().method() === 'PUT' && res.url().includes('/preferences'));
-    await this.page.getByRole('button', { name: 'Salvar preferências' }).click();
+    await this.page.getByRole('button', { name: 'Salvar alterações' }).click();
     return response;
   }
 

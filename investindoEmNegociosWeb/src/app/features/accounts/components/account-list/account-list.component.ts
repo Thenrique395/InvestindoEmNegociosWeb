@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { AccountResponse, AccountType } from '../../models/account.models';
 import { EmptyStateComponent } from '../../../../empty-state/empty-state.component';
 import { UiStateComponent } from '../../../../ui-state/ui-state.component';
@@ -8,7 +9,8 @@ import { UiStateComponent } from '../../../../ui-state/ui-state.component';
   selector: 'app-account-list',
   standalone: true,
   imports: [CommonModule, EmptyStateComponent, UiStateComponent],
-  templateUrl: './account-list.component.html'
+  templateUrl: './account-list.component.html',
+  styleUrl: './account-list.component.scss'
 })
 export class AccountListComponent {
   @Input() accounts: AccountResponse[] = [];

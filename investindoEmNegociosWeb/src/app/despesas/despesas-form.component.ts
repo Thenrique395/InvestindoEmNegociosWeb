@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { RouterLink } from '@angular/router';
@@ -9,7 +9,7 @@ import { CategoryDto } from '../categories.service';
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, DigitOnlyDirective, RouterLink],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink],
   templateUrl: './despesas-form.component.html',
   styleUrls: ['./despesas-form.component.scss']
 })
@@ -115,7 +115,7 @@ export class DespesasFormComponent {
   fechar(): void {
     this.cancel.emit();
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

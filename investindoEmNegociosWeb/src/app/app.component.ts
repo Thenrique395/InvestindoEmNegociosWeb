@@ -1,6 +1,6 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf, NgFor, NgClass, isPlatformBrowser } from '@angular/common';
+import { NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
@@ -17,7 +17,7 @@ import { ThemeService } from './theme.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
+  imports: [NgClass, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -229,7 +229,6 @@ export class AppComponent implements OnInit, OnDestroy {
       || current.startsWith('/checkout')
       || current.startsWith('/login')
       || current.startsWith('/register')
-      || current.startsWith('/design-lab')
       || current.startsWith('/calculadora')
       || current.startsWith('/forgot-password')
       || current.startsWith('/reset-password');
@@ -506,7 +505,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 }

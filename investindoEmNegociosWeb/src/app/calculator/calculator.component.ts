@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -53,7 +53,7 @@ interface CalcItem {
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [FormsModule, NgIf, NgFor, NgSwitch, NgSwitchCase, DecimalPipe, RouterLink],
+  imports: [FormsModule, DecimalPipe, RouterLink],
   templateUrl: './calculator.component.html',
   styleUrls: ['./calculator.component.scss']
 })
@@ -423,6 +423,14 @@ export class CalculatorComponent implements OnDestroy {
     return this.calculators.filter((c) => c.category === 'trabalhistas');
   }
 
+  get implementedCount(): number {
+    return this.calculators.filter((c) => c.implemented).length;
+  }
+
+  get pendingCount(): number {
+    return this.calculators.length - this.implementedCount;
+  }
+
   get selecionado(): CalcItem | undefined {
     return this.selected ? this.calculators.find((c) => c.id === this.selected) : undefined;
   }
@@ -430,7 +438,7 @@ export class CalculatorComponent implements OnDestroy {
   get isImplementado(): boolean {
     return !!this.selecionado?.implemented;
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

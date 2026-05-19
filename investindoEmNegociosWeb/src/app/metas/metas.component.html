@@ -77,370 +77,384 @@
         <span class="goals-filter__label">Ano</span>
         <select [(ngModel)]="filtroAno" (change)="aplicarFiltros()">
           <option [ngValue]="'ALL'">Todos</option>
-          <option *ngFor="let ano of anos; trackBy: trackByIndex" [ngValue]="ano">{{ ano }}</option>
+          @for (ano of anos; track trackByIndex($index, ano)) {
+            <option [ngValue]="ano">{{ ano }}</option>
+          }
         </select>
       </label>
       <label class="goals-filter">
         <span class="goals-filter__label">Status</span>
         <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
           <option [ngValue]="'ALL'">Todos</option>
-          <option *ngFor="let st of statusLista; trackBy: trackByIndex" [ngValue]="st.id">{{ st.label }}</option>
+          @for (st of statusLista; track trackByIndex($index, st)) {
+            <option [ngValue]="st.id">{{ st.label }}</option>
+          }
         </select>
       </label>
       <label class="goals-filter">
         <span class="goals-filter__label">Tipo</span>
         <select [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
           <option [ngValue]="'ALL'">Todos</option>
-          <option *ngFor="let tipo of metaTipos; trackBy: trackByIndex" [ngValue]="tipo.id">{{ tipo.label }}</option>
+          @for (tipo of metaTipos; track trackByIndex($index, tipo)) {
+            <option [ngValue]="tipo.id">{{ tipo.label }}</option>
+          }
         </select>
       </label>
     </div>
 
-    <div class="goals-state" *ngIf="loading">
-      <p>Carregando metas...</p>
-    </div>
+    @if (loading) {
+      <div class="goals-state">
+        <p>Carregando metas...</p>
+      </div>
+    }
 
-    <div *ngIf="!loading && metas.length === 0">
-      <app-empty-state
-        title="Sem metas cadastradas"
-        description="Crie sua primeira meta anual para acompanhar progresso, aporte e prazo."
-        ctaLabel="Adicionar meta"
-        icon="🎯"
+    @if (!loading && metas.length === 0) {
+      <div>
+        <app-empty-state
+          title="Sem metas cadastradas"
+          description="Crie sua primeira meta anual para acompanhar progresso, aporte e prazo."
+          ctaLabel="Adicionar meta"
+          icon="🎯"
         (action)="abrirModal()"></app-empty-state>
-    </div>
+      </div>
+    }
 
-    <div class="goals-sections" *ngIf="!loading && metas.length">
-      <section class="goals-section" *ngFor="let section of metasPorSecao; trackBy: trackBySection">
-        <header class="goals-section__header">
-          <div>
-            <p class="goals-section__eyebrow">{{ section.kind }}</p>
-            <h3>{{ section.label }}</h3>
-            <p>{{ section.subtitle }}</p>
-          </div>
-          <span class="goals-section__count">{{ section.metas.length }} meta(s)</span>
-        </header>
-
-        <div class="goals-grid">
-          <article class="goal-card" *ngFor="let meta of section.metas; trackBy: trackByGoal" [ngClass]="'goal-card--' + goalTone(meta)">
-            <header class="goal-card__header">
-              <div class="goal-card__identity">
-                <span class="goal-card__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                    <path d="M5 19V5M5 19h14M9 16v-4M13 16V8M17 16v-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <div>
-                  <p class="goal-card__eyebrow">{{ tipoMetaLabel(meta) }} · {{ meta.year }}</p>
-                  <h4>{{ meta.title }}</h4>
-                </div>
+    @if (!loading && metas.length) {
+      <div class="goals-sections">
+        @for (section of metasPorSecao; track trackBySection($index, section)) {
+          <section class="goals-section">
+            <header class="goals-section__header">
+              <div>
+                <p class="goals-section__eyebrow">{{ section.kind }}</p>
+                <h3>{{ section.label }}</h3>
+                <p>{{ section.subtitle }}</p>
               </div>
-              <span class="goal-card__status" [ngClass]="'goal-card__status--' + statusClass(meta.status)">
-                {{ statusLabel(meta.status) }}
-              </span>
+              <span class="goals-section__count">{{ section.metas.length }} meta(s)</span>
             </header>
-
-            <p class="goal-card__description" *ngIf="descricaoMeta(meta); else semDescricao">{{ descricaoMeta(meta) }}</p>
-            <ng-template #semDescricao>
-              <p class="goal-card__description">Meta criada para acompanhar seu avanço financeiro no período.</p>
-            </ng-template>
-
-            <div class="goal-card__progress">
-              <div class="goal-card__progress-head">
-                <span>{{ progresso(meta) }}% concluída</span>
-                <strong>Falta R$ {{ goalRemaining(meta) | number : '1.2-2' }}</strong>
-              </div>
-              <div class="goal-card__bar">
-                <span [style.width.%]="progresso(meta)"></span>
-              </div>
+            <div class="goals-grid">
+              @for (meta of section.metas; track trackByGoal($index, meta)) {
+                <article class="goal-card" [ngClass]="'goal-card--' + goalTone(meta)">
+                  <header class="goal-card__header">
+                    <div class="goal-card__identity">
+                      <span class="goal-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                          <path d="M5 19V5M5 19h14M9 16v-4M13 16V8M17 16v-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </span>
+                      <div>
+                        <p class="goal-card__eyebrow">{{ tipoMetaLabel(meta) }} · {{ meta.year }}</p>
+                        <h4>{{ meta.title }}</h4>
+                      </div>
+                    </div>
+                    <span class="goal-card__status" [ngClass]="'goal-card__status--' + statusClass(meta.status)">
+                      {{ statusLabel(meta.status) }}
+                    </span>
+                  </header>
+                  @if (descricaoMeta(meta)) {
+                    <p class="goal-card__description">{{ descricaoMeta(meta) }}</p>
+                  } @else {
+                    <p class="goal-card__description">Meta criada para acompanhar seu avanço financeiro no período.</p>
+                  }
+                  <div class="goal-card__progress">
+                    <div class="goal-card__progress-head">
+                      <span>{{ progresso(meta) }}% concluída</span>
+                      <strong>Falta R$ {{ goalRemaining(meta) | number : '1.2-2' }}</strong>
+                    </div>
+                    <div class="goal-card__bar">
+                      <span [style.width.%]="progresso(meta)"></span>
+                    </div>
+                  </div>
+                  <div class="goal-card__metrics" aria-label="Resumo financeiro da meta">
+                    <span>
+                      <small>Meta</small>
+                      <strong>R$ {{ meta.targetAmount | number : '1.2-2' }}</strong>
+                    </span>
+                    <span>
+                      <small>Acumulado</small>
+                      <strong>R$ {{ meta.currentAmount | number : '1.2-2' }}</strong>
+                    </span>
+                    <span>
+                      <small>Aporte</small>
+                      @if (meta.expectedMonthly) {
+                        <strong>R$ {{ meta.expectedMonthly | number : '1.2-2' }}</strong>
+                      } @else {
+                        <strong>Sem previsão</strong>
+                      }
+                    </span>
+                  </div>
+                  @if (contribResumo[meta.id]) {
+                    <button
+                      type="button"
+                      class="goal-card__history"
+                      [attr.title]="aporteTooltip(meta.id)"
+                      (click)="abrirHistorico(meta)"
+                      >
+                      Ver {{ contribResumo[meta.id].total }} aporte(s) registrado(s)
+                    </button>
+                  }
+                  <footer class="goal-card__actions">
+                    @if (!isCanceled(meta)) {
+                      <button type="button" class="goal-card__button goal-card__button--primary" (click)="abrirModalAporte(meta)">Registrar aporte</button>
+                    }
+                    @if (isCanceled(meta)) {
+                      <button type="button" class="goal-card__button goal-card__button--success" (click)="reativarMeta(meta)">Reativar</button>
+                    }
+                    <div class="goal-card__secondary-actions">
+                      <button type="button" class="goal-card__button goal-card__button--ghost" (click)="abrirModalEditar(meta)">Editar</button>
+                      @if (!isCanceled(meta)) {
+                        <button type="button" class="goal-card__button goal-card__button--danger" (click)="cancelarMeta(meta)">Cancelar</button>
+                      }
+                    </div>
+                  </footer>
+                </article>
+              }
             </div>
-
-            <div class="goal-card__metrics" aria-label="Resumo financeiro da meta">
-              <span>
-                <small>Meta</small>
-                <strong>R$ {{ meta.targetAmount | number : '1.2-2' }}</strong>
-              </span>
-              <span>
-                <small>Acumulado</small>
-                <strong>R$ {{ meta.currentAmount | number : '1.2-2' }}</strong>
-              </span>
-              <span>
-                <small>Aporte</small>
-                <strong *ngIf="meta.expectedMonthly; else semPrevisao">R$ {{ meta.expectedMonthly | number : '1.2-2' }}</strong>
-                <ng-template #semPrevisao>
-                  <strong>Sem previsão</strong>
-                </ng-template>
-              </span>
-            </div>
-
-            <button
-              type="button"
-              class="goal-card__history"
-              *ngIf="contribResumo[meta.id]"
-              [attr.title]="aporteTooltip(meta.id)"
-              (click)="abrirHistorico(meta)"
-            >
-              Ver {{ contribResumo[meta.id].total }} aporte(s) registrado(s)
-            </button>
-
-            <footer class="goal-card__actions">
-              <button type="button" class="goal-card__button goal-card__button--primary" *ngIf="!isCanceled(meta)" (click)="abrirModalAporte(meta)">Registrar aporte</button>
-              <button type="button" class="goal-card__button goal-card__button--success" *ngIf="isCanceled(meta)" (click)="reativarMeta(meta)">Reativar</button>
-              <div class="goal-card__secondary-actions">
-                <button type="button" class="goal-card__button goal-card__button--ghost" (click)="abrirModalEditar(meta)">Editar</button>
-                <button type="button" class="goal-card__button goal-card__button--danger" *ngIf="!isCanceled(meta)" (click)="cancelarMeta(meta)">Cancelar</button>
-              </div>
-            </footer>
-          </article>
-        </div>
-      </section>
-    </div>
+          </section>
+        }
+      </div>
+    }
   </section>
 
-  <div class="goals-modal" *ngIf="mostrarModal">
-    <div class="goals-modal__backdrop" (click)="fecharModal()"></div>
-
-    <div class="goals-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="goal-modal-title">
-      <header class="goals-modal__header">
-        <div class="goals-modal__title-wrap">
-          <p class="goals-modal__eyebrow">{{ editando ? 'Editar meta' : 'Cadastrar meta' }}</p>
-          <h3 id="goal-modal-title" class="goals-modal__title">{{ editando ? 'Atualizar meta anual' : 'Nova meta anual' }}</h3>
-          <p class="goals-modal__subtitle">Defina o objetivo, o prazo e o valor esperado para acompanhar a evolução da meta.</p>
-        </div>
-        <button class="goals-modal__close" type="button" [disabled]="saving" (click)="fecharModal()" aria-label="Fechar">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
-      </header>
-
-      <div class="goals-modal__body">
-        <form class="goals-modal__form" (ngSubmit)="salvar()">
-          <section class="goals-modal__section">
-            <div class="goals-modal__section-head">
-              <h4 class="goals-modal__section-title">Identidade da meta</h4>
-              <p class="goals-modal__section-text">Escolha o tipo e dê um nome claro para reconhecer essa meta rapidamente.</p>
-            </div>
-
-            <div class="goals-modal__grid goals-modal__grid--identity">
-              <label class="goals-field">
-                <span class="goals-field__label">Tipo da meta</span>
-                <select class="goals-field__control" [(ngModel)]="metaTipo" name="metaTipo">
-                  <option *ngFor="let tipo of metaTipos; trackBy: trackByIndex" [ngValue]="tipo.id">{{ tipo.label }}</option>
-                </select>
-              </label>
-
-              <label class="goals-field">
-                <span class="goals-field__label">Nome da meta</span>
-                <input class="goals-field__control" type="text" [(ngModel)]="metaNome" name="metaNome" placeholder="Ex.: Fundo de emergência" />
-              </label>
-
-              <label class="goals-field goals-field--full">
-                <span class="goals-field__label">Descrição (opcional)</span>
-                <textarea class="goals-field__control goals-field__control--textarea" [(ngModel)]="metaDescricao" name="metaDescricao" rows="3" placeholder="Notas ou critérios da meta"></textarea>
-              </label>
-            </div>
-          </section>
-
-          <section class="goals-modal__section">
-            <div class="goals-modal__section-head">
-              <h4 class="goals-modal__section-title">Planejamento financeiro</h4>
-              <p class="goals-modal__section-text">Informe o valor total, uma previsão mensal e o prazo que orienta o acompanhamento.</p>
-            </div>
-
-            <div class="goals-modal__grid goals-modal__grid--financial">
-              <label class="goals-field">
-                <span class="goals-field__label">Valor da meta</span>
-                <input class="goals-field__control" type="text" [(ngModel)]="metaValor" name="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
-              </label>
-
-              <label class="goals-field">
-                <span class="goals-field__label">Aporte mensal previsto</span>
-                <input class="goals-field__control" type="text" [(ngModel)]="metaMensal" name="metaMensal" digitOnly (input)="formatarMensal()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
-              </label>
-
-              <label class="goals-field">
-                <span class="goals-field__label">Data de vencimento</span>
-                <input class="goals-field__control" type="text" [(ngModel)]="metaVencimento" name="metaVencimento" digitOnly (input)="formatarVencimento()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 31/12/2026" />
-              </label>
-
-              <label class="goals-field">
-                <span class="goals-field__label">Ano</span>
-                <input class="goals-field__control" type="text" [(ngModel)]="metaAno" name="metaAno" digitOnly (input)="formatarAno()" inputmode="numeric" pattern="[0-9]*" maxlength="4" />
-              </label>
-            </div>
-          </section>
-
-          <footer class="goals-modal__actions">
-            <button type="button" class="goals-modal__secondary" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
-            <button type="submit" class="goals-modal__primary" [disabled]="saving">
-              {{ saving ? 'Salvando...' : 'Salvar meta' }}
-            </button>
-          </footer>
-        </form>
-
-        <aside class="goals-preview" aria-label="Prévia da meta">
-          <div class="goals-preview__card">
-            <div class="goals-preview__top">
-              <span class="goals-preview__chip">Meta</span>
-              <span class="goals-preview__kind">{{ metaTipoLabel }}</span>
-            </div>
-
-            <div>
-              <span class="goals-preview__label">Objetivo</span>
-              <strong class="goals-preview__name">{{ metaPreviewNome }}</strong>
-            </div>
-
-            <strong class="goals-preview__amount">{{ metaPreviewValor }}</strong>
-
-            <div class="goals-preview__footer">
+  @if (mostrarModal) {
+    <div class="goals-modal">
+      <div class="goals-modal__backdrop" (click)="fecharModal()"></div>
+      <div class="goals-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="goal-modal-title">
+        <header class="goals-modal__header">
+          <div class="goals-modal__title-wrap">
+            <p class="goals-modal__eyebrow">{{ editando ? 'Editar meta' : 'Cadastrar meta' }}</p>
+            <h3 id="goal-modal-title" class="goals-modal__title">{{ editando ? 'Atualizar meta anual' : 'Nova meta anual' }}</h3>
+            <p class="goals-modal__subtitle">Defina o objetivo, o prazo e o valor esperado para acompanhar a evolução da meta.</p>
+          </div>
+          <button class="goals-modal__close" type="button" [disabled]="saving" (click)="fecharModal()" aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </header>
+        <div class="goals-modal__body">
+          <form class="goals-modal__form" (ngSubmit)="salvar()">
+            <section class="goals-modal__section">
+              <div class="goals-modal__section-head">
+                <h4 class="goals-modal__section-title">Identidade da meta</h4>
+                <p class="goals-modal__section-text">Escolha o tipo e dê um nome claro para reconhecer essa meta rapidamente.</p>
+              </div>
+              <div class="goals-modal__grid goals-modal__grid--identity">
+                <label class="goals-field">
+                  <span class="goals-field__label">Tipo da meta</span>
+                  <select class="goals-field__control" [(ngModel)]="metaTipo" name="metaTipo">
+                    @for (tipo of metaTipos; track trackByIndex($index, tipo)) {
+                      <option [ngValue]="tipo.id">{{ tipo.label }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="goals-field">
+                  <span class="goals-field__label">Nome da meta</span>
+                  <input class="goals-field__control" type="text" [(ngModel)]="metaNome" name="metaNome" placeholder="Ex.: Fundo de emergência" />
+                </label>
+                <label class="goals-field goals-field--full">
+                  <span class="goals-field__label">Descrição (opcional)</span>
+                  <textarea class="goals-field__control goals-field__control--textarea" [(ngModel)]="metaDescricao" name="metaDescricao" rows="3" placeholder="Notas ou critérios da meta"></textarea>
+                </label>
+              </div>
+            </section>
+            <section class="goals-modal__section">
+              <div class="goals-modal__section-head">
+                <h4 class="goals-modal__section-title">Planejamento financeiro</h4>
+                <p class="goals-modal__section-text">Informe o valor total, uma previsão mensal e o prazo que orienta o acompanhamento.</p>
+              </div>
+              <div class="goals-modal__grid goals-modal__grid--financial">
+                <label class="goals-field">
+                  <span class="goals-field__label">Valor da meta</span>
+                  <input class="goals-field__control" type="text" [(ngModel)]="metaValor" name="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
+                </label>
+                <label class="goals-field">
+                  <span class="goals-field__label">Aporte mensal previsto</span>
+                  <input class="goals-field__control" type="text" [(ngModel)]="metaMensal" name="metaMensal" digitOnly (input)="formatarMensal()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
+                </label>
+                <label class="goals-field">
+                  <span class="goals-field__label">Data de vencimento</span>
+                  <input class="goals-field__control" type="text" [(ngModel)]="metaVencimento" name="metaVencimento" digitOnly (input)="formatarVencimento()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 31/12/2026" />
+                </label>
+                <label class="goals-field">
+                  <span class="goals-field__label">Ano</span>
+                  <input class="goals-field__control" type="text" [(ngModel)]="metaAno" name="metaAno" digitOnly (input)="formatarAno()" inputmode="numeric" pattern="[0-9]*" maxlength="4" />
+                </label>
+              </div>
+            </section>
+            <footer class="goals-modal__actions">
+              <button type="button" class="goals-modal__secondary" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
+              <button type="submit" class="goals-modal__primary" [disabled]="saving">
+                {{ saving ? 'Salvando...' : 'Salvar meta' }}
+              </button>
+            </footer>
+          </form>
+          <aside class="goals-preview" aria-label="Prévia da meta">
+            <div class="goals-preview__card">
+              <div class="goals-preview__top">
+                <span class="goals-preview__chip">Meta</span>
+                <span class="goals-preview__kind">{{ metaTipoLabel }}</span>
+              </div>
               <div>
-                <span class="goals-preview__label">Prazo</span>
-                <strong>{{ metaPreviewPrazo }}</strong>
+                <span class="goals-preview__label">Objetivo</span>
+                <strong class="goals-preview__name">{{ metaPreviewNome }}</strong>
               </div>
-              <div class="goals-preview__tail">
-                <span class="goals-preview__label">Ano</span>
-                <strong>{{ metaAno || '2026' }}</strong>
+              <strong class="goals-preview__amount">{{ metaPreviewValor }}</strong>
+              <div class="goals-preview__footer">
+                <div>
+                  <span class="goals-preview__label">Prazo</span>
+                  <strong>{{ metaPreviewPrazo }}</strong>
+                </div>
+                <div class="goals-preview__tail">
+                  <span class="goals-preview__label">Ano</span>
+                  <strong>{{ metaAno || '2026' }}</strong>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="goals-preview__meta">
-            <div class="goals-preview__meta-item">
-              <span>Aporte previsto</span>
-              <strong>{{ metaPreviewMensal }}</strong>
+            <div class="goals-preview__meta">
+              <div class="goals-preview__meta-item">
+                <span>Aporte previsto</span>
+                <strong>{{ metaPreviewMensal }}</strong>
+              </div>
+              <div class="goals-preview__meta-item">
+                <span>Tipo da meta</span>
+                <strong>{{ metaTipoLabel }}</strong>
+              </div>
+              <div class="goals-preview__meta-item">
+                <span>Status inicial</span>
+                <strong>{{ editando ? 'Atualização' : 'Planejada' }}</strong>
+              </div>
             </div>
-            <div class="goals-preview__meta-item">
-              <span>Tipo da meta</span>
-              <strong>{{ metaTipoLabel }}</strong>
-            </div>
-            <div class="goals-preview__meta-item">
-              <span>Status inicial</span>
-              <strong>{{ editando ? 'Atualização' : 'Planejada' }}</strong>
-            </div>
-          </div>
-        </aside>
+          </aside>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
-  <div class="modal" *ngIf="mostrarAporte">
-    <div class="modal__backdrop" (click)="fecharAporte()"></div>
-    <div class="modal__content modal__content--goal-action">
-      <div class="modal__header">
-        <div>
-          <p class="modal__eyebrow">Registrar aporte</p>
-          <h3>{{ metaSelecionada?.title }}</h3>
-          <p>Informe o valor aplicado para atualizar o progresso da meta.</p>
+  @if (mostrarAporte) {
+    <div class="modal">
+      <div class="modal__backdrop" (click)="fecharAporte()"></div>
+      <div class="modal__content modal__content--goal-action">
+        <div class="modal__header">
+          <div>
+            <p class="modal__eyebrow">Registrar aporte</p>
+            <h3>{{ metaSelecionada?.title }}</h3>
+            <p>Informe o valor aplicado para atualizar o progresso da meta.</p>
+          </div>
+          <button class="modal__close" type="button" [disabled]="saving" (click)="fecharAporte()" aria-label="Fechar">×</button>
         </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharAporte()" aria-label="Fechar">×</button>
-      </div>
-
-      <div class="goal-action-summary" *ngIf="metaSelecionada">
-        <div>
-          <span>Acumulado atual</span>
-          <strong>R$ {{ metaSelecionada.currentAmount | number : '1.2-2' }}</strong>
+        @if (metaSelecionada) {
+          <div class="goal-action-summary">
+            <div>
+              <span>Acumulado atual</span>
+              <strong>R$ {{ metaSelecionada.currentAmount | number : '1.2-2' }}</strong>
+            </div>
+            <div>
+              <span>Falta para concluir</span>
+              <strong>R$ {{ goalRemaining(metaSelecionada) | number : '1.2-2' }}</strong>
+            </div>
+          </div>
+        }
+        <div class="form form--single">
+          <label>
+            <span>Valor (R$)</span>
+            <input type="text" [(ngModel)]="aporteValor" digitOnly (input)="formatarAporte()" inputmode="numeric" placeholder="Ex.: 1.500,00" />
+          </label>
+          <label>
+            <span>Data</span>
+            <input type="date" [(ngModel)]="aporteData" />
+          </label>
+          <label>
+            <span>Nota (opcional)</span>
+            <textarea [(ngModel)]="aporteNota" rows="3" placeholder="Detalhes do aporte"></textarea>
+          </label>
         </div>
-        <div>
-          <span>Falta para concluir</span>
-          <strong>R$ {{ goalRemaining(metaSelecionada) | number : '1.2-2' }}</strong>
+        <div class="modal__actions">
+          <button type="button" class="modal__button modal__button--ghost" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
+          <button type="button" class="modal__button modal__button--primary" [disabled]="saving" (click)="salvarAporte()">
+            {{ saving ? 'Salvando...' : 'Salvar aporte' }}
+          </button>
         </div>
-      </div>
-
-      <div class="form form--single">
-        <label>
-          <span>Valor (R$)</span>
-          <input type="text" [(ngModel)]="aporteValor" digitOnly (input)="formatarAporte()" inputmode="numeric" placeholder="Ex.: 1.500,00" />
-        </label>
-        <label>
-          <span>Data</span>
-          <input type="date" [(ngModel)]="aporteData" />
-        </label>
-        <label>
-          <span>Nota (opcional)</span>
-          <textarea [(ngModel)]="aporteNota" rows="3" placeholder="Detalhes do aporte"></textarea>
-        </label>
-      </div>
-
-      <div class="modal__actions">
-        <button type="button" class="modal__button modal__button--ghost" [disabled]="saving" (click)="fecharAporte()">Cancelar</button>
-        <button type="button" class="modal__button modal__button--primary" [disabled]="saving" (click)="salvarAporte()">
-          {{ saving ? 'Salvando...' : 'Salvar aporte' }}
-        </button>
       </div>
     </div>
-  </div>
+  }
 
-  <div class="modal" *ngIf="confirmModal.show">
-    <div class="modal__backdrop" (click)="fecharConfirm()"></div>
-    <div class="modal__content">
-      <div class="modal__header">
-        <div>
-          <p class="modal__eyebrow">{{ confirmModal.mode === 'cancel' ? 'Cancelar meta' : 'Reativar meta' }}</p>
-          <h3>{{ confirmModal.goal?.title }}</h3>
-          <p>
-            {{ confirmModal.mode === 'cancel'
+  @if (confirmModal.show) {
+    <div class="modal">
+      <div class="modal__backdrop" (click)="fecharConfirm()"></div>
+      <div class="modal__content">
+        <div class="modal__header">
+          <div>
+            <p class="modal__eyebrow">{{ confirmModal.mode === 'cancel' ? 'Cancelar meta' : 'Reativar meta' }}</p>
+            <h3>{{ confirmModal.goal?.title }}</h3>
+            <p>
+              {{ confirmModal.mode === 'cancel'
               ? 'A meta ficará como cancelada, mas continuará no histórico.'
               : 'A meta voltará para o acompanhamento ativo.' }}
-          </p>
+            </p>
+          </div>
+          <button class="modal__close" type="button" [disabled]="saving" (click)="fecharConfirm()" aria-label="Fechar">×</button>
         </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharConfirm()" aria-label="Fechar">×</button>
-      </div>
-      <div class="modal__actions">
-        <button type="button" class="modal__button modal__button--ghost" [disabled]="saving" (click)="fecharConfirm()">Fechar</button>
-        <button type="button" class="modal__button modal__button--primary" [disabled]="saving" (click)="confirmarAcao()">
-          {{ saving ? 'Processando...' : (confirmModal.mode === 'cancel' ? 'Confirmar cancelamento' : 'Reativar meta') }}
-        </button>
+        <div class="modal__actions">
+          <button type="button" class="modal__button modal__button--ghost" [disabled]="saving" (click)="fecharConfirm()">Fechar</button>
+          <button type="button" class="modal__button modal__button--primary" [disabled]="saving" (click)="confirmarAcao()">
+            {{ saving ? 'Processando...' : (confirmModal.mode === 'cancel' ? 'Confirmar cancelamento' : 'Reativar meta') }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
-  <div class="modal" *ngIf="mostrarHistorico">
-    <div class="modal__backdrop" (click)="fecharHistorico()"></div>
-    <div class="modal__content modal__content--goal-history">
-      <div class="modal__header">
-        <div>
-          <p class="modal__eyebrow">Histórico de aportes</p>
-          <h3>{{ historicoMeta?.title }}</h3>
-          <p>Confira os registros que formam o acumulado desta meta.</p>
-        </div>
-        <button class="modal__close" type="button" [disabled]="saving" (click)="fecharHistorico()" aria-label="Fechar">×</button>
-      </div>
-
-      <div class="goal-history-summary" *ngIf="historicoMeta">
-        <div>
-          <span>Total acumulado</span>
-          <strong>R$ {{ historicoMeta.currentAmount | number : '1.2-2' }}</strong>
-        </div>
-        <div>
-          <span>Meta planejada</span>
-          <strong>R$ {{ historicoMeta.targetAmount | number : '1.2-2' }}</strong>
-        </div>
-        <div>
-          <span>Progresso</span>
-          <strong>{{ progresso(historicoMeta) }}%</strong>
-        </div>
-      </div>
-
-      <div *ngIf="historicoMeta && contribDetalhes[historicoMeta.id]?.length; else semAporte" class="history">
-        <div class="history__row" *ngFor="let c of contribDetalhes[historicoMeta.id]; trackBy: trackByIndex">
-          <div class="history__date">
-            <span>Data</span>
-            <strong>{{ c.date | date:'dd/MM/yyyy' }}</strong>
+  @if (mostrarHistorico) {
+    <div class="modal">
+      <div class="modal__backdrop" (click)="fecharHistorico()"></div>
+      <div class="modal__content modal__content--goal-history">
+        <div class="modal__header">
+          <div>
+            <p class="modal__eyebrow">Histórico de aportes</p>
+            <h3>{{ historicoMeta?.title }}</h3>
+            <p>Confira os registros que formam o acumulado desta meta.</p>
           </div>
-          <div class="history__amount">
-            <span>Aporte</span>
-            <strong>R$ {{ c.amount | number:'1.2-2' }}</strong>
-          </div>
-          <p class="history__note">{{ c.note || 'Sem observação' }}</p>
+          <button class="modal__close" type="button" [disabled]="saving" (click)="fecharHistorico()" aria-label="Fechar">×</button>
         </div>
-      </div>
-      <ng-template #semAporte>
-        <p class="goals-state">Nenhum aporte registrado para esta meta.</p>
-      </ng-template>
-
-      <div class="modal__actions">
-        <button type="button" class="modal__button modal__button--ghost" (click)="fecharHistorico()">Fechar</button>
+        @if (historicoMeta) {
+          <div class="goal-history-summary">
+            <div>
+              <span>Total acumulado</span>
+              <strong>R$ {{ historicoMeta.currentAmount | number : '1.2-2' }}</strong>
+            </div>
+            <div>
+              <span>Meta planejada</span>
+              <strong>R$ {{ historicoMeta.targetAmount | number : '1.2-2' }}</strong>
+            </div>
+            <div>
+              <span>Progresso</span>
+              <strong>{{ progresso(historicoMeta) }}%</strong>
+            </div>
+          </div>
+        }
+        @if (historicoMeta && contribDetalhes[historicoMeta.id]?.length) {
+          <div class="history">
+            @for (c of contribDetalhes[historicoMeta.id]; track trackByIndex($index, c)) {
+              <div class="history__row">
+                <div class="history__date">
+                  <span>Data</span>
+                  <strong>{{ c.date | date:'dd/MM/yyyy' }}</strong>
+                </div>
+                <div class="history__amount">
+                  <span>Aporte</span>
+                  <strong>R$ {{ c.amount | number:'1.2-2' }}</strong>
+                </div>
+                <p class="history__note">{{ c.note || 'Sem observação' }}</p>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="goals-state">Nenhum aporte registrado para esta meta.</p>
+        }
+        <div class="modal__actions">
+          <button type="button" class="modal__button modal__button--ghost" (click)="fecharHistorico()">Fechar</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 </section>

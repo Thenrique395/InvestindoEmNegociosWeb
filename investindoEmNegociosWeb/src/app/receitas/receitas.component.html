@@ -1,99 +1,101 @@
 <div class="receitas-page">
-  <section class="receitas-summary-grid" *ngIf="hasAccess('Basic')">
-    <article class="receitas-summary-card receitas-summary-card--success">
-      <div class="receitas-summary-card__head">
-        <span class="receitas-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="receitas-summary-card__copy">
-          <p class="receitas-summary-card__eyebrow">Recebidas</p>
-          <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</h3>
-        </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas recebidas">
-          ?
-          <span class="ui-tooltip__panel">
-            Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos.
+  @if (hasAccess('Basic')) {
+    <section class="receitas-summary-grid">
+      <article class="receitas-summary-card receitas-summary-card--success">
+        <div class="receitas-summary-card__head">
+          <span class="receitas-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
-      </div>
-      <p class="receitas-summary-card__note">
-        Entradas já confirmadas neste período.
-        <span class="receitas-summary-card__meta">· {{ statusResumo.pagos }} lançamento(s)</span>
-      </p>
-    </article>
-
-    <article class="receitas-summary-card receitas-summary-card--warning">
-      <div class="receitas-summary-card__head">
-        <span class="receitas-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
-          </svg>
-        </span>
-        <div class="receitas-summary-card__copy">
-          <p class="receitas-summary-card__eyebrow">Pendentes</p>
-          <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</h3>
+          <div class="receitas-summary-card__copy">
+            <p class="receitas-summary-card__eyebrow">Recebidas</p>
+            <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</h3>
+          </div>
+          <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas recebidas">
+            ?
+            <span class="ui-tooltip__panel">
+              Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos.
+            </span>
+            <span class="ui-tooltip__arrow"></span>
+          </button>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas pendentes">
-          ?
-          <span class="ui-tooltip__panel">
-            Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos.
+        <p class="receitas-summary-card__note">
+          Entradas já confirmadas neste período.
+          <span class="receitas-summary-card__meta">· {{ statusResumo.pagos }} lançamento(s)</span>
+        </p>
+      </article>
+      <article class="receitas-summary-card receitas-summary-card--warning">
+        <div class="receitas-summary-card__head">
+          <span class="receitas-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+            </svg>
           </span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
-      </div>
-      <p class="receitas-summary-card__note">
-        Valores previstos que ainda não entraram.
-        <span class="receitas-summary-card__meta">· {{ statusResumo.pendentes }} lançamento(s)</span>
-      </p>
-    </article>
-
-    <article class="receitas-summary-card receitas-summary-card--info">
-      <div class="receitas-summary-card__head">
-        <span class="receitas-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="receitas-summary-card__copy">
-          <p class="receitas-summary-card__eyebrow">Comparativo</p>
-          <h3 class="receitas-summary-card__title">
-            {{
+          <div class="receitas-summary-card__copy">
+            <p class="receitas-summary-card__eyebrow">Pendentes</p>
+            <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</h3>
+          </div>
+          <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas pendentes">
+            ?
+            <span class="ui-tooltip__panel">
+              Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos.
+            </span>
+            <span class="ui-tooltip__arrow"></span>
+          </button>
+        </div>
+        <p class="receitas-summary-card__note">
+          Valores previstos que ainda não entraram.
+          <span class="receitas-summary-card__meta">· {{ statusResumo.pendentes }} lançamento(s)</span>
+        </p>
+      </article>
+      <article class="receitas-summary-card receitas-summary-card--info">
+        <div class="receitas-summary-card__head">
+          <span class="receitas-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <div class="receitas-summary-card__copy">
+            <p class="receitas-summary-card__eyebrow">Comparativo</p>
+            <h3 class="receitas-summary-card__title">
+              {{
               previousComparison.isNew
-                ? 'Novo'
-                : (previousComparison.delta > 0 ? '+' : previousComparison.delta < 0 ? '-' : '') +
-                  'R$ ' +
-                  (previousComparison.deltaAbs | number:'1.2-2')
-            }}
-          </h3>
+              ? 'Novo'
+              : (previousComparison.delta > 0 ? '+' : previousComparison.delta < 0 ? '-' : '') +
+              'R$ ' +
+              (previousComparison.deltaAbs | number:'1.2-2')
+              }}
+            </h3>
+          </div>
+          <button type="button" class="ui-tooltip" aria-label="Mais informações sobre comparativo de receitas">
+            ?
+            <span class="ui-tooltip__panel">
+              Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.
+            </span>
+            <span class="ui-tooltip__arrow"></span>
+          </button>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre comparativo de receitas">
-          ?
-          <span class="ui-tooltip__panel">
-            Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.
-          </span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
-      </div>
-      <p class="receitas-summary-card__note">
-        Como este mês está ficando frente ao anterior.
-        <span
-          class="receitas-summary-card__delta"
+        <p class="receitas-summary-card__note">
+          Como este mês está ficando frente ao anterior.
+          <span
+            class="receitas-summary-card__delta"
           [ngClass]="previousComparison.trend === 'up'
             ? 'receitas-summary-card__delta--up'
             : previousComparison.trend === 'down'
               ? 'receitas-summary-card__delta--down'
               : 'receitas-summary-card__delta--flat'">
-          · {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
-          <span *ngIf="!previousComparison.isNew">({{ previousComparison.percent | number:'1.0-0' }}%)</span>
-          · {{ previousComparison.monthLabel }}
-        </span>
-      </p>
-    </article>
-  </section>
+            · {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
+            @if (!previousComparison.isNew) {
+              <span>({{ previousComparison.percent | number:'1.0-0' }}%)</span>
+            }
+            · {{ previousComparison.monthLabel }}
+          </span>
+        </p>
+      </article>
+    </section>
+  }
 
   <section class="receitas-shell">
     <div class="receitas-hero">
@@ -105,30 +107,33 @@
         </p>
 
         <div class="receitas-hero__toolbar">
-          <div class="receitas-hero__comparison" *ngIf="previousComparison as comparison">
-            <span class="receitas-comparison-pill">
-              <span class="receitas-comparison-pill__label">Comparado a {{ comparison.monthLabel }}</span>
-              <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de receitas">
-                ?
-                <span class="ui-tooltip__panel">
-                  Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.
-                </span>
-                <span class="ui-tooltip__arrow"></span>
-              </button>
-              <span
+          @if (previousComparison; as comparison) {
+            <div class="receitas-hero__comparison">
+              <span class="receitas-comparison-pill">
+                <span class="receitas-comparison-pill__label">Comparado a {{ comparison.monthLabel }}</span>
+                <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de receitas">
+                  ?
+                  <span class="ui-tooltip__panel">
+                    Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.
+                  </span>
+                  <span class="ui-tooltip__arrow"></span>
+                </button>
+                <span
                 [ngClass]="comparison.trend === 'up'
                   ? 'receitas-comparison-pill__delta--up'
                   : comparison.trend === 'down'
                     ? 'receitas-comparison-pill__delta--down'
                     : 'receitas-comparison-pill__delta--flat'">
-                <ng-container *ngIf="comparison.isNew; else diffValue">Sem base anterior</ng-container>
-                <ng-template #diffValue>
-                  {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
-                  ({{ comparison.percent | number:'1.0-0' }}%)
-                </ng-template>
+                  @if (comparison.isNew) {
+                    Sem base anterior
+                  } @else {
+                    {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
+                    ({{ comparison.percent | number:'1.0-0' }}%)
+                  }
+                </span>
               </span>
-            </span>
-          </div>
+            </div>
+          }
 
           <div class="receitas-hero__nav">
             <button type="button" class="receitas-hero__nav-btn" (click)="mesAnterior()">
@@ -141,9 +146,11 @@
             </button>
           </div>
 
-          <div class="receitas-focus-pill" *ngIf="focusMode !== 'none'">
-            <span>{{ focusBadgeLabel }}</span>
-          </div>
+          @if (focusMode !== 'none') {
+            <div class="receitas-focus-pill">
+              <span>{{ focusBadgeLabel }}</span>
+            </div>
+          }
         </div>
       </div>
 
@@ -151,10 +158,12 @@
         <p class="receitas-total-card__eyebrow">Total do mês</p>
         <strong class="receitas-total-card__value">R$ {{ totalRendas | number:'1.2-2' }}</strong>
         <p class="receitas-total-card__text">Total de receitas registradas neste período, considerando entradas recorrentes e avulsas.</p>
-        <div class="receitas-total-card__split" *ngIf="hasAccess('Basic')">
-          <span>Recorrentes: <strong>R$ {{ totalRecorrentes | number:'1.2-2' }}</strong></span>
-          <span>Avulsas: <strong>R$ {{ totalAvulsas | number:'1.2-2' }}</strong></span>
-        </div>
+        @if (hasAccess('Basic')) {
+          <div class="receitas-total-card__split">
+            <span>Recorrentes: <strong>R$ {{ totalRecorrentes | number:'1.2-2' }}</strong></span>
+            <span>Avulsas: <strong>R$ {{ totalAvulsas | number:'1.2-2' }}</strong></span>
+          </div>
+        }
         <div class="receitas-total-card__actions">
           <button type="button" class="receitas-total-card__action receitas-total-card__action--primary" (click)="abrirModal()">
             <span class="receitas-total-card__action-icon" aria-hidden="true">
@@ -171,27 +180,37 @@
       </aside>
     </div>
 
-    <div class="receitas-bulk" *ngIf="selecionados.length">
-      <div class="receitas-bulk__meta">
-        <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
-        <label class="receitas-bulk__account" *ngIf="canChooseAccount">
-          <span>Conta de entrada</span>
-          <select [(ngModel)]="contaBaixaId">
-            <option *ngFor="let conta of contas; trackBy: trackByIndex" [ngValue]="conta.id">
-              {{ conta.name }}
-            </option>
-          </select>
-        </label>
+    @if (selecionados.length) {
+      <div class="receitas-bulk">
+        <div class="receitas-bulk__meta">
+          <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
+          @if (canChooseAccount) {
+            <label class="receitas-bulk__account">
+              <span>Conta de entrada</span>
+              <select [(ngModel)]="contaBaixaId">
+                @for (conta of contas; track trackByIndex($index, conta)) {
+                  <option [ngValue]="conta.id">
+                    {{ conta.name }}
+                  </option>
+                }
+              </select>
+            </label>
+          }
+        </div>
+        <button
+          type="button"
+          class="receitas-bulk__button"
+          [disabled]="loadingRecebido"
+          (click)="marcarRecebidasSelecionadas()">
+          @if (loadingRecebido) {
+            <span>Processando...</span>
+          }
+          @if (!loadingRecebido) {
+            <span>Marcar como recebida</span>
+          }
+        </button>
       </div>
-      <button
-        type="button"
-        class="receitas-bulk__button"
-        [disabled]="loadingRecebido"
-        (click)="marcarRecebidasSelecionadas()">
-        <span *ngIf="loadingRecebido">Processando...</span>
-        <span *ngIf="!loadingRecebido">Marcar como recebida</span>
-      </button>
-    </div>
+    }
 
     <div class="receitas-filters">
       <label class="receitas-filter receitas-filter--search">
@@ -232,7 +251,7 @@
         (remover)="remover($event)"
         (selecionar)="toggleSelecionar($event.id, $event.checked)"
         (selecionarTodos)="toggleSelecionarTodos($event)"
-        (emptyAction)="abrirModal()"></app-receitas-lista>
+      (emptyAction)="abrirModal()"></app-receitas-lista>
     </div>
 
     <app-receitas-form
@@ -257,34 +276,36 @@
   </section>
 </div>
 
-<div *ngIf="showEditReceivedModal" class="receitas-edit-received">
-  <div class="receitas-edit-received__backdrop" (click)="cancelarEdicaoRecebida()"></div>
-  <div class="receitas-edit-received__dialog">
-    <div class="receitas-edit-received__head">
-      <div class="receitas-edit-received__copy">
-        <p class="receitas-edit-received__eyebrow">Editar receita recebida</p>
-        <p class="receitas-edit-received__text">
-          Ao editar esta receita <strong>{{ editReceivedSource }}</strong>, o status voltará para
-          <strong>Pendente</strong> para que o ajuste seja feito.
-        </p>
+@if (showEditReceivedModal) {
+  <div class="receitas-edit-received">
+    <div class="receitas-edit-received__backdrop" (click)="cancelarEdicaoRecebida()"></div>
+    <div class="receitas-edit-received__dialog">
+      <div class="receitas-edit-received__head">
+        <div class="receitas-edit-received__copy">
+          <p class="receitas-edit-received__eyebrow">Editar receita recebida</p>
+          <p class="receitas-edit-received__text">
+            Ao editar esta receita <strong>{{ editReceivedSource }}</strong>, o status voltará para
+            <strong>Pendente</strong> para que o ajuste seja feito.
+          </p>
+        </div>
+        <button
+          class="receitas-edit-received__close"
+          type="button"
+          (click)="cancelarEdicaoRecebida()"
+          aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" focusable="false" role="presentation" width="18" height="18">
+            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
       </div>
-      <button
-        class="receitas-edit-received__close"
-        type="button"
-        (click)="cancelarEdicaoRecebida()"
-        aria-label="Fechar modal">
-        <svg viewBox="0 0 24 24" focusable="false" role="presentation" width="18" height="18">
-          <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-      </button>
-    </div>
-    <div class="receitas-edit-received__actions">
-      <button type="button" class="receitas-edit-received__secondary" (click)="cancelarEdicaoRecebida()">
-        Não aceito
-      </button>
-      <button type="button" class="receitas-edit-received__primary" (click)="confirmarEdicaoRecebida()">
-        Aceitar e editar
-      </button>
+      <div class="receitas-edit-received__actions">
+        <button type="button" class="receitas-edit-received__secondary" (click)="cancelarEdicaoRecebida()">
+          Não aceito
+        </button>
+        <button type="button" class="receitas-edit-received__primary" (click)="confirmarEdicaoRecebida()">
+          Aceitar e editar
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}

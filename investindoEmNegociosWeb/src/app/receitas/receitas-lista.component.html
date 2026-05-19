@@ -18,9 +18,11 @@
               class="receitas-table__sort"
               (click)="ordenarPor('fonte')">
               Fonte
-              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'fonte'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'fonte') {
+                <span class="receitas-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="receitas-table__cell">
@@ -29,9 +31,11 @@
               class="receitas-table__sort"
               (click)="ordenarPor('categoria')">
               Categoria
-              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'categoria'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'categoria') {
+                <span class="receitas-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="receitas-table__cell receitas-table__cell--value">
@@ -40,9 +44,11 @@
               class="receitas-table__sort"
               (click)="ordenarPor('valor')">
               Valor
-              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'valor'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'valor') {
+                <span class="receitas-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="receitas-table__cell">
@@ -51,9 +57,11 @@
               class="receitas-table__sort"
               (click)="ordenarPor('recebimento')">
               Recebimento
-              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'recebimento'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'recebimento') {
+                <span class="receitas-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
           <th class="receitas-table__cell">
@@ -62,93 +70,107 @@
               class="receitas-table__sort"
               (click)="ordenarPor('tipo')">
               Tipo
-              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'tipo'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
+              @if (sortBy === 'tipo') {
+                <span class="receitas-table__sort-dir">
+                  {{ sortDir === 1 ? '↑' : '↓' }}
+                </span>
+              }
             </button>
           </th>
-          <th *ngIf="showStatus" class="receitas-table__cell">
-            <button
-              type="button"
-              class="receitas-table__sort"
-              (click)="ordenarPor('status')">
-              Status
-              <span class="receitas-table__sort-dir" *ngIf="sortBy === 'status'">
-                {{ sortDir === 1 ? '↑' : '↓' }}
-              </span>
-            </button>
-          </th>
+          @if (showStatus) {
+            <th class="receitas-table__cell">
+              <button
+                type="button"
+                class="receitas-table__sort"
+                (click)="ordenarPor('status')">
+                Status
+                @if (sortBy === 'status') {
+                  <span class="receitas-table__sort-dir">
+                    {{ sortDir === 1 ? '↑' : '↓' }}
+                  </span>
+                }
+              </button>
+            </th>
+          }
           <th class="receitas-table__cell receitas-table__cell--actions">Ações</th>
         </tr>
       </thead>
       <tbody class="receitas-table__body">
-        <tr *ngIf="loading">
-          <td class="receitas-table__empty" [attr.colspan]="showStatus ? 8 : 7">
-            <div class="receitas-table__loading">
-              <span class="receitas-table__spinner"></span>
-              Carregando receitas do mês...
-            </div>
-          </td>
-        </tr>
-        <tr *ngIf="!loading && !rendas.length">
-          <td class="receitas-table__empty" [attr.colspan]="showStatus ? 8 : 7">
-            <app-empty-state
-              [title]="emptyTitle"
-              [description]="emptyDescription"
-              [ctaLabel]="emptyCtaLabel"
-              icon="💰"
+        @if (loading) {
+          <tr>
+            <td class="receitas-table__empty" [attr.colspan]="showStatus ? 8 : 7">
+              <div class="receitas-table__loading">
+                <span class="receitas-table__spinner"></span>
+                Carregando receitas do mês...
+              </div>
+            </td>
+          </tr>
+        }
+        @if (!loading && !rendas.length) {
+          <tr>
+            <td class="receitas-table__empty" [attr.colspan]="showStatus ? 8 : 7">
+              <app-empty-state
+                [title]="emptyTitle"
+                [description]="emptyDescription"
+                [ctaLabel]="emptyCtaLabel"
+                icon="💰"
               (action)="emptyAction.emit()"></app-empty-state>
-          </td>
-        </tr>
-        <tr *ngFor="let r of rendas; trackBy: trackByIndex" class="receitas-table__row">
-          <td class="receitas-table__item receitas-table__item--checkbox">
-            <input
-              class="receitas-table__check"
-              type="checkbox"
-              [checked]="isSelecionado(r.id)"
-              [disabled]="r.status === 'PAID' || r.status === 'CANCELED'"
-              (change)="selecionar.emit({ id: r.id!, checked: $any($event.target)?.checked ?? false })"
-              aria-label="Selecionar receita" />
-          </td>
-          <td class="receitas-table__item receitas-table__item--name">{{ r.fonte }}</td>
-          <td class="receitas-table__item receitas-table__item--muted">{{ r.categoria || 'Sem categoria' }}</td>
-          <td class="receitas-table__item receitas-table__item--value">
-            <span class="receitas-table__amount">R$ {{ r.valor | number:'1.2-2' }}</span>
-          </td>
-          <td class="receitas-table__item receitas-table__item--muted">{{ r.recebimento || '—' }}</td>
-          <td class="receitas-table__item receitas-table__item--muted">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>
-          <td *ngIf="showStatus" class="receitas-table__item">
-            <app-status-badge [status]="r.status" [label]="statusLabel(r)"></app-status-badge>
-          </td>
-          <td class="receitas-table__item receitas-table__item--actions">
-            <div class="receitas-table__actions">
-              <button
-                type="button"
-                class="receitas-table__icon-action"
-                (click)="onEditar(r.id!)"
-                aria-label="Editar"
-                [attr.data-tooltip]="'Editar'">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                class="receitas-table__icon-action receitas-table__icon-action--danger"
-                (click)="onRemover(r.planId, r.id)"
-                aria-label="Excluir"
-                [attr.data-tooltip]="'Excluir'">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M4 7h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                  <path d="M9 7V5h6v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        }
+        @for (r of rendas; track trackByIndex($index, r)) {
+          <tr class="receitas-table__row">
+            <td class="receitas-table__item receitas-table__item--checkbox">
+              <input
+                class="receitas-table__check"
+                type="checkbox"
+                [checked]="isSelecionado(r.id)"
+                [disabled]="r.status === 'PAID' || r.status === 'CANCELED'"
+                (change)="selecionar.emit({ id: r.id!, checked: $any($event.target)?.checked ?? false })"
+                aria-label="Selecionar receita" />
+            </td>
+            <td class="receitas-table__item receitas-table__item--name">{{ r.fonte }}</td>
+            <td class="receitas-table__item receitas-table__item--muted">{{ r.categoria || 'Sem categoria' }}</td>
+            <td class="receitas-table__item receitas-table__item--value">
+              <span class="receitas-table__amount">R$ {{ r.valor | number:'1.2-2' }}</span>
+            </td>
+            <td class="receitas-table__item receitas-table__item--muted">{{ r.recebimento || '—' }}</td>
+            <td class="receitas-table__item receitas-table__item--muted">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>
+            @if (showStatus) {
+              <td class="receitas-table__item">
+                <app-status-badge [status]="r.status" [label]="statusLabel(r)"></app-status-badge>
+              </td>
+            }
+            <td class="receitas-table__item receitas-table__item--actions">
+              <div class="receitas-table__actions">
+                <button
+                  type="button"
+                  class="receitas-table__icon-action"
+                  (click)="onEditar(r.id!)"
+                  aria-label="Editar"
+                  [attr.data-tooltip]="'Editar'">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="receitas-table__icon-action receitas-table__icon-action--danger"
+                  (click)="onRemover(r.planId, r.id)"
+                  aria-label="Excluir"
+                  [attr.data-tooltip]="'Excluir'">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M4 7h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M9 7V5h6v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>

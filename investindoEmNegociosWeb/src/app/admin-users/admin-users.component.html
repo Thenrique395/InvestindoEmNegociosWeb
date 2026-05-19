@@ -26,174 +26,197 @@
     </button>
   </header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
-    Carregando usuários...
-  </div>
-  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]" *ngIf="!loading && users.length">
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
-          <tr class="border-b border-[var(--border)]">
-            <th class="px-6 py-4 font-semibold">Nome</th>
-            <th class="px-6 py-4 font-semibold">Status</th>
-            <th class="px-6 py-4 font-semibold">Criado em</th>
-            <th class="px-6 py-4 font-semibold">Nível</th>
-            <th class="px-6 py-4 font-semibold">Features</th>
-            <th class="px-6 py-4 font-semibold text-right">Ações</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--border)]">
-          <ng-container *ngFor="let user of users; trackBy: trackByUser">
-          <tr class="hover:bg-[var(--surface-2)]">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-3">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
-                  {{ (user.name || user.email || '?').charAt(0) }}
-                </span>
-                <div>
-                  <div class="font-semibold text-[var(--text)]">{{ user.name || 'Sem nome' }}</div>
-                  <div class="text-xs text-[var(--text-muted)]">{{ user.email }}</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <span
-                class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                [ngClass]="user.isActive ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-slate-200 bg-slate-100 text-slate-600'">
-                {{ user.isActive ? 'Ativo' : 'Inativo' }}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-[var(--text-muted)]">{{ user.createdAt | date: 'short' }}</td>
-            <td class="px-6 py-4">
-              <select
-                class="h-10 w-full min-w-[160px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-                [(ngModel)]="user.pendingRole"
-                (ngModelChange)="updateRole(user, $event)"
-                [disabled]="savingId === user.id || deletingId === user.id">
-                <option *ngFor="let role of roles; trackBy: trackByIndex" [value]="role">{{ role }}</option>
-              </select>
-            </td>
-            <td class="px-6 py-4">
-              <button
-                type="button"
-                class="btn-secondary sm"
-                (click)="toggleFeatures(user)"
-                [disabled]="savingId === user.id || deletingId === user.id || !!featuresLoadingForUserId">
-                {{ featuresOpenForUserId === user.id ? 'Fechar' : 'Gerenciar' }}
-              </button>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex flex-wrap items-center justify-end gap-2">
-                <button
-                  type="button"
-                  class="btn-warning sm"
-                  (click)="toggleStatus(user)"
-                  [disabled]="savingId === user.id || deletingId === user.id">
-                  <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
-                    <svg *ngIf="user.isActive" viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
-                      <path
-                        d="M7 11V8a5 5 0 0 1 10 0v3"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round" />
-                      <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
-                    </svg>
-                    <svg *ngIf="!user.isActive" viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
-                      <path
-                        d="M17 11V8a5 5 0 0 0-9.9-1"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round" />
-                      <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
-                    </svg>
-                  </span>
-                  {{ user.pendingActive ? 'Bloquear' : 'Desbloquear' }}
-                </button>
-                <button
-                  type="button"
-                  class="btn-primary sm"
-                  (click)="saveChanges(user)"
-                  [disabled]="!user.dirty || savingId === user.id || deletingId === user.id">
-                  <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
-                      <path
-                        d="M5 12l4 4 10-10"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round" />
-                    </svg>
-                  </span>
-                  Salvar
-                </button>
-                <button
-                  type="button"
-                  class="btn-danger sm"
-                  (click)="removeUser(user)"
-                  [disabled]="savingId === user.id || deletingId === user.id">
-                  <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
-                      <path
-                        d="M4 7h16M9 7V5h6v2M8 7l1 12h6l1-12"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round" />
-                    </svg>
-                  </span>
-                  Excluir
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="featuresOpenForUserId === user.id">
-            <td colspan="6" class="px-6 pb-4">
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-                <div class="text-xs text-[var(--text-muted)]" *ngIf="featuresLoadingForUserId === user.id">
-                  Carregando features...
-                </div>
-                <div class="grid gap-3 md:grid-cols-2" *ngIf="featuresLoadingForUserId !== user.id">
-                  <label class="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3" *ngFor="let feature of getFeatures(user.id); trackBy: trackByFeature">
-                    <div>
-                      <div class="text-sm font-semibold text-[var(--text)]">{{ featureLabel(feature.featureKey) }}</div>
-                      <div class="text-xs text-[var(--text-muted)]">
-                        Base perfil: {{ feature.enabledByRole ? 'habilitado' : 'bloqueado' }} ·
-                        Efetivo: {{ feature.effectiveEnabled ? 'habilitado' : 'bloqueado' }}
-                      </div>
-                    </div>
-                    <select
-                      class="h-9 min-w-[120px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-xs text-[var(--text)]"
-                      [ngModel]="getFeatureMode(feature)"
-                      (ngModelChange)="onFeatureModeChange(user, feature, $event)"
-                      [disabled]="isFeatureBusy(user.id, feature.featureKey)">
-                      <option *ngFor="let mode of featureModeOptions" [ngValue]="mode">{{ modeLabel(mode) }}</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
-            </td>
-          </tr>
-          </ng-container>
-        </tbody>
-      </table>
+  @if (loading) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
+      Carregando usuários...
     </div>
-  </div>
+  }
+  @if (!loading && users.length) {
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
+            <tr class="border-b border-[var(--border)]">
+              <th class="px-6 py-4 font-semibold">Nome</th>
+              <th class="px-6 py-4 font-semibold">Status</th>
+              <th class="px-6 py-4 font-semibold">Criado em</th>
+              <th class="px-6 py-4 font-semibold">Nível</th>
+              <th class="px-6 py-4 font-semibold">Features</th>
+              <th class="px-6 py-4 font-semibold text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border)]">
+            @for (user of users; track trackByUser($index, user)) {
+              <tr class="hover:bg-[var(--surface-2)]">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
+                      {{ (user.name || user.email || '?').charAt(0) }}
+                    </span>
+                    <div>
+                      <div class="font-semibold text-[var(--text)]">{{ user.name || 'Sem nome' }}</div>
+                      <div class="text-xs text-[var(--text-muted)]">{{ user.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                    [ngClass]="user.isActive ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-slate-200 bg-slate-100 text-slate-600'">
+                    {{ user.isActive ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-[var(--text-muted)]">{{ user.createdAt | date: 'short' }}</td>
+                <td class="px-6 py-4">
+                  <select
+                    class="h-10 w-full min-w-[160px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+                    [(ngModel)]="user.pendingRole"
+                    (ngModelChange)="updateRole(user, $event)"
+                    [disabled]="savingId === user.id || deletingId === user.id">
+                    @for (role of roles; track trackByIndex($index, role)) {
+                      <option [value]="role">{{ role }}</option>
+                    }
+                  </select>
+                </td>
+                <td class="px-6 py-4">
+                  <button
+                    type="button"
+                    class="btn-secondary sm"
+                    (click)="toggleFeatures(user)"
+                    [disabled]="savingId === user.id || deletingId === user.id || !!featuresLoadingForUserId">
+                    {{ featuresOpenForUserId === user.id ? 'Fechar' : 'Gerenciar' }}
+                  </button>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      class="btn-warning sm"
+                      (click)="toggleStatus(user)"
+                      [disabled]="savingId === user.id || deletingId === user.id">
+                      <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                        @if (user.isActive) {
+                          <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                            <path
+                              d="M7 11V8a5 5 0 0 1 10 0v3"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round" />
+                            <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
+                          </svg>
+                        }
+                        @if (!user.isActive) {
+                          <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                            <path
+                              d="M17 11V8a5 5 0 0 0-9.9-1"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round" />
+                            <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
+                          </svg>
+                        }
+                      </span>
+                      {{ user.pendingActive ? 'Bloquear' : 'Desbloquear' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-primary sm"
+                      (click)="saveChanges(user)"
+                      [disabled]="!user.dirty || savingId === user.id || deletingId === user.id">
+                      <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                          <path
+                            d="M5 12l4 4 10-10"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        </svg>
+                      </span>
+                      Salvar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-danger sm"
+                      (click)="removeUser(user)"
+                      [disabled]="savingId === user.id || deletingId === user.id">
+                      <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                          <path
+                            d="M4 7h16M9 7V5h6v2M8 7l1 12h6l1-12"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        </svg>
+                      </span>
+                      Excluir
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              @if (featuresOpenForUserId === user.id) {
+                <tr>
+                  <td colspan="6" class="px-6 pb-4">
+                    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+                      @if (featuresLoadingForUserId === user.id) {
+                        <div class="text-xs text-[var(--text-muted)]">
+                          Carregando features...
+                        </div>
+                      }
+                      @if (featuresLoadingForUserId !== user.id) {
+                        <div class="grid gap-3 md:grid-cols-2">
+                          @for (feature of getFeatures(user.id); track trackByFeature($index, feature)) {
+                            <label class="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3">
+                              <div>
+                                <div class="text-sm font-semibold text-[var(--text)]">{{ featureLabel(feature.featureKey) }}</div>
+                                <div class="text-xs text-[var(--text-muted)]">
+                                  Base perfil: {{ feature.enabledByRole ? 'habilitado' : 'bloqueado' }} ·
+                                  Efetivo: {{ feature.effectiveEnabled ? 'habilitado' : 'bloqueado' }}
+                                </div>
+                              </div>
+                              <select
+                                class="h-9 min-w-[120px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-xs text-[var(--text)]"
+                                [ngModel]="getFeatureMode(feature)"
+                                (ngModelChange)="onFeatureModeChange(user, feature, $event)"
+                                [disabled]="isFeatureBusy(user.id, feature.featureKey)">
+                                @for (mode of featureModeOptions; track mode) {
+                                  <option [ngValue]="mode">{{ modeLabel(mode) }}</option>
+                                }
+                              </select>
+                            </label>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]" *ngIf="!loading && !users.length">
-    Nenhum usuário encontrado.
-  </div>
+  @if (!loading && !users.length) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]">
+      Nenhum usuário encontrado.
+    </div>
+  }
 
-  <app-confirm-dialog
-    *ngIf="confirmOpen"
-    [title]="confirmTitle"
-    [message]="confirmMessage"
-    [confirmLabel]="confirmLabel"
-    [variant]="confirmVariant"
-    (confirmed)="confirmAction()"
-    (cancelled)="cancelConfirm()"
-  ></app-confirm-dialog>
+  @if (confirmOpen) {
+    <app-confirm-dialog
+      [title]="confirmTitle"
+      [message]="confirmMessage"
+      [confirmLabel]="confirmLabel"
+      [variant]="confirmVariant"
+      (confirmed)="confirmAction()"
+      (cancelled)="cancelConfirm()"
+    ></app-confirm-dialog>
+  }
 </section>

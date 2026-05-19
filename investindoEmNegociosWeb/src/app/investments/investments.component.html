@@ -1,924 +1,1054 @@
 <section class="investments">
-  <nav class="tabs card" aria-label="Abas de investimentos">
-    <button
-      type="button"
-      class="tab"
-      *ngFor="let tab of tabs; trackBy: trackByIndex"
-      [class.active]="activeTab === tab.key"
-      (click)="setActiveTab(tab.key)">
-      {{ tab.label }}
-    </button>
-  </nav>
+  <section class="investments-shell">
+    <div class="investments-hero">
+      <div class="investments-hero__main">
+        <p class="investments-hero__eyebrow">Investimentos</p>
+        <h2 class="investments-hero__title">Carteira, evolução e decisões</h2>
+        <p class="investments-hero__text">
+          Acompanhe patrimônio, posições, rentabilidade e proventos com a mesma leitura operacional do restante do painel.
+        </p>
 
-  <div class="tabs-actions card">
-    <button class="btn-ghost" type="button" (click)="openB3ImportModal()">Importações</button>
-    <button class="btn-primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
-      {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
-    </button>
-  </div>
+        <nav class="tabs" aria-label="Abas de investimentos">
+          @for (tab of tabs; track trackByIndex($index, tab)) {
+            <button
+              type="button"
+              class="tab"
+              [class.active]="activeTab === tab.key"
+              (click)="setActiveTab(tab.key)">
+              {{ tab.label }}
+            </button>
+          }
+        </nav>
+      </div>
 
-  <section class="executive-grid" *ngIf="activeTab === 'RESUMO'">
-    <article class="card executive-card">
-      <div class="executive-card__head">
-        <span class="kpi-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-            <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          </svg>
-        </span>
-        <p class="label">Patrimônio total</p>
-      </div>
-      <div class="label-row">
-        <button type="button" class="hint" aria-label="Explicação do card patrimônio total">
-          i
-          <span class="hint__panel">Soma do valor atual de todas as posições ativas (quantidade x preço médio).</span>
-        </button>
-      </div>
-      <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-      <small>Valor investido: {{ aporteTotal | currency: 'BRL':'symbol':'1.2-2' }}</small>
-    </article>
-    <article class="card executive-card">
-      <div class="executive-card__head">
-        <span class="kpi-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M4 18h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-            <path d="m6 15 3-3 3 2 5-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M16 8h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <p class="label">Lucro total</p>
-      </div>
-      <div class="label-row">
-        <button type="button" class="hint" aria-label="Explicação do card aportes no mês">
-          i
-          <span class="hint__panel">Diferença entre o patrimônio atual e o valor líquido aportado.</span>
-        </button>
-      </div>
-      <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
-        {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
-      </strong>
-      <small>Aportes no mês: {{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
-    </article>
-    <article class="card executive-card">
-      <div class="executive-card__head">
-        <span class="kpi-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <ellipse cx="12" cy="6.5" rx="7" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-            <path d="M5 6.5v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-            <path d="M5 11.5v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          </svg>
-        </span>
-        <p class="label">Proventos recebidos</p>
-      </div>
-      <div class="label-row">
-        <button type="button" class="hint" aria-label="Explicação do card proventos recebidos">
-          i
-          <span class="hint__panel">Total acumulado de dividendos, JCP e rendimentos registrados na carteira.</span>
-        </button>
-      </div>
-      <strong class="success">{{ proventosTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-      <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
-    </article>
-    <article class="card executive-card">
-      <div class="executive-card__head">
-        <span class="kpi-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M4 19h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-            <rect x="6" y="12" width="3" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
-            <rect x="11" y="9" width="3" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
-            <rect x="16" y="6" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          </svg>
-        </span>
-        <p class="label">Rentabilidade</p>
-      </div>
-      <div class="label-row">
-        <button type="button" class="hint" aria-label="Explicação do card rentabilidade">
-          i
-          <span class="hint__panel">Comparativo percentual do desempenho estimado no mês e no acumulado.</span>
-        </button>
-      </div>
-      <strong [class.success]="rentabilidadeAcumuladaPercent >= 0" [class.danger]="rentabilidadeAcumuladaPercent < 0">
-        {{ rentabilidadeAcumuladaPercent | number:'1.2-2' }}%
-      </strong>
-      <small>Variação no mês: {{ rentabilidadeMensalPercent | number:'1.2-2' }}%</small>
-    </article>
-  </section>
+      <aside class="investments-action-card">
+        <p class="investments-action-card__eyebrow">Próxima ação</p>
+        <strong class="investments-action-card__title">Atualizar a carteira</strong>
+        <p class="investments-action-card__text">Registre lançamentos ou importe operações para manter a posição atualizada.</p>
+        <div class="investments-action-card__actions">
+          <button class="investments-action-card__button investments-action-card__button--ghost" type="button" (click)="openB3ImportModal()">Importações</button>
+          <button class="investments-action-card__button investments-action-card__button--primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
+            {{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}
+          </button>
+        </div>
+      </aside>
+    </div>
 
-  <section class="visual-grid visual-grid--resume" *ngIf="activeTab === 'RESUMO'">
-    <article class="card chart-card chart-card--allocation">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Evolução do patrimônio</h3>
+  @if (activeTab === 'RESUMO') {
+    <section class="executive-grid">
+      <article class="card executive-card">
+        <div class="executive-card__head">
+          <span class="kpi-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            </svg>
+          </span>
+          <p class="label">Patrimônio total</p>
         </div>
-        <div class="chart-filters">
-          <select [(ngModel)]="patrimonioRangeMonths">
-            <option [ngValue]="12">12 meses</option>
-            <option [ngValue]="6">6 meses</option>
-          </select>
-          <select [(ngModel)]="patrimonioTypeFilter">
-            <option value="ALL">Todos os tipos</option>
-            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
-          </select>
+        <div class="label-row">
+          <button type="button" class="hint" aria-label="Explicação do card patrimônio total">
+            i
+            <span class="hint__panel">Soma do valor atual de todas as posições ativas (quantidade x preço médio).</span>
+          </button>
         </div>
-      </div>
-      <div class="patrimony-chart">
-        <div class="patrimony-axis">
-          <span *ngFor="let tick of patrimonioAxisTicks; trackBy: trackByIndex">{{ formatPatrimonioAxisValue(tick) }}</span>
+        <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        <small>Valor investido: {{ aporteTotal | currency: 'BRL':'symbol':'1.2-2' }}</small>
+      </article>
+      <article class="card executive-card">
+        <div class="executive-card__head">
+          <span class="kpi-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M4 18h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="m6 15 3-3 3 2 5-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 8h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <p class="label">Lucro total</p>
         </div>
-        <div class="patrimony-plot">
-          <div class="patrimony-chart__bars" [style.gridTemplateColumns]="patrimonioGridColumns">
-            <div class="patrimony-column" *ngFor="let item of patrimonioEvolucaoSeries; trackBy: trackByIndex">
-              <div class="patrimony-bars">
-                <div class="patrimony-chart__grid">
-                  <span class="patrimony-chart__line" *ngFor="let _ of [1,2,3,4,5,6]; trackBy: trackByIndex"></span>
+        <div class="label-row">
+          <button type="button" class="hint" aria-label="Explicação do card aportes no mês">
+            i
+            <span class="hint__panel">Diferença entre o patrimônio atual e o valor líquido aportado.</span>
+          </button>
+        </div>
+        <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
+          {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
+        </strong>
+        <small>Aportes no mês: {{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
+      </article>
+      <article class="card executive-card">
+        <div class="executive-card__head">
+          <span class="kpi-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <ellipse cx="12" cy="6.5" rx="7" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M5 6.5v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M5 11.5v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            </svg>
+          </span>
+          <p class="label">Proventos recebidos</p>
+        </div>
+        <div class="label-row">
+          <button type="button" class="hint" aria-label="Explicação do card proventos recebidos">
+            i
+            <span class="hint__panel">Total acumulado de dividendos, JCP e rendimentos registrados na carteira.</span>
+          </button>
+        </div>
+        <strong class="success">{{ proventosTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
+      </article>
+      <article class="card executive-card">
+        <div class="executive-card__head">
+          <span class="kpi-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M4 19h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <rect x="6" y="12" width="3" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <rect x="11" y="9" width="3" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <rect x="16" y="6" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            </svg>
+          </span>
+          <p class="label">Rentabilidade</p>
+        </div>
+        <div class="label-row">
+          <button type="button" class="hint" aria-label="Explicação do card rentabilidade">
+            i
+            <span class="hint__panel">Comparativo percentual do desempenho estimado no mês e no acumulado.</span>
+          </button>
+        </div>
+        <strong [class.success]="rentabilidadeAcumuladaPercent >= 0" [class.danger]="rentabilidadeAcumuladaPercent < 0">
+          {{ rentabilidadeAcumuladaPercent | number:'1.2-2' }}%
+        </strong>
+        <small>Variação no mês: {{ rentabilidadeMensalPercent | number:'1.2-2' }}%</small>
+      </article>
+    </section>
+  }
+
+  @if (activeTab === 'RESUMO') {
+    <section class="visual-grid visual-grid--resume">
+      <article class="card chart-card chart-card--allocation">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Evolução do patrimônio</h3>
+          </div>
+          <div class="chart-filters">
+            <select [(ngModel)]="patrimonioRangeMonths">
+              <option [ngValue]="12">12 meses</option>
+              <option [ngValue]="6">6 meses</option>
+            </select>
+            <select [(ngModel)]="patrimonioTypeFilter">
+              <option value="ALL">Todos os tipos</option>
+              @for (t of tipos; track trackByIndex($index, t)) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="patrimony-chart">
+          <div class="patrimony-axis">
+            @for (tick of patrimonioAxisTicks; track trackByIndex($index, tick)) {
+              <span>{{ formatPatrimonioAxisValue(tick) }}</span>
+            }
+          </div>
+          <div class="patrimony-plot">
+            <div class="patrimony-chart__bars" [style.gridTemplateColumns]="patrimonioGridColumns">
+              @for (item of patrimonioEvolucaoSeries; track trackByIndex($index, item)) {
+                <div class="patrimony-column">
+                  <div class="patrimony-bars">
+                    <div class="patrimony-chart__grid">
+                      @for (_ of [1,2,3,4,5,6]; track trackByIndex($index, _)) {
+                        <span class="patrimony-chart__line"></span>
+                      }
+                    </div>
+                    <div class="patrimony-bars__stack">
+                      <span class="bar aplicado" [style.height.%]="(item.aplicado / patrimonioChartMax) * 100"></span>
+                      <span class="bar ganho" [style.height.%]="(item.ganho / patrimonioChartMax) * 100"></span>
+                    </div>
+                  </div>
+                  <span class="chart-hover-tip">
+                    Aplicado: {{ item.aplicado | currency:'BRL':'symbol':'1.2-2' }}<br />
+                    Ganho: {{ item.ganho | currency:'BRL':'symbol':'1.2-2' }}<br />
+                    Total: {{ item.total | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                  <small class="patrimony-x-label">{{ item.label }}</small>
                 </div>
-                <div class="patrimony-bars__stack">
-                  <span class="bar aplicado" [style.height.%]="(item.aplicado / patrimonioChartMax) * 100"></span>
-                  <span class="bar ganho" [style.height.%]="(item.ganho / patrimonioChartMax) * 100"></span>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="legend-row">
+          <span><i class="chip aplicado"></i> Valor aplicado</span>
+          <span><i class="chip ganho"></i> Ganho capital</span>
+          @if (patrimonioEvolucaoEstimado) {
+            <span class="muted">Série estimada pelo saldo atual (histórico mensal insuficiente)</span>
+          }
+        </div>
+      </article>
+      <article class="card chart-card">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Ativos na carteira</h3>
+          </div>
+          <div class="chart-filters">
+            <select [(ngModel)]="carteiraTypeFilter">
+              <option value="ALL">Todos os tipos</option>
+              @for (t of tipos; track trackByIndex($index, t)) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        @if (carteiraDistribuicaoChart.length) {
+          <div class="donut-layout">
+            <div class="donut" [style.background]="carteiraDistribuicaoConicGradient" aria-hidden="true"></div>
+            <div class="distribution-list">
+              @for (item of carteiraDistribuicaoChart; track trackByIndex($index, item)) {
+                <div class="distribution-item">
+                  <div class="distribution-item__top">
+                    <div class="legend">
+                      <span class="legend__dot" [style.background]="item.color"></span>
+                      <strong>{{ item.label }}</strong>
+                    </div>
+                    <span>{{ item.percent | number:'1.1-1' }}%</span>
+                  </div>
+                  <small>{{ item.value | currency:'BRL':'symbol':'1.2-2' }}</small>
+                  <span class="chart-hover-tip">
+                    {{ item.label }}<br />
+                    Participação: {{ item.percent | number:'1.1-1' }}%<br />
+                    Valor: {{ item.value | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
                 </div>
-              </div>
-              <span class="chart-hover-tip">
-                Aplicado: {{ item.aplicado | currency:'BRL':'symbol':'1.2-2' }}<br />
-                Ganho: {{ item.ganho | currency:'BRL':'symbol':'1.2-2' }}<br />
-                Total: {{ item.total | currency:'BRL':'symbol':'1.2-2' }}
-              </span>
-              <small class="patrimony-x-label">{{ item.label }}</small>
+              }
             </div>
           </div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <span><i class="chip aplicado"></i> Valor aplicado</span>
-        <span><i class="chip ganho"></i> Ganho capital</span>
-        <span *ngIf="patrimonioEvolucaoEstimado" class="muted">Série estimada pelo saldo atual (histórico mensal insuficiente)</span>
-      </div>
-    </article>
-
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Ativos na carteira</h3>
-        </div>
-        <div class="chart-filters">
-          <select [(ngModel)]="carteiraTypeFilter">
-            <option value="ALL">Todos os tipos</option>
-            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
-          </select>
-        </div>
-      </div>
-      <div class="donut-layout" *ngIf="carteiraDistribuicaoChart.length; else semDistribuicaoResumo">
-        <div class="donut" [style.background]="carteiraDistribuicaoConicGradient" aria-hidden="true"></div>
-        <div class="distribution-list">
-          <div class="distribution-item" *ngFor="let item of carteiraDistribuicaoChart; trackBy: trackByIndex">
-            <div class="distribution-item__top">
-              <div class="legend">
-                <span class="legend__dot" [style.background]="item.color"></span>
-                <strong>{{ item.label }}</strong>
-              </div>
-              <span>{{ item.percent | number:'1.1-1' }}%</span>
-            </div>
-            <small>{{ item.value | currency:'BRL':'symbol':'1.2-2' }}</small>
-            <span class="chart-hover-tip">
-              {{ item.label }}<br />
-              Participação: {{ item.percent | number:'1.1-1' }}%<br />
-              Valor: {{ item.value | currency:'BRL':'symbol':'1.2-2' }}
-            </span>
-          </div>
-        </div>
-      </div>
-      <ng-template #semDistribuicaoResumo>
-        <div class="empty">Sem dados para a distribuição atual.</div>
-      </ng-template>
-    </article>
-  </section>
-
-  <article class="card action-card" *ngIf="activeTab === 'ANALISE'">
-    <div>
-      <p class="label">O que fazer agora</p>
-      <strong>{{ proximaAcao.titulo }}</strong>
-      <small>{{ proximaAcao.descricao }}</small>
-    </div>
-    <button class="btn-primary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
-  </article>
-
-  <div class="card" id="sec-posicoes" *ngIf="activeTab === 'RESUMO'">
-    <div class="section-head">
-      <h3>Meus Ativos</h3>
-      <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
-    </div>
-
-    <div class="table-filters">
-      <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onFiltroMudou()" placeholder="Buscar por ativo, conta ou categoria" />
-      <select [(ngModel)]="filterType" (ngModelChange)="onFiltroMudou()">
-        <option value="ALL">Todos os tipos</option>
-        <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
-      </select>
-      <select [(ngModel)]="filterAccount" (ngModelChange)="onFiltroMudou()">
-        <option value="ALL">Todas as contas</option>
-        <option *ngFor="let acc of contasDisponiveis; trackBy: trackByIndex" [value]="acc">{{ acc }}</option>
-      </select>
-      <select [(ngModel)]="filterStatus" (ngModelChange)="onFiltroMudou()">
-        <option value="ALL">Todos os status</option>
-        <option value="ACTIVE">Ativas</option>
-        <option value="ZEROED">Zeradas</option>
-      </select>
-    </div>
-
-    <div *ngIf="!sortedPositions.length" class="empty">Nenhuma posição para os filtros atuais.</div>
-    <div class="table-wrap" *ngIf="sortedPositions.length">
-      <table>
-        <thead>
-          <tr>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('asset')" title="Código do ativo na carteira (ticker B3).">Ativo <span>{{ sortIcon('asset') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('paperType')" title="Classificação do ativo: ON/PN/PNA/PNB/UNT ou Cotas">Classe <span>{{ sortIcon('paperType') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('status')" title="Ativa: quantidade maior que zero. Zerada: quantidade igual a zero.">Status <span>{{ sortIcon('status') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')" title="Quantidade atual do ativo em carteira.">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')" title="Preço médio por unidade da posição (custo médio).">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
-            <th title="Preço atual de mercado por unidade, quando disponível na fonte de cotação.">Preço mercado</th>
-            <th title="Variação percentual entre preço de mercado e preço médio: (preço mercado - preço médio) / preço médio.">Variação</th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')" title="Valor atual da posição: quantidade × preço de mercado (ou preço médio no fallback).">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('portfolioPercent')" title="Participação desta posição no patrimônio total da carteira">% carteira <span>{{ sortIcon('portfolioPercent') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade atual da posição: (resultado / base da posição) × 100.">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
-            <th><button class="sort-btn" type="button" (click)="ordenarPor('estimatedResult')" title="Resultado financeiro da posição: valor atual - base da posição (quantidade × preço médio).">Resultado <span>{{ sortIcon('estimatedResult') }}</span></button></th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of pagedPositions; trackBy: trackByIndex">
-            <td>
-              <div class="asset-cell">
-                <img *ngIf="marketLogo(p)" [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" />
-                <span>{{ p.asset }}</span>
-              </div>
-            </td>
-            <td>{{ tipoPapel(p) }}</td>
-            <td>
-              <span class="status-pill" [class.zeroed]="p.quantity <= 0">
-                {{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}
-              </span>
-            </td>
-            <td>{{ p.quantity }}</td>
-            <td>{{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}</td>
-            <td>
-              <span *ngIf="marketPrice(p) !== null; else fallbackMarketPrice">{{ marketPrice(p) | currency: 'BRL':'symbol':'1.2-2' }}</span>
-              <ng-template #fallbackMarketPrice>
-                <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
-                  {{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}*
-                </span>
-              </ng-template>
-            </td>
-            <td [class.success]="(variacaoPrecoPercent(p) || 0) >= 0" [class.danger]="(variacaoPrecoPercent(p) || 0) < 0">
-              <span *ngIf="variacaoPrecoPercent(p) !== null; else noMarketChange">{{ variacaoPrecoPercent(p) | number:'1.2-2' }}%</span>
-              <ng-template #noMarketChange><span class="muted">-</span></ng-template>
-            </td>
-            <td>{{ valorAtualPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}</td>
-            <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
-            <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
-              {{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%
-            </td>
-            <td [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">
-              {{ resultadoPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}
-            </td>
-            <td>
-              <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="table-pagination" *ngIf="sortedPositions.length">
-      <button class="btn-ghost sm" type="button" (click)="mudarPagina(-1)" [disabled]="currentPage <= 1">Anterior</button>
-      <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }}</small>
-      <button class="btn-ghost sm" type="button" (click)="mudarPagina(1)" [disabled]="currentPage >= totalPages">Próxima</button>
-    </div>
-  </div>
-
-  <section *ngIf="activeTab === 'CONSOLIDACAO'" class="consolidacao">
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Consolidação de aportes</h3>
-        </div>
-        <div class="chart-filters">
-          <select [(ngModel)]="consolidacaoGranularidade">
-            <option value="MONTHLY">Mensal</option>
-          </select>
-          <select [(ngModel)]="consolidacaoHorizonteAnos">
-            <option [ngValue]="1">1 ano</option>
-            <option [ngValue]="2">2 anos</option>
-            <option [ngValue]="3">3 anos</option>
-          </select>
-          <select [(ngModel)]="consolidacaoTipoFiltro">
-            <option value="ALL">Todos os tipos</option>
-            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="consolidacao-chart">
-        <div class="consolidacao-axis">
-          <span>{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
-          <span>{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
-          <span>R$ 0</span>
-          <span>-{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
-          <span>-{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
-        </div>
-        <div class="consolidacao-plot">
-          <div class="consolidacao-grid-lines">
-            <span *ngFor="let _ of [1,2,3,4,5]; trackBy: trackByIndex"></span>
-          </div>
-          <div class="consolidacao-zero-line"></div>
-          <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + consolidacaoSeries.length + ', minmax(0, 1fr))'">
-            <div class="consolidacao-col" *ngFor="let item of consolidacaoSeries; trackBy: trackByIndex">
-              <div class="consolidacao-bars__stack">
-                <span
-                  class="bar compra"
-                  [style.height.%]="(item.compras / consolidacaoChartMax) * 50"
-                  [attr.title]="'Compras: ' + (item.compras | currency:'BRL':'symbol':'1.2-2')"></span>
-                <span
-                  class="bar venda"
-                  [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"
-                  [attr.title]="'Vendas: ' + (item.vendas | currency:'BRL':'symbol':'1.2-2')"></span>
-              </div>
-              <small>{{ item.label }}</small>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <span><i class="chip compra"></i> Compras</span>
-        <span><i class="chip venda"></i> Vendas</span>
-      </div>
-    </article>
-
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Lançamentos consolidados</h3>
-        </div>
-        <input type="text" [(ngModel)]="consolidacaoSearchTerm" placeholder="Buscar ativos" />
-      </div>
-
-      <div class="table-wrap" *ngIf="consolidacaoRows.length; else semConsolidacaoRows">
-        <table>
-          <thead>
-            <tr>
-              <th>Ativo</th>
-              <th>Tipo de investimento</th>
-              <th>Tipo de ordem</th>
-              <th>Quantidade</th>
-              <th>Preço unitário</th>
-              <th>Total</th>
-              <th>Quantidade total</th>
-              <th>Data do lançamento</th>
-              <th>Fonte</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of consolidacaoRows; trackBy: trackById">
-              <td><strong>{{ row.asset }}</strong></td>
-              <td>{{ investimentoTipoLabel(row.investmentType) }}</td>
-              <td [class.success]="row.ordem === 'Compra'" [class.danger]="row.ordem === 'Venda'">{{ row.ordem }}</td>
-              <td>{{ row.quantity | number:'1.0-4' }}</td>
-              <td>{{ row.unitPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ row.total | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ row.quantityAfter | number:'1.0-4' }}</td>
-              <td>{{ row.date | date:'dd/MM/yyyy' }}</td>
-              <td><span class="status-pill" [class.zeroed]="row.source === 'Manual'">{{ row.source }}</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <ng-template #semConsolidacaoRows>
-        <div class="empty">Sem lançamentos para os filtros atuais.</div>
-      </ng-template>
-    </article>
-  </section>
-
-  <section class="visual-grid" *ngIf="activeTab === 'ANALISE'">
-    <article class="card chart-card" id="sec-alocacao" *ngIf="activeTab === 'ANALISE'">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Alocação da carteira</h3>
-          <button type="button" class="hint" aria-label="Explicação do gráfico de alocação">
-            i
-            <span class="hint__panel">Mostra como sua carteira está distribuída por classe de ativo.</span>
-          </button>
-        </div>
-        <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
-      </div>
-      <div *ngIf="!distribuicaoPorTipoComCor.length" class="empty">Sem posições para exibir distribuição.</div>
-      <div class="donut-layout" *ngIf="distribuicaoPorTipoComCor.length">
-        <div class="donut" [style.background]="distribuicaoConicGradient" aria-hidden="true"></div>
-        <div class="distribution-list">
-          <div class="distribution-item" *ngFor="let item of distribuicaoPorTipoComCor; trackBy: trackByIndex">
-            <div class="distribution-item__top">
-              <div class="legend">
-                <span class="legend__dot" [style.background]="item.color"></span>
-                <strong>{{ item.label }}</strong>
-              </div>
-              <span>{{ item.value | currency: 'BRL':'symbol':'1.2-2' }}</span>
-            </div>
-            <small>{{ item.percent | number:'1.0-1' }}%</small>
-          </div>
-        </div>
-      </div>
-    </article>
-
-  </section>
-
-  <section class="rentabilidade-grid" *ngIf="activeTab === 'RENTABILIDADE'">
-    <div class="rentabilidade-side">
-      <article class="card executive-card rent-card">
-        <p class="label">Total</p>
-        <small>Rentabilidade</small>
-        <strong [class.success]="rentabilidadeTotalPercent >= 0" [class.danger]="rentabilidadeTotalPercent < 0">
-          {{ rentabilidadeTotalPercent | number:'1.2-2' }}%
-        </strong>
-        <small>{{ comparativoCdiLabel(rentabilidadeTotalPercent, rentabilidadeTotalCdiPercent) }}</small>
+        } @else {
+          <div class="empty">Sem dados para a distribuição atual.</div>
+        }
       </article>
-      <article class="card executive-card rent-card">
-        <p class="label">Últimos 12 meses</p>
-        <small>Rentabilidade</small>
-        <strong [class.success]="rentabilidade12mPercent >= 0" [class.danger]="rentabilidade12mPercent < 0">
-          {{ rentabilidade12mPercent | number:'1.2-2' }}%
-        </strong>
-        <small>{{ comparativoCdiLabel(rentabilidade12mPercent, rentabilidade12mCdiPercent) }}</small>
-      </article>
-      <article class="card executive-card rent-card">
-        <p class="label">Último mês</p>
-        <small>Rentabilidade</small>
-        <strong [class.success]="rentabilidadeUltimoMesPercent >= 0" [class.danger]="rentabilidadeUltimoMesPercent < 0">
-          {{ rentabilidadeUltimoMesPercent | number:'1.2-2' }}%
-        </strong>
-        <small>{{ comparativoCdiLabel(rentabilidadeUltimoMesPercent, rentabilidadeUltimoMesCdiPercent) }}</small>
-      </article>
-    </div>
+    </section>
+  }
 
-    <article class="card chart-card rentabilidade-main" id="sec-evolucao">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Rentabilidade comparada com índices</h3>
-        </div>
-        <div class="chart-filters">
-          <select [(ngModel)]="rentabilidadePeriodo">
-            <option value="SINCE_START">Desde o início</option>
-            <option value="LAST_12M">Últimos 12 meses</option>
-          </select>
-          <select [(ngModel)]="rentabilidadeBenchmark">
-            <option *ngFor="let item of benchmarkOptions; trackBy: trackByIndex" [value]="item.key">{{ item.label }}</option>
-          </select>
-          <select [(ngModel)]="rentabilidadeTipoFiltro">
-            <option value="ALL">Todos os tipos</option>
-            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
-          </select>
-        </div>
+  @if (activeTab === 'ANALISE') {
+    <article class="card action-card">
+      <div>
+        <p class="label">O que fazer agora</p>
+        <strong>{{ proximaAcao.titulo }}</strong>
+        <small>{{ proximaAcao.descricao }}</small>
       </div>
-
-      <div class="rentabilidade-chart">
-        <div class="rentabilidade-axis">
-          <span *ngFor="let tick of rentabilidadeChartTicks; trackBy: trackByIndex">{{ tick | number:'1.0-0' }}%</span>
-        </div>
-        <div class="rentabilidade-plot">
-          <div class="rentabilidade-grid-lines">
-            <span *ngFor="let _ of [1,2,3,4,5]; trackBy: trackByIndex"></span>
-          </div>
-          <svg
-            viewBox="0 0 1000 280"
-            preserveAspectRatio="none"
-            role="img"
-            aria-label="Evolução de rentabilidade da carteira e índice"
-            [style.--benchmark-color]="indiceSelecionadoCor">
-            <polyline class="line cdi" [attr.points]="rentabilidadeLinhaCdi"></polyline>
-            <polyline class="line carteira" [attr.points]="rentabilidadeLinhaCarteira"></polyline>
-          </svg>
-          <div class="rentabilidade-x-axis">
-            <small *ngFor="let point of rentabilidadeSeries; trackBy: trackByIndex">{{ point.label }}</small>
-          </div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <span><i class="chip carteira"></i> Carteira</span>
-        <span><i class="chip cdi" [style.background]="indiceSelecionadoCor"></i> {{ indiceSelecionadoLabel }} (estimado no período)</span>
-      </div>
+      <button class="btn-primary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
     </article>
-  </section>
+  }
 
-  <section class="proventos-grid" *ngIf="activeTab === 'PROVENTOS'">
-    <article class="card chart-card">
+  @if (activeTab === 'RESUMO') {
+    <div class="card" id="sec-posicoes">
       <div class="section-head">
-        <div class="section-head__title">
-          <h3>Resumo de proventos</h3>
-        </div>
+        <h3>Meus Ativos</h3>
+        <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
       </div>
-      <div class="proventos-summary">
-        <div class="proventos-summary__row">
-          <small>Média mensal (12 meses)</small>
-          <strong>{{ proventosMedia12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
-        </div>
-        <div class="proventos-summary__row">
-          <small>Total em 12 meses</small>
-          <strong>{{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
-        </div>
-        <div class="proventos-summary__row">
-          <small>Ativos pagadores</small>
-          <strong>{{ proventosAtivosPagadores }}</strong>
-        </div>
-      </div>
-    </article>
-
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Evolução mensal de proventos</h3>
-          <button type="button" class="hint" aria-label="Explicação do gráfico evolução de proventos">
-            i
-            <span class="hint__panel">Total recebido por mês em dividendos, JCP e rendimentos nos últimos 12 meses.</span>
-          </button>
-        </div>
-        <span class="muted">Últimos 12 meses</span>
-      </div>
-      <div class="proventos-evolution">
-        <div class="proventos-evolution__column" *ngFor="let item of proventosMensaisSeries; trackBy: trackByIndex">
-          <div class="proventos-evolution__bars">
-            <span
-              class="bar provento"
-              [style.height.%]="(item.total / proventosMensaisMax) * 100"
-              [attr.title]="item.label + ': ' + (item.total | currency:'BRL':'symbol':'1.2-2')"></span>
-          </div>
-          <small>{{ item.label }}</small>
-        </div>
-      </div>
-    </article>
-  </section>
-
-  <article class="card chart-card" *ngIf="activeTab === 'PROVENTOS'">
-    <div class="section-head">
-      <div class="section-head__title">
-        <h3>Ativos que pagam proventos</h3>
-      </div>
-      <span class="muted">Total: {{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</span>
-    </div>
-    <div *ngIf="!proventosPorAtivo12Meses.length" class="empty">Sem proventos registrados no período.</div>
-    <div class="income-list" *ngIf="proventosPorAtivo12Meses.length">
-      <div class="income-item" *ngFor="let item of proventosPorAtivo12Meses; trackBy: trackByIndex">
-        <div class="income-item__top">
-          <strong>{{ item.asset }}</strong>
-          <span>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-        <div class="progress-bar slim">
-          <span [style.width.%]="(item.total / proventosTotal12Meses) * 100"></span>
-        </div>
-        <small>{{ item.percent | number:'1.1-1' }}% do total</small>
-      </div>
-    </div>
-  </article>
-
-  <article class="card chart-card" *ngIf="activeTab === 'RENTABILIDADE'">
-    <div class="section-head">
-      <div class="section-head__title">
-        <h3>Rentabilidade mensal</h3>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Ano</th>
-            <th>Jan</th>
-            <th>Fev</th>
-            <th>Mar</th>
-            <th>Abr</th>
-            <th>Mai</th>
-            <th>Jun</th>
-            <th>Jul</th>
-            <th>Ago</th>
-            <th>Set</th>
-            <th>Out</th>
-            <th>Nov</th>
-            <th>Dez</th>
-            <th>Ano</th>
-            <th>Acumulado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of rentabilidadeTabelaAnual; trackBy: trackByIndex">
-            <td><strong>{{ row.year }}</strong></td>
-            <td *ngFor="let monthValue of row.months; trackBy: trackByIndex" [class.success]="(monthValue || 0) >= 0" [class.danger]="(monthValue || 0) < 0">
-              {{ monthValue === null ? '-' : ((monthValue | number:'1.2-2') + '%') }}
-            </td>
-            <td [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">{{ row.yearValue | number:'1.2-2' }}%</td>
-            <td [class.success]="row.acumulado >= 0" [class.danger]="row.acumulado < 0">{{ row.acumulado | number:'1.2-2' }}%</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </article>
-
-  <section class="visual-grid" *ngIf="activeTab === 'ANALISE'">
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Alocação alvo e alertas</h3>
-          <button type="button" class="hint" aria-label="Explicação da alocação alvo">
-            i
-            <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
-          </button>
-        </div>
-        <button class="btn-ghost sm" type="button" (click)="showAlocacaoConfig = !showAlocacaoConfig">
-          {{ showAlocacaoConfig ? 'Fechar parâmetros' : 'Editar alocação alvo' }}
-        </button>
-      </div>
-      <div class="allocation-config" *ngIf="showAlocacaoConfig">
-        <div class="allocation-config__inputs">
-          <label *ngFor="let t of allocationTypes; trackBy: trackByIndex">
-            <span>{{ t.label }}</span>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="0.1"
-              [ngModel]="targetAllocation[t.value]"
-              (ngModelChange)="updateTargetAllocation(t.value, $event)" />
-          </label>
-        </div>
-        <small class="muted" [class.danger]="targetAllocationTotal !== 100">
-          Total configurado: {{ targetAllocationTotal | number:'1.1-1' }}%
-        </small>
-        <div class="allocation-config__actions">
-          <button class="btn-ghost sm" type="button" (click)="resetTargetAllocation()">Resetar padrão</button>
-          <button class="btn-primary sm" type="button" (click)="saveTargetAllocation()">Salvar</button>
-        </div>
-      </div>
-      <div class="allocation-list">
-        <div class="allocation-item" *ngFor="let item of alvoAlocacao; trackBy: trackByIndex">
-          <div class="allocation-item__top">
-            <strong>{{ item.label }}</strong>
-            <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
-          </div>
-          <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
-          <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? '• rebalancear' : '' }}</small>
-        </div>
-      </div>
-    </article>
-  </section>
-
-  <div class="modal" *ngIf="showCadastro">
-    <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
-    <div class="modal__card modal__card--launch">
-      <div class="launch-header">
-        <h3>Adicionar lançamento</h3>
-        <button class="modal__close" type="button" (click)="closeCadastroModal()">✕</button>
-      </div>
-      <div class="launch-type">
-        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao('COMPRA')">Compra</button>
-        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao('VENDA')">Venda</button>
-      </div>
-      <div class="form grid-form" *ngIf="cadastroOperacao === 'COMPRA'">
-        <div>
-          <label>Tipo de ativo</label>
-          <select [(ngModel)]="novaPosicao.type" name="type">
-            <option *ngFor="let t of tipos; trackBy: trackByIndex" [value]="t.value">{{ t.label }}</option>
-          </select>
-        </div>
-        <div>
-          <label>Ativo</label>
-          <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
-        </div>
-        <div>
-          <label>Quantidade</label>
-          <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
-        </div>
-        <div>
-          <label>Preço em R$</label>
-          <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
-        </div>
-        <div>
-          <label>Outros custos <span class="muted">(opcional)</span></label>
-          <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="cadastroCustos" />
-        </div>
-        <div>
-          <label>Data da compra</label>
-          <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
-        </div>
-        <div>
-          <label>Conta/Corretora</label>
-          <input
-            type="text"
-            [(ngModel)]="novaPosicao.account"
-            name="account"
-            placeholder="Ex.: Nubank, XP"
-            list="brokerOptions" />
-          <datalist id="brokerOptions">
-            <option *ngFor="let inst of institutions; trackBy: trackByIndex" [value]="inst.name"></option>
-          </datalist>
-        </div>
-        <div>
-          <label>Categoria (opcional)</label>
-          <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
-        </div>
-      </div>
-      <div class="form grid-form" *ngIf="cadastroOperacao === 'VENDA'">
-        <div>
-          <label>Ativo</label>
-          <select [(ngModel)]="vendaPositionId" name="vendaPositionId" (ngModelChange)="onVendaPositionChange()">
-            <option value="">Selecione</option>
-            <option *ngFor="let p of posicoesVendaveis; trackBy: trackById" [value]="p.id">
-              {{ p.asset }} ({{ p.quantity | number:'1.0-4' }})
-            </option>
-          </select>
-        </div>
-        <div>
-          <label>Quantidade</label>
-          <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
-        </div>
-        <div>
-          <label>Preço em R$</label>
-          <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
-        </div>
-        <div>
-          <label>Outros custos <span class="muted">(opcional)</span></label>
-          <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="vendaCustos" />
-        </div>
-        <div>
-          <label>Data da venda</label>
-          <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
-        </div>
-        <div>
-          <label>Observação (opcional)</label>
-          <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
-        </div>
-      </div>
-      <div class="launch-total">
-        <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
-        <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | currency:'BRL':'symbol':'1.2-2' }}</strong>
-      </div>
-      <div class="actions">
-        <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
-        <button class="btn-primary" type="button" (click)="cadastroOperacao === 'COMPRA' ? salvarPosicao() : salvarVenda()">
-          {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" *ngIf="showMovimento && posSelecionada">
-    <div class="modal__backdrop" (click)="closeMovimentoModal()"></div>
-    <div class="modal__card">
-      <h3>Registrar compra/venda para {{ posSelecionada.asset }}</h3>
-      <div class="form inline">
-        <label>Operação</label>
-        <select [(ngModel)]="movimento.type" name="movType">
-          <option *ngFor="let tipo of movimentoTipos; trackBy: trackByIndex" [value]="tipo.value">{{ tipo.label }}</option>
+      <div class="table-filters">
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onFiltroMudou()" placeholder="Buscar por ativo, conta ou categoria" />
+        <select [(ngModel)]="filterType" (ngModelChange)="onFiltroMudou()">
+          <option value="ALL">Todos os tipos</option>
+          @for (t of tipos; track trackByIndex($index, t)) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
         </select>
-
-        <label>Qtd.</label>
-        <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
-
-        <label>Preço unitário</label>
-        <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
-
-        <label>Outros custos</label>
-        <input type="number" min="0" step="any" [(ngModel)]="movimentoCustos" name="movCost" />
-
-        <label>Data</label>
-        <input type="date" [(ngModel)]="movimento.date" name="movDate" />
-
-        <label>Nota</label>
-        <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+        <select [(ngModel)]="filterAccount" (ngModelChange)="onFiltroMudou()">
+          <option value="ALL">Todas as contas</option>
+          @for (acc of contasDisponiveis; track trackByIndex($index, acc)) {
+            <option [value]="acc">{{ acc }}</option>
+          }
+        </select>
+        <select [(ngModel)]="filterStatus" (ngModelChange)="onFiltroMudou()">
+          <option value="ALL">Todos os status</option>
+          <option value="ACTIVE">Ativas</option>
+          <option value="ZEROED">Zeradas</option>
+        </select>
       </div>
-      <div class="launch-total">
-        <span>Valor total</span>
-        <strong>{{ movimentoValorTotal | currency:'BRL':'symbol':'1.2-2' }}</strong>
-      </div>
-      <div class="actions">
-        <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
-        <button class="btn-cancel sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
-      </div>
+      @if (!sortedPositions.length) {
+        <div class="empty">Nenhuma posição para os filtros atuais.</div>
+      }
+      @if (sortedPositions.length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('asset')" title="Código do ativo na carteira (ticker B3).">Ativo <span>{{ sortIcon('asset') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('paperType')" title="Classificação do ativo: ON/PN/PNA/PNB/UNT ou Cotas">Classe <span>{{ sortIcon('paperType') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('status')" title="Ativa: quantidade maior que zero. Zerada: quantidade igual a zero.">Status <span>{{ sortIcon('status') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')" title="Quantidade atual do ativo em carteira.">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')" title="Preço médio por unidade da posição (custo médio).">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
+                <th title="Preço atual de mercado por unidade, quando disponível na fonte de cotação.">Preço mercado</th>
+                <th title="Variação percentual entre preço de mercado e preço médio: (preço mercado - preço médio) / preço médio.">Variação</th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')" title="Valor atual da posição: quantidade × preço de mercado (ou preço médio no fallback).">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('portfolioPercent')" title="Participação desta posição no patrimônio total da carteira">% carteira <span>{{ sortIcon('portfolioPercent') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade atual da posição: (resultado / base da posição) × 100.">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
+                <th><button class="sort-btn" type="button" (click)="ordenarPor('estimatedResult')" title="Resultado financeiro da posição: valor atual - base da posição (quantidade × preço médio).">Resultado <span>{{ sortIcon('estimatedResult') }}</span></button></th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of pagedPositions; track trackByIndex($index, p)) {
+                <tr>
+                  <td>
+                    <div class="asset-cell">
+                      @if (marketLogo(p)) {
+                        <img [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" />
+                      }
+                      <span>{{ p.asset }}</span>
+                    </div>
+                  </td>
+                  <td>{{ tipoPapel(p) }}</td>
+                  <td>
+                    <span class="status-pill" [class.zeroed]="p.quantity <= 0">
+                      {{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}
+                    </span>
+                  </td>
+                  <td>{{ p.quantity }}</td>
+                  <td>{{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}</td>
+                  <td>
+                    @if (marketPrice(p) !== null) {
+                      <span>{{ marketPrice(p) | currency: 'BRL':'symbol':'1.2-2' }}</span>
+                    } @else {
+                      <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
+                        {{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}*
+                      </span>
+                    }
+                  </td>
+                  <td [class.success]="(variacaoPrecoPercent(p) || 0) >= 0" [class.danger]="(variacaoPrecoPercent(p) || 0) < 0">
+                    @if (variacaoPrecoPercent(p) !== null) {
+                      <span>{{ variacaoPrecoPercent(p) | number:'1.2-2' }}%</span>
+                    } @else {
+                      <span class="muted">-</span>
+                    }
+                  </td>
+                  <td>{{ valorAtualPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
+                  <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
+                    {{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%
+                  </td>
+                  <td [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">
+                    {{ resultadoPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}
+                  </td>
+                  <td>
+                    <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (sortedPositions.length) {
+        <div class="table-pagination">
+          <button class="btn-ghost sm" type="button" (click)="mudarPagina(-1)" [disabled]="currentPage <= 1">Anterior</button>
+          <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }}</small>
+          <button class="btn-ghost sm" type="button" (click)="mudarPagina(1)" [disabled]="currentPage >= totalPages">Próxima</button>
+        </div>
+      }
     </div>
-  </div>
+  }
 
-  <div class="modal" *ngIf="showB3Import">
-    <div class="modal__backdrop" (click)="closeB3ImportModal()"></div>
-    <div class="modal__card modal__card--wide">
-      <h3>Importações e exportações</h3>
-
-      <section class="import-section">
-        <p class="label">Relatório consolidado da B3 (PDF)</p>
-        <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
-        <div class="import-upload">
-          <label class="btn-primary sm import-upload__button">
-            <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
-            Escolher PDF
-          </label>
-          <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
-        </div>
-
-        <div class="muted" *ngIf="b3Loading">Lendo relatório...</div>
-        <div class="danger" *ngIf="b3Error">{{ b3Error }}</div>
-      </section>
-
-      <section class="import-section">
-        <p class="label">Planilha CSV</p>
-        <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
-        <div class="import-compact">
-          <div class="import-upload">
-            <label class="btn-primary sm import-upload__button">
-              <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
-              Importar CSV
-            </label>
-            <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Exportar modelo</button>
+  @if (activeTab === 'CONSOLIDACAO') {
+    <section class="consolidacao">
+      <article class="card chart-card">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Consolidação de aportes</h3>
           </div>
-          <small class="muted">Importados nesta execução: {{ csvImported }}</small>
+          <div class="chart-filters">
+            <select [(ngModel)]="consolidacaoGranularidade">
+              <option value="MONTHLY">Mensal</option>
+            </select>
+            <select [(ngModel)]="consolidacaoHorizonteAnos">
+              <option [ngValue]="1">1 ano</option>
+              <option [ngValue]="2">2 anos</option>
+              <option [ngValue]="3">3 anos</option>
+            </select>
+            <select [(ngModel)]="consolidacaoTipoFiltro">
+              <option value="ALL">Todos os tipos</option>
+              @for (t of tipos; track trackByIndex($index, t)) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+          </div>
         </div>
-        <div class="danger" *ngIf="csvError">{{ csvError }}</div>
-        <details class="csv-preview" *ngIf="csvPreviewRows.length">
-          <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
+        <div class="consolidacao-chart">
+          <div class="consolidacao-axis">
+            <span>{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
+            <span>{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
+            <span>R$ 0</span>
+            <span>-{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
+            <span>-{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="consolidacao-plot">
+            <div class="consolidacao-grid-lines">
+              @for (_ of [1,2,3,4,5]; track trackByIndex($index, _)) {
+                <span></span>
+              }
+            </div>
+            <div class="consolidacao-zero-line"></div>
+            <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + consolidacaoSeries.length + ', minmax(0, 1fr))'">
+              @for (item of consolidacaoSeries; track trackByIndex($index, item)) {
+                <div class="consolidacao-col">
+                  <div class="consolidacao-bars__stack">
+                    <span
+                      class="bar compra"
+                      [style.height.%]="(item.compras / consolidacaoChartMax) * 50"
+                    [attr.title]="'Compras: ' + (item.compras | currency:'BRL':'symbol':'1.2-2')"></span>
+                    <span
+                      class="bar venda"
+                      [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"
+                    [attr.title]="'Vendas: ' + (item.vendas | currency:'BRL':'symbol':'1.2-2')"></span>
+                  </div>
+                  <small>{{ item.label }}</small>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="legend-row">
+          <span><i class="chip compra"></i> Compras</span>
+          <span><i class="chip venda"></i> Vendas</span>
+        </div>
+      </article>
+      <article class="card chart-card">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Lançamentos consolidados</h3>
+          </div>
+          <input type="text" [(ngModel)]="consolidacaoSearchTerm" placeholder="Buscar ativos" />
+        </div>
+        @if (consolidacaoRows.length) {
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Tipo</th>
                   <th>Ativo</th>
-                  <th>Qtd</th>
-                  <th>Preço médio</th>
-                  <th>Conta</th>
+                  <th>Tipo de investimento</th>
+                  <th>Tipo de ordem</th>
+                  <th>Quantidade</th>
+                  <th>Preço unitário</th>
+                  <th>Total</th>
+                  <th>Quantidade total</th>
+                  <th>Data do lançamento</th>
+                  <th>Fonte</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let row of csvPreviewRows; trackBy: trackByIndex">
-                  <td>{{ row.type }}</td>
-                  <td>{{ row.asset }}</td>
-                  <td>{{ row.quantity }}</td>
-                  <td>{{ row.avgPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
-                  <td>{{ row.account }}</td>
-                </tr>
+                @for (row of consolidacaoRows; track trackById($index, row)) {
+                  <tr>
+                    <td><strong>{{ row.asset }}</strong></td>
+                    <td>{{ investimentoTipoLabel(row.investmentType) }}</td>
+                    <td [class.success]="row.ordem === 'Compra'" [class.danger]="row.ordem === 'Venda'">{{ row.ordem }}</td>
+                    <td>{{ row.quantity | number:'1.0-4' }}</td>
+                    <td>{{ row.unitPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+                    <td>{{ row.total | currency:'BRL':'symbol':'1.2-2' }}</td>
+                    <td>{{ row.quantityAfter | number:'1.0-4' }}</td>
+                    <td>{{ row.date | date:'dd/MM/yyyy' }}</td>
+                    <td><span class="status-pill" [class.zeroed]="row.source === 'Manual'">{{ row.source }}</span></td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
-        </details>
-      </section>
+        } @else {
+          <div class="empty">Sem lançamentos para os filtros atuais.</div>
+        }
+      </article>
+    </section>
+  }
 
-      <ng-container *ngIf="b3Preview">
-        <div class="executive-grid">
-          <article class="card executive-card">
-            <p class="label">Mês de referência</p>
-            <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
-          </article>
-          <article class="card executive-card">
-            <p class="label">Total em posições</p>
-            <strong>{{ b3Preview.totals.positions | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          </article>
-          <article class="card executive-card">
-            <p class="label">Proventos</p>
-            <strong>{{ b3Preview.totals.incomes | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          </article>
-          <article class="card executive-card">
-            <p class="label">Negociações</p>
-            <strong>{{ b3Preview.trades.length }}</strong>
-          </article>
-        </div>
+  @if (activeTab === 'ANALISE') {
+    <section class="visual-grid">
+      @if (activeTab === 'ANALISE') {
+        <article class="card chart-card" id="sec-alocacao">
+          <div class="section-head">
+            <div class="section-head__title">
+              <h3>Alocação da carteira</h3>
+              <button type="button" class="hint" aria-label="Explicação do gráfico de alocação">
+                i
+                <span class="hint__panel">Mostra como sua carteira está distribuída por classe de ativo.</span>
+              </button>
+            </div>
+            <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
+          </div>
+          @if (!distribuicaoPorTipoComCor.length) {
+            <div class="empty">Sem posições para exibir distribuição.</div>
+          }
+          @if (distribuicaoPorTipoComCor.length) {
+            <div class="donut-layout">
+              <div class="donut" [style.background]="distribuicaoConicGradient" aria-hidden="true"></div>
+              <div class="distribution-list">
+                @for (item of distribuicaoPorTipoComCor; track trackByIndex($index, item)) {
+                  <div class="distribution-item">
+                    <div class="distribution-item__top">
+                      <div class="legend">
+                        <span class="legend__dot" [style.background]="item.color"></span>
+                        <strong>{{ item.label }}</strong>
+                      </div>
+                      <span>{{ item.value | currency: 'BRL':'symbol':'1.2-2' }}</span>
+                    </div>
+                    <small>{{ item.percent | number:'1.0-1' }}%</small>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </article>
+      }
+    </section>
+  }
 
-        <div class="table-wrap" *ngIf="b3Preview.positions.length">
-          <table>
-            <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Instituição</th>
-              <th>Qtd</th>
-              <th>Fechamento</th>
-              <th>Atualizado</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let p of b3Preview.positions; trackBy: trackByIndex">
-              <td>{{ p.product }}</td>
-              <td>{{ p.institution }}</td>
-              <td>{{ p.quantity }}</td>
-              <td>{{ p.closingPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ p.updatedValue | currency:'BRL':'symbol':'1.2-2' }}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="import-actions">
-          <label class="filter">
-            <span>Estratégia</span>
-            <select [(ngModel)]="b3Strategy">
-              <option value="merge">Mesclar com dados atuais</option>
-              <option value="replace">Substituir mês importado</option>
+  @if (activeTab === 'RENTABILIDADE') {
+    <section class="rentabilidade-grid">
+      <div class="rentabilidade-side">
+        <article class="card executive-card rent-card">
+          <p class="label">Total</p>
+          <small>Rentabilidade</small>
+          <strong [class.success]="rentabilidadeTotalPercent >= 0" [class.danger]="rentabilidadeTotalPercent < 0">
+            {{ rentabilidadeTotalPercent | number:'1.2-2' }}%
+          </strong>
+          <small>{{ comparativoCdiLabel(rentabilidadeTotalPercent, rentabilidadeTotalCdiPercent) }}</small>
+        </article>
+        <article class="card executive-card rent-card">
+          <p class="label">Últimos 12 meses</p>
+          <small>Rentabilidade</small>
+          <strong [class.success]="rentabilidade12mPercent >= 0" [class.danger]="rentabilidade12mPercent < 0">
+            {{ rentabilidade12mPercent | number:'1.2-2' }}%
+          </strong>
+          <small>{{ comparativoCdiLabel(rentabilidade12mPercent, rentabilidade12mCdiPercent) }}</small>
+        </article>
+        <article class="card executive-card rent-card">
+          <p class="label">Último mês</p>
+          <small>Rentabilidade</small>
+          <strong [class.success]="rentabilidadeUltimoMesPercent >= 0" [class.danger]="rentabilidadeUltimoMesPercent < 0">
+            {{ rentabilidadeUltimoMesPercent | number:'1.2-2' }}%
+          </strong>
+          <small>{{ comparativoCdiLabel(rentabilidadeUltimoMesPercent, rentabilidadeUltimoMesCdiPercent) }}</small>
+        </article>
+      </div>
+      <article class="card chart-card rentabilidade-main" id="sec-evolucao">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Rentabilidade comparada com índices</h3>
+          </div>
+          <div class="chart-filters">
+            <select [(ngModel)]="rentabilidadePeriodo">
+              <option value="SINCE_START">Desde o início</option>
+              <option value="LAST_12M">Últimos 12 meses</option>
             </select>
-          </label>
-          <div class="actions">
-            <button class="btn-cancel sm" type="button" (click)="closeB3ImportModal()">Cancelar</button>
-            <button class="btn-primary sm" type="button" (click)="confirmarImportacaoB3()" [disabled]="b3Importing">
-              {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
-            </button>
+            <select [(ngModel)]="rentabilidadeBenchmark">
+              @for (item of benchmarkOptions; track trackByIndex($index, item)) {
+                <option [value]="item.key">{{ item.label }}</option>
+              }
+            </select>
+            <select [(ngModel)]="rentabilidadeTipoFiltro">
+              <option value="ALL">Todos os tipos</option>
+              @for (t of tipos; track trackByIndex($index, t)) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
           </div>
         </div>
-      </ng-container>
+        <div class="rentabilidade-chart">
+          <div class="rentabilidade-axis">
+            @for (tick of rentabilidadeChartTicks; track trackByIndex($index, tick)) {
+              <span>{{ tick | number:'1.0-0' }}%</span>
+            }
+          </div>
+          <div class="rentabilidade-plot">
+            <div class="rentabilidade-grid-lines">
+              @for (_ of [1,2,3,4,5]; track trackByIndex($index, _)) {
+                <span></span>
+              }
+            </div>
+            <svg
+              viewBox="0 0 1000 280"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="Evolução de rentabilidade da carteira e índice"
+              [style.--benchmark-color]="indiceSelecionadoCor">
+              <polyline class="line cdi" [attr.points]="rentabilidadeLinhaCdi"></polyline>
+              <polyline class="line carteira" [attr.points]="rentabilidadeLinhaCarteira"></polyline>
+            </svg>
+            <div class="rentabilidade-x-axis">
+              @for (point of rentabilidadeSeries; track trackByIndex($index, point)) {
+                <small>{{ point.label }}</small>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="legend-row">
+          <span><i class="chip carteira"></i> Carteira</span>
+          <span><i class="chip cdi" [style.background]="indiceSelecionadoCor"></i> {{ indiceSelecionadoLabel }} (estimado no período)</span>
+        </div>
+      </article>
+    </section>
+  }
+
+  @if (activeTab === 'PROVENTOS') {
+    <section class="proventos-grid">
+      <article class="card chart-card">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Resumo de proventos</h3>
+          </div>
+        </div>
+        <div class="proventos-summary">
+          <div class="proventos-summary__row">
+            <small>Média mensal (12 meses)</small>
+            <strong>{{ proventosMedia12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          </div>
+          <div class="proventos-summary__row">
+            <small>Total em 12 meses</small>
+            <strong>{{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          </div>
+          <div class="proventos-summary__row">
+            <small>Ativos pagadores</small>
+            <strong>{{ proventosAtivosPagadores }}</strong>
+          </div>
+        </div>
+      </article>
+      <article class="card chart-card">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Evolução mensal de proventos</h3>
+            <button type="button" class="hint" aria-label="Explicação do gráfico evolução de proventos">
+              i
+              <span class="hint__panel">Total recebido por mês em dividendos, JCP e rendimentos nos últimos 12 meses.</span>
+            </button>
+          </div>
+          <span class="muted">Últimos 12 meses</span>
+        </div>
+        <div class="proventos-evolution">
+          @for (item of proventosMensaisSeries; track trackByIndex($index, item)) {
+            <div class="proventos-evolution__column">
+              <div class="proventos-evolution__bars">
+                <span
+                  class="bar provento"
+                  [style.height.%]="(item.total / proventosMensaisMax) * 100"
+                [attr.title]="item.label + ': ' + (item.total | currency:'BRL':'symbol':'1.2-2')"></span>
+              </div>
+              <small>{{ item.label }}</small>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+  }
+
+  @if (activeTab === 'PROVENTOS') {
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Ativos que pagam proventos</h3>
+        </div>
+        <span class="muted">Total: {{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</span>
+      </div>
+      @if (!proventosPorAtivo12Meses.length) {
+        <div class="empty">Sem proventos registrados no período.</div>
+      }
+      @if (proventosPorAtivo12Meses.length) {
+        <div class="income-list">
+          @for (item of proventosPorAtivo12Meses; track trackByIndex($index, item)) {
+            <div class="income-item">
+              <div class="income-item__top">
+                <strong>{{ item.asset }}</strong>
+                <span>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="progress-bar slim">
+                <span [style.width.%]="(item.total / proventosTotal12Meses) * 100"></span>
+              </div>
+              <small>{{ item.percent | number:'1.1-1' }}% do total</small>
+            </div>
+          }
+        </div>
+      }
+    </article>
+  }
+
+  @if (activeTab === 'RENTABILIDADE') {
+    <article class="card chart-card">
+      <div class="section-head">
+        <div class="section-head__title">
+          <h3>Rentabilidade mensal</h3>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ano</th>
+              <th>Jan</th>
+              <th>Fev</th>
+              <th>Mar</th>
+              <th>Abr</th>
+              <th>Mai</th>
+              <th>Jun</th>
+              <th>Jul</th>
+              <th>Ago</th>
+              <th>Set</th>
+              <th>Out</th>
+              <th>Nov</th>
+              <th>Dez</th>
+              <th>Ano</th>
+              <th>Acumulado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rentabilidadeTabelaAnual; track trackByIndex($index, row)) {
+              <tr>
+                <td><strong>{{ row.year }}</strong></td>
+                @for (monthValue of row.months; track trackByIndex($index, monthValue)) {
+                  <td [class.success]="(monthValue || 0) >= 0" [class.danger]="(monthValue || 0) < 0">
+                    {{ monthValue === null ? '-' : ((monthValue | number:'1.2-2') + '%') }}
+                  </td>
+                }
+                <td [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">{{ row.yearValue | number:'1.2-2' }}%</td>
+                <td [class.success]="row.acumulado >= 0" [class.danger]="row.acumulado < 0">{{ row.acumulado | number:'1.2-2' }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+
+  @if (activeTab === 'ANALISE') {
+    <section class="visual-grid">
+      <article class="card chart-card">
+        <div class="section-head">
+          <div class="section-head__title">
+            <h3>Alocação alvo e alertas</h3>
+            <button type="button" class="hint" aria-label="Explicação da alocação alvo">
+              i
+              <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
+            </button>
+          </div>
+          <button class="btn-ghost sm" type="button" (click)="showAlocacaoConfig = !showAlocacaoConfig">
+            {{ showAlocacaoConfig ? 'Fechar parâmetros' : 'Editar alocação alvo' }}
+          </button>
+        </div>
+        @if (showAlocacaoConfig) {
+          <div class="allocation-config">
+            <div class="allocation-config__inputs">
+              @for (t of allocationTypes; track trackByIndex($index, t)) {
+                <label>
+                  <span>{{ t.label }}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    [ngModel]="targetAllocation[t.value]"
+                    (ngModelChange)="updateTargetAllocation(t.value, $event)" />
+                </label>
+              }
+            </div>
+            <small class="muted" [class.danger]="targetAllocationTotal !== 100">
+              Total configurado: {{ targetAllocationTotal | number:'1.1-1' }}%
+            </small>
+            <div class="allocation-config__actions">
+              <button class="btn-ghost sm" type="button" (click)="resetTargetAllocation()">Resetar padrão</button>
+              <button class="btn-primary sm" type="button" (click)="saveTargetAllocation()">Salvar</button>
+            </div>
+          </div>
+        }
+        <div class="allocation-list">
+          @for (item of alvoAlocacao; track trackByIndex($index, item)) {
+            <div class="allocation-item">
+              <div class="allocation-item__top">
+                <strong>{{ item.label }}</strong>
+                <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
+              </div>
+              <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
+              <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? '• rebalancear' : '' }}</small>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+  }
+
+  </section>
+
+  @if (showCadastro) {
+    <div class="modal">
+      <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
+      <div class="modal__card modal__card--launch">
+        <div class="launch-header">
+          <h3>Adicionar lançamento</h3>
+          <button class="modal__close" type="button" (click)="closeCadastroModal()">✕</button>
+        </div>
+        <div class="launch-type">
+          <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao('COMPRA')">Compra</button>
+          <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao('VENDA')">Venda</button>
+        </div>
+        @if (cadastroOperacao === 'COMPRA') {
+          <div class="form grid-form">
+            <div>
+              <label>Tipo de ativo</label>
+              <select [(ngModel)]="novaPosicao.type" name="type">
+                @for (t of tipos; track trackByIndex($index, t)) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label>Ativo</label>
+              <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
+            </div>
+            <div>
+              <label>Quantidade</label>
+              <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
+            </div>
+            <div>
+              <label>Preço em R$</label>
+              <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
+            </div>
+            <div>
+              <label>Outros custos <span class="muted">(opcional)</span></label>
+              <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="cadastroCustos" />
+            </div>
+            <div>
+              <label>Data da compra</label>
+              <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
+            </div>
+            <div>
+              <label>Conta/Corretora</label>
+              <input
+                type="text"
+                [(ngModel)]="novaPosicao.account"
+                name="account"
+                placeholder="Ex.: Nubank, XP"
+                list="brokerOptions" />
+              <datalist id="brokerOptions">
+                @for (inst of institutions; track trackByIndex($index, inst)) {
+                  <option [value]="inst.name"></option>
+                }
+              </datalist>
+            </div>
+            <div>
+              <label>Categoria (opcional)</label>
+              <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
+            </div>
+          </div>
+        }
+        @if (cadastroOperacao === 'VENDA') {
+          <div class="form grid-form">
+            <div>
+              <label>Ativo</label>
+              <select [(ngModel)]="vendaPositionId" name="vendaPositionId" (ngModelChange)="onVendaPositionChange()">
+                <option value="">Selecione</option>
+                @for (p of posicoesVendaveis; track trackById($index, p)) {
+                  <option [value]="p.id">
+                    {{ p.asset }} ({{ p.quantity | number:'1.0-4' }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label>Quantidade</label>
+              <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
+            </div>
+            <div>
+              <label>Preço em R$</label>
+              <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
+            </div>
+            <div>
+              <label>Outros custos <span class="muted">(opcional)</span></label>
+              <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="vendaCustos" />
+            </div>
+            <div>
+              <label>Data da venda</label>
+              <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
+            </div>
+            <div>
+              <label>Observação (opcional)</label>
+              <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
+            </div>
+          </div>
+        }
+        <div class="launch-total">
+          <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
+          <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="actions">
+          <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
+          <button class="btn-primary" type="button" (click)="cadastroOperacao === 'COMPRA' ? salvarPosicao() : salvarVenda()">
+            {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
+  }
+
+  @if (showMovimento && posSelecionada) {
+    <div class="modal">
+      <div class="modal__backdrop" (click)="closeMovimentoModal()"></div>
+      <div class="modal__card">
+        <h3>Registrar compra/venda para {{ posSelecionada.asset }}</h3>
+        <div class="form inline">
+          <label>Operação</label>
+          <select [(ngModel)]="movimento.type" name="movType">
+            @for (tipo of movimentoTipos; track trackByIndex($index, tipo)) {
+              <option [value]="tipo.value">{{ tipo.label }}</option>
+            }
+          </select>
+          <label>Qtd.</label>
+          <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
+          <label>Preço unitário</label>
+          <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
+          <label>Outros custos</label>
+          <input type="number" min="0" step="any" [(ngModel)]="movimentoCustos" name="movCost" />
+          <label>Data</label>
+          <input type="date" [(ngModel)]="movimento.date" name="movDate" />
+          <label>Nota</label>
+          <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+        </div>
+        <div class="launch-total">
+          <span>Valor total</span>
+          <strong>{{ movimentoValorTotal | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
+          <button class="btn-cancel sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showB3Import) {
+    <div class="modal">
+      <div class="modal__backdrop" (click)="closeB3ImportModal()"></div>
+      <div class="modal__card modal__card--wide">
+        <h3>Importações e exportações</h3>
+        <section class="import-section">
+          <p class="label">Relatório consolidado da B3 (PDF)</p>
+          <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+          <div class="import-upload">
+            <label class="btn-primary sm import-upload__button">
+              <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
+              Escolher PDF
+            </label>
+            <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
+          </div>
+          @if (b3Loading) {
+            <div class="muted">Lendo relatório...</div>
+          }
+          @if (b3Error) {
+            <div class="danger">{{ b3Error }}</div>
+          }
+        </section>
+        <section class="import-section">
+          <p class="label">Planilha CSV</p>
+          <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
+          <div class="import-compact">
+            <div class="import-upload">
+              <label class="btn-primary sm import-upload__button">
+                <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
+                Importar CSV
+              </label>
+              <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Exportar modelo</button>
+            </div>
+            <small class="muted">Importados nesta execução: {{ csvImported }}</small>
+          </div>
+          @if (csvError) {
+            <div class="danger">{{ csvError }}</div>
+          }
+          @if (csvPreviewRows.length) {
+            <details class="csv-preview">
+              <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tipo</th>
+                      <th>Ativo</th>
+                      <th>Qtd</th>
+                      <th>Preço médio</th>
+                      <th>Conta</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of csvPreviewRows; track trackByIndex($index, row)) {
+                      <tr>
+                        <td>{{ row.type }}</td>
+                        <td>{{ row.asset }}</td>
+                        <td>{{ row.quantity }}</td>
+                        <td>{{ row.avgPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+                        <td>{{ row.account }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          }
+        </section>
+        @if (b3Preview) {
+          <div class="executive-grid">
+            <article class="card executive-card">
+              <p class="label">Mês de referência</p>
+              <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
+            </article>
+            <article class="card executive-card">
+              <p class="label">Total em posições</p>
+              <strong>{{ b3Preview.totals.positions | currency:'BRL':'symbol':'1.2-2' }}</strong>
+            </article>
+            <article class="card executive-card">
+              <p class="label">Proventos</p>
+              <strong>{{ b3Preview.totals.incomes | currency:'BRL':'symbol':'1.2-2' }}</strong>
+            </article>
+            <article class="card executive-card">
+              <p class="label">Negociações</p>
+              <strong>{{ b3Preview.trades.length }}</strong>
+            </article>
+          </div>
+          @if (b3Preview.positions.length) {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Instituição</th>
+                    <th>Qtd</th>
+                    <th>Fechamento</th>
+                    <th>Atualizado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of b3Preview.positions; track trackByIndex($index, p)) {
+                    <tr>
+                      <td>{{ p.product }}</td>
+                      <td>{{ p.institution }}</td>
+                      <td>{{ p.quantity }}</td>
+                      <td>{{ p.closingPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+                      <td>{{ p.updatedValue | currency:'BRL':'symbol':'1.2-2' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+          <div class="import-actions">
+            <label class="filter">
+              <span>Estratégia</span>
+              <select [(ngModel)]="b3Strategy">
+                <option value="merge">Mesclar com dados atuais</option>
+                <option value="replace">Substituir mês importado</option>
+              </select>
+            </label>
+            <div class="actions">
+              <button class="btn-cancel sm" type="button" (click)="closeB3ImportModal()">Cancelar</button>
+              <button class="btn-primary sm" type="button" (click)="confirmarImportacaoB3()" [disabled]="b3Importing">
+                {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
 </section>

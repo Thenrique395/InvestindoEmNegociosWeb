@@ -30,53 +30,57 @@
         </div>
 
         <div class="plan-picker">
-          <button
-            type="button"
-            class="plan-option"
-            *ngFor="let plan of plans"
-            [class.is-active]="plan.code === selectedPlan.code"
-            (click)="selectPlan(plan.code)">
-            <div>
-              <strong>{{ plan.name }}</strong>
-              <span>{{ plan.description }}</span>
-            </div>
-            <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
-          </button>
+          @for (plan of plans; track plan) {
+            <button
+              type="button"
+              class="plan-option"
+              [class.is-active]="plan.code === selectedPlan.code"
+              (click)="selectPlan(plan.code)">
+              <div>
+                <strong>{{ plan.name }}</strong>
+                <span>{{ plan.description }}</span>
+              </div>
+              <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
+            </button>
+          }
         </div>
       </div>
 
-      <div class="checkout-card__section" *ngIf="!isLogged">
-        <p class="eyebrow">2. Identificação</p>
-        <h2>Crie sua conta para continuar</h2>
-        <p class="muted">
-          A seleção do plano já fica salva. Depois do login, você volta para este checkout e conclui a ativação.
-        </p>
-        <app-signup (signedUp)="handleSignedUp()"></app-signup>
-        <div class="checkout-card__footer">
-          <span>Já possui cadastro?</span>
-          <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
+      @if (!isLogged) {
+        <div class="checkout-card__section">
+          <p class="eyebrow">2. Identificação</p>
+          <h2>Crie sua conta para continuar</h2>
+          <p class="muted">
+            A seleção do plano já fica salva. Depois do login, você volta para este checkout e conclui a ativação.
+          </p>
+          <app-signup (signedUp)="handleSignedUp()"></app-signup>
+          <div class="checkout-card__footer">
+            <span>Já possui cadastro?</span>
+            <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
+          </div>
         </div>
-      </div>
+      }
 
-      <div class="checkout-card__section" *ngIf="isLogged">
-        <p class="eyebrow">2. Confirmação</p>
-        <h2>{{ selectedPlan.code === 'basic' ? 'Ative o plano gratuito' : 'Finalize a contratação' }}</h2>
-        <p class="muted">
-          {{ selectedPlan.code === 'basic'
+      @if (isLogged) {
+        <div class="checkout-card__section">
+          <p class="eyebrow">2. Confirmação</p>
+          <h2>{{ selectedPlan.code === 'basic' ? 'Ative o plano gratuito' : 'Finalize a contratação' }}</h2>
+          <p class="muted">
+            {{ selectedPlan.code === 'basic'
             ? 'Seu acesso é ativado imediatamente ao confirmar.'
             : 'Neste ambiente, a contratação é concluída pelo fluxo interno de assinatura já conectado ao backend.' }}
-        </p>
-
-        <div class="activation-panel">
-          <div>
-            <strong>Plano selecionado</strong>
-            <span>{{ selectedPlan.name }} • {{ selectedCycle === 'Yearly' ? 'cobrança anual' : 'cobrança mensal' }}</span>
+          </p>
+          <div class="activation-panel">
+            <div>
+              <strong>Plano selecionado</strong>
+              <span>{{ selectedPlan.name }} • {{ selectedCycle === 'Yearly' ? 'cobrança anual' : 'cobrança mensal' }}</span>
+            </div>
+            <button type="button" class="btn-primary" [disabled]="processing" (click)="activatePlan()">
+              {{ processing ? 'Processando...' : (selectedPlan.code === 'basic' ? 'Ativar plano' : 'Confirmar e ativar assinatura') }}
+            </button>
           </div>
-          <button type="button" class="btn-primary" [disabled]="processing" (click)="activatePlan()">
-            {{ processing ? 'Processando...' : (selectedPlan.code === 'basic' ? 'Ativar plano' : 'Confirmar e ativar assinatura') }}
-          </button>
         </div>
-      </div>
+      }
     </article>
 
     <aside class="summary-card">
@@ -94,7 +98,9 @@
       <div class="summary-section">
         <h3>Você leva agora</h3>
         <ul>
-          <li *ngFor="let feature of selectedPlan.features">{{ feature }}</li>
+          @for (feature of selectedPlan.features; track feature) {
+            <li>{{ feature }}</li>
+          }
         </ul>
       </div>
 
@@ -118,10 +124,12 @@
         </ul>
       </div>
 
-      <div class="summary-note" *ngIf="selectedPlan.code !== 'basic'">
-        O checkout comercial já direciona a contratação até a ativação da assinatura. Se você ainda não estiver logado,
-        sua escolha permanece salva até voltar para concluir.
-      </div>
+      @if (selectedPlan.code !== 'basic') {
+        <div class="summary-note">
+          O checkout comercial já direciona a contratação até a ativação da assinatura. Se você ainda não estiver logado,
+          sua escolha permanece salva até voltar para concluir.
+        </div>
+      }
     </aside>
   </section>
 </section>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { FormFieldComponent } from '../../../../shared/form-field/form-field.component';
 import { AccountRequest, AccountType } from '../../models/account.models';
@@ -9,8 +9,9 @@ type AccountFormField = 'name' | 'type' | 'initialBalance';
 @Component({
   selector: 'app-account-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormFieldComponent],
-  templateUrl: './account-form.component.html'
+  imports: [FormsModule, FormFieldComponent],
+  templateUrl: './account-form.component.html',
+  styleUrl: './account-form.component.scss'
 })
 export class AccountFormComponent {
   @Input({ required: true }) form!: AccountRequest;

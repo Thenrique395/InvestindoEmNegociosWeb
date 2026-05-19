@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
@@ -32,7 +32,7 @@ interface CalendarCell {
 @Component({
   selector: 'app-calendario',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, FormsModule],
+  imports: [NgClass, FormsModule],
   templateUrl: './calendario.component.html',
   styleUrls: ['./calendario.component.scss']
 })

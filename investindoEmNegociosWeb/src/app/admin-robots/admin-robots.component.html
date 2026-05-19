@@ -19,28 +19,30 @@
     <span> "Itens gerados" é a quantidade de novos lembretes/ações geradas. Se for 0, veja o "motivo do zero" para entender por que não houve geração.</span>
   </div>
 
-  <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" *ngIf="!loading">
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-      <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Execuções (24h)</p>
-      <p class="mt-1 text-2xl font-semibold">{{ summary24h.totalRuns }}</p>
-      <p class="mt-1 text-xs text-[var(--text-muted)]">Sucesso: {{ summary24h.successRuns }} | Falha: {{ summary24h.failedRuns }}</p>
-    </article>
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-      <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Taxa de sucesso (24h)</p>
-      <p class="mt-1 text-2xl font-semibold">{{ summary24h.successRatePercent }}%</p>
-      <p class="mt-1 text-xs text-[var(--text-muted)]">Com base nas últimas 24 horas.</p>
-    </article>
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-      <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Itens gerados (24h)</p>
-      <p class="mt-1 text-2xl font-semibold">{{ summary24h.itemsGenerated }}</p>
-      <p class="mt-1 text-xs text-[var(--text-muted)]">Novos lembretes/ações criados.</p>
-    </article>
-    <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-      <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">E-mails (24h)</p>
-      <p class="mt-1 text-2xl font-semibold">{{ summary24h.emailsSent }}/{{ summary24h.emailsAttempted }}</p>
-      <p class="mt-1 text-xs text-[var(--text-muted)]">Falhas: {{ summary24h.emailsFailed }}</p>
-    </article>
-  </div>
+  @if (!loading) {
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
+        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Execuções (24h)</p>
+        <p class="mt-1 text-2xl font-semibold">{{ summary24h.totalRuns }}</p>
+        <p class="mt-1 text-xs text-[var(--text-muted)]">Sucesso: {{ summary24h.successRuns }} | Falha: {{ summary24h.failedRuns }}</p>
+      </article>
+      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
+        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Taxa de sucesso (24h)</p>
+        <p class="mt-1 text-2xl font-semibold">{{ summary24h.successRatePercent }}%</p>
+        <p class="mt-1 text-xs text-[var(--text-muted)]">Com base nas últimas 24 horas.</p>
+      </article>
+      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
+        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Itens gerados (24h)</p>
+        <p class="mt-1 text-2xl font-semibold">{{ summary24h.itemsGenerated }}</p>
+        <p class="mt-1 text-xs text-[var(--text-muted)]">Novos lembretes/ações criados.</p>
+      </article>
+      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
+        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">E-mails (24h)</p>
+        <p class="mt-1 text-2xl font-semibold">{{ summary24h.emailsSent }}/{{ summary24h.emailsAttempted }}</p>
+        <p class="mt-1 text-xs text-[var(--text-muted)]">Falhas: {{ summary24h.emailsFailed }}</p>
+      </article>
+    </div>
+  }
 
   <div class="filter-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
     <div class="mb-4 flex flex-col gap-1 border-b border-[var(--border)] pb-3">
@@ -103,147 +105,154 @@
     </div>
   </div>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
-    Carregando monitor...
-  </div>
-
-  <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]" *ngIf="!loading && recentRuns.length">
-    <div class="border-b border-[var(--border)] px-4 py-3">
-      <h3 class="text-base font-semibold">Histórico recente</h3>
+  @if (loading) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
+      Carregando monitor...
     </div>
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
-          <tr class="border-b border-[var(--border)]">
-            <th class="px-4 py-3 font-semibold">Robô</th>
-            <th class="px-4 py-3 font-semibold">Início</th>
-            <th class="px-4 py-3 font-semibold">Fim</th>
-            <th class="px-4 py-3 font-semibold">Status</th>
-            <th class="px-4 py-3 font-semibold">Itens gerados</th>
-            <th class="px-4 py-3 font-semibold">E-mails</th>
-            <th class="px-4 py-3 font-semibold">Motivo do zero</th>
-            <th class="px-4 py-3 font-semibold">Detalhe do erro</th>
-            <th class="px-4 py-3 font-semibold">Ação</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--border)]">
-          <tr *ngFor="let row of recentRuns">
-            <td class="px-4 py-3 font-medium">{{ row.robotName }}</td>
-            <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.startedAt | date: 'short' }}</td>
-            <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.finishedAt | date: 'short' }}</td>
-            <td class="px-4 py-3">
-              <span
-                class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
-                [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-rose-200 bg-rose-100 text-rose-700'">
-                {{ row.wasSkipped ? 'Pulado' : (row.success ? 'Sucesso' : 'Falha') }}
-              </span>
-            </td>
-            <td class="px-4 py-3">{{ row.metrics.itemsGenerated }}</td>
-            <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-muted)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
-            <td class="px-4 py-3 text-[var(--text-muted)]">{{ zeroItemsReasonLabel(row.metrics.zeroItemsReasonCode) }}</td>
-            <td class="px-4 py-3 text-rose-600">{{ row.error || '-' }}</td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2">
-                <button
-                  class="btn-warning sm"
-                  type="button"
-                  (click)="runRobot(row.robotName)"
-                  [disabled]="runningAll || !!runningRobot">
-                  {{ runningRobot === row.robotName ? 'Executando...' : 'Executar' }}
-                </button>
-                <button class="btn-ghost sm" type="button" (click)="openRunDetails(row)">Detalhe</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  }
+
+  @if (!loading && recentRuns.length) {
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+      <div class="border-b border-[var(--border)] px-4 py-3">
+        <h3 class="text-base font-semibold">Histórico recente</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
+            <tr class="border-b border-[var(--border)]">
+              <th class="px-4 py-3 font-semibold">Robô</th>
+              <th class="px-4 py-3 font-semibold">Início</th>
+              <th class="px-4 py-3 font-semibold">Fim</th>
+              <th class="px-4 py-3 font-semibold">Status</th>
+              <th class="px-4 py-3 font-semibold">Itens gerados</th>
+              <th class="px-4 py-3 font-semibold">E-mails</th>
+              <th class="px-4 py-3 font-semibold">Motivo do zero</th>
+              <th class="px-4 py-3 font-semibold">Detalhe do erro</th>
+              <th class="px-4 py-3 font-semibold">Ação</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border)]">
+            @for (row of recentRuns; track row) {
+              <tr>
+                <td class="px-4 py-3 font-medium">{{ row.robotName }}</td>
+                <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.startedAt | date: 'short' }}</td>
+                <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.finishedAt | date: 'short' }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
+                    [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-rose-200 bg-rose-100 text-rose-700'">
+                    {{ row.wasSkipped ? 'Pulado' : (row.success ? 'Sucesso' : 'Falha') }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">{{ row.metrics.itemsGenerated }}</td>
+                <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-muted)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
+                <td class="px-4 py-3 text-[var(--text-muted)]">{{ zeroItemsReasonLabel(row.metrics.zeroItemsReasonCode) }}</td>
+                <td class="px-4 py-3 text-rose-600">{{ row.error || '-' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <button
+                      class="btn-warning sm"
+                      type="button"
+                      (click)="runRobot(row.robotName)"
+                      [disabled]="runningAll || !!runningRobot">
+                      {{ runningRobot === row.robotName ? 'Executando...' : 'Executar' }}
+                    </button>
+                    <button class="btn-ghost sm" type="button" (click)="openRunDetails(row)">Detalhe</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  }
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]" *ngIf="!loading && !recentRuns.length">
-    Sem execuções recentes para exibir.
-  </div>
+  @if (!loading && !recentRuns.length) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]">
+      Sem execuções recentes para exibir.
+    </div>
+  }
 
-  <div class="fixed inset-0 z-50 grid place-items-center bg-[rgba(15,23,42,0.55)] p-4" *ngIf="selectedRun">
-    <div class="robot-run-modal w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="flex flex-col gap-3 border-b border-[var(--border)] pb-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Execução</p>
-          <h3 class="mt-1 text-2xl font-semibold text-[var(--text)]">{{ selectedRun.robotName }}</h3>
-          <p class="mt-1 text-sm text-[var(--text-muted)]">
-            {{ selectedRun.startedAt | date: 'dd/MM/yyyy HH:mm:ss' }} - {{ selectedRun.finishedAt | date: 'HH:mm:ss' }}
-          </p>
-        </div>
-        <div class="flex items-center gap-2">
-          <span
-            class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
+  @if (selectedRun) {
+    <div class="fixed inset-0 z-50 grid place-items-center bg-[rgba(15,23,42,0.55)] p-4">
+      <div class="robot-run-modal w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+        <div class="flex flex-col gap-3 border-b border-[var(--border)] pb-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Execução</p>
+            <h3 class="mt-1 text-2xl font-semibold text-[var(--text)]">{{ selectedRun.robotName }}</h3>
+            <p class="mt-1 text-sm text-[var(--text-muted)]">
+              {{ selectedRun.startedAt | date: 'dd/MM/yyyy HH:mm:ss' }} - {{ selectedRun.finishedAt | date: 'HH:mm:ss' }}
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
             [ngClass]="selectedRun.wasSkipped
               ? 'border-amber-200 bg-amber-100 text-amber-700'
               : (selectedRun.success
                   ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
                   : 'border-rose-200 bg-rose-100 text-rose-700')">
-            {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}
-          </span>
-          <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
+              {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}
+            </span>
+            <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <article class="modal-kpi">
+            <p class="modal-kpi__label">Duração</p>
+            <p class="modal-kpi__value">{{ selectedRun.durationMs }} ms</p>
+          </article>
+          <article class="modal-kpi">
+            <p class="modal-kpi__label">Itens gerados</p>
+            <p class="modal-kpi__value">{{ selectedRun.metrics.itemsGenerated }}</p>
+          </article>
+          <article class="modal-kpi">
+            <p class="modal-kpi__label">E-mails enviados</p>
+            <p class="modal-kpi__value">{{ selectedRun.metrics.emailsSent }}/{{ selectedRun.metrics.emailsAttempted }}</p>
+          </article>
+          <article class="modal-kpi">
+            <p class="modal-kpi__label">Falhas de e-mail</p>
+            <p class="modal-kpi__value">{{ selectedRun.metrics.emailsFailed }}</p>
+          </article>
+        </div>
+        <div class="mt-5 grid gap-4 lg:grid-cols-2">
+          <section class="modal-section">
+            <h4 class="modal-section__title">Contexto técnico</h4>
+            <dl class="modal-dl">
+              <div class="modal-dl__row">
+                <dt>CorrelationId</dt>
+                <dd class="break-all">{{ selectedRun.correlationId || '-' }}</dd>
+              </div>
+              <div class="modal-dl__row">
+                <dt>Host</dt>
+                <dd>{{ selectedRun.hostName || '-' }}</dd>
+              </div>
+              <div class="modal-dl__row">
+                <dt>Disparado por</dt>
+                <dd>{{ selectedRun.triggeredByUserId || 'scheduler/sistema' }}</dd>
+              </div>
+            </dl>
+          </section>
+          <section class="modal-section">
+            <h4 class="modal-section__title">Resultado</h4>
+            <dl class="modal-dl">
+              <div class="modal-dl__row">
+                <dt>Motivo do zero</dt>
+                <dd>{{ zeroItemsReasonLabel(selectedRun.metrics.zeroItemsReasonCode || null) }}</dd>
+              </div>
+              <div class="modal-dl__row">
+                <dt>Skip reason</dt>
+                <dd>{{ selectedRun.skipReason || '-' }}</dd>
+              </div>
+              <div class="modal-dl__row">
+                <dt>Erro</dt>
+                <dd [ngClass]="selectedRun.error ? 'text-rose-600' : 'text-[var(--text-muted)]'">{{ selectedRun.error || '-' }}</dd>
+              </div>
+            </dl>
+          </section>
         </div>
       </div>
-
-      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <article class="modal-kpi">
-          <p class="modal-kpi__label">Duração</p>
-          <p class="modal-kpi__value">{{ selectedRun.durationMs }} ms</p>
-        </article>
-        <article class="modal-kpi">
-          <p class="modal-kpi__label">Itens gerados</p>
-          <p class="modal-kpi__value">{{ selectedRun.metrics.itemsGenerated }}</p>
-        </article>
-        <article class="modal-kpi">
-          <p class="modal-kpi__label">E-mails enviados</p>
-          <p class="modal-kpi__value">{{ selectedRun.metrics.emailsSent }}/{{ selectedRun.metrics.emailsAttempted }}</p>
-        </article>
-        <article class="modal-kpi">
-          <p class="modal-kpi__label">Falhas de e-mail</p>
-          <p class="modal-kpi__value">{{ selectedRun.metrics.emailsFailed }}</p>
-        </article>
-      </div>
-
-      <div class="mt-5 grid gap-4 lg:grid-cols-2">
-        <section class="modal-section">
-          <h4 class="modal-section__title">Contexto técnico</h4>
-          <dl class="modal-dl">
-            <div class="modal-dl__row">
-              <dt>CorrelationId</dt>
-              <dd class="break-all">{{ selectedRun.correlationId || '-' }}</dd>
-            </div>
-            <div class="modal-dl__row">
-              <dt>Host</dt>
-              <dd>{{ selectedRun.hostName || '-' }}</dd>
-            </div>
-            <div class="modal-dl__row">
-              <dt>Disparado por</dt>
-              <dd>{{ selectedRun.triggeredByUserId || 'scheduler/sistema' }}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <section class="modal-section">
-          <h4 class="modal-section__title">Resultado</h4>
-          <dl class="modal-dl">
-            <div class="modal-dl__row">
-              <dt>Motivo do zero</dt>
-              <dd>{{ zeroItemsReasonLabel(selectedRun.metrics.zeroItemsReasonCode || null) }}</dd>
-            </div>
-            <div class="modal-dl__row">
-              <dt>Skip reason</dt>
-              <dd>{{ selectedRun.skipReason || '-' }}</dd>
-            </div>
-            <div class="modal-dl__row">
-              <dt>Erro</dt>
-              <dd [ngClass]="selectedRun.error ? 'text-rose-600' : 'text-[var(--text-muted)]'">{{ selectedRun.error || '-' }}</dd>
-            </div>
-          </dl>
-        </section>
-      </div>
     </div>
-  </div>
+  }
 </section>

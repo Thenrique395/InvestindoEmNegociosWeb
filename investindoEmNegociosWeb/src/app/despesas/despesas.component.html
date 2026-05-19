@@ -78,31 +78,34 @@
         </p>
 
         <div class="expenses-hero__toolbar">
-          <div class="expenses-hero__comparison" *ngIf="previousComparison as comparison">
-            <span class="expenses-comparison-pill">
-              <span class="expenses-comparison-pill__label">Comparado a {{ comparison.month }}</span>
-              <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de despesas">
-                ?
-                <span class="ui-tooltip__panel">
-                  Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução.
-                </span>
-                <span class="ui-tooltip__arrow"></span>
-              </button>
-              <span
-                class="expenses-comparison-pill__delta"
+          @if (previousComparison; as comparison) {
+            <div class="expenses-hero__comparison">
+              <span class="expenses-comparison-pill">
+                <span class="expenses-comparison-pill__label">Comparado a {{ comparison.month }}</span>
+                <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de despesas">
+                  ?
+                  <span class="ui-tooltip__panel">
+                    Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução.
+                  </span>
+                  <span class="ui-tooltip__arrow"></span>
+                </button>
+                <span
+                  class="expenses-comparison-pill__delta"
                 [ngClass]="comparison.trend === 'up'
                   ? 'expenses-comparison-pill__delta--up'
                   : comparison.trend === 'down'
                     ? 'expenses-comparison-pill__delta--down'
                     : 'expenses-comparison-pill__delta--flat'">
-                <ng-container *ngIf="comparison.isNew; else diffValue">Sem base anterior</ng-container>
-                <ng-template #diffValue>
-                  {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
-                  ({{ comparison.percent | number:'1.0-0' }}%)
-                </ng-template>
+                  @if (comparison.isNew) {
+                    Sem base anterior
+                  } @else {
+                    {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
+                    ({{ comparison.percent | number:'1.0-0' }}%)
+                  }
+                </span>
               </span>
-            </span>
-          </div>
+            </div>
+          }
 
           <div class="expenses-hero__nav">
             <button type="button" class="expenses-hero__nav-btn" (click)="mesAnterior()">
@@ -149,44 +152,59 @@
       </aside>
     </div>
 
-    <div class="expenses-bulk" *ngIf="selecionados.length">
-      <div class="expenses-bulk__meta">
-        <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
-        <label class="expenses-bulk__account" *ngIf="canChooseAccount">
-          <span>Conta de baixa</span>
-          <select [(ngModel)]="contaBaixaId">
-            <option *ngFor="let conta of contas; trackBy: trackByIndex" [ngValue]="conta.id">
-              {{ conta.name }}
-            </option>
-          </select>
-        </label>
+    @if (selecionados.length) {
+      <div class="expenses-bulk">
+        <div class="expenses-bulk__meta">
+          <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
+          @if (canChooseAccount) {
+            <label class="expenses-bulk__account">
+              <span>Conta de baixa</span>
+              <select [(ngModel)]="contaBaixaId">
+                @for (conta of contas; track trackByIndex($index, conta)) {
+                  <option [ngValue]="conta.id">
+                    {{ conta.name }}
+                  </option>
+                }
+              </select>
+            </label>
+          }
+        </div>
+        <div class="expenses-bulk__actions">
+          <button
+            type="button"
+            class="expenses-bulk__button expenses-bulk__button--primary"
+            [disabled]="loadingPagar"
+            (click)="pagarSelecionadas()">
+            @if (loadingPagar) {
+              <span>Processando...</span>
+            }
+            @if (!loadingPagar) {
+              <span>Marcar como pago</span>
+            }
+          </button>
+          @if (canAnticipateExpenses) {
+            <button
+              type="button"
+              class="expenses-bulk__button expenses-bulk__button--ghost"
+              [disabled]="loadingAntecipar"
+              (click)="anteciparSelecionadas()">
+              @if (loadingAntecipar) {
+                <span>Antecipando...</span>
+              }
+              @if (!loadingAntecipar) {
+                <span>Solicitar antecipação</span>
+              }
+            </button>
+          }
+          <button
+            type="button"
+            class="expenses-bulk__button expenses-bulk__button--danger"
+            (click)="excluirSelecionadas()">
+            Excluir
+          </button>
+        </div>
       </div>
-      <div class="expenses-bulk__actions">
-        <button
-          type="button"
-          class="expenses-bulk__button expenses-bulk__button--primary"
-          [disabled]="loadingPagar"
-          (click)="pagarSelecionadas()">
-          <span *ngIf="loadingPagar">Processando...</span>
-          <span *ngIf="!loadingPagar">Marcar como pago</span>
-        </button>
-        <button
-          type="button"
-          class="expenses-bulk__button expenses-bulk__button--ghost"
-          *ngIf="canAnticipateExpenses"
-          [disabled]="loadingAntecipar"
-          (click)="anteciparSelecionadas()">
-          <span *ngIf="loadingAntecipar">Antecipando...</span>
-          <span *ngIf="!loadingAntecipar">Solicitar antecipação</span>
-        </button>
-        <button
-          type="button"
-          class="expenses-bulk__button expenses-bulk__button--danger"
-          (click)="excluirSelecionadas()">
-          Excluir
-        </button>
-      </div>
-    </div>
+    }
 
     <div class="expenses-filters">
       <label class="expenses-filter">
@@ -204,8 +222,12 @@
         <span class="expenses-filter__label">Categoria</span>
         <select [(ngModel)]="filtroCategoria">
           <option value="ALL">Todas</option>
-          <option *ngIf="!categorias.length" value="" disabled>Sem categorias cadastradas</option>
-          <option *ngFor="let c of categorias; trackBy: trackByIndex" [value]="c.id">{{ c.name }}</option>
+          @if (!categorias.length) {
+            <option value="" disabled>Sem categorias cadastradas</option>
+          }
+          @for (c of categorias; track trackByIndex($index, c)) {
+            <option [value]="c.id">{{ c.name }}</option>
+          }
         </select>
       </label>
       <label class="expenses-filter expenses-filter--search">
@@ -232,7 +254,7 @@
         (historico)="abrirHistorico($event)"
         (selecionar)="toggleSelecionar($event.id, $event.checked)"
         (selecionarTodos)="toggleSelecionarTodos($event)"
-        (emptyAction)="abrirModal()"></app-despesas-lista>
+      (emptyAction)="abrirModal()"></app-despesas-lista>
     </div>
   </section>
 
@@ -272,138 +294,168 @@
     [cards]="cartoes"
     [categories]="categorias"
     (imported)="onImportFaturaConcluida($event)"
-    (close)="fecharImportFatura()"></app-invoice-import>
+  (close)="fecharImportFatura()"></app-invoice-import>
 
-  <div *ngIf="confirmEdicao" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarEdicao()"></div>
-    <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-      <div class="flex items-start justify-between gap-4">
-        <div class="space-y-1">
-          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Editar despesa</p>
-          <h3 class="text-xl font-semibold text-[var(--text)]">Aplicar alterações</h3>
+  @if (confirmEdicao) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarEdicao()"></div>
+      <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Editar despesa</p>
+            <h3 class="text-xl font-semibold text-[var(--text)]">Aplicar alterações</h3>
+          </div>
+          <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarEdicao()">✕</button>
         </div>
-        <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarEdicao()">✕</button>
-      </div>
-      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmEdicao && !confirmEdicao.isRecorrente">
-        Esta despesa está parcelada. Deseja alterar apenas esta parcela ou todas as parcelas da série?
-      </p>
-      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmEdicao && confirmEdicao.isRecorrente">
-        Esta despesa é recorrente. Deseja alterar somente este lançamento ou toda a recorrência?
-      </p>
-      <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
-        <button type="button" class="btn-ghost sm" (click)="confirmarEdicao('single')">
-          {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Somente este mês' : 'Somente esta' }}
-        </button>
-        <button type="button" class="btn-primary sm" (click)="confirmarEdicao('all')">
-          {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Toda a recorrência' : 'Todas as parcelas' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="confirmRemocao" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarRemocao()"></div>
-    <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-      <div class="flex items-start justify-between gap-4">
-        <div class="space-y-1">
-          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Excluir despesa</p>
-          <h3 class="text-xl font-semibold text-[var(--text)]">Confirmar remoção</h3>
+        @if (confirmEdicao && !confirmEdicao.isRecorrente) {
+          <p class="mt-3 text-sm text-[var(--text-muted)]">
+            Esta despesa está parcelada. Deseja alterar apenas esta parcela ou todas as parcelas da série?
+          </p>
+        }
+        @if (confirmEdicao && confirmEdicao.isRecorrente) {
+          <p class="mt-3 text-sm text-[var(--text-muted)]">
+            Esta despesa é recorrente. Deseja alterar somente este lançamento ou toda a recorrência?
+          </p>
+        }
+        <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
+          <button type="button" class="btn-ghost sm" (click)="confirmarEdicao('single')">
+            {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Somente este mês' : 'Somente esta' }}
+          </button>
+          <button type="button" class="btn-primary sm" (click)="confirmarEdicao('all')">
+            {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Toda a recorrência' : 'Todas as parcelas' }}
+          </button>
         </div>
-        <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarRemocao()">✕</button>
-      </div>
-      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmRemocao && !confirmRemocao.isRecurring">
-        Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?
-      </p>
-      <p class="mt-3 text-sm text-[var(--text-muted)]" *ngIf="confirmRemocao && confirmRemocao.isRecurring">
-        Esta despesa é recorrente. Deseja excluir apenas este mês ou encerrar a recorrência?
-      </p>
-      <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
-        <button type="button" class="btn-ghost sm" (click)="confirmarRemocao(false)">
-          {{ confirmRemocao && confirmRemocao.isRecurring ? 'Somente este mês' : 'Somente esta' }}
-        </button>
-        <button type="button" class="btn-danger sm" (click)="confirmarRemocao(true)">
-          {{ confirmRemocao && confirmRemocao.isRecurring ? 'Encerrar recorrência' : 'Todas as parcelas' }}
-        </button>
       </div>
     </div>
-  </div>
+  }
 
-  <div *ngIf="historicoAberto" class="expenses-history-drawer">
-    <div class="expenses-history-drawer__backdrop" (click)="fecharHistorico()"></div>
-    <aside class="expenses-history-drawer__panel">
-      <div class="expenses-history-drawer__header">
-        <div class="expenses-history-drawer__heading">
-          <p class="expenses-history-drawer__eyebrow">Histórico</p>
-          <h3 class="expenses-history-drawer__title">{{ historicoTitulo }}</h3>
+  @if (confirmRemocao) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarRemocao()"></div>
+      <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Excluir despesa</p>
+            <h3 class="text-xl font-semibold text-[var(--text)]">Confirmar remoção</h3>
+          </div>
+          <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarRemocao()">✕</button>
         </div>
-        <button type="button" class="expenses-history-drawer__close" (click)="fecharHistorico()" aria-label="Fechar histórico">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
+        @if (confirmRemocao && !confirmRemocao.isRecurring) {
+          <p class="mt-3 text-sm text-[var(--text-muted)]">
+            Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?
+          </p>
+        }
+        @if (confirmRemocao && confirmRemocao.isRecurring) {
+          <p class="mt-3 text-sm text-[var(--text-muted)]">
+            Esta despesa é recorrente. Deseja excluir apenas este mês ou encerrar a recorrência?
+          </p>
+        }
+        <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
+          <button type="button" class="btn-ghost sm" (click)="confirmarRemocao(false)">
+            {{ confirmRemocao && confirmRemocao.isRecurring ? 'Somente este mês' : 'Somente esta' }}
+          </button>
+          <button type="button" class="btn-danger sm" (click)="confirmarRemocao(true)">
+            {{ confirmRemocao && confirmRemocao.isRecurring ? 'Encerrar recorrência' : 'Todas as parcelas' }}
+          </button>
+        </div>
       </div>
+    </div>
+  }
 
-      <section class="expenses-history-group">
-        <div class="expenses-history-group__head">
-          <h4 class="expenses-history-group__title">Pagas</h4>
-          <p class="expenses-history-group__note">Parcelas já liquidadas neste ciclo.</p>
+  @if (historicoAberto) {
+    <div class="expenses-history-drawer">
+      <div class="expenses-history-drawer__backdrop" (click)="fecharHistorico()"></div>
+      <aside class="expenses-history-drawer__panel">
+        <div class="expenses-history-drawer__header">
+          <div class="expenses-history-drawer__heading">
+            <p class="expenses-history-drawer__eyebrow">Histórico</p>
+            <h3 class="expenses-history-drawer__title">{{ historicoTitulo }}</h3>
+          </div>
+          <button type="button" class="expenses-history-drawer__close" (click)="fecharHistorico()" aria-label="Fechar histórico">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
         </div>
-        <div *ngIf="historicoPagas.length; else semPagas" class="expenses-history-group__list">
-          <article class="expenses-history-item expenses-history-item--paid" *ngFor="let h of historicoPagas; trackBy: trackByIndex">
-            <div class="expenses-history-item__main">
-              <div class="expenses-history-item__title-row">
-                <strong class="expenses-history-item__name">{{ h.nome }}</strong>
-                <span class="expenses-history-item__status expenses-history-item__status--paid">{{ statusLabel('PAID') }}</span>
-              </div>
-              <div class="expenses-history-item__meta">
-                <span *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
-                <span>Vencimento {{ h.vencimento }}</span>
-              </div>
+        <section class="expenses-history-group">
+          <div class="expenses-history-group__head">
+            <h4 class="expenses-history-group__title">Pagas</h4>
+            <p class="expenses-history-group__note">Parcelas já liquidadas neste ciclo.</p>
+          </div>
+          @if (historicoPagas.length) {
+            <div class="expenses-history-group__list">
+              @for (h of historicoPagas; track trackByIndex($index, h)) {
+                <article class="expenses-history-item expenses-history-item--paid">
+                  <div class="expenses-history-item__main">
+                    <div class="expenses-history-item__title-row">
+                      <strong class="expenses-history-item__name">{{ h.nome }}</strong>
+                      <span class="expenses-history-item__status expenses-history-item__status--paid">{{ statusLabel('PAID') }}</span>
+                    </div>
+                    <div class="expenses-history-item__meta">
+                      @if (h.parcelasTotal) {
+                        <span>Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
+                      }
+                      <span>Vencimento {{ h.vencimento }}</span>
+                    </div>
+                  </div>
+                  <div class="expenses-history-item__value-col">
+                    <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
+                    <button
+                      type="button"
+                      class="expenses-history-item__action"
+                      [disabled]="isReversing(h.id)"
+                      (click)="estornarDespesa(h)">
+                      @if (!isReversing(h.id)) {
+                        <span>Estornar pagamento</span>
+                      }
+                      @if (isReversing(h.id)) {
+                        <span>Estornando...</span>
+                      }
+                    </button>
+                  </div>
+                </article>
+              }
             </div>
-            <div class="expenses-history-item__value-col">
-              <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
-              <button
-                type="button"
-                class="expenses-history-item__action"
-                [disabled]="isReversing(h.id)"
-                (click)="estornarDespesa(h)">
-                <span *ngIf="!isReversing(h.id)">Estornar pagamento</span>
-                <span *ngIf="isReversing(h.id)">Estornando...</span>
-              </button>
+          } @else {
+            <p class="expenses-history-group__empty">Nenhuma parcela paga.</p>
+          }
+        </section>
+        <section class="expenses-history-group">
+          <div class="expenses-history-group__head">
+            <h4 class="expenses-history-group__title">Pendentes / Antecipadas</h4>
+            <p class="expenses-history-group__note">Próximas parcelas ainda em aberto ou pagas antes do vencimento.</p>
+          </div>
+          @if (historicoPendentes.length) {
+            <div class="expenses-history-group__list">
+              @for (h of historicoPendentes; track trackByIndex($index, h)) {
+                <article class="expenses-history-item">
+                  <div class="expenses-history-item__main">
+                    <div class="expenses-history-item__title-row">
+                      <strong class="expenses-history-item__name">{{ h.nome }}</strong>
+                      <span
+                        class="expenses-history-item__status"
+                        [ngClass]="h.status === 'ANTICIPATED' ? 'expenses-history-item__status--anticipated' : 'expenses-history-item__status--pending'">
+                        {{ statusLabel(h.status) }}
+                      </span>
+                    </div>
+                    <div class="expenses-history-item__meta">
+                      @if (h.parcelasTotal) {
+                        <span>Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
+                      }
+                      <span>Vencimento {{ h.vencimento }}</span>
+                    </div>
+                  </div>
+                  <div class="expenses-history-item__value-col">
+                    <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
+                  </div>
+                </article>
+              }
             </div>
-          </article>
-        </div>
-        <ng-template #semPagas><p class="expenses-history-group__empty">Nenhuma parcela paga.</p></ng-template>
-      </section>
-
-      <section class="expenses-history-group">
-        <div class="expenses-history-group__head">
-          <h4 class="expenses-history-group__title">Pendentes / Antecipadas</h4>
-          <p class="expenses-history-group__note">Próximas parcelas ainda em aberto ou pagas antes do vencimento.</p>
-        </div>
-        <div *ngIf="historicoPendentes.length; else semPendentes" class="expenses-history-group__list">
-          <article class="expenses-history-item" *ngFor="let h of historicoPendentes; trackBy: trackByIndex">
-            <div class="expenses-history-item__main">
-              <div class="expenses-history-item__title-row">
-                <strong class="expenses-history-item__name">{{ h.nome }}</strong>
-                <span
-                  class="expenses-history-item__status"
-                  [ngClass]="h.status === 'ANTICIPATED' ? 'expenses-history-item__status--anticipated' : 'expenses-history-item__status--pending'">
-                  {{ statusLabel(h.status) }}
-                </span>
-              </div>
-              <div class="expenses-history-item__meta">
-                <span *ngIf="h.parcelasTotal">Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
-                <span>Vencimento {{ h.vencimento }}</span>
-              </div>
-            </div>
-            <div class="expenses-history-item__value-col">
-              <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
-            </div>
-          </article>
-        </div>
-        <ng-template #semPendentes><p class="expenses-history-group__empty">Nenhuma parcela pendente.</p></ng-template>
-      </section>
-    </aside>
-  </div>
+          } @else {
+            <p class="expenses-history-group__empty">Nenhuma parcela pendente.</p>
+          }
+        </section>
+      </aside>
+    </div>
+  }
 </div>

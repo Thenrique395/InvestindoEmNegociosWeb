@@ -279,7 +279,7 @@ export class AdminUsersComponent implements OnInit {
   private syncDirty(user: AdminUserRow): void {
     user.dirty = user.pendingRole !== user.role || user.pendingActive !== user.isActive;
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

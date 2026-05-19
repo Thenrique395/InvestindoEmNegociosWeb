@@ -21,6 +21,22 @@ export class MonthlySnapshotsComponent implements OnInit {
     this.load();
   }
 
+  get latestSnapshot(): MonthlyFinancialSnapshotResponse | null {
+    return this.snapshots[0] || null;
+  }
+
+  get latestRealBalance(): number {
+    return Number(this.latestSnapshot?.realAvailableBalance || 0);
+  }
+
+  get latestProjectedBalance(): number {
+    return Number(this.latestSnapshot?.projectedBalance || 0);
+  }
+
+  get latestRiskScore(): number {
+    return Number(this.latestSnapshot?.riskScore || 0);
+  }
+
   load(): void {
     this.loading = true;
     this.snapshotsService.list().subscribe({

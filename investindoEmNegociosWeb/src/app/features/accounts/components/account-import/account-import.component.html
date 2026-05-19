@@ -21,123 +21,249 @@
       [disabled]="extractingOfx || importingOfx || !ofxExtract.items.length">
       Limpar OFX
     </button>
+
+    <button
+      type="button"
+      class="btn-primary sm max-md:w-full"
+      (click)="importOfx.emit()"
+      [disabled]="extractingOfx || importingOfx || !ofxExtract.items.length">
+      {{ importingOfx ? 'Importando OFX...' : 'Importar OFX' }}
+    </button>
+
+    <button
+      type="button"
+      class="btn-ghost sm max-md:w-full"
+      (click)="clearCsv.emit()"
+      [disabled]="extractingCsv || importingCsv || !csvExtract.items.length">
+      Limpar CSV
+    </button>
+
+    <button
+      type="button"
+      class="btn-primary sm max-md:w-full"
+      (click)="importCsv.emit()"
+      [disabled]="extractingCsv || importingCsv || !csvExtract.items.length">
+      {{ importingCsv ? 'Importando CSV...' : 'Importar CSV' }}
+    </button>
   </div>
 
   <div class="mt-3">
     <p class="text-sm text-[var(--text-muted)]">{{ ofxFileName || 'Nenhum arquivo OFX selecionado' }}</p>
 
-    <p *ngIf="extractingOfx" class="text-sm text-[var(--text-muted)]">Processando arquivo...</p>
+    @if (extractingOfx) {
+      <p class="text-sm text-[var(--text-muted)]">Processando arquivo...</p>
+    }
 
-    <div *ngIf="hasOfxPreview" class="mt-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-sm text-[var(--text)]">
-      <p>
-        {{ ofxExtract.items.length }} itens •
-        {{ duplicateCount }} duplicados •
-        {{ ofxAiSuggestedCount }} categorizados automaticamente
-      </p>
-    </div>
+    @if (hasOfxPreview) {
+      <div class="mt-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-sm text-[var(--text)]">
+        <p>
+          {{ ofxExtract.items.length }} itens •
+          {{ duplicateCount }} duplicados •
+          {{ ofxAiSuggestedCount }} categorizados automaticamente
+        </p>
+      </div>
+    }
   </div>
 
   <!-- Desktop: tabela completa -->
-  <div *ngIf="hasOfxPreview" class="mt-4 overflow-x-auto max-md:hidden">
-    <table class="min-w-full text-sm">
-      <thead>
-        <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
-          <th class="py-2 px-3">Data</th>
-          <th class="py-2 px-3">Descrição</th>
-          <th class="py-2 px-3">Valor</th>
-          <th class="py-2 px-3">Categoria sugerida</th>
-          <th class="py-2 px-3">Corrigir / ensinar</th>
-          <th class="py-2 px-3">Confiança</th>
-          <th class="py-2 px-3">Recorrência</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of ofxExtract.items; trackBy: trackPreviewItem" class="border-b border-[var(--border)]/60 text-[var(--text)]">
-          <td class="py-2 px-3">{{ item.postedAt | date:'dd/MM/yyyy' }}</td>
-          <td class="py-2 px-3">{{ item.description }}</td>
-          <td class="py-2 px-3">{{ signedAmount(item) }}</td>
-          <td class="py-2 px-3">{{ categorySuggestionLabel(item) }}</td>
-          <td class="py-2 px-3">
-            <select
-              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
-              [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
-              (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
-              <option [ngValue]="null">Sem categoria</option>
-              <option *ngFor="let category of categoriesForItem(item)" [ngValue]="category.id">
-                {{ category.name }}
-              </option>
-            </select>
-          </td>
-          <td class="py-2 px-3">
+  @if (hasOfxPreview) {
+    <div class="mt-4 overflow-x-auto max-md:hidden">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+            <th class="py-2 px-3">Data</th>
+            <th class="py-2 px-3">Descrição</th>
+            <th class="py-2 px-3">Valor</th>
+            <th class="py-2 px-3">Categoria sugerida</th>
+            <th class="py-2 px-3">Corrigir / ensinar</th>
+            <th class="py-2 px-3">Confiança</th>
+            <th class="py-2 px-3">Recorrência</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of ofxExtract.items; track trackPreviewItem($index, item)) {
+            <tr class="border-b border-[var(--border)]/60 text-[var(--text)]">
+              <td class="py-2 px-3">{{ item.postedAt | date:'dd/MM/yyyy' }}</td>
+              <td class="py-2 px-3">{{ item.description }}</td>
+              <td class="py-2 px-3">{{ signedAmount(item) }}</td>
+              <td class="py-2 px-3">{{ categorySuggestionLabel(item) }}</td>
+              <td class="py-2 px-3">
+                <select
+                  class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
+                  [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
+                  (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
+                  <option [ngValue]="null">Sem categoria</option>
+                  @for (category of categoriesForItem(item); track category) {
+                    <option [ngValue]="category.id">
+                      {{ category.name }}
+                    </option>
+                  }
+                </select>
+              </td>
+              <td class="py-2 px-3">
             <span [ngClass]="{
               'text-green-600': confidenceTone(item) === 'success',
               'text-yellow-600': confidenceTone(item) === 'warning',
               'text-gray-500': confidenceTone(item) === 'muted'
             }">
-              {{ confidenceLabel(item) }}
-            </span>
-          </td>
-          <td class="py-2 px-3">{{ recurrenceSuggestionLabel(item) }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+                  {{ confidenceLabel(item) }}
+                </span>
+              </td>
+              <td class="py-2 px-3">{{ recurrenceSuggestionLabel(item) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 
   <!-- Mobile: cards sem scroll lateral -->
-  <div *ngIf="hasOfxPreview" class="mt-4 hidden gap-3 max-md:grid">
-    <article
-      *ngFor="let item of ofxExtract.items; trackBy: trackPreviewItem"
-      class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
-      <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0">
-          <p class="text-xs text-[var(--text-muted)]">{{ item.postedAt | date:'dd/MM/yyyy' }}</p>
-          <h3 class="mt-1 break-words text-sm font-semibold text-[var(--text)]">{{ item.description }}</h3>
-        </div>
-        <strong
-          class="shrink-0 text-sm"
-          [ngClass]="item.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-          {{ signedAmount(item) }}
-        </strong>
-      </div>
-
-      <div class="mt-3 grid gap-2 text-xs text-[var(--text-muted)]">
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
-          <span class="block font-medium text-[var(--text-muted)]">Sugestão IA</span>
-          <span class="mt-1 block text-sm text-[var(--text)]">{{ categorySuggestionLabel(item) }}</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
-            <span class="block font-medium text-[var(--text-muted)]">Confiança</span>
+  @if (hasOfxPreview) {
+    <div class="mt-4 hidden gap-3 max-md:grid">
+      @for (item of ofxExtract.items; track trackPreviewItem($index, item)) {
+        <article
+          class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs text-[var(--text-muted)]">{{ item.postedAt | date:'dd/MM/yyyy' }}</p>
+              <h3 class="mt-1 break-words text-sm font-semibold text-[var(--text)]">{{ item.description }}</h3>
+            </div>
+            <strong
+              class="shrink-0 text-sm"
+              [ngClass]="item.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              {{ signedAmount(item) }}
+            </strong>
+          </div>
+          <div class="mt-3 grid gap-2 text-xs text-[var(--text-muted)]">
+            <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+              <span class="block font-medium text-[var(--text-muted)]">Sugestão IA</span>
+              <span class="mt-1 block text-sm text-[var(--text)]">{{ categorySuggestionLabel(item) }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+                <span class="block font-medium text-[var(--text-muted)]">Confiança</span>
             <span class="mt-1 block text-sm" [ngClass]="{
               'text-green-600': confidenceTone(item) === 'success',
               'text-yellow-600': confidenceTone(item) === 'warning',
               'text-gray-500': confidenceTone(item) === 'muted'
             }">
-              {{ confidenceLabel(item) }}
-            </span>
+                  {{ confidenceLabel(item) }}
+                </span>
+              </div>
+              <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+                <span class="block font-medium text-[var(--text-muted)]">Recorrência</span>
+                <span class="mt-1 block text-sm text-[var(--text)]">{{ recurrenceSuggestionLabel(item) }}</span>
+              </div>
+            </div>
+            <label class="grid gap-1 text-xs font-medium text-[var(--text-muted)]">
+              Corrigir / ensinar
+              <select
+                class="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+                [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
+                (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
+                <option [ngValue]="null">Sem categoria</option>
+                @for (category of categoriesForItem(item); track category) {
+                  <option [ngValue]="category.id">
+                    {{ category.name }}
+                  </option>
+                }
+              </select>
+            </label>
           </div>
+        </article>
+      }
+    </div>
+  }
 
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
-            <span class="block font-medium text-[var(--text-muted)]">Recorrência</span>
-            <span class="mt-1 block text-sm text-[var(--text)]">{{ recurrenceSuggestionLabel(item) }}</span>
-          </div>
-        </div>
+  <div class="mt-3">
+    <p class="text-sm text-[var(--text-muted)]">
+      {{ hasCsvPreview ? 'CSV pronto para importar' : 'Nenhum arquivo CSV selecionado' }}
+    </p>
 
-        <label class="grid gap-1 text-xs font-medium text-[var(--text-muted)]">
-          Corrigir / ensinar
-          <select
-            class="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-            [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
-            (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
-            <option [ngValue]="null">Sem categoria</option>
-            <option *ngFor="let category of categoriesForItem(item)" [ngValue]="category.id">
-              {{ category.name }}
-            </option>
-          </select>
-        </label>
+    @if (extractingCsv) {
+      <p class="text-sm text-[var(--text-muted)]">Processando arquivo CSV...</p>
+    }
+
+    @if (hasCsvPreview) {
+      <div class="mt-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-sm text-[var(--text)]">
+        <p>
+          {{ csvExtract.items.length }} itens •
+          {{ csvAiSuggestedCount }} categorizados automaticamente
+        </p>
       </div>
-    </article>
+    }
   </div>
+
+  @if (hasCsvPreview) {
+    <div class="mt-4 overflow-x-auto max-md:hidden">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+            <th class="py-2 px-3">Data</th>
+            <th class="py-2 px-3">Descrição</th>
+            <th class="py-2 px-3">Valor</th>
+            <th class="py-2 px-3">Categoria sugerida</th>
+            <th class="py-2 px-3">Corrigir / ensinar</th>
+            <th class="py-2 px-3">Confiança</th>
+            <th class="py-2 px-3">Recorrência</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of csvExtract.items; track trackPreviewItem($index, item)) {
+            <tr class="border-b border-[var(--border)]/60 text-[var(--text)]">
+              <td class="py-2 px-3">{{ item.postedAt | date:'dd/MM/yyyy' }}</td>
+              <td class="py-2 px-3">{{ item.description }}</td>
+              <td class="py-2 px-3">{{ signedAmount(item) }}</td>
+              <td class="py-2 px-3">{{ categorySuggestionLabel(item) }}</td>
+              <td class="py-2 px-3">
+                <select
+                  class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
+                  [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
+                  (ngModelChange)="onCategoryChange(item, $event, 'CSV')">
+                  <option [ngValue]="null">Sem categoria</option>
+                  @for (category of categoriesForItem(item); track category) {
+                    <option [ngValue]="category.id">
+                      {{ category.name }}
+                    </option>
+                  }
+                </select>
+              </td>
+              <td class="py-2 px-3">
+            <span [ngClass]="{
+              'text-green-600': confidenceTone(item) === 'success',
+              'text-yellow-600': confidenceTone(item) === 'warning',
+              'text-gray-500': confidenceTone(item) === 'muted'
+            }">
+                  {{ confidenceLabel(item) }}
+                </span>
+              </td>
+              <td class="py-2 px-3">{{ recurrenceSuggestionLabel(item) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (hasCsvPreview) {
+    <div class="mt-4 hidden gap-3 max-md:grid">
+      @for (item of csvExtract.items; track trackPreviewItem($index, item)) {
+        <article
+          class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs text-[var(--text-muted)]">{{ item.postedAt | date:'dd/MM/yyyy' }}</p>
+              <h3 class="mt-1 break-words text-sm font-semibold text-[var(--text)]">{{ item.description }}</h3>
+            </div>
+            <strong
+              class="shrink-0 text-sm"
+              [ngClass]="item.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+              {{ signedAmount(item) }}
+            </strong>
+          </div>
+        </article>
+      }
+    </div>
+  }
 
 </app-section-card>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { StoredIncome } from '../data/api-data.service';
 import { incomeStatusLabel } from '../utils/status';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
@@ -8,7 +8,7 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 @Component({
   selector: 'app-receitas-lista',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe, StatusBadgeComponent, EmptyStateComponent],
+  imports: [DecimalPipe, StatusBadgeComponent, EmptyStateComponent],
   templateUrl: './receitas-lista.component.html',
   styleUrls: ['./receitas-lista.component.scss']
 })
@@ -62,7 +62,7 @@ export class ReceitasListaComponent {
     if (!id) return false;
     return this.selectedIds.includes(id);
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

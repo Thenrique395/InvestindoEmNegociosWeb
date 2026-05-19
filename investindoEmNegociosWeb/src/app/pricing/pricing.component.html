@@ -40,64 +40,70 @@
     </div>
 
     <div class="progression-grid">
-      <article class="progression-step" *ngFor="let step of commercialSteps; let index = index">
-        <span class="progression-step__index">0{{ index + 1 }}</span>
-        <h3>{{ step.title }}</h3>
-        <p>{{ step.copy }}</p>
-      </article>
+      @for (step of commercialSteps; track step; let index = $index) {
+        <article class="progression-step">
+          <span class="progression-step__index">0{{ index + 1 }}</span>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.copy }}</p>
+        </article>
+      }
     </div>
   </section>
 
   <section class="pricing-grid">
-    <article class="plan-card" *ngFor="let plan of plans" [class.plan-card--featured]="plan.recommended">
-      <div class="plan-card__top">
-        <div>
-          <p class="plan-card__audience">{{ plan.audience }}</p>
-          <h2>{{ plan.name }}</h2>
-          <p class="plan-card__description">{{ plan.description }}</p>
+    @for (plan of plans; track plan) {
+      <article class="plan-card" [class.plan-card--featured]="plan.recommended">
+        <div class="plan-card__top">
+          <div>
+            <p class="plan-card__audience">{{ plan.audience }}</p>
+            <h2>{{ plan.name }}</h2>
+            <p class="plan-card__description">{{ plan.description }}</p>
+          </div>
+          @if (plan.recommended) {
+            <span class="plan-badge">Mais escolhido</span>
+          }
         </div>
-        <span class="plan-badge" *ngIf="plan.recommended">Mais escolhido</span>
-      </div>
-
-      <div class="plan-price">
-        <strong>{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
-        <span>/ {{ cycle === 'Yearly' ? 'ano' : 'mês' }}</span>
-      </div>
-      <p class="plan-equivalent" *ngIf="cycle === 'Yearly' && plan.yearlyPrice > 0">
-        equivalente a {{ yearlyEquivalent(plan) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês
-      </p>
-
-      <div class="plan-message">
-        <h3>{{ plan.salesHeadline }}</h3>
-        <p>{{ plan.salesSubheadline }}</p>
-      </div>
-
-      <p class="plan-highlight">{{ plan.highlight }}</p>
-
-      <div class="plan-section">
-        <h3>O que voce destrava</h3>
-        <ul>
-          <li *ngFor="let feature of plan.features">{{ feature }}</li>
-        </ul>
-      </div>
-
-      <div class="plan-section plan-section--muted">
-        <h3>Limites desta etapa</h3>
-        <ul>
-          <li *ngFor="let limit of plan.limits">{{ limit }}</li>
-        </ul>
-      </div>
-
-      <div class="plan-actions">
-        <a
-          class="btn btn--primary"
-          [routerLink]="['/checkout']"
-          [queryParams]="{ plan: plan.code, cycle: cycle }">
-          {{ plan.code === 'basic' ? 'Comecar sem custo' : plan.code === 'intermediate' ? 'Escolher Controle' : 'Evoluir para Patrimonio' }}
-        </a>
-        <a class="btn btn--ghost" routerLink="/">Ver visao do produto</a>
-      </div>
-    </article>
+        <div class="plan-price">
+          <strong>{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <span>/ {{ cycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+        </div>
+        @if (cycle === 'Yearly' && plan.yearlyPrice > 0) {
+          <p class="plan-equivalent">
+            equivalente a {{ yearlyEquivalent(plan) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês
+          </p>
+        }
+        <div class="plan-message">
+          <h3>{{ plan.salesHeadline }}</h3>
+          <p>{{ plan.salesSubheadline }}</p>
+        </div>
+        <p class="plan-highlight">{{ plan.highlight }}</p>
+        <div class="plan-section">
+          <h3>O que voce destrava</h3>
+          <ul>
+            @for (feature of plan.features; track feature) {
+              <li>{{ feature }}</li>
+            }
+          </ul>
+        </div>
+        <div class="plan-section plan-section--muted">
+          <h3>Limites desta etapa</h3>
+          <ul>
+            @for (limit of plan.limits; track limit) {
+              <li>{{ limit }}</li>
+            }
+          </ul>
+        </div>
+        <div class="plan-actions">
+          <a
+            class="btn btn--primary"
+            [routerLink]="['/checkout']"
+            [queryParams]="{ plan: plan.code, cycle: cycle }">
+            {{ plan.code === 'basic' ? 'Comecar sem custo' : plan.code === 'intermediate' ? 'Escolher Controle' : 'Evoluir para Patrimonio' }}
+          </a>
+          <a class="btn btn--ghost" routerLink="/">Ver visao do produto</a>
+        </div>
+      </article>
+    }
   </section>
 
   <section class="comparison-card">
@@ -116,12 +122,14 @@
         <div role="columnheader">Controle</div>
         <div role="columnheader">Patrimônio</div>
       </div>
-      <div class="comparison-row" role="row" *ngFor="let row of comparisonRows">
-        <div role="cell">{{ row.label }}</div>
-        <div role="cell">{{ row.values[0] }}</div>
-        <div role="cell">{{ row.values[1] }}</div>
-        <div role="cell">{{ row.values[2] }}</div>
-      </div>
+      @for (row of comparisonRows; track row) {
+        <div class="comparison-row" role="row">
+          <div role="cell">{{ row.label }}</div>
+          <div role="cell">{{ row.values[0] }}</div>
+          <div role="cell">{{ row.values[1] }}</div>
+          <div role="cell">{{ row.values[2] }}</div>
+        </div>
+      }
     </div>
   </section>
 
@@ -147,9 +155,11 @@
   </section>
 
   <section class="faq-grid">
-    <article class="faq-card" *ngFor="let item of faqs">
-      <h3>{{ item.question }}</h3>
-      <p>{{ item.answer }}</p>
-    </article>
+    @for (item of faqs; track item) {
+      <article class="faq-card">
+        <h3>{{ item.question }}</h3>
+        <p>{{ item.answer }}</p>
+      </article>
+    }
   </section>
 </section>

@@ -1,14 +1,77 @@
-<section class="page-shell">
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Planejamento de passivos</p>
-      <h1>Empréstimos</h1>
-      <p class="muted">Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização.</p>
-    </div>
-  </header>
+<section class="loans-page">
+  <section class="loans-summary-grid">
+    <article class="loans-summary-card loans-summary-card--warning">
+      <div class="loans-summary-card__head">
+        <span class="loans-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="loans-summary-card__copy">
+          <p class="loans-summary-card__eyebrow">Saldo aberto</p>
+          <h3 class="loans-summary-card__title">{{ totalOpenBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="loans-summary-card__note">Valor ainda pendente nos contratos cadastrados.</p>
+    </article>
+    <article class="loans-summary-card loans-summary-card--primary">
+      <div class="loans-summary-card__head">
+        <span class="loans-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="loans-summary-card__copy">
+          <p class="loans-summary-card__eyebrow">Parcelas/mês</p>
+          <h3 class="loans-summary-card__title">{{ totalMonthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="loans-summary-card__note">Compromisso mensal estimado pelos contratos ativos.</p>
+    </article>
+    <article class="loans-summary-card loans-summary-card--info">
+      <div class="loans-summary-card__head">
+        <span class="loans-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="loans-summary-card__copy">
+          <p class="loans-summary-card__eyebrow">Parcelas abertas</p>
+          <h3 class="loans-summary-card__title">{{ totalOpenInstallments }}</h3>
+        </div>
+      </div>
+      <p class="loans-summary-card__note">{{ contracts.length }} contrato(s) acompanhado(s).</p>
+    </article>
+  </section>
 
-  <div class="feedback error" *ngIf="error">{{ error }}</div>
-  <div class="feedback success" *ngIf="success">{{ success }}</div>
+  <section class="loans-shell">
+    <div class="loans-hero">
+      <div class="loans-hero__main">
+        <p class="loans-hero__eyebrow">Planejamento de passivos</p>
+        <h2 class="loans-hero__title">Empréstimos e amortização</h2>
+        <p class="loans-hero__text">Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização dentro do contexto financeiro.</p>
+      </div>
+
+      <aside class="loans-action-card">
+        <p class="loans-action-card__eyebrow">Próxima ação</p>
+        <strong class="loans-action-card__title">Simular antes de contratar</strong>
+        <p class="loans-action-card__text">Revise parcela, custo total e juros antes de salvar o contrato.</p>
+        <button class="loans-action-card__button" type="button" (click)="simulate()">
+          <span class="loans-action-card__button-icon" aria-hidden="true">→</span>
+          <span class="loans-action-card__button-copy">
+            <strong>Simular contrato</strong>
+            <small>Calcular parcelas com os dados preenchidos.</small>
+          </span>
+        </button>
+      </aside>
+    </div>
+
+  @if (error) {
+    <div class="feedback error">{{ error }}</div>
+  }
+  @if (success) {
+    <div class="feedback success">{{ success }}</div>
+  }
 
   <div class="grid">
     <article class="card form-card">
@@ -31,50 +94,63 @@
       </div>
     </article>
 
-    <article class="card" *ngIf="simulation as s">
-      <h2>Simulação</h2>
-      <div class="kpis">
-        <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-        <div><span>Custo total</span><strong>{{ s.totalCost | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-        <div><span>Juros totais</span><strong>{{ s.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let item of s.installments.slice(0, 6)">
-              <td>{{ item.installmentNo }}</td>
-              <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
-              <td>{{ item.principalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ item.interestAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ item.totalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ item.endingBalance | currency:'BRL':'symbol':'1.2-2' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </article>
+    @if (simulation; as s) {
+      <article class="card">
+        <h2>Simulação</h2>
+        <div class="kpis">
+          <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Custo total</span><strong>{{ s.totalCost | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Juros totais</span><strong>{{ s.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
+            <tbody>
+              @for (item of s.installments.slice(0, 6); track item) {
+                <tr>
+                  <td>{{ item.installmentNo }}</td>
+                  <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ item.principalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ item.interestAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ item.totalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ item.endingBalance | currency:'BRL':'symbol':'1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    }
   </div>
 
   <article class="card">
     <h2>Contratos cadastrados</h2>
-    <p class="muted" *ngIf="loading">Carregando...</p>
-    <p class="muted" *ngIf="!loading && !contracts.length">Nenhum empréstimo cadastrado.</p>
-    <div class="contract-list" *ngIf="contracts.length">
-      <section class="contract" *ngFor="let contract of contracts">
-        <div class="contract__head">
-          <div>
-            <h3>{{ contract.title }}</h3>
-            <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | currency:'BRL':'symbol':'1.2-2' }}</p>
-          </div>
-          <div class="pill">{{ contract.status }}</div>
-        </div>
-        <div class="kpis compact">
-          <div><span>Parcela</span><strong>{{ contract.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Juros totais</span><strong>{{ contract.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
-        </div>
-      </section>
-    </div>
+    @if (loading) {
+      <p class="muted">Carregando...</p>
+    }
+    @if (!loading && !contracts.length) {
+      <p class="muted">Nenhum empréstimo cadastrado.</p>
+    }
+    @if (contracts.length) {
+      <div class="contract-list">
+        @for (contract of contracts; track contract) {
+          <section class="contract">
+            <div class="contract__head">
+              <div>
+                <h3>{{ contract.title }}</h3>
+                <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | currency:'BRL':'symbol':'1.2-2' }}</p>
+              </div>
+              <div class="pill">{{ contract.status }}</div>
+            </div>
+            <div class="kpis compact">
+              <div><span>Parcela</span><strong>{{ contract.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>Juros totais</span><strong>{{ contract.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
+            </div>
+          </section>
+        }
+      </div>
+    }
   </article>
+  </section>
 </section>

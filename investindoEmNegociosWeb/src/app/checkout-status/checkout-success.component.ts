@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -8,7 +8,7 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
 @Component({
   selector: 'app-checkout-success',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './checkout-success.component.html',
   styleUrl: './checkout-status.component.scss'
 })

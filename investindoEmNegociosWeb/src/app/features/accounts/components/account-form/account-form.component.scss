@@ -1,0 +1,80 @@
+.account-panel {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface-2) 54%, white);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.account-panel__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.account-panel__eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.account-panel h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.account-form-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  align-items: end;
+}
+
+.account-form-grid input,
+.account-form-grid select {
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 0.95rem;
+  width: 100%;
+}
+
+.account-checkbox {
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 0.95rem;
+  font-weight: 650;
+}
+
+.account-checkbox input {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.account-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+@media (max-width: 960px) {
+  .account-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

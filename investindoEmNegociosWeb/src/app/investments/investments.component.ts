@@ -1542,7 +1542,7 @@ export class InvestmentsComponent implements OnInit {
     };
   }
 
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

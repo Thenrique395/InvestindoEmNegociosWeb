@@ -6,10 +6,15 @@ test.describe('role regression', () => {
     await setupAuthenticatedApp(page, { role: 'Basic', profileName: 'Usuário Basic' });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('link', { name: 'Calendário' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Calculadoras' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Contas' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Cartões' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Investimentos' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: /Controle de acessos/i })).toHaveCount(0);
+
+    await page.goto('/calendario', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/\/calendario$/);
 
     await page.goto('/investimentos', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/);

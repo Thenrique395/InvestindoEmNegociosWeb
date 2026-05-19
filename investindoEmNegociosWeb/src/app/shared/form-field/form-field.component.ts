@@ -1,12 +1,12 @@
 import { Component, computed, input } from '@angular/core';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 type FormFieldTone = 'default' | 'danger' | 'success';
 
 @Component({
   selector: 'app-form-field',
   standalone: true,
-  imports: [NgClass, NgIf],
+  imports: [NgClass],
   host: {
     '[class.form-field--invalid]': 'hasError()',
     '[class.form-field--animate]': 'shouldAnimate()'
@@ -61,18 +61,24 @@ type FormFieldTone = 'default' | 'danger' | 'success';
       <span class="flex items-center justify-between gap-2">
         <span class="inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--color-danger)]' : ''">
           {{ label() }}
-          <span *ngIf="required()" class="text-[var(--color-danger)]" aria-hidden="true">*</span>
+          @if (required()) {
+            <span class="text-[var(--color-danger)]" aria-hidden="true">*</span>
+          }
         </span>
-        <small *ngIf="hint()" class="font-medium text-[var(--color-text-muted)]">{{ hint() }}</small>
+        @if (hint()) {
+          <small class="font-medium text-[var(--color-text-muted)]">{{ hint() }}</small>
+        }
       </span>
-
+    
       <ng-content></ng-content>
-
-      <span *ngIf="descriptionToShow()" [class]="messageClass()" [attr.role]="hasError() ? 'alert' : null">
-        {{ descriptionToShow() }}
-      </span>
+    
+      @if (descriptionToShow()) {
+        <span [class]="messageClass()" [attr.role]="hasError() ? 'alert' : null">
+          {{ descriptionToShow() }}
+        </span>
+      }
     </label>
-  `
+    `
 })
 export class FormFieldComponent {
   readonly label = input.required<string>();

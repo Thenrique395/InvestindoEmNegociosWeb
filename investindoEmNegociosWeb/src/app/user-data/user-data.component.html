@@ -7,27 +7,30 @@
     </div>
   </div>
 
-  <div class="privacy-strip" *ngIf="privacySummary as privacy; else privacyLoadingState">
-    <div class="privacy-pill">
-      <strong>{{ privacy.activeSessions }}</strong>
-      <span>Sessões ativas</span>
+  @if (privacySummary; as privacy) {
+    <div class="privacy-strip">
+      <div class="privacy-pill">
+        <strong>{{ privacy.activeSessions }}</strong>
+        <span>Sessões ativas</span>
+      </div>
+      <div class="privacy-pill">
+        <strong>{{ privacy.pendingPasswordResetRequests }}</strong>
+        <span>Resets pendentes</span>
+      </div>
+      <div class="privacy-pill">
+        <strong>{{ privacy.auditEntries }}</strong>
+        <span>Eventos auditados</span>
+      </div>
+      <div class="privacy-pill">
+        <strong>{{ privacy.scalabilityPhase }}</strong>
+        <span>Fase operacional</span>
+      </div>
     </div>
-    <div class="privacy-pill">
-      <strong>{{ privacy.pendingPasswordResetRequests }}</strong>
-      <span>Resets pendentes</span>
-    </div>
-    <div class="privacy-pill">
-      <strong>{{ privacy.auditEntries }}</strong>
-      <span>Eventos auditados</span>
-    </div>
-    <div class="privacy-pill">
-      <strong>{{ privacy.scalabilityPhase }}</strong>
-      <span>Fase operacional</span>
-    </div>
-  </div>
-  <ng-template #privacyLoadingState>
-    <p class="meta" *ngIf="privacyLoading">Carregando centro de privacidade.</p>
-  </ng-template>
+  } @else {
+    @if (privacyLoading) {
+      <p class="meta">Carregando centro de privacidade.</p>
+    }
+  }
 
   <div class="grid">
     <div class="card">
@@ -36,7 +39,9 @@
       <button type="button" class="btn btn--primary btn--inline" [disabled]="exporting" (click)="exportData()">
         {{ exporting ? 'Exportando...' : 'Exportar dados' }}
       </button>
-      <p class="meta" *ngIf="lastExportAt">Última exportação: {{ lastExportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      @if (lastExportAt) {
+        <p class="meta">Última exportação: {{ lastExportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      }
     </div>
 
     <div class="card">
@@ -61,16 +66,24 @@
       </div>
 
       <p class="danger">Atenção: ao marcar “Substituir dados atuais”, os dados existentes da conta serão removidos antes da importação.</p>
-      <p class="meta" *ngIf="lastImportAt">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      @if (lastImportAt) {
+        <p class="meta">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      }
     </div>
 
     <div class="card danger-card">
       <h3>Privacidade e exclusão</h3>
-      <p class="muted" *ngIf="privacySummary as privacy">{{ privacy.retentionPolicy }}</p>
+      @if (privacySummary; as privacy) {
+        <p class="muted">{{ privacy.retentionPolicy }}</p>
+      }
 
-      <div class="scope" *ngIf="privacySummary as privacy">
-        <div *ngFor="let item of privacy.deletionScope">{{ item }}</div>
-      </div>
+      @if (privacySummary; as privacy) {
+        <div class="scope">
+          @for (item of privacy.deletionScope; track item) {
+            <div>{{ item }}</div>
+          }
+        </div>
+      }
 
       <label class="field">
         <span>Senha atual</span>
@@ -90,36 +103,42 @@
         {{ deletingAccount ? 'Excluindo...' : 'Excluir minha conta' }}
       </button>
 
-      <div class="controls" *ngIf="privacySummary as privacy">
-        <strong>Controles ativos</strong>
-        <div class="scope scope--compact">
-          <div *ngFor="let item of privacy.productionControls">{{ item }}</div>
+      @if (privacySummary; as privacy) {
+        <div class="controls">
+          <strong>Controles ativos</strong>
+          <div class="scope scope--compact">
+            @for (item of privacy.productionControls; track item) {
+              <div>{{ item }}</div>
+            }
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 
-  <app-confirm-dialog
-    *ngIf="confirmImportOpen"
-    title="Confirmar importação"
+  @if (confirmImportOpen) {
+    <app-confirm-dialog
+      title="Confirmar importação"
     [message]="replaceExisting
       ? 'Isso vai substituir os dados atuais pelo arquivo selecionado. Deseja continuar?'
       : 'Isso vai adicionar dados do arquivo sem apagar os atuais. Deseja continuar?'"
-    [confirmLabel]="importing ? 'Importando...' : 'Confirmar'"
-    cancelLabel="Cancelar"
-    [variant]="replaceExisting ? 'danger' : 'warning'"
-    (cancelled)="cancelImportRequest()"
-    (confirmed)="importData(fileInput)"
-  ></app-confirm-dialog>
+      [confirmLabel]="importing ? 'Importando...' : 'Confirmar'"
+      cancelLabel="Cancelar"
+      [variant]="replaceExisting ? 'danger' : 'warning'"
+      (cancelled)="cancelImportRequest()"
+      (confirmed)="importData(fileInput)"
+    ></app-confirm-dialog>
+  }
 
-  <app-confirm-dialog
-    *ngIf="confirmDeleteOpen"
-    title="Excluir conta permanentemente"
-    message="Essa ação remove seus dados operacionais, revoga sessões e não pode ser desfeita. Deseja continuar?"
-    [confirmLabel]="deletingAccount ? 'Excluindo...' : 'Excluir conta'"
-    cancelLabel="Cancelar"
-    variant="danger"
-    (cancelled)="cancelDeleteRequest()"
-    (confirmed)="confirmDeleteAccount()"
-  ></app-confirm-dialog>
+  @if (confirmDeleteOpen) {
+    <app-confirm-dialog
+      title="Excluir conta permanentemente"
+      message="Essa ação remove seus dados operacionais, revoga sessões e não pode ser desfeita. Deseja continuar?"
+      [confirmLabel]="deletingAccount ? 'Excluindo...' : 'Excluir conta'"
+      cancelLabel="Cancelar"
+      variant="danger"
+      (cancelled)="cancelDeleteRequest()"
+      (confirmed)="confirmDeleteAccount()"
+    ></app-confirm-dialog>
+  }
 </section>

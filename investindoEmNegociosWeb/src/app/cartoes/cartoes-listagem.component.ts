@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DecimalPipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgFor, NgIf, NgClass, DecimalPipe],
+  imports: [NgClass, DecimalPipe],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })
@@ -85,7 +85,7 @@ export class CartoesListagemComponent {
     this.remover.emit(id);
   }
 
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 }

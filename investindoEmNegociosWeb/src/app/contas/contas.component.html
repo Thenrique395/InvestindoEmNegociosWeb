@@ -1,145 +1,222 @@
-<section class="grid gap-4">
-  <header class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-    <h1 class="text-xl font-semibold text-[var(--text)]">Contas</h1>
-    <p class="text-sm text-[var(--text-muted)]">Cadastre contas e acompanhe saldo atual por movimentações.</p>
-  </header>
+<section class="accounts-page">
+  <section class="accounts-summary-grid">
+    <article class="accounts-summary-card accounts-summary-card--primary">
+      <div class="accounts-summary-card__head">
+        <span class="accounts-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+        </span>
+        <div class="accounts-summary-card__copy">
+          <p class="accounts-summary-card__eyebrow">Saldo consolidado</p>
+          <h3 class="accounts-summary-card__title">R$ {{ totalBalance | number:'1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="accounts-summary-card__note">Soma atual das contas cadastradas.</p>
+    </article>
 
-  <app-account-form
-    [form]="form"
-    [editingId]="editingId"
-    [saving]="saving"
-    [accountTypes]="accountTypes"
-    (save)="save()"
-    (clear)="startCreate()">
-  </app-account-form>
+    <article class="accounts-summary-card accounts-summary-card--success">
+      <div class="accounts-summary-card__head">
+        <span class="accounts-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="accounts-summary-card__copy">
+          <p class="accounts-summary-card__eyebrow">Contas ativas</p>
+          <h3 class="accounts-summary-card__title">{{ activeAccountsCount }}</h3>
+        </div>
+      </div>
+      <p class="accounts-summary-card__note">{{ accounts.length }} conta(s) cadastrada(s) no total.</p>
+    </article>
 
-  <p *ngIf="error" class="rounded-xl border border-[var(--danger)]/30 bg-[var(--danger)]/10 p-3 text-sm text-[var(--danger)]">
-    {{ error }}
-  </p>
-
-  <app-account-transfer
-    [accounts]="accounts"
-    [value]="transferForm"
-    [transferring]="transferring"
-    (valueChange)="onTransferChange($event)"
-    (submitTransfer)="transfer()">
-  </app-account-transfer>
-
-  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-    <app-account-list
-      [accounts]="accounts"
-      [loading]="loading"
-      (refresh)="loadAccounts()"
-      (create)="startCreate()"
-      (selectAccount)="selectAccount($event)"
-      (edit)="startEdit($event)"
-      (remove)="remove($event)">
-    </app-account-list>
+    <article class="accounts-summary-card accounts-summary-card--info">
+      <div class="accounts-summary-card__head">
+        <span class="accounts-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="accounts-summary-card__copy">
+          <p class="accounts-summary-card__eyebrow">Extrato</p>
+          <h3 class="accounts-summary-card__title">{{ transactions.length }}</h3>
+        </div>
+      </div>
+      <p class="accounts-summary-card__note">{{ selectedAccountLabel }}</p>
+    </article>
   </section>
 
-  <app-section-card
-    *ngIf="selectedAccount"
-    [title]="'Extrato: ' + selectedAccount.name"
-    description="Acompanhe movimentações, filtros e importações de extrato">
-    <div card-actions class="flex flex-wrap items-end gap-2 max-md:flex-col max-md:items-stretch">
-      <label class="grid gap-1 text-xs text-[var(--text-muted)] max-md:w-full">
-        De
-        <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm max-md:h-11 max-md:w-full" />
-      </label>
-      <label class="grid gap-1 text-xs text-[var(--text-muted)] max-md:w-full">
-        Até
-        <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm max-md:h-11 max-md:w-full" />
-      </label>
-      <button type="button" class="btn-primary sm max-md:w-full" (click)="loadTransactions()">Filtrar</button>
+  <section class="accounts-shell">
+    <div class="accounts-hero">
+      <div class="accounts-hero__main">
+        <p class="accounts-hero__eyebrow">Contas e movimentações</p>
+        <h2 class="accounts-hero__title">Controle saldos e transferências</h2>
+        <p class="accounts-hero__text">Cadastre contas, acompanhe saldo atual por movimentações e importe extratos quando precisar reconciliar o mês.</p>
+      </div>
+
+      <aside class="accounts-action-card">
+        <p class="accounts-action-card__eyebrow">Próxima ação</p>
+        <strong class="accounts-action-card__title">{{ editingId ? 'Finalizar edição' : 'Cadastrar conta' }}</strong>
+        <p class="accounts-action-card__text">Mantenha as contas atualizadas para que o saldo real do dashboard fique consistente.</p>
+        <button type="button" class="accounts-action-card__button" (click)="startCreate()">
+          <span class="accounts-action-card__button-icon" aria-hidden="true">+</span>
+          <span class="accounts-action-card__button-copy">
+            <strong>Nova conta</strong>
+            <small>Limpar o formulário e começar um novo cadastro.</small>
+          </span>
+        </button>
+      </aside>
     </div>
 
-    <app-account-import
-      [ofxFileName]="ofxFileName"
-      [extractingOfx]="extractingOfx"
-      [importingOfx]="importingOfx"
-      [ofxExtract]="ofxExtract"
-      [duplicateCount]="duplicateCount()"
-      [categories]="categories"
-      [extractingCsv]="extractingCsv"
-      [importingCsv]="importingCsv"
-      [csvExtract]="csvExtract"
-      [csvSkipDuplicates]="csvSkipDuplicates"
-      (ofxSelected)="onOfxSelected($event)"
-      (csvSelected)="onCsvSelected($event)"
-      (clearOfx)="clearOfxState()"
-      (clearCsv)="clearCsvState()"
-      (csvSkipDuplicatesChange)="csvSkipDuplicates = $event"
-      (categoryChanged)="onImportCategoryChanged($event)">
-    </app-account-import>
+  @if (error) {
+    <p class="accounts-feedback accounts-feedback--error">
+      {{ error }}
+    </p>
+  }
 
-    <app-ui-state *ngIf="loadingTransactions" type="loading" title="Carregando extrato..."></app-ui-state>
-    <app-empty-state
-      *ngIf="!loadingTransactions && !transactions.length"
-      title="Nenhuma movimentação"
-      description="Tente alterar o filtro ou importar um extrato.">
-    </app-empty-state>
+    <div class="accounts-workspace">
+      <app-account-form
+        [form]="form"
+        [editingId]="editingId"
+        [saving]="saving"
+        [accountTypes]="accountTypes"
+        (save)="save()"
+        (clear)="startCreate()">
+      </app-account-form>
 
-    <!-- Desktop: tabela analítica -->
-    <div class="overflow-x-auto max-md:hidden" *ngIf="!loadingTransactions && transactions.length">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
-            <th class="py-2 pr-4">Data</th>
-            <th class="py-2 pr-4">Tipo</th>
-            <th class="py-2 pr-4">Descrição</th>
-            <th class="py-2 pr-4">Origem</th>
-            <th class="py-2 text-right">Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let tx of transactions" class="border-b border-[var(--border)]/60 text-[var(--text)]">
-            <td class="py-2 pr-4">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td class="py-2 pr-4">
-              <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-                {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
-              </span>
-            </td>
-            <td class="py-2 pr-4">{{ tx.description }}</td>
-            <td class="py-2 pr-4">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</td>
-            <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-              {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <app-account-transfer
+        [accounts]="accounts"
+        [value]="transferForm"
+        [transferring]="transferring"
+        (valueChange)="onTransferChange($event)"
+        (submitTransfer)="transfer()">
+      </app-account-transfer>
     </div>
 
-    <!-- Mobile: cards sem scroll lateral -->
-    <div class="hidden gap-3 max-md:grid" *ngIf="!loadingTransactions && transactions.length">
-      <article
-        *ngFor="let tx of transactions"
-        class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
-        <div class="flex items-start justify-between gap-3">
-          <div class="min-w-0">
-            <p class="text-xs text-[var(--text-muted)]">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</p>
-            <h3 class="mt-1 break-words text-sm font-semibold text-[var(--text)]">{{ tx.description }}</h3>
-          </div>
-          <strong
-            class="shrink-0 text-sm"
-            [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-            {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
-          </strong>
+    <section class="accounts-list-card">
+      <app-account-list
+        [accounts]="accounts"
+        [loading]="loading"
+        (refresh)="loadAccounts()"
+        (create)="startCreate()"
+        (selectAccount)="selectAccount($event)"
+        (edit)="startEdit($event)"
+        (remove)="remove($event)">
+      </app-account-list>
+    </section>
+
+  @if (selectedAccount) {
+    <app-section-card
+      [title]="'Extrato: ' + selectedAccount.name"
+      description="Acompanhe movimentações, filtros e importações de extrato">
+      <div card-actions class="flex flex-wrap items-end gap-2 max-md:flex-col max-md:items-stretch">
+        <label class="grid gap-1 text-xs text-[var(--text-muted)] max-md:w-full">
+          De
+          <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm max-md:h-11 max-md:w-full" />
+        </label>
+        <label class="grid gap-1 text-xs text-[var(--text-muted)] max-md:w-full">
+          Até
+          <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm max-md:h-11 max-md:w-full" />
+        </label>
+        <button type="button" class="btn-primary sm max-md:w-full" (click)="loadTransactions()">Filtrar</button>
+      </div>
+      <app-account-import
+        [ofxFileName]="ofxFileName"
+        [extractingOfx]="extractingOfx"
+        [importingOfx]="importingOfx"
+        [ofxExtract]="ofxExtract"
+        [duplicateCount]="duplicateCount()"
+        [categories]="categories"
+        [extractingCsv]="extractingCsv"
+        [importingCsv]="importingCsv"
+        [csvExtract]="csvExtract"
+        [csvSkipDuplicates]="csvSkipDuplicates"
+        (ofxSelected)="onOfxSelected($event)"
+        (csvSelected)="onCsvSelected($event)"
+        (clearOfx)="clearOfxState()"
+        (clearCsv)="clearCsvState()"
+        (importOfx)="importOfx()"
+        (importCsv)="importCsv()"
+        (csvSkipDuplicatesChange)="csvSkipDuplicates = $event"
+        (categoryChanged)="onImportCategoryChanged($event)">
+      </app-account-import>
+      @if (loadingTransactions) {
+        <app-ui-state type="loading" title="Carregando extrato..."></app-ui-state>
+      }
+      @if (!loadingTransactions && !transactions.length) {
+        <app-empty-state
+          title="Nenhuma movimentação"
+          description="Tente alterar o filtro ou importar um extrato.">
+        </app-empty-state>
+      }
+      <!-- Desktop: tabela analítica -->
+      @if (!loadingTransactions && transactions.length) {
+        <div class="overflow-x-auto max-md:hidden">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+                <th class="py-2 pr-4">Data</th>
+                <th class="py-2 pr-4">Tipo</th>
+                <th class="py-2 pr-4">Descrição</th>
+                <th class="py-2 pr-4">Origem</th>
+                <th class="py-2 text-right">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tx of transactions; track tx) {
+                <tr class="border-b border-[var(--border)]/60 text-[var(--text)]">
+                  <td class="py-2 pr-4">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="py-2 pr-4">
+                    <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                      {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
+                    </span>
+                  </td>
+                  <td class="py-2 pr-4">{{ tx.description }}</td>
+                  <td class="py-2 pr-4">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</td>
+                  <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                    {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-
-        <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
-            <span class="block text-[var(--text-muted)]">Tipo</span>
-            <span class="mt-1 block font-semibold" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-              {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
-            </span>
-          </div>
-
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
-            <span class="block text-[var(--text-muted)]">Origem</span>
-            <span class="mt-1 block break-words font-semibold text-[var(--text)]">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</span>
-          </div>
+      }
+      <!-- Mobile: cards sem scroll lateral -->
+      @if (!loadingTransactions && transactions.length) {
+        <div class="hidden gap-3 max-md:grid">
+          @for (tx of transactions; track tx) {
+            <article
+              class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="text-xs text-[var(--text-muted)]">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                  <h3 class="mt-1 break-words text-sm font-semibold text-[var(--text)]">{{ tx.description }}</h3>
+                </div>
+                <strong
+                  class="shrink-0 text-sm"
+                  [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                  {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
+                </strong>
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+                  <span class="block text-[var(--text-muted)]">Tipo</span>
+                  <span class="mt-1 block font-semibold" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                    {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
+                  </span>
+                </div>
+                <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2">
+                  <span class="block text-[var(--text-muted)]">Origem</span>
+                  <span class="mt-1 block break-words font-semibold text-[var(--text)]">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</span>
+                </div>
+              </div>
+            </article>
+          }
         </div>
-      </article>
-    </div>
-  </app-section-card>
+      }
+    </app-section-card>
+  }
+  </section>
 </section>

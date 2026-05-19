@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { StoredExpense } from '../data/api-data.service';
 import { expenseStatusLabel } from '../utils/status';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
@@ -8,7 +8,7 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 @Component({
   selector: 'app-despesas-lista',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe, StatusBadgeComponent, EmptyStateComponent],
+  imports: [DecimalPipe, StatusBadgeComponent, EmptyStateComponent],
   templateUrl: './despesas-lista.component.html',
   styleUrls: ['./despesas-lista.component.scss']
 })
@@ -64,7 +64,7 @@ export class DespesasListaComponent {
     if (!id) return false;
     return this.selectedIds.includes(id);
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

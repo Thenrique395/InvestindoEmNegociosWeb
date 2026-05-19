@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, DatePipe, DecimalPipe, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { UpperCasePipe, DatePipe, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
@@ -23,14 +23,9 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     UpperCasePipe,
     DatePipe,
     DecimalPipe,
-    NgIf,
-    NgFor,
-    NgSwitch,
-    NgSwitchCase,
-    NgSwitchDefault,
     CartoesListagemComponent,
     DigitOnlyDirective
-  ],
+],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
 })
@@ -455,10 +450,10 @@ export class CartoesComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackByStatement(index: number): number {
+  trackByStatement(index: number, _item?: unknown): number {
     return index;
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgIf } from '@angular/common';
+
 
 @Component({
   selector: 'app-ui-state',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
   template: `
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-4 text-sm text-[var(--text)]">
       <div class="flex items-start gap-3">
@@ -13,18 +13,21 @@ import { NgIf } from '@angular/common';
         </div>
         <div class="min-w-0 flex-1 space-y-1">
           <p class="m-0 font-semibold">{{ titleToShow }}</p>
-          <p *ngIf="description" class="m-0 text-[var(--text-muted)]">{{ description }}</p>
+          @if (description) {
+            <p class="m-0 text-[var(--text-muted)]">{{ description }}</p>
+          }
         </div>
-        <button
-          *ngIf="retryLabel"
-          type="button"
-          class="btn-ghost sm"
-          (click)="retry.emit()">
-          {{ retryLabel }}
-        </button>
+        @if (retryLabel) {
+          <button
+            type="button"
+            class="btn-ghost sm"
+            (click)="retry.emit()">
+            {{ retryLabel }}
+          </button>
+        }
       </div>
     </div>
-  `
+    `
 })
 export class UiStateComponent {
   @Input() type: 'loading' | 'error' | 'info' = 'info';

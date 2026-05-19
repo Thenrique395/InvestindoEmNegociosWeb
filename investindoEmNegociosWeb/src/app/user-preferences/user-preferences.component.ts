@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
 import { getInitialLocale, persistLocaleSettings, setLocaleSettings } from '../utils/locale-settings';
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-user-preferences',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './user-preferences.component.html',
   styleUrls: ['./user-preferences.component.scss']
 })
@@ -181,7 +181,7 @@ export class UserPreferencesComponent implements OnInit {
       this.localizacoes.unshift(this.linguaSelecionada);
     }
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

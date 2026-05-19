@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
 import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin, RobotSettings, ScalabilityRuntime } from '../admin-parameters.service';
@@ -9,7 +9,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 @Component({
   selector: 'app-admin-parameters',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [FormsModule, ConfirmDialogComponent],
   templateUrl: './admin-parameters.component.html',
   styleUrls: ['./admin-parameters.component.scss']
 })
@@ -500,7 +500,7 @@ export class AdminParametersComponent implements OnInit {
     if (err?.status) return `${fallback} (HTTP ${err.status}).`;
     return fallback;
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

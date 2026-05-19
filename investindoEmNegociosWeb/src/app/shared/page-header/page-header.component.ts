@@ -1,37 +1,43 @@
 import { Component, computed, input } from '@angular/core';
-import { NgIf } from '@angular/common';
+
 
 type PageHeaderSize = 'sm' | 'md' | 'lg';
 
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
   template: `
     <header [class]="containerClass()">
       <div class="min-w-0 space-y-2">
-        <p *ngIf="eyebrow()" class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-          {{ eyebrow() }}
-        </p>
-
+        @if (eyebrow()) {
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+            {{ eyebrow() }}
+          </p>
+        }
+    
         <h1 [class]="titleClass()">
           {{ title() }}
         </h1>
-
-        <p *ngIf="description()" class="m-0 max-w-3xl text-sm text-[var(--text-muted)]">
-          {{ description() }}
-        </p>
-
-        <div *ngIf="hasMeta()" class="flex flex-wrap items-center gap-2 pt-1 text-xs text-[var(--text-muted)]">
-          <ng-content select="[page-meta]"></ng-content>
-        </div>
+    
+        @if (description()) {
+          <p class="m-0 max-w-3xl text-sm text-[var(--text-muted)]">
+            {{ description() }}
+          </p>
+        }
+    
+        @if (hasMeta()) {
+          <div class="flex flex-wrap items-center gap-2 pt-1 text-xs text-[var(--text-muted)]">
+            <ng-content select="[page-meta]"></ng-content>
+          </div>
+        }
       </div>
-
+    
       <div class="flex flex-wrap items-center gap-2">
         <ng-content select="[page-actions]"></ng-content>
       </div>
     </header>
-  `
+    `
 })
 export class PageHeaderComponent {
   readonly eyebrow = input<string>('');

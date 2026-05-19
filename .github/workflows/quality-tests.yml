@@ -1,0 +1,62 @@
+name: Quality Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Suite to run"
+        required: true
+        default: "e2e"
+        type: choice
+        options:
+          - e2e
+          - performance
+      app_base_url:
+        description: "Optional existing app URL. Empty starts local Angular server for e2e."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  quality-tests:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: "24.x"
+      APP_BASE_URL: ${{ inputs.app_base_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            investindoEmNegociosWeb/package-lock.json
+            quality-tests/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: investindoEmNegociosWeb
+
+      - name: Install quality test dependencies
+        run: npm ci
+        working-directory: quality-tests
+
+      - name: Install Playwright browser
+        if: ${{ inputs.suite == 'e2e' }}
+        run: npx playwright install --with-deps chromium
+        working-directory: quality-tests
+
+      - name: Run e2e suite
+        if: ${{ inputs.suite == 'e2e' }}
+        run: npm run test:e2e
+        working-directory: quality-tests
+
+      - name: Run performance suite
+        if: ${{ inputs.suite == 'performance' }}
+        run: npm run test:performance
+        working-directory: quality-tests

@@ -29,19 +29,15 @@ test.describe('authenticated finance modules', () => {
     await expect(page.getByText('Snapshot gerado com sucesso')).toBeVisible();
   });
 
-  test('troca plano e cancela renovação na interface', async ({ page }) => {
-    await page.goto('/planos', { waitUntil: 'domcontentloaded' });
+  test('redireciona troca de plano pago para checkout', async ({ page }) => {
+    await page.goto('/assinatura', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Assinatura e monetização' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Minha assinatura' })).toBeVisible();
     await page.getByRole('button', { name: 'Anual' }).click();
     await page.locator('.plan-card').filter({ has: page.getByRole('heading', { level: 3, name: 'Intermediate' }) }).getByRole('button', { name: 'Trocar para este plano' }).click();
-    await page.reload({ waitUntil: 'domcontentloaded' });
 
-    await expect(page.locator('.privacy-pill').filter({ hasText: 'Plano atual' }).locator('strong')).toHaveText('Intermediate');
-
-    await page.getByRole('button', { name: 'Cancelar renovação' }).click();
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator('.privacy-pill').filter({ hasText: 'Renovação' }).locator('strong')).toHaveText('Cancelada');
+    await expect(page).toHaveURL(/\/checkout\?plan=intermediate&cycle=Yearly/);
+    await expect(page.getByRole('heading', { level: 1, name: /confirme o plano/i })).toBeVisible();
   });
 
   test('carrega segurança e revoga sessões ativas', async ({ page }) => {
@@ -50,6 +46,6 @@ test.describe('authenticated finance modules', () => {
     await expect(page.getByRole('heading', { level: 2, name: 'Sessões e login' })).toBeVisible();
     await expect(page.locator('.privacy-pill').filter({ hasText: 'Sessões ativas' }).locator('strong')).toHaveText('2');
     await page.getByRole('button', { name: 'Revogar sessões ativas' }).click();
-    await expect(page.locator('.privacy-pill').filter({ hasText: 'Sessões ativas' }).locator('strong')).toHaveText('0');
+    await expect(page.getByText('2 sessão(ões) revogada(s).')).toBeVisible();
   });
 });

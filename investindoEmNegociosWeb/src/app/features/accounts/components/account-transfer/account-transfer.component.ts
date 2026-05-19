@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AccountResponse } from '../../models/account.models';
 
@@ -14,7 +14,7 @@ export interface AccountTransferFormValue {
 @Component({
   selector: 'app-account-transfer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './account-transfer.component.html'
 })
 export class AccountTransferComponent {

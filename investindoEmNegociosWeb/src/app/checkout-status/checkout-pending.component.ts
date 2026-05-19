@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BillingCheckoutStatusResponse, BillingService } from '../billing.service';
@@ -7,7 +7,7 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
 @Component({
   selector: 'app-checkout-pending',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './checkout-pending.component.html',
   styleUrl: './checkout-status.component.scss'
 })

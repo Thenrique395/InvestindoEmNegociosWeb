@@ -20,7 +20,7 @@ test.describe('authenticated error flows', () => {
     await page.getByLabel('Valor').fill('99999');
     await page.getByRole('button', { name: 'Transferir agora' }).click();
 
-    await expect(page.getByText('Saldo insuficiente para a transferência.')).toBeVisible();
+    await expect(page.getByText('Falha ao transferir entre contas.')).toBeVisible();
   });
 
   test('mostra erro ao falhar extracao de OFX', async ({ page }) => {
@@ -36,7 +36,7 @@ test.describe('authenticated error flows', () => {
     });
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: 'Ver extrato' }).first().click();
+    await page.getByRole('button', { name: 'Extrato' }).first().click();
     await page.locator('input[type="file"]').first().setInputFiles({
       name: 'broken.ofx',
       mimeType: 'application/x-ofx',
@@ -59,7 +59,7 @@ test.describe('authenticated error flows', () => {
     });
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: 'Ver extrato' }).first().click();
+    await page.getByRole('button', { name: 'Extrato' }).first().click();
     await page.locator('input[type="file"]').nth(1).setInputFiles({
       name: 'sample.csv',
       mimeType: 'text/csv',
@@ -67,7 +67,7 @@ test.describe('authenticated error flows', () => {
     });
     await page.getByRole('button', { name: 'Importar CSV' }).click();
 
-    await expect(page.getByText('Importação CSV bloqueada por duplicidade detectada.')).toBeVisible();
+    await expect(page.getByText('Falha ao importar CSV.')).toBeVisible();
   });
 
   test('mostra erro ao falhar criacao de conta', async ({ page }) => {
@@ -83,10 +83,10 @@ test.describe('authenticated error flows', () => {
     });
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
-    await page.getByLabel('Nome').fill('Conta com erro');
-    await page.getByRole('button', { name: 'Criar conta' }).click();
+    await page.getByLabel('Nome da conta').fill('Conta com erro');
+    await page.getByRole('button', { name: 'Salvar' }).click();
 
-    await expect(page.getByText('Nome da conta é obrigatório.')).toBeVisible();
+    await expect(page.getByText('Falha ao salvar conta.')).toBeVisible();
   });
 
   test('mostra erro ao falhar edicao de conta', async ({ page }) => {
@@ -104,9 +104,9 @@ test.describe('authenticated error flows', () => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
     await contaPrincipal.getByRole('button', { name: 'Editar' }).click();
-    await page.getByLabel('Nome').fill('Conta principal alterada');
-    await page.getByRole('button', { name: 'Atualizar conta' }).click();
+    await page.getByLabel('Nome da conta').fill('Conta principal alterada');
+    await page.getByRole('button', { name: 'Salvar' }).click();
 
-    await expect(page.getByText('Não foi possível atualizar a conta.')).toBeVisible();
+    await expect(page.getByText('Falha ao salvar conta.')).toBeVisible();
   });
 });

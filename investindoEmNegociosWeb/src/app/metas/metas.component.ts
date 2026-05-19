@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, NgIf, NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.service';
 import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/input-mask';
@@ -19,7 +19,7 @@ type GoalSection = {
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, FormsModule, DigitOnlyDirective, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })
@@ -560,7 +560,7 @@ export class MetasComponent implements OnInit {
     return a.title.localeCompare(b.title, 'pt-BR');
   }
 
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

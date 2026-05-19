@@ -1,5 +1,6 @@
 import { Page, Route } from '@playwright/test';
-import { UserRole } from '../../src/app/roles';
+
+type UserRole = 'Basic' | 'Intermediate' | 'Advanced' | 'Admin';
 
 const accountPrimaryId = '11111111-1111-1111-1111-111111111111';
 const accountReserveId = '22222222-2222-2222-2222-222222222222';
@@ -669,7 +670,7 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
           yearlyPrice: 0,
           recommended: false,
           current: true,
-          features: ['Dashboard', 'Contas', 'Cartões'],
+          features: ['Dashboard', 'Calendário', 'Calculadora', 'Contas', 'Cartões'],
           limits: { contas: '1 conta extra' }
         },
         {
@@ -681,7 +682,7 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
           yearlyPrice: 299,
           recommended: true,
           current: false,
-          features: ['Calendário', 'Importação de fatura'],
+          features: ['Importação de fatura'],
           limits: { categorias: 'Ilimitadas' }
         }
       ],

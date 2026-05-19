@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { StoredIncome } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
@@ -9,7 +9,7 @@ import { DigitOnlyDirective } from '../utils/digit-only.directive';
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, NgIf, NgFor, DecimalPipe, DigitOnlyDirective, RouterLink],
+  imports: [FormsModule, DecimalPipe, DigitOnlyDirective, RouterLink],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })
@@ -61,7 +61,7 @@ export class ReceitasFormComponent {
   fecharModal(): void {
     this.fechar.emit();
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

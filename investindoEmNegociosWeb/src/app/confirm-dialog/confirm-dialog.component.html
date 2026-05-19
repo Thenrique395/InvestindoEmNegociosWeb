@@ -2,7 +2,9 @@
   <div class="modal__backdrop" (click)="cancelled.emit()"></div>
   <div class="modal__card">
     <h2>{{ title }}</h2>
-    <p class="muted" *ngIf="message">{{ message }}</p>
+    @if (message) {
+      <p class="muted">{{ message }}</p>
+    }
     <div class="modal__actions">
       <button type="button" class="btn-cancel" (click)="cancelled.emit()">{{ cancelLabel }}</button>
       <button type="button" [class]="confirmClass" (click)="confirmed.emit()">{{ confirmLabel }}</button>

@@ -5,383 +5,429 @@
       <p class="mt-1 text-sm text-[var(--text-muted)]">Controle bandeiras de cartão e formas de pagamento disponíveis.</p>
     </div>
     <button type="button" class="ghost sm" (click)="loadAll()" [disabled]="loading" [attr.aria-busy]="loading">
-      <span *ngIf="!loading">Atualizar</span>
-      <span *ngIf="loading">Atualizando...</span>
+      @if (!loading) {
+        <span>Atualizar</span>
+      }
+      @if (loading) {
+        <span>Atualizando...</span>
+      }
     </button>
   </header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]" *ngIf="loading">
-    Carregando parâmetros...
-  </div>
-  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]" *ngIf="!loading && scalabilityRuntime as runtime">
-    <div class="flex flex-col gap-1">
-      <div class="text-sm font-semibold text-[var(--text)]">Escalabilidade por fases</div>
-      <p class="text-sm text-[var(--text-muted)]">Fase atual: {{ runtime.currentPhase }}</p>
+  @if (loading) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
+      Carregando parâmetros...
     </div>
-    <div class="mt-4 grid gap-4 lg:grid-cols-3">
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-        <strong class="text-sm text-[var(--text)]">Ativo agora</strong>
-        <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
-          <li *ngFor="let item of runtime.enabledControls; trackBy: trackByIndex">{{ item }}</li>
-        </ul>
+  }
+  @if (!loading && scalabilityRuntime; as runtime) {
+    <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="flex flex-col gap-1">
+        <div class="text-sm font-semibold text-[var(--text)]">Escalabilidade por fases</div>
+        <p class="text-sm text-[var(--text-muted)]">Fase atual: {{ runtime.currentPhase }}</p>
       </div>
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-        <strong class="text-sm text-[var(--text)]">Próxima fase</strong>
-        <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
-          <li *ngFor="let item of runtime.nextPhaseTargets; trackBy: trackByIndex">{{ item }}</li>
-        </ul>
-      </div>
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-        <strong class="text-sm text-[var(--text)]">Longo prazo</strong>
-        <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
-          <li *ngFor="let item of runtime.longTermTargets; trackBy: trackByIndex">{{ item }}</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-  <div class="grid gap-6 lg:grid-cols-2" *ngIf="!loading">
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="text-sm font-semibold text-[var(--text)]">Bandeiras de cartão</div>
-      <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
-        <input
-          type="text"
-          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Nome da bandeira"
-          [(ngModel)]="newBrandName"
-          name="newBrandName" />
-        <input
-          type="text"
-          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Código (ex: visa)"
-          [(ngModel)]="newBrandCode"
-          name="newBrandCode" />
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="createCardBrand()"
-          [disabled]="savingCreateBrand || loading">
-          <span class="btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          {{ savingCreateBrand ? 'Salvando...' : 'Cadastrar' }}
-        </button>
-      </div>
-      <div class="mt-4 flex items-center gap-3">
-        <input
-          type="text"
-          class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Buscar por nome ou codigo"
-          [(ngModel)]="brandFilter" />
-        <span class="text-sm text-[var(--text-muted)]" *ngIf="brandFilter">
-          {{ filteredCardBrands.length }} de {{ cardBrands.length }}
-        </span>
-      </div>
-      <div class="mt-4 space-y-3">
-        <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let brand of filteredCardBrands; trackBy: trackByIndex">
-          <div class="flex flex-wrap items-center gap-2 text-sm">
-            <strong>{{ brand.name }}</strong>
-            <span class="text-[var(--text-muted)]">{{ brand.code }}</span>
-            <span class="text-[var(--text-muted)]">{{ brand.isActive ? 'Ativo' : 'Desativado' }}</span>
-            <span class="text-[var(--text-muted)]" *ngIf="brandUpdatedLabel(brand)">{{ brandUpdatedLabel(brand) }}</span>
-            <span class="text-amber-600" *ngIf="isSavingBrand(brand)">Salvando...</span>
-          </div>
-          <label class="switch">
-            <input
-              type="checkbox"
-              [checked]="brand.isActive"
-              [disabled]="isSavingBrand(brand)"
-              (change)="toggleCardBrand(brand)" />
-            <span class="slider"></span>
-          </label>
+      <div class="mt-4 grid gap-4 lg:grid-cols-3">
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <strong class="text-sm text-[var(--text)]">Ativo agora</strong>
+          <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+            @for (item of runtime.enabledControls; track trackByIndex($index, item)) {
+              <li>{{ item }}</li>
+            }
+          </ul>
         </div>
-        <div class="text-sm text-[var(--text-muted)]" *ngIf="!filteredCardBrands.length">
-          {{ brandFilter ? 'Nenhuma bandeira encontrada.' : 'Nenhuma bandeira cadastrada.' }}
-          <span class="mt-1 block text-sm text-[var(--text-muted)]" *ngIf="!brandFilter">Use o cadastro acima para adicionar a primeira.</span>
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <strong class="text-sm text-[var(--text)]">Próxima fase</strong>
+          <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+            @for (item of runtime.nextPhaseTargets; track trackByIndex($index, item)) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <strong class="text-sm text-[var(--text)]">Longo prazo</strong>
+          <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+            @for (item of runtime.longTermTargets; track trackByIndex($index, item)) {
+              <li>{{ item }}</li>
+            }
+          </ul>
         </div>
       </div>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="text-sm font-semibold text-[var(--text)]">Formas de pagamento</div>
-      <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
-        <input
-          type="text"
-          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Nome da forma de pagamento"
-          [(ngModel)]="newMethodName"
-          name="newMethodName" />
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="createPaymentMethod()"
-          [disabled]="savingCreateMethod || loading">
-          <span class="btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          {{ savingCreateMethod ? 'Salvando...' : 'Cadastrar' }}
-        </button>
-      </div>
-      <div class="mt-4 flex items-center gap-3">
-        <input
-          type="text"
-          class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Buscar por nome"
-          [(ngModel)]="methodFilter" />
-        <span class="text-sm text-[var(--text-muted)]" *ngIf="methodFilter">
-          {{ filteredPaymentMethods.length }} de {{ paymentMethods.length }}
-        </span>
-      </div>
-      <div class="mt-4 space-y-3">
-        <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let method of filteredPaymentMethods; trackBy: trackByIndex">
-          <div class="flex flex-wrap items-center gap-2 text-sm">
-            <strong>{{ method.name }}</strong>
-            <span class="text-[var(--text-muted)]">{{ method.isActive ? 'Ativo' : 'Desativado' }}</span>
-            <span class="text-[var(--text-muted)]" *ngIf="methodUpdatedLabel(method)">{{ methodUpdatedLabel(method) }}</span>
-            <span class="text-amber-600" *ngIf="isSavingMethod(method)">Salvando...</span>
-          </div>
-          <label class="switch">
-            <input
-              type="checkbox"
-              [checked]="method.isActive"
-              [disabled]="isSavingMethod(method)"
-              (change)="togglePaymentMethod(method)" />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="text-sm text-[var(--text-muted)]" *ngIf="!filteredPaymentMethods.length">
-          {{ methodFilter ? 'Nenhuma forma encontrada.' : 'Nenhuma forma de pagamento cadastrada.' }}
-          <span class="mt-1 block text-sm text-[var(--text-muted)]" *ngIf="!methodFilter">Use o cadastro acima para adicionar a primeira.</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="text-sm font-semibold text-[var(--text)]">Bancos e corretoras</div>
-      <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
-        <input
-          type="text"
-          class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Nome da instituição"
-          [(ngModel)]="newInstitutionName"
-          name="newInstitutionName" />
-        <select
-          class="h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          [(ngModel)]="newInstitutionType"
-          name="newInstitutionType">
-          <option value="Bank">Banco</option>
-          <option value="Broker">Corretora</option>
-        </select>
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="createInstitution()"
-          [disabled]="savingCreateInstitution || loading">
-          <span class="btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          {{ savingCreateInstitution ? 'Salvando...' : 'Cadastrar' }}
-        </button>
-      </div>
-      <div class="mt-4 flex items-center gap-3">
-        <input
-          type="text"
-          class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-          placeholder="Buscar por nome"
-          [(ngModel)]="institutionFilter" />
-        <span class="text-sm text-[var(--text-muted)]" *ngIf="institutionFilter">
-          {{ filteredInstitutions.length }} de {{ institutions.length }}
-        </span>
-      </div>
-      <div class="mt-4 space-y-3">
-        <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3" *ngFor="let inst of filteredInstitutions; trackBy: trackByIndex">
-          <div class="flex flex-wrap items-center gap-2 text-sm">
-            <strong>{{ inst.name }}</strong>
-            <span class="text-[var(--text-muted)]">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
-            <span class="text-[var(--text-muted)]">{{ inst.isActive ? 'Ativo' : 'Desativado' }}</span>
-            <span class="text-[var(--text-muted)]" *ngIf="institutionUpdatedLabel(inst)">{{ institutionUpdatedLabel(inst) }}</span>
-            <span class="text-amber-600" *ngIf="isSavingInstitution(inst)">Salvando...</span>
-          </div>
-          <label class="switch">
-            <input
-              type="checkbox"
-              [checked]="inst.isActive"
-              [disabled]="isSavingInstitution(inst)"
-              (change)="toggleInstitution(inst)" />
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="text-sm text-[var(--text-muted)]" *ngIf="!filteredInstitutions.length">
-          {{ institutionFilter ? 'Nenhuma instituição encontrada.' : 'Nenhuma instituição cadastrada.' }}
-          <span class="mt-1 block text-sm text-[var(--text-muted)]" *ngIf="!institutionFilter">Use o cadastro acima para adicionar a primeira.</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="text-sm font-semibold text-[var(--text)]">Notificações globais</div>
-      <p class="mt-1 text-sm text-[var(--text-muted)]">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
-
-      <div class="mt-4 grid gap-4 md:grid-cols-2">
-        <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <strong class="text-sm text-[var(--text)]">Receitas</strong>
-          <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
-            <span>Ativar lembretes</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.incomeUpcomingEnabled" />
-          </label>
-          <label class="field-row flex items-center justify-between gap-3 text-sm text-[var(--text)]">
-            <span>Receber em</span>
-            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.incomeDaysBefore" class="h-9 w-20 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
-            <span>dias</span>
-          </label>
-        </div>
-
-        <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <strong class="text-sm text-[var(--text)]">Despesas</strong>
-          <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
-            <span>Vencimento próximo</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.expenseUpcomingEnabled" />
-          </label>
-          <label class="field-row flex items-center justify-between gap-3 text-sm text-[var(--text)]">
-            <span>Vence em</span>
-            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.expenseDaysBefore" class="h-9 w-20 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
-            <span>dias</span>
-          </label>
-          <label class="toggle-row">
-            <span>Atraso</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.expenseOverdueEnabled" />
-          </label>
-        </div>
-
-        <div class="settings-block">
-          <strong>Fechamento de fatura</strong>
-          <label class="toggle-row">
-            <span>Avisar antes</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.cardCloseSoonEnabled" />
-          </label>
-          <label class="field-row">
-            <span>Fechar em</span>
-            <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.cardCloseDaysBefore" />
-            <span>dias</span>
-          </label>
-          <label class="toggle-row">
-            <span>No dia do fechamento</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.cardCloseDayEnabled" />
-          </label>
-        </div>
-
-        <div class="settings-block">
-          <strong>Fechamento do mês</strong>
-          <label class="toggle-row">
-            <span>Último dia do mês</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.monthCloseEnabled" />
-          </label>
-          <label class="toggle-row">
-            <span>Resumo no dia 1</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.monthSummaryEnabled" />
-          </label>
-        </div>
-
-        <div class="settings-block">
-          <strong>Metas</strong>
-          <label class="toggle-row">
-            <span>Progresso abaixo do esperado</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.goalBelowExpectedEnabled" />
-          </label>
-          <label class="toggle-row">
-            <span>Meta atingida</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.goalCompletedEnabled" />
-          </label>
-          <label class="toggle-row">
-            <span>Sem movimentações</span>
-            <input type="checkbox" [(ngModel)]="notificationSettings.goalInactivityEnabled" />
-          </label>
-          <label class="field-row">
-            <span>Sem aporte há</span>
-            <input type="number" min="1" max="180" [(ngModel)]="notificationSettings.goalInactivityDays" />
-            <span>dias</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="card__actions">
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="salvarNotificacoes()"
-          [disabled]="savingNotificationSettings || loading">
-          {{ savingNotificationSettings ? 'Salvando...' : 'Salvar regras' }}
-        </button>
-        <span class="item-meta" *ngIf="notificationUpdatedLabel()">{{ notificationUpdatedLabel() }}</span>
-      </div>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
-      <div class="text-sm font-semibold text-[var(--text)]">Agendamento de robôs</div>
-      <p class="mt-1 text-sm text-[var(--text-muted)]">
-        Defina se a execução automática diária fica ativa e o horário em UTC.
-      </p>
-
-      <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-        <label class="toggle-row">
-          <span>Execução automática ativa</span>
-          <input type="checkbox" [(ngModel)]="robotSettings.enabled" />
-        </label>
-        <label class="field-row">
-          <span>Horário diário (UTC)</span>
+    </section>
+  }
+  @if (!loading) {
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+        <div class="text-sm font-semibold text-[var(--text)]">Bandeiras de cartão</div>
+        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
           <input
-            type="time"
-            [(ngModel)]="robotSettings.dailyRunTimeUtc"
-            class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
-        </label>
-      </div>
-
-      <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-        <div class="text-sm font-semibold text-[var(--text)]">Teste de envio de e-mail</div>
-        <p class="text-sm text-[var(--text-muted)]">Use para validar credenciais SMTP configuradas no ambiente.</p>
-        <div class="flex flex-col gap-3 md:flex-row">
-          <input
-            type="email"
+            type="text"
             class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
-            placeholder="destino@exemplo.com"
-            [(ngModel)]="testEmailTo"
-            name="testEmailTo" />
+            placeholder="Nome da bandeira"
+            [(ngModel)]="newBrandName"
+            name="newBrandName" />
+          <input
+            type="text"
+            class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            placeholder="Código (ex: visa)"
+            [(ngModel)]="newBrandCode"
+            name="newBrandCode" />
           <button
             type="button"
-            class="ghost sm"
-            (click)="enviarEmailTeste()"
-            [disabled]="sendingTestEmail || loading">
-            {{ sendingTestEmail ? 'Enviando...' : 'Enviar teste' }}
+            class="btn-primary"
+            (click)="createCardBrand()"
+            [disabled]="savingCreateBrand || loading">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            {{ savingCreateBrand ? 'Salvando...' : 'Cadastrar' }}
           </button>
         </div>
-        <span class="item-meta" *ngIf="testEmailUpdatedLabel()">{{ testEmailUpdatedLabel() }}</span>
+        <div class="mt-4 flex items-center gap-3">
+          <input
+            type="text"
+            class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            placeholder="Buscar por nome ou codigo"
+            [(ngModel)]="brandFilter" />
+          @if (brandFilter) {
+            <span class="text-sm text-[var(--text-muted)]">
+              {{ filteredCardBrands.length }} de {{ cardBrands.length }}
+            </span>
+          }
+        </div>
+        <div class="mt-4 space-y-3">
+          @for (brand of filteredCardBrands; track trackByIndex($index, brand)) {
+            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+              <div class="flex flex-wrap items-center gap-2 text-sm">
+                <strong>{{ brand.name }}</strong>
+                <span class="text-[var(--text-muted)]">{{ brand.code }}</span>
+                <span class="text-[var(--text-muted)]">{{ brand.isActive ? 'Ativo' : 'Desativado' }}</span>
+                @if (brandUpdatedLabel(brand)) {
+                  <span class="text-[var(--text-muted)]">{{ brandUpdatedLabel(brand) }}</span>
+                }
+                @if (isSavingBrand(brand)) {
+                  <span class="text-amber-600">Salvando...</span>
+                }
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  [checked]="brand.isActive"
+                  [disabled]="isSavingBrand(brand)"
+                  (change)="toggleCardBrand(brand)" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          }
+          @if (!filteredCardBrands.length) {
+            <div class="text-sm text-[var(--text-muted)]">
+              {{ brandFilter ? 'Nenhuma bandeira encontrada.' : 'Nenhuma bandeira cadastrada.' }}
+              @if (!brandFilter) {
+                <span class="mt-1 block text-sm text-[var(--text-muted)]">Use o cadastro acima para adicionar a primeira.</span>
+              }
+            </div>
+          }
+        </div>
       </div>
-
-      <div class="card__actions">
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="salvarRobotSettings()"
-          [disabled]="savingRobotSettings || loading">
-          {{ savingRobotSettings ? 'Salvando...' : 'Salvar agendamento' }}
-        </button>
-        <span class="item-meta" *ngIf="robotUpdatedLabel()">{{ robotUpdatedLabel() }}</span>
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+        <div class="text-sm font-semibold text-[var(--text)]">Formas de pagamento</div>
+        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+          <input
+            type="text"
+            class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            placeholder="Nome da forma de pagamento"
+            [(ngModel)]="newMethodName"
+            name="newMethodName" />
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="createPaymentMethod()"
+            [disabled]="savingCreateMethod || loading">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            {{ savingCreateMethod ? 'Salvando...' : 'Cadastrar' }}
+          </button>
+        </div>
+        <div class="mt-4 flex items-center gap-3">
+          <input
+            type="text"
+            class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            placeholder="Buscar por nome"
+            [(ngModel)]="methodFilter" />
+          @if (methodFilter) {
+            <span class="text-sm text-[var(--text-muted)]">
+              {{ filteredPaymentMethods.length }} de {{ paymentMethods.length }}
+            </span>
+          }
+        </div>
+        <div class="mt-4 space-y-3">
+          @for (method of filteredPaymentMethods; track trackByIndex($index, method)) {
+            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+              <div class="flex flex-wrap items-center gap-2 text-sm">
+                <strong>{{ method.name }}</strong>
+                <span class="text-[var(--text-muted)]">{{ method.isActive ? 'Ativo' : 'Desativado' }}</span>
+                @if (methodUpdatedLabel(method)) {
+                  <span class="text-[var(--text-muted)]">{{ methodUpdatedLabel(method) }}</span>
+                }
+                @if (isSavingMethod(method)) {
+                  <span class="text-amber-600">Salvando...</span>
+                }
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  [checked]="method.isActive"
+                  [disabled]="isSavingMethod(method)"
+                  (change)="togglePaymentMethod(method)" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          }
+          @if (!filteredPaymentMethods.length) {
+            <div class="text-sm text-[var(--text-muted)]">
+              {{ methodFilter ? 'Nenhuma forma encontrada.' : 'Nenhuma forma de pagamento cadastrada.' }}
+              @if (!methodFilter) {
+                <span class="mt-1 block text-sm text-[var(--text-muted)]">Use o cadastro acima para adicionar a primeira.</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+        <div class="text-sm font-semibold text-[var(--text)]">Bancos e corretoras</div>
+        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+          <input
+            type="text"
+            class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            placeholder="Nome da instituição"
+            [(ngModel)]="newInstitutionName"
+            name="newInstitutionName" />
+          <select
+            class="h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            [(ngModel)]="newInstitutionType"
+            name="newInstitutionType">
+            <option value="Bank">Banco</option>
+            <option value="Broker">Corretora</option>
+          </select>
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="createInstitution()"
+            [disabled]="savingCreateInstitution || loading">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            {{ savingCreateInstitution ? 'Salvando...' : 'Cadastrar' }}
+          </button>
+        </div>
+        <div class="mt-4 flex items-center gap-3">
+          <input
+            type="text"
+            class="h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+            placeholder="Buscar por nome"
+            [(ngModel)]="institutionFilter" />
+          @if (institutionFilter) {
+            <span class="text-sm text-[var(--text-muted)]">
+              {{ filteredInstitutions.length }} de {{ institutions.length }}
+            </span>
+          }
+        </div>
+        <div class="mt-4 space-y-3">
+          @for (inst of filteredInstitutions; track trackByIndex($index, inst)) {
+            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+              <div class="flex flex-wrap items-center gap-2 text-sm">
+                <strong>{{ inst.name }}</strong>
+                <span class="text-[var(--text-muted)]">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
+                <span class="text-[var(--text-muted)]">{{ inst.isActive ? 'Ativo' : 'Desativado' }}</span>
+                @if (institutionUpdatedLabel(inst)) {
+                  <span class="text-[var(--text-muted)]">{{ institutionUpdatedLabel(inst) }}</span>
+                }
+                @if (isSavingInstitution(inst)) {
+                  <span class="text-amber-600">Salvando...</span>
+                }
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  [checked]="inst.isActive"
+                  [disabled]="isSavingInstitution(inst)"
+                  (change)="toggleInstitution(inst)" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          }
+          @if (!filteredInstitutions.length) {
+            <div class="text-sm text-[var(--text-muted)]">
+              {{ institutionFilter ? 'Nenhuma instituição encontrada.' : 'Nenhuma instituição cadastrada.' }}
+              @if (!institutionFilter) {
+                <span class="mt-1 block text-sm text-[var(--text-muted)]">Use o cadastro acima para adicionar a primeira.</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+        <div class="text-sm font-semibold text-[var(--text)]">Notificações globais</div>
+        <p class="mt-1 text-sm text-[var(--text-muted)]">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+            <strong class="text-sm text-[var(--text)]">Receitas</strong>
+            <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
+              <span>Ativar lembretes</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.incomeUpcomingEnabled" />
+            </label>
+            <label class="field-row flex items-center justify-between gap-3 text-sm text-[var(--text)]">
+              <span>Receber em</span>
+              <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.incomeDaysBefore" class="h-9 w-20 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
+              <span>dias</span>
+            </label>
+          </div>
+          <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+            <strong class="text-sm text-[var(--text)]">Despesas</strong>
+            <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
+              <span>Vencimento próximo</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.expenseUpcomingEnabled" />
+            </label>
+            <label class="field-row flex items-center justify-between gap-3 text-sm text-[var(--text)]">
+              <span>Vence em</span>
+              <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.expenseDaysBefore" class="h-9 w-20 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
+              <span>dias</span>
+            </label>
+            <label class="toggle-row">
+              <span>Atraso</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.expenseOverdueEnabled" />
+            </label>
+          </div>
+          <div class="settings-block">
+            <strong>Fechamento de fatura</strong>
+            <label class="toggle-row">
+              <span>Avisar antes</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.cardCloseSoonEnabled" />
+            </label>
+            <label class="field-row">
+              <span>Fechar em</span>
+              <input type="number" min="0" max="30" [(ngModel)]="notificationSettings.cardCloseDaysBefore" />
+              <span>dias</span>
+            </label>
+            <label class="toggle-row">
+              <span>No dia do fechamento</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.cardCloseDayEnabled" />
+            </label>
+          </div>
+          <div class="settings-block">
+            <strong>Fechamento do mês</strong>
+            <label class="toggle-row">
+              <span>Último dia do mês</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.monthCloseEnabled" />
+            </label>
+            <label class="toggle-row">
+              <span>Resumo no dia 1</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.monthSummaryEnabled" />
+            </label>
+          </div>
+          <div class="settings-block">
+            <strong>Metas</strong>
+            <label class="toggle-row">
+              <span>Progresso abaixo do esperado</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.goalBelowExpectedEnabled" />
+            </label>
+            <label class="toggle-row">
+              <span>Meta atingida</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.goalCompletedEnabled" />
+            </label>
+            <label class="toggle-row">
+              <span>Sem movimentações</span>
+              <input type="checkbox" [(ngModel)]="notificationSettings.goalInactivityEnabled" />
+            </label>
+            <label class="field-row">
+              <span>Sem aporte há</span>
+              <input type="number" min="1" max="180" [(ngModel)]="notificationSettings.goalInactivityDays" />
+              <span>dias</span>
+            </label>
+          </div>
+        </div>
+        <div class="card__actions">
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="salvarNotificacoes()"
+            [disabled]="savingNotificationSettings || loading">
+            {{ savingNotificationSettings ? 'Salvando...' : 'Salvar regras' }}
+          </button>
+          @if (notificationUpdatedLabel()) {
+            <span class="item-meta">{{ notificationUpdatedLabel() }}</span>
+          }
+        </div>
+      </div>
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+        <div class="text-sm font-semibold text-[var(--text)]">Agendamento de robôs</div>
+        <p class="mt-1 text-sm text-[var(--text-muted)]">
+          Defina se a execução automática diária fica ativa e o horário em UTC.
+        </p>
+        <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <label class="toggle-row">
+            <span>Execução automática ativa</span>
+            <input type="checkbox" [(ngModel)]="robotSettings.enabled" />
+          </label>
+          <label class="field-row">
+            <span>Horário diário (UTC)</span>
+            <input
+              type="time"
+              [(ngModel)]="robotSettings.dailyRunTimeUtc"
+              class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
+          </label>
+        </div>
+        <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <div class="text-sm font-semibold text-[var(--text)]">Teste de envio de e-mail</div>
+          <p class="text-sm text-[var(--text-muted)]">Use para validar credenciais SMTP configuradas no ambiente.</p>
+          <div class="flex flex-col gap-3 md:flex-row">
+            <input
+              type="email"
+              class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+              placeholder="destino@exemplo.com"
+              [(ngModel)]="testEmailTo"
+              name="testEmailTo" />
+            <button
+              type="button"
+              class="ghost sm"
+              (click)="enviarEmailTeste()"
+              [disabled]="sendingTestEmail || loading">
+              {{ sendingTestEmail ? 'Enviando...' : 'Enviar teste' }}
+            </button>
+          </div>
+          @if (testEmailUpdatedLabel()) {
+            <span class="item-meta">{{ testEmailUpdatedLabel() }}</span>
+          }
+        </div>
+        <div class="card__actions">
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="salvarRobotSettings()"
+            [disabled]="savingRobotSettings || loading">
+            {{ savingRobotSettings ? 'Salvando...' : 'Salvar agendamento' }}
+          </button>
+          @if (robotUpdatedLabel()) {
+            <span class="item-meta">{{ robotUpdatedLabel() }}</span>
+          }
+        </div>
       </div>
     </div>
-  </div>
+  }
 
-  <app-confirm-dialog
-    *ngIf="confirmOpen"
-    [title]="confirmTitle"
-    [message]="confirmMessage"
-    [confirmLabel]="confirmLabel"
-    [variant]="confirmVariant"
-    (confirmed)="confirmAction()"
-    (cancelled)="cancelConfirm()"
-  ></app-confirm-dialog>
+  @if (confirmOpen) {
+    <app-confirm-dialog
+      [title]="confirmTitle"
+      [message]="confirmMessage"
+      [confirmLabel]="confirmLabel"
+      [variant]="confirmVariant"
+      (confirmed)="confirmAction()"
+      (cancelled)="cancelConfirm()"
+    ></app-confirm-dialog>
+  }
 </section>

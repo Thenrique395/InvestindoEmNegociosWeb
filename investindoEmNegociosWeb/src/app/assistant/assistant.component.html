@@ -1,38 +1,103 @@
-<section class="page-shell">
-  <header class="card hero">
-    <div>
-      <p class="eyebrow">Assistente financeiro</p>
-      <h1>Assistente</h1>
-      <p class="muted">Conversa guiada com base em SDR, projeção, dívida, patrimônio, risco e recomendações já calculadas.</p>
-    </div>
-  </header>
-
-  <div class="feedback error" *ngIf="error">{{ error }}</div>
-
-  <article class="card" *ngIf="context as c">
-    <div class="summary-grid">
-      <div><span>SDR</span><strong>{{ c.realBalance.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-      <div><span>Dívida</span><strong>{{ c.debts.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-      <div><span>Patrimônio</span><strong>{{ c.netWorth.netWorth | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-      <div><span>Risco</span><strong>{{ c.risk.score }}/100</strong></div>
-    </div>
-    <p class="muted">{{ c.governanceSummary }}</p>
-  </article>
-
-  <article class="card composer">
-    <label>Pergunta
-      <textarea [(ngModel)]="question" rows="4" placeholder="Ex.: Qual é meu maior risco financeiro neste mês?"></textarea>
-    </label>
-    <div class="actions">
-      <button class="btn-primary" type="button" (click)="send()" [disabled]="sending || loading">{{ sending ? 'Respondendo...' : 'Perguntar' }}</button>
-    </div>
-  </article>
-
-  <article class="card conversation" *ngIf="conversation.length">
-    <section class="bubble" *ngFor="let item of conversation">
-      <p class="bubble__q">{{ item.question }}</p>
-      <p class="bubble__a">{{ item.answer }}</p>
-      <p class="bubble__d">{{ item.disclaimer }}</p>
+<section class="assistant-page">
+  @if (context; as c) {
+    <section class="assistant-summary-grid">
+      <article class="assistant-summary-card assistant-summary-card--primary">
+        <div class="assistant-summary-card__head">
+          <span class="assistant-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <div class="assistant-summary-card__copy">
+            <p class="assistant-summary-card__eyebrow">SDR</p>
+            <h3 class="assistant-summary-card__title">{{ c.realBalance.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          </div>
+        </div>
+        <p class="assistant-summary-card__note">Saldo disponível real usado no contexto da conversa.</p>
+      </article>
+      <article class="assistant-summary-card assistant-summary-card--warning">
+        <div class="assistant-summary-card__head">
+          <span class="assistant-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <div class="assistant-summary-card__copy">
+            <p class="assistant-summary-card__eyebrow">Dívida</p>
+            <h3 class="assistant-summary-card__title">{{ c.debts.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          </div>
+        </div>
+        <p class="assistant-summary-card__note">Compromissos considerados nas recomendações.</p>
+      </article>
+      <article class="assistant-summary-card assistant-summary-card--info">
+        <div class="assistant-summary-card__head">
+          <span class="assistant-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <div class="assistant-summary-card__copy">
+            <p class="assistant-summary-card__eyebrow">Patrimônio</p>
+            <h3 class="assistant-summary-card__title">{{ c.netWorth.netWorth | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          </div>
+        </div>
+        <p class="assistant-summary-card__note">Base patrimonial consolidada para análise.</p>
+      </article>
+      <article class="assistant-summary-card assistant-summary-card--risk">
+        <div class="assistant-summary-card__head">
+          <span class="assistant-summary-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <div class="assistant-summary-card__copy">
+            <p class="assistant-summary-card__eyebrow">Risco</p>
+            <h3 class="assistant-summary-card__title">{{ c.risk.score }}/100</h3>
+          </div>
+        </div>
+        <p class="assistant-summary-card__note">Pontuação usada para priorizar alertas.</p>
+      </article>
     </section>
-  </article>
+  }
+
+  <section class="assistant-shell">
+    <div class="assistant-hero">
+      <div class="assistant-hero__main">
+        <p class="assistant-hero__eyebrow">Assistente financeiro</p>
+        <h2 class="assistant-hero__title">Pergunte com contexto real</h2>
+        <p class="assistant-hero__text">Conversa guiada com base em SDR, projeção, dívida, patrimônio, risco e recomendações já calculadas.</p>
+      </div>
+
+      <aside class="assistant-action-card">
+        <p class="assistant-action-card__eyebrow">Próxima ação</p>
+        <strong class="assistant-action-card__title">Analisar o mês</strong>
+        <p class="assistant-action-card__text">{{ context?.governanceSummary || 'Carregando contexto financeiro para orientar as respostas.' }}</p>
+      </aside>
+    </div>
+
+    @if (error) {
+      <div class="feedback error">{{ error }}</div>
+    }
+
+    <article class="assistant-composer">
+      <label>Pergunta
+        <textarea [(ngModel)]="question" rows="4" placeholder="Ex.: Qual é meu maior risco financeiro neste mês?"></textarea>
+      </label>
+      <div class="actions">
+        <button class="btn-primary" type="button" (click)="send()" [disabled]="sending || loading">{{ sending ? 'Respondendo...' : 'Perguntar' }}</button>
+      </div>
+    </article>
+
+    @if (conversation.length) {
+      <article class="conversation">
+        @for (item of conversation; track item) {
+          <section class="bubble">
+            <p class="bubble__q">{{ item.question }}</p>
+            <p class="bubble__a">{{ item.answer }}</p>
+            <p class="bubble__d">{{ item.disclaimer }}</p>
+          </section>
+        }
+      </article>
+    }
+  </section>
 </section>

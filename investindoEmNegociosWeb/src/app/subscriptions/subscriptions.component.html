@@ -11,9 +11,11 @@
     </div>
   </div>
 
-  <p class="muted" *ngIf="loading">Carregando catálogo de planos.</p>
+  @if (loading) {
+    <p class="muted">Carregando catálogo de planos.</p>
+  }
 
-  <ng-container *ngIf="catalog as vm">
+  @if (catalog; as vm) {
     <div class="privacy-strip">
       <div class="privacy-pill">
         <strong>{{ vm.current.planName }}</strong>
@@ -32,71 +34,77 @@
         <span>Próxima virada</span>
       </div>
     </div>
-
     <div class="plans-grid">
-      <article class="plan-card" *ngFor="let plan of vm.plans" [class.plan-card--current]="plan.current" [class.plan-card--recommended]="plan.recommended">
-        <div class="plan-card__header">
-          <div>
-            <h3>{{ plan.name }}</h3>
-            <p class="muted">{{ plan.description }}</p>
+      @for (plan of vm.plans; track plan) {
+        <article class="plan-card" [class.plan-card--current]="plan.current" [class.plan-card--recommended]="plan.recommended">
+          <div class="plan-card__header">
+            <div>
+              <h3>{{ plan.name }}</h3>
+              <p class="muted">{{ plan.description }}</p>
+            </div>
+            @if (plan.recommended) {
+              <span class="badge">Recomendado</span>
+            }
           </div>
-          <span class="badge" *ngIf="plan.recommended">Recomendado</span>
-        </div>
-
-        <div class="price">
-          <strong>
-            {{
+          <div class="price">
+            <strong>
+              {{
               (changingCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice)
-                | currency:'BRL':'symbol':'1.2-2':'pt-BR'
-            }}
-          </strong>
-          <span>/ {{ changingCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
-        </div>
-
-        <div class="scope scope--compact">
-          <div *ngFor="let feature of plan.features">{{ feature }}</div>
-        </div>
-
-        <div class="limits">
-          <div *ngFor="let limit of plan.limits | keyvalue">
-            <strong>{{ limit.key }}</strong>
-            <span>{{ limit.value }}</span>
+              | currency:'BRL':'symbol':'1.2-2':'pt-BR'
+              }}
+            </strong>
+            <span>/ {{ changingCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
           </div>
-        </div>
-
-        <button
-          type="button"
-          class="btn"
-          [class.btn--primary]="!plan.current"
-          [class.btn--ghost]="plan.current"
-          [disabled]="plan.current || changingPlanCode !== null"
-          (click)="change(plan)">
-          {{ plan.current ? 'Plano atual' : (changingPlanCode === plan.code ? 'Aplicando...' : 'Trocar para este plano') }}
+          <div class="scope scope--compact">
+            @for (feature of plan.features; track feature) {
+              <div>{{ feature }}</div>
+            }
+          </div>
+          <div class="limits">
+            @for (limit of plan.limits | keyvalue; track limit) {
+              <div>
+                <strong>{{ limit.key }}</strong>
+                <span>{{ limit.value }}</span>
+              </div>
+            }
+          </div>
+          <button
+            type="button"
+            class="btn"
+            [class.btn--primary]="!plan.current"
+            [class.btn--ghost]="plan.current"
+            [disabled]="plan.current || changingPlanCode !== null"
+            (click)="change(plan)">
+            {{ plan.current ? 'Plano atual' : (changingPlanCode === plan.code ? 'Aplicando...' : 'Trocar para este plano') }}
+          </button>
+        </article>
+      }
+    </div>
+    @if (vm.current.planCode !== 'basic') {
+      <div class="card">
+        <h3>Gerenciar cobrança</h3>
+        <p class="muted">Atualize meio de pagamento, trate cobrança pendente e acompanhe a renovação pelo portal seguro do provedor.</p>
+        <button type="button" class="btn btn--ghost" [disabled]="openingPortal" (click)="openPortal()">
+          {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
         </button>
-      </article>
-    </div>
-
-    <div class="card" *ngIf="vm.current.planCode !== 'basic'">
-      <h3>Gerenciar cobrança</h3>
-      <p class="muted">Atualize meio de pagamento, trate cobrança pendente e acompanhe a renovação pelo portal seguro do provedor.</p>
-      <button type="button" class="btn btn--ghost" [disabled]="openingPortal" (click)="openPortal()">
-        {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
-      </button>
-    </div>
-
-    <div class="card" *ngIf="vm.current.planCode !== 'basic'">
-      <h3>Cancelar renovação</h3>
-      <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
-      <button type="button" class="btn btn--danger" [disabled]="cancelling" (click)="cancel()">
-        {{ cancelling ? 'Cancelando...' : 'Cancelar renovação' }}
-      </button>
-    </div>
-
+      </div>
+    }
+    @if (vm.current.planCode !== 'basic') {
+      <div class="card">
+        <h3>Cancelar renovação</h3>
+        <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
+        <button type="button" class="btn btn--danger" [disabled]="cancelling" (click)="cancel()">
+          {{ cancelling ? 'Cancelando...' : 'Cancelar renovação' }}
+        </button>
+      </div>
+    }
     <div class="card">
       <h3>Notas operacionais</h3>
       <div class="scope scope--compact">
-        <div *ngFor="let note of vm.notes">{{ note }}</div>
+        @for (note of vm.notes; track note) {
+          <div>{{ note }}</div>
+        }
       </div>
     </div>
-  </ng-container>
+  }
 </section>

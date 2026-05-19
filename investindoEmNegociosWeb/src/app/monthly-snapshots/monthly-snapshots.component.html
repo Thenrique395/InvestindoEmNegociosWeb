@@ -1,33 +1,100 @@
-<section class="page-shell">
-  <header class="card hero">
-    <div>
-      <p class="eyebrow">Fechamento mensal</p>
-      <h1>Snapshots mensais</h1>
-      <p class="muted">Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco.</p>
-    </div>
-    <button class="btn-primary" type="button" (click)="generateCurrentMonth()" [disabled]="generating">
-      {{ generating ? 'Gerando...' : 'Gerar snapshot do mês' }}
-    </button>
-  </header>
+<section class="snapshots-page">
+  <section class="snapshots-summary-grid">
+    <article class="snapshots-summary-card snapshots-summary-card--primary">
+      <div class="snapshots-summary-card__head">
+        <span class="snapshots-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="snapshots-summary-card__copy">
+          <p class="snapshots-summary-card__eyebrow">SDR atual</p>
+          <h3 class="snapshots-summary-card__title">{{ latestRealBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="snapshots-summary-card__note">Saldo disponível real do snapshot mais recente.</p>
+    </article>
+    <article class="snapshots-summary-card snapshots-summary-card--info">
+      <div class="snapshots-summary-card__head">
+        <span class="snapshots-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="snapshots-summary-card__copy">
+          <p class="snapshots-summary-card__eyebrow">Projeção</p>
+          <h3 class="snapshots-summary-card__title">{{ latestProjectedBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+      </div>
+      <p class="snapshots-summary-card__note">Visão projetada do mês fechado mais recente.</p>
+    </article>
+    <article class="snapshots-summary-card snapshots-summary-card--warning">
+      <div class="snapshots-summary-card__head">
+        <span class="snapshots-summary-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <div class="snapshots-summary-card__copy">
+          <p class="snapshots-summary-card__eyebrow">Risco</p>
+          <h3 class="snapshots-summary-card__title">{{ latestRiskScore }}/100</h3>
+        </div>
+      </div>
+      <p class="snapshots-summary-card__note">{{ latestSnapshot?.riskClassification || 'Sem snapshot gerado' }}</p>
+    </article>
+  </section>
 
-  <div class="feedback error" *ngIf="error">{{ error }}</div>
-  <article class="card">
-    <p class="muted" *ngIf="loading">Carregando...</p>
-    <p class="muted" *ngIf="!loading && !snapshots.length">Nenhum snapshot gerado.</p>
-    <div class="snapshot-list" *ngIf="snapshots.length">
-      <section class="snapshot" *ngFor="let item of snapshots">
-        <div class="snapshot__head">
-          <h2>{{ item.snapshotLabel }}</h2>
-          <span class="pill">{{ item.riskClassification }} · {{ item.riskScore }}/100</span>
-        </div>
-        <div class="grid">
-          <div><span>SDR</span><strong>{{ item.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Projeção</span><strong>{{ item.projectedBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Dívida</span><strong>{{ item.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Patrimônio</span><strong>{{ item.netWorth | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-        </div>
-        <p class="muted">{{ item.primaryInsight }}</p>
-      </section>
+  <section class="snapshots-shell">
+    <div class="snapshots-hero">
+      <div class="snapshots-hero__main">
+        <p class="snapshots-hero__eyebrow">Fechamento mensal</p>
+        <h2 class="snapshots-hero__title">Snapshots mensais</h2>
+        <p class="snapshots-hero__text">Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco.</p>
+      </div>
+
+      <aside class="snapshots-action-card">
+        <p class="snapshots-action-card__eyebrow">Próxima ação</p>
+        <strong class="snapshots-action-card__title">Gerar fechamento</strong>
+        <p class="snapshots-action-card__text">Atualize o retrato do mês para comparar risco, patrimônio e projeção.</p>
+        <button class="snapshots-action-card__button" type="button" (click)="generateCurrentMonth()" [disabled]="generating">
+          <span class="snapshots-action-card__button-icon" aria-hidden="true">+</span>
+          <span class="snapshots-action-card__button-copy">
+            <strong>{{ generating ? 'Gerando...' : 'Gerar snapshot' }}</strong>
+            <small>Registrar o fechamento do mês atual.</small>
+          </span>
+        </button>
+      </aside>
     </div>
+
+  @if (error) {
+    <div class="feedback error">{{ error }}</div>
+  }
+  <article class="card">
+    @if (loading) {
+      <p class="muted">Carregando...</p>
+    }
+    @if (!loading && !snapshots.length) {
+      <p class="muted">Nenhum snapshot gerado.</p>
+    }
+    @if (snapshots.length) {
+      <div class="snapshot-list">
+        @for (item of snapshots; track item) {
+          <section class="snapshot">
+            <div class="snapshot__head">
+              <h2>{{ item.snapshotLabel }}</h2>
+              <span class="pill">{{ item.riskClassification }} · {{ item.riskScore }}/100</span>
+            </div>
+            <div class="grid">
+              <div><span>SDR</span><strong>{{ item.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>Projeção</span><strong>{{ item.projectedBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>Dívida</span><strong>{{ item.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>Patrimônio</span><strong>{{ item.netWorth | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+            </div>
+            <p class="muted">{{ item.primaryInsight }}</p>
+          </section>
+        }
+      </div>
+    }
   </article>
+  </section>
 </section>

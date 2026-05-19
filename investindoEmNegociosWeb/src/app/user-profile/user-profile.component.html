@@ -9,8 +9,12 @@
   <div class="form">
     <div class="avatar-block">
       <div class="avatar-preview" [class.is-empty]="!avatarUrl">
-        <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Foto de perfil" />
-        <span *ngIf="!avatarUrl">Sem foto</span>
+        @if (avatarUrl) {
+          <img [src]="avatarUrl" alt="Foto de perfil" />
+        }
+        @if (!avatarUrl) {
+          <span>Sem foto</span>
+        }
       </div>
       <div class="avatar-actions">
         <label class="upload">
@@ -74,7 +78,9 @@
     <label>
       Dia de início da competência
       <select [(ngModel)]="carryOverDay">
-        <option *ngFor="let day of carryOverDayOptions" [ngValue]="day">Dia {{ day }}</option>
+        @for (day of carryOverDayOptions; track day) {
+          <option [ngValue]="day">Dia {{ day }}</option>
+        }
       </select>
     </label>
   </div>

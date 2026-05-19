@@ -24,14 +24,18 @@
           <label>
             Moeda
             <select [(ngModel)]="moedaSelecionada">
-              <option *ngFor="let m of moedas; trackBy: trackByIndex" [value]="m">{{ m }}</option>
+              @for (m of moedas; track trackByIndex($index, m)) {
+                <option [value]="m">{{ m }}</option>
+              }
             </select>
           </label>
 
           <label>
             Idioma da aplicação
             <select [(ngModel)]="linguaSelecionada" (ngModelChange)="onLanguageChange($event)">
-              <option *ngFor="let l of linguas; trackBy: trackByIndex" [value]="l.id">{{ l.label }}</option>
+              @for (l of linguas; track trackByIndex($index, l)) {
+                <option [value]="l.id">{{ l.label }}</option>
+              }
             </select>
           </label>
         </div>
@@ -53,12 +57,16 @@
             <p class="muted">Mantenha a principal em primeiro lugar e adicione alternativas se precisar.</p>
           </div>
 
-          <div class="chips" *ngIf="localizacoes.length">
-            <span class="chip" *ngFor="let loc of localizacoes; let i = index; trackBy: trackByIndex">
-              {{ loc }}
-              <button type="button" [attr.aria-label]="'Remover ' + loc" (click)="removerLocalizacao(i)">×</button>
-            </span>
-          </div>
+          @if (localizacoes.length) {
+            <div class="chips">
+              @for (loc of localizacoes; track trackByIndex(i, loc); let i = $index) {
+                <span class="chip">
+                  {{ loc }}
+                  <button type="button" [attr.aria-label]="'Remover ' + loc" (click)="removerLocalizacao(i)">×</button>
+                </span>
+              }
+            </div>
+          }
 
           <div class="inline">
             <input type="text" [(ngModel)]="novaLocalizacao" placeholder="Ex.: pt-BR ou en-US" />

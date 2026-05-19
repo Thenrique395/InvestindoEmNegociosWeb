@@ -72,6 +72,12 @@ export class ContasComponent implements OnInit {
       this.accounts = this.accountsStore.accounts();
       this.loading = this.accountsStore.loading();
       this.error = this.accountsStore.error() || this.error;
+      if (this.accountsStore.error()) {
+        this.saving = false;
+        this.transferring = false;
+        this.importingOfx = false;
+        this.importingCsv = false;
+      }
       this.selectedAccountId = this.accountsStore.selectedAccountId();
       this.syncTransferDefaults();
     });
@@ -90,6 +96,18 @@ export class ContasComponent implements OnInit {
 
   get selectedAccount(): AccountResponse | undefined {
     return this.accounts.find((account) => account.id === this.selectedAccountId);
+  }
+
+  get totalBalance(): number {
+    return this.accounts.reduce((total, account) => total + Number(account.currentBalance || 0), 0);
+  }
+
+  get activeAccountsCount(): number {
+    return this.accounts.filter((account) => account.isActive).length;
+  }
+
+  get selectedAccountLabel(): string {
+    return this.selectedAccount?.name || 'Nenhuma conta selecionada';
   }
 
   loadAccounts(): void {

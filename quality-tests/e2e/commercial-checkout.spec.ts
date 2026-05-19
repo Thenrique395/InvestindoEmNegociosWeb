@@ -4,9 +4,9 @@ test.describe('commercial checkout', () => {
   test('leva da pagina de planos ao checkout com o plano selecionado', async ({ page }) => {
     await page.goto('/planos', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: /venda por clareza/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /comece com clareza/i })).toBeVisible();
 
-    await page.getByRole('link', { name: /Escolher e ir para checkout/i }).first().click();
+    await page.getByRole('link', { name: /Escolher Controle/i }).click();
 
     await expect(page).toHaveURL(/\/checkout\?plan=intermediate&cycle=Monthly/);
     await expect(page.getByRole('heading', { level: 1, name: /confirme o plano/i })).toBeVisible();

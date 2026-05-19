@@ -44,14 +44,13 @@ test.describe('live access flow', () => {
     await expect(page.getByText('Categoria personalizada')).toBeVisible();
   });
 
-  test('redireciona usuario Basic ao tentar abrir calendario', async ({ page }, testInfo) => {
+  test('permite usuario Basic abrir calendario', async ({ page }, testInfo) => {
     test.setTimeout(120000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
-    const dashboardPage = new DashboardPage(page);
 
     await page.goto('/calendario', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/dashboard$/i, { timeout: 20000 });
-    await dashboardPage.expectLoaded();
+    await expect(page).toHaveURL(/\/calendario$/i, { timeout: 20000 });
+    await expect(page.getByText('Calendário financeiro')).toBeVisible();
   });
 
   test('redireciona usuario Basic ao tentar abrir investimentos', async ({ page }, testInfo) => {

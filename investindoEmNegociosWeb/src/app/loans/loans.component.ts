@@ -34,6 +34,18 @@ export class LoansComponent implements OnInit {
     this.load();
   }
 
+  get totalOpenBalance(): number {
+    return this.contracts.reduce((total, contract) => total + Number(contract.openBalance || 0), 0);
+  }
+
+  get totalMonthlyPayment(): number {
+    return this.contracts.reduce((total, contract) => total + Number(contract.monthlyPayment || 0), 0);
+  }
+
+  get totalOpenInstallments(): number {
+    return this.contracts.reduce((total, contract) => total + Number(contract.openInstallments || 0), 0);
+  }
+
   load(): void {
     this.loading = true;
     this.loansService.list().subscribe({

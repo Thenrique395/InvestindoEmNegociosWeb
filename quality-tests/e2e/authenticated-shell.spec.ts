@@ -58,21 +58,21 @@ test.describe('authenticated app shell', () => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { level: 1, name: 'Contas' })).toBeVisible();
-    await page.getByRole('button', { name: 'Ver extrato' }).first().click();
+    await page.getByRole('button', { name: 'Extrato' }).first().click();
 
     await expect(page.getByRole('heading', { level: 2, name: /Extrato: Conta principal/i })).toBeVisible();
-    await expect(page.getByText('Motor de importação de extrato')).toBeVisible();
-    await expect(page.getByText('PIX SALARIO')).toBeVisible();
-    await expect(page.getByText('Mercado bairro')).toBeVisible();
+    await expect(page.getByText('Motor de importação com IA')).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'PIX SALARIO' }).first()).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Mercado bairro' }).first()).toBeVisible();
   });
 
   test('abre cartoes e carrega a fatura por competencia', async ({ page }) => {
     await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Meus cartões' })).toBeVisible();
-    await expect(page.getByText('Fatura por competência')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Seus cartões e ciclos de fatura' })).toBeVisible();
+    await expect(page.getByText('Faturas do cartão')).toBeVisible();
     await expect(page.getByText(/Ciclo 03\/2026/i)).toBeVisible();
-    await expect(page.getByText('Total:')).toBeVisible();
-    await expect(page.getByText('Em aberto:')).toBeVisible();
+    await expect(page.getByText('Total', { exact: true })).toBeVisible();
+    await expect(page.getByText('Em aberto', { exact: true })).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { NgIf } from '@angular/common';
+
 
 type SectionCardPadding = 'sm' | 'md' | 'lg';
 
@@ -8,27 +8,32 @@ type SectionCardSurface = 'default' | 'muted';
 @Component({
   selector: 'app-section-card',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
   template: `
     <section [class]="cardClass()">
-      <header *ngIf="title() || description() || hasHeaderActions()" class="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div class="min-w-0 space-y-1">
-          <h2 *ngIf="title()" class="m-0 text-base font-semibold text-[var(--color-text)]">
-            {{ title() }}
-          </h2>
-          <p *ngIf="description()" class="m-0 text-sm text-[var(--color-text-muted)]">
-            {{ description() }}
-          </p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <ng-content select="[card-actions]"></ng-content>
-        </div>
-      </header>
-
+      @if (title() || description() || hasHeaderActions()) {
+        <header class="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div class="min-w-0 space-y-1">
+            @if (title()) {
+              <h2 class="m-0 text-base font-semibold text-[var(--color-text)]">
+                {{ title() }}
+              </h2>
+            }
+            @if (description()) {
+              <p class="m-0 text-sm text-[var(--color-text-muted)]">
+                {{ description() }}
+              </p>
+            }
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <ng-content select="[card-actions]"></ng-content>
+          </div>
+        </header>
+      }
+    
       <ng-content></ng-content>
     </section>
-  `
+    `
 })
 export class SectionCardComponent {
   readonly title = input<string>('');

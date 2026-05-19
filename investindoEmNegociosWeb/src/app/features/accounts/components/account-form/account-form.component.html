@@ -1,7 +1,12 @@
-<section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-  <h2>{{ editingId ? 'Editar conta' : 'Nova conta' }}</h2>
+<section class="account-panel">
+  <div class="account-panel__head">
+    <div>
+      <p class="account-panel__eyebrow">Cadastro</p>
+      <h2>{{ editingId ? 'Editar conta' : 'Nova conta' }}</h2>
+    </div>
+  </div>
 
-  <div class="grid gap-3 md:grid-cols-4">
+  <div class="account-form-grid">
 
     <app-form-field label="Nome da conta" [error]="nameError">
       <input type="text" [(ngModel)]="form.name" (blur)="onTouch('name')" />
@@ -9,7 +14,9 @@
 
     <app-form-field label="Tipo" [error]="typeError">
       <select [(ngModel)]="form.type" (blur)="onTouch('type')">
-        <option *ngFor="let t of accountTypes" [value]="t">{{ t }}</option>
+        @for (t of accountTypes; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
       </select>
     </app-form-field>
 
@@ -17,14 +24,14 @@
       <input type="number" [(ngModel)]="form.initialBalance" (blur)="onTouch('initialBalance')" />
     </app-form-field>
 
-    <label>
+    <label class="account-checkbox">
       <input type="checkbox" [(ngModel)]="form.isActive" /> Conta ativa
     </label>
 
   </div>
 
-  <div>
-    <button (click)="onSave()">Salvar</button>
-    <button (click)="onClear()">Limpar</button>
+  <div class="account-panel__actions">
+    <button class="btn-primary" type="button" [disabled]="saving" (click)="onSave()">{{ saving ? 'Salvando...' : 'Salvar conta' }}</button>
+    <button class="btn-ghost" type="button" (click)="onClear()">Limpar</button>
   </div>
 </section>

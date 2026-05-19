@@ -1,0 +1,37 @@
+{
+  "name": "investindo-em-negocios-quality-tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:live": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-*.spec.ts'",
+    "test:e2e:live:core": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-core.spec.ts'",
+    "test:e2e:live:access": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-access.spec.ts'",
+    "test:e2e:live:profile": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-profile.spec.ts'",
+    "test:e2e:live:write": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-writeflows.spec.ts'",
+    "test:e2e:live:roles": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-role-profiles.spec.ts'",
+    "test:e2e:live:role-write": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-role-writeflows.spec.ts'",
+    "test:performance": "npm --prefix ../investindoEmNegociosWeb run build:prod && lhci autorun --config=performance/lighthouserc.json",
+    "test:load": "k6 run k6/smoke.js"
+  },
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11"
+  },
+  "devDependencies": {
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "^1.53.1",
+    "lighthouse": "^12.8.2"
+  },
+  "overrides": {
+    "@lhci/cli": {
+      "inquirer": "8.2.7",
+      "lighthouse": "12.6.1",
+      "tmp": "0.2.5"
+    },
+    "@lhci/utils": {
+      "lighthouse": "12.6.1"
+    }
+  }
+}

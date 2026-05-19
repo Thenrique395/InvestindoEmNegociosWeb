@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+
 import { InvoiceImportService, InvoiceReconciliationResponse } from '../invoice-import.service';
 import { FormsModule } from '@angular/forms';
 import { StoredCard } from '../data/api-data.service';
@@ -44,273 +44,291 @@ type InvoiceExtract = {
 @Component({
   selector: 'app-invoice-import',
   standalone: true,
-  imports: [NgIf, NgFor, FormsModule],
+  imports: [FormsModule],
   providers: [InvoiceImportService],
   template: `
-    <div *ngIf="open" class="invoice-import-modal">
-      <div class="invoice-import-modal__backdrop" (click)="close.emit()"></div>
-
-      <div class="invoice-import-modal__dialog">
-        <header class="invoice-import-modal__header">
-          <div class="invoice-import-modal__header-copy">
-            <p class="invoice-import-modal__eyebrow">Fatura do cartao</p>
-            <h2 class="invoice-import-modal__title">Importar fatura em PDF</h2>
-            <p class="invoice-import-modal__subtitle">
-              Envie a fatura para extrair lancamentos, validar os dados e salvar com o cartao correto.
-            </p>
-          </div>
-
-          <button type="button" class="invoice-import-modal__close" (click)="close.emit()" aria-label="Fechar modal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M6 6 18 18"></path>
-              <path d="M18 6 6 18"></path>
-            </svg>
-          </button>
-        </header>
-
-        <div class="invoice-import-modal__layout">
-          <section class="invoice-import-modal__main">
-            <section class="invoice-import-modal__section">
-              <div class="invoice-import-modal__section-head">
-                <div>
-                  <h3 class="invoice-import-modal__section-title">Arquivo da fatura</h3>
-                  <p class="invoice-import-modal__section-text">
-                    Selecione um PDF para extrair total, datas, itens e sugerir categorias.
-                  </p>
-                </div>
-
-                <input #pdfInput type="file" accept="application/pdf" class="invoice-import-modal__file-input" (change)="onFileSelected($event)" />
-                <div class="invoice-import-modal__actions-inline">
-                  <button
-                    type="button"
-                    class="invoice-import-modal__button invoice-import-modal__button--primary invoice-import-modal__button--upload"
-                    (click)="pdfInput.click()">
-                    Escolher arquivo
-                  </button>
-                  <button type="button" class="invoice-import-modal__button invoice-import-modal__button--ghost" (click)="clear()" [disabled]="loading">
-                    Limpar
-                  </button>
-                </div>
-              </div>
-
-              <div class="invoice-import-dropzone" [class.invoice-import-dropzone--error]="!!error">
-                <p class="invoice-import-dropzone__title">{{ fileName || 'Nenhum arquivo selecionado' }}</p>
-                <p class="invoice-import-dropzone__text" *ngIf="loading">Enviando e processando o PDF...</p>
-                <p class="invoice-import-dropzone__error" *ngIf="error">{{ error }}</p>
-                <p class="invoice-import-dropzone__text" *ngIf="!loading && !error">Formatos suportados: PDF · Limite de 15MB</p>
-              </div>
-            </section>
-
-            <section class="invoice-import-modal__section">
-              <div class="invoice-import-modal__section-head">
-                <div>
-                  <h3 class="invoice-import-modal__section-title">Destino e leitura inicial</h3>
-                  <p class="invoice-import-modal__section-text">
-                    Defina o cartao de destino e revise as informacoes extraidas antes de salvar.
-                  </p>
-                </div>
-              </div>
-
-              <div class="invoice-import-grid invoice-import-grid--selectors">
-                <label class="invoice-field">
-                  <span class="invoice-field__label">Cartao destino</span>
-                  <select class="invoice-field__control" [(ngModel)]="selectedCardId" (ngModelChange)="onCardChanged()">
-                    <option [ngValue]="null">Selecione</option>
-                    <option *ngFor="let card of cards; trackBy: trackByCardId" [ngValue]="card.id">
-                      {{ card.nome }} · {{ card.numero }}
-                    </option>
-                  </select>
-                </label>
-
-                <label class="invoice-field">
-                  <span class="invoice-field__label">Categoria padrao</span>
-                  <select class="invoice-field__control" [(ngModel)]="selectedCategoryId">
-                    <option [ngValue]="null">Sem categoria</option>
-                    <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
-                      {{ category.name }}
-                    </option>
-                  </select>
-                </label>
-              </div>
-
-              <div class="invoice-import-grid invoice-import-grid--summary">
-                <div class="invoice-summary-card">
-                  <p class="invoice-summary-card__label">Total</p>
-                  <p class="invoice-summary-card__value">{{ extract.total || 'Nao identificado' }}</p>
-                </div>
-
-                <div class="invoice-summary-card">
-                  <p class="invoice-summary-card__label">Vencimento</p>
-                  <p class="invoice-summary-card__value">{{ extract.dueDate || 'Nao identificado' }}</p>
-                </div>
-
-                <div class="invoice-summary-card">
-                  <p class="invoice-summary-card__label">Fechamento</p>
-                  <p class="invoice-summary-card__value">{{ extract.closeDate || 'Nao identificado' }}</p>
-                </div>
-
-                <div class="invoice-summary-card">
-                  <p class="invoice-summary-card__label">Cartao / Banco</p>
-                  <p class="invoice-summary-card__value invoice-summary-card__value--small">
-                    {{ extract.cardName || 'Cartao' }} · {{ extract.bankName || 'Banco' }}
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <section class="invoice-import-modal__section">
-              <div class="invoice-import-modal__section-head">
-                <div>
-                  <h3 class="invoice-import-modal__section-title">Itens encontrados</h3>
-                  <p class="invoice-import-modal__section-text">
-                    Revise a data, parcela, categoria e recorrencia antes de importar.
-                  </p>
-                </div>
-                <span class="invoice-import-modal__meta">{{ extract.items.length }} item(s)</span>
-              </div>
-
-              <div class="invoice-table-card">
-                <div class="invoice-table-card__scroll">
-                  <table class="invoice-table">
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Descricao</th>
-                        <th>Parcela</th>
-                        <th>Categoria</th>
-                        <th>Recorrencia</th>
-                        <th class="invoice-table__numeric">Valor</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngIf="!extract.items.length">
-                        <td colspan="6" class="invoice-table__empty">Nenhum item identificado.</td>
-                      </tr>
-                      <tr *ngFor="let item of extract.items; trackBy: trackByIndex">
-                        <td>{{ item.date || '-' }}</td>
-                        <td>{{ item.baseDescription || item.description }}</td>
-                        <td>
-                          <span *ngIf="item.isInstallment && item.installmentCurrent && item.installmentTotal; else noInstallment">
-                            {{ item.installmentCurrent }}/{{ item.installmentTotal }}
-                          </span>
-                          <ng-template #noInstallment>-</ng-template>
-                        </td>
-                        <td>
-                          <select class="invoice-field__control invoice-field__control--table" [(ngModel)]="item.categoryId">
-                            <option [ngValue]="null">Sem categoria</option>
-                            <option *ngFor="let category of categories; trackBy: trackByCategoryId" [ngValue]="category.id">
-                              {{ category.name }}
-                            </option>
-                          </select>
-                          <small class="invoice-table__hint" *ngIf="item.suggestedCategoryName">
-                            Sugestao: {{ item.suggestedCategoryName }} · {{ confidenceLabel(item.suggestedCategoryScore, item.suggestedCategoryConfidenceBand, item.suggestedCategoryConfidence) }}
-                          </small>
-                        </td>
-                        <td>
-                          <span *ngIf="item.suggestedRecurrence?.isRecurringCandidate; else noRecurrence">
-                            {{ recurrenceLabel(item.suggestedRecurrence?.frequency) }}
-                            <small class="invoice-table__hint">
-                              {{ recurrenceScoreLabel(item.suggestedRecurrence?.score, item.suggestedRecurrence?.confidenceBand) }}
-                            </small>
-                          </span>
-                          <ng-template #noRecurrence>-</ng-template>
-                        </td>
-                        <td class="invoice-table__numeric">{{ item.amount || '-' }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <p class="invoice-table-card__footnote">
-                  Dica: se algum valor nao for encontrado, voce pode ajustar manualmente antes de salvar.
-                </p>
-              </div>
-            </section>
-
-            <section class="invoice-import-modal__section" *ngIf="extract.items.length">
-              <div class="invoice-import-modal__section-head">
-                <div>
-                  <h3 class="invoice-import-modal__section-title">Conciliação da fatura</h3>
-                  <p class="invoice-import-modal__section-text">
-                    Compare os itens novos com ciclos existentes do cartao antes de consolidar a importacao.
-                  </p>
-                </div>
-                <span class="invoice-import-modal__meta" *ngIf="reconciling">Recalculando...</span>
-              </div>
-
-              <p *ngIf="reconciliation && !reconciling" class="invoice-import-modal__context-line">
-                {{ reconciliation.newItems }} novo(s), {{ reconciliation.duplicateItems }} duplicado(s), {{ reconciliation.cycles.length }} ciclo(s) afetado(s).
+    @if (open) {
+      <div class="invoice-import-modal">
+        <div class="invoice-import-modal__backdrop" (click)="close.emit()"></div>
+        <div class="invoice-import-modal__dialog">
+          <header class="invoice-import-modal__header">
+            <div class="invoice-import-modal__header-copy">
+              <p class="invoice-import-modal__eyebrow">Fatura do cartao</p>
+              <h2 class="invoice-import-modal__title">Importar fatura em PDF</h2>
+              <p class="invoice-import-modal__subtitle">
+                Envie a fatura para extrair lancamentos, validar os dados e salvar com o cartao correto.
               </p>
-
-              <div *ngIf="reconciliation?.cycles?.length; else noReconciliationCycles" class="invoice-table-card">
-                <div class="invoice-table-card__scroll">
-                  <table class="invoice-table">
-                    <thead>
-                      <tr>
-                        <th>Fatura</th>
-                        <th>Fech.</th>
-                        <th>Venc.</th>
-                        <th class="invoice-table__numeric">Atual</th>
-                        <th class="invoice-table__numeric">Novos</th>
-                        <th class="invoice-table__numeric">Duplicados</th>
-                        <th class="invoice-table__numeric">Projetado</th>
-                        <th class="invoice-table__numeric">Diferenca</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let cycle of reconciliation?.cycles || []; trackBy: trackByStatementReference">
-                        <td>{{ cycle.statementReference }}</td>
-                        <td>{{ cycle.statementCloseDate }}</td>
-                        <td>{{ cycle.statementDueDate }}</td>
-                        <td class="invoice-table__numeric">{{ formatMoney(cycle.currentTotalAmount) }}</td>
-                        <td class="invoice-table__numeric">{{ formatMoney(cycle.importedNewAmount) }}</td>
-                        <td class="invoice-table__numeric">{{ formatMoney(cycle.duplicateAmount) }}</td>
-                        <td class="invoice-table__numeric">{{ formatMoney(cycle.projectedTotalAmount) }}</td>
-                        <td class="invoice-table__numeric">{{ cycle.differenceAmount == null ? '-' : formatMoney(cycle.differenceAmount) }}</td>
-                        <td>
-                          <span *ngIf="cycle.readyToClose; else cycleOpen">Pronto para fechamento automatico</span>
-                          <ng-template #cycleOpen>{{ cycle.duplicateItemsCount ? 'Revisar duplicados' : 'Conciliação parcial' }}</ng-template>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <ng-template #noReconciliationCycles>
-                <div class="invoice-import-note">
-                  {{ reconciling ? 'Calculando conciliação...' : 'Selecione um cartao e mantenha itens válidos para ver o fechamento por ciclo.' }}
-                </div>
-              </ng-template>
-            </section>
-          </section>
-
-          <aside class="invoice-import-modal__sidebar">
-            <section class="invoice-import-modal__sidecard">
-              <h3 class="invoice-import-modal__section-title">Texto extraido</h3>
-              <p class="invoice-import-modal__section-text">Use este painel para conferir se os dados batem com a fatura original.</p>
-              <div class="invoice-import-modal__rawtext">
-                <pre>{{ rawText || 'Nenhum texto extraido.' }}</pre>
-              </div>
-            </section>
-          </aside>
-        </div>
-
-        <footer class="invoice-import-modal__footer">
-          <div class="invoice-import-modal__footer-copy">
-            <p class="invoice-import-modal__footer-title">Revisao final</p>
-            <p class="invoice-import-modal__footer-text">Confirme o cartao, ajuste categorias se necessario e salve a fatura para registrar os itens.</p>
-          </div>
-          <div class="invoice-import-modal__footer-actions">
-            <button type="button" class="invoice-import-modal__button invoice-import-modal__button--ghost" (click)="close.emit()">Fechar</button>
-            <button type="button" class="invoice-import-modal__button invoice-import-modal__button--primary" (click)="salvarImportacao()" [disabled]="!canImport || importing">
-              {{ importing ? 'Importando...' : 'Salvar fatura' }}
+            </div>
+            <button type="button" class="invoice-import-modal__close" (click)="close.emit()" aria-label="Fechar modal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M6 6 18 18"></path>
+                <path d="M18 6 6 18"></path>
+              </svg>
             </button>
+          </header>
+          <div class="invoice-import-modal__layout">
+            <section class="invoice-import-modal__main">
+              <section class="invoice-import-modal__section">
+                <div class="invoice-import-modal__section-head">
+                  <div>
+                    <h3 class="invoice-import-modal__section-title">Arquivo da fatura</h3>
+                    <p class="invoice-import-modal__section-text">
+                      Selecione um PDF para extrair total, datas, itens e sugerir categorias.
+                    </p>
+                  </div>
+                  <input #pdfInput type="file" accept="application/pdf" class="invoice-import-modal__file-input" (change)="onFileSelected($event)" />
+                  <div class="invoice-import-modal__actions-inline">
+                    <button
+                      type="button"
+                      class="invoice-import-modal__button invoice-import-modal__button--primary invoice-import-modal__button--upload"
+                      (click)="pdfInput.click()">
+                      Escolher arquivo
+                    </button>
+                    <button type="button" class="invoice-import-modal__button invoice-import-modal__button--ghost" (click)="clear()" [disabled]="loading">
+                      Limpar
+                    </button>
+                  </div>
+                </div>
+                <div class="invoice-import-dropzone" [class.invoice-import-dropzone--error]="!!error">
+                  <p class="invoice-import-dropzone__title">{{ fileName || 'Nenhum arquivo selecionado' }}</p>
+                  @if (loading) {
+                    <p class="invoice-import-dropzone__text">Enviando e processando o PDF...</p>
+                  }
+                  @if (error) {
+                    <p class="invoice-import-dropzone__error">{{ error }}</p>
+                  }
+                  @if (!loading && !error) {
+                    <p class="invoice-import-dropzone__text">Formatos suportados: PDF · Limite de 15MB</p>
+                  }
+                </div>
+              </section>
+              <section class="invoice-import-modal__section">
+                <div class="invoice-import-modal__section-head">
+                  <div>
+                    <h3 class="invoice-import-modal__section-title">Destino e leitura inicial</h3>
+                    <p class="invoice-import-modal__section-text">
+                      Defina o cartao de destino e revise as informacoes extraidas antes de salvar.
+                    </p>
+                  </div>
+                </div>
+                <div class="invoice-import-grid invoice-import-grid--selectors">
+                  <label class="invoice-field">
+                    <span class="invoice-field__label">Cartao destino</span>
+                    <select class="invoice-field__control" [(ngModel)]="selectedCardId" (ngModelChange)="onCardChanged()">
+                      <option [ngValue]="null">Selecione</option>
+                      @for (card of cards; track trackByCardId($index, card)) {
+                        <option [ngValue]="card.id">
+                          {{ card.nome }} · {{ card.numero }}
+                        </option>
+                      }
+                    </select>
+                  </label>
+                  <label class="invoice-field">
+                    <span class="invoice-field__label">Categoria padrao</span>
+                    <select class="invoice-field__control" [(ngModel)]="selectedCategoryId">
+                      <option [ngValue]="null">Sem categoria</option>
+                      @for (category of categories; track trackByCategoryId($index, category)) {
+                        <option [ngValue]="category.id">
+                          {{ category.name }}
+                        </option>
+                      }
+                    </select>
+                  </label>
+                </div>
+                <div class="invoice-import-grid invoice-import-grid--summary">
+                  <div class="invoice-summary-card">
+                    <p class="invoice-summary-card__label">Total</p>
+                    <p class="invoice-summary-card__value">{{ extract.total || 'Nao identificado' }}</p>
+                  </div>
+                  <div class="invoice-summary-card">
+                    <p class="invoice-summary-card__label">Vencimento</p>
+                    <p class="invoice-summary-card__value">{{ extract.dueDate || 'Nao identificado' }}</p>
+                  </div>
+                  <div class="invoice-summary-card">
+                    <p class="invoice-summary-card__label">Fechamento</p>
+                    <p class="invoice-summary-card__value">{{ extract.closeDate || 'Nao identificado' }}</p>
+                  </div>
+                  <div class="invoice-summary-card">
+                    <p class="invoice-summary-card__label">Cartao / Banco</p>
+                    <p class="invoice-summary-card__value invoice-summary-card__value--small">
+                      {{ extract.cardName || 'Cartao' }} · {{ extract.bankName || 'Banco' }}
+                    </p>
+                  </div>
+                </div>
+              </section>
+              <section class="invoice-import-modal__section">
+                <div class="invoice-import-modal__section-head">
+                  <div>
+                    <h3 class="invoice-import-modal__section-title">Itens encontrados</h3>
+                    <p class="invoice-import-modal__section-text">
+                      Revise a data, parcela, categoria e recorrencia antes de importar.
+                    </p>
+                  </div>
+                  <span class="invoice-import-modal__meta">{{ extract.items.length }} item(s)</span>
+                </div>
+                <div class="invoice-table-card">
+                  <div class="invoice-table-card__scroll">
+                    <table class="invoice-table">
+                      <thead>
+                        <tr>
+                          <th>Data</th>
+                          <th>Descricao</th>
+                          <th>Parcela</th>
+                          <th>Categoria</th>
+                          <th>Recorrencia</th>
+                          <th class="invoice-table__numeric">Valor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (!extract.items.length) {
+                          <tr>
+                            <td colspan="6" class="invoice-table__empty">Nenhum item identificado.</td>
+                          </tr>
+                        }
+                        @for (item of extract.items; track trackByIndex($index, item)) {
+                          <tr>
+                            <td>{{ item.date || '-' }}</td>
+                            <td>{{ item.baseDescription || item.description }}</td>
+                            <td>
+                              @if (item.isInstallment && item.installmentCurrent && item.installmentTotal) {
+                                <span>
+                                  {{ item.installmentCurrent }}/{{ item.installmentTotal }}
+                                </span>
+                              } @else {
+                                -
+                              }
+                            </td>
+                            <td>
+                              <select class="invoice-field__control invoice-field__control--table" [(ngModel)]="item.categoryId">
+                                <option [ngValue]="null">Sem categoria</option>
+                                @for (category of categories; track trackByCategoryId($index, category)) {
+                                  <option [ngValue]="category.id">
+                                    {{ category.name }}
+                                  </option>
+                                }
+                              </select>
+                              @if (item.suggestedCategoryName) {
+                                <small class="invoice-table__hint">
+                                  Sugestao: {{ item.suggestedCategoryName }} · {{ confidenceLabel(item.suggestedCategoryScore, item.suggestedCategoryConfidenceBand, item.suggestedCategoryConfidence) }}
+                                </small>
+                              }
+                            </td>
+                            <td>
+                              @if (item.suggestedRecurrence?.isRecurringCandidate) {
+                                <span>
+                                  {{ recurrenceLabel(item.suggestedRecurrence?.frequency) }}
+                                  <small class="invoice-table__hint">
+                                    {{ recurrenceScoreLabel(item.suggestedRecurrence?.score, item.suggestedRecurrence?.confidenceBand) }}
+                                  </small>
+                                </span>
+                              } @else {
+                                -
+                              }
+                            </td>
+                            <td class="invoice-table__numeric">{{ item.amount || '-' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                  <p class="invoice-table-card__footnote">
+                    Dica: se algum valor nao for encontrado, voce pode ajustar manualmente antes de salvar.
+                  </p>
+                </div>
+              </section>
+              @if (extract.items.length) {
+                <section class="invoice-import-modal__section">
+                  <div class="invoice-import-modal__section-head">
+                    <div>
+                      <h3 class="invoice-import-modal__section-title">Conciliação da fatura</h3>
+                      <p class="invoice-import-modal__section-text">
+                        Compare os itens novos com ciclos existentes do cartao antes de consolidar a importacao.
+                      </p>
+                    </div>
+                    @if (reconciling) {
+                      <span class="invoice-import-modal__meta">Recalculando...</span>
+                    }
+                  </div>
+                  @if (reconciliation && !reconciling) {
+                    <p class="invoice-import-modal__context-line">
+                      {{ reconciliation.newItems }} novo(s), {{ reconciliation.duplicateItems }} duplicado(s), {{ reconciliation.cycles.length }} ciclo(s) afetado(s).
+                    </p>
+                  }
+                  @if (reconciliation?.cycles?.length) {
+                    <div class="invoice-table-card">
+                      <div class="invoice-table-card__scroll">
+                        <table class="invoice-table">
+                          <thead>
+                            <tr>
+                              <th>Fatura</th>
+                              <th>Fech.</th>
+                              <th>Venc.</th>
+                              <th class="invoice-table__numeric">Atual</th>
+                              <th class="invoice-table__numeric">Novos</th>
+                              <th class="invoice-table__numeric">Duplicados</th>
+                              <th class="invoice-table__numeric">Projetado</th>
+                              <th class="invoice-table__numeric">Diferenca</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (cycle of reconciliation?.cycles || []; track trackByStatementReference($index, cycle)) {
+                              <tr>
+                                <td>{{ cycle.statementReference }}</td>
+                                <td>{{ cycle.statementCloseDate }}</td>
+                                <td>{{ cycle.statementDueDate }}</td>
+                                <td class="invoice-table__numeric">{{ formatMoney(cycle.currentTotalAmount) }}</td>
+                                <td class="invoice-table__numeric">{{ formatMoney(cycle.importedNewAmount) }}</td>
+                                <td class="invoice-table__numeric">{{ formatMoney(cycle.duplicateAmount) }}</td>
+                                <td class="invoice-table__numeric">{{ formatMoney(cycle.projectedTotalAmount) }}</td>
+                                <td class="invoice-table__numeric">{{ cycle.differenceAmount == null ? '-' : formatMoney(cycle.differenceAmount) }}</td>
+                                <td>
+                                  @if (cycle.readyToClose) {
+                                    <span>Pronto para fechamento automatico</span>
+                                  } @else {
+                                    {{ cycle.duplicateItemsCount ? 'Revisar duplicados' : 'Conciliação parcial' }}
+                                  }
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="invoice-import-note">
+                      {{ reconciling ? 'Calculando conciliação...' : 'Selecione um cartao e mantenha itens válidos para ver o fechamento por ciclo.' }}
+                    </div>
+                  }
+                </section>
+              }
+            </section>
+            <aside class="invoice-import-modal__sidebar">
+              <section class="invoice-import-modal__sidecard">
+                <h3 class="invoice-import-modal__section-title">Texto extraido</h3>
+                <p class="invoice-import-modal__section-text">Use este painel para conferir se os dados batem com a fatura original.</p>
+                <div class="invoice-import-modal__rawtext">
+                  <pre>{{ rawText || 'Nenhum texto extraido.' }}</pre>
+                </div>
+              </section>
+            </aside>
           </div>
-        </footer>
+          <footer class="invoice-import-modal__footer">
+            <div class="invoice-import-modal__footer-copy">
+              <p class="invoice-import-modal__footer-title">Revisao final</p>
+              <p class="invoice-import-modal__footer-text">Confirme o cartao, ajuste categorias se necessario e salve a fatura para registrar os itens.</p>
+            </div>
+            <div class="invoice-import-modal__footer-actions">
+              <button type="button" class="invoice-import-modal__button invoice-import-modal__button--ghost" (click)="close.emit()">Fechar</button>
+              <button type="button" class="invoice-import-modal__button invoice-import-modal__button--primary" (click)="salvarImportacao()" [disabled]="!canImport || importing">
+                {{ importing ? 'Importando...' : 'Salvar fatura' }}
+              </button>
+            </div>
+          </footer>
+        </div>
       </div>
-    </div>
-  `,
+    }
+    `,
   styles: [`
     .invoice-import-modal {
       position: fixed;
@@ -957,7 +975,7 @@ export class InvoiceImportComponent implements OnChanges {
     return Number.isFinite(parsed) ? parsed === 0 : true;
   }
 
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

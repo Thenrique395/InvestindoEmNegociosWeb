@@ -2176,7 +2176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         return null;
     }
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

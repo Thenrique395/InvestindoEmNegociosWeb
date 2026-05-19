@@ -1,23 +1,23 @@
 <section class="signup-shell" [class.signup-shell--page]="isRoutePage">
   <div class="signup-card">
-    <aside class="signup-visual" *ngIf="isRoutePage">
-      <img class="signup-visual__logo" src="/assets/logoHeaderInvestindoemNegocios.png" alt="Investindo em Negócios" />
-
-      <div class="signup-visual__content">
-        <p class="signup-eyebrow signup-eyebrow--light">Conta gratuita</p>
-        <h2>Sua rotina financeira começa aqui</h2>
-        <p>
-          Monte seu primeiro painel e acompanhe o mês com decisões mais simples, visuais e
-          consistentes.
-        </p>
-      </div>
-
-      <div class="signup-visual__dock" aria-label="Etapas iniciais">
-        <span>Perfil</span>
-        <span>Contas</span>
-        <span>Dashboard</span>
-      </div>
-    </aside>
+    @if (isRoutePage) {
+      <aside class="signup-visual">
+        <img class="signup-visual__logo" src="/assets/logoHeaderInvestindoemNegocios.png" alt="Investindo em Negócios" />
+        <div class="signup-visual__content">
+          <p class="signup-eyebrow signup-eyebrow--light">Conta gratuita</p>
+          <h2>Sua rotina financeira começa aqui</h2>
+          <p>
+            Monte seu primeiro painel e acompanhe o mês com decisões mais simples, visuais e
+            consistentes.
+          </p>
+        </div>
+        <div class="signup-visual__dock" aria-label="Etapas iniciais">
+          <span>Perfil</span>
+          <span>Contas</span>
+          <span>Dashboard</span>
+        </div>
+      </aside>
+    }
 
     <main class="signup-panel">
       <section class="signup-panel__card" aria-labelledby="signup-title">
@@ -48,8 +48,12 @@
               formControlName="nome"
               placeholder="Digite seu nome completo"
               autocomplete="name" />
-            <small class="signup-form__error" *ngIf="hasError('nome', 'required')">Informe seu nome.</small>
-            <small class="signup-form__error" *ngIf="hasError('nome', 'minlength')">Use ao menos 2 caracteres.</small>
+            @if (hasError('nome', 'required')) {
+              <small class="signup-form__error">Informe seu nome.</small>
+            }
+            @if (hasError('nome', 'minlength')) {
+              <small class="signup-form__error">Use ao menos 2 caracteres.</small>
+            }
           </label>
 
           <label class="signup-form__field">
@@ -62,9 +66,15 @@
               formControlName="email"
               placeholder="Digite seu e-mail"
               autocomplete="email" />
-            <small class="signup-form__error" *ngIf="hasError('email', 'required')">Informe um e-mail.</small>
-            <small class="signup-form__error" *ngIf="hasError('email', 'email')">Digite um e-mail válido.</small>
-            <small class="signup-form__error" *ngIf="hasError('email', 'emailInUse')">E-mail já está em uso.</small>
+            @if (hasError('email', 'required')) {
+              <small class="signup-form__error">Informe um e-mail.</small>
+            }
+            @if (hasError('email', 'email')) {
+              <small class="signup-form__error">Digite um e-mail válido.</small>
+            }
+            @if (hasError('email', 'emailInUse')) {
+              <small class="signup-form__error">E-mail já está em uso.</small>
+            }
           </label>
 
           <label class="signup-form__field">
@@ -85,8 +95,12 @@
                 {{ showPassword ? 'Ocultar' : 'Mostrar' }}
               </button>
             </div>
-            <small class="signup-form__error" *ngIf="hasError('senha', 'required')">Informe uma senha.</small>
-            <small class="signup-form__error" *ngIf="hasError('senha', 'minlength')">Use ao menos 6 caracteres.</small>
+            @if (hasError('senha', 'required')) {
+              <small class="signup-form__error">Informe uma senha.</small>
+            }
+            @if (hasError('senha', 'minlength')) {
+              <small class="signup-form__error">Use ao menos 6 caracteres.</small>
+            }
           </label>
 
           <label class="signup-form__field">
@@ -109,17 +123,23 @@
                 {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
               </button>
             </div>
-            <small class="signup-form__error" *ngIf="hasError('confirmarSenha', 'required')">Confirme sua senha.</small>
-            <small class="signup-form__error" *ngIf="hasPasswordMismatch()">As senhas precisam ser iguais.</small>
+            @if (hasError('confirmarSenha', 'required')) {
+              <small class="signup-form__error">Confirme sua senha.</small>
+            }
+            @if (hasPasswordMismatch()) {
+              <small class="signup-form__error">As senhas precisam ser iguais.</small>
+            }
           </label>
 
           <label class="signup-form__terms" [class.signup-form__terms--invalid]="hasControlError('aceitarTermos')">
             <input type="checkbox" formControlName="aceitarTermos" />
             <span>Li e aceito os termos de uso e a política de privacidade.</span>
           </label>
-          <small class="signup-form__error" *ngIf="hasError('aceitarTermos', 'required')">
-            Aceite os termos para continuar.
-          </small>
+          @if (hasError('aceitarTermos', 'required')) {
+            <small class="signup-form__error">
+              Aceite os termos para continuar.
+            </small>
+          }
 
           <button
             class="signup-form__submit"

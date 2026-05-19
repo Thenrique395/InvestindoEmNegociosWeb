@@ -1,58 +1,56 @@
 <div class="cards-list">
-  <div *ngIf="cards.length; else emptyCards" class="cards-list__grid">
-    <article class="cards-list__card" [ngClass]="cardToneClass(c)" *ngFor="let c of cards; trackBy: trackByIndex">
-      <div class="cards-list__top">
-        <div class="cards-list__identity">
-          <div class="cards-list__brand" [ngClass]="'cards-list__brand--' + brandCode(c)" aria-hidden="true">
-            <ng-container *ngIf="!isMastercard(brandCode(c)); else mastercardBadge">
-              {{ brandName(c) }}
-            </ng-container>
-            <ng-template #mastercardBadge>
-              <span class="cards-list__mastercard">
-                <span></span>
-                <span></span>
-              </span>
-              <span class="cards-list__mastercard-label">mastercard</span>
-            </ng-template>
+  @if (cards.length) {
+    <div class="cards-list__grid">
+      @for (c of cards; track trackByIndex($index, c)) {
+        <article class="cards-list__card" [ngClass]="cardToneClass(c)">
+          <div class="cards-list__top">
+            <div class="cards-list__identity">
+              <div class="cards-list__brand" [ngClass]="'cards-list__brand--' + brandCode(c)" aria-hidden="true">
+                @if (!isMastercard(brandCode(c))) {
+                  {{ brandName(c) }}
+                } @else {
+                  <span class="cards-list__mastercard">
+                    <span></span>
+                    <span></span>
+                  </span>
+                  <span class="cards-list__mastercard-label">mastercard</span>
+                }
+              </div>
+              <span class="cards-list__bank-tag">{{ c.banco || 'Banco não informado' }}</span>
+            </div>
+            <div class="cards-list__actions">
+              <button type="button" class="cards-list__action" (click)="onEditar(c)" aria-label="Editar cartão" title="Editar cartão">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button type="button" class="cards-list__action cards-list__action--danger" (click)="onRemover(c.id)" aria-label="Remover cartão" title="Remover cartão">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M8 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <span class="cards-list__bank-tag">{{ c.banco || 'Banco não informado' }}</span>
-        </div>
-
-        <div class="cards-list__actions">
-          <button type="button" class="cards-list__action" (click)="onEditar(c)" aria-label="Editar cartão" title="Editar cartão">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-          <button type="button" class="cards-list__action cards-list__action--danger" (click)="onRemover(c.id)" aria-label="Remover cartão" title="Remover cartão">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M8 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="cards-list__copy">
-        <p class="cards-list__eyebrow">Cartão ativo</p>
-        <h3 class="cards-list__title">{{ c.nome }}</h3>
-        <p class="cards-list__masked-inline">{{ numeroProtegido(c.numero) }}</p>
-      </div>
-
-      <div class="cards-list__summary">
-        <div class="cards-list__summary-chip">
-          <span class="cards-list__summary-label">Limite</span>
-          <strong class="cards-list__summary-value">R$ {{ c.limiteCredito | number:'1.2-2' }}</strong>
-        </div>
-        <div class="cards-list__summary-chip">
-          <span class="cards-list__summary-label">Ciclo</span>
-          <strong class="cards-list__summary-value">Fecha {{ c.diaFechamento }} · Vence {{ c.diaVencimento }}</strong>
-        </div>
-      </div>
-    </article>
-  </div>
-
-  <ng-template #emptyCards>
+          <div class="cards-list__copy">
+            <p class="cards-list__eyebrow">Cartão ativo</p>
+            <h3 class="cards-list__title">{{ c.nome }}</h3>
+            <p class="cards-list__masked-inline">{{ numeroProtegido(c.numero) }}</p>
+          </div>
+          <div class="cards-list__summary">
+            <div class="cards-list__summary-chip">
+              <span class="cards-list__summary-label">Limite</span>
+              <strong class="cards-list__summary-value">R$ {{ c.limiteCredito | number:'1.2-2' }}</strong>
+            </div>
+            <div class="cards-list__summary-chip">
+              <span class="cards-list__summary-label">Ciclo</span>
+              <strong class="cards-list__summary-value">Fecha {{ c.diaFechamento }} · Vence {{ c.diaVencimento }}</strong>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
     <section class="cards-list__empty">
       <div class="cards-list__empty-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -66,5 +64,6 @@
       </div>
       <button type="button" class="cards-list__empty-cta" (click)="emptyAction.emit()">{{ emptyCtaLabel }}</button>
     </section>
-  </ng-template>
+  }
+
 </div>

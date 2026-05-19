@@ -1,29 +1,54 @@
-<section>
-  <div class="mb-3 flex items-center justify-between">
-    <h2>Minhas contas</h2>
-    <button (click)="refresh.emit()">Atualizar</button>
+<section class="account-list">
+  <div class="account-list__head">
+    <div>
+      <p class="account-list__eyebrow">Carteira de contas</p>
+      <h2>Minhas contas</h2>
+    </div>
+    <button type="button" class="account-list__refresh" (click)="refresh.emit()">Atualizar</button>
   </div>
 
-  <app-ui-state *ngIf="loading" type="loading" title="Carregando contas..."></app-ui-state>
+  @if (loading) {
+    <app-ui-state type="loading" title="Carregando contas..."></app-ui-state>
+  }
 
-  <app-empty-state
-    *ngIf="!loading && !hasAccounts"
-    title="Nenhuma conta cadastrada"
-    description="Crie sua primeira conta"
-    ctaLabel="Criar conta"
-    (action)="create.emit()">
-  </app-empty-state>
+  @if (!loading && !hasAccounts) {
+    <app-empty-state
+      title="Nenhuma conta cadastrada"
+      description="Crie sua primeira conta"
+      ctaLabel="Criar conta"
+      (action)="create.emit()">
+    </app-empty-state>
+  }
 
-  <div *ngIf="!loading && hasAccounts" class="grid gap-3 md:grid-cols-2">
-    <article *ngFor="let account of accounts; trackBy: trackByAccountId">
-      <h3>{{ account.name }}</h3>
-      <p>{{ accountTypeLabel(account.type) }}</p>
-
-      <p>Saldo: {{ account.currentBalance }}</p>
-
-      <button (click)="selectAccount.emit(account.id)">Extrato</button>
-      <button (click)="edit.emit(account)">Editar</button>
-      <button (click)="remove.emit(account)">Remover</button>
-    </article>
-  </div>
+  @if (!loading && hasAccounts) {
+    <div class="account-list__grid">
+      @for (account of accounts; track trackByAccountId($index, account)) {
+        <article class="account-card">
+          <div class="account-card__head">
+            <span class="account-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div>
+              <h3>{{ account.name }}</h3>
+              <p>{{ accountTypeLabel(account.type) }}</p>
+            </div>
+            <span class="account-card__status" [ngClass]="account.isActive ? 'account-card__status--active' : 'account-card__status--inactive'">
+              {{ account.isActive ? 'Ativa' : 'Inativa' }}
+            </span>
+          </div>
+          <div class="account-card__balance">
+            <span>Saldo atual</span>
+            <strong>R$ {{ account.currentBalance | number:'1.2-2' }}</strong>
+          </div>
+          <div class="account-card__actions">
+            <button type="button" class="account-card__action account-card__action--primary" (click)="selectAccount.emit(account.id)">Extrato</button>
+            <button type="button" class="account-card__action" (click)="edit.emit(account)">Editar</button>
+            <button type="button" class="account-card__action account-card__action--danger" (click)="remove.emit(account)">Remover</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
 </section>

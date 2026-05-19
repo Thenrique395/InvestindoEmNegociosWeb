@@ -1,490 +1,530 @@
-<section class="grid gap-4" *ngIf="isLogged">
-  <ng-container *ngIf="isBasicProfile; else advancedDashboardIntro">
-    <section class="basic-home-shell" *ngIf="!isLoadingDashboard; else loadingSummary">
-      <div class="basic-home-hero">
-        <div class="basic-home-hero__copy">
-          <p class="basic-home-hero__eyebrow">Resumo do mês</p>
-          <h1 class="basic-home-hero__title">Seu mês com clareza</h1>
-          <p class="basic-home-hero__text">
-            Acompanhe o que entrou, o que saiu e o que ainda precisa da sua ação em {{ mesAtualLabel }}.
-          </p>
-          <div class="basic-home-periods">
-            <button
-              type="button"
-              class="basic-home-periods__button"
-              [ngClass]="periodo === 'month' ? 'basic-home-periods__button--active' : ''"
-              (click)="setPeriodo('month')"
-            >
-              Mensal
-            </button>
-            <button
-              type="button"
-              class="basic-home-periods__button"
-              [ngClass]="periodo === 'quarter' ? 'basic-home-periods__button--active' : ''"
-              (click)="setPeriodo('quarter')"
-            >
-              Trimestral
-            </button>
-            <button
-              type="button"
-              class="basic-home-periods__button"
-              [ngClass]="periodo === 'year' ? 'basic-home-periods__button--active' : ''"
-              (click)="setPeriodo('year')"
-            >
-              Anual
-            </button>
-          </div>
-        </div>
-
-        <article class="basic-home-guidance">
-          <div class="basic-home-guidance__head">
-            <div>
-              <p class="basic-home-guidance__label">Próximo passo do mês</p>
-              <h2 class="basic-home-guidance__title">{{ basicDashboardNextTitle }}</h2>
+@if (isLogged) {
+  <section class="grid gap-4">
+    @if (isBasicProfile) {
+      @if (!isLoadingDashboard) {
+        <section class="basic-home-shell">
+          <div class="basic-home-hero">
+            <div class="basic-home-hero__copy">
+              <p class="basic-home-hero__eyebrow">Resumo do mês</p>
+              <h1 class="basic-home-hero__title">Seu mês com clareza</h1>
+              <p class="basic-home-hero__text">
+                Acompanhe o que entrou, o que saiu e o que ainda precisa da sua ação em {{ mesAtualLabel }}.
+              </p>
+              <div class="basic-home-periods">
+                <button
+                  type="button"
+                  class="basic-home-periods__button"
+                  [ngClass]="periodo === 'month' ? 'basic-home-periods__button--active' : ''"
+                  (click)="setPeriodo('month')"
+                  >
+                  Mensal
+                </button>
+                <button
+                  type="button"
+                  class="basic-home-periods__button"
+                  [ngClass]="periodo === 'quarter' ? 'basic-home-periods__button--active' : ''"
+                  (click)="setPeriodo('quarter')"
+                  >
+                  Trimestral
+                </button>
+                <button
+                  type="button"
+                  class="basic-home-periods__button"
+                  [ngClass]="periodo === 'year' ? 'basic-home-periods__button--active' : ''"
+                  (click)="setPeriodo('year')"
+                  >
+                  Anual
+                </button>
+              </div>
             </div>
-            <span class="basic-home-guidance__chip">{{ mesAtualLabel }}</span>
+            <article class="basic-home-guidance">
+              <div class="basic-home-guidance__head">
+                <div>
+                  <p class="basic-home-guidance__label">Próximo passo do mês</p>
+                  <h2 class="basic-home-guidance__title">{{ basicDashboardNextTitle }}</h2>
+                </div>
+                <span class="basic-home-guidance__chip">{{ mesAtualLabel }}</span>
+              </div>
+              <p class="basic-home-guidance__text">{{ basicDashboardNextMessage }}</p>
+              <a [routerLink]="basicDashboardNextActionLink" class="basic-home-guidance__cta">
+                {{ basicDashboardNextActionLabel }}
+              </a>
+            </article>
           </div>
-          <p class="basic-home-guidance__text">{{ basicDashboardNextMessage }}</p>
-          <a [routerLink]="basicDashboardNextActionLink" class="basic-home-guidance__cta">
-            {{ basicDashboardNextActionLabel }}
-          </a>
-        </article>
-      </div>
-
-      <div class="basic-home-kpis">
-        <article class="basic-home-kpi basic-home-kpi--primary">
-          <div class="basic-home-kpi__head">
-            <span class="basic-home-kpi__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-                <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <div class="basic-home-kpi__title-wrap">
-              <p class="basic-home-kpi__eyebrow">Quanto sobra</p>
-              <h2 class="basic-home-kpi__title">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+          <div class="basic-home-kpis">
+            <article class="basic-home-kpi basic-home-kpi--primary">
+              <div class="basic-home-kpi__head">
+                <span class="basic-home-kpi__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <div class="basic-home-kpi__title-wrap">
+                  <p class="basic-home-kpi__eyebrow">Quanto sobra</p>
+                  <h2 class="basic-home-kpi__title">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+                </div>
+                <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre quanto sobra agora">
+                  ?
+                  <span class="basic-home-tooltip__content">Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.</span>
+                </button>
+              </div>
+              <p class="basic-home-kpi__support">Disponível em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }} · Pendências do mês: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            </article>
+            <article class="basic-home-kpi basic-home-kpi--income">
+              <div class="basic-home-kpi__head">
+                <span class="basic-home-kpi__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <div class="basic-home-kpi__title-wrap">
+                  <p class="basic-home-kpi__eyebrow">Quanto entrou</p>
+                  <h2 class="basic-home-kpi__title">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+                </div>
+                <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre entradas do mês">
+                  ?
+                  <span class="basic-home-tooltip__content">Entradas do mês: considera só receitas já recebidas dentro do período selecionado.</span>
+                </button>
+              </div>
+              <p class="basic-home-kpi__support">Ainda a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            </article>
+            <article class="basic-home-kpi basic-home-kpi--expense">
+              <div class="basic-home-kpi__head">
+                <span class="basic-home-kpi__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <div class="basic-home-kpi__title-wrap">
+                  <p class="basic-home-kpi__eyebrow">Quanto saiu</p>
+                  <h2 class="basic-home-kpi__title">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+                </div>
+                <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre saídas do mês">
+                  ?
+                  <span class="basic-home-tooltip__content">Saídas do mês: soma de despesas com vencimento dentro do período selecionado.</span>
+                </button>
+              </div>
+              <p class="basic-home-kpi__support">Compras no cartão: {{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            </article>
+          </div>
+          <section class="basic-home-month">
+            <div class="basic-home-month__copy">
+              <p class="basic-home-month__eyebrow">Situação do mês</p>
+              <h2 class="basic-home-month__title">Entenda o que precisa da sua atenção agora</h2>
+              <p class="basic-home-month__text">
+                Use este resumo para decidir sua próxima ação e manter o dashboard útil durante o mês.
+              </p>
             </div>
-            <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre quanto sobra agora">
-              ?
-              <span class="basic-home-tooltip__content">Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.</span>
-            </button>
-          </div>
-          <p class="basic-home-kpi__support">Disponível em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }} · Pendências do mês: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}</p>
-        </article>
-
-        <article class="basic-home-kpi basic-home-kpi--income">
-          <div class="basic-home-kpi__head">
-            <span class="basic-home-kpi__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <div class="basic-home-kpi__title-wrap">
-              <p class="basic-home-kpi__eyebrow">Quanto entrou</p>
-              <h2 class="basic-home-kpi__title">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            </div>
-            <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre entradas do mês">
-              ?
-              <span class="basic-home-tooltip__content">Entradas do mês: considera só receitas já recebidas dentro do período selecionado.</span>
-            </button>
-          </div>
-          <p class="basic-home-kpi__support">Ainda a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}</p>
-        </article>
-
-        <article class="basic-home-kpi basic-home-kpi--expense">
-          <div class="basic-home-kpi__head">
-            <span class="basic-home-kpi__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <div class="basic-home-kpi__title-wrap">
-              <p class="basic-home-kpi__eyebrow">Quanto saiu</p>
-              <h2 class="basic-home-kpi__title">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            </div>
-            <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre saídas do mês">
-              ?
-              <span class="basic-home-tooltip__content">Saídas do mês: soma de despesas com vencimento dentro do período selecionado.</span>
-            </button>
-          </div>
-          <p class="basic-home-kpi__support">Compras no cartão: {{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</p>
-        </article>
-      </div>
-
-      <section class="basic-home-month">
-        <div class="basic-home-month__copy">
-          <p class="basic-home-month__eyebrow">Situação do mês</p>
-          <h2 class="basic-home-month__title">Entenda o que precisa da sua atenção agora</h2>
-          <p class="basic-home-month__text">
-            Use este resumo para decidir sua próxima ação e manter o dashboard útil durante o mês.
-          </p>
-        </div>
-
-        <div class="basic-home-month__grid">
+            <div class="basic-home-month__grid">
           <article class="basic-home-insight-card" [ngClass]="{
             'basic-home-insight-card--danger': basicDashboardInsightTone === 'danger',
             'basic-home-insight-card--warn': basicDashboardInsightTone === 'warn',
             'basic-home-insight-card--ok': basicDashboardInsightTone === 'ok'
           }">
-            <div class="basic-home-insight-card__head">
-              <div>
-                <p class="basic-home-insight-card__eyebrow">Insight principal</p>
-                <h3 class="basic-home-insight-card__title">{{ basicDashboardInsightTitle }}</h3>
-              </div>
-              <div class="basic-home-insight-card__meta">
-                <span class="basic-home-insight-card__badge">{{ basicDashboardInsightBadge }}</span>
-                <div class="basic-home-insight-card__nav" *ngIf="basicDashboardHasInsightPagination">
-                  <button type="button" class="basic-home-insight-card__nav-button" (click)="previousBasicDashboardInsight()" aria-label="Insight anterior">
-                    ‹
-                  </button>
-                  <span class="basic-home-insight-card__nav-counter">{{ basicDashboardInsightPosition }} de {{ basicDashboardInsightCount }}</span>
-                  <button type="button" class="basic-home-insight-card__nav-button" (click)="nextBasicDashboardInsight()" aria-label="Próximo insight">
-                    ›
-                  </button>
+                <div class="basic-home-insight-card__head">
+                  <div>
+                    <p class="basic-home-insight-card__eyebrow">Insight principal</p>
+                    <h3 class="basic-home-insight-card__title">{{ basicDashboardInsightTitle }}</h3>
+                  </div>
+                  <div class="basic-home-insight-card__meta">
+                    <span class="basic-home-insight-card__badge">{{ basicDashboardInsightBadge }}</span>
+                    @if (basicDashboardHasInsightPagination) {
+                      <div class="basic-home-insight-card__nav">
+                        <button type="button" class="basic-home-insight-card__nav-button" (click)="previousBasicDashboardInsight()" aria-label="Insight anterior">
+                          ‹
+                        </button>
+                        <span class="basic-home-insight-card__nav-counter">{{ basicDashboardInsightPosition }} de {{ basicDashboardInsightCount }}</span>
+                        <button type="button" class="basic-home-insight-card__nav-button" (click)="nextBasicDashboardInsight()" aria-label="Próximo insight">
+                          ›
+                        </button>
+                      </div>
+                    }
+                  </div>
                 </div>
-              </div>
-            </div>
-            <p class="basic-home-insight-card__text">{{ basicDashboardInsightMessage }}</p>
-            <p class="basic-home-insight-card__support" *ngIf="basicDashboardInsightExtraLabel">
-              {{ basicDashboardInsightExtraLabel }}
-            </p>
-            <a [routerLink]="basicDashboardCurrentActionLink" [queryParams]="basicDashboardCurrentActionQueryParams" class="basic-home-insight-card__cta">
-              {{ basicDashboardCurrentActionLabel }}
-            </a>
-          </article>
-
-          <article class="basic-home-summary-card">
-            <div class="basic-home-summary-card__head">
-              <div>
-                <p class="basic-home-summary-card__eyebrow">Resumo rápido</p>
-                <h3 class="basic-home-summary-card__title">Como o mês está ficando</h3>
-                <p class="basic-home-summary-card__period">{{ mesAtualLabel }}</p>
-              </div>
+                <p class="basic-home-insight-card__text">{{ basicDashboardInsightMessage }}</p>
+                @if (basicDashboardInsightExtraLabel) {
+                  <p class="basic-home-insight-card__support">
+                    {{ basicDashboardInsightExtraLabel }}
+                  </p>
+                }
+                <a [routerLink]="basicDashboardCurrentActionLink" [queryParams]="basicDashboardCurrentActionQueryParams" class="basic-home-insight-card__cta">
+                  {{ basicDashboardCurrentActionLabel }}
+                </a>
+              </article>
+              <article class="basic-home-summary-card">
+                <div class="basic-home-summary-card__head">
+                  <div>
+                    <p class="basic-home-summary-card__eyebrow">Resumo rápido</p>
+                    <h3 class="basic-home-summary-card__title">Como o mês está ficando</h3>
+                    <p class="basic-home-summary-card__period">{{ mesAtualLabel }}</p>
+                  </div>
               <span class="basic-home-summary-card__status" [ngClass]="{
                 'basic-home-summary-card__status--ok': basicDashboardSummaryTone === 'ok',
                 'basic-home-summary-card__status--warn': basicDashboardSummaryTone === 'warn',
                 'basic-home-summary-card__status--danger': basicDashboardSummaryTone === 'danger'
               }">
-                {{ basicDashboardSummaryStatus }}
-              </span>
-            </div>
-            <div class="basic-home-summary-card__rows">
-              <div class="basic-home-summary-card__row basic-home-summary-card__row--income">
-                <span>Entrou</span>
-                <strong>{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-              </div>
-              <div class="basic-home-summary-card__row basic-home-summary-card__row--expense">
-                <span>Saiu</span>
-                <strong>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-              </div>
-              <div class="basic-home-summary-card__row basic-home-summary-card__row--available">
-                <span>Sobra hoje</span>
-                <strong>{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-              </div>
-              <div class="basic-home-summary-card__row basic-home-summary-card__row--pending">
-                <span>Pendente a receber</span>
-                <strong>{{ basicDashboardPendingReceivablesLabel }}</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <div class="basic-home-month__grid basic-home-month__grid--single">
-          <article class="basic-home-recent-card">
-            <div class="basic-home-recent-card__head">
-              <div>
-                <p class="basic-home-recent-card__eyebrow">Últimos movimentos</p>
-                <h3 class="basic-home-recent-card__title">Movimentos recentes do período</h3>
-              </div>
-              <a routerLink="/calendario" class="basic-home-recent-card__link">Abrir calendário</a>
-            </div>
-            <div class="basic-home-recent-card__list" *ngIf="basicDashboardRecentTransactions.length; else basicSemMovimentos">
-              <div class="basic-home-recent-card__item" *ngFor="let item of basicDashboardRecentTransactions; trackBy: trackByIndex">
-                <span class="basic-home-recent-card__icon" [ngClass]="item.type === 'income' ? 'basic-home-recent-card__icon--income' : 'basic-home-recent-card__icon--expense'" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                    <path *ngIf="item.type === 'income'" d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                    <path *ngIf="item.type === 'expense'" d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <div class="basic-home-recent-card__item-main">
-                  <strong>{{ item.title }}</strong>
-                  <span>
-                    {{ item.type === 'income' ? 'Receita' : 'Despesa' }}
-                    <ng-container *ngIf="item.status"> • {{ item.status }}</ng-container>
-                    • {{ item.date }}
+                    {{ basicDashboardSummaryStatus }}
                   </span>
                 </div>
-                <strong [ngClass]="item.type === 'income' ? 'basic-home-recent-card__amount--income' : 'basic-home-recent-card__amount--expense'">
-                  {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
-                </strong>
-              </div>
+                <div class="basic-home-summary-card__rows">
+                  <div class="basic-home-summary-card__row basic-home-summary-card__row--income">
+                    <span>Entrou</span>
+                    <strong>{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                  </div>
+                  <div class="basic-home-summary-card__row basic-home-summary-card__row--expense">
+                    <span>Saiu</span>
+                    <strong>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                  </div>
+                  <div class="basic-home-summary-card__row basic-home-summary-card__row--available">
+                    <span>Sobra hoje</span>
+                    <strong>{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                  </div>
+                  <div class="basic-home-summary-card__row basic-home-summary-card__row--pending">
+                    <span>Pendente a receber</span>
+                    <strong>{{ basicDashboardPendingReceivablesLabel }}</strong>
+                  </div>
+                </div>
+              </article>
             </div>
-            <ng-template #basicSemMovimentos>
-              <p class="basic-home-recent-card__empty">Sem movimentos recentes. Cadastre uma receita ou despesa para começar.</p>
-            </ng-template>
-          </article>
+            <div class="basic-home-month__grid basic-home-month__grid--single">
+              <article class="basic-home-recent-card">
+                <div class="basic-home-recent-card__head">
+                  <div>
+                    <p class="basic-home-recent-card__eyebrow">Últimos movimentos</p>
+                    <h3 class="basic-home-recent-card__title">Movimentos recentes do período</h3>
+                  </div>
+                  <a routerLink="/calendario" class="basic-home-recent-card__link">Abrir calendário</a>
+                </div>
+                @if (basicDashboardRecentTransactions.length) {
+                  <div class="basic-home-recent-card__list">
+                    @for (item of basicDashboardRecentTransactions; track trackByIndex($index, item)) {
+                      <div class="basic-home-recent-card__item">
+                        <span class="basic-home-recent-card__icon" [ngClass]="item.type === 'income' ? 'basic-home-recent-card__icon--income' : 'basic-home-recent-card__icon--expense'" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                            @if (item.type === 'income') {
+                              <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                            }
+                            @if (item.type === 'expense') {
+                              <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                            }
+                          </svg>
+                        </span>
+                        <div class="basic-home-recent-card__item-main">
+                          <strong>{{ item.title }}</strong>
+                          <span>
+                            {{ item.type === 'income' ? 'Receita' : 'Despesa' }}
+                            @if (item.status) {
+                              • {{ item.status }}
+                            }
+                            • {{ item.date }}
+                          </span>
+                        </div>
+                        <strong [ngClass]="item.type === 'income' ? 'basic-home-recent-card__amount--income' : 'basic-home-recent-card__amount--expense'">
+                          {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+                        </strong>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="basic-home-recent-card__empty">Sem movimentos recentes. Cadastre uma receita ou despesa para começar.</p>
+                }
+              </article>
+            </div>
+          </section>
+        </section>
+      } @else {
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
+          </div>
         </div>
-      </section>
-    </section>
-  </ng-container>
-
-  <ng-template #advancedDashboardIntro>
-    <header class="flex flex-wrap items-start justify-between gap-3">
-      <div class="max-w-[560px]">
-        <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
-        <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
-          Visão geral de {{ mesAtualLabel }}
-        </h1>
-        <p class="mt-1 text-[12px] text-[var(--text-muted)]">
-          Combine receitas, despesas e cartões para saber o quanto pode gastar.
-        </p>
-      </div>
-      <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
-        <button
-          type="button"
-          class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
-          [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-          (click)="setPeriodo('month')"
-        >
-          Mensal
-        </button>
-        <button
-          type="button"
-          class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
-          [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-          (click)="setPeriodo('quarter')"
-        >
-          Trimestral
-        </button>
-        <button
-          type="button"
-          class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
-          [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-          (click)="setPeriodo('year')"
-        >
-          Anual
-        </button>
-      </div>
-    </header>
-
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3" *ngIf="!isLoadingDashboard; else loadingSummary">
-      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-      <div class="mb-2 flex items-center gap-3">
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(37,99,235,0.16)] text-[var(--primary)]" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-            <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Disponível Real</p>
-          <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo disponível real">
-            i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            SDR = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+      }
+    } @else {
+      <header class="flex flex-wrap items-start justify-between gap-3">
+        <div class="max-w-[560px]">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
+          <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
+            Visão geral de {{ mesAtualLabel }}
+          </h1>
+          <p class="mt-1 text-[12px] text-[var(--text-muted)]">
+            Combine receitas, despesas e cartões para saber o quanto pode gastar.
+          </p>
+        </div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
+          <button
+            type="button"
+            class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+            [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+            (click)="setPeriodo('month')"
+            >
+            Mensal
           </button>
-      </div>
-      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[11px] font-semibold text-sky-700">
-        <span class="inline-block h-2 w-2 rounded-full bg-sky-500"></span>
-        Em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}. Pendências: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}.
-      </p>
-      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | currency: 'BRL':'symbol':'1.2-2' }}</p>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-      <div class="mb-2 flex items-center gap-3">
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(16,185,129,0.18)] text-emerald-700" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Patrimônio líquido</p>
-        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre patrimônio líquido">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
-        <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-        Ativos: {{ patrimonioTotalAtivos | currency: 'BRL':'symbol':'1.2-2' }}. Passivos: {{ patrimonioPassivos | currency: 'BRL':'symbol':'1.2-2' }}.
-      </p>
-      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | currency: 'BRL':'symbol':'1.2-2' }} · Ativos reais: {{ patrimonioEmAtivosReais | currency: 'BRL':'symbol':'1.2-2' }}</p>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-      <div class="mb-2 flex items-center gap-3">
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(34,197,94,0.18)] text-[var(--success)]" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
-        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Total de receitas do mês: apenas receitas com status recebido no período selecionado.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-3 py-1 text-[11px] font-semibold text-amber-700">
-        <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-        Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}.
-      </p>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-      <div class="mb-2 flex items-center gap-3">
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(239,68,68,0.18)] text-[var(--danger)]" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
-        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
-    </div>
-
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-      <div class="mb-2 flex items-center gap-3">
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(100,116,139,0.2)] text-[var(--text-muted)]" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
-        <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-      <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-      <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
-    </div>
-    </div>
-  </ng-template>
-
-  <ng-template #loadingSummary>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
-      </div>
-    </div>
-  </ng-template>
-
-  <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]" *ngIf="hasAccess('Advanced') && accountBalances.length">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <div>
-        <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
-        <p class="m-0 text-[11px] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}</p>
-      </div>
-      <a routerLink="/contas" class="btn-ghost sm" *ngIf="hasAccess('Intermediate')">Gerenciar contas</a>
-    </div>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2">
-      <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]" *ngFor="let account of accountBalances; trackBy: trackByIndex">
-        <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ account.name }}</p>
-        <p class="m-0 mt-1 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
-        <strong class="mt-2 block text-[14px] text-[var(--text)]">{{ account.currentBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-      </article>
-    </div>
-  </section>
-
-  <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]" *ngIf="hasAccess('Advanced') && patrimonioHistoryPoints.length">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <div>
-        <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Evolução patrimonial</p>
-        <p class="m-0 text-[11px] text-[var(--text-muted)]">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
-      </div>
-      <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] text-[var(--text-muted)]">
-        Atual: {{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}
-      </span>
-    </div>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(72px,1fr))] gap-2">
-      <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-2" *ngFor="let point of patrimonioHistoryPoints; trackBy: trackByIndex">
-        <div class="flex h-[92px] items-end justify-center">
-          <div class="w-full rounded-t-[10px] bg-[linear-gradient(180deg,rgba(16,185,129,0.28),rgba(16,185,129,0.9))]" [style.height.%]="(point.netWorth / patrimonioHistoryMax) * 100"></div>
+          <button
+            type="button"
+            class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+            [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+            (click)="setPeriodo('quarter')"
+            >
+            Trimestral
+          </button>
+          <button
+            type="button"
+            class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+            [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
+            (click)="setPeriodo('year')"
+            >
+            Anual
+          </button>
         </div>
-        <div class="mt-2 text-center">
-          <strong class="block text-[11px] text-[var(--text)]">{{ point.label }}</strong>
-          <span class="block text-[10px] text-[var(--text-muted)]">{{ point.netWorth | currency: 'BRL':'symbol':'1.0-0' }}</span>
-        </div>
-      </article>
-    </div>
-    <p class="m-0 text-[11px] text-[var(--text-muted)]" *ngIf="patrimonioHistoryEstimated">
-      Série estimada a partir do histórico disponível de contas, pagamentos e movimentos de investimento.
-    </p>
-  </section>
-
-  <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]" *ngIf="hasAccess('Intermediate') && debtSummary">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <div>
-        <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Mapa de dívidas</p>
-        <p class="m-0 text-[11px] text-[var(--text-muted)]">Composição oficial das obrigações em aberto.</p>
-      </div>
-      <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] text-[var(--text-muted)]">
-        Total: {{ debtSummary.totalDebt | currency: 'BRL':'symbol':'1.2-2' }}
-      </span>
-    </div>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
-      <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3" *ngFor="let bucket of debtBuckets; trackBy: trackByIndex">
-        <p class="m-0 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ bucket.label }}</p>
-        <strong class="mt-2 block text-[15px] text-[var(--text)]">{{ bucket.totalAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        <p class="m-0 mt-1 text-[10px] text-[var(--text-muted)]">{{ bucket.itemsCount }} item(ns)</p>
-      </article>
-    </div>
-    <div class="grid gap-2" *ngIf="debtNextItems.length">
-      <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3" *ngFor="let item of debtNextItems; trackBy: trackByIndex">
-        <div class="flex flex-wrap items-start justify-between gap-2">
-          <div class="min-w-0">
-            <strong class="block text-[12px] text-[var(--text)]">{{ item.title }}</strong>
-            <p class="m-0 mt-1 text-[10px] text-[var(--text-muted)]">
-              {{ item.family === 'card' ? 'Cartão' : 'Obrigação' }}<span *ngIf="item.relatedName"> · {{ item.relatedName }}</span><span *ngIf="item.statementReference"> · {{ item.statementReference }}</span>
+      </header>
+      @if (!isLoadingDashboard) {
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3">
+          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+            <div class="mb-2 flex items-center gap-3">
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(37,99,235,0.16)] text-[var(--primary)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                  <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Disponível Real</p>
+              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo disponível real">
+                i
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                  SDR = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.
+                </span>
+                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+              </button>
+            </div>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[11px] font-semibold text-sky-700">
+              <span class="inline-block h-2 w-2 rounded-full bg-sky-500"></span>
+              Em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}. Pendências: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}.
+            </p>
+            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | currency: 'BRL':'symbol':'1.2-2' }}</p>
+          </div>
+          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+            <div class="mb-2 flex items-center gap-3">
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(16,185,129,0.18)] text-emerald-700" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Patrimônio líquido</p>
+              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre patrimônio líquido">
+                i
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                  Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.
+                </span>
+                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+              </button>
+            </div>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+              <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+              Ativos: {{ patrimonioTotalAtivos | currency: 'BRL':'symbol':'1.2-2' }}. Passivos: {{ patrimonioPassivos | currency: 'BRL':'symbol':'1.2-2' }}.
+            </p>
+            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | currency: 'BRL':'symbol':'1.2-2' }} · Ativos reais: {{ patrimonioEmAtivosReais | currency: 'BRL':'symbol':'1.2-2' }}</p>
+          </div>
+          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+            <div class="mb-2 flex items-center gap-3">
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(34,197,94,0.18)] text-[var(--success)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
+              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
+                i
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                  Total de receitas do mês: apenas receitas com status recebido no período selecionado.
+                </span>
+                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+              </button>
+            </div>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-3 py-1 text-[11px] font-semibold text-amber-700">
+              <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
+              Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}.
             </p>
           </div>
-          <div class="text-right">
-            <strong class="block text-[12px] text-[var(--text)]">{{ item.openAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-            <span class="text-[10px] text-[var(--text-muted)]">vence {{ item.dueDate | date:'dd/MM' }}</span>
+          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+            <div class="mb-2 flex items-center gap-3">
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(239,68,68,0.18)] text-[var(--danger)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
+              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
+                i
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                  Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.
+                </span>
+                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+              </button>
+            </div>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
+          </div>
+          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+            <div class="mb-2 flex items-center gap-3">
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(100,116,139,0.2)] text-[var(--text-muted)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
+              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
+                i
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                  Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.
+                </span>
+                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+              </button>
+            </div>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
           </div>
         </div>
-      </article>
-    </div>
-  </section>
-
-  <section
-    class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]"
-    *ngIf="!isBasicProfile && !isLoadingDashboard"
+      } @else {
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
+            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
+          </div>
+        </div>
+      }
+    }
+    @if (hasAccess('Advanced') && accountBalances.length) {
+      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
+            <p class="m-0 text-[11px] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}</p>
+          </div>
+          @if (hasAccess('Intermediate')) {
+            <a routerLink="/contas" class="btn-ghost sm">Gerenciar contas</a>
+          }
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2">
+          @for (account of accountBalances; track trackByIndex($index, account)) {
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+              <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ account.name }}</p>
+              <p class="m-0 mt-1 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
+              <strong class="mt-2 block text-[14px] text-[var(--text)]">{{ account.currentBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+            </article>
+          }
+        </div>
+      </section>
+    }
+    @if (hasAccess('Advanced') && patrimonioHistoryPoints.length) {
+      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Evolução patrimonial</p>
+            <p class="m-0 text-[11px] text-[var(--text-muted)]">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
+          </div>
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] text-[var(--text-muted)]">
+            Atual: {{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}
+          </span>
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(72px,1fr))] gap-2">
+          @for (point of patrimonioHistoryPoints; track trackByIndex($index, point)) {
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-2">
+              <div class="flex h-[92px] items-end justify-center">
+                <div class="w-full rounded-t-[10px] bg-[linear-gradient(180deg,rgba(16,185,129,0.28),rgba(16,185,129,0.9))]" [style.height.%]="(point.netWorth / patrimonioHistoryMax) * 100"></div>
+              </div>
+              <div class="mt-2 text-center">
+                <strong class="block text-[11px] text-[var(--text)]">{{ point.label }}</strong>
+                <span class="block text-[10px] text-[var(--text-muted)]">{{ point.netWorth | currency: 'BRL':'symbol':'1.0-0' }}</span>
+              </div>
+            </article>
+          }
+        </div>
+        @if (patrimonioHistoryEstimated) {
+          <p class="m-0 text-[11px] text-[var(--text-muted)]">
+            Série estimada a partir do histórico disponível de contas, pagamentos e movimentos de investimento.
+          </p>
+        }
+      </section>
+    }
+    @if (hasAccess('Intermediate') && debtSummary) {
+      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Mapa de dívidas</p>
+            <p class="m-0 text-[11px] text-[var(--text-muted)]">Composição oficial das obrigações em aberto.</p>
+          </div>
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] text-[var(--text-muted)]">
+            Total: {{ debtSummary.totalDebt | currency: 'BRL':'symbol':'1.2-2' }}
+          </span>
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
+          @for (bucket of debtBuckets; track trackByIndex($index, bucket)) {
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+              <p class="m-0 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ bucket.label }}</p>
+              <strong class="mt-2 block text-[15px] text-[var(--text)]">{{ bucket.totalAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              <p class="m-0 mt-1 text-[10px] text-[var(--text-muted)]">{{ bucket.itemsCount }} item(ns)</p>
+            </article>
+          }
+        </div>
+        @if (debtNextItems.length) {
+          <div class="grid gap-2">
+            @for (item of debtNextItems; track trackByIndex($index, item)) {
+              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <strong class="block text-[12px] text-[var(--text)]">{{ item.title }}</strong>
+                    <p class="m-0 mt-1 text-[10px] text-[var(--text-muted)]">
+                      {{ item.family === 'card' ? 'Cartão' : 'Obrigação' }}@if (item.relatedName) {
+                      <span> · {{ item.relatedName }}</span>
+                      }@if (item.statementReference) {
+                      <span> · {{ item.statementReference }}</span>
+                    }
+                  </p>
+                </div>
+                <div class="text-right">
+                  <strong class="block text-[12px] text-[var(--text)]">{{ item.openAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                  <span class="text-[10px] text-[var(--text-muted)]">vence {{ item.dueDate | date:'dd/MM' }}</span>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+  @if (!isBasicProfile && !isLoadingDashboard) {
+    <section
+      class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]"
     [ngClass]="insight.tone === 'warn'
       ? 'border-amber-400/40 border-l-amber-400 bg-amber-500/10'
       : insight.tone === 'danger'
@@ -492,494 +532,541 @@
         : insight.tone === 'info'
           ? 'border-sky-400/40 border-l-sky-400 bg-sky-500/10'
           : ''"
-  >
-    <div class="flex items-start gap-3">
-      <div class="grid h-8 w-8 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
-        <svg viewBox="0 0 24 24" class="h-4 w-4" role="presentation" focusable="false">
-          <path d="M12 9v4m0 4h.01M10.3 4.8l-7 12.2A2 2 0 0 0 5 20h14a2 2 0 0 0 1.7-3l-7-12.2a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-[10px] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
-        <h3 class="m-0 text-[var(--text-sm)] font-semibold">{{ insight.title }}</h3>
-        <p class="mt-1 text-[11px] text-[var(--text-muted)]">{{ insight.message }}</p>
-        <div class="mt-2" *ngIf="insightAction">
-          <a
-            class="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[11px] font-semibold text-[var(--text)] hover:border-[var(--primary)]"
-            [routerLink]="insightAction.route">
-            Ação recomendada: {{ insightAction.label }}
-          </a>
+      >
+      <div class="flex items-start gap-3">
+        <div class="grid h-8 w-8 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" role="presentation" focusable="false">
+            <path d="M12 9v4m0 4h.01M10.3 4.8l-7 12.2A2 2 0 0 0 5 20h14a2 2 0 0 0 1.7-3l-7-12.2a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="mt-2 flex flex-wrap gap-1.5" *ngIf="insightHighlights.length">
-          <span
-            class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
-            *ngFor="let item of insightHighlights; trackBy: trackByIndex">
-            {{ item }}
+        <div>
+          <p class="text-[10px] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+          <h3 class="m-0 text-[var(--text-sm)] font-semibold">{{ insight.title }}</h3>
+          <p class="mt-1 text-[11px] text-[var(--text-muted)]">{{ insight.message }}</p>
+          @if (insightAction) {
+            <div class="mt-2">
+              <a
+                class="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[11px] font-semibold text-[var(--text)] hover:border-[var(--primary)]"
+                [routerLink]="insightAction.route">
+                Ação recomendada: {{ insightAction.label }}
+              </a>
+            </div>
+          }
+          @if (insightHighlights.length) {
+            <div class="mt-2 flex flex-wrap gap-1.5">
+              @for (item of insightHighlights; track trackByIndex($index, item)) {
+                <span
+                  class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
+                  >
+                  {{ item }}
+                </span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <button class="ghost sm" type="button" (click)="openInsightDetails()">Detalhes</button>
+    </section>
+  }
+  @if (!isBasicProfile && showInsightDetails) {
+    <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]">
+      <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 sm:pb-[var(--space-3)]">
+        <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
+          ×
+        </button>
+        <div class="flex flex-wrap items-center gap-2 pr-10">
+          <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+          <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" [ngClass]="insightPriorityClass">
+            {{ insightPriority }}
           </span>
         </div>
-      </div>
-    </div>
-    <button class="ghost sm" type="button" (click)="openInsightDetails()">Detalhes</button>
-  </section>
-
-  <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]" *ngIf="!isBasicProfile && showInsightDetails">
-    <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 sm:pb-[var(--space-3)]">
-      <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
-        ×
-      </button>
-      <div class="flex flex-wrap items-center gap-2 pr-10">
-        <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
-        <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" [ngClass]="insightPriorityClass">
-          {{ insightPriority }}
-        </span>
-      </div>
-      <h3 class="m-0 text-[var(--text-lg)] font-semibold">{{ insight.title }}</h3>
-      <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">{{ insight.message }}</p>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
-        <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ insightActionSentence }}</p>
-        <p class="m-1 text-[10px] text-[var(--text-muted)]">{{ insightDeadlineLabel }}</p>
-        <p class="m-0 text-[10px] text-[var(--text-secondary)]">{{ insightShortGoal }}</p>
-      </div>
-      <div class="flex flex-wrap gap-1.5" *ngIf="insightHighlights.length">
-        <span
-          class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
-          *ngFor="let item of insightHighlights; trackBy: trackByIndex">
-          {{ item }}
-        </span>
-      </div>
-      <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
-        <div class="flex items-center justify-between gap-2">
-          <p class="m-0 text-[11px] font-semibold text-[var(--text)]">Painel de risco</p>
-          <span class="text-[10px] text-[var(--text-muted)]">Atualização automática</span>
+        <h3 class="m-0 text-[var(--text-lg)] font-semibold">{{ insight.title }}</h3>
+        <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">{{ insight.message }}</p>
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
+          <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ insightActionSentence }}</p>
+          <p class="m-1 text-[10px] text-[var(--text-muted)]">{{ insightDeadlineLabel }}</p>
+          <p class="m-0 text-[10px] text-[var(--text-secondary)]">{{ insightShortGoal }}</p>
         </div>
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1.15fr_1fr]">
-          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
-            <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira</p>
-            <div class="mt-2 flex items-center justify-between gap-2">
-              <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-semibold" [ngClass]="insightHealthToneClass">
-                {{ insightDiagnostics.healthScore }}/100
-              </strong>
-              <span class="text-[10px] text-[var(--text-muted)]">Score mensal</span>
-            </div>
-            <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-              <div class="h-full rounded-full transition-all duration-300"
-                   [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
-                   [style.width.%]="insightScoreGaugeWidth"></div>
-            </div>
-            <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-2" *ngIf="robotScoreBreakdown.length">
-              <p class="m-0 text-[10px] text-[var(--text-muted)]">Como chegamos nesse score:</p>
-              <ul class="m-0 mt-1 list-disc pl-4 text-[10px] text-[var(--text-secondary)]">
-                <li *ngFor="let item of robotScoreBreakdown; trackBy: trackByIndex">{{ item }}</li>
-              </ul>
-            </div>
-          </article>
-          <div class="grid gap-2">
-            <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightRiskToneClass">
-              <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
-              <strong class="mt-2 block text-[13px] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
-            </article>
+        @if (insightHighlights.length) {
+          <div class="flex flex-wrap gap-1.5">
+            @for (item of insightHighlights; track trackByIndex($index, item)) {
+              <span
+                class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
+                >
+                {{ item }}
+              </span>
+            }
+          </div>
+        }
+        <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="flex items-center justify-between gap-2">
+            <p class="m-0 text-[11px] font-semibold text-[var(--text)]">Painel de risco</p>
+            <span class="text-[10px] text-[var(--text-muted)]">Atualização automática</span>
+          </div>
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1.15fr_1fr]">
             <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
-              <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
-              <strong class="mt-2 block text-[14px] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-              <p class="mt-1 text-[10px] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
+              <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira</p>
+              <div class="mt-2 flex items-center justify-between gap-2">
+                <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-semibold" [ngClass]="insightHealthToneClass">
+                  {{ insightDiagnostics.healthScore }}/100
+                </strong>
+                <span class="text-[10px] text-[var(--text-muted)]">Score mensal</span>
+              </div>
+              <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+                <div class="h-full rounded-full transition-all duration-300"
+                  [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
+                [style.width.%]="insightScoreGaugeWidth"></div>
+              </div>
+              @if (robotScoreBreakdown.length) {
+                <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-2">
+                  <p class="m-0 text-[10px] text-[var(--text-muted)]">Como chegamos nesse score:</p>
+                  <ul class="m-0 mt-1 list-disc pl-4 text-[10px] text-[var(--text-secondary)]">
+                    @for (item of robotScoreBreakdown; track trackByIndex($index, item)) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
+                </div>
+              }
             </article>
-          </div>
-        </div>
-        <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightOverdueToneClass">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
-              <strong class="mt-1 block text-[13px] font-semibold">
-                {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
-              </strong>
+            <div class="grid gap-2">
+              <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightRiskToneClass">
+                <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
+                <strong class="mt-2 block text-[13px] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
+              </article>
+              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+                <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
+                <strong class="mt-2 block text-[14px] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                <p class="mt-1 text-[10px] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
+              </article>
             </div>
           </div>
-          <div class="mt-2 grid gap-2" *ngIf="insightTodoItems.length; else noTodoItems">
-            <article
-              class="rounded-[10px] border px-2 py-2 text-[11px]"
-              *ngFor="let todo of insightTodoItems; trackBy: trackByIndex"
+          <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightOverdueToneClass">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
+                <strong class="mt-1 block text-[13px] font-semibold">
+                  {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
+                </strong>
+              </div>
+            </div>
+            @if (insightTodoItems.length) {
+              <div class="mt-2 grid gap-2">
+                @for (todo of insightTodoItems; track trackByIndex($index, todo)) {
+                  <article
+                    class="rounded-[10px] border px-2 py-2 text-[11px]"
               [ngClass]="todo.severity === 'danger'
                 ? 'border-rose-300/60 bg-rose-500/10 text-rose-700'
                 : todo.severity === 'warn'
                   ? 'border-amber-300/60 bg-amber-500/10 text-amber-700'
                   : 'border-sky-300/60 bg-sky-500/10 text-sky-700'">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <p class="m-0 flex-1">{{ todo.text }}</p>
-                <a
-                  class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text)]"
-                  [routerLink]="todo.route"
-                  [queryParams]="todo.queryParams">
-                  {{ todo.actionLabel }}
-                </a>
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <p class="m-0 flex-1">{{ todo.text }}</p>
+                      <a
+                        class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text)]"
+                        [routerLink]="todo.route"
+                        [queryParams]="todo.queryParams">
+                        {{ todo.actionLabel }}
+                      </a>
+                    </div>
+                  </article>
+                }
               </div>
-            </article>
-          </div>
-          <ng-template #noTodoItems>
-            <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem pendências acionáveis no momento.</p>
-          </ng-template>
-        </article>
-        <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]" *ngIf="cashflowProjection">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Simulação diária</p>
-              <strong class="mt-1 block text-[13px] font-semibold text-[var(--text)]">
-                Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | currency: 'BRL':'symbol':'1.2-2' }}
-              </strong>
-            </div>
-            <span class="text-[10px] text-[var(--text-muted)]">
-              Menor saldo:
-              {{ cashflowProjection.lowestBalance | currency: 'BRL':'symbol':'1.2-2' }}
-            </span>
-          </div>
-          <div class="mt-2 grid gap-2" *ngIf="projectionHighlights.length; else noProjection">
-            <div
-              class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[11px]"
-              *ngFor="let point of projectionHighlights; trackBy: trackByIndex"
+            } @else {
+              <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem pendências acionáveis no momento.</p>
+            }
+          </article>
+          @if (cashflowProjection) {
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Simulação diária</p>
+                  <strong class="mt-1 block text-[13px] font-semibold text-[var(--text)]">
+                    Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | currency: 'BRL':'symbol':'1.2-2' }}
+                  </strong>
+                </div>
+                <span class="text-[10px] text-[var(--text-muted)]">
+                  Menor saldo:
+                  {{ cashflowProjection.lowestBalance | currency: 'BRL':'symbol':'1.2-2' }}
+                </span>
+              </div>
+              @if (projectionHighlights.length) {
+                <div class="mt-2 grid gap-2">
+                  @for (point of projectionHighlights; track trackByIndex($index, point)) {
+                    <div
+                      class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[11px]"
               [ngClass]="point.tone === 'danger'
                 ? 'border-rose-300/60 bg-rose-500/10 text-rose-700'
                 : point.tone === 'warn'
                   ? 'border-amber-300/60 bg-amber-500/10 text-amber-700'
                   : 'border-emerald-300/60 bg-emerald-500/10 text-emerald-700'">
-              <strong>{{ point.dateLabel }}</strong>
-              <span>+{{ point.incomesAmount | currency: 'BRL':'symbol':'1.2-2' }} / -{{ point.expensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</span>
-              <strong>{{ point.closingBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                      <strong>{{ point.dateLabel }}</strong>
+                      <span>+{{ point.incomesAmount | currency: 'BRL':'symbol':'1.2-2' }} / -{{ point.expensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</span>
+                      <strong>{{ point.closingBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem eventos futuros no período selecionado.</p>
+              }
+            </article>
+          }
+        </div>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+            <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Comparação com mês anterior</p>
+            <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
+              @for (item of insightComparison; track trackByIndex($index, item)) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+            <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">O que mudou hoje</p>
+            <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
+              @for (item of insightChangesToday; track trackByIndex($index, item)) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
+          <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
+          <ul class="mt-2 list-disc pl-[var(--space-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
+            @for (tip of insightTips; track trackByIndex($index, tip)) {
+              <li>{{ tip }}</li>
+            }
+          </ul>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
+          <a class="btn-primary sm" routerLink="/despesas">Ver despesas</a>
+        </div>
+        <div class="fixed inset-x-0 bottom-0 z-[2200] border-t border-[var(--border)] bg-[var(--surface)]/95 p-3 backdrop-blur sm:hidden">
+          <div class="mx-auto flex max-w-[620px] items-center justify-end gap-2">
+            <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
+            <a class="btn-primary sm" routerLink="/despesas">Resolver agora</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @if (!isBasicProfile && metasResumo.total) {
+    <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
+          <p class="text-[11px] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-[11px] text-[var(--text-secondary)]">
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+            Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+          </span>
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+            Acumulado: <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+          </span>
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+            Falta: <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+          </span>
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
+            Progresso médio: <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong>
+          </span>
+        </div>
+      </div>
+      <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">Metas ativas</p>
+          <button
+            type="button"
+            class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+            aria-label="Como ler o resumo de metas">
+            i
+            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+              Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano.
+            </span>
+            <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+          </button>
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
+          <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+            Planejadas <strong>{{ metasResumo.planned }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+            Em andamento <strong>{{ metasResumo.inProgress }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+            Concluídas <strong>{{ metasResumo.completed }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+            Canceladas <strong>{{ metasResumo.canceled }}</strong>
+          </div>
+        </div>
+        <div class="grid gap-2">
+          <div class="inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] p-1">
+            <button
+              type="button"
+              class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
+              [ngClass]="metasVisao === 'progresso' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
+              (click)="metasVisao = 'progresso'">
+              Progresso
+            </button>
+            <button
+              type="button"
+              class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
+              [ngClass]="metasVisao === 'aporte' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
+              (click)="metasVisao = 'aporte'">
+              Por meta
+            </button>
+          </div>
+          @if (metasVisao === 'progresso') {
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]">
+              <div class="mb-2 h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+                <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--info))]" [style.width.%]="metasResumo.progressoMedio"></div>
+              </div>
+              <p class="text-[11px] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
+            </div>
+          }
+          @if (metasVisao === 'aporte') {
+            <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]">
+              @if (metasDetalhe.length) {
+                <div class="grid gap-2">
+                  @for (meta of metasDetalhe; track trackByIndex($index, meta)) {
+                    <div class="grid gap-2">
+                      <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="min-w-0">
+                          <strong class="block truncate text-[12px] text-[var(--text)]">{{ meta.title }}</strong>
+                          <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
+                            <span
+                              class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]"
+                              [ngClass]="meta.status === 'Completed' ? 'text-[var(--success)]' : meta.status === 'Canceled' ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)]'">
+                              {{ meta.statusLabel }}
+                            </span>
+                            @if (meta.targetDateLabel) {
+                              <span class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]">
+                                Meta até {{ meta.targetDateLabel }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-[11px] text-[var(--text-muted)]">{{ meta.progress | number:'1.0-0' }}%</span>
+                          <a class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/metas" aria-label="Ver detalhes da meta">
+                            ↗
+                          </a>
+                        </div>
+                      </div>
+                      <div class="flex h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+                        <div class="h-full bg-[linear-gradient(90deg,var(--success),rgba(34,197,94,0.35))]" [style.width.%]="meta.progress"></div>
+                        <div class="h-full bg-[linear-gradient(90deg,rgba(148,163,184,0.45),rgba(148,163,184,0.2))]" [style.width.%]="100 - meta.progress"></div>
+                      </div>
+                      @if (meta.expectedMonthly) {
+                        <div class="text-[10px] text-[var(--text-muted)]">
+                          Ritmo sugerido: <strong>{{ meta.expectedMonthly | currency: 'BRL':'symbol':'1.2-2' }}</strong> / mês
+                        </div>
+                      }
+                      <div class="flex flex-wrap justify-between gap-2 text-[11px] text-[var(--text-muted)]">
+                        <span>Aportado: <strong>{{ meta.current | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                        <span>Falta: <strong>{{ meta.remaining | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                        <span>Alvo: <strong>{{ meta.target | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-[11px] text-[var(--text-muted)]">Nenhuma meta ativa com valor de alvo definido.</p>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+  @if (!isBasicProfile && !isLoadingDashboard) {
+    <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1">
+      <div class="grid gap-3">
+        <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+          <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+            <div class="grid gap-1">
+              <p class="m-0 text-[12px] text-[var(--text-muted)]">Resultado do mês</p>
+              <span class="text-[11px] text-[var(--text-muted)]">Saldo anterior + receitas recebidas - despesas</span>
+            </div>
+            <button
+              type="button"
+              class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
+              aria-label="Como ler o gráfico de resultado do mês">
+              i
+              <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                Resultado considera somente receitas recebidas. Receitas pendentes aparecem separadas e não entram no saldo principal.
+              </span>
+              <span class="pointer-events-none absolute right-3 top-full z-10 mt-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+            </button>
+          </div>
+          <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
+            <div class="grid gap-1">
+              <span class="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[20px] font-semibold text-[var(--text)]">
+                  {{ saldoPrincipal | currency: 'BRL':'symbol':'1.2-2' }}
+                </span>
+                <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] text-[var(--text-muted)]">
+                  Saldo ant. {{ saldoAnterior | currency: 'BRL':'symbol':'1.2-2' }} • Recebidas {{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }} • Despesas {{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}
+                </span>
+              </div>
+              <span class="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-2 py-[2px] text-[10px] font-semibold text-amber-700">
+                <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
+                Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}
+              </span>
+            </div>
+            <div class="mt-3 grid gap-2">
+              <div class="flex h-[12px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+                <div
+                  class="h-full bg-[linear-gradient(90deg,var(--success),rgba(34,197,94,0.35))]"
+                [style.width.%]="saldoBasePercentual"></div>
+                <div
+                  class="h-full bg-[linear-gradient(90deg,var(--danger),rgba(239,68,68,0.35))]"
+                [style.width.%]="saldoDespesasPercentual"></div>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--text-muted)]">
+                <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.08)] px-2 py-[2px]">
+                  <span class="inline-block h-2 w-2 rounded-full bg-[rgba(34,197,94,0.9)]"></span>
+                  Base disponível
+                  <strong class="text-[var(--text)]">
+                    {{ saldoBasePercentual | number:'1.0-0' }}%
+                  </strong>
+                </span>
+                <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)] px-2 py-[2px]">
+                  <span class="inline-block h-2 w-2 rounded-full bg-[rgba(239,68,68,0.9)]"></span>
+                  Despesas
+                  <strong class="text-[var(--text)]">
+                    {{ saldoDespesasPercentual | number:'1.0-0' }}%
+                  </strong>
+                </span>
+              </div>
             </div>
           </div>
-          <ng-template #noProjection>
-            <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem eventos futuros no período selecionado.</p>
-          </ng-template>
-        </article>
-      </div>
-
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
-          <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Comparação com mês anterior</p>
-          <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
-            <li *ngFor="let item of insightComparison; trackBy: trackByIndex">{{ item }}</li>
-          </ul>
         </div>
-        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
-          <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">O que mudou hoje</p>
-          <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
-            <li *ngFor="let item of insightChangesToday; trackBy: trackByIndex">{{ item }}</li>
-          </ul>
-        </div>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
-        <ul class="mt-2 list-disc pl-[var(--space-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
-          <li *ngFor="let tip of insightTips; trackBy: trackByIndex">{{ tip }}</li>
-        </ul>
-      </div>
-      <div class="flex justify-end gap-2">
-        <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
-        <a class="btn-primary sm" routerLink="/despesas">Ver despesas</a>
-      </div>
-      <div class="fixed inset-x-0 bottom-0 z-[2200] border-t border-[var(--border)] bg-[var(--surface)]/95 p-3 backdrop-blur sm:hidden">
-        <div class="mx-auto flex max-w-[620px] items-center justify-end gap-2">
-          <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
-          <a class="btn-primary sm" routerLink="/despesas">Resolver agora</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]" *ngIf="!isBasicProfile && metasResumo.total">
-    <div class="flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
-        <p class="text-[11px] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
-      </div>
-      <div class="flex flex-wrap gap-2 text-[11px] text-[var(--text-secondary)]">
-        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-          Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        </span>
-        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-          Acumulado: <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        </span>
-        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-          Falta: <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        </span>
-        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-          Progresso médio: <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong>
-        </span>
-      </div>
-    </div>
-    <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">Metas ativas</p>
-        <button
-          type="button"
-          class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-          aria-label="Como ler o resumo de metas">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-      <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
-        <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
-          Planejadas <strong>{{ metasResumo.planned }}</strong>
-        </div>
-        <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
-          Em andamento <strong>{{ metasResumo.inProgress }}</strong>
-        </div>
-        <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
-          Concluídas <strong>{{ metasResumo.completed }}</strong>
-        </div>
-        <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
-          Canceladas <strong>{{ metasResumo.canceled }}</strong>
-        </div>
-      </div>
-      <div class="grid gap-2">
-        <div class="inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] p-1">
-          <button
-            type="button"
-            class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
-            [ngClass]="metasVisao === 'progresso' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
-            (click)="metasVisao = 'progresso'">
-            Progresso
-          </button>
-          <button
-            type="button"
-            class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
-            [ngClass]="metasVisao === 'aporte' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
-            (click)="metasVisao = 'aporte'">
-            Por meta
-          </button>
-        </div>
-        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'progresso'">
-          <div class="mb-2 h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-            <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--info))]" [style.width.%]="metasResumo.progressoMedio"></div>
-          </div>
-          <p class="text-[11px] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
-        </div>
-        <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]" *ngIf="metasVisao === 'aporte'">
-          <div class="grid gap-2" *ngIf="metasDetalhe.length; else semMetasDetalhe">
-            <div class="grid gap-2" *ngFor="let meta of metasDetalhe; trackBy: trackByIndex">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="min-w-0">
-                  <strong class="block truncate text-[12px] text-[var(--text)]">{{ meta.title }}</strong>
-                  <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
-                    <span
-                      class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]"
-                      [ngClass]="meta.status === 'Completed' ? 'text-[var(--success)]' : meta.status === 'Canceled' ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)]'">
-                      {{ meta.statusLabel }}
-                    </span>
-                    <span *ngIf="meta.targetDateLabel" class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]">
-                      Meta até {{ meta.targetDateLabel }}
-                    </span>
+        <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1">
+          <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+            <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
+            @if (expenseCategorySlices.length) {
+              <div class="grid gap-3">
+                <div class="expense-donut-wrap">
+                  <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuicao de despesas por categoria">
+                    <div class="expense-donut__center">
+                      <small>Total</small>
+                      <strong>{{ expenseCategoryTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
+                    </div>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px] text-[var(--text-muted)]">{{ meta.progress | number:'1.0-0' }}%</span>
-                  <a class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/metas" aria-label="Ver detalhes da meta">
-                    ↗
-                  </a>
+                <div class="grid gap-2">
+                  @for (item of expenseCategorySlices | slice:0:5; track trackByIndex($index, item)) {
+                    <div class="flex items-center justify-between text-[12px]">
+                      <span class="inline-flex min-w-0 items-center gap-2">
+                        <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
+                        <span class="truncate font-semibold">{{ item.label }}</span>
+                      </span>
+                      <span class="font-semibold text-[var(--text)]">
+                        {{ item.percent | number:'1.0-0' }}%
+                      </span>
+                    </div>
+                  }
                 </div>
               </div>
-              <div class="flex h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-                <div class="h-full bg-[linear-gradient(90deg,var(--success),rgba(34,197,94,0.35))]" [style.width.%]="meta.progress"></div>
-                <div class="h-full bg-[linear-gradient(90deg,rgba(148,163,184,0.45),rgba(148,163,184,0.2))]" [style.width.%]="100 - meta.progress"></div>
-              </div>
-              <div class="text-[10px] text-[var(--text-muted)]" *ngIf="meta.expectedMonthly">
-                Ritmo sugerido: <strong>{{ meta.expectedMonthly | currency: 'BRL':'symbol':'1.2-2' }}</strong> / mês
-              </div>
-              <div class="flex flex-wrap justify-between gap-2 text-[11px] text-[var(--text-muted)]">
-                <span>Aportado: <strong>{{ meta.current | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-                <span>Falta: <strong>{{ meta.remaining | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-                <span>Alvo: <strong>{{ meta.target | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-              </div>
-            </div>
+            } @else {
+              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem despesas.</div>
+            }
           </div>
-          <ng-template #semMetasDetalhe>
-            <p class="text-[11px] text-[var(--text-muted)]">Nenhuma meta ativa com valor de alvo definido.</p>
-          </ng-template>
+          <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+            <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por categoria</p>
+            @if (incomeSourceSlices.length) {
+              <div class="grid gap-3">
+                <div class="expense-donut-wrap">
+                  <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuicao de receitas por categoria">
+                    <div class="expense-donut__center">
+                      <small>Total</small>
+                      <strong>{{ incomeSourceTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid gap-2">
+                  @for (item of incomeSourceSlices | slice:0:5; track trackByIndex($index, item)) {
+                    <div class="flex items-center justify-between text-[12px]">
+                      <span class="inline-flex min-w-0 items-center gap-2">
+                        <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
+                        <span class="truncate font-semibold">{{ item.label }}</span>
+                      </span>
+                      <span class="font-semibold text-[var(--text)]">
+                        {{ item.percent | number:'1.0-0' }}%
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem receitas por categoria.</div>
+            }
+          </div>
         </div>
       </div>
+      <aside class="grid grid-rows-[auto_minmax(0,1fr)] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="m-0 text-[13px] font-semibold text-[var(--text)]">Movimentos recentes</p>
+            <span class="text-[12px] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
+          </div>
+          <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
+            i
+            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+              Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido.
+            </span>
+            <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
+          </button>
+        </div>
+        @if (recentTransactions.length) {
+          <div class="grid gap-2 min-h-0 overflow-y-auto pr-1">
+            @for (item of recentTransactions; track trackByIndex($index, item)) {
+              <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]">
+                <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
+                  <span
+                    class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[12px] font-semibold text-[var(--text)]"
+                    [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.2)] text-[var(--success)]' : 'bg-[rgba(239,68,68,0.2)] text-[var(--danger)]'">
+                    {{ item.type === 'income' ? '↑' : '↓' }}
+                  </span>
+                  <div class="min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                      <strong class="block truncate text-[12px]">{{ item.title }}</strong>
+                    </div>
+                    <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
+                      <span>{{ item.date }}</span>
+                      <span class="opacity-70">•</span>
+                      <span
+                        class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-medium"
+                        [ngClass]="item.status === 'Pago' ? 'text-[var(--success)]' : item.status === 'Pendente' ? 'text-[var(--warning)]' : 'text-[var(--text-secondary)]'">
+                        {{ item.status }}
+                      </span>
+                      @if (item.recurring) {
+                        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <div class="flex items-center gap-2">
+                    <div class="text-[13px] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                      {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+                    </div>
+                    <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
+                      ↗
+                    </a>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-[11px] text-[var(--text-muted)]">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
+        }
+      </aside>
     </div>
-  </div>
-
-  <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1" *ngIf="!isBasicProfile && !isLoadingDashboard">
-    <div class="grid gap-3">
-      <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-      <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
-        <div class="grid gap-1">
-          <p class="m-0 text-[12px] text-[var(--text-muted)]">Resultado do mês</p>
-          <span class="text-[11px] text-[var(--text-muted)]">Saldo anterior + receitas recebidas - despesas</span>
-        </div>
-        <button
-          type="button"
-          class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-          aria-label="Como ler o gráfico de resultado do mês">
-          i
-          <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Resultado considera somente receitas recebidas. Receitas pendentes aparecem separadas e não entram no saldo principal.
-          </span>
-          <span class="pointer-events-none absolute right-3 top-full z-10 mt-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-
-      <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
-        <div class="grid gap-1">
-          <span class="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
-          <div class="flex items-center gap-2">
-            <span class="text-[20px] font-semibold text-[var(--text)]">
-              {{ saldoPrincipal | currency: 'BRL':'symbol':'1.2-2' }}
-            </span>
-            <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] text-[var(--text-muted)]">
-              Saldo ant. {{ saldoAnterior | currency: 'BRL':'symbol':'1.2-2' }} • Recebidas {{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }} • Despesas {{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}
-            </span>
-          </div>
-          <span class="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-2 py-[2px] text-[10px] font-semibold text-amber-700">
-            <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-            Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}
-          </span>
-        </div>
-
-        <div class="mt-3 grid gap-2">
-          <div class="flex h-[12px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-            <div
-              class="h-full bg-[linear-gradient(90deg,var(--success),rgba(34,197,94,0.35))]"
-              [style.width.%]="saldoBasePercentual"></div>
-            <div
-              class="h-full bg-[linear-gradient(90deg,var(--danger),rgba(239,68,68,0.35))]"
-              [style.width.%]="saldoDespesasPercentual"></div>
-          </div>
-          <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--text-muted)]">
-            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.08)] px-2 py-[2px]">
-              <span class="inline-block h-2 w-2 rounded-full bg-[rgba(34,197,94,0.9)]"></span>
-              Base disponível
-              <strong class="text-[var(--text)]">
-                {{ saldoBasePercentual | number:'1.0-0' }}%
-              </strong>
-            </span>
-            <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)] px-2 py-[2px]">
-              <span class="inline-block h-2 w-2 rounded-full bg-[rgba(239,68,68,0.9)]"></span>
-              Despesas
-              <strong class="text-[var(--text)]">
-                {{ saldoDespesasPercentual | number:'1.0-0' }}%
-              </strong>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1">
-      <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-        <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
-        <div class="grid gap-3" *ngIf="expenseCategorySlices.length; else despesasVazio5">
-          <div class="expense-donut-wrap">
-            <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuicao de despesas por categoria">
-              <div class="expense-donut__center">
-                <small>Total</small>
-                <strong>{{ expenseCategoryTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="grid gap-2">
-            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of expenseCategorySlices | slice:0:5; trackBy: trackByIndex">
-              <span class="inline-flex min-w-0 items-center gap-2">
-                <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
-                <span class="truncate font-semibold">{{ item.label }}</span>
-              </span>
-              <span class="font-semibold text-[var(--text)]">
-                {{ item.percent | number:'1.0-0' }}%
-              </span>
-            </div>
-          </div>
-        </div>
-        <ng-template #despesasVazio5>
-          <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem despesas.</div>
-        </ng-template>
-      </div>
-      <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-        <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por categoria</p>
-        <div class="grid gap-3" *ngIf="incomeSourceSlices.length; else receitasVazio5">
-          <div class="expense-donut-wrap">
-            <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuicao de receitas por categoria">
-              <div class="expense-donut__center">
-                <small>Total</small>
-                <strong>{{ incomeSourceTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="grid gap-2">
-            <div class="flex items-center justify-between text-[12px]" *ngFor="let item of incomeSourceSlices | slice:0:5; trackBy: trackByIndex">
-              <span class="inline-flex min-w-0 items-center gap-2">
-                <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
-                <span class="truncate font-semibold">{{ item.label }}</span>
-              </span>
-              <span class="font-semibold text-[var(--text)]">
-                {{ item.percent | number:'1.0-0' }}%
-              </span>
-            </div>
-          </div>
-        </div>
-        <ng-template #receitasVazio5>
-          <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem receitas por categoria.</div>
-        </ng-template>
-      </div>
-    </div>
-  </div>
-
-    <aside class="grid grid-rows-[auto_minmax(0,1fr)] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="m-0 text-[13px] font-semibold text-[var(--text)]">Movimentos recentes</p>
-          <span class="text-[12px] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
-        </div>
-        <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
-          i
-          <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-            Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido.
-          </span>
-          <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-        </button>
-      </div>
-      <div class="grid gap-2 min-h-0 overflow-y-auto pr-1" *ngIf="recentTransactions.length; else semMovimentos">
-        <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]" *ngFor="let item of recentTransactions; trackBy: trackByIndex">
-          <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
-            <span
-              class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[12px] font-semibold text-[var(--text)]"
-              [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.2)] text-[var(--success)]' : 'bg-[rgba(239,68,68,0.2)] text-[var(--danger)]'">
-              {{ item.type === 'income' ? '↑' : '↓' }}
-            </span>
-            <div class="min-w-0">
-              <div class="flex items-center justify-between gap-2">
-                <strong class="block truncate text-[12px]">{{ item.title }}</strong>
-              </div>
-              <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
-                <span>{{ item.date }}</span>
-                <span class="opacity-70">•</span>
-                <span
-                  class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-medium"
-                  [ngClass]="item.status === 'Pago' ? 'text-[var(--success)]' : item.status === 'Pendente' ? 'text-[var(--warning)]' : 'text-[var(--text-secondary)]'">
-                  {{ item.status }}
-                </span>
-                <span *ngIf="item.recurring" class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col items-end gap-2">
-            <div class="flex items-center gap-2">
-              <div class="text-[13px] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
-                {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
-              </div>
-              <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
-                ↗
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <ng-template #semMovimentos>
-        <p class="text-[11px] text-[var(--text-muted)]">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
-      </ng-template>
-    </aside>
-  </div>
-
+  }
 </section>
+}

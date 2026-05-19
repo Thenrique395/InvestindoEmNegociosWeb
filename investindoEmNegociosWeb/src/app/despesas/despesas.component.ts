@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TitleCasePipe, NgIf, DecimalPipe, NgFor, NgClass } from '@angular/common';
+import { TitleCasePipe, DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -33,15 +33,13 @@ import {
   standalone: true,
   imports: [
     TitleCasePipe,
-    NgIf,
-    NgFor,
     NgClass,
     DecimalPipe,
     FormsModule,
     DespesasListaComponent,
     DespesasFormComponent,
     InvoiceImportComponent
-  ],
+],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss']
 })
@@ -1115,7 +1113,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
       return acc;
     }, {} as Record<string, StoredExpense[]>);
   }
-  trackByIndex(index: number): number {
+  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 

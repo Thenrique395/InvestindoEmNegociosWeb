@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DecimalPipe, NgIf, NgClass } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
@@ -26,7 +26,7 @@ import {
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgIf, NgClass, FormsModule],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })
@@ -714,6 +714,10 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     }
     this.sortBy = campo;
     this.sortDir = 1;
+  }
+
+  trackByIndex(index: number, _item?: unknown): number {
+    return index;
   }
 
   private mesKey(): string {

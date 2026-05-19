@@ -30,6 +30,7 @@ export const MARKETING_PLANS: MarketingPlan[] = [
       'Dashboard financeiro do mês',
       'Receitas, despesas e categorias',
       'Metas financeiras e onboarding guiado',
+      'Calendário financeiro',
       'Calculadora financeira'
     ],
     limits: [

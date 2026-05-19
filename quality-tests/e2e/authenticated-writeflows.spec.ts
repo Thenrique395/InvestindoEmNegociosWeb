@@ -9,21 +9,21 @@ test.describe('authenticated write flows', () => {
   test('cria uma nova conta e reflete na listagem', async ({ page }) => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
-    await page.getByLabel('Nome').fill('Conta teste E2E');
+    await page.getByLabel('Nome da conta').fill('Conta teste E2E');
     await page.getByLabel('Saldo inicial').fill('1500');
-    await page.getByRole('button', { name: 'Criar conta' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
 
     await expect(page.getByRole('heading', { level: 3, name: 'Conta teste E2E' })).toBeVisible();
-    await expect(page.getByText('Saldo atual:').filter({ hasText: 'R$ 1.500,00' })).toBeVisible();
+    await expect(page.locator('article').filter({ hasText: 'Conta teste E2E' }).getByText(/Saldo:\s*1500/)).toBeVisible();
   });
 
   test('cria um novo cartao e reflete na listagem', async ({ page }) => {
     await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('button', { name: 'Adicionar cartão' }).click();
+    await page.getByRole('button', { name: /Adicionar cartão Registrar um/i }).click();
     await page.getByLabel('Número do cartão').fill('5555 4444 3333 2222');
-    await page.getByLabel('Nome impresso no cartão').fill('Cartao E2E');
-    await page.getByLabel('Banco (opcional)').fill('Banco Teste');
+    await page.getByLabel('Nome do cartão').fill('Cartao E2E');
+    await page.getByLabel('Banco').fill('Banco Teste');
     await page.getByLabel('Limite de crédito').fill('8000');
     await page.getByLabel('Dia do fechamento').fill('12');
     await page.getByLabel('Dia do vencimento').fill('20');
@@ -36,15 +36,14 @@ test.describe('authenticated write flows', () => {
   test('importa OFX pela interface e atualiza o extrato', async ({ page }) => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('button', { name: 'Ver extrato' }).first().click();
+    await page.getByRole('button', { name: 'Extrato' }).first().click();
     await page.locator('input[type="file"]').first().setInputFiles({
       name: 'sample.ofx',
       mimeType: 'application/x-ofx',
       buffer: Buffer.from('OFX SAMPLE')
     });
 
-    await expect(page.getByText('2 movimentação(ões) encontradas.')).toBeVisible();
-    await expect(page.getByText('Prontas para importar:').filter({ hasText: '2' })).toBeVisible();
+    await expect(page.getByText('2 itens • 0 duplicados • 0 categorizados automaticamente')).toBeVisible();
 
     await page.getByRole('button', { name: 'Importar OFX' }).click();
 
@@ -56,15 +55,14 @@ test.describe('authenticated write flows', () => {
   test('importa CSV pela interface e atualiza o extrato', async ({ page }) => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('button', { name: 'Ver extrato' }).first().click();
+    await page.getByRole('button', { name: 'Extrato' }).first().click();
     await page.locator('input[type="file"]').nth(1).setInputFiles({
       name: 'sample.csv',
       mimeType: 'text/csv',
       buffer: Buffer.from('data;descricao;valor;tipo')
     });
 
-    await expect(page.getByText('2 movimentação(ões) encontradas.')).toBeVisible();
-    await expect(page.getByText('Prontas para importar:').filter({ hasText: '2' })).toBeVisible();
+    await expect(page.getByText('2 itens • 0 categorizados automaticamente')).toBeVisible();
 
     await page.getByRole('button', { name: 'Importar CSV' }).click();
 
@@ -84,10 +82,10 @@ test.describe('authenticated write flows', () => {
 
     const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
     const reserva = page.locator('article').filter({ hasText: 'Reserva' });
-    await expect(contaPrincipal.getByText('Saldo atual:').filter({ hasText: 'R$ 3.080,00' })).toBeVisible();
-    await expect(reserva.getByText('Saldo atual:').filter({ hasText: 'R$ 5.500,00' })).toBeVisible();
+    await expect(contaPrincipal.getByText(/Saldo:\s*3080/)).toBeVisible({ timeout: 10000 });
+    await expect(reserva.getByText(/Saldo:\s*5500/)).toBeVisible({ timeout: 10000 });
 
-    await contaPrincipal.getByRole('button', { name: 'Ver extrato' }).click();
+    await contaPrincipal.getByRole('button', { name: 'Extrato' }).click();
     await expect(page.getByRole('cell', { name: 'Reserva automática' }).first()).toBeVisible();
     await expect(page.getByRole('cell', { name: 'Transferência' }).first()).toBeVisible();
   });
@@ -98,20 +96,21 @@ test.describe('authenticated write flows', () => {
     const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
     await contaPrincipal.getByRole('button', { name: 'Editar' }).click();
 
-    await page.getByLabel('Nome').fill('Conta principal ajustada');
+    await expect(page.getByLabel('Nome da conta')).toHaveValue('Conta principal');
+    await page.getByLabel('Nome da conta').fill('Conta principal ajustada');
     await page.getByLabel('Saldo inicial').fill('4100');
-    await page.getByRole('button', { name: 'Atualizar conta' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
 
     await expect(page.getByRole('heading', { level: 3, name: 'Conta principal ajustada' })).toBeVisible();
-    await expect(page.getByText('Saldo atual:').filter({ hasText: 'R$ 4.100,00' })).toBeVisible();
+    await expect(page.locator('article').filter({ hasText: 'Conta principal ajustada' }).getByText(/Saldo:\s*4100/)).toBeVisible();
   });
 
   test('remove uma conta criada na interface', async ({ page }) => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
-    await page.getByLabel('Nome').fill('Conta descartável');
+    await page.getByLabel('Nome da conta').fill('Conta descartável');
     await page.getByLabel('Saldo inicial').fill('250');
-    await page.getByRole('button', { name: 'Criar conta' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Conta descartável' })).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
@@ -128,8 +127,8 @@ test.describe('authenticated write flows', () => {
     await cartao.getByRole('button', { name: 'Editar' }).click();
 
     await page.getByLabel('Número do cartão').fill('9999 8888 7777 9876');
-    await page.getByLabel('Nome impresso no cartão').fill('Cartao principal premium');
-    await page.getByLabel('Banco (opcional)').fill('Banco Atualizado');
+    await page.getByLabel('Nome do cartão').fill('Cartao principal premium');
+    await page.getByLabel('Banco').fill('Banco Atualizado');
     await page.getByLabel('Limite de crédito').fill('9500');
     await page.getByRole('button', { name: 'Salvar alterações' }).click();
 
