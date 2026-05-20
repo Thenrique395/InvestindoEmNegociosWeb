@@ -108,6 +108,12 @@ jobs:
             set -euo pipefail
             mkdir -p "$DEPLOY_PATH"
             cd "$DEPLOY_PATH"
+            FRONTEND_PORT="$(printf '%s' "${FRONTEND_PORT:-}" | tr -d '[:space:]')"
+            if ! printf '%s' "$FRONTEND_PORT" | grep -Eq '^[0-9]+$'; then
+              echo "FRONTEND_PORT must be numeric."
+              exit 1
+            fi
+            export FRONTEND_PORT
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             docker compose -p "$STACK_NAME" config >/dev/null
             docker compose -p "$STACK_NAME" pull
@@ -151,6 +157,12 @@ jobs:
             set -euo pipefail
             mkdir -p "$DEPLOY_PATH"
             cd "$DEPLOY_PATH"
+            FRONTEND_PORT="$(printf '%s' "${FRONTEND_PORT:-}" | tr -d '[:space:]')"
+            if ! printf '%s' "$FRONTEND_PORT" | grep -Eq '^[0-9]+$'; then
+              echo "FRONTEND_PORT must be numeric."
+              exit 1
+            fi
+            export FRONTEND_PORT
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             docker compose -p "$STACK_NAME" config >/dev/null
             docker compose -p "$STACK_NAME" pull
