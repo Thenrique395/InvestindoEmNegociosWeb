@@ -17,7 +17,7 @@
         <a href="/" (click)="goToPublicHome($event)">Início</a>
         <a href="/#produto" (click)="scrollToPublicSection('produto', $event)">Produto</a>
         <a href="/#como-funciona" (click)="scrollToPublicSection('como-funciona', $event)">Como funciona</a>
-        <a routerLink="/planos" routerLinkActive="active">Planos</a>
+        <a href="/#planos" (click)="scrollToPublicSection('planos', $event)">Planos</a>
         <a href="/#faq" (click)="scrollToPublicSection('faq', $event)">FAQ</a>
       </nav>
       <div class="topbar__actions">
