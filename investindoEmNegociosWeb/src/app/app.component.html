@@ -14,10 +14,11 @@
         </a>
       </div>
       <nav class="menu">
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="reloadIfSame('/', $event)">Início</a>
-        <a routerLink="/" fragment="produto">Produto</a>
+        <a href="/" (click)="goToPublicHome($event)">Início</a>
+        <a href="/#produto" (click)="scrollToPublicSection('produto', $event)">Produto</a>
+        <a href="/#como-funciona" (click)="scrollToPublicSection('como-funciona', $event)">Como funciona</a>
         <a routerLink="/planos" routerLinkActive="active">Planos</a>
-        <a routerLink="/calculadora" routerLinkActive="active" (click)="reloadIfSame('/calculadora', $event)">Calculadora</a>
+        <a href="/#faq" (click)="scrollToPublicSection('faq', $event)">FAQ</a>
       </nav>
       <div class="topbar__actions">
         <a class="signup-link" routerLink="/checkout" [queryParams]="{ plan: 'intermediate', cycle: 'Monthly' }">Contratar</a>

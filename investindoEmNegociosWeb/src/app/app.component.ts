@@ -115,6 +115,29 @@ export class AppComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/login');
   }
 
+  goToPublicHome(event?: Event): void {
+    event?.preventDefault();
+    this.router.navigateByUrl('/').then(() => {
+      if (!this.isBrowser || typeof window === 'undefined') return;
+      window.history.replaceState(null, '', '/');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  scrollToPublicSection(sectionId: string, event?: Event): void {
+    event?.preventDefault();
+    const scroll = () => this.scrollToElement(sectionId);
+
+    if (this.getCurrentPath() === '/') {
+      scroll();
+      return;
+    }
+
+    this.router.navigate(['/']).then(() => {
+      window.setTimeout(scroll, 0);
+    });
+  }
+
   openSignup(): void {
     this.showSignupModal = true;
   }
@@ -137,6 +160,15 @@ export class AppComponent implements OnInit, OnDestroy {
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as Element | null;
     if (!target) return;
+
+    const publicAnchor = target.closest<HTMLAnchorElement>('.menu a[href^="/#"]');
+    if (publicAnchor) {
+      const sectionId = publicAnchor.getAttribute('href')?.split('#')[1];
+      if (sectionId) {
+        this.scrollToPublicSection(sectionId, event);
+        return;
+      }
+    }
 
     if (this.notificationsOpen && !target.closest('.notifications')) {
       this.notificationsOpen = false;
@@ -335,6 +367,18 @@ export class AppComponent implements OnInit, OnDestroy {
         this.apiDataService.refresh();
       }
     }
+  }
+
+  private scrollToElement(sectionId: string): void {
+    if (!this.isBrowser || typeof document === 'undefined' || typeof window === 'undefined') return;
+
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+
+    const headerOffset = 72;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.history.pushState(null, '', `/#${sectionId}`);
+    window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
   }
 
   goToPreferences(event?: Event): void {
