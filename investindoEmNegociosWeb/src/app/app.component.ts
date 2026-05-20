@@ -163,7 +163,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const target = event.target as Element | null;
     if (!target) return;
 
-    const publicAnchor = target.closest<HTMLAnchorElement>('.menu a[href^="/#"]');
+    const publicAnchor = target.closest<HTMLAnchorElement>('a[href^="/#"]');
     if (publicAnchor) {
       const sectionId = publicAnchor.getAttribute('href')?.split('#')[1];
       if (sectionId) {
