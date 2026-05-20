@@ -117,11 +117,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   goToPublicHome(event?: Event): void {
     event?.preventDefault();
-    this.router.navigateByUrl('/').then(() => {
-      if (!this.isBrowser || typeof window === 'undefined') return;
-      window.history.replaceState(null, '', '/');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+
+    if (this.getCurrentPath() === '/') {
+      this.scrollToPublicTop();
+      return;
+    }
+
+    this.router.navigateByUrl('/').then(() => this.scrollToPublicTop());
   }
 
   scrollToPublicSection(sectionId: string, event?: Event): void {
@@ -168,6 +170,12 @@ export class AppComponent implements OnInit, OnDestroy {
         this.scrollToPublicSection(sectionId, event);
         return;
       }
+    }
+
+    const publicHome = target.closest<HTMLAnchorElement>('.menu a[href="/"]');
+    if (publicHome) {
+      this.goToPublicHome(event);
+      return;
     }
 
     if (this.notificationsOpen && !target.closest('.notifications')) {
@@ -379,6 +387,15 @@ export class AppComponent implements OnInit, OnDestroy {
     const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
     window.history.pushState(null, '', `/#${sectionId}`);
     window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+  }
+
+  private scrollToPublicTop(): void {
+    if (!this.isBrowser || typeof window === 'undefined') return;
+
+    window.history.replaceState(null, '', '/');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 80);
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 250);
   }
 
   goToPreferences(event?: Event): void {
