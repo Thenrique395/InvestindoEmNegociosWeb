@@ -1,8 +1,8 @@
 services:
   frontend:
-    image: ghcr.io/thenrique395/investindoemnegociosweb:latest
+    image: ${FRONTEND_IMAGE:-ghcr.io/thenrique395/investindoemnegociosweb:latest}
     ports:
-      - "4200:4000"
+      - "${FRONTEND_PORT:-4200}:4000"
     environment:
       PORT: 4000
       API_BASE_URL: ${API_BASE_URL:-http://35.174.50.187:5059/api/v1}
