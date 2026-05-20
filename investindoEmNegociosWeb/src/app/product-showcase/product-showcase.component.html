@@ -1,247 +1,192 @@
 <section class="showcase">
-  <section id="visao" class="hero">
-    <div class="hero__grid">
+  <section id="produto" class="hero">
+    <div class="hero__content">
+      <p class="eyebrow">Produto financeiro pessoal</p>
+      <h1>Sua rotina financeira com clareza</h1>
+      <p class="hero__lead">
+        Organize receitas, despesas, cartões e metas em um só lugar para entender o mês e decidir o próximo passo.
+      </p>
+      <div class="hero__actions">
+        <a routerLink="/register" class="button button--primary">
+          Começar agora
+          <span aria-hidden="true">→</span>
+        </a>
+        <a routerLink="/planos" class="button button--secondary">Ver planos</a>
+      </div>
+      <div class="hero__signals" aria-label="Principais benefícios">
+        <span>Saldo real do mês</span>
+        <span>Cartões e metas no mesmo fluxo</span>
+        <span>Calendário e calculadoras liberados</span>
+      </div>
+    </div>
+
+    <div class="hero__visual" aria-label="Pessoa controlando suas finanças pelo dashboard">
+      <article class="hero-image-card">
+        <img
+          src="assets/landing/hero-financial-control.png"
+          alt="Pessoa acompanhando o dashboard financeiro do Investindo em Negócios"
+          width="1408"
+          height="768"
+          loading="eager"
+          decoding="async" />
+      </article>
+    </div>
+  </section>
+
+  <section class="section section--steps">
+    <div class="section__intro">
+      <p class="eyebrow">Como funciona</p>
+      <h2>Do primeiro lançamento à leitura do mês em poucos passos</h2>
+      <p>
+        A experiência foi pensada para sair da planilha e transformar registros soltos em uma visão financeira útil.
+      </p>
+    </div>
+    <div class="steps-grid">
+      <article>
+        <span>01</span>
+        <h3>Cadastre sua base</h3>
+        <p>Informe contas, entradas, despesas recorrentes e cartões para montar a primeira leitura do mês.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h3>Acompanhe a rotina</h3>
+        <p>Use calendário, categorias e faturas para entender o que entrou, o que saiu e o que ainda vence.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Decida o próximo passo</h3>
+        <p>Veja sinais de atenção, metas e projeções antes do mês fechar no aperto.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="recursos" class="section">
+    <div class="section__intro section__intro--split">
       <div>
-        <p class="tag">Produto</p>
-        <h1>Uma plataforma para sair do caos financeiro e ganhar clareza sobre o próximo passo</h1>
-        <p>
-          O Investindo em Negócios reúne orçamento, contas, cartões, metas e patrimônio no mesmo fluxo. O objetivo não
-          é só registrar gasto: é ajudar você a decidir melhor mês a mês.
-        </p>
-        <div class="hero__actions">
-          <a routerLink="/planos" class="btn btn--primary">Ver planos</a>
-          <a routerLink="/checkout" [queryParams]="{ plan: 'intermediate', cycle: 'Monthly' }" class="btn btn--ghost">Começar contratação</a>
-        </div>
-        <div class="hero__proof">
-          <span>✓ Fluxo mensal com saldo real, risco e projeção</span>
-          <span>✓ Cartões e faturas sem digitação manual</span>
-          <span>✓ Metas, patrimônio e evolução financeira no mesmo contexto</span>
-        </div>
+        <p class="eyebrow">Recursos</p>
+        <h2>Controle financeiro com contexto, não só lançamento</h2>
       </div>
-      <div class="hero__media">
-        <span class="hero__shape hero__shape--one" aria-hidden="true"></span>
-        <span class="hero__shape hero__shape--two" aria-hidden="true"></span>
-        <article class="hero__mockup">
-          <div class="hero__mockup-header">
-            <img
-              src="assets/logoHeaderInvestindoemNegocios2.png"
-              alt="Investindo em Negócios"
-              class="hero__logo"
-              width="28"
-              height="28"
-              decoding="async" />
-            <span>Fluxo financeiro</span>
-          </div>
-          <div class="hero__mockup-body">
-            <div class="hero__mockup-summary">
-              <div>
-                <small>Receitas</small>
-                <strong class="income">R$ 8.450</strong>
-              </div>
-              <div>
-                <small>Despesas</small>
-                <strong class="expense">R$ 5.980</strong>
-              </div>
-              <div>
-                <small>Saldo do mês</small>
-                <strong class="balance">+ R$ 2.470</strong>
-              </div>
-            </div>
-            <div class="hero__mockup-chart" aria-hidden="true">
-              <div class="bar-row">
-                <span>Receitas</span>
-                <div class="track"><div class="fill fill--income"></div></div>
-              </div>
-              <div class="bar-row">
-                <span>Despesas</span>
-                <div class="track"><div class="fill fill--expense"></div></div>
-              </div>
-            </div>
-            <div class="hero__mockup-benefit">
-              <strong>Leitura de negócio:</strong>
-              <small>menos improviso financeiro e mais previsibilidade para agir antes do aperto.</small>
-            </div>
-            <div class="hero__mockup-extra">
-              <div class="hero__extra-item">
-                <small>Despesas fixas</small>
-                <strong>R$ 3.420</strong>
-              </div>
-              <div class="hero__extra-item">
-                <small>Despesas variáveis</small>
-                <strong>R$ 2.560</strong>
-              </div>
-              <div class="hero__extra-item">
-                <small>Meta de economia</small>
-                <strong>72% concluída</strong>
-              </div>
-            </div>
-            <div class="hero__mockup-alert">
-              <strong>Insight automático:</strong>
-              Seu fechamento do mês ainda sustenta a meta, mas o risco aumenta se a próxima fatura subir.
-            </div>
-          </div>
-        </article>
-      </div>
+      <p>
+        Cada módulo ajuda a responder uma pergunta prática sobre o seu dinheiro, mantendo tudo conectado ao mesmo mês.
+      </p>
     </div>
-  </section>
 
-  <section class="block block--inside">
-    <h2>Como o produto funciona na prática</h2>
-    <p class="block__lead">
-      A proposta é simples: transformar rotina financeira solta em um sistema contínuo de leitura, decisão e execução.
-    </p>
-    <div class="inside-grid">
-      <article class="inside-card">
-        <p class="inside-card__kicker">Visão do mês</p>
-        <h3>Entenda receita, despesa, saldo e risco sem montar planilha manual.</h3>
-        <div class="system-shot system-shot--dashboard" role="img" aria-label="Tela de dashboard da carteira">
-          <span>Dashboard financeiro</span>
+    <div class="feature-grid">
+      <article class="feature-card feature-card--large">
+        <div class="feature-card__mock feature-card__mock--calendar">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
+        <p class="eyebrow">Dashboard</p>
+        <h3>Entenda o saldo real sem montar cálculo manual</h3>
+        <p>Resumo de entradas, saídas, pendências e situação do mês em uma leitura direta.</p>
       </article>
-      <article class="inside-card">
-        <p class="inside-card__kicker">Cartões e faturas</p>
-        <h3>Importe a fatura, concilie lançamentos e feche competência com menos atrito.</h3>
-        <div class="system-shot system-shot--cartoes" role="img" aria-label="Tela de cartões e faturas">
-          <span>Cartões e faturas</span>
-        </div>
+      <article class="feature-card">
+        <p class="eyebrow">Cartões</p>
+        <h3>Fatura e compras dentro do mesmo fluxo</h3>
+        <p>Organize vencimento, fechamento, parcelas e impacto no caixa.</p>
       </article>
-      <article class="inside-card">
-        <p class="inside-card__kicker">Metas financeiras</p>
-        <h3>Defina meta, acompanhe progresso e receba alertas quando sair do esperado.</h3>
-        <div class="system-shot system-shot--metas" role="img" aria-label="Tela de metas financeiras">
-          <span>Metas</span>
-        </div>
+      <article class="feature-card feature-card--dark">
+        <p class="eyebrow">Metas</p>
+        <h3>Progresso visível para não perder o objetivo</h3>
+        <p>Defina prazo, acompanhe aportes e identifique desvios antes de comprometer o plano.</p>
       </article>
-      <article class="inside-card">
-        <p class="inside-card__kicker">Patrimônio</p>
-        <h3>Quando fizer sentido evoluir, acompanhe investimentos no mesmo sistema.</h3>
-        <div class="system-shot system-shot--investimentos" role="img" aria-label="Tela de investimentos">
-          <span>Investimentos</span>
-        </div>
+      <article class="feature-card">
+        <p class="eyebrow">Calendário</p>
+        <h3>Receitas e despesas no tempo certo</h3>
+        <p>Veja vencimentos, recebimentos e compromissos financeiros por data.</p>
+      </article>
+      <article class="feature-card">
+        <p class="eyebrow">Calculadoras</p>
+        <h3>Simulações simples para decisões melhores</h3>
+        <p>Use cenários de juros, metas, aposentadoria e renda para planejar com mais clareza.</p>
       </article>
     </div>
   </section>
 
-  <section id="funcionalidades" class="block">
-    <h2>O que você realmente consegue resolver aqui</h2>
-    <p class="block__lead">
-      O produto já está desenhado para cobrir o mês atual, antecipar risco e sustentar evolução financeira.
-    </p>
-    <div class="cards">
-      <article class="card">
-        <h3><span class="card__icon">📊</span>Painel financeiro com leitura do mês</h3>
-        <p>
-          Visão de entradas, saídas, contas abertas, saldo real e sinais de risco para agir antes do aperto.
-        </p>
-      </article>
-      <article class="card">
-        <h3><span class="card__icon">💸</span>Receitas, despesas e rotina financeira</h3>
-        <p>
-          Lançamento, categorização, histórico e acompanhamento mensal para sair da operação manual.
-        </p>
-      </article>
-      <article class="card">
-        <h3><span class="card__icon">💳</span>Cartões, faturas e importação de PDF</h3>
-        <p>
-          Leitura automática de itens, totais, vencimento, fechamento e parcelas para acelerar o fechamento do mês.
-        </p>
-      </article>
-      <article class="card">
-        <h3><span class="card__icon">🎯</span>Metas com acompanhamento contínuo</h3>
-        <p>
-          Objetivo, prazo, aportes e alertas automáticos para transformar intenção em progresso visível.
-        </p>
-      </article>
-      <article class="card">
-        <h3><span class="card__icon">📈</span>Investimentos e patrimônio</h3>
-        <p>
-          Registro de posições e comparativos para acompanhar evolução patrimonial sem trocar de sistema.
-        </p>
-      </article>
-      <article class="card">
-        <h3><span class="card__icon">🔄</span>Portabilidade e segurança operacional</h3>
-        <p>
-          Exportação, importação e governança de dados para dar autonomia e reduzir dependência de ferramenta.
-        </p>
-      </article>
+  <section id="planos" class="section section--pricing">
+    <div class="section__intro">
+      <p class="eyebrow">Planos</p>
+      <h2>Comece simples e avance conforme sua maturidade financeira</h2>
+      <p>Os planos liberam mais profundidade sem mudar a forma de usar o sistema.</p>
     </div>
-  </section>
 
-  <section class="block">
-    <h2>Escolha o plano conforme sua maturidade financeira</h2>
-    <p class="block__lead">
-      Em vez de vender recurso solto, cada plano libera um nível de profundidade maior no mesmo sistema.
-    </p>
-
-    <div class="plan-cards">
-      <article class="plan-card">
-        <h3>Essencial</h3>
-        <p>Para sair do improviso e ganhar disciplina financeira.</p>
+    <div class="pricing-grid">
+      <article class="price-card">
+        <p class="price-card__label">Basic</p>
+        <h3>Base financeira</h3>
+        <strong>Para começar</strong>
+        <ul>
+          <li>Dashboard mensal</li>
+          <li>Receitas e despesas</li>
+          <li>Calendário</li>
+          <li>Calculadoras</li>
+        </ul>
       </article>
-      <article class="plan-card">
-        <h3>Controle</h3>
-        <p>Para quem já usa cartão e quer fechar o mês com previsibilidade.</p>
+      <article class="price-card price-card--featured">
+        <p class="price-card__label">Intermediate</p>
+        <h3>Controle do mês</h3>
+        <strong>Mais escolhido</strong>
+        <ul>
+          <li>Tudo do Basic</li>
+          <li>Cartões e contas</li>
+          <li>Metas financeiras</li>
+          <li>Leitura mais completa do mês</li>
+        </ul>
       </article>
-      <article class="plan-card">
+      <article class="price-card">
+        <p class="price-card__label">Advanced</p>
         <h3>Patrimônio</h3>
-        <p>Para quem quer juntar controle financeiro e visão patrimonial.</p>
+        <strong>Para evoluir</strong>
+        <ul>
+          <li>Tudo do Intermediate</li>
+          <li>Investimentos</li>
+          <li>Visão patrimonial</li>
+          <li>Recursos avançados</li>
+        </ul>
       </article>
     </div>
 
-    <div class="plan-table-wrap">
-      <table class="plan-table">
-        <thead>
-          <tr>
-            <th>Funcionalidade</th>
-            <th>Essencial</th>
-            <th>Controle</th>
-            <th>Patrimônio</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Dashboard financeiro</td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-          </tr>
-          <tr>
-            <td>Receitas, despesas e categorias</td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-          </tr>
-          <tr>
-            <td>Calculadora financeira</td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-          </tr>
-          <tr>
-            <td>Cartões e contas</td>
-            <td><span class="no">—</span></td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-          </tr>
-          <tr>
-            <td>Importação de fatura</td>
-            <td><span class="no">—</span></td>
-            <td><span class="ok">✓</span></td>
-            <td><span class="ok">✓</span></td>
-          </tr>
-          <tr>
-            <td>Investimentos e patrimônio</td>
-            <td><span class="no">—</span></td>
-            <td><span class="no">—</span></td>
-            <td><span class="ok">✓</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="section__actions">
+      <a routerLink="/planos" class="button button--primary">Comparar planos</a>
+      <a routerLink="/register" class="button button--secondary">Criar conta gratuita</a>
     </div>
+  </section>
 
-    <div class="hero__actions">
-      <a routerLink="/planos" class="btn btn--primary">Comparar planos</a>
-      <a routerLink="/checkout" [queryParams]="{ plan: 'advanced', cycle: 'Yearly' }" class="btn btn--ghost">Ir para checkout</a>
+  <section class="section faq-section">
+    <div class="faq-card">
+      <p class="eyebrow">FAQ</p>
+      <h2>Dúvidas comuns antes de começar</h2>
+      <a routerLink="/register" class="button button--dark">Criar conta</a>
     </div>
+    <div class="faq-list">
+      <details open>
+        <summary>Preciso conectar banco para usar?</summary>
+        <p>Não. Você pode começar manualmente e evoluir sua base aos poucos.</p>
+      </details>
+      <details>
+        <summary>O plano Basic tem calendário e calculadoras?</summary>
+        <p>Sim. Esses dois menus ficam disponíveis para todos os perfis.</p>
+      </details>
+      <details>
+        <summary>O produto substitui minha planilha?</summary>
+        <p>A proposta é justamente reduzir a dependência da planilha, mantendo uma leitura mensal mais organizada.</p>
+      </details>
+      <details>
+        <summary>Consigo usar para cartão de crédito?</summary>
+        <p>Sim, nos planos com cartões habilitados você acompanha faturas, vencimentos e compras parceladas.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div>
+      <p class="eyebrow">Vamos começar</p>
+      <h2>Seu próximo mês pode ser mais claro que o último.</h2>
+      <p>Monte sua base financeira e acompanhe entradas, saídas, cartões e metas em um só lugar.</p>
+    </div>
+    <a routerLink="/register" class="button button--primary">Criar conta agora</a>
   </section>
 </section>
