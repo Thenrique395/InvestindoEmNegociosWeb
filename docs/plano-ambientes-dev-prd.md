@@ -33,10 +33,10 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 ### Parcial ou inconsistente
 
 - [x] Confirmar na UI do GitHub se os environments `development` e `production` existem com vars/secrets completos.
-- [ ] Configurar reviewers/aprovacao manual no environment `production` antes do deploy.
+- [x] Configurar reviewers/aprovacao manual no environment `production` antes do deploy.
 - [ ] Padronizar estrategia de branch: o plano sugere `develop -> DEV` e `main -> PRD`, mas os workflows atuais disparam em `main` e promovem DEV antes de PRD.
-- [ ] Padronizar portas da API: este plano usa DEV `5060` e PRD `5059`, enquanto a doc de deploy do backend sugere DEV `5059` e PRD `5060`.
-- [ ] Decidir se o modelo oficial sera compose unico com variaveis ou compose separado por ambiente.
+- [x] Padronizar portas da API: DEV publica em `5059` e PRD publica em `5060`; a API continua ouvindo em `5059` dentro do container.
+- [x] Definir modelo oficial de deploy: por enquanto sera `compose` unico com variaveis por ambiente.
 - [ ] Remover fallback fixo do frontend para `http://35.174.50.187:5059/api/v1` e exigir `API_BASE_URL` correta por ambiente.
 - [ ] Adicionar validacao pos-deploy do frontend para garantir que a tela abriu e chamou a API certa.
 
@@ -118,8 +118,8 @@ Exemplo:
 
 | Ambiente | Container | Porta externa | Banco |
 | --- | --- | --- | --- |
-| DEV | `investindo-api-dev` | `5060` | Banco DEV |
-| PRD | `investindo-api-prd` | `5059` | Banco PRD |
+| DEV | `investindo-api-dev` | `5059` | Banco DEV |
+| PRD | `investindo-api-prd` | `5060` | Banco PRD |
 
 ### 2.2. Separar variaveis de ambiente
 
@@ -186,8 +186,8 @@ Sem dominio oficial ainda, pode usar portas na VPS:
 
 | Ambiente | Front | API |
 | --- | --- | --- |
-| DEV | `http://35.174.50.187:4201` | `http://35.174.50.187:5060/api/v1` |
-| PRD | `http://35.174.50.187:4200` | `http://35.174.50.187:5059/api/v1` |
+| DEV | `http://35.174.50.187:4201` | `http://35.174.50.187:5059/api/v1` |
+| PRD | `http://35.174.50.187:4200` | `http://35.174.50.187:5060/api/v1` |
 
 Quando houver dominio:
 
