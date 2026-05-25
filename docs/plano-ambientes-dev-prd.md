@@ -32,8 +32,8 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 
 ### Parcial ou inconsistente
 
-- [ ] Confirmar na UI do GitHub se os environments `development` e `production` existem com vars/secrets completos.
-- [ ] Confirmar se `production` tem aprovacao manual/reviewers antes do deploy.
+- [x] Confirmar na UI do GitHub se os environments `development` e `production` existem com vars/secrets completos.
+- [ ] Configurar reviewers/aprovacao manual no environment `production` antes do deploy.
 - [ ] Padronizar estrategia de branch: o plano sugere `develop -> DEV` e `main -> PRD`, mas os workflows atuais disparam em `main` e promovem DEV antes de PRD.
 - [ ] Padronizar portas da API: este plano usa DEV `5060` e PRD `5059`, enquanto a doc de deploy do backend sugere DEV `5059` e PRD `5060`.
 - [ ] Decidir se o modelo oficial sera compose unico com variaveis ou compose separado por ambiente.
