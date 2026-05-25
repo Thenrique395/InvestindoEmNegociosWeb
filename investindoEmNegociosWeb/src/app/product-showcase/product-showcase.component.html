@@ -1,34 +1,138 @@
 <section class="showcase">
   <section id="produto" class="hero">
     <div class="hero__content">
-      <p class="eyebrow">Produto financeiro pessoal</p>
+      <p class="eyebrow">Investindo em Negócios</p>
       <h1>Seu mês financeiro claro, sem planilha manual</h1>
       <p class="hero__lead">
-        Veja receitas, despesas, cartões e metas em uma leitura única para decidir o próximo passo antes do mês apertar.
+        Acompanhe entradas, saídas, cartões e metas em uma leitura única para decidir melhor antes do mês apertar.
       </p>
       <div class="hero__actions">
         <a routerLink="/register" class="button button--primary">
-          Começar agora
+          Criar conta gratuita
           <span aria-hidden="true">→</span>
         </a>
-        <a href="/#como-funciona" class="button button--secondary">Como funciona</a>
+        <a href="/#como-funciona" class="button button--secondary">Ver como funciona</a>
       </div>
       <div class="hero__signals" aria-label="Principais benefícios">
-        <span>Saldo real do mês</span>
-        <span>Cartões no contexto</span>
-        <span>Metas acompanhadas</span>
+        <span>Leitura mensal simples</span>
+        <span>Cartões e faturas no fluxo</span>
+        <span>Metas sem perder contexto</span>
       </div>
     </div>
 
-    <div class="hero__visual" aria-label="Pessoa controlando suas finanças pelo dashboard">
-      <article class="hero-image-card">
-        <img
-          src="assets/landing/hero-financial-control.png"
-          alt="Pessoa acompanhando o dashboard financeiro do Investindo em Negócios"
-          width="1408"
-          height="768"
-          loading="eager"
-          decoding="async" />
+    <div
+      class="hero__visual"
+      aria-label="Prévia alternada do produto"
+      (mouseenter)="pausePreview()"
+      (mouseleave)="resumePreview()">
+      <article class="hero-preview-card">
+        <div class="hero-preview-card__brand">
+          <span class="hero-preview-card__logo">IN</span>
+          <div>
+            <strong>Investindo em Negócios</strong>
+            <span>Gestão de finanças pessoais</span>
+          </div>
+        </div>
+
+        @for (preview of heroPreviews; track preview.kind; let index = $index) {
+          <section
+            class="hero-preview"
+            [class.hero-preview--active]="activePreviewIndex === index"
+            [attr.aria-hidden]="activePreviewIndex === index ? null : true">
+            <p class="eyebrow">{{ preview.eyebrow }}</p>
+            <h2>{{ preview.title }}</h2>
+            <p>{{ preview.description }}</p>
+
+            @if (preview.kind === 'dashboard') {
+              <div class="preview-kpis">
+                <article class="preview-mini-card preview-mini-card--blue">
+                  <span>Quanto sobra</span>
+                  <strong>R$ 8.380,00</strong>
+                  <small>Disponível após saídas do período</small>
+                </article>
+                <article class="preview-mini-card preview-mini-card--green">
+                  <span>Quanto entrou</span>
+                  <strong>R$ 11.000,00</strong>
+                  <small>Receitas confirmadas no mês</small>
+                </article>
+                <article class="preview-mini-card preview-mini-card--red">
+                  <span>Quanto saiu</span>
+                  <strong>R$ 2.620,00</strong>
+                  <small>Despesas registradas no período</small>
+                </article>
+              </div>
+              <div class="preview-row preview-row--split">
+                <article>
+                  <span>Próxima ação</span>
+                  <strong>Revise despesas vencidas</strong>
+                </article>
+                <article>
+                  <span>Movimento recente</span>
+                  <strong>Salário · + R$ 11.000,00</strong>
+                </article>
+              </div>
+            }
+
+            @if (preview.kind === 'cards') {
+              <div class="preview-card-strip">
+                <article class="preview-credit-card">
+                  <span class="preview-brand">VISA</span>
+                  <strong>Joanna Amanda</strong>
+                  <small>Itaú · Final 1111</small>
+                  <p>1111 •••• •••• 1111</p>
+                </article>
+                <article class="preview-invoice">
+                  <span>Ciclo 06/2026</span>
+                  <strong>R$ 100,00 em aberto</strong>
+                  <small>Fecha 30/06 · vence 05/07</small>
+                </article>
+                <article class="preview-purchase">
+                  <span>Compras do cartão</span>
+                  <strong>Mercado · 1/1 · R$ 100,00</strong>
+                  <small>05/07/2026</small>
+                </article>
+              </div>
+            }
+
+            @if (preview.kind === 'goals') {
+              <div class="preview-goal">
+                <div>
+                  <span>Meta de investimentos · 2026</span>
+                  <strong>Fundo de emergência</strong>
+                  <small>42% concluída · falta R$ 29.000,00</small>
+                </div>
+                <div class="preview-progress" aria-hidden="true">
+                  <span style="width: 42%"></span>
+                </div>
+                <div class="preview-goal__metrics">
+                  <article>
+                    <span>Valor da meta</span>
+                    <strong>R$ 50.000,00</strong>
+                  </article>
+                  <article>
+                    <span>Acumulado</span>
+                    <strong>R$ 21.000,00</strong>
+                  </article>
+                  <article>
+                    <span>Aporte previsto</span>
+                    <strong>R$ 3.000,00</strong>
+                  </article>
+                </div>
+              </div>
+            }
+          </section>
+        }
+
+        <div class="hero-preview-card__controls" aria-label="Selecionar prévia do produto">
+          @for (preview of heroPreviews; track preview.kind; let index = $index) {
+            <button
+              type="button"
+              [class.is-active]="activePreviewIndex === index"
+              (click)="selectPreview(index)"
+              [attr.aria-label]="'Mostrar prévia: ' + preview.title">
+            </button>
+          }
+        </div>
       </article>
     </div>
   </section>
