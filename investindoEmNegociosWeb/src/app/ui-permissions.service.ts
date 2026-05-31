@@ -24,8 +24,8 @@ export class UiPermissionsService {
     return this.can(APP_FEATURE_KEYS.cardsRead);
   }
 
-  canManageCards(): boolean {
-    return this.can(APP_FEATURE_KEYS.cardsManage);
+  canCreateUpdateCards(): boolean {
+    return this.can(APP_FEATURE_KEYS.cardsCreateUpdate);
   }
 
   canReadCategories(): boolean {

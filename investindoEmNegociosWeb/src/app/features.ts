@@ -13,7 +13,9 @@ export const APP_FEATURE_KEYS = {
   accountsManage: 'feature.accounts.manage',
 
   cardsRead: 'feature.cards.read',
+  cardsCreateUpdate: 'feature.cards.create-update',
   cardsManage: 'feature.cards.manage',
+  cardsStatementsRead: 'feature.cards.statements',
 
   categoriesRead: 'feature.categories.read',
   categoriesManage: 'feature.categories.manage',
@@ -32,7 +34,7 @@ export const APP_FEATURE_KEYS = {
   accountsAccess: 'feature.accounts.read',
 
   /**
-   * @deprecated Use cardsRead/cardsManage depending on the screen/action.
+   * @deprecated Use cardsRead/cardsCreateUpdate/cardsManage depending on the screen/action.
    * Temporary alias kept to avoid breaking existing routes while the frontend is migrated.
    */
   cardsAccess: 'feature.cards.read',
@@ -48,6 +50,7 @@ export type AppFeatureKey = (typeof APP_FEATURE_KEYS)[keyof typeof APP_FEATURE_K
 
 const BASIC_FEATURES: AppFeatureKey[] = [
   APP_FEATURE_KEYS.cardsRead,
+  APP_FEATURE_KEYS.cardsCreateUpdate,
   APP_FEATURE_KEYS.accountsRead,
   APP_FEATURE_KEYS.categoriesRead,
   APP_FEATURE_KEYS.cardsAccess,
@@ -57,7 +60,6 @@ const BASIC_FEATURES: AppFeatureKey[] = [
 
 const INTERMEDIATE_FEATURES: AppFeatureKey[] = [
   ...BASIC_FEATURES,
-  APP_FEATURE_KEYS.cardsManage,
   APP_FEATURE_KEYS.accountsManage,
   APP_FEATURE_KEYS.categoriesManage,
   APP_FEATURE_KEYS.invoiceImportAccess
