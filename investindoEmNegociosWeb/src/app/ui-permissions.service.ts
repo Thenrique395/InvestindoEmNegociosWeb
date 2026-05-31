@@ -28,6 +28,10 @@ export class UiPermissionsService {
     return this.can(APP_FEATURE_KEYS.cardsCreateUpdate);
   }
 
+  canDeleteCards(): boolean {
+    return this.can(APP_FEATURE_KEYS.cardsDelete);
+  }
+
   canReadCategories(): boolean {
     return this.can(APP_FEATURE_KEYS.categoriesRead);
   }
