@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test:e2e": "playwright test",
+    "test:e2e:post-deploy": "playwright test e2e/post-deploy-frontend.spec.ts",
     "test:e2e:live": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-*.spec.ts'",
     "test:e2e:live:core": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-core.spec.ts'",
     "test:e2e:live:access": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-access.spec.ts'",

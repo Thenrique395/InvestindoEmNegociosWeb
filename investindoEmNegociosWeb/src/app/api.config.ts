@@ -4,10 +4,4 @@ const runtimeEnv =
     ? String(process.env['API_BASE_URL']).trim().replace(/\/$/, '')
     : '';
 
-if (!runtimeEnv) {
-  throw new Error(
-    'API_BASE_URL nao configurada. Defina a URL da API correta para o ambiente atual.'
-  );
-}
-
-export const API_BASE_URL = runtimeEnv;
+export const API_BASE_URL = runtimeEnv || 'http://35.174.50.187:5059/api/v1';

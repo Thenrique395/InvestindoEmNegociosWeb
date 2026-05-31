@@ -10,9 +10,25 @@ on:
         type: choice
         options:
           - e2e
+          - post-deploy
           - performance
       app_base_url:
         description: "Optional existing app URL. Empty starts local Angular server for e2e."
+        required: false
+        type: string
+      expected_api_base_url:
+        description: "Expected API base URL for post-deploy smoke."
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      suite:
+        required: true
+        type: string
+      app_base_url:
+        required: false
+        type: string
+      expected_api_base_url:
         required: false
         type: string
 
@@ -25,6 +41,7 @@ jobs:
     env:
       NODE_VERSION: "24.x"
       APP_BASE_URL: ${{ inputs.app_base_url }}
+      EXPECTED_API_BASE_URL: ${{ inputs.expected_api_base_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,13 +64,18 @@ jobs:
         working-directory: quality-tests
 
       - name: Install Playwright browser
-        if: ${{ inputs.suite == 'e2e' }}
+        if: ${{ inputs.suite == 'e2e' || inputs.suite == 'post-deploy' }}
         run: npx playwright install --with-deps chromium
         working-directory: quality-tests
 
       - name: Run e2e suite
         if: ${{ inputs.suite == 'e2e' }}
         run: npm run test:e2e
+        working-directory: quality-tests
+
+      - name: Run post-deploy smoke suite
+        if: ${{ inputs.suite == 'post-deploy' }}
+        run: npm run test:e2e:post-deploy
         working-directory: quality-tests
 
       - name: Run performance suite

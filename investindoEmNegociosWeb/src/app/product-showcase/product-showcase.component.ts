@@ -41,7 +41,7 @@ export class ProductShowcaseComponent implements OnInit, OnDestroy {
   protected activePreviewIndex = 0;
   protected previewPaused = false;
 
-  private previewTimer?: ReturnType<typeof setInterval>;
+  private previewTimer?: number;
 
   ngOnInit(): void {
     if (typeof window === 'undefined') return;
