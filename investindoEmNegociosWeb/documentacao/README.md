@@ -68,7 +68,7 @@ Fluxo principal:
 
 ## Stack principal
 
-- Angular 19
+- Angular 21
 - SSR com `@angular/ssr`
 - Angular Router com `loadComponent`
 - HttpClient com interceptor de autenticação

@@ -42,6 +42,10 @@ class CategoriesServiceMock {
   list = jasmine.createSpy().and.returnValue(of([]));
 }
 
+class UiPermissionsServiceMock {
+  canReadCards = jasmine.createSpy().and.returnValue(true);
+}
+
 class RouterMock {
   navigateByUrl = jasmine.createSpy().and.resolveTo(true);
 }
@@ -55,6 +59,7 @@ function createComponent() {
   const cards = new CardsServiceMock();
   const plans = new PlansServiceMock();
   const categories = new CategoriesServiceMock();
+  const uiPermissions = new UiPermissionsServiceMock();
   const router = new RouterMock();
 
   const component = new OnboardingComponent(
@@ -67,10 +72,11 @@ function createComponent() {
     accounts as any,
     cards as any,
     plans as any,
-    categories as any
+    categories as any,
+    uiPermissions as any
   );
 
-  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, router };
+  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, uiPermissions, router };
 }
 
 describe('OnboardingComponent smoke', () => {
@@ -81,6 +87,15 @@ describe('OnboardingComponent smoke', () => {
     ctx.component.ngOnInit();
 
     expect(ctx.router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('deve buscar cartões quando o plano permite cartões', () => {
+    const ctx = createComponent();
+
+    ctx.component.ngOnInit();
+
+    expect(ctx.uiPermissions.canReadCards).toHaveBeenCalled();
+    expect(ctx.cards.list).toHaveBeenCalled();
   });
 
   it('deve bloquear submit sem objetivo selecionado', () => {

@@ -443,7 +443,7 @@
               <section class="onboarding-panel">
                 <div class="onboarding-panel__header">
                   <strong>Pronto para avançar</strong>
-                  <span>Depois da conta criada, seguimos para receita, despesa e cartão opcional.</span>
+                  <span>Depois da conta criada, seguimos para receita e despesa inicial.</span>
                 </div>
               </section>
             </div>
@@ -524,38 +524,40 @@
                   {{ hasInitialExpense ? 'Editar despesa inicial' : 'Adicionar despesa' }}
                 </button>
               </article>
-              <article
-                class="onboarding-entry-card onboarding-entry-card--optional"
-                [class.onboarding-entry-card--done]="hasInitialCard">
-                <div class="onboarding-entry-card__header">
-                  <div class="onboarding-entry-card__header-main">
-                    <span class="onboarding-entry-card__icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                        <rect x="4" y="7" width="16" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" />
-                        <path d="M4 10.5h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      </svg>
-                    </span>
-                    <strong>Cartão (opcional)</strong>
+              @if (canUseCards) {
+                <article
+                  class="onboarding-entry-card onboarding-entry-card--optional"
+                  [class.onboarding-entry-card--done]="hasInitialCard">
+                  <div class="onboarding-entry-card__header">
+                    <div class="onboarding-entry-card__header-main">
+                      <span class="onboarding-entry-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                          <rect x="4" y="7" width="16" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+                          <path d="M4 10.5h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                      </span>
+                      <strong>Cartão (opcional)</strong>
+                    </div>
+                    <div class="onboarding-entry-card__header-meta">
+                      <span class="onboarding-entry-card__status">{{ hasInitialCard ? 'Configurado' : 'Opcional' }}</span>
+                      <span class="onboarding-entry-card__tooltip-anchor">
+                        <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Cadastre quando quiser acompanhar compras no crédito.">?</span>
+                        <span class="onboarding-entry-card__tooltip">Cadastre quando quiser acompanhar compras no crédito.</span>
+                      </span>
+                    </div>
                   </div>
-                  <div class="onboarding-entry-card__header-meta">
-                    <span class="onboarding-entry-card__status">{{ hasInitialCard ? 'Configurado' : 'Opcional' }}</span>
-                    <span class="onboarding-entry-card__tooltip-anchor">
-                      <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="No plano Basic, o cartão é opcional. Cadastre quando quiser acompanhar compras no crédito.">?</span>
-                      <span class="onboarding-entry-card__tooltip">No plano Basic, o cartão é opcional. Cadastre quando quiser acompanhar compras no crédito.</span>
-                    </span>
-                  </div>
-                </div>
-                @if (!hasInitialCard) {
-                  <p>Nenhum cartão cadastrado.</p>
-                }
-                @if (hasInitialCard) {
-                  <p>{{ cardsCount }} cartão(ões) cadastrado(s).</p>
-                }
-                <small>Você pode concluir sem cartão. Cadastre um depois se quiser lançar compras no crédito.</small>
-                <button class="ghost onboarding-btn onboarding-btn--inline" type="button" (click)="openCardsPage()">
-                  {{ hasInitialCard ? 'Gerenciar cartões' : 'Cadastrar cartão agora' }}
-                </button>
-              </article>
+                  @if (!hasInitialCard) {
+                    <p>Nenhum cartão cadastrado.</p>
+                  }
+                  @if (hasInitialCard) {
+                    <p>{{ cardsCount }} cartão(ões) cadastrado(s).</p>
+                  }
+                  <small>Você pode concluir sem cartão. Cadastre um depois se quiser lançar compras no crédito.</small>
+                  <button class="ghost onboarding-btn onboarding-btn--inline" type="button" (click)="openCardsPage()">
+                    {{ hasInitialCard ? 'Gerenciar cartões' : 'Cadastrar cartão agora' }}
+                  </button>
+                </article>
+              }
             </div>
           </section>
           <div class="onboarding-actions onboarding-actions--footer">
@@ -619,6 +621,7 @@
         [saving]="savingExpenseModal"
         [cartaoSelecionadoId]="modalExpenseCartaoId"
         [cartaoSelecionadoLabel]="''"
+        [allowCardPayment]="canUseCards"
         [isEdit]="false"
         (valorChange)="onExpenseAmountChange($event)"
         (vencimentoChange)="onExpenseDateChange($event)"

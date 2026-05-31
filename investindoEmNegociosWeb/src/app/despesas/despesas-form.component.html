@@ -49,7 +49,9 @@
                 name="formaPagamento"
                 (ngModelChange)="onFormaPagamentoChange($event)">
                 <option value="avista">À vista</option>
-                <option value="cartao">Cartão de crédito</option>
+                @if (allowCardPayment) {
+                  <option value="cartao">Cartão de crédito</option>
+                }
               </select>
             </label>
             <label class="expense-field">
@@ -111,7 +113,7 @@
         <section class="expense-form-modal__section">
           <div class="expense-form-modal__section-head">
             <h4 class="expense-form-modal__section-title">Comportamento da despesa</h4>
-            <p class="expense-form-modal__section-text">Defina se a cobrança é fixa, parcelada ou vinculada a um cartão.</p>
+            <p class="expense-form-modal__section-text">Defina se a cobrança é fixa, parcelada ou vinculada a um cartão quando disponível no plano.</p>
           </div>
           <div class="expense-form-modal__stack">
             @if (formaPagamento === 'cartao') {
@@ -145,14 +147,18 @@
             @if (semCartaoNoCredito) {
               <div
                 class="expense-form-modal__warning expense-form-modal__warning--amber">
-                <p class="expense-form-modal__warning-title">Nenhum cartão cadastrado.</p>
-                <p class="expense-form-modal__warning-text">Para lançar esta despesa no cartão de crédito, cadastre um cartão primeiro.</p>
-                <a
-                  routerLink="/cartoes"
-                  (click)="fechar()"
-                  class="expense-form-modal__warning-link expense-form-modal__warning-link--amber">
-                  Cadastrar cartão
-                </a>
+                <p class="expense-form-modal__warning-title">{{ allowCardPayment ? 'Nenhum cartão cadastrado.' : 'Cartão indisponível no seu plano.' }}</p>
+                <p class="expense-form-modal__warning-text">
+                  {{ allowCardPayment ? 'Para lançar esta despesa no cartão de crédito, cadastre um cartão primeiro.' : 'Registre esta despesa à vista ou altere o plano para usar cartão de crédito.' }}
+                </p>
+                @if (allowCardPayment) {
+                  <a
+                    routerLink="/cartoes"
+                    (click)="fechar()"
+                    class="expense-form-modal__warning-link expense-form-modal__warning-link--amber">
+                    Cadastrar cartão
+                  </a>
+                }
               </div>
             }
             @if (formaPagamento === 'cartao') {

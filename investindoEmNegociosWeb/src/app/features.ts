@@ -52,7 +52,9 @@ const BASIC_FEATURES: AppFeatureKey[] = [
   APP_FEATURE_KEYS.cardsRead,
   APP_FEATURE_KEYS.cardsCreateUpdate,
   APP_FEATURE_KEYS.accountsRead,
-  APP_FEATURE_KEYS.categoriesRead,  APP_FEATURE_KEYS.cardsDelete,  APP_FEATURE_KEYS.cardsAccess,
+  APP_FEATURE_KEYS.categoriesRead,
+  APP_FEATURE_KEYS.cardsDelete,
+  APP_FEATURE_KEYS.cardsAccess,
   APP_FEATURE_KEYS.accountsAccess,
   APP_FEATURE_KEYS.categoriesAccess
 ];
@@ -60,6 +62,7 @@ const BASIC_FEATURES: AppFeatureKey[] = [
 const INTERMEDIATE_FEATURES: AppFeatureKey[] = [
   ...BASIC_FEATURES,
   APP_FEATURE_KEYS.accountsManage,
+  APP_FEATURE_KEYS.cardsStatementsRead,
   APP_FEATURE_KEYS.categoriesManage,
   APP_FEATURE_KEYS.invoiceImportAccess
 ];

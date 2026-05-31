@@ -13,6 +13,7 @@ import { CreatePlanPayload, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
+import { UiPermissionsService } from '../ui-permissions.service';
 import { ReceitasFormComponent } from '../receitas/receitas-form.component';
 import { DespesasFormComponent } from '../despesas/despesas-form.component';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
@@ -131,7 +132,8 @@ export class OnboardingComponent implements OnInit {
     private accountsService: AccountsService,
     private cardsService: CardsService,
     private plansService: PlansService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private uiPermissions: UiPermissionsService
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
@@ -190,16 +192,7 @@ export class OnboardingComponent implements OnInit {
       }
     });
 
-    this.cardsService.list().subscribe({
-      next: (cards) => {
-        this.cardsCount = (cards || []).length;
-        this.modalExpenseCartoes = (cards || []).map((card) => this.toStoredCard(card));
-      },
-      error: () => {
-        this.cardsCount = 0;
-        this.modalExpenseCartoes = [];
-      }
-    });
+    this.loadCardsWhenAllowed();
   }
 
   submit(): void {
@@ -468,7 +461,11 @@ export class OnboardingComponent implements OnInit {
   }
 
   get hasInitialCard(): boolean {
-    return this.cardsCount > 0;
+    return this.canUseCards && this.cardsCount > 0;
+  }
+
+  get canUseCards(): boolean {
+    return this.uiPermissions.canReadCards();
   }
 
   get modalExpenseParcelValueLabel(): string {
@@ -576,6 +573,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   openCardsPage(): void {
+    if (!this.canUseCards) return;
     this.router.navigateByUrl('/cartoes');
   }
 
@@ -597,6 +595,13 @@ export class OnboardingComponent implements OnInit {
   }
 
   onExpenseFormaPagamentoChange(value: 'avista' | 'cartao'): void {
+    if (value === 'cartao' && !this.canUseCards) {
+      this.modalExpenseFormaPagamento = 'avista';
+      this.modalExpenseParcelar = false;
+      this.modalExpenseParcelas = 1;
+      this.modalExpenseCartaoId = null;
+      return;
+    }
     this.modalExpenseFormaPagamento = value;
     if (value !== 'cartao') {
       this.modalExpenseParcelar = false;
@@ -727,6 +732,25 @@ export class OnboardingComponent implements OnInit {
       carryOverDay: this.canEditCarryOverDay ? this.carryOverDay : 1,
       intelligenceMode: this.intelligenceMode as IntelligenceMode
     };
+  }
+
+  private loadCardsWhenAllowed(): void {
+    if (!this.canUseCards) {
+      this.cardsCount = 0;
+      this.modalExpenseCartoes = [];
+      return;
+    }
+
+    this.cardsService.list().subscribe({
+      next: (cards) => {
+        this.cardsCount = (cards || []).length;
+        this.modalExpenseCartoes = (cards || []).map((card) => this.toStoredCard(card));
+      },
+      error: () => {
+        this.cardsCount = 0;
+        this.modalExpenseCartoes = [];
+      }
+    });
   }
 
   private cpfValidator(): ValidatorFn {

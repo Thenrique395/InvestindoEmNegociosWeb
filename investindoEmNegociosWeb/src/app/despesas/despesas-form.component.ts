@@ -39,6 +39,7 @@ export class DespesasFormComponent {
   @Input() cartaoSelecionadoId: string | null = null;
   @Input() cartaoSelecionadoLabel = '';
   @Input() cardBrandMap: Record<string, string> = {};
+  @Input() allowCardPayment = true;
   @Input() isEdit = false;
 
   @Output() valorChange = new EventEmitter<string>();
@@ -53,7 +54,7 @@ export class DespesasFormComponent {
   @Output() cancel = new EventEmitter<void>();
 
   get semCartaoNoCredito(): boolean {
-    return this.formaPagamento === 'cartao' && !this.cartoes.length;
+    return this.formaPagamento === 'cartao' && (!this.allowCardPayment || !this.cartoes.length);
   }
 
   private resolveBrandName(brandIdOrName?: string): string {
@@ -92,6 +93,10 @@ export class DespesasFormComponent {
   }
 
   onFormaPagamentoChange(value: 'avista' | 'cartao'): void {
+    if (value === 'cartao' && !this.allowCardPayment) {
+      this.formaPagamentoChange.emit('avista');
+      return;
+    }
     this.formaPagamentoChange.emit(value);
   }
 

@@ -3,6 +3,9 @@ import { APP_FEATURE_KEYS, hasFeatureForRole } from './features';
 describe('features matrix', () => {
   it('deve liberar cartões para Basic', () => {
     expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.cardsAccess)).toBeTrue();
+    expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.cardsRead)).toBeTrue();
+    expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.cardsCreateUpdate)).toBeTrue();
+    expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.cardsDelete)).toBeTrue();
   });
 
   it('deve bloquear investimentos para Basic e Intermediate', () => {

@@ -78,8 +78,8 @@ Usar estes pontos de referencia para navegar mais rapido:
 - guards: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/*guard*.ts`
 - interceptors: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/*interceptor*.ts`
 - componentes e telas: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/`
-- testes E2E: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/e2e/`
-- configuracao de E2E: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/playwright.config.ts`
+- testes E2E: `InvestindoEmNegociosWeb/quality-tests/e2e/`
+- configuracao de E2E: `InvestindoEmNegociosWeb/quality-tests/playwright.config.ts`
 - documentacao especializada local: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/documentacao/`
 
 ## Fluxo obrigatorio de leitura
