@@ -1,15 +1,28 @@
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
+import { LoginPage } from './support/page-objects/login.page';
+
+const onboardingEmail = 'onboarding.e2e@example.com';
+const onboardingPassword = 'senha-e2e-123';
+
+async function loginIntoIncompleteOnboarding(page: Parameters<typeof setupAuthenticatedApp>[0]) {
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.login(onboardingEmail, onboardingPassword);
+  await expect(page).toHaveURL(/\/onboarding$/, { timeout: 10000 });
+}
 
 test.describe('onboarding regression', () => {
-  test('mantem usuario sem onboarding preso no fluxo sem shell da aplicacao', async ({ page }) => {
+  test('loga e mantem usuario sem onboarding preso no fluxo sem shell da aplicacao', async ({ page }) => {
     await setupAuthenticatedApp(page, {
       role: 'Basic',
       profileName: 'Usuário Onboarding E2E',
-      onboardingCompleted: false
+      email: onboardingEmail,
+      onboardingCompleted: false,
+      skipSession: true
     });
 
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await loginIntoIncompleteOnboarding(page);
 
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(page.getByRole('heading', { level: 2, name: 'Vamos definir seu foco inicial' })).toBeVisible();
@@ -22,7 +35,7 @@ test.describe('onboarding regression', () => {
     await expect(page.getByRole('heading', { level: 2, name: 'Vamos definir seu foco inicial' })).toBeVisible();
   });
 
-  test('prefill de perfil e recarrega categorias ao abrir modais iniciais', async ({ page }) => {
+  test('loga, preenche onboarding e recarrega categorias ao abrir modais iniciais', async ({ page }) => {
     const categoryRequests: string[] = [];
 
     page.on('request', (request) => {
@@ -35,10 +48,12 @@ test.describe('onboarding regression', () => {
     await setupAuthenticatedApp(page, {
       role: 'Basic',
       profileName: 'Usuário Onboarding E2E',
-      onboardingCompleted: false
+      email: onboardingEmail,
+      onboardingCompleted: false,
+      skipSession: true
     });
 
-    await page.goto('/onboarding', { waitUntil: 'domcontentloaded' });
+    await loginIntoIncompleteOnboarding(page);
     await page.getByText('Melhorar vida financeira').click();
     await page.getByRole('button', { name: 'Continuar para preferências' }).click();
     await page.getByText('Balanceado').click();

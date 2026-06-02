@@ -106,8 +106,10 @@ type ApiFailure = {
 type SetupAuthenticatedAppOptions = {
   role?: UserRole;
   profileName?: string;
+  email?: string;
   notifications?: unknown[];
   onboardingCompleted?: boolean;
+  skipSession?: boolean;
   apiFailures?: ApiFailure[];
 };
 
@@ -503,6 +505,7 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     adminCategories: structuredClone(initialAdminCategories),
     role,
     profileName: options.profileName || 'Henrique Santos',
+    email: options.email || 'usuario.e2e@example.com',
     notifications: structuredClone(options.notifications || []),
     onboardingCompleted: options.onboardingCompleted ?? true,
     securitySummary: {
@@ -691,15 +694,17 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     apiFailures: options.apiFailures || []
   };
 
-  await page.addInitScript(({ token, profileName }) => {
-    window.localStorage.setItem('access_token', token);
-    window.localStorage.setItem('refresh_token', 'refresh-token');
-    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-    window.localStorage.setItem('user_role', payload.role);
-    window.localStorage.setItem('user_name', profileName);
-    window.localStorage.setItem('user_email', 'usuario.e2e@example.com');
-    window.localStorage.setItem('access_expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
-  }, { token: accessToken, profileName: state.profileName });
+  if (!options.skipSession) {
+    await page.addInitScript(({ token, profileName, email }) => {
+      window.localStorage.setItem('access_token', token);
+      window.localStorage.setItem('refresh_token', 'refresh-token');
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      window.localStorage.setItem('user_role', payload.role);
+      window.localStorage.setItem('user_name', profileName);
+      window.localStorage.setItem('user_email', email);
+      window.localStorage.setItem('access_expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
+    }, { token: accessToken, profileName: state.profileName, email: state.email });
+  }
 
   await page.route('**/api/v1/**', async (route) => fulfillApi(route, state));
 }
@@ -735,6 +740,7 @@ async function fulfillApi(route: Route, state: {
   adminCategories: AdminCategory[];
   role: UserRole;
   profileName: string;
+  email: string;
   notifications: unknown[];
   onboardingCompleted: boolean;
   securitySummary: {
@@ -810,6 +816,23 @@ async function fulfillApi(route: Route, state: {
   });
   if (apiFailure) {
     await json(route, apiFailure.body ?? { detail: 'Falha simulada.' }, apiFailure.status ?? 500);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/auth/login') {
+    const token = buildJwt({
+      role: state.role,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60
+    });
+    await json(route, {
+      userId: '44444444-4444-4444-4444-444444444444',
+      name: state.profileName,
+      email: state.email,
+      role: state.role,
+      token,
+      refreshToken: 'refresh-token',
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+    });
     return;
   }
 

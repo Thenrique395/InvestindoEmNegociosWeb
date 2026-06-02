@@ -9,8 +9,8 @@ export class LoginPage {
   }
 
   async login(email: string, password: string) {
-    await this.page.getByLabel('Email').fill(email);
-    await this.page.getByLabel('Senha').fill(password);
-    await this.page.locator('form').getByRole('button', { name: 'Entrar' }).click();
+    await this.page.getByLabel('E-mail').fill(email);
+    await this.page.getByPlaceholder('Digite sua senha').fill(password);
+    await this.page.locator('form').getByRole('button', { name: /Entrar no dashboard/i }).click();
   }
 }

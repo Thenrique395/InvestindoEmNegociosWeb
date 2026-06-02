@@ -26,7 +26,7 @@ O comando `test:e2e` roda em modo headless, sem janela visivel. Para ver o fluxo
 npm run test:e2e:headed
 ```
 
-Para ver especificamente o fluxo do onboarding com navegacao mais lenta:
+Para ver especificamente o fluxo do onboarding com login e navegacao mais lenta:
 
 ```bash
 npm run test:e2e:onboarding:headed
