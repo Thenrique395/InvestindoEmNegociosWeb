@@ -15,6 +15,8 @@ npm install
 npm run test:e2e
 npm run test:e2e:headed
 npm run test:e2e:ui
+npm run test:e2e:smoke
+npm run test:e2e:smoke:headed
 npm run test:performance
 npm run test:load
 ```
@@ -30,6 +32,19 @@ Para ver especificamente o fluxo do onboarding com login e navegacao mais lenta:
 
 ```bash
 npm run test:e2e:onboarding:headed
+```
+
+Para ver o fluxo de cadastro novo ate o dashboard:
+
+```bash
+npm run test:e2e:signup:headed
+```
+
+Para rodar uma suite curta de smoke com login, onboarding, dashboard e permissoes Basic:
+
+```bash
+npm run test:e2e:smoke
+npm run test:e2e:smoke:headed
 ```
 
 Para abrir o runner interativo do Playwright:

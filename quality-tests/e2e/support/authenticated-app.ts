@@ -853,6 +853,26 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'POST' && path === '/api/v1/auth/register') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    state.profileName = payload.name || state.profileName;
+    state.email = payload.email || state.email;
+    const token = buildJwt({
+      role: state.role,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60
+    });
+    await json(route, {
+      userId: '44444444-4444-4444-4444-444444444444',
+      name: state.profileName,
+      email: state.email,
+      role: state.role,
+      token,
+      refreshToken: 'refresh-token',
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+    }, 201);
+    return;
+  }
+
   if (method === 'PUT' && path === '/api/v1/onboarding') {
     const payload = JSON.parse(route.request().postData() || '{}');
     state.onboardingCompleted = payload.completed === true;
