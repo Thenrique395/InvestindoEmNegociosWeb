@@ -28,9 +28,15 @@ on:
       app_base_url:
         required: false
         type: string
+      frontend_port:
+        required: false
+        type: string
       expected_api_base_url:
         required: false
         type: string
+    secrets:
+      VPS_HOST:
+        required: false
 
 permissions:
   contents: read
@@ -40,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: "24.x"
-      APP_BASE_URL: ${{ inputs.app_base_url }}
+      APP_BASE_URL: ${{ inputs.app_base_url || format('http://{0}:{1}', secrets.VPS_HOST, inputs.frontend_port) }}
       EXPECTED_API_BASE_URL: ${{ inputs.expected_api_base_url }}
     steps:
       - name: Checkout

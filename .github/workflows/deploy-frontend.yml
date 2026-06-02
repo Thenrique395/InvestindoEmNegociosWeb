@@ -125,8 +125,10 @@ jobs:
     uses: ./.github/workflows/quality-tests.yml
     with:
       suite: post-deploy
-      app_base_url: http://${{ secrets.VPS_HOST }}:${{ vars.FRONTEND_PORT }}
+      frontend_port: ${{ vars.FRONTEND_PORT }}
       expected_api_base_url: ${{ vars.API_BASE_URL }}
+    secrets:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
 
   deploy-prd:
     name: Deploy Production
@@ -184,5 +186,7 @@ jobs:
     uses: ./.github/workflows/quality-tests.yml
     with:
       suite: post-deploy
-      app_base_url: http://${{ secrets.VPS_HOST }}:${{ vars.FRONTEND_PORT }}
+      frontend_port: ${{ vars.FRONTEND_PORT }}
       expected_api_base_url: ${{ vars.API_BASE_URL }}
+    secrets:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
