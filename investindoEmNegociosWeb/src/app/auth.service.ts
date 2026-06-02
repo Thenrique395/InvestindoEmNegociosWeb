@@ -105,6 +105,8 @@ export class AuthService {
     if (res.role) this.setStorageItem('user_role', res.role);
     if (res.refreshToken) this.setStorageItem('refresh_token', res.refreshToken);
     if (res.expiresAt) this.setStorageItem('access_expires_at', res.expiresAt);
+    if (res.name) this.setStorageItem('user_name', res.name);
+    if (res.email) this.setStorageItem('user_email', res.email);
     return res;
   }
 
@@ -140,11 +142,21 @@ export class AuthService {
     return null;
   }
 
+  getUserName(): string {
+    return this.getStorageItem('user_name') || '';
+  }
+
+  getUserEmail(): string {
+    return this.getStorageItem('user_email') || '';
+  }
+
   clearSession(): void {
     this.removeStorageItem('access_token');
     this.removeStorageItem('refresh_token');
     this.removeStorageItem('access_expires_at');
     this.removeStorageItem('user_role');
+    this.removeStorageItem('user_name');
+    this.removeStorageItem('user_email');
   }
 
   isAuthenticated(): boolean {

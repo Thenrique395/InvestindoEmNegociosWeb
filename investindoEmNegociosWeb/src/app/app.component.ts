@@ -73,12 +73,15 @@ export class AppComponent implements OnInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         this.isLoginRoute = event.urlAfterRedirects.startsWith('/login') || event.urlAfterRedirects.startsWith('/register');
         this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
+        const isOnboardingRoute = event.urlAfterRedirects.split('?')[0].startsWith('/onboarding');
         this.userMenuOpen = false;
         this.notificationsOpen = false;
         this.sidebarOpen = false;
         if (this.isLogged) {
-          this.ensureUserContext();
-          if (!event.urlAfterRedirects.startsWith('/receitas')) {
+          if (!isOnboardingRoute) {
+            this.ensureUserContext();
+          }
+          if (!isOnboardingRoute && !event.urlAfterRedirects.startsWith('/receitas')) {
             this.apiDataService.refresh();
           }
         } else {
@@ -97,7 +100,7 @@ export class AppComponent implements OnInit, OnDestroy {
       document.documentElement.lang = initialLocale;
     }
     setLocaleSettings({ locale: initialLocale, currency: initialCurrency });
-    if (this.isLogged) this.ensureUserContext();
+    if (this.isLogged && !this.isOnboardingRoute) this.ensureUserContext();
     this.startSessionMonitor();
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
       this.feedbackMessage = message;
@@ -228,12 +231,16 @@ export class AppComponent implements OnInit, OnDestroy {
     return !this.isLogged && this.isPublicLayoutRoute && this.router.navigated;
   }
 
+  get isOnboardingRoute(): boolean {
+    return this.getCurrentPath().startsWith('/onboarding');
+  }
+
   isActiveRoute(path: string): boolean {
     return this.getCurrentPath().startsWith(path);
   }
 
   get displayName(): string {
-    return this.profile?.fullName?.trim() || 'Usuário';
+    return this.profile?.fullName?.trim() || this.authService.getUserName() || 'Usuário';
   }
 
   get avatarUrl(): string {

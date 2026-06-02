@@ -121,6 +121,7 @@ export class OnboardingComponent implements OnInit {
   cardsCount = 0;
   initialIncome = { source: '', amount: 0, receivedOn: '' };
   initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null as string | null };
+  private readonly draftStorageKey = 'onboarding_draft';
 
   constructor(
     private fb: FormBuilder,
@@ -148,6 +149,8 @@ export class OnboardingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.restoreDraft();
+
     this.onboarding.getStatus().subscribe({
       next: (status) => {
         if (status.completed) {
@@ -175,22 +178,7 @@ export class OnboardingComponent implements OnInit {
       }
     });
 
-    this.categoriesService.list('Expense').subscribe({
-      next: (categories) => {
-        this.expenseCategories = categories || [];
-      },
-      error: () => {
-        this.expenseCategories = [];
-      }
-    });
-    this.categoriesService.list('Income').subscribe({
-      next: (categories) => {
-        this.incomeCategories = categories || [];
-      },
-      error: () => {
-        this.incomeCategories = [];
-      }
-    });
+    this.loadCategories();
 
     this.loadCardsWhenAllowed();
   }
@@ -201,12 +189,14 @@ export class OnboardingComponent implements OnInit {
     if (!this.focus) {
       this.uiFeedback.warning('Selecione seu objetivo inicial.');
       this.announce('Selecione um objetivo inicial para continuar.');
+      this.step = 0;
       return;
     }
 
     if (!this.intelligenceMode) {
       this.uiFeedback.warning('Selecione o estilo inicial dos insights.');
       this.announce('Selecione o estilo inicial dos insights para continuar.');
+      this.step = 1;
       return;
     }
 
@@ -257,6 +247,7 @@ export class OnboardingComponent implements OnInit {
 
   selectFocus(id: FocusArea): void {
     this.focus = id;
+    this.saveDraft();
   }
 
   continueFromFocus(): void {
@@ -265,6 +256,7 @@ export class OnboardingComponent implements OnInit {
       this.announce('Selecione um objetivo inicial para continuar.');
       return;
     }
+    this.saveDraft();
     this.nextStep();
   }
 
@@ -276,6 +268,7 @@ export class OnboardingComponent implements OnInit {
     }
     this.uiFeedback.success('Preferências iniciais definidas. Vamos para seus dados básicos.');
     this.announce('Preferências iniciais definidas.');
+    this.saveDraft();
     this.nextStep();
   }
 
@@ -287,6 +280,7 @@ export class OnboardingComponent implements OnInit {
       return;
     }
     this.persistStep(true);
+    this.clearDraft();
     this.router.navigateByUrl('/dashboard');
   }
 
@@ -474,6 +468,7 @@ export class OnboardingComponent implements OnInit {
 
   openIncomeModal(): void {
     if (!this.accountReady || this.savingIncomeModal) return;
+    this.loadCategories('Income', true);
     this.modalIncome = this.createIncomeDraft();
     this.modalIncomeAmountInput = '';
     this.modalIncomeDateInput = this.isoToBr(this.todayIso());
@@ -558,6 +553,7 @@ export class OnboardingComponent implements OnInit {
 
   openExpenseModal(): void {
     if (!this.accountReady || this.savingExpenseModal) return;
+    this.loadCategories('Expense', true);
     this.modalExpense = this.createExpenseDraft();
     this.modalExpenseAmountInput = '';
     this.modalExpenseDateInput = this.isoToBr(this.todayIso());
@@ -753,6 +749,34 @@ export class OnboardingComponent implements OnInit {
     });
   }
 
+  private loadCategories(type?: 'Income' | 'Expense', forceRefresh = false): void {
+    if (forceRefresh) {
+      this.categoriesService.invalidateCache();
+    }
+
+    if (!type || type === 'Expense') {
+      this.categoriesService.list('Expense').subscribe({
+        next: (categories) => {
+          this.expenseCategories = categories || [];
+        },
+        error: () => {
+          this.expenseCategories = [];
+        }
+      });
+    }
+
+    if (!type || type === 'Income') {
+      this.categoriesService.list('Income').subscribe({
+        next: (categories) => {
+          this.incomeCategories = categories || [];
+        },
+        error: () => {
+          this.incomeCategories = [];
+        }
+      });
+    }
+  }
+
   private cpfValidator(): ValidatorFn {
     return (control: AbstractControl) => {
       const digits = (control.value || '').toString().replace(/\D/g, '');
@@ -909,16 +933,21 @@ export class OnboardingComponent implements OnInit {
   private loadProfile(prefillForm: boolean): void {
     this.profile.getProfile().subscribe({
       next: (data) => {
-        if (!data) return;
+        if (!data) {
+          if (prefillForm) this.prefillProfileFromSession();
+          return;
+        }
 
         const goals = new Set(this.focusOptions.map((x) => x.id));
         const savedGoal = (data as { financialGoal?: string }).financialGoal;
         if (savedGoal && goals.has(savedGoal as FocusArea)) {
           this.focus = savedGoal as FocusArea;
+          this.saveDraft();
         }
         const savedMode = (data as { intelligenceMode?: string }).intelligenceMode?.toUpperCase();
         if (savedMode === 'B' || savedMode === 'C') {
           this.intelligenceMode = savedMode as IntelligenceMode;
+          this.saveDraft();
         }
         const savedCarryOver = Number((data as { carryOverDay?: number }).carryOverDay);
         if (this.canEditCarryOverDay && Number.isInteger(savedCarryOver) && savedCarryOver >= 1 && savedCarryOver <= 31) {
@@ -930,7 +959,7 @@ export class OnboardingComponent implements OnInit {
         if (!prefillForm) return;
 
         this.form.patchValue({
-          fullName: data.fullName,
+          fullName: data.fullName || this.authService.getUserName(),
           document: this.maskCpf(data.document),
           phone: this.maskPhone(data.phone),
           birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
@@ -942,9 +971,58 @@ export class OnboardingComponent implements OnInit {
       error: (err) => {
         if (err.status === 401) {
           this.router.navigateByUrl('/login');
+          return;
         }
+        if (prefillForm) this.prefillProfileFromSession();
       }
     });
+  }
+
+  private prefillProfileFromSession(): void {
+    const fullName = this.authService.getUserName().trim();
+    if (!fullName || this.form.get('fullName')?.value) return;
+    this.form.patchValue({ fullName });
+  }
+
+  private restoreDraft(): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const raw = window.localStorage.getItem(this.draftStorageKey);
+      if (!raw) return;
+
+      const draft = JSON.parse(raw) as {
+        focus?: FocusArea;
+        intelligenceMode?: IntelligenceMode;
+        carryOverDay?: number;
+      };
+      if (draft.focus && this.focusOptions.some((option) => option.id === draft.focus)) {
+        this.focus = draft.focus;
+      }
+      if (draft.intelligenceMode === 'B' || draft.intelligenceMode === 'C') {
+        this.intelligenceMode = draft.intelligenceMode;
+      }
+      if (Number.isInteger(draft.carryOverDay) && Number(draft.carryOverDay) >= 1 && Number(draft.carryOverDay) <= 31) {
+        this.carryOverDay = Number(draft.carryOverDay);
+      }
+    } catch {
+      window.localStorage.removeItem(this.draftStorageKey);
+    }
+  }
+
+  saveDraft(): void {
+    if (typeof window === 'undefined') return;
+
+    window.localStorage.setItem(this.draftStorageKey, JSON.stringify({
+      focus: this.focus,
+      intelligenceMode: this.intelligenceMode,
+      carryOverDay: this.carryOverDay
+    }));
+  }
+
+  private clearDraft(): void {
+    if (typeof window === 'undefined') return;
+    window.localStorage.removeItem(this.draftStorageKey);
   }
 
   private toStoredCard(card: CardDto): StoredCard {

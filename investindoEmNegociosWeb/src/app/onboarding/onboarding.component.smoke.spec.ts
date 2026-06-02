@@ -21,6 +21,7 @@ class UiFeedbackServiceMock {
 
 class AuthServiceMock {
   getRole = jasmine.createSpy().and.returnValue('Basic');
+  getUserName = jasmine.createSpy().and.returnValue('Tiago Cadastro');
 }
 
 class AccountsServiceMock {
@@ -40,6 +41,7 @@ class PlansServiceMock {
 
 class CategoriesServiceMock {
   list = jasmine.createSpy().and.returnValue(of([]));
+  invalidateCache = jasmine.createSpy();
 }
 
 class UiPermissionsServiceMock {
@@ -96,6 +98,27 @@ describe('OnboardingComponent smoke', () => {
 
     expect(ctx.uiPermissions.canReadCards).toHaveBeenCalled();
     expect(ctx.cards.list).toHaveBeenCalled();
+  });
+
+  it('deve preencher nome com dados da sessão quando perfil ainda não existe', () => {
+    const ctx = createComponent();
+    ctx.profile.getProfile.and.returnValue(of(null));
+
+    ctx.component.ngOnInit();
+
+    expect(ctx.component.form.get('fullName')?.value).toBe('Tiago Cadastro');
+  });
+
+  it('deve atualizar cache de categorias ao abrir modais de lançamentos iniciais', () => {
+    const ctx = createComponent();
+    ctx.component.accountReady = true;
+
+    ctx.component.openIncomeModal();
+    ctx.component.openExpenseModal();
+
+    expect(ctx.categories.invalidateCache).toHaveBeenCalledTimes(2);
+    expect(ctx.categories.list).toHaveBeenCalledWith('Income');
+    expect(ctx.categories.list).toHaveBeenCalledWith('Expense');
   });
 
   it('deve bloquear submit sem objetivo selecionado', () => {

@@ -27,7 +27,7 @@
     </header>
   }
 
-  @if (isLogged) {
+  @if (isLogged && !isOnboardingRoute) {
     <div class="shell relative grid min-h-screen grid-cols-[300px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] max-md:grid-cols-1">
       @if (sidebarOpen) {
         <div class="sidebar-backdrop fixed inset-0 z-30 bg-[rgba(15,23,42,0.4)] backdrop-blur-[2px]" (click)="closeSidebar()"></div>
@@ -580,6 +580,12 @@
         }
       </div>
     </div>
+  }
+
+  @if (isLogged && isOnboardingRoute) {
+    <main class="onboarding-route-main">
+      <router-outlet />
+    </main>
   }
 
   @if (showPublicExperience) {
