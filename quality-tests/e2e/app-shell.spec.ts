@@ -4,7 +4,7 @@ test.describe('app shell', () => {
   test('abre a home comercial e navega para login', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: /sair do caos financeiro/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /seu mês financeiro claro/i })).toBeVisible();
 
     await page.getByRole('button', { name: 'Entrar' }).click();
 
@@ -20,10 +20,8 @@ test.describe('app shell', () => {
     await expect(page.getByRole('button', { name: /Esqueci minha senha/i })).toBeVisible();
   });
 
-  test('acessa a calculadora publica pelo menu principal', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-
-    await page.getByRole('link', { name: 'Calculadora' }).click();
+  test('acessa a calculadora publica por rota direta', async ({ page }) => {
+    await page.goto('/calculadora', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveURL(/\/calculadora$/);
     await expect(page.getByRole('heading', { level: 2, name: /Simuladores financeiros e trabalhistas/i })).toBeVisible();

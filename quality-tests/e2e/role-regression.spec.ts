@@ -6,11 +6,14 @@ test.describe('role regression', () => {
     await setupAuthenticatedApp(page, { role: 'Basic', profileName: 'Usuário Basic' });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('link', { name: 'Calendário' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Calculadoras' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Contas' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Cartões' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Investimentos' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Despesas', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Receitas', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Calendário', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Cartões', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Metas', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Calculadoras', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contas', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Investimentos', exact: true })).toHaveCount(0);
     await expect(page.getByRole('link', { name: /Controle de acessos/i })).toHaveCount(0);
 
     await page.goto('/calendario', { waitUntil: 'domcontentloaded' });
@@ -24,8 +27,8 @@ test.describe('role regression', () => {
     await setupAuthenticatedApp(page, { role: 'Intermediate', profileName: 'Usuário Intermediate' });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('link', { name: 'Calendário' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Investimentos' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Calendário', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Investimentos', exact: true })).toHaveCount(0);
 
     await page.goto('/calendario', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/calendario$/);
@@ -35,7 +38,7 @@ test.describe('role regression', () => {
     await setupAuthenticatedApp(page, { role: 'Advanced', profileName: 'Usuário Advanced' });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('link', { name: 'Investimentos' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Investimentos', exact: true })).toBeVisible();
     await expect(page.getByText('Saldos por conta')).toBeVisible();
     await expect(page.getByText('Evolução patrimonial')).toBeVisible();
   });

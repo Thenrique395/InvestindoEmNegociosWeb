@@ -691,13 +691,15 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     apiFailures: options.apiFailures || []
   };
 
-  await page.addInitScript((token) => {
+  await page.addInitScript(({ token, profileName }) => {
     window.localStorage.setItem('access_token', token);
     window.localStorage.setItem('refresh_token', 'refresh-token');
     const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
     window.localStorage.setItem('user_role', payload.role);
+    window.localStorage.setItem('user_name', profileName);
+    window.localStorage.setItem('user_email', 'usuario.e2e@example.com');
     window.localStorage.setItem('access_expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
-  }, accessToken);
+  }, { token: accessToken, profileName: state.profileName });
 
   await page.route('**/api/v1/**', async (route) => fulfillApi(route, state));
 }
@@ -1607,8 +1609,12 @@ async function fulfillApi(route: Route, state: {
     await json(route, {
       userId: '44444444-4444-4444-4444-444444444444',
       fullName: state.profileName,
-      document: '12345678901',
+      document: '52998224725',
       phone: '(81) 99999-9999',
+      birthDate: '1991-03-02T00:00:00Z',
+      city: 'Recife',
+      state: 'PE',
+      country: 'Brasil',
       financialGoal: 'organizar-fluxo',
       carryOverDay: 12,
       intelligenceMode: 'C',
