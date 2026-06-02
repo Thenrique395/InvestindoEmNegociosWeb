@@ -13,11 +13,31 @@ Projeto separado para testes de navegador, carga e performance do frontend.
 ```bash
 npm install
 npm run test:e2e
+npm run test:e2e:headed
+npm run test:e2e:ui
 npm run test:performance
 npm run test:load
 ```
 
 Por padrao, o Playwright sobe o app Angular em `http://127.0.0.1:4300`.
+O comando `test:e2e` roda em modo headless, sem janela visivel. Para ver o fluxo abrindo o navegador, use:
+
+```bash
+npm run test:e2e:headed
+```
+
+Para ver especificamente o fluxo do onboarding com navegacao mais lenta:
+
+```bash
+npm run test:e2e:onboarding:headed
+```
+
+Para abrir o runner interativo do Playwright:
+
+```bash
+npm run test:e2e:ui
+```
+
 Para apontar para outro ambiente:
 
 ```bash
