@@ -8,7 +8,7 @@ export async function loginIntoOnboarding(page: Page, email: string, password: s
   await expect(page).toHaveURL(/\/onboarding$/, { timeout: 10000 });
 }
 
-export async function completeOnboarding(page: Page) {
+export async function advanceToProfileStep(page: Page) {
   await page.getByText('Melhorar vida financeira').click();
   await page.getByRole('button', { name: 'Continuar para preferências' }).click();
   await page.getByText('Balanceado').click();
@@ -22,11 +22,16 @@ export async function completeOnboarding(page: Page) {
   await expect(page.getByLabel('Cidade')).toHaveValue('Recife');
   await expect(page.getByLabel('Estado (UF)')).toHaveValue('PE');
   await expect(page.getByLabel('País')).toHaveValue('Brasil');
+}
 
+export async function advanceToInitialEntriesStep(page: Page) {
+  await advanceToProfileStep(page);
   await page.getByRole('button', { name: 'Salvar e continuar para conta e lançamentos' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Ative sua conta e seus primeiros movimentos' })).toBeVisible();
   await expect(page.getByText('Conta principal criada. Agora você já pode registrar os primeiros lançamentos.')).toBeVisible();
+}
 
+export async function saveInitialIncome(page: Page) {
   await page.getByRole('button', { name: 'Adicionar receita' }).click();
   const incomeDialog = page.getByRole('dialog', { name: 'Adicionar receita' });
   await expect(incomeDialog.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
@@ -38,7 +43,9 @@ export async function completeOnboarding(page: Page) {
   await incomeDialog.getByRole('button', { name: 'Salvar receita' }).click();
   await expect(incomeDialog).toHaveCount(0);
   await expect(page.getByText(/Salário E2E/)).toBeVisible();
+}
 
+export async function saveInitialExpense(page: Page) {
   await page.getByRole('button', { name: 'Adicionar despesa' }).click();
   const expenseDialog = page.getByRole('dialog', { name: 'Adicionar lançamento' });
   await expect(expenseDialog.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
@@ -50,6 +57,16 @@ export async function completeOnboarding(page: Page) {
   await expenseDialog.getByRole('button', { name: 'Salvar despesa' }).click();
   await expect(expenseDialog).toHaveCount(0);
   await expect(page.getByText(/Mercado E2E/)).toBeVisible();
+}
+
+export async function completeInitialEntries(page: Page) {
+  await saveInitialIncome(page);
+  await saveInitialExpense(page);
+}
+
+export async function completeOnboarding(page: Page) {
+  await advanceToInitialEntriesStep(page);
+  await completeInitialEntries(page);
 
   await page.getByRole('button', { name: 'Concluir onboarding' }).click();
   await expect(page).toHaveURL(/\/dashboard$/, { timeout: 10000 });

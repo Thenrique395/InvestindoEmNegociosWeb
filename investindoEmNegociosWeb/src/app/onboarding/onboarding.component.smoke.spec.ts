@@ -222,4 +222,20 @@ describe('OnboardingComponent smoke', () => {
     expect(ctx.onboarding.updateStatus).toHaveBeenCalledWith({ step: 2, completed: true });
     expect(ctx.router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
   });
+
+  it('deve manter usuario no onboarding quando conclusao falha', () => {
+    const ctx = createComponent();
+    ctx.component.step = 3;
+    ctx.component.accountReady = true;
+    ctx.component.initialIncome = { source: 'Salário', amount: 5000, receivedOn: '2026-03-05' };
+    ctx.component.initialExpense = { name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null };
+    ctx.onboarding.updateStatus.and.returnValue(throwError(() => ({ error: { detail: 'Falha ao concluir onboarding E2E.' } })));
+
+    ctx.component.saveInitialEntriesAndFinish();
+
+    expect(ctx.onboarding.updateStatus).toHaveBeenCalledWith({ step: 3, completed: true });
+    expect(ctx.ui.error).toHaveBeenCalledWith('Falha ao concluir onboarding E2E.');
+    expect(ctx.router.navigateByUrl).not.toHaveBeenCalledWith('/dashboard');
+    expect(ctx.component.savingEntries).toBeFalse();
+  });
 });

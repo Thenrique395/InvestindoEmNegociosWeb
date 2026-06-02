@@ -99,6 +99,7 @@ type MonthlySnapshot = {
 type ApiFailure = {
   path: string | RegExp;
   method?: string;
+  requestBodyIncludes?: string;
   status?: number;
   body?: unknown;
 };
@@ -829,7 +830,8 @@ async function fulfillApi(route: Route, state: {
   const apiFailure = state.apiFailures.find((failure) => {
     const matchesMethod = !failure.method || failure.method.toUpperCase() === method;
     const matchesPath = typeof failure.path === 'string' ? failure.path === path : failure.path.test(path);
-    return matchesMethod && matchesPath;
+    const matchesBody = !failure.requestBodyIncludes || (route.request().postData() || '').includes(failure.requestBodyIncludes);
+    return matchesMethod && matchesPath && matchesBody;
   });
   if (apiFailure) {
     await json(route, apiFailure.body ?? { detail: 'Falha simulada.' }, apiFailure.status ?? 500);

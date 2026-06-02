@@ -222,7 +222,7 @@ export class OnboardingComponent implements OnInit {
           this.announce('Sessão expirada. Faça login novamente.');
           this.router.navigateByUrl('/login');
         } else {
-          this.uiFeedback.error(err instanceof Error ? err.message : 'Erro ao salvar dados.');
+          this.uiFeedback.error(err?.error?.detail || (err instanceof Error ? err.message : 'Erro ao salvar dados.'));
           this.announce('Falha ao salvar os dados do perfil.');
         }
         this.loading = false;
@@ -273,15 +273,26 @@ export class OnboardingComponent implements OnInit {
   }
 
   finishOnboarding(): void {
+    if (this.savingEntries) return;
     if (!this.accountReady) {
       this.uiFeedback.warning('Crie uma conta para concluir o cadastro.');
       this.announce('Crie uma conta ativa para concluir o cadastro.');
       this.step = this.totalSteps - 1;
       return;
     }
-    this.persistStep(true);
-    this.clearDraft();
-    this.router.navigateByUrl('/dashboard');
+    this.savingEntries = true;
+    this.onboarding.updateStatus({ step: this.step, completed: true }).subscribe({
+      next: () => {
+        this.savingEntries = false;
+        this.clearDraft();
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (err) => {
+        this.savingEntries = false;
+        this.uiFeedback.error(err?.error?.detail || 'Falha ao concluir onboarding.');
+        this.announce('Falha ao concluir onboarding.');
+      }
+    });
   }
 
   skipOnboarding(): void {
