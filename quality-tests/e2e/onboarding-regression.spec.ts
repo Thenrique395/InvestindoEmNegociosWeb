@@ -75,13 +75,31 @@ test.describe('onboarding regression', () => {
     await page.getByRole('button', { name: 'Adicionar receita' }).click();
     const incomeDialog = page.getByRole('dialog', { name: 'Adicionar receita' });
     await expect(incomeDialog.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
-    await expect(incomeDialog.getByRole('combobox', { name: 'Categoria' })).toContainText('Salário');
-    await incomeDialog.getByRole('button', { name: 'Cancelar' }).click();
+    const incomeCategory = incomeDialog.getByRole('combobox', { name: 'Categoria' });
+    await expect(incomeCategory).toContainText('Salário');
+    await incomeDialog.getByRole('textbox', { name: 'Fonte' }).fill('Salário E2E');
+    await incomeCategory.selectOption({ label: 'Salário' });
+    await incomeDialog.getByRole('textbox', { name: 'Valor (R$)' }).fill('520000');
+    await incomeDialog.getByRole('button', { name: 'Salvar receita' }).click();
+    await expect(incomeDialog).toHaveCount(0);
+    await expect(page.getByText(/Salário E2E/)).toBeVisible();
 
     await page.getByRole('button', { name: 'Adicionar despesa' }).click();
     const expenseDialog = page.getByRole('dialog', { name: 'Adicionar lançamento' });
     await expect(expenseDialog.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
-    await expect(expenseDialog.getByRole('combobox', { name: 'Categoria' })).toContainText('Mercado');
+    const expenseCategory = expenseDialog.getByRole('combobox', { name: 'Categoria' });
+    await expect(expenseCategory).toContainText('Mercado');
+    await expenseDialog.getByRole('textbox', { name: 'Nome da despesa' }).fill('Mercado E2E');
+    await expenseCategory.selectOption({ label: 'Mercado' });
+    await expenseDialog.getByRole('textbox', { name: 'Valor (R$)' }).fill('43050');
+    await expenseDialog.getByRole('button', { name: 'Salvar despesa' }).click();
+    await expect(expenseDialog).toHaveCount(0);
+    await expect(page.getByText(/Mercado E2E/)).toBeVisible();
+
+    await page.getByRole('button', { name: 'Concluir onboarding' }).click();
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 10000 });
+    await expect(page.getByRole('heading', { level: 1, name: 'Seu mês com clareza' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Dashboard', exact: true })).toBeVisible();
 
     expect(categoryRequests.filter((url) => url.includes('appliesTo=Income')).length).toBeGreaterThanOrEqual(2);
     expect(categoryRequests.filter((url) => url.includes('appliesTo=Expense')).length).toBeGreaterThanOrEqual(2);

@@ -204,6 +204,21 @@ type Category = {
   isActive?: boolean;
 };
 
+type Plan = {
+  id: string;
+  userId: string;
+  type: 'Income' | 'Expense';
+  title: string;
+  amount: number;
+  schedule: string;
+  categoryId?: string | null;
+  cardId?: string | null;
+  frequency?: string | null;
+  installmentsCount?: number | null;
+  startDate: string;
+  status: string;
+};
+
 type AdminCategory = {
   id: string;
   name: string;
@@ -503,6 +518,7 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     adminUserFeatures: structuredClone(initialAdminUserFeatures),
     categories: structuredClone(initialCategories),
     adminCategories: structuredClone(initialAdminCategories),
+    plans: [] as Plan[],
     role,
     profileName: options.profileName || 'Henrique Santos',
     email: options.email || 'usuario.e2e@example.com',
@@ -738,6 +754,7 @@ async function fulfillApi(route: Route, state: {
   adminUserFeatures: Record<string, AdminUserFeatureAccess[]>;
   categories: Category[];
   adminCategories: AdminCategory[];
+  plans: Plan[];
   role: UserRole;
   profileName: string;
   email: string;
@@ -833,6 +850,38 @@ async function fulfillApi(route: Route, state: {
       refreshToken: 'refresh-token',
       expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
     });
+    return;
+  }
+
+  if (method === 'PUT' && path === '/api/v1/onboarding') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    state.onboardingCompleted = payload.completed === true;
+    await json(route, {
+      step: Number(payload.step ?? (state.onboardingCompleted ? 3 : 0)),
+      completed: state.onboardingCompleted,
+      completedAt: state.onboardingCompleted ? new Date().toISOString() : null
+    });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/plans') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const created: Plan = {
+      id: crypto.randomUUID(),
+      userId: '44444444-4444-4444-4444-444444444444',
+      type: payload.type,
+      title: payload.title,
+      amount: Number(payload.amount || 0),
+      schedule: payload.schedule,
+      categoryId: payload.categoryId ?? null,
+      cardId: payload.cardId ?? null,
+      frequency: payload.frequency ?? null,
+      installmentsCount: payload.installmentsCount ?? null,
+      startDate: payload.startDate,
+      status: 'Active'
+    };
+    state.plans.push(created);
+    await json(route, created, 201);
     return;
   }
 
@@ -1649,7 +1698,7 @@ async function fulfillApi(route: Route, state: {
   }
 
   if (path === '/api/v1/onboarding') {
-    await json(route, { step: state.onboardingCompleted ? 2 : 0, completed: state.onboardingCompleted });
+    await json(route, { step: state.onboardingCompleted ? 3 : 0, completed: state.onboardingCompleted });
     return;
   }
 
@@ -2003,7 +2052,9 @@ async function fulfillApi(route: Route, state: {
   }
 
   if (path === '/api/v1/plans') {
-    await json(route, []);
+    const type = url.searchParams.get('type');
+    const plans = type ? state.plans.filter((plan) => plan.type === type) : state.plans;
+    await json(route, plans);
     return;
   }
 
