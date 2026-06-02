@@ -5,11 +5,11 @@ export class IncomesPage {
 
   async goto() {
     await this.page.goto('/receitas', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Suas fontes de receita' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 2, name: /Receitas de/i })).toBeVisible();
   }
 
   async openCreateModal() {
-    await this.page.getByRole('button', { name: 'Adicionar receita' }).click();
+    await this.page.getByRole('button', { name: 'Adicionar receita', exact: true }).click();
     await expect(this.page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
   }
 
@@ -22,8 +22,12 @@ export class IncomesPage {
   }
 
   async expectNoActiveCategories() {
-    await expect(this.page.getByText('Nenhuma categoria de receita ativa encontrada.')).toBeVisible();
+    await expect(this.page.getByText('Crie uma categoria antes de continuar.')).toBeVisible();
     await expect(this.page.getByRole('button', { name: 'Salvar receita' })).toBeDisabled();
+  }
+
+  async expectCategoryOptionVisible(name: string) {
+    await expect(this.createForm().getByLabel('Categoria')).toContainText(name);
   }
 
   async createIncome(name: string, categoryName: string, amount: string, recurring = false) {

@@ -111,6 +111,8 @@ type SetupAuthenticatedAppOptions = {
   notifications?: unknown[];
   onboardingCompleted?: boolean;
   skipSession?: boolean;
+  categories?: Category[];
+  adminCategories?: AdminCategory[];
   apiFailures?: ApiFailure[];
 };
 
@@ -517,8 +519,8 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     adminRobots: structuredClone(initialAdminRobots),
     adminUsers: structuredClone(initialAdminUsers),
     adminUserFeatures: structuredClone(initialAdminUserFeatures),
-    categories: structuredClone(initialCategories),
-    adminCategories: structuredClone(initialAdminCategories),
+    categories: structuredClone(options.categories ?? initialCategories),
+    adminCategories: structuredClone(options.adminCategories ?? initialAdminCategories),
     plans: [] as Plan[],
     role,
     profileName: options.profileName || 'Henrique Santos',

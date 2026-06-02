@@ -11,6 +11,7 @@
     "test:e2e:signup:headed": "E2E_SLOWMO_MS=1400 playwright test e2e/signup-onboarding.spec.ts --headed --workers=1 --project=chromium",
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts --project=chromium",
     "test:e2e:smoke:headed": "E2E_SLOWMO_MS=1000 playwright test e2e/smoke.spec.ts --headed --workers=1 --project=chromium",
+    "test:e2e:visual": "E2E_SLOWMO_MS=700 playwright test e2e/smoke.spec.ts e2e/role-regression.spec.ts e2e/category-propagation.spec.ts --headed --workers=1 --project=chromium",
     "test:e2e:post-deploy": "playwright test e2e/post-deploy-frontend.spec.ts",
     "test:e2e:live": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-*.spec.ts'",
     "test:e2e:live:core": "RUN_LIVE_SERVER_E2E=1 sh -c 'node scripts/check-live-env.mjs && playwright test e2e/live-core.spec.ts'",

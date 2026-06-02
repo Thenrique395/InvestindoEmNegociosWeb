@@ -25,8 +25,12 @@ export class ExpensesPage {
   }
 
   async expectNoActiveCategories() {
-    await expect(this.page.getByText('Crie uma categoria primeiro para continuar.')).toBeVisible();
+    await expect(this.page.getByText('Crie uma categoria antes de continuar.')).toBeVisible();
     await expect(this.page.getByRole('button', { name: 'Salvar despesa' })).toBeDisabled();
+  }
+
+  async expectCategoryOptionVisible(name: string) {
+    await expect(this.createForm().getByLabel('Categoria')).toContainText(name);
   }
 
   async createExpense(name: string, categoryName: string, amount: string) {

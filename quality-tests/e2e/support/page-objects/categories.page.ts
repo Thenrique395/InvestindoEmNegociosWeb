@@ -5,16 +5,16 @@ export class CategoriesPage {
 
   async goto() {
     await this.page.goto('/categorias', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('heading', { level: 1, name: 'Organize receitas e despesas' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 2, name: 'Organize receitas e despesas' })).toBeVisible();
   }
 
   async createCategory(name: string, type: 'Income' | 'Expense') {
     await this.page.getByPlaceholder('Nome da categoria').fill(name);
-    await this.page.locator('.add-card select').selectOption(type);
+    await this.page.locator('.add-card__form select').selectOption(type);
     const createResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'POST' && response.url().includes('/categories')
     );
-    await this.page.getByRole('button', { name: 'Adicionar' }).click();
+    await this.page.getByRole('button', { name: 'Adicionar', exact: true }).click();
     await expect.poll(async () => (await createResponse).ok()).toBeTruthy();
     await expect(this.page.getByText(name)).toBeVisible({ timeout: 20000 });
   }
@@ -45,12 +45,12 @@ export class CategoriesPage {
 
   async createDefaultCategory(name: string, type: 'Income' | 'Expense') {
     await this.page.getByPlaceholder('Nome da categoria').fill(name);
-    await this.page.locator('.add-card select').nth(0).selectOption('default');
-    await this.page.locator('.add-card select').nth(1).selectOption(type);
+    await this.page.locator('.add-card__form select').nth(0).selectOption('default');
+    await this.page.locator('.add-card__form select').nth(1).selectOption(type);
     const createResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'POST' && response.url().includes('/admin/categories')
     );
-    await this.page.getByRole('button', { name: 'Adicionar' }).click();
+    await this.page.getByRole('button', { name: 'Adicionar', exact: true }).click();
     await expect.poll(async () => (await createResponse).ok()).toBeTruthy();
   }
 
