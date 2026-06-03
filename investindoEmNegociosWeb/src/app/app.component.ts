@@ -1,4 +1,4 @@
-import { Component, HostBinding, HostListener, OnDestroy, OnInit, NgZone } from '@angular/core';
+import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
@@ -13,6 +13,7 @@ import { NotificationsService, NotificationItem } from './notifications.service'
 import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { ThemeService } from './theme.service';
+import { SessionMonitorService } from './session-monitor.service';
 
 @Component({
   selector: 'app-root',
@@ -48,25 +49,17 @@ export class AppComponent implements OnInit, OnDestroy {
   private feedbackSub?: Subscription;
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
-  private lastActivityAt = Date.now();
-  private sessionMonitorId: ReturnType<typeof setInterval> | null = null;
-  private readonly sessionIdleTimeoutMs = 60 * 60 * 1000;
-  private readonly sessionRefreshWindowMs = 2 * 60 * 1000;
-  private readonly sessionCheckIntervalMs = 30 * 1000;
-  private readonly activityEvents: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
-  private sessionRefreshInFlight = false;
-  private sessionExpiryRedirectScheduled = false;
 
   constructor(
     @Inject(PLATFORM_ID) platformId: object,
-    private ngZone: NgZone,
     private router: Router,
     private profileService: ProfileService,
     private authService: AuthService,
     private apiDataService: ApiDataService,
     private notificationsService: NotificationsService,
     private uiFeedback: UiFeedbackService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private sessionMonitor: SessionMonitorService
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.sub = this.router.events.subscribe((event) => {
@@ -101,7 +94,10 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     setLocaleSettings({ locale: initialLocale, currency: initialCurrency });
     if (this.isLogged && !this.isOnboardingRoute) this.ensureUserContext();
-    this.startSessionMonitor();
+    this.sessionMonitor.start({
+      isProtectedRoute: () => this.isProtectedRoute(this.getCurrentPath()),
+      onSessionExpired: () => this.handleExpiredSession()
+    });
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
       this.feedbackMessage = message;
     });
@@ -111,7 +107,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
     this.profileSub?.unsubscribe();
     this.feedbackSub?.unsubscribe();
-    this.stopSessionMonitor();
+    this.sessionMonitor.stop();
   }
 
   goToLogin(): void {
@@ -199,13 +195,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   @HostListener('window:focus')
   onWindowFocus(): void {
-    this.markActivity();
+    this.sessionMonitor.markActivity();
   }
 
   @HostListener('document:visibilitychange')
   onVisibilityChange(): void {
     if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-      this.markActivity();
+      this.sessionMonitor.markActivity();
     }
   }
 
@@ -218,7 +214,7 @@ export class AppComponent implements OnInit, OnDestroy {
   get isLogged(): boolean {
     const authenticated = this.authService.isAuthenticated();
     if (!authenticated && this.isBrowser && this.isProtectedRoute(this.getCurrentPath())) {
-      this.scheduleExpiredSessionRedirect();
+      this.sessionMonitor.scheduleExpiredSessionRedirect();
     }
     return authenticated;
   }
@@ -460,112 +456,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.unreadCount = 0;
   }
 
-  private startSessionMonitor(): void {
-    if (!this.isBrowser) return;
-    this.stopSessionMonitor();
-    this.lastActivityAt = Date.now();
-    this.registerActivityListeners();
-    this.ngZone.runOutsideAngular(() => {
-      this.sessionMonitorId = setInterval(() => {
-        this.ngZone.run(() => this.checkSessionHealth());
-      }, this.sessionCheckIntervalMs);
-    });
-  }
-
-  private stopSessionMonitor(): void {
-    if (this.sessionMonitorId) {
-      clearInterval(this.sessionMonitorId);
-      this.sessionMonitorId = null;
-    }
-    this.unregisterActivityListeners();
-    this.sessionRefreshInFlight = false;
-  }
-
-  private registerActivityListeners(): void {
-    if (!this.isBrowser || typeof window === 'undefined') return;
-    this.activityEvents.forEach((eventName) => {
-      window.addEventListener(eventName, this.handleUserActivity, { passive: true });
-    });
-  }
-
-  private unregisterActivityListeners(): void {
-    if (!this.isBrowser || typeof window === 'undefined') return;
-    this.activityEvents.forEach((eventName) => {
-      window.removeEventListener(eventName, this.handleUserActivity);
-    });
-  }
-
-  private readonly handleUserActivity = (): void => {
-    this.markActivity();
-  };
-
-  private markActivity(): void {
-    this.lastActivityAt = Date.now();
-  }
-
-  private scheduleExpiredSessionRedirect(): void {
-    if (this.sessionExpiryRedirectScheduled) return;
-    this.sessionExpiryRedirectScheduled = true;
-    setTimeout(() => {
-      this.sessionExpiryRedirectScheduled = false;
-      this.expireSession('Sessão expirada. Faça login novamente.');
-    }, 0);
-  }
-
-  private expireSession(message: string): void {
-    this.authService.clearSession();
+  private handleExpiredSession(): void {
     this.resetUserContext();
     this.userMenuOpen = false;
     this.notificationsOpen = false;
     this.sidebarOpen = false;
-    this.sessionRefreshInFlight = false;
-    if (!this.router.url.startsWith('/login')) {
-      this.uiFeedback.warning(message);
-      this.router.navigateByUrl('/login');
-    }
-  }
-
-  private checkSessionHealth(): void {
-    if (!this.isBrowser) return;
-
-    if (!this.authService.isAuthenticated()) {
-      if (this.isProtectedRoute(this.getCurrentPath())) {
-        this.expireSession('Sessão expirada. Faça login novamente.');
-      }
-      return;
-    }
-
-    const now = Date.now();
-    const idleMs = now - this.lastActivityAt;
-    if (idleMs >= this.sessionIdleTimeoutMs) {
-      this.expireSession('Sessão encerrada por inatividade. Faça login novamente.');
-      return;
-    }
-
-    const expiresAtMs = this.authService.getAccessTokenExpiresAtMs();
-    if (!expiresAtMs || this.sessionRefreshInFlight) return;
-
-    const remainingMs = expiresAtMs - now;
-    if (remainingMs > this.sessionRefreshWindowMs) return;
-
-    const refreshToken = this.authService.getRefreshToken();
-    if (!refreshToken) {
-      if (remainingMs <= 0) {
-        this.expireSession('Sessão expirada. Faça login novamente.');
-      }
-      return;
-    }
-
-    this.sessionRefreshInFlight = true;
-    this.authService.refresh(refreshToken).subscribe({
-      next: () => {
-        this.sessionRefreshInFlight = false;
-      },
-      error: () => {
-        this.sessionRefreshInFlight = false;
-        this.expireSession('Sessão expirada. Faça login novamente.');
-      }
-    });
   }
 
   trackByIndex(index: number, _item?: unknown): number {
