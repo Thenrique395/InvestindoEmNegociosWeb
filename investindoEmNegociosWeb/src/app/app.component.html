@@ -1,30 +1,12 @@
 <div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isLoginRoute">
   @if (showPublicExperience && !isLoginRoute) {
-    <header class="header">
-      <div class="brand">
-        <a routerLink="/" (click)="reloadIfSame('/', $event)">
-          <img
-            class="brand__logo"
-            [src]="isLightTheme ? '/assets/logoHeaderInvestindoemNegocios2.png' : '/assets/logoHeaderInvestindoemNegocios.png'"
-            [alt]="brandName"
-            width="36"
-            height="36"
-            loading="eager"
-            decoding="async" />
-        </a>
-      </div>
-      <nav class="menu">
-        <a href="/" (click)="goToPublicHome($event)">Início</a>
-        <a href="/#produto" (click)="scrollToPublicSection('produto', $event)">Produto</a>
-        <a href="/#como-funciona" (click)="scrollToPublicSection('como-funciona', $event)">Como funciona</a>
-        <a href="/#planos" (click)="scrollToPublicSection('planos', $event)">Planos</a>
-        <a href="/#faq" (click)="scrollToPublicSection('faq', $event)">FAQ</a>
-      </nav>
-      <div class="topbar__actions">
-        <a class="signup-link" routerLink="/register">Criar conta grátis</a>
-        <button class="login-link" type="button" (click)="goToLogin()">Entrar</button>
-      </div>
-    </header>
+    <app-public-header
+      [brandName]="brandName"
+      [isLightTheme]="isLightTheme"
+      (brandReload)="reloadIfSame('/', $event)"
+      (publicHome)="goToPublicHome($event)"
+      (sectionRequested)="scrollToPublicSection($event.sectionId, $event.event)"
+      (loginRequested)="goToLogin()" />
   }
 
   @if (isLogged && !isOnboardingRoute) {

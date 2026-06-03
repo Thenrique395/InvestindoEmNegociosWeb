@@ -1,0 +1,23 @@
+<header class="header">
+  <div class="brand">
+    <a routerLink="/" (click)="brandReload.emit($event)">
+      <img
+        class="brand__logo"
+        [src]="logoSrc"
+        [alt]="brandName()"
+        width="36"
+        height="36"
+        loading="eager"
+        decoding="async" />
+    </a>
+  </div>
+  <nav class="menu">
+    @for (item of navItems; track item.href) {
+      <a [href]="item.href" (click)="handleNavClick(item, $event)">{{ item.label }}</a>
+    }
+  </nav>
+  <div class="header__actions">
+    <a class="signup-link" routerLink="/register">Criar conta grátis</a>
+    <button class="login-link" type="button" (click)="loginRequested.emit()">Entrar</button>
+  </div>
+</header>

@@ -15,11 +15,12 @@ import { ThemeService } from './theme.service';
 import { SessionMonitorService } from './session-monitor.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { TopbarComponent } from './topbar/topbar.component';
+import { PublicHeaderComponent } from './public-header/public-header.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgClass, RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent],
+  imports: [NgClass, RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
