@@ -14,11 +14,12 @@ import { Inject, PLATFORM_ID } from '@angular/core';
 import { ThemeService } from './theme.service';
 import { SessionMonitorService } from './session-monitor.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { TopbarComponent } from './topbar/topbar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgClass, RouterOutlet, RouterLink, SignupComponent, SidebarComponent],
+  imports: [NgClass, RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -458,7 +459,4 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sidebarOpen = false;
   }
 
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
-  }
 }
