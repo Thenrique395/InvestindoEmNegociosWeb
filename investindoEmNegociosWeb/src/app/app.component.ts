@@ -8,7 +8,8 @@ import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
-import { NotificationsService, NotificationItem } from './notifications.service';
+import { NotificationItem } from './notifications.service';
+import { NotificationsFacadeService } from './notifications-facade.service';
 import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { ThemeService } from './theme.service';
@@ -49,6 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private sub: Subscription;
   private profileSub?: Subscription;
   private feedbackSub?: Subscription;
+  private notificationsSub?: Subscription;
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
 
@@ -58,7 +60,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private authService: AuthService,
     private apiDataService: ApiDataService,
-    private notificationsService: NotificationsService,
+    private notificationsFacade: NotificationsFacadeService,
     private uiFeedback: UiFeedbackService,
     private themeService: ThemeService,
     private sessionMonitor: SessionMonitorService,
@@ -71,7 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
         const isOnboardingRoute = event.urlAfterRedirects.split('?')[0].startsWith('/onboarding');
         this.userMenuOpen = false;
-        this.notificationsOpen = false;
+        this.notificationsFacade.close();
         this.sidebarOpen = false;
         if (this.isLogged) {
           if (!isOnboardingRoute) {
@@ -104,12 +106,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
       this.feedbackMessage = message;
     });
+    this.notificationsSub = this.notificationsFacade.state$.subscribe((state) => {
+      this.notificationsOpen = state.open;
+      this.notifications = state.items;
+      this.unreadCount = state.unreadCount;
+      this.notificationsLoading = state.loading;
+      this.notificationsError = state.error;
+    });
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
     this.profileSub?.unsubscribe();
     this.feedbackSub?.unsubscribe();
+    this.notificationsSub?.unsubscribe();
     this.sessionMonitor.stop();
   }
 
@@ -164,7 +174,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     if (this.notificationsOpen && !target.closest('.notifications')) {
-      this.notificationsOpen = false;
+      this.notificationsFacade.close();
     }
 
     if (this.userMenuOpen && !target.closest('.user-menu')) {
@@ -175,7 +185,7 @@ export class AppComponent implements OnInit, OnDestroy {
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     this.userMenuOpen = false;
-    this.notificationsOpen = false;
+    this.notificationsFacade.close();
     this.sidebarOpen = false;
   }
 
@@ -278,17 +288,15 @@ export class AppComponent implements OnInit, OnDestroy {
   toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
     if (this.userMenuOpen) {
-      this.notificationsOpen = false;
+      this.notificationsFacade.close();
     }
   }
 
   toggleNotifications(): void {
-    this.notificationsOpen = !this.notificationsOpen;
-    if (this.notificationsOpen) {
+    const wasOpen = this.notificationsOpen;
+    this.notificationsFacade.toggle();
+    if (!wasOpen) {
       this.userMenuOpen = false;
-    }
-    if (this.notificationsOpen && !this.notifications.length) {
-      this.fetchNotifications();
     }
   }
 
@@ -301,53 +309,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   refreshNotifications(): void {
-    this.notificationsError = '';
-    this.notificationsLoading = true;
-    this.notificationsService.generate().subscribe({
-      next: () => this.fetchNotifications(),
-      error: () => {
-        this.notificationsError = 'Falha ao atualizar.';
-        this.fetchNotifications();
-      }
-    });
+    this.notificationsFacade.refresh();
   }
 
   markNotificationRead(item: NotificationItem, event?: Event): void {
-    event?.preventDefault();
-    event?.stopPropagation();
-    if (item.readAt) return;
-    this.notificationsService.markRead(item.id).subscribe({
-      next: () => {
-        item.readAt = new Date().toISOString();
-        this.recalculateUnread();
-      },
-      error: () => {
-        /* ignore */
-      }
-    });
-  }
-
-  private fetchNotifications(): void {
-    this.notificationsLoading = true;
-    this.notificationsService.list(false, 20).subscribe({
-      next: (items) => {
-        this.notifications = items || [];
-        this.recalculateUnread();
-        this.notificationsError = '';
-      },
-      error: () => {
-        this.notifications = [];
-        this.unreadCount = 0;
-        this.notificationsError = 'Não foi possível carregar.';
-      },
-      complete: () => {
-        this.notificationsLoading = false;
-      }
-    });
-  }
-
-  private recalculateUnread(): void {
-    this.unreadCount = this.notifications.filter((n) => !n.readAt).length;
+    this.notificationsFacade.markRead(item, event);
   }
 
   reloadIfSame(path: string, event?: Event): void {
@@ -405,7 +371,7 @@ export class AppComponent implements OnInit, OnDestroy {
         /* ignore */
       }
     });
-    this.refreshNotifications();
+    this.notificationsFacade.refresh();
   }
 
   private resetUserContext(): void {
@@ -413,14 +379,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.profileSub = undefined;
     this.profile = null;
     this.userContextInitialized = false;
-    this.notifications = [];
-    this.unreadCount = 0;
+    this.notificationsFacade.reset();
   }
 
   private handleExpiredSession(): void {
     this.resetUserContext();
     this.userMenuOpen = false;
-    this.notificationsOpen = false;
+    this.notificationsFacade.close();
     this.sidebarOpen = false;
   }
 
