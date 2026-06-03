@@ -12,17 +12,17 @@ function buildLiveUser(workerIndex: number, retry: number) {
 async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
   const user = buildLiveUser(workerIndex, retry);
 
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByRole('button', { name: 'Criar conta' }).click();
-  await expect(page.getByRole('heading', { level: 3, name: 'Crie sua conta gratuita' })).toBeVisible();
+  await page.goto('/register', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { level: 1, name: 'Vamos começar' })).toBeVisible();
 
   await page.getByLabel('Nome completo').fill(user.fullName);
   await page.getByLabel('E-mail').fill(user.email);
-  await page.getByLabel('Senha').fill(user.password);
-  await page.getByRole('checkbox').check();
-  await page.getByRole('button', { name: 'Criar conta e entrar' }).click();
+  await page.getByPlaceholder('Digite sua senha').fill(user.password);
+  await page.getByPlaceholder('Confirme sua senha').fill(user.password);
+  await page.getByLabel('Li e aceito os termos de uso e a política de privacidade.').check();
+  await page.getByRole('button', { name: 'Criar conta agora' }).click();
 
-  await expect(page.getByRole('heading', { level: 3, name: 'Crie sua conta gratuita' })).toBeHidden({ timeout: 30000 });
+  await expect(page).toHaveURL(/\/login$/, { timeout: 30000 });
 
   await page.goto('/login', { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveURL(/\/login$/);

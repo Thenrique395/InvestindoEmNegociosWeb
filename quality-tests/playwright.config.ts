@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+delete process.env['FORCE_COLOR'];
+delete process.env['NO_COLOR'];
+
 const appBaseUrl = process.env['APP_BASE_URL'] || 'http://127.0.0.1:4300';
 const shouldStartServer = !process.env['APP_BASE_URL'];
 const slowMo = Number(process.env['E2E_SLOWMO_MS'] || 0);
@@ -17,7 +20,7 @@ export default defineConfig({
   },
   webServer: shouldStartServer
     ? {
-        command: 'npm --prefix ../investindoEmNegociosWeb run start -- --host 127.0.0.1 --port 4300 --allowed-hosts all',
+        command: 'env -u FORCE_COLOR -u NO_COLOR npm --prefix ../investindoEmNegociosWeb run start -- --host 127.0.0.1 --port 4300 --allowed-hosts all',
         url: appBaseUrl,
         reuseExistingServer: !process.env['CI'],
         timeout: 120000

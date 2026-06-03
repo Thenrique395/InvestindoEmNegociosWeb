@@ -1,11 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
-
-const brl = (value: number) =>
-  new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(value);
+import { AccountsPage } from './support/page-objects/accounts.page';
+import { CardsPage } from './support/page-objects/cards.page';
 
 test.describe('authenticated write flows', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,30 +9,19 @@ test.describe('authenticated write flows', () => {
   });
 
   test('cria uma nova conta e reflete na listagem', async ({ page }) => {
-    await page.goto('/contas', { waitUntil: 'domcontentloaded' });
+    const accountsPage = new AccountsPage(page);
 
-    await page.getByLabel('Nome da conta').fill('Conta teste E2E');
-    await page.getByLabel('Saldo inicial').fill('1500');
-    await page.getByRole('button', { name: 'Salvar' }).click();
-
-    await expect(page.getByRole('heading', { level: 3, name: 'Conta teste E2E' })).toBeVisible();
-    await expect(page.locator('article').filter({ hasText: 'Conta teste E2E' }).getByText(brl(1500))).toBeVisible();
+    await accountsPage.goto();
+    await accountsPage.createAccount('Conta teste E2E', '1500');
+    await accountsPage.expectAccountBalance('Conta teste E2E', 1500);
   });
 
   test('cria um novo cartao e reflete na listagem', async ({ page }) => {
-    await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
+    const cardsPage = new CardsPage(page);
 
-    await page.getByRole('button', { name: /Adicionar cartão Registrar um/i }).click();
-    await page.getByLabel('Número do cartão').fill('5555 4444 3333 2222');
-    await page.getByLabel('Nome do cartão').fill('Cartao E2E');
-    await page.getByLabel('Banco').fill('Banco Teste');
-    await page.getByLabel('Limite de crédito').fill('8000');
-    await page.getByLabel('Dia do fechamento').fill('12');
-    await page.getByLabel('Dia do vencimento').fill('20');
-    await page.getByRole('button', { name: 'Salvar cartão' }).click();
-
-    await expect(page.getByText('Cartao E2E')).toBeVisible();
-    await expect(page.getByText('•••• 2222')).toBeVisible();
+    await cardsPage.goto();
+    await cardsPage.createCard('Cartao E2E', '2222');
+    await cardsPage.expectCardVisible('Cartao E2E', '2222');
   });
 
   test('importa OFX pela interface e atualiza o extrato', async ({ page }) => {
@@ -78,81 +63,45 @@ test.describe('authenticated write flows', () => {
   });
 
   test('transfere saldo entre contas e reflete nos saldos e extrato', async ({ page }) => {
-    await page.goto('/contas', { waitUntil: 'domcontentloaded' });
+    const accountsPage = new AccountsPage(page);
 
-    await page.getByLabel('Conta origem').selectOption({ label: 'Conta principal' });
-    await page.getByLabel('Conta destino').selectOption({ label: 'Reserva' });
-    await page.getByLabel('Valor').fill('300');
-    await page.getByLabel('Descrição (opcional)').fill('Reserva automática');
-    await page.getByRole('button', { name: 'Transferir agora' }).click();
+    await accountsPage.goto();
+    await accountsPage.transfer('Conta principal', 'Reserva', '300', 'Reserva automática');
+    await accountsPage.expectAccountBalance('Conta principal', 3080, 10000);
+    await accountsPage.expectAccountBalance('Reserva', 5500, 10000);
 
-    const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
-    const reserva = page.locator('article').filter({ hasText: 'Reserva' });
-    await expect(contaPrincipal.getByText(brl(3080))).toBeVisible({ timeout: 10000 });
-    await expect(reserva.getByText(brl(5500))).toBeVisible({ timeout: 10000 });
-
-    await contaPrincipal.getByRole('button', { name: 'Extrato' }).click();
+    await accountsPage.openStatement('Conta principal');
     await expect(page.getByRole('cell', { name: 'Reserva automática' }).first()).toBeVisible();
     await expect(page.getByRole('cell', { name: 'Transferência' }).first()).toBeVisible();
   });
 
   test('edita uma conta existente e atualiza a listagem', async ({ page }) => {
-    await page.goto('/contas', { waitUntil: 'domcontentloaded' });
+    const accountsPage = new AccountsPage(page);
 
-    const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
-    await contaPrincipal.getByRole('button', { name: 'Editar' }).click();
-
-    await expect(page.getByLabel('Nome da conta')).toHaveValue('Conta principal');
-    await page.getByLabel('Nome da conta').fill('Conta principal ajustada');
-    await page.getByLabel('Saldo inicial').fill('4100');
-    await page.getByRole('button', { name: 'Salvar' }).click();
-
-    await expect(page.getByRole('heading', { level: 3, name: 'Conta principal ajustada' })).toBeVisible();
-    await expect(page.locator('article').filter({ hasText: 'Conta principal ajustada' }).getByText(brl(4100))).toBeVisible();
+    await accountsPage.goto();
+    await accountsPage.editAccount('Conta principal', 'Conta principal ajustada', '4100');
+    await accountsPage.expectAccountBalance('Conta principal ajustada', 4100);
   });
 
   test('remove uma conta criada na interface', async ({ page }) => {
-    await page.goto('/contas', { waitUntil: 'domcontentloaded' });
+    const accountsPage = new AccountsPage(page);
 
-    await page.getByLabel('Nome da conta').fill('Conta descartável');
-    await page.getByLabel('Saldo inicial').fill('250');
-    await page.getByRole('button', { name: 'Salvar' }).click();
-    await expect(page.getByRole('heading', { level: 3, name: 'Conta descartável' })).toBeVisible();
-
-    page.once('dialog', (dialog) => dialog.accept());
-    const descartavel = page.locator('article').filter({ hasText: 'Conta descartável' });
-    await descartavel.getByRole('button', { name: 'Remover' }).click();
-
-    await expect(page.getByRole('heading', { level: 3, name: 'Conta descartável' })).toHaveCount(0);
+    await accountsPage.goto();
+    await accountsPage.createAccount('Conta descartável', '250');
+    await accountsPage.removeAccount('Conta descartável');
   });
 
   test('edita um cartao existente e reflete na listagem', async ({ page }) => {
-    await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
+    const cardsPage = new CardsPage(page);
 
-    const cartao = page.locator('article').filter({ hasText: 'Cartao principal' });
-    await cartao.getByRole('button', { name: 'Editar' }).click();
-
-    await page.getByLabel('Número do cartão').fill('9999 8888 7777 9876');
-    await page.getByLabel('Nome do cartão').fill('Cartao principal premium');
-    await page.getByLabel('Banco').fill('Banco Atualizado');
-    await page.getByLabel('Limite de crédito').fill('9500');
-    await page.getByRole('button', { name: 'Salvar alterações' }).click();
-
-    await expect(page.getByText('Cartao principal premium')).toBeVisible();
-    await expect(page.getByText('•••• 9876')).toBeVisible();
+    await cardsPage.goto();
+    await cardsPage.editCard('Cartao principal', 'Cartao principal premium', '9876');
   });
 
   test('remove um cartao existente da listagem', async ({ page }) => {
-    await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
+    const cardsPage = new CardsPage(page);
 
-    const cartaoPrincipal = page.locator('article').filter({ hasText: 'Cartao principal' });
-    await expect(cartaoPrincipal).toBeVisible();
-    const deleteResponse = page.waitForResponse((response) =>
-      response.request().method() === 'DELETE' && response.url().includes('/cards/')
-    );
-    await cartaoPrincipal.getByRole('button', { name: 'Remover' }).click();
-    await expect.poll(async () => (await deleteResponse).ok()).toBeTruthy();
-
-    await expect(page.getByText('Cartao principal')).toHaveCount(0, { timeout: 10000 });
+    await cardsPage.goto();
+    await cardsPage.removeCard('Cartao principal');
   });
 });
