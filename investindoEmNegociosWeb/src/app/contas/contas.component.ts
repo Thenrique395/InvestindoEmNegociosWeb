@@ -399,8 +399,7 @@ export class ContasComponent implements OnInit {
     return this.ofxExtract.items.filter((item) => item.isDuplicate).length;
   }
 
-  onImportCategoryChanged(event: unknown): void {
-    console.log('Category changed from import:', event);
+  onImportCategoryChanged(_event: unknown): void {
   }
 
   private createEmptyForm(): AccountRequest {
