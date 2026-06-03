@@ -10,10 +10,10 @@ O objetivo e ter um ambiente DEV para validar alteracoes com mais liberdade e um
 
 ## Objetivo dos Ambientes
 
-| Ambiente | Finalidade | Branch sugerida | Estabilidade |
+| Ambiente | Finalidade | Entrega | Estabilidade |
 | --- | --- | --- | --- |
-| DEV | Validar features em desenvolvimento | `develop` | Pode quebrar ocasionalmente |
-| PRD | Ambiente estavel de uso | `main` | Deve receber apenas versoes aprovadas |
+| DEV | Validar features em desenvolvimento | Push/merge em `main` | Pode quebrar ocasionalmente |
+| PRD | Ambiente estavel de uso | Workflow manual de producao | Deve receber apenas versoes aprovadas |
 
 ## Checklist do Estado Atual
 
@@ -23,18 +23,21 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 
 - [x] Plano DEV/PRD documentado neste arquivo.
 - [x] Backend com workflow usando GitHub Environments `development` e `production`.
-- [x] Backend com testes, cobertura, build de imagem por SHA e deploy DEV antes de PRD.
+- [x] Backend com testes, cobertura, build de imagem por SHA e deploy automatico em DEV.
+- [x] Backend com workflow manual separado para deploy em PRD.
 - [x] Backend com compose parametrizado por `API_PORT`, `DB_CONN`, secrets e healthcheck.
 - [x] Frontend com workflow usando GitHub Environments `development` e `production`.
-- [x] Frontend com quality gate, build de imagem por SHA e deploy separado por stack (`invest-web-dev` e `invest-web-prd`).
+- [x] Frontend com quality gate, build de imagem por SHA e deploy automatico em DEV.
+- [x] Frontend com workflow manual separado para deploy em PRD.
+- [x] Frontend com deploy separado por stack (`invest-web-dev` e `invest-web-prd`).
 - [x] Frontend com compose parametrizado por `FRONTEND_PORT` e `API_BASE_URL`.
 - [x] Suite de quality tests aceita `APP_BASE_URL`, permitindo validar uma URL DEV/PRD existente.
 
 ### Parcial ou inconsistente
 
 - [x] Confirmar na UI do GitHub se os environments `development` e `production` existem com vars/secrets completos.
-- [x] Configurar reviewers/aprovacao manual no environment `production` antes do deploy.
-- [ ] Padronizar estrategia de branch: o plano sugere `develop -> DEV` e `main -> PRD`, mas os workflows atuais disparam em `main` e promovem DEV antes de PRD.
+- [x] Definir aprovacao de PRD por workflow manual separado, sem depender de required reviewer no GitHub Environment.
+- [x] Padronizar estrategia de branch: `main` entrega DEV; PRD e promovido manualmente pelo workflow de producao.
 - [x] Padronizar portas da API: DEV publica em `5059` e PRD publica em `5060`; a API continua ouvindo em `5059` dentro do container.
 - [x] Definir modelo oficial de deploy: por enquanto sera `compose` unico com variaveis por ambiente.
 - [x] Remover fallback fixo do frontend para `http://35.174.50.187:5059/api/v1` e exigir `API_BASE_URL` correta por ambiente.
@@ -160,10 +163,12 @@ Cada compose deve ter:
 
 ### 2.5. Criar pipelines da API
 
-Fluxo sugerido:
+Fluxo atual:
 
-- Push em `develop`: roda testes, builda imagem `api:dev`, publica e faz deploy DEV.
-- Push em `main`: roda testes, builda imagem `api:prd`, publica e faz deploy PRD.
+- Push/merge em `main`: roda testes, builda imagem por SHA, publica no GHCR e faz deploy DEV.
+- Workflow manual `Deploy Backend Production`: promove uma imagem por SHA para PRD.
+
+O workflow manual aceita informar a imagem exata. Se o campo ficar vazio, usa a imagem do SHA selecionado ao executar o workflow.
 
 ### 2.6. Validar API antes do frontend
 
@@ -229,10 +234,12 @@ Cada arquivo deve configurar:
 
 ### 3.5. Criar pipelines do frontend
 
-Fluxo sugerido:
+Fluxo atual:
 
-- Push em `develop`: roda unit/build, publica imagem `web:dev`, deploy DEV.
-- Push em `main`: roda unit/build, publica imagem `web:prd`, deploy PRD.
+- Push/merge em `main`: roda quality gate, builda imagem por SHA, publica no GHCR, faz deploy DEV e valida o frontend DEV.
+- Workflow manual `Deploy Frontend Production`: promove uma imagem por SHA para PRD e roda validacao pos-deploy.
+
+O workflow manual aceita informar a imagem exata. Se o campo ficar vazio, usa a imagem do SHA selecionado ao executar o workflow.
 
 ### 3.6. Validar frontend
 
@@ -257,13 +264,11 @@ Checklist:
 8. Validar API DEV e PRD separadamente.
 9. Criar deploy do frontend DEV apontando para API DEV.
 10. Criar deploy do frontend PRD apontando para API PRD.
-11. Criar branch `develop`.
-12. Ajustar pipelines:
-    - `develop` -> DEV
-    - `main` -> PRD
+11. Validar que push/merge em `main` entrega apenas DEV.
+12. Validar que PRD so muda quando o workflow manual de producao e executado.
 13. Validar fluxo completo:
-    - feature entra em DEV;
-    - depois merge controlado para PRD.
+    - feature entra em DEV automaticamente;
+    - depois o mesmo SHA e promovido manualmente para PRD.
 
 ## Decisoes Pendentes
 
