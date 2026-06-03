@@ -87,7 +87,7 @@ export async function loginWithLiveCredential(page: Page, credential: LiveCreden
       .then(() => true)
       .catch(() => false);
     if (loggedIn) break;
-    await page.waitForTimeout(2500);
+    await expect(page.locator('form').getByRole('button', { name: /Entrar no dashboard/i })).toBeVisible({ timeout: 10000 });
   }
 
   await expect(page).toHaveURL(/\/(onboarding|dashboard)$/i, { timeout: 30000 });
@@ -125,7 +125,7 @@ export async function signUpAndLogin(page: Page, workerIndex: number, retry: num
       .then(() => true)
       .catch(() => false);
     if (signedUp) break;
-    await page.waitForTimeout(2000);
+    await expect(page.getByRole('button', { name: 'Criar conta e entrar' })).toBeEnabled({ timeout: 10000 });
   }
 
   await expect(page.getByRole('heading', { level: 3, name: 'Crie sua conta gratuita' })).toBeHidden({ timeout: 30000 });
@@ -159,7 +159,7 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
       .then(() => true)
       .catch(() => false);
     if (movedToAccountStep) break;
-    await page.waitForTimeout(1500);
+    await expect(page.getByRole('button', { name: 'Salvar e continuar para conta' })).toBeEnabled({ timeout: 10000 });
   }
 
   await expect(page.getByRole('heading', { level: 2, name: 'Crie sua primeira conta' })).toBeVisible();
@@ -189,7 +189,7 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
         .then(() => true)
         .catch(() => false);
       if (opened) return;
-      await page.waitForTimeout(1500);
+      await expect(page.getByRole('button', { name: 'Adicionar receita' })).toBeVisible({ timeout: 10000 });
     }
   };
 
@@ -211,7 +211,7 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
         .then(() => true)
         .catch(() => false);
       if (opened) return;
-      await page.waitForTimeout(1500);
+      await expect(page.getByRole('button', { name: 'Adicionar despesa' })).toBeVisible({ timeout: 10000 });
     }
   };
 

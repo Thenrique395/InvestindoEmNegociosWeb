@@ -127,7 +127,7 @@ test.describe('live write flow', () => {
     await incomesPage.reloadAndExpectRow(updatedName);
     await expect(incomesPage.rowByName(updatedName).getByText('R$ 4.700,00')).toBeVisible();
     await incomesPage.deleteIncome(updatedName);
-    await page.waitForTimeout(2500);
+    await expect(incomesPage.rowByName(updatedName)).toHaveCount(0, { timeout: 20000 });
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(incomesPage.rowByName(updatedName)).toHaveCount(0);
   });
@@ -150,7 +150,6 @@ test.describe('live write flow', () => {
     await expensesPage.markAsPaid(expenseName);
     await expensesPage.openHistory(expenseName);
     await expensesPage.tryReversePaymentExpectRejection();
-    await page.waitForTimeout(2500);
     await expensesPage.closeHistoryModal();
     await expensesPage.reloadAndExpectRow(expenseName);
     await expensesPage.expectStatus(expenseName, 'Pago');
@@ -172,7 +171,7 @@ test.describe('live write flow', () => {
     await incomesPage.createIncome(incomeName, categoryName, '175000');
     await incomesPage.reloadAndExpectRow(incomeName);
     await incomesPage.deleteIncome(incomeName);
-    await page.waitForTimeout(2500);
+    await expect(incomesPage.rowByName(incomeName)).toHaveCount(0, { timeout: 20000 });
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(incomesPage.rowByName(incomeName)).toHaveCount(0);
   });

@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 
+const brl = (value: number) =>
+  new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
+
 test.describe('authenticated write flows', () => {
   test.beforeEach(async ({ page }) => {
     await setupAuthenticatedApp(page);
@@ -14,7 +20,7 @@ test.describe('authenticated write flows', () => {
     await page.getByRole('button', { name: 'Salvar' }).click();
 
     await expect(page.getByRole('heading', { level: 3, name: 'Conta teste E2E' })).toBeVisible();
-    await expect(page.locator('article').filter({ hasText: 'Conta teste E2E' }).getByText(/Saldo:\s*1500/)).toBeVisible();
+    await expect(page.locator('article').filter({ hasText: 'Conta teste E2E' }).getByText(brl(1500))).toBeVisible();
   });
 
   test('cria um novo cartao e reflete na listagem', async ({ page }) => {
@@ -82,8 +88,8 @@ test.describe('authenticated write flows', () => {
 
     const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
     const reserva = page.locator('article').filter({ hasText: 'Reserva' });
-    await expect(contaPrincipal.getByText(/Saldo:\s*3080/)).toBeVisible({ timeout: 10000 });
-    await expect(reserva.getByText(/Saldo:\s*5500/)).toBeVisible({ timeout: 10000 });
+    await expect(contaPrincipal.getByText(brl(3080))).toBeVisible({ timeout: 10000 });
+    await expect(reserva.getByText(brl(5500))).toBeVisible({ timeout: 10000 });
 
     await contaPrincipal.getByRole('button', { name: 'Extrato' }).click();
     await expect(page.getByRole('cell', { name: 'Reserva automática' }).first()).toBeVisible();
@@ -102,7 +108,7 @@ test.describe('authenticated write flows', () => {
     await page.getByRole('button', { name: 'Salvar' }).click();
 
     await expect(page.getByRole('heading', { level: 3, name: 'Conta principal ajustada' })).toBeVisible();
-    await expect(page.locator('article').filter({ hasText: 'Conta principal ajustada' }).getByText(/Saldo:\s*4100/)).toBeVisible();
+    await expect(page.locator('article').filter({ hasText: 'Conta principal ajustada' }).getByText(brl(4100))).toBeVisible();
   });
 
   test('remove uma conta criada na interface', async ({ page }) => {
@@ -141,8 +147,11 @@ test.describe('authenticated write flows', () => {
 
     const cartaoPrincipal = page.locator('article').filter({ hasText: 'Cartao principal' });
     await expect(cartaoPrincipal).toBeVisible();
-    await page.waitForTimeout(1600);
+    const deleteResponse = page.waitForResponse((response) =>
+      response.request().method() === 'DELETE' && response.url().includes('/cards/')
+    );
     await cartaoPrincipal.getByRole('button', { name: 'Remover' }).click();
+    await expect.poll(async () => (await deleteResponse).ok()).toBeTruthy();
 
     await expect(page.getByText('Cartao principal')).toHaveCount(0, { timeout: 10000 });
   });

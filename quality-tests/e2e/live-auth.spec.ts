@@ -38,7 +38,7 @@ async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
       .then(() => true)
       .catch(() => false);
     if (loggedIn) break;
-    await page.waitForTimeout(1500);
+    await expect(page.locator('form').getByRole('button', { name: 'Entrar' })).toBeVisible({ timeout: 10000 });
   }
 
   await expect(page).toHaveURL(/\/(onboarding|dashboard)$/i, { timeout: 30000 });

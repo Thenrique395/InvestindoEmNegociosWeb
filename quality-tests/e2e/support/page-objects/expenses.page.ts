@@ -49,7 +49,7 @@ export class ExpensesPage {
   }
 
   async reloadAndExpectRow(name: string) {
-    await this.page.waitForTimeout(2500);
+    await expect(this.rowByName(name)).toBeVisible({ timeout: 20000 });
     await this.page.reload({ waitUntil: 'domcontentloaded' });
     await expect(this.rowByName(name)).toBeVisible({ timeout: 20000 });
   }
