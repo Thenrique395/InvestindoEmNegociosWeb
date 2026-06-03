@@ -16,6 +16,7 @@ import { SessionMonitorService } from './session-monitor.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { TopbarComponent } from './topbar/topbar.component';
 import { PublicHeaderComponent } from './public-header/public-header.component';
+import { PublicNavigationService } from './public-navigation.service';
 
 @Component({
   selector: 'app-root',
@@ -60,7 +61,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private notificationsService: NotificationsService,
     private uiFeedback: UiFeedbackService,
     private themeService: ThemeService,
-    private sessionMonitor: SessionMonitorService
+    private sessionMonitor: SessionMonitorService,
+    private publicNavigation: PublicNavigationService
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.sub = this.router.events.subscribe((event) => {
@@ -116,28 +118,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   goToPublicHome(event?: Event): void {
-    event?.preventDefault();
-
-    if (this.getCurrentPath() === '/') {
-      this.scrollToPublicTop();
-      return;
-    }
-
-    this.router.navigateByUrl('/').then(() => this.scrollToPublicTop());
+    this.publicNavigation.goToPublicHome(this.getCurrentPath(), this.isBrowser, event);
   }
 
   scrollToPublicSection(sectionId: string, event?: Event): void {
-    event?.preventDefault();
-    const scroll = () => this.scrollToElement(sectionId);
-
-    if (this.getCurrentPath() === '/') {
-      scroll();
-      return;
-    }
-
-    this.router.navigate(['/']).then(() => {
-      window.setTimeout(scroll, 0);
-    });
+    this.publicNavigation.scrollToPublicSection(sectionId, this.getCurrentPath(), this.isBrowser, event);
   }
 
   openSignup(): void {
@@ -375,27 +360,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.apiDataService.refresh();
       }
     }
-  }
-
-  private scrollToElement(sectionId: string): void {
-    if (!this.isBrowser || typeof document === 'undefined' || typeof window === 'undefined') return;
-
-    const target = document.getElementById(sectionId);
-    if (!target) return;
-
-    const headerOffset = 72;
-    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-    window.history.pushState(null, '', `/#${sectionId}`);
-    window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
-  }
-
-  private scrollToPublicTop(): void {
-    if (!this.isBrowser || typeof window === 'undefined') return;
-
-    window.history.replaceState(null, '', '/');
-    window.scrollTo({ top: 0, behavior: 'auto' });
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 80);
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 250);
   }
 
   goToPreferences(event?: Event): void {
