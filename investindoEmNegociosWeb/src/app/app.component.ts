@@ -3,7 +3,7 @@ import { Router, RouterOutlet, NavigationEnd, RouterLink } from '@angular/router
 import { NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
-import { ProfileService, UserProfile } from './profile.service';
+import { ProfileService } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
@@ -18,6 +18,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { TopbarComponent } from './topbar/topbar.component';
 import { PublicHeaderComponent } from './public-header/public-header.component';
 import { PublicNavigationService } from './public-navigation.service';
+import { UserContextFacadeService } from './user-context-facade.service';
 
 @Component({
   selector: 'app-root',
@@ -42,15 +43,17 @@ export class AppComponent implements OnInit, OnDestroy {
   notificationsLoading = false;
   notificationsError = '';
   sidebarOpen = false;
-  profile: UserProfile | null = null;
+  displayName = 'Usuário';
+  avatarUrl = '';
+  userInitials = 'U';
   feedbackMessage: UiFeedbackMessage | null = null;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
   private sub: Subscription;
-  private profileSub?: Subscription;
   private feedbackSub?: Subscription;
   private notificationsSub?: Subscription;
+  private userContextSub?: Subscription;
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
 
@@ -64,7 +67,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private uiFeedback: UiFeedbackService,
     private themeService: ThemeService,
     private sessionMonitor: SessionMonitorService,
-    private publicNavigation: PublicNavigationService
+    private publicNavigation: PublicNavigationService,
+    private userContextFacade: UserContextFacadeService
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.sub = this.router.events.subscribe((event) => {
@@ -113,13 +117,18 @@ export class AppComponent implements OnInit, OnDestroy {
       this.notificationsLoading = state.loading;
       this.notificationsError = state.error;
     });
+    this.userContextSub = this.userContextFacade.state$.subscribe((state) => {
+      this.displayName = state.displayName;
+      this.avatarUrl = state.avatarUrl;
+      this.userInitials = state.userInitials;
+    });
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
-    this.profileSub?.unsubscribe();
     this.feedbackSub?.unsubscribe();
     this.notificationsSub?.unsubscribe();
+    this.userContextSub?.unsubscribe();
     this.sessionMonitor.stop();
   }
 
@@ -231,24 +240,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.getCurrentPath().startsWith(path);
   }
 
-  get displayName(): string {
-    return this.profile?.fullName?.trim() || this.authService.getUserName() || 'Usuário';
-  }
-
-  get avatarUrl(): string {
-    return this.profile?.avatarUrl || '';
-  }
-
-  get userInitials(): string {
-    const name = this.displayName.trim();
-    if (!name) return 'U';
-    const parts = name.split(/\s+/).filter(Boolean);
-    const first = parts.shift() || '';
-    const last = parts.pop() || '';
-    const initials = `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
-    return initials || first.charAt(0).toUpperCase() || 'U';
-  }
-
   private get storage(): Storage | null {
     return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
       ? window.localStorage
@@ -342,17 +333,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private ensureUserContext(): void {
-    if (!this.profileSub) {
-      this.profileSub = this.profileService.profile$.subscribe((profile) => {
-        this.profile = profile;
-      });
-    }
-
-    this.profileService.getProfile().subscribe({
-      error: () => {
-        /* ignore */
-      }
-    });
+    this.userContextFacade.loadProfile();
 
     if (this.userContextInitialized) return;
     this.userContextInitialized = true;
@@ -375,9 +356,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private resetUserContext(): void {
-    this.profileSub?.unsubscribe();
-    this.profileSub = undefined;
-    this.profile = null;
+    this.userContextFacade.reset();
     this.userContextInitialized = false;
     this.notificationsFacade.reset();
   }

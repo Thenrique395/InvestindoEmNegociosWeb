@@ -72,6 +72,10 @@ export class ProfileService {
 
   constructor(private http: HttpClient) {}
 
+  clearProfile(): void {
+    this.profileSubject.next(null);
+  }
+
   getProfile() {
     return this.http.get<UserProfile>(this.baseUrl).pipe(
       tap((profile) => this.profileSubject.next(profile)),
