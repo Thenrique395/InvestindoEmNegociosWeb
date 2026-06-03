@@ -8,6 +8,11 @@ describe('features matrix', () => {
     expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.cardsDelete)).toBeTrue();
   });
 
+  it('deve liberar leitura de categorias para Basic', () => {
+    expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.categoriesAccess)).toBeTrue();
+    expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.categoriesRead)).toBeTrue();
+  });
+
   it('deve bloquear investimentos para Basic e Intermediate', () => {
     expect(hasFeatureForRole('Basic', APP_FEATURE_KEYS.investmentsAccess)).toBeFalse();
     expect(hasFeatureForRole('Intermediate', APP_FEATURE_KEYS.investmentsAccess)).toBeFalse();

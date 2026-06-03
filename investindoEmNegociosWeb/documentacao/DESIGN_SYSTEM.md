@@ -445,6 +445,7 @@ Regras:
 
 - esconder menus e módulos que não geram valor para `Basic`
 - evitar telas de gestão avançada quando o perfil usa defaults do sistema
+- manter `Categorias` disponível para `Basic`, pois classificar receitas e despesas é parte do fluxo operacional básico; restringir apenas gestão avançada/global de categorias
 - manter o mesmo padrão visual dos demais perfis, mudando apenas densidade e disponibilidade
 - remover informações repetidas, principalmente quando já foram configuradas no onboarding
 - cards devem responder a decisões simples: `o que entrou`, `o que saiu`, `o que falta revisar`

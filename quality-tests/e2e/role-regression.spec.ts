@@ -10,6 +10,7 @@ test.describe('role regression', () => {
     await expect(page.getByRole('link', { name: 'Receitas', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Calendário', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Cartões', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Categorias', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Metas', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Calculadoras', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Contas', exact: true })).toHaveCount(0);
@@ -18,6 +19,10 @@ test.describe('role regression', () => {
 
     await page.goto('/calendario', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/calendario$/);
+
+    await page.goto('/categorias', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/\/categorias$/);
+    await expect(page.getByRole('heading', { level: 2, name: 'Organize receitas e despesas' })).toBeVisible();
 
     await page.goto('/investimentos', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/);
@@ -45,6 +50,7 @@ test.describe('role regression', () => {
     await expect(page.getByRole('link', { name: 'Cartões', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Receitas', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Despesas', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Categorias', exact: true })).toBeVisible();
 
     await page.getByRole('link', { name: 'Cartões', exact: true }).click();
     await expect(page).toHaveURL(/\/cartoes$/);
@@ -57,6 +63,10 @@ test.describe('role regression', () => {
     await page.getByRole('link', { name: 'Despesas', exact: true }).click();
     await expect(page).toHaveURL(/\/despesas$/);
     await expect(page.getByRole('heading', { level: 2, name: /Despesas de/i })).toBeVisible();
+
+    await page.getByRole('link', { name: 'Categorias', exact: true }).click();
+    await expect(page).toHaveURL(/\/categorias$/);
+    await expect(page.getByRole('heading', { level: 2, name: 'Organize receitas e despesas' })).toBeVisible();
 
     await page.goto('/investimentos', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/);

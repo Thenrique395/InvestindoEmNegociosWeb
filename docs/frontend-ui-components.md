@@ -20,7 +20,7 @@ Regras de composição:
 - manter CTAs principais em card lateral, rodapé de seção ou footer de modal
 - manter cards irmãos com altura e peso visual equivalentes
 - usar nuances semânticas suaves: receita/sucesso, despesa/perigo, pendência/atenção, informação/azul
-- para `Basic`, esconder gestão avançada e remover módulos sem valor operacional imediato
+- para `Basic`, esconder gestão avançada e remover módulos sem valor operacional imediato; manter `Categorias` como módulo operacional para classificar receitas e despesas
 
 Checklist de UX antes de alterar uma tela:
 
@@ -29,7 +29,7 @@ Checklist de UX antes de alterar uma tela:
 - definir uma ação principal clara ou assumir uma tela de consulta
 - remover textos repetidos entre hero, cards, rodapés e empty states
 - garantir feedback útil para ações bloqueadas, erro, vazio e sucesso
-- validar se `Basic` está recebendo apenas informação útil e operacional
+- validar se `Basic` está recebendo apenas informação útil e operacional, incluindo `Categorias` quando o fluxo envolver classificação de lançamentos
 - manter tamanho, CTA, modal, card e cor semântica consistentes com as telas já ajustadas
 
 Regras de modais:

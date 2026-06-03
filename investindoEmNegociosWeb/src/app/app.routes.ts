@@ -126,7 +126,7 @@ export const routes: Routes = [
   {
     path: 'categorias',
     canActivate: [authGuard, roleGuard],
-    data: { minRole: 'Intermediate', preload: false },
+    data: { feature: APP_FEATURE_KEYS.categoriesRead, preload: false },
     loadComponent: () => import('./categories/categories.component').then((m) => m.CategoriesComponent),
   },
   {

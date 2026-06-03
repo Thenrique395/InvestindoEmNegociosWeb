@@ -182,7 +182,7 @@
               <span class="nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]">Contas</span>
             </a>
           }
-          @if (hasAccess('Intermediate')) {
+          @if (hasFeature(features.categoriesRead)) {
             <a
               routerLink="/categorias"
               routerLinkActive="active"
