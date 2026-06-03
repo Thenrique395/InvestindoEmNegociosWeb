@@ -3,11 +3,9 @@ import { Router, RouterOutlet, NavigationEnd, RouterLink } from '@angular/router
 import { NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
-import { ProfileService } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
-import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 import { NotificationItem } from './notifications.service';
 import { NotificationsFacadeService } from './notifications-facade.service';
 import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
@@ -19,6 +17,7 @@ import { TopbarComponent } from './topbar/topbar.component';
 import { PublicHeaderComponent } from './public-header/public-header.component';
 import { PublicNavigationService } from './public-navigation.service';
 import { UserContextFacadeService } from './user-context-facade.service';
+import { UserPreferencesFacadeService } from './user-preferences-facade.service';
 
 @Component({
   selector: 'app-root',
@@ -60,7 +59,6 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(PLATFORM_ID) platformId: object,
     private router: Router,
-    private profileService: ProfileService,
     private authService: AuthService,
     private apiDataService: ApiDataService,
     private notificationsFacade: NotificationsFacadeService,
@@ -68,7 +66,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private sessionMonitor: SessionMonitorService,
     private publicNavigation: PublicNavigationService,
-    private userContextFacade: UserContextFacadeService
+    private userContextFacade: UserContextFacadeService,
+    private userPreferencesFacade: UserPreferencesFacadeService
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.sub = this.router.events.subscribe((event) => {
@@ -96,12 +95,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const theme = this.themeService.init();
     this.isLightTheme = theme === 'light';
-    const initialLocale = getInitialLocale();
-    const initialCurrency = getInitialCurrency();
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = initialLocale;
-    }
-    setLocaleSettings({ locale: initialLocale, currency: initialCurrency });
+    this.userPreferencesFacade.initFromStorage();
     if (this.isLogged && !this.isOnboardingRoute) this.ensureUserContext();
     this.sessionMonitor.start({
       isProtectedRoute: () => this.isProtectedRoute(this.getCurrentPath()),
@@ -240,12 +234,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.getCurrentPath().startsWith(path);
   }
 
-  private get storage(): Storage | null {
-    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
-      ? window.localStorage
-      : null;
-  }
-
   private getCurrentPath(): string {
     if (this.isBrowser && typeof window !== 'undefined') {
       return (window.location.pathname || '/').split('?')[0];
@@ -338,20 +326,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.userContextInitialized) return;
     this.userContextInitialized = true;
 
-    this.profileService.getPreferences().subscribe({
-      next: (prefs) => {
-        const locale = prefs.locales?.[0] || 'pt-BR';
-        const currency = prefs.currency || 'BRL';
-        if (typeof document !== 'undefined') {
-          document.documentElement.lang = locale;
-        }
-        setLocaleSettings({ locale, currency });
-        persistLocaleSettings(locale, currency);
-      },
-      error: () => {
-        /* ignore */
-      }
-    });
+    this.userPreferencesFacade.loadRemotePreferences();
     this.notificationsFacade.refresh();
   }
 
