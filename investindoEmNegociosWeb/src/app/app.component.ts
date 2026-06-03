@@ -1,12 +1,11 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd, RouterLink } from '@angular/router';
 import { NgClass, isPlatformBrowser } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { ProfileService, UserProfile } from './profile.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
-import { APP_FEATURE_KEYS, AppFeatureKey, hasFeatureForRole } from './features';
 import { ApiDataService } from './data/api-data.service';
 import { getInitialCurrency, getInitialLocale, persistLocaleSettings, setLocaleSettings } from './utils/locale-settings';
 import { NotificationsService, NotificationItem } from './notifications.service';
@@ -14,11 +13,12 @@ import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { ThemeService } from './theme.service';
 import { SessionMonitorService } from './session-monitor.service';
+import { SidebarComponent } from './sidebar/sidebar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgClass, RouterOutlet, RouterLink, RouterLinkActive, SignupComponent],
+  imports: [NgClass, RouterOutlet, RouterLink, SignupComponent, SidebarComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -26,7 +26,6 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Investindo em Negócios';
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
-  readonly features = APP_FEATURE_KEYS;
   isLoginRoute = false;
   isReceitasRoute = false;
   isLightTheme = false;
@@ -287,10 +286,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
-  }
-
-  hasFeature(featureKey: AppFeatureKey): boolean {
-    return hasFeatureForRole(this.currentRole, featureKey);
   }
 
   toggleUserMenu(): void {

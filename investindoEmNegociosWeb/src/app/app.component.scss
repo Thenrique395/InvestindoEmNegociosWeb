@@ -25,76 +25,6 @@
   background: var(--bg);
 }
 
-.sidebar {
-  gap: 0.75rem;
-  padding: 1.35rem 1.05rem !important;
-}
-
-.sidebar__nav {
-  gap: 0.35rem !important;
-}
-
-.sidebar__nav a,
-.sidebar__settings {
-  min-height: 45px !important;
-  padding: 0.52rem 0.72rem !important;
-  border-radius: 13px !important;
-  gap: 0.65rem !important;
-}
-
-.sidebar__nav .nav-icon,
-.sidebar__settings .nav-icon {
-  width: 37px !important;
-  height: 37px !important;
-  border-radius: 12px !important;
-}
-
-.sidebar__nav .nav-text,
-.sidebar__settings .nav-text {
-  font-size: 0.88rem !important;
-  line-height: 1.25 !important;
-}
-
-.sidebar__brand {
-  gap: 0.65rem;
-  padding-bottom: 0.85rem;
-}
-
-.sidebar__logo {
-  height: 30px;
-  width: auto;
-}
-
-.sidebar__title {
-  font-size: 0.95rem;
-  line-height: 1.15;
-}
-
-.sidebar__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.sidebar__nav a,
-.sidebar__settings {
-  min-height: 54px;
-  padding: 0.65rem 1rem !important;
-  border-radius: 16px;
-}
-
-.nav-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-}
-
-.nav-text {
-  font-size: 0.95rem;
-  line-height: 1.25;
-}
-
 .topbar__slogan {
   font-size: 0.8rem;
   font-weight: 700;
@@ -227,13 +157,6 @@
   background: var(--surface-2);
   transform: translateY(-1px);
   border: 1px solid var(--border-strong);
-}
-
-.sidebar__nav a.active .nav-icon {
-  color: var(--primary);
-  background: rgba(37, 99, 235, 0.14);
-  border-color: rgba(37, 99, 235, 0.35);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
 }
 
 .page--logged .content {
