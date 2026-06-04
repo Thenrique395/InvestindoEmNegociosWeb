@@ -68,22 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isBrowser = this.appSession.isBrowserEnvironment();
     this.sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.isLoginRoute = event.urlAfterRedirects.startsWith('/login') || event.urlAfterRedirects.startsWith('/register');
-        this.isReceitasRoute = event.urlAfterRedirects.startsWith('/receitas');
-        const isOnboardingRoute = event.urlAfterRedirects.split('?')[0].startsWith('/onboarding');
-        this.userMenuOpen = false;
-        this.notificationsFacade.close();
-        this.sidebarOpen = false;
-        if (this.isLogged) {
-          if (!isOnboardingRoute) {
-            this.ensureUserContext();
-          }
-          if (!isOnboardingRoute && !event.urlAfterRedirects.startsWith('/receitas')) {
-            this.apiDataService.refresh();
-          }
-        } else {
-          this.resetUserContext();
-        }
+        this.handleNavigationEnd(event);
       }
     });
   }
@@ -297,6 +282,35 @@ export class AppComponent implements OnInit, OnDestroy {
     this.notificationsFacade.refresh();
   }
 
+  private handleNavigationEnd(event: NavigationEnd): void {
+    const currentPath = event.urlAfterRedirects.split('?')[0];
+    this.isLoginRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
+    this.isReceitasRoute = currentPath.startsWith('/receitas');
+    this.closeTransientUi();
+
+    if (this.isLogged) {
+      this.handleAuthenticatedRoute(currentPath);
+      return;
+    }
+
+    this.resetUserContext();
+  }
+
+  private handleAuthenticatedRoute(currentPath: string): void {
+    if (currentPath.startsWith('/onboarding')) return;
+
+    this.ensureUserContext();
+    if (!currentPath.startsWith('/receitas')) {
+      this.apiDataService.refresh();
+    }
+  }
+
+  private closeTransientUi(): void {
+    this.userMenuOpen = false;
+    this.notificationsFacade.close();
+    this.sidebarOpen = false;
+  }
+
   private resetUserContext(): void {
     this.userContextFacade.reset();
     this.userContextInitialized = false;
@@ -305,9 +319,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private handleExpiredSession(): void {
     this.resetUserContext();
-    this.userMenuOpen = false;
-    this.notificationsFacade.close();
-    this.sidebarOpen = false;
+    this.closeTransientUi();
   }
 
 }
