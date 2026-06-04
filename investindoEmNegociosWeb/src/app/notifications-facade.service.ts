@@ -89,6 +89,7 @@ export class NotificationsFacadeService {
         this.patch({
           items: [],
           unreadCount: 0,
+          loading: false,
           error: 'Não foi possível carregar.'
         });
       },
