@@ -29,6 +29,7 @@ import {
   toStoredCard,
   todayIso
 } from './onboarding.helpers';
+import { OnboardingDraftService } from './onboarding-draft.service';
 
 @Component({
   selector: 'app-onboarding',
@@ -132,7 +133,6 @@ export class OnboardingComponent implements OnInit {
   cardsCount = 0;
   initialIncome = { source: '', amount: 0, receivedOn: '' };
   initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null as string | null };
-  private readonly draftStorageKey = 'onboarding_draft';
 
   constructor(
     private fb: FormBuilder,
@@ -145,7 +145,8 @@ export class OnboardingComponent implements OnInit {
     private cardsService: CardsService,
     private plansService: PlansService,
     private categoriesService: CategoriesService,
-    private uiPermissions: UiPermissionsService
+    private uiPermissions: UiPermissionsService,
+    private onboardingDraft: OnboardingDraftService
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
@@ -947,44 +948,24 @@ export class OnboardingComponent implements OnInit {
   }
 
   private restoreDraft(): void {
-    if (typeof window === 'undefined') return;
+    const draft = this.onboardingDraft.read();
+    if (!draft) return;
 
-    try {
-      const raw = window.localStorage.getItem(this.draftStorageKey);
-      if (!raw) return;
-
-      const draft = JSON.parse(raw) as {
-        focus?: FocusArea;
-        intelligenceMode?: IntelligenceMode;
-        carryOverDay?: number;
-      };
-      if (draft.focus && this.focusOptions.some((option) => option.id === draft.focus)) {
-        this.focus = draft.focus;
-      }
-      if (draft.intelligenceMode === 'B' || draft.intelligenceMode === 'C') {
-        this.intelligenceMode = draft.intelligenceMode;
-      }
-      if (Number.isInteger(draft.carryOverDay) && Number(draft.carryOverDay) >= 1 && Number(draft.carryOverDay) <= 31) {
-        this.carryOverDay = Number(draft.carryOverDay);
-      }
-    } catch {
-      window.localStorage.removeItem(this.draftStorageKey);
-    }
+    this.focus = draft.focus;
+    this.intelligenceMode = draft.intelligenceMode;
+    this.carryOverDay = draft.carryOverDay;
   }
 
   saveDraft(): void {
-    if (typeof window === 'undefined') return;
-
-    window.localStorage.setItem(this.draftStorageKey, JSON.stringify({
+    this.onboardingDraft.save({
       focus: this.focus,
       intelligenceMode: this.intelligenceMode,
       carryOverDay: this.carryOverDay
-    }));
+    });
   }
 
   private clearDraft(): void {
-    if (typeof window === 'undefined') return;
-    window.localStorage.removeItem(this.draftStorageKey);
+    this.onboardingDraft.clear();
   }
 
 }

@@ -48,6 +48,12 @@ class UiPermissionsServiceMock {
   canReadCards = jasmine.createSpy().and.returnValue(true);
 }
 
+class OnboardingDraftServiceMock {
+  read = jasmine.createSpy().and.returnValue(null);
+  save = jasmine.createSpy();
+  clear = jasmine.createSpy();
+}
+
 class RouterMock {
   navigateByUrl = jasmine.createSpy().and.resolveTo(true);
 }
@@ -62,6 +68,7 @@ function createComponent() {
   const plans = new PlansServiceMock();
   const categories = new CategoriesServiceMock();
   const uiPermissions = new UiPermissionsServiceMock();
+  const onboardingDraft = new OnboardingDraftServiceMock();
   const router = new RouterMock();
 
   const component = new OnboardingComponent(
@@ -75,10 +82,11 @@ function createComponent() {
     cards as any,
     plans as any,
     categories as any,
-    uiPermissions as any
+    uiPermissions as any,
+    onboardingDraft as any
   );
 
-  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, uiPermissions, router };
+  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, uiPermissions, onboardingDraft, router };
 }
 
 describe('OnboardingComponent smoke', () => {
