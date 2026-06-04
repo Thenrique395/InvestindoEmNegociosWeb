@@ -8,7 +8,7 @@ import { FocusArea, IntelligenceMode } from './onboarding.types';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AuthService } from '../auth.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
-import { CardDto, CardsService } from '../cards.service';
+import { CardsService } from '../cards.service';
 import { CreatePlanPayload, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
@@ -18,6 +18,17 @@ import { ReceitasFormComponent } from '../receitas/receitas-form.component';
 import { DespesasFormComponent } from '../despesas/despesas-form.component';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { parseLocaleDate, parseLocalizedNumber } from '../utils/locale-utils';
+import {
+  accountTypeLabel,
+  brToIso,
+  createExpenseDraft,
+  createIncomeDraft,
+  isoToBr,
+  maskCpf,
+  maskPhone,
+  toStoredCard,
+  todayIso
+} from './onboarding.helpers';
 
 @Component({
   selector: 'app-onboarding',
@@ -34,7 +45,7 @@ export class OnboardingComponent implements OnInit {
   liveMessage = '';
   readonly totalSteps = 4;
   readonly minBirthDate = '1900-01-01';
-  readonly maxBirthDate = this.todayIso();
+  readonly maxBirthDate = todayIso();
   step = 0;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode | null = null;
@@ -101,12 +112,12 @@ export class OnboardingComponent implements OnInit {
   savingIncomeModal = false;
   savingExpenseModal = false;
   showStep4Validation = false;
-  modalIncome: StoredIncome = this.createIncomeDraft();
+  modalIncome: StoredIncome = createIncomeDraft();
   modalIncomeAmountInput = '';
   modalIncomeDateInput = '';
   modalIncomeDateError = '';
   modalIncomeCategoryError = '';
-  modalExpense: StoredExpense = this.createExpenseDraft();
+  modalExpense: StoredExpense = createExpenseDraft();
   modalExpenseAmountInput = '';
   modalExpenseDateInput = '';
   modalExpenseDateError = '';
@@ -349,13 +360,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   accountTypeLabel(type: AccountType): string {
-    switch (type) {
-      case 'Checking': return 'Conta corrente';
-      case 'Savings': return 'Poupança';
-      case 'DigitalWallet': return 'Carteira digital';
-      case 'Cash': return 'Dinheiro';
-      default: return 'Outro';
-    }
+    return accountTypeLabel(type);
   }
 
   hasError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country', type: string): boolean {
@@ -480,9 +485,9 @@ export class OnboardingComponent implements OnInit {
   openIncomeModal(): void {
     if (!this.accountReady || this.savingIncomeModal) return;
     this.loadCategories('Income', true);
-    this.modalIncome = this.createIncomeDraft();
+    this.modalIncome = createIncomeDraft();
     this.modalIncomeAmountInput = '';
-    this.modalIncomeDateInput = this.isoToBr(this.todayIso());
+    this.modalIncomeDateInput = isoToBr(todayIso());
     this.modalIncomeDateError = '';
     this.modalIncomeCategoryError = '';
     this.showIncomeModal = true;
@@ -536,7 +541,7 @@ export class OnboardingComponent implements OnInit {
       title: this.modalIncome.fonte.trim(),
       amount,
       schedule: this.modalIncome.fixa ? 'Recurring' : 'OneTime',
-      startDate: this.brToIso(this.modalIncomeDateInput),
+      startDate: brToIso(this.modalIncomeDateInput),
       frequency: this.modalIncome.fixa ? 'Monthly' : null,
       installmentsCount: this.modalIncome.fixa ? null : 1,
       categoryId: this.modalIncome.categoryId,
@@ -551,7 +556,7 @@ export class OnboardingComponent implements OnInit {
         this.initialIncome = {
           source: this.modalIncome.fonte.trim(),
           amount,
-          receivedOn: this.brToIso(this.modalIncomeDateInput)
+          receivedOn: brToIso(this.modalIncomeDateInput)
         };
         this.uiFeedback.success('Receita inicial cadastrada.');
       },
@@ -565,9 +570,9 @@ export class OnboardingComponent implements OnInit {
   openExpenseModal(): void {
     if (!this.accountReady || this.savingExpenseModal) return;
     this.loadCategories('Expense', true);
-    this.modalExpense = this.createExpenseDraft();
+    this.modalExpense = createExpenseDraft();
     this.modalExpenseAmountInput = '';
-    this.modalExpenseDateInput = this.isoToBr(this.todayIso());
+    this.modalExpenseDateInput = isoToBr(todayIso());
     this.modalExpenseDateError = '';
     this.modalExpenseCategoryError = '';
     this.modalExpenseFormaPagamento = 'avista';
@@ -688,7 +693,7 @@ export class OnboardingComponent implements OnInit {
       title: this.modalExpense.nome.trim(),
       amount: launchAmount,
       schedule,
-      startDate: this.brToIso(this.modalExpenseDateInput),
+      startDate: brToIso(this.modalExpenseDateInput),
       frequency,
       installmentsCount,
       categoryId: this.modalExpense.categoryId,
@@ -703,7 +708,7 @@ export class OnboardingComponent implements OnInit {
         this.initialExpense = {
           name: this.modalExpense.nome.trim(),
           amount,
-          dueDate: this.brToIso(this.modalExpenseDateInput),
+          dueDate: brToIso(this.modalExpenseDateInput),
           categoryId: this.modalExpense.categoryId || null
         };
         this.uiFeedback.success('Despesa inicial cadastrada.');
@@ -751,7 +756,7 @@ export class OnboardingComponent implements OnInit {
     this.cardsService.list().subscribe({
       next: (cards) => {
         this.cardsCount = (cards || []).length;
-        this.modalExpenseCartoes = (cards || []).map((card) => this.toStoredCard(card));
+        this.modalExpenseCartoes = (cards || []).map((card) => toStoredCard(card));
       },
       error: () => {
         this.cardsCount = 0;
@@ -852,21 +857,6 @@ export class OnboardingComponent implements OnInit {
     });
   }
 
-  private maskCpf(value: string): string {
-    const digits = (value || '').replace(/\D/g, '').slice(0, 11);
-    return digits
-      .replace(/^(\d{3})(\d)/, '$1.$2')
-      .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
-      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-  }
-
-  private maskPhone(value: string): string {
-    const digits = (value || '').replace(/\D/g, '').slice(0, 11);
-    if (!digits) return '';
-    if (digits.length <= 2) return `(${digits}`;
-    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-  }
   trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
@@ -891,47 +881,8 @@ export class OnboardingComponent implements OnInit {
     return this.currentRole !== 'Basic';
   }
 
-  private todayIso(): string {
-    return new Date().toISOString().slice(0, 10);
-  }
-
-  private createIncomeDraft(): StoredIncome {
-    return {
-      id: '',
-      fonte: '',
-      categoria: '',
-      categoryId: null,
-      valor: 0,
-      recebimento: '',
-      fixa: false
-    };
-  }
-
-  private createExpenseDraft(): StoredExpense {
-    return {
-      id: '',
-      nome: '',
-      categoria: '',
-      categoryId: null,
-      valor: 0,
-      vencimento: ''
-    };
-  }
-
   private isValidBrDate(value: string): boolean {
     return !!parseLocaleDate(value);
-  }
-
-  private brToIso(value: string): string {
-    const [dd, mm, yyyy] = value.split('/');
-    if (!dd || !mm || !yyyy) return this.todayIso();
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
-  private isoToBr(value: string): string {
-    const [yyyy, mm, dd] = (value || '').split('-');
-    if (!yyyy || !mm || !dd) return '';
-    return `${dd}/${mm}/${yyyy}`;
   }
 
   private announce(message: string): void {
@@ -971,8 +922,8 @@ export class OnboardingComponent implements OnInit {
 
         this.form.patchValue({
           fullName: data.fullName || this.authService.getUserName(),
-          document: this.maskCpf(data.document),
-          phone: this.maskPhone(data.phone),
+          document: maskCpf(data.document),
+          phone: maskPhone(data.phone),
           birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
           city: data.city ?? '',
           state: data.state ?? '',
@@ -1034,19 +985,6 @@ export class OnboardingComponent implements OnInit {
   private clearDraft(): void {
     if (typeof window === 'undefined') return;
     window.localStorage.removeItem(this.draftStorageKey);
-  }
-
-  private toStoredCard(card: CardDto): StoredCard {
-    return {
-      id: card.id,
-      bandeira: String(card.brandId),
-      numero: card.last4,
-      nome: card.nickname || card.holderName,
-      banco: card.bank || '',
-      limiteCredito: card.creditLimit ?? 0,
-      diaFechamento: card.statementCloseDay ?? 1,
-      diaVencimento: card.dueDay ?? 1
-    };
   }
 
 }
