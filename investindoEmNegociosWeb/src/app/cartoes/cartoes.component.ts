@@ -12,6 +12,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
 import { CardsStore } from '../cards.store';
 import { FormState } from '../utils/form-state';
+import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -24,7 +25,8 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     DatePipe,
     DecimalPipe,
     CartoesListagemComponent,
-    DigitOnlyDirective
+    DigitOnlyDirective,
+    TooltipComponent
 ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']

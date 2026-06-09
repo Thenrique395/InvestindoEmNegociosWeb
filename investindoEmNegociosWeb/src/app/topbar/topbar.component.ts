@@ -32,9 +32,11 @@ export class TopbarComponent {
   @Input({ required: true }) avatarUrl = '';
   @Input({ required: true }) userInitials = 'U';
   @Input({ required: true }) displayName = 'Usuário';
+  @Input({ required: true }) isLightTheme = true;
   @Input() currentRole: UserRole | null = null;
 
   @Output() sidebarToggle = new EventEmitter<void>();
+  @Output() themeToggle = new EventEmitter<void>();
   @Output() notificationsToggle = new EventEmitter<void>();
   @Output() notificationsRefresh = new EventEmitter<void>();
   @Output() notificationRead = new EventEmitter<TopbarNotificationRead>();

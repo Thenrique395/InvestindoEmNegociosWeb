@@ -14,6 +14,7 @@ import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
+import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -26,7 +27,7 @@ import {
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })

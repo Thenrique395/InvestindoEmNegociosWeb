@@ -15,42 +15,42 @@ export class PricingComponent {
   plans = MARKETING_PLANS;
   commercialSteps = [
     {
-      title: 'Comecar',
+      title: 'Começar',
       copy: 'Use o Essencial para sair do improviso e validar a rotina sem custo.'
     },
     {
       title: 'Prever',
-      copy: 'Suba para Controle quando cartao, vencimentos e saldo real passarem a pesar no seu mes.'
+      copy: 'Suba para Controle quando cartão, vencimentos e saldo real passarem a pesar no seu mês.'
     },
     {
       title: 'Evoluir',
-      copy: 'Vá para Patrimonio quando a sua rotina ja estiver madura e a meta virar crescimento financeiro.'
+      copy: 'Vá para Patrimônio quando a sua rotina já estiver madura e a meta virar crescimento financeiro.'
     }
   ];
   comparisonRows = [
     {
       label: 'Resultado principal',
-      values: ['Comecar a organizar', 'Operar o mes com previsibilidade', 'Acompanhar patrimonio e evolucao']
+      values: ['Começar a organizar', 'Operar o mês com previsibilidade', 'Acompanhar patrimônio e evolução']
     },
     {
       label: 'Receitas, despesas e metas',
       values: ['Sim', 'Sim', 'Sim']
     },
     {
-      label: 'Cartoes e fechamento por competencia',
-      values: ['Nao', 'Sim', 'Sim']
+      label: 'Cartões e fechamento por competência',
+      values: ['Não', 'Sim', 'Sim']
     },
     {
-      label: 'Importacao de fatura em PDF',
-      values: ['Nao', 'Sim', 'Sim']
+      label: 'Importação de fatura em PDF',
+      values: ['Não', 'Sim', 'Sim']
     },
     {
-      label: 'Contas, saldo real e transferencias',
-      values: ['Nao', 'Sim', 'Sim']
+      label: 'Contas, saldo real e transferências',
+      values: ['Não', 'Sim', 'Sim']
     },
     {
-      label: 'Investimentos e patrimonio',
-      values: ['Nao', 'Nao', 'Sim']
+      label: 'Investimentos e patrimônio',
+      values: ['Não', 'Não', 'Sim']
     }
   ];
   faqs = [
@@ -67,8 +67,8 @@ export class PricingComponent {
       answer: 'Quando você já controla o mês e quer consolidar investimentos e patrimônio no mesmo painel.'
     },
     {
-      question: 'Qual plano e mais indicado para a maioria dos usuarios pagantes?',
-      answer: 'Controle. Ele resolve a dor mais comum de quem usa cartao, precisa prever vencimentos e quer saber o que sobra no fim do mes.'
+      question: 'Qual plano é mais indicado para a maioria dos usuários pagantes?',
+      answer: 'Controle. Ele resolve a dor mais comum de quem usa cartão, precisa prever vencimentos e quer saber o que sobra no fim do mês.'
     }
   ];
 

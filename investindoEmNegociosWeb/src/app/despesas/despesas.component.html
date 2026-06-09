@@ -12,13 +12,7 @@
           <p class="expenses-summary-card__eyebrow">Pendentes</p>
           <h3 class="expenses-summary-card__title">R$ {{ totalPendentes | number:'1.2-2' }}</h3>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre despesas pendentes">
-          ?
-          <span class="ui-tooltip__panel">
-            Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas.
-          </span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
+        <app-tooltip label="Mais informações sobre despesas pendentes" text="Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas." />
       </div>
       <p class="expenses-summary-card__note">Contas abertas para o período atual.</p>
     </article>
@@ -34,13 +28,7 @@
           <p class="expenses-summary-card__eyebrow">Antecipadas</p>
           <h3 class="expenses-summary-card__title">R$ {{ totalAntecipadas | number:'1.2-2' }}</h3>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre despesas antecipadas">
-          ?
-          <span class="ui-tooltip__panel">
-            Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período.
-          </span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
+        <app-tooltip label="Mais informações sobre despesas antecipadas" text="Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período." />
       </div>
       <p class="expenses-summary-card__note">Pagamentos feitos antes do vencimento.</p>
     </article>
@@ -56,13 +44,7 @@
           <p class="expenses-summary-card__eyebrow">Pagas</p>
           <h3 class="expenses-summary-card__title">R$ {{ totalPagas | number:'1.2-2' }}</h3>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre despesas pagas">
-          ?
-          <span class="ui-tooltip__panel">
-            Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações.
-          </span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
+        <app-tooltip label="Mais informações sobre despesas pagas" text="Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações." />
       </div>
       <p class="expenses-summary-card__note">Saídas já liquidadas neste período.</p>
     </article>
@@ -82,13 +64,7 @@
             <div class="expenses-hero__comparison">
               <span class="expenses-comparison-pill">
                 <span class="expenses-comparison-pill__label">Comparado a {{ comparison.month }}</span>
-                <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de despesas">
-                  ?
-                  <span class="ui-tooltip__panel">
-                    Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução.
-                  </span>
-                  <span class="ui-tooltip__arrow"></span>
-                </button>
+                <app-tooltip label="Mais informações sobre comparativo de despesas" text="Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução." size="sm" />
                 <span
                   class="expenses-comparison-pill__delta"
                 [ngClass]="comparison.trend === 'up'

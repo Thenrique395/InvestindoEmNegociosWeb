@@ -12,13 +12,7 @@
             <p class="receitas-summary-card__eyebrow">Recebidas</p>
             <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</h3>
           </div>
-          <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas recebidas">
-            ?
-            <span class="ui-tooltip__panel">
-              Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos.
-            </span>
-            <span class="ui-tooltip__arrow"></span>
-          </button>
+          <app-tooltip label="Mais informações sobre receitas recebidas" text="Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos." />
         </div>
         <p class="receitas-summary-card__note">
           Entradas já confirmadas neste período.
@@ -37,13 +31,7 @@
             <p class="receitas-summary-card__eyebrow">Pendentes</p>
             <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</h3>
           </div>
-          <button type="button" class="ui-tooltip" aria-label="Mais informações sobre receitas pendentes">
-            ?
-            <span class="ui-tooltip__panel">
-              Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos.
-            </span>
-            <span class="ui-tooltip__arrow"></span>
-          </button>
+          <app-tooltip label="Mais informações sobre receitas pendentes" text="Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos." />
         </div>
         <p class="receitas-summary-card__note">
           Valores previstos que ainda não entraram.
@@ -69,13 +57,7 @@
               }}
             </h3>
           </div>
-          <button type="button" class="ui-tooltip" aria-label="Mais informações sobre comparativo de receitas">
-            ?
-            <span class="ui-tooltip__panel">
-              Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.
-            </span>
-            <span class="ui-tooltip__arrow"></span>
-          </button>
+          <app-tooltip label="Mais informações sobre comparativo de receitas" text="Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução." />
         </div>
         <p class="receitas-summary-card__note">
           Como este mês está ficando frente ao anterior.
@@ -111,13 +93,7 @@
             <div class="receitas-hero__comparison">
               <span class="receitas-comparison-pill">
                 <span class="receitas-comparison-pill__label">Comparado a {{ comparison.monthLabel }}</span>
-                <button type="button" class="ui-tooltip ui-tooltip--sm" aria-label="Mais informações sobre comparativo de receitas">
-                  ?
-                  <span class="ui-tooltip__panel">
-                    Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.
-                  </span>
-                  <span class="ui-tooltip__arrow"></span>
-                </button>
+                <app-tooltip label="Mais informações sobre comparativo de receitas" text="Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução." size="sm" />
                 <span
                 [ngClass]="comparison.trend === 'up'
                   ? 'receitas-comparison-pill__delta--up'

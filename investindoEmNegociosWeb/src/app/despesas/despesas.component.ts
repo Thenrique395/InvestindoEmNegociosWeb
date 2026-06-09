@@ -17,6 +17,7 @@ import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
+import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import {
   formatLocaleDate,
   formatMonthLabelFromKey,
@@ -38,7 +39,8 @@ import {
     FormsModule,
     DespesasListaComponent,
     DespesasFormComponent,
-    InvoiceImportComponent
+    InvoiceImportComponent,
+    TooltipComponent
 ],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss']

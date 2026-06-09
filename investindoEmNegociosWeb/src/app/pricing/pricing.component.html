@@ -2,10 +2,10 @@
   <section class="pricing-hero">
     <div class="pricing-hero__content">
       <p class="eyebrow">Planos</p>
-      <h1>Comece com clareza, pague por previsibilidade, evolua para patrimonio</h1>
+      <h1>Comece com clareza, pague por previsibilidade, evolua para patrimônio</h1>
       <p class="lead">
-        O Essencial tira voce do improviso. O Controle organiza o mes com menos surpresa e menos retrabalho. O
-        Patrimonio conecta a rotina financeira com crescimento e visao de longo prazo.
+        O Essencial tira você do improviso. O Controle organiza o mês com menos surpresa e menos retrabalho. O
+        Patrimônio conecta a rotina financeira com crescimento e visão de longo prazo.
       </p>
       <div class="hero-points">
         <span>Comece sem custo</span>
@@ -24,8 +24,8 @@
         </button>
       </div>
       <div class="hero-callout">
-        <strong>{{ cycle === 'Yearly' ? 'Anual para consolidar o habito financeiro' : 'Mensal para reduzir friccao na decisao' }}</strong>
-        <span>{{ cycle === 'Yearly' ? 'Baixe o custo equivalente por mes e assuma uma rotina mais consistente ao longo do ano.' : 'Entre no plano certo com menor compromisso inicial e ajuste depois se precisar.' }}</span>
+        <strong>{{ cycle === 'Yearly' ? 'Anual para consolidar o hábito financeiro' : 'Mensal para reduzir fricção na decisão' }}</strong>
+        <span>{{ cycle === 'Yearly' ? 'Baixe o custo equivalente por mês e assuma uma rotina mais consistente ao longo do ano.' : 'Entre no plano certo com menor compromisso inicial e ajuste depois se precisar.' }}</span>
       </div>
     </div>
   </section>
@@ -33,10 +33,10 @@
   <section class="progression-card">
     <div class="comparison-head">
       <div>
-        <p class="eyebrow">Progressao</p>
-        <h2>A logica comercial dos planos precisa ser obvia</h2>
+        <p class="eyebrow">Progressão</p>
+        <h2>A lógica comercial dos planos precisa ser óbvia</h2>
       </div>
-      <p class="comparison-copy">A venda funciona melhor quando o usuario entende em que etapa esta e qual o proximo passo natural.</p>
+      <p class="comparison-copy">A venda funciona melhor quando o usuário entende em que etapa está e qual o próximo passo natural.</p>
     </div>
 
     <div class="progression-grid">
@@ -78,7 +78,7 @@
         </div>
         <p class="plan-highlight">{{ plan.highlight }}</p>
         <div class="plan-section">
-          <h3>O que voce destrava</h3>
+          <h3>O que você destrava</h3>
           <ul>
             @for (feature of plan.features; track feature) {
               <li>{{ feature }}</li>
@@ -98,9 +98,9 @@
             class="btn btn--primary"
             [routerLink]="['/checkout']"
             [queryParams]="{ plan: plan.code, cycle: cycle }">
-            {{ plan.code === 'basic' ? 'Comecar sem custo' : plan.code === 'intermediate' ? 'Escolher Controle' : 'Evoluir para Patrimonio' }}
+            {{ plan.code === 'basic' ? 'Começar sem custo' : plan.code === 'intermediate' ? 'Escolher Controle' : 'Evoluir para Patrimônio' }}
           </a>
-          <a class="btn btn--ghost" routerLink="/">Ver visao do produto</a>
+          <a class="btn btn--ghost" routerLink="/">Ver visão do produto</a>
         </div>
       </article>
     }
@@ -110,9 +110,9 @@
     <div class="comparison-head">
       <div>
         <p class="eyebrow">Comparativo</p>
-        <h2>O que muda na pratica entre os planos</h2>
+        <h2>O que muda na prática entre os planos</h2>
       </div>
-      <p class="comparison-copy">A decisao fica mais facil quando a diferenca entre entrada, previsibilidade e patrimonio e objetiva.</p>
+      <p class="comparison-copy">A decisão fica mais fácil quando a diferença entre entrada, previsibilidade e patrimônio é objetiva.</p>
     </div>
 
     <div class="comparison-table" role="table" aria-label="Comparativo de planos">
@@ -136,20 +136,20 @@
   <section class="trust-card">
     <div>
       <p class="eyebrow">Escolha guiada</p>
-      <h2>Qual plano faz sentido para voce agora?</h2>
+      <h2>Qual plano faz sentido para você agora?</h2>
     </div>
     <div class="trust-grid">
       <article>
         <strong>Essencial</strong>
-        <p>Se voce quer parar de se perder e criar uma base simples sem pagar para testar.</p>
+        <p>Se você quer parar de se perder e criar uma base simples sem pagar para testar.</p>
       </article>
       <article>
         <strong>Controle</strong>
-        <p>Se voce usa cartao, precisa prever vencimentos e quer saber com mais clareza o que sobra no mes.</p>
+        <p>Se você usa cartão, precisa prever vencimentos e quer saber com mais clareza o que sobra no mês.</p>
       </article>
       <article>
         <strong>Patrimonio</strong>
-        <p>Se voce ja controla a rotina e quer transformar acompanhamento mensal em visao patrimonial.</p>
+        <p>Se você já controla a rotina e quer transformar acompanhamento mensal em visão patrimonial.</p>
       </article>
     </div>
   </section>

@@ -12,11 +12,7 @@
           <p class="cards-summary-card__eyebrow">Cartões ativos</p>
           <h3 class="cards-summary-card__title">{{ totalCards }}</h3>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre cartões ativos">
-          ?
-          <span class="ui-tooltip__panel">Quantidade de cartões cadastrados e disponíveis para acompanhar limite e fatura.</span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
+        <app-tooltip label="Mais informações sobre cartões ativos" text="Quantidade de cartões cadastrados e disponíveis para acompanhar limite e fatura." />
       </div>
       <p class="cards-summary-card__note">Base disponível para registrar compras e acompanhar vencimentos.</p>
     </article>
@@ -32,11 +28,7 @@
           <p class="cards-summary-card__eyebrow">Limite total</p>
           <h3 class="cards-summary-card__title">R$ {{ totalLimit | number:'1.2-2' }}</h3>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre limite total">
-          ?
-          <span class="ui-tooltip__panel">Soma do limite de crédito de todos os cartões cadastrados para o usuário atual.</span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
+        <app-tooltip label="Mais informações sobre limite total" text="Soma do limite de crédito de todos os cartões cadastrados para o usuário atual." />
       </div>
       <p class="cards-summary-card__note">Visão consolidada do potencial de compra disponível nos cartões.</p>
     </article>
@@ -53,11 +45,7 @@
           <p class="cards-summary-card__eyebrow">Próximo fechamento</p>
           <h3 class="cards-summary-card__title">{{ nextClosingDay ? ('Dia ' + nextClosingDay) : '—' }}</h3>
         </div>
-        <button type="button" class="ui-tooltip" aria-label="Mais informações sobre próximo fechamento">
-          ?
-          <span class="ui-tooltip__panel">Mostra o menor dia de fechamento entre os cartões cadastrados e a referência de vencimento vinculada a ele.</span>
-          <span class="ui-tooltip__arrow"></span>
-        </button>
+        <app-tooltip label="Mais informações sobre próximo fechamento" text="Mostra o menor dia de fechamento entre os cartões cadastrados e a referência de vencimento vinculada a ele." />
       </div>
       @if (nextDueDay) {
         <p class="cards-summary-card__note">Vencimento associado no dia {{ nextDueDay }}.</p>

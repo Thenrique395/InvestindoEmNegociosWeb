@@ -132,9 +132,6 @@ app-ui-state {
     --text-xl: 18px;
     --text-2xl: 22px;
     --text-3xl: 26px;
-    --space-3: 18px;
-    --space-4: 24px;
-    --space-5: 32px;
     --control-h: 44px;
   }
 
@@ -273,5 +270,33 @@ app-ui-state {
   .overflow-x-auto table,
   .table-responsive table {
     min-width: 640px;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-grid,
+  .responsive-grid--compact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .responsive-actions,
+  .actions {
+    gap: var(--spacing-1);
+  }
+}
+
+@media (max-width: 375px) {
+  .main,
+  main {
+    padding-inline: var(--spacing-1) !important;
+  }
+
+  h1 {
+    font-size: clamp(1.2rem, 7vw, 1.5rem);
+  }
+
+  .global-alert {
+    inset-inline: var(--spacing-1);
+    width: auto;
   }
 }

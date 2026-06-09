@@ -6,6 +6,18 @@
   </button>
   <div class="topbar__slogan hidden text-[var(--text-sm)] font-medium text-[var(--text-muted)] xl:block">{{ brandSlogan }}</div>
   <div class="topbar__actions flex min-w-0 flex-1 items-center justify-end gap-[var(--space-2)] max-sm:flex-wrap">
+    <button
+      class="theme-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
+      type="button"
+      (click)="themeToggle.emit()"
+      [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'"
+      [attr.title]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
+      @if (isLightTheme) {
+        <span aria-hidden="true">☾</span>
+      } @else {
+        <span aria-hidden="true">☀</span>
+      }
+    </button>
     <div class="notifications relative" [class.open]="notificationsOpen">
       <button class="notif-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="notificationsToggle.emit()" aria-label="Notificações">
         <svg viewBox="0 0 24 24" role="presentation" focusable="false">

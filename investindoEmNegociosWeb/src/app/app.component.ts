@@ -235,6 +235,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
+  toggleTheme(): void {
+    this.isLightTheme = this.themeService.toggle() === 'light';
+  }
+
   closeSidebar(): void {
     this.sidebarOpen = false;
   }
