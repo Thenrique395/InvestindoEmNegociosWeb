@@ -140,14 +140,14 @@
                 <td class="px-4 py-3">
                   <span
                     class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
-                    [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-rose-200 bg-rose-100 text-rose-700'">
+                    [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-[var(--success-text)]' : 'border border-rose-200 bg-rose-100 text-[var(--danger-text)]'">
                     {{ row.wasSkipped ? 'Pulado' : (row.success ? 'Sucesso' : 'Falha') }}
                   </span>
                 </td>
                 <td class="px-4 py-3">{{ row.metrics.itemsGenerated }}</td>
                 <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-muted)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
                 <td class="px-4 py-3 text-[var(--text-muted)]">{{ zeroItemsReasonLabel(row.metrics.zeroItemsReasonCode) }}</td>
-                <td class="px-4 py-3 text-rose-600">{{ row.error || '-' }}</td>
+                <td class="px-4 py-3 text-[var(--danger-text)]">{{ row.error || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
                     <button
@@ -189,10 +189,10 @@
             <span
               class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
             [ngClass]="selectedRun.wasSkipped
-              ? 'border-amber-200 bg-amber-100 text-amber-700'
+              ? 'border-amber-200 bg-amber-100 text-[var(--warning-text)]'
               : (selectedRun.success
-                  ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
-                  : 'border-rose-200 bg-rose-100 text-rose-700')">
+                  ? 'border-emerald-200 bg-emerald-100 text-[var(--success-text)]'
+                  : 'border-rose-200 bg-rose-100 text-[var(--danger-text)]')">
               {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}
             </span>
             <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
@@ -247,7 +247,7 @@
               </div>
               <div class="modal-dl__row">
                 <dt>Erro</dt>
-                <dd [ngClass]="selectedRun.error ? 'text-rose-600' : 'text-[var(--text-muted)]'">{{ selectedRun.error || '-' }}</dd>
+                <dd [ngClass]="selectedRun.error ? 'text-[var(--danger-text)]' : 'text-[var(--text-muted)]'">{{ selectedRun.error || '-' }}</dd>
               </div>
             </dl>
           </section>

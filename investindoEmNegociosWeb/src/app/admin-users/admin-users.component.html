@@ -62,7 +62,7 @@
                 <td class="px-6 py-4">
                   <span
                     class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                    [ngClass]="user.isActive ? 'border border-emerald-200 bg-emerald-100 text-emerald-700' : 'border border-slate-200 bg-slate-100 text-slate-600'">
+                    [ngClass]="user.isActive ? 'border border-emerald-200 bg-emerald-100 text-[var(--success-text)]' : 'border border-slate-200 bg-slate-100 text-slate-600'">
                     {{ user.isActive ? 'Ativo' : 'Inativo' }}
                   </span>
                 </td>

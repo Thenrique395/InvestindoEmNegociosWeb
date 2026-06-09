@@ -25,7 +25,7 @@
 .checkout-hero h1 {
   margin: 0;
   font-size: clamp(1.8rem, 4vw, 3rem);
-  line-height: 1;
+  line-height: var(--line-height-display);
 }
 
 .lead,
@@ -39,7 +39,7 @@
 .link-back {
   color: var(--text);
   text-decoration: none;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .checkout-grid {
@@ -91,7 +91,7 @@
   color: var(--text-secondary);
   padding: 0.65rem 1rem;
   border-radius: var(--radius-pill);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .billing-switch__item.is-active {
@@ -125,7 +125,7 @@
 
 .plan-option span {
   color: var(--text-secondary);
-  line-height: 1.45;
+  line-height: var(--line-height-body);
 }
 
 .plan-option b {
@@ -144,20 +144,20 @@
   gap: 0.45rem;
   flex-wrap: wrap;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: var(--font-size-body-sm);
 }
 
 .checkout-card__footer a {
-  color: var(--primary);
-  font-weight: 700;
+  color: var(--primary-text);
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
 }
 
 .text-link {
   border: 0;
   background: transparent;
-  color: var(--primary);
-  font-weight: 700;
+  color: var(--primary-text);
+  font-weight: var(--font-weight-bold);
   padding: 0;
   cursor: pointer;
 }
@@ -192,11 +192,11 @@
 
 .summary-card__kicker {
   margin: 0;
-  color: var(--primary);
-  font-size: 0.78rem;
+  color: var(--primary-text);
+  font-size: var(--font-size-caption);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 800;
+  letter-spacing: var(--letter-spacing-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .summary-price {
@@ -206,8 +206,8 @@
 }
 
 .summary-price strong {
-  font-size: 2rem;
-  line-height: 1;
+  font-size: var(--font-size-title-lg);
+  line-height: var(--line-height-display);
 }
 
 .summary-section {

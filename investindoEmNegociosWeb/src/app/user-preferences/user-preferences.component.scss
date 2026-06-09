@@ -12,7 +12,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
   background:
-    radial-gradient(circle at 92% 0%, rgba(37, 99, 235, 0.08), transparent 24%),
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 24%),
     rgba(255, 255, 255, 0.94);
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.07);
 }
@@ -26,8 +26,8 @@
   margin: 0;
   color: var(--text);
   font-size: clamp(2.4rem, 4.2vw, 3.7rem);
-  line-height: 1;
-  letter-spacing: -0.07em;
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
 }
 
 .settings-hero__copy p:not(.eyebrow) {
@@ -35,23 +35,23 @@
   max-width: 720px;
   color: var(--text-secondary);
   font-size: clamp(0.98rem, 1.2vw, 1.08rem);
-  line-height: 1.45;
+  line-height: var(--line-height-body);
 }
 
 .eyebrow {
   margin: 0 0 0.45rem;
   color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.28em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 .muted {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.42;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-control);
 }
 
 .settings-grid {
@@ -74,9 +74,9 @@
 .settings-card__header h2 {
   margin: 0 0 0.35rem;
   color: var(--text);
-  font-size: 1.08rem;
-  line-height: 1.12;
-  letter-spacing: -0.04em;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-display);
 }
 
 .form-grid,
@@ -91,15 +91,15 @@ label {
   display: grid;
   gap: 0.45rem;
   color: var(--text);
-  font-size: 0.82rem;
-  font-weight: 900;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 label small {
   color: var(--text-secondary);
-  font-size: 0.76rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-control);
 }
 
 select,
@@ -113,8 +113,8 @@ textarea {
   color: var(--text);
   padding: 0 0.85rem;
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 650;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
@@ -126,9 +126,9 @@ textarea {
 select:focus,
 input:focus,
 textarea:focus {
-  border-color: rgba(37, 99, 235, 0.7);
+  border-color: color-mix(in srgb, var(--primary) 70%, transparent);
   background: var(--surface);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .preset-panel,
@@ -144,8 +144,8 @@ textarea:focus {
 .preset-panel__title {
   margin: 0 0 0.2rem;
   color: var(--text);
-  font-size: 0.9rem;
-  font-weight: 900;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .preset-row,
@@ -176,14 +176,14 @@ textarea:focus {
   border-radius: var(--radius-pill);
   background: var(--surface-2);
   color: var(--text);
-  font-size: 0.86rem;
-  font-weight: 900;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .secondary-action {
-  border-color: rgba(37, 99, 235, 0.28);
-  color: var(--primary);
-  background: rgba(37, 99, 235, 0.06);
+  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
+  color: var(--primary-text);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
 }
 
 .chip {
@@ -192,12 +192,12 @@ textarea:focus {
   align-items: center;
   gap: 0.55rem;
   padding: 0.4rem 0.65rem;
-  border: 1px solid rgba(37, 99, 235, 0.22);
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
   border-radius: var(--radius-pill);
-  background: rgba(37, 99, 235, 0.08);
-  color: var(--primary);
-  font-size: 0.84rem;
-  font-weight: 900;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--primary-text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .chip button {
@@ -207,11 +207,11 @@ textarea:focus {
   place-items: center;
   border: 0;
   border-radius: var(--radius-pill);
-  background: rgba(37, 99, 235, 0.12);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
   color: inherit;
   cursor: pointer;
   font: inherit;
-  line-height: 1;
+  line-height: var(--line-height-display);
 }
 
 .inline {
@@ -240,14 +240,14 @@ textarea:focus {
 
 .preview-card span {
   color: var(--text-secondary);
-  font-size: 0.82rem;
-  font-weight: 750;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .preview-card strong {
   color: var(--text);
-  font-size: 0.94rem;
-  font-weight: 950;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
   text-align: right;
 }
 
@@ -270,14 +270,14 @@ textarea:focus {
 
 .toggle-row strong {
   color: var(--text);
-  font-size: 0.84rem;
+  font-size: var(--font-size-label);
 }
 
 .toggle-row small {
   color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 650;
-  line-height: 1.35;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-control);
 }
 
 .toggle-row input[type='checkbox'] {
@@ -285,7 +285,7 @@ textarea:focus {
   min-width: 22px;
   height: 22px;
   min-height: 22px;
-  accent-color: var(--primary);
+  accent-color: var(--primary-text);
 }
 
 .days-before-due {
@@ -296,9 +296,9 @@ textarea:focus {
   grid-column: 1 / -1;
   grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.3fr) auto;
   align-items: center;
-  border-color: rgba(239, 68, 68, 0.18);
+  border-color: color-mix(in srgb, var(--danger) 18%, transparent);
   background:
-    radial-gradient(circle at 100% 0%, rgba(239, 68, 68, 0.045), transparent 22%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--danger) 4.5%, transparent), transparent 22%),
     rgba(255, 255, 255, 0.94);
 }
 
@@ -307,7 +307,7 @@ textarea:focus {
 }
 
 .danger-card .settings-card__header h2 {
-  font-size: 1.02rem;
+  font-size: var(--font-size-body);
 }
 
 .danger-card .muted {
@@ -326,13 +326,13 @@ textarea:focus {
   justify-content: center;
   gap: 0.65rem;
   padding: 0.58rem 0.85rem;
-  border: 1px solid rgba(239, 68, 68, 0.24);
+  border: 1px solid color-mix(in srgb, var(--danger) 24%, transparent);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.9);
-  color: var(--danger);
-  font-size: 0.88rem;
-  font-weight: 900;
-  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.08);
+  color: var(--danger-text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .danger-action__icon {
@@ -342,7 +342,7 @@ textarea:focus {
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);
-  background: rgba(239, 68, 68, 0.08);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .danger-action__icon svg {
@@ -374,14 +374,14 @@ textarea:focus {
 
 .settings-footer strong {
   color: var(--text);
-  font-size: 0.98rem;
-  font-weight: 950;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
 }
 
 .settings-footer span {
   color: var(--text-secondary);
-  font-size: 0.86rem;
-  line-height: 1.35;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-control);
 }
 
 .primary-action {
@@ -394,10 +394,10 @@ textarea:focus {
   gap: 0.8rem;
   padding: 0.7rem 1rem;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, #2563eb, #5b8cff);
+  background: linear-gradient(135deg, var(--primary), #5b8cff);
   color: #fff;
   text-align: left;
-  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.24);
+  box-shadow: 0 18px 34px color-mix(in srgb, var(--primary) 24%, transparent);
 }
 
 .primary-action__icon {
@@ -418,7 +418,7 @@ textarea:focus {
 
 .primary-action > span:last-child {
   color: #fff;
-  font-size: 0.92rem;
-  font-weight: 950;
-  line-height: 1.1;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
 }

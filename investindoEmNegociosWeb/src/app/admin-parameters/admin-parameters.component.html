@@ -106,7 +106,7 @@
                   <span class="text-[var(--text-muted)]">{{ brandUpdatedLabel(brand) }}</span>
                 }
                 @if (isSavingBrand(brand)) {
-                  <span class="text-amber-600">Salvando...</span>
+                  <span class="text-[var(--warning-text)]">Salvando...</span>
                 }
               </div>
               <label class="switch">
@@ -173,7 +173,7 @@
                   <span class="text-[var(--text-muted)]">{{ methodUpdatedLabel(method) }}</span>
                 }
                 @if (isSavingMethod(method)) {
-                  <span class="text-amber-600">Salvando...</span>
+                  <span class="text-[var(--warning-text)]">Salvando...</span>
                 }
               </div>
               <label class="switch">
@@ -248,7 +248,7 @@
                   <span class="text-[var(--text-muted)]">{{ institutionUpdatedLabel(inst) }}</span>
                 }
                 @if (isSavingInstitution(inst)) {
-                  <span class="text-amber-600">Salvando...</span>
+                  <span class="text-[var(--warning-text)]">Salvando...</span>
                 }
               </div>
               <label class="switch">

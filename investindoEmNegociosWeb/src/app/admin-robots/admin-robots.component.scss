@@ -27,17 +27,17 @@
 
 .filter-item__label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
   color: var(--text-muted);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--letter-spacing-normal);
 }
 
 .filter-control {
   height: 2.5rem;
   padding: 0 0.75rem;
-  font-size: 0.95rem;
-  line-height: 1.2;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-tight);
 }
 
 .filter-control[type='datetime-local'] {
@@ -63,16 +63,16 @@
 }
 
 .filter-options label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
 }
 
 .filter-hint {
   display: inline-flex;
   align-items: center;
   max-width: 460px;
-  line-height: 1.35;
-  font-size: 0.75rem;
+  line-height: var(--line-height-control);
+  font-size: var(--font-size-caption);
 }
 
 .robot-run-modal {
@@ -90,17 +90,17 @@
 
 .modal-kpi__label {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: var(--font-size-caption);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--letter-spacing-label);
   color: var(--text-muted);
 }
 
 .modal-kpi__value {
   margin: 4px 0 0 0;
-  font-size: 1.25rem;
-  line-height: 1.2;
-  font-weight: 700;
+  font-size: var(--font-size-title-sm);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
@@ -113,9 +113,9 @@
 
 .modal-section__title {
   margin: 0 0 10px 0;
-  font-size: 0.875rem;
-  line-height: 1.2;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
@@ -134,13 +134,13 @@
 
 .modal-dl__row dt {
   margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-muted);
 }
 
 .modal-dl__row dd {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-label);
   color: var(--text);
 }

@@ -12,7 +12,7 @@
 .receitas-summary-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 7%, transparent), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
   display: grid;
@@ -35,7 +35,7 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  border: 1px solid rgba(37, 99, 235, 0.14);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
   background: rgba(255, 255, 255, 0.82);
 
   svg {
@@ -53,17 +53,17 @@
 .receitas-summary-card__title {
   margin: 0.15rem 0 0;
   font-size: clamp(2rem, 3vw, 2.35rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .receitas-summary-card__eyebrow {
   margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -71,41 +71,41 @@
 .receitas-summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }
 
 .receitas-summary-card__meta {
   color: var(--text-muted);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
 }
 
 .receitas-summary-card--success .receitas-summary-card__icon {
-  border-color: rgba(34, 197, 94, 0.18);
-  background: rgba(34, 197, 94, 0.12);
-  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 18%, transparent);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--success-text);
 }
 
 .receitas-summary-card--warning .receitas-summary-card__icon {
   border-color: rgba(251, 191, 36, 0.18);
   background: rgba(251, 191, 36, 0.12);
-  color: var(--warning);
+  color: var(--warning-text);
 }
 
 .receitas-summary-card--info .receitas-summary-card__icon {
   border-color: rgba(56, 189, 248, 0.16);
   background: rgba(56, 189, 248, 0.12);
-  color: var(--info);
+  color: var(--info-text);
 }
 
 .receitas-summary-card--success {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--success) 8%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .receitas-summary-card--warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.09), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--warning) 9%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .receitas-summary-card--info {
@@ -114,16 +114,16 @@
 
 .receitas-summary-card__delta {
   display: inline;
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .receitas-summary-card__delta--up {
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .receitas-summary-card__delta--down {
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .receitas-summary-card__delta--flat {
@@ -154,27 +154,27 @@
 
 .receitas-hero__eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .receitas-hero__title {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 0.98;
-  font-weight: 650;
-  letter-spacing: -0.045em;
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .receitas-hero__text {
   margin: 0;
   max-inline-size: 62ch;
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -199,8 +199,8 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 72%, white);
   padding: 0.5rem 0.8rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-secondary);
 }
 
@@ -209,11 +209,11 @@
 }
 
 .receitas-comparison-pill__delta--up {
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .receitas-comparison-pill__delta--down {
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .receitas-comparison-pill__delta--flat {
@@ -228,9 +228,9 @@
   border: 1px solid rgba(56, 189, 248, 0.28);
   background: rgba(56, 189, 248, 0.1);
   padding: 0.55rem 0.9rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: color-mix(in srgb, var(--info) 92%, black);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--info-text);
 }
 
 .receitas-hero__nav {
@@ -247,8 +247,8 @@
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   padding: 0.7rem 1rem;
   color: var(--text);
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -276,30 +276,30 @@
 
 .receitas-total-card__eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .receitas-total-card__value {
   font-size: clamp(1.45rem, 2vw, 2rem);
-  line-height: 1;
+  line-height: var(--line-height-display);
   color: var(--text);
 }
 
 .receitas-total-card__text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.94rem;
-  line-height: 1.45;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
 }
 
 .receitas-total-card__split {
   display: grid;
   gap: 0.35rem;
-  font-size: 0.88rem;
+  font-size: var(--font-size-label);
   color: var(--text-secondary);
 }
 
@@ -352,7 +352,7 @@
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, var(--surface-2) 74%, white);
-  color: var(--primary);
+  color: var(--primary-text);
 
   svg {
     inline-size: 18px;
@@ -371,15 +371,15 @@
 }
 
 .receitas-total-card__action-copy strong {
-  font-size: 1rem;
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .receitas-total-card__action-copy small {
-  font-size: 0.84rem;
-  line-height: 1.4;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-control);
   color: var(--text-muted);
 }
 
@@ -405,7 +405,7 @@
   align-items: center;
   gap: 1rem;
   color: var(--text-secondary);
-  font-size: 0.92rem;
+  font-size: var(--font-size-body-sm);
 }
 
 .receitas-bulk__account {
@@ -420,7 +420,7 @@
     background: var(--surface);
     padding: 0 0.85rem;
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: var(--font-size-label);
   }
 }
 
@@ -435,9 +435,9 @@
     color-mix(in srgb, var(--primary) 76%, black)
   );
   color: white;
-  font-size: 0.95rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -475,9 +475,9 @@
 }
 
 .receitas-filter__label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -486,18 +486,9 @@
 .receitas-filter input {
   min-height: 60px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 76%, white);
   padding: 0 1.15rem;
-  color: var(--text);
-  font-size: 0.98rem;
-  font-weight: 500;
-}
-
-.receitas-filter select:focus,
-.receitas-filter input:focus {
-  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .receitas-list-wrap {
@@ -546,9 +537,9 @@
 
 .receitas-edit-received__eyebrow {
   margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -556,8 +547,8 @@
 .receitas-edit-received__text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.98rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
 }
 
 .receitas-edit-received__close {
@@ -582,8 +573,8 @@
   min-height: 48px;
   border-radius: var(--radius-lg);
   padding: 0.85rem 1.35rem;
-  font-size: 0.98rem;
-  font-weight: 650;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .receitas-edit-received__secondary {

@@ -19,7 +19,7 @@
 
 .eyebrow {
   text-transform: none;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--letter-spacing-label);
   font-size: var(--text-sm);
   color: var(--text-muted);
   margin: 0;

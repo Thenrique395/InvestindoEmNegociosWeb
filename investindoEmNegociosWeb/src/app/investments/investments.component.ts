@@ -111,13 +111,13 @@ export class InvestmentsComponent implements OnInit {
     { key: 'ANALISE', label: 'Análise' }
   ];
   benchmarkOptions: Array<{ key: BenchmarkKey; label: string; color: string }> = [
-    { key: 'CDI', label: 'CDI', color: '#f59e0b' },
-    { key: 'IPCA', label: 'IPCA', color: '#84cc16' },
-    { key: 'IFIX', label: 'IFIX', color: '#92400e' },
-    { key: 'IBOV', label: 'IBOV', color: '#ef4444' },
-    { key: 'SMLL', label: 'SMLL', color: '#06b6d4' },
-    { key: 'IDIV', label: 'IDIV', color: '#f97316' },
-    { key: 'IVVB11', label: 'IVVB11', color: '#a855f7' }
+    { key: 'CDI', label: 'CDI', color: 'var(--color-chart-series-3)' },
+    { key: 'IPCA', label: 'IPCA', color: 'var(--color-chart-series-2)' },
+    { key: 'IFIX', label: 'IFIX', color: 'var(--color-warning-text)' },
+    { key: 'IBOV', label: 'IBOV', color: 'var(--color-chart-expense)' },
+    { key: 'SMLL', label: 'SMLL', color: 'var(--color-chart-series-5)' },
+    { key: 'IDIV', label: 'IDIV', color: 'var(--color-chart-income)' },
+    { key: 'IVVB11', label: 'IVVB11', color: 'var(--color-chart-series-4)' }
   ];
 
   // Prioridade 7: importação CSV
@@ -402,12 +402,12 @@ export class InvestmentsComponent implements OnInit {
 
   get distribuicaoPorTipoComCor(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
     const palette: Record<InvestmentType, string> = {
-      RF: '#2563eb',
-      ACOES: '#16a34a',
-      FUNDOS: '#0ea5a4',
-      CRIPTO: '#f59e0b',
-      IMOVEL: '#8b5cf6',
-      VEICULO: '#ef4444'
+      RF: 'var(--color-chart-series-1)',
+      ACOES: 'var(--color-chart-income)',
+      FUNDOS: 'var(--color-chart-series-5)',
+      CRIPTO: 'var(--color-chart-series-3)',
+      IMOVEL: 'var(--color-chart-investment)',
+      VEICULO: 'var(--color-chart-expense)'
     };
     return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
   }
@@ -420,7 +420,7 @@ export class InvestmentsComponent implements OnInit {
       parts.push(`${item.color} ${cursor}% ${next}%`);
       cursor = next;
     }
-    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(#cbd5e1 0 100%)';
+    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(var(--color-border-strong) 0 100%)';
   }
 
   get evolucaoMensalSeries(): ChartBucket[] {
@@ -572,7 +572,7 @@ export class InvestmentsComponent implements OnInit {
       parts.push(`${item.color} ${cursor}% ${next}%`);
       cursor = next;
     }
-    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(#cbd5e1 0 100%)';
+    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(var(--color-border-strong) 0 100%)';
   }
 
   get evolucaoMaxValor(): number {
@@ -842,7 +842,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get indiceSelecionadoCor(): string {
-    return this.benchmarkOptions.find((item) => item.key === this.rentabilidadeBenchmark)?.color || '#f59e0b';
+    return this.benchmarkOptions.find((item) => item.key === this.rentabilidadeBenchmark)?.color || 'var(--warning)';
   }
 
   get rentabilidadeTabelaAnual(): Array<{ year: number; months: Array<number | null>; yearValue: number; acumulado: number }> {

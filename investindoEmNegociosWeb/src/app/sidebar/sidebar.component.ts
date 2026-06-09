@@ -77,17 +77,17 @@ export class SidebarComponent {
   private readonly compactLinkClass =
     'group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]';
   private readonly activeLinkClass =
-    'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]';
+    'border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] !text-[var(--primary-text)]';
   private readonly primaryIconClass =
     'nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition';
   private readonly compactIconClass =
     'nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition';
   private readonly activeIconByTone: Record<string, string> = {
-    primary: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]',
-    danger: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--danger)] shadow-[inset_0_0_0_1px_rgba(239,68,68,0.18)]',
-    success: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--success)] shadow-[inset_0_0_0_1px_rgba(34,197,94,0.18)]',
-    warning: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--warning)] shadow-[inset_0_0_0_1px_rgba(245,158,11,0.18)]',
-    info: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--info)] shadow-[inset_0_0_0_1px_rgba(14,165,233,0.18)]'
+    primary: 'border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] !text-[var(--primary-text)]',
+    danger: 'border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] !text-[var(--danger-text)]',
+    success: 'border-[var(--color-success-soft)] bg-[var(--color-success-weak)] !text-[var(--success-text)]',
+    warning: 'border-[var(--color-warning-soft)] bg-[var(--color-warning-weak)] !text-[var(--warning-text)]',
+    info: 'border-[var(--color-info-soft)] bg-[var(--color-info-weak)] !text-[var(--info-text)]'
   };
 
   hasAccess(minRole: UserRole): boolean {

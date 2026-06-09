@@ -57,10 +57,10 @@ type FormFieldTone = 'default' | 'danger' | 'success';
   template: `
     <label class="grid gap-2 text-sm font-semibold text-[var(--color-text)]">
       <span class="flex items-center justify-between gap-2">
-        <span class="inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--color-danger)]' : ''">
+        <span class="inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--color-danger-text)]' : ''">
           {{ label() }}
           @if (required()) {
-            <span class="text-[var(--color-danger)]" aria-hidden="true">*</span>
+            <span class="text-[var(--color-danger-text)]" aria-hidden="true">*</span>
           }
         </span>
         @if (hint()) {
@@ -94,8 +94,8 @@ export class FormFieldComponent {
 
   readonly messageClass = computed(() => {
     const tone = this.hasError() ? 'danger' : this.tone();
-    if (tone === 'danger') return 'text-xs font-medium text-[var(--color-danger)]';
-    if (tone === 'success') return 'text-xs font-medium text-[var(--color-success)]';
+    if (tone === 'danger') return 'text-xs font-medium text-[var(--color-danger-text)]';
+    if (tone === 'success') return 'text-xs font-medium text-[var(--color-success-text)]';
     return 'text-xs font-medium text-[var(--color-text-muted)]';
   });
 }

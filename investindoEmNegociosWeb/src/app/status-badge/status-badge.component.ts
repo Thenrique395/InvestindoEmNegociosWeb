@@ -27,13 +27,13 @@ export class StatusBadgeComponent {
     const variant = this.variant || this.resolveVariant(this.labelToShow, this.status);
     switch (variant) {
       case 'success':
-        return 'border-emerald-200 bg-emerald-100 text-emerald-700';
+        return 'border-emerald-200 bg-emerald-100 text-[var(--success-text)]';
       case 'warning':
-        return 'border-amber-200 bg-amber-100 text-amber-700';
+        return 'border-amber-200 bg-amber-100 text-[var(--warning-text)]';
       case 'danger':
-        return 'border-rose-200 bg-rose-100 text-rose-700';
+        return 'border-rose-200 bg-rose-100 text-[var(--danger-text)]';
       case 'info':
-        return 'border-sky-200 bg-sky-100 text-sky-700';
+        return 'border-sky-200 bg-sky-100 text-[var(--info-text)]';
       default:
         return 'border-slate-200 bg-slate-100 text-slate-600';
     }

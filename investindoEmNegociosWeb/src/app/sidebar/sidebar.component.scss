@@ -27,8 +27,8 @@
 
 .sidebar__nav .nav-text,
 .sidebar__settings .nav-text {
-  font-size: 0.88rem;
-  line-height: 1.25;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-tight);
 }
 
 .sidebar__brand {
@@ -42,14 +42,14 @@
 }
 
 .sidebar__title {
-  font-size: 0.95rem;
-  line-height: 1.15;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-tight);
 }
 
 .sidebar__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
@@ -60,13 +60,13 @@
 }
 
 .nav-text {
-  font-size: 0.95rem;
-  line-height: 1.25;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-tight);
 }
 
 .sidebar__nav a.active .nav-icon {
-  color: var(--primary);
-  background: rgba(37, 99, 235, 0.14);
-  border-color: rgba(37, 99, 235, 0.35);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+  color: var(--primary-text);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 8%, transparent);
 }

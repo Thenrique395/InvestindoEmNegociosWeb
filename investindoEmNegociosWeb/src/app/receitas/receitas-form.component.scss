@@ -42,9 +42,9 @@
 
 .income-form-modal__eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -52,16 +52,16 @@
 .income-form-modal__title {
   margin: 0;
   font-size: clamp(1.7rem, 2vw, 2.1rem);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-title);
   color: var(--text);
 }
 
 .income-form-modal__subtitle {
   margin: 0;
   max-inline-size: 52ch;
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -113,15 +113,15 @@
 
 .income-form-modal__section-title {
   margin: 0;
-  font-size: 1.12rem;
-  font-weight: 700;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
 .income-form-modal__section-text {
   margin: 0;
-  font-size: 0.96rem;
-  line-height: 1.5;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -144,36 +144,22 @@
 }
 
 .income-field__label {
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
 .income-field__control {
   min-height: 52px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
   padding: 0 1rem;
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 550;
-  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
-}
-
-.income-field__control::placeholder {
-  color: var(--text-muted);
-}
-
-.income-field__control:focus {
-  border-color: color-mix(in srgb, var(--primary) 26%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent);
-  background: color-mix(in srgb, var(--surface) 95%, white);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
 }
 
 .income-field__error {
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   color: #e11d48;
 }
 
@@ -199,14 +185,14 @@
 }
 
 .income-toggle-card__title {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
 .income-toggle-card__text {
-  font-size: 0.84rem;
-  line-height: 1.45;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -266,15 +252,15 @@
 
 .income-form-modal__warning-title {
   margin: 0;
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
 .income-form-modal__warning-text {
   margin: 0;
-  font-size: 0.84rem;
-  line-height: 1.45;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -287,8 +273,8 @@
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   background: var(--surface);
   padding: 0.65rem 0.95rem;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
   text-decoration: none;
 }
@@ -311,17 +297,17 @@
 }
 
 .income-form-modal__hint-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .income-form-modal__hint-text {
   margin: 0;
-  font-size: 0.98rem;
-  font-weight: 650;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -331,8 +317,8 @@
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   background: var(--surface);
   padding: 0.65rem 0.95rem;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
   transition:
     transform 160ms ease,
@@ -355,17 +341,17 @@
 
 .income-form-modal__summary-eyebrow {
   margin: 0;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .income-form-modal__summary-text {
   margin: 0.45rem 0 0;
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
   color: var(--text);
 }
 
@@ -375,57 +361,4 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 0.25rem;
-}
-
-.modal-actions__secondary,
-.modal-actions__primary {
-  min-height: 50px;
-  border-radius: var(--radius-lg);
-  padding: 0.875rem 1.4rem;
-  font-size: 1rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
-}
-
-.modal-actions__secondary {
-  border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 72%, white);
-  color: var(--text);
-}
-
-.modal-actions__primary {
-  border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 90%, #1d4ed8), #5a8dff);
-  color: #fff;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent),
-    0 18px 28px color-mix(in srgb, var(--primary) 24%, transparent);
-}
-
-.modal-actions__primary:hover:not(:disabled),
-.modal-actions__secondary:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.modal-actions__secondary:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--text) 14%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 86%, white);
-}
-
-.modal-actions__primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 96%, #1e40af), #4f7ef2);
-}
-
-.modal-actions__secondary:disabled,
-.modal-actions__primary:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-  transform: none;
-  box-shadow: none;
 }

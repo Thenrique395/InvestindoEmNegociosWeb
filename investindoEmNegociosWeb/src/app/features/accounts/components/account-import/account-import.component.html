@@ -102,8 +102,8 @@
               </td>
               <td class="py-2 px-3">
             <span [ngClass]="{
-              'text-green-600': confidenceTone(item) === 'success',
-              'text-yellow-600': confidenceTone(item) === 'warning',
+              'text-[var(--success-text)]': confidenceTone(item) === 'success',
+              'text-[var(--warning-text)]': confidenceTone(item) === 'warning',
               'text-gray-500': confidenceTone(item) === 'muted'
             }">
                   {{ confidenceLabel(item) }}
@@ -172,8 +172,8 @@
               </td>
               <td class="py-2 px-3">
             <span [ngClass]="{
-              'text-green-600': confidenceTone(item) === 'success',
-              'text-yellow-600': confidenceTone(item) === 'warning',
+              'text-[var(--success-text)]': confidenceTone(item) === 'success',
+              'text-[var(--warning-text)]': confidenceTone(item) === 'warning',
               'text-gray-500': confidenceTone(item) === 'muted'
             }">
                   {{ confidenceLabel(item) }}

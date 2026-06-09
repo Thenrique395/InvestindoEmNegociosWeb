@@ -62,9 +62,9 @@ export class ToastContainerComponent {
 
   toastClass(type: UiFeedbackMessage['type']): string {
     switch (type) {
-      case 'success': return 'border-[rgba(34,197,94,0.35)] bg-[var(--surface)]';
-      case 'error': return 'border-[rgba(239,68,68,0.35)] bg-[var(--surface)]';
-      case 'warning': return 'border-[rgba(245,158,11,0.35)] bg-[var(--surface)]';
+      case 'success': return 'border-[var(--color-success-soft)] bg-[var(--surface)]';
+      case 'error': return 'border-[var(--color-danger-soft)] bg-[var(--surface)]';
+      case 'warning': return 'border-[var(--color-warning-soft)] bg-[var(--surface)]';
       default: return 'border-[var(--border)] bg-[var(--surface)]';
     }
   }

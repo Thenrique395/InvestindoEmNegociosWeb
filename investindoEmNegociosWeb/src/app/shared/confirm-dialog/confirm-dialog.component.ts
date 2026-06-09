@@ -69,8 +69,8 @@ export class ConfirmDialogComponent {
 
   iconClass(tone: ConfirmDialogTone | undefined): string {
     const base = 'grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg';
-    if (tone === 'danger') return `${base} bg-[rgba(239,68,68,0.14)] text-[var(--danger)]`;
-    if (tone === 'warning') return `${base} bg-[rgba(245,158,11,0.16)] text-[var(--warning)]`;
-    return `${base} bg-[rgba(52,144,99,0.14)] text-[var(--success)]`;
+    if (tone === 'danger') return `${base} bg-[var(--color-danger-weak)] text-[var(--danger-text)]`;
+    if (tone === 'warning') return `${base} bg-[var(--color-warning-weak)] text-[var(--warning-text)]`;
+    return `${base} bg-[var(--color-success-weak)] text-[var(--success-text)]`;
   }
 }

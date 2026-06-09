@@ -16,7 +16,7 @@
 .cards-summary-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 7%, transparent), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
   display: grid;
@@ -39,7 +39,7 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  border: 1px solid rgba(37, 99, 235, 0.14);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
   background: rgba(255, 255, 255, 0.82);
 
   svg {
@@ -56,9 +56,9 @@
 
 .cards-summary-card__eyebrow {
   margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -66,44 +66,44 @@
 .cards-summary-card__title {
   margin: 0.15rem 0 0;
   font-size: clamp(2rem, 3vw, 2.35rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .cards-summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }
 
 .cards-summary-card--primary .cards-summary-card__icon {
-  border-color: rgba(37, 99, 235, 0.18);
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary-text);
 }
 
 .cards-summary-card--success .cards-summary-card__icon {
-  border-color: rgba(34, 197, 94, 0.18);
-  background: rgba(34, 197, 94, 0.12);
-  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 18%, transparent);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--success-text);
 }
 
 .cards-summary-card--info .cards-summary-card__icon {
   border-color: rgba(56, 189, 248, 0.16);
   background: rgba(56, 189, 248, 0.12);
-  color: var(--info);
+  color: var(--info-text);
 }
 
 .cards-summary-card--primary {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.09), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 9%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .cards-summary-card--success {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--success) 8%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .cards-summary-card--info {
@@ -134,34 +134,34 @@
 
 .cards-hero__eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .cards-hero__title {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 0.98;
-  font-weight: 650;
-  letter-spacing: -0.045em;
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .cards-hero__text {
   margin: 0;
   max-inline-size: 62ch;
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
 .cards-total-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(37, 99, 235, 0.06));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), color-mix(in srgb, var(--primary) 6%, transparent));
   box-shadow: var(--shadow-sm);
   padding: 1.5rem;
   display: grid;
@@ -170,9 +170,9 @@
 
 .cards-total-card__eyebrow {
   margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -181,16 +181,16 @@
   display: block;
   margin: 0;
   font-size: clamp(2rem, 2.8vw, 2.7rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .cards-total-card__text {
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -246,13 +246,13 @@
   gap: 0.2rem;
 
   strong {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
   }
 
   small {
-    font-size: 0.96rem;
-    line-height: 1.45;
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body);
     color: inherit;
     opacity: 0.94;
   }
@@ -277,9 +277,9 @@
 
 .cards-statements__eyebrow {
   margin: 0 0 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -287,17 +287,17 @@
 .cards-statements__title {
   margin: 0;
   font-size: clamp(1.75rem, 2.3vw, 2.25rem);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
-  font-weight: 650;
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
 .cards-statements__text {
   margin: 0.6rem 0 0;
   max-inline-size: 58ch;
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -314,9 +314,9 @@
 }
 
 .cards-filter__label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -339,13 +339,13 @@
   border: 1px solid transparent;
   background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 78%, white));
   color: white;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
 .cards-statements__feedback {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: var(--font-size-body-sm);
   color: var(--text-secondary);
 }
 
@@ -358,7 +358,7 @@
   padding: 1.2rem 1.25rem;
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(255, 255, 255, 0.98) 60%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), rgba(255, 255, 255, 0.98) 60%);
   box-shadow: var(--shadow-sm);
   display: grid;
   gap: 1rem;
@@ -373,15 +373,15 @@
 
 .cards-statements__item-title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 650;
-  letter-spacing: -0.03em;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
   color: var(--text);
 }
 
 .cards-statements__item-copy {
   margin: 0.25rem 0 0;
-  font-size: 0.98rem;
+  font-size: var(--font-size-body-sm);
   color: var(--text-secondary);
 }
 
@@ -394,8 +394,8 @@
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--surface-2) 75%, white);
   color: var(--text-secondary);
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .cards-statements__metrics {
@@ -413,35 +413,35 @@
   background: rgba(255, 255, 255, 0.88);
 
   span {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
   }
 
   strong {
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
     color: var(--text);
   }
 }
 
 .cards-statements__metric--success {
-  border-color: rgba(34, 197, 94, 0.18);
-  background: rgba(34, 197, 94, 0.08);
+  border-color: color-mix(in srgb, var(--success) 18%, transparent);
+  background: color-mix(in srgb, var(--success) 8%, transparent);
 
   strong {
-    color: var(--success);
+    color: var(--success-text);
   }
 }
 
 .cards-statements__metric--danger {
-  border-color: rgba(239, 68, 68, 0.16);
-  background: rgba(239, 68, 68, 0.08);
+  border-color: color-mix(in srgb, var(--danger) 16%, transparent);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
 
   strong {
-    color: var(--danger);
+    color: var(--danger-text);
   }
 }
 
@@ -449,7 +449,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
   background:
-    radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.08), transparent 34%),
+    radial-gradient(circle at 0 0, color-mix(in srgb, var(--primary) 8%, transparent), transparent 34%),
     color-mix(in srgb, var(--surface) 96%, white);
   box-shadow: var(--shadow-sm);
   padding: 1.2rem;
@@ -467,25 +467,25 @@
 .cards-purchases__eyebrow {
   margin: 0 0 0.25rem;
   color: var(--text-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 .cards-purchases__title {
   margin: 0;
   color: var(--text);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .cards-purchases__subtitle {
   margin: 0.35rem 0 0;
   color: var(--text-secondary);
-  font-size: 0.98rem;
-  line-height: 1.45;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
 }
 
 .cards-purchases__count {
@@ -497,15 +497,15 @@
   border-radius: var(--radius-pill);
   padding: 0.35rem 0.8rem;
   background: color-mix(in srgb, var(--primary) 9%, white);
-  color: var(--primary);
-  font-size: 0.84rem;
-  font-weight: 700;
+  color: var(--primary-text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .cards-purchases__empty {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.98rem;
+  font-size: var(--font-size-body-sm);
 }
 
 .cards-purchases__list {
@@ -532,9 +532,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(239, 68, 68, 0.14);
+  border: 1px solid color-mix(in srgb, var(--danger) 14%, transparent);
   background: rgba(254, 226, 226, 0.72);
-  color: var(--danger);
+  color: var(--danger-text);
 
   svg {
     inline-size: 1.25rem;
@@ -549,20 +549,20 @@
 
   strong {
     color: var(--text);
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
   }
 
   span {
     color: var(--text-secondary);
-    font-size: 0.92rem;
+    font-size: var(--font-size-body-sm);
   }
 }
 
 .cards-purchases__date {
   color: var(--text-secondary);
-  font-size: 0.92rem;
-  font-weight: 650;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
 }
 
@@ -576,21 +576,21 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 72%, white);
   color: var(--text-secondary);
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
 .cards-purchases__pill--status {
-  border-color: rgba(245, 158, 11, 0.22);
+  border-color: color-mix(in srgb, var(--warning) 22%, transparent);
   background: rgba(254, 243, 199, 0.6);
-  color: #b45309;
+  color: var(--warning-text);
 }
 
 .cards-purchases__amount {
   color: var(--text);
-  font-size: 1rem;
-  font-weight: 750;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
   text-align: right;
 }
 
@@ -639,27 +639,27 @@
 
 .cards-modal__eyebrow {
   margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.26em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .cards-modal__title {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 0.98;
-  font-weight: 650;
-  letter-spacing: -0.045em;
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .cards-modal__subtitle {
   margin: 0;
   max-inline-size: 62ch;
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -709,15 +709,15 @@
 
 .cards-modal__section-title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 650;
+  font-size: var(--font-size-title-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
 .cards-modal__section-text {
   margin: 0;
-  font-size: 0.98rem;
-  line-height: 1.5;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -744,9 +744,9 @@
 }
 
 .cards-field__label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -756,9 +756,6 @@
   min-height: 3.6rem;
   padding: 0.95rem 1rem;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
-  color: var(--text);
   font: inherit;
 }
 
@@ -807,7 +804,7 @@
   padding: 0.85rem 1.35rem;
   border-radius: var(--radius-lg);
   font: inherit;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .cards-modal__secondary {
@@ -834,8 +831,8 @@
   min-height: 250px;
   padding: 1.4rem;
   border-radius: var(--radius-2xl);
-  border: 1px solid rgba(37, 99, 235, 0.16);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(15, 23, 42, 0.9));
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent), rgba(15, 23, 42, 0.9));
   color: white;
   box-shadow: var(--shadow-md);
 }
@@ -854,9 +851,9 @@
 }
 
 .cards-preview__brand {
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
@@ -886,9 +883,9 @@
 }
 
 .cards-preview__number {
-  font-size: 1.15rem;
-  font-weight: 650;
-  letter-spacing: 0.18em;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-eyebrow);
 }
 
 .cards-preview__footer {
@@ -902,9 +899,9 @@
 .cards-preview__label {
   display: block;
   margin-bottom: 0.25rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.72);
 }
@@ -929,12 +926,12 @@
   background: color-mix(in srgb, var(--surface-2) 72%, white);
 
   span {
-    font-size: 0.9rem;
+    font-size: var(--font-size-label);
     color: var(--text-secondary);
   }
 
   strong {
-    font-size: 0.98rem;
+    font-size: var(--font-size-body-sm);
     color: var(--text);
   }
 }

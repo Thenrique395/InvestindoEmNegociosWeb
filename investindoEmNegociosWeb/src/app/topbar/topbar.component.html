@@ -34,13 +34,13 @@
               <div class="notif-empty px-[var(--spacing-1)] text-[var(--text-sm)] text-[var(--text-muted)]">Carregando...</div>
             }
             @if (notificationsError) {
-              <div class="notif-empty error px-[var(--spacing-1)] text-[var(--text-sm)] !text-[var(--danger)]">{{ notificationsError }}</div>
+              <div class="notif-empty error px-[var(--spacing-1)] text-[var(--text-sm)] !text-[var(--danger-text)]">{{ notificationsError }}</div>
             }
             @for (item of notifications; track trackNotification($index, item)) {
               <button
                 type="button"
                 class="notif-item grid gap-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-left text-[var(--text)]"
-                [ngClass]="!item.readAt ? 'border-[rgba(37,99,235,0.35)] bg-[rgba(37,99,235,0.08)]' : ''"
+                [ngClass]="!item.readAt ? 'border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)]' : ''"
                 (click)="markNotificationRead(item, $event)"
                 >
                 <strong>{{ item.title }}</strong>
@@ -64,7 +64,7 @@
         aria-controls="user-menu-dropdown"
         [attr.aria-expanded]="userMenuOpen"
         (click)="userMenuToggle.emit()">
-        <span class="avatar grid h-9 w-9 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
+        <span class="avatar grid h-9 w-9 place-items-center rounded-full border border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
           @if (avatarUrl) {
             <img class="h-full w-full rounded-full object-cover" [src]="avatarUrl" alt="Avatar" />
           }
@@ -83,7 +83,7 @@
           aria-label="Menu do usuário"
           >
           <div class="user-dropdown__summary flex items-center gap-3 rounded-[16px] border border-[var(--border)] bg-[linear-gradient(135deg,rgba(37,99,235,0.10),rgba(255,255,255,0.92))] px-4 py-3">
-            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[rgba(37,99,235,0.25)] bg-[rgba(37,99,235,0.12)] font-bold text-[var(--primary)]">
+            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] font-bold text-[var(--primary-text)]">
               {{ userInitials }}
             </div>
             <div class="min-w-0">

@@ -30,17 +30,17 @@ let nextTooltipId = 0;
       border-radius: var(--radius-pill);
       border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
       background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-      color: var(--primary);
+      color: var(--primary-text);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font: inherit;
-      font-weight: 700;
-      line-height: 1;
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-display);
       cursor: help;
       transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
     }
-    .tooltip--sm { inline-size: 1.625rem; block-size: 1.625rem; font-size: 0.84rem; }
+    .tooltip--sm { inline-size: 1.625rem; block-size: 1.625rem; font-size: var(--font-size-label); }
     .tooltip:hover, .tooltip:focus-visible, .tooltip--open {
       transform: translateY(-1px);
       border-color: color-mix(in srgb, var(--primary) 30%, transparent);
@@ -62,9 +62,9 @@ let nextTooltipId = 0;
       border: 1px solid var(--border-strong);
       background: var(--surface);
       color: var(--text);
-      font-size: 0.86rem;
-      font-weight: 500;
-      line-height: 1.45;
+      font-size: var(--font-size-label);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-body);
       text-align: left;
       box-shadow: var(--shadow-md);
       z-index: 50;

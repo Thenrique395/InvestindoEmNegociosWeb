@@ -38,10 +38,10 @@ export class StatusBadgeComponent {
 
   private toneClass(): string {
     switch (this.tone()) {
-      case 'success': return 'border-[var(--color-success-soft)] bg-[var(--color-success-weak)] text-[var(--color-success)]';
-      case 'danger': return 'border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] text-[var(--color-danger)]';
-      case 'warning': return 'border-[var(--color-warning-soft)] bg-[var(--color-warning-weak)] text-[var(--color-warning)]';
-      case 'info': return 'border-[var(--color-info-soft)] bg-[var(--color-info-weak)] text-[var(--color-info)]';
+      case 'success': return 'border-[var(--color-success-soft)] bg-[var(--color-success-weak)] text-[var(--color-success-text)]';
+      case 'danger': return 'border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] text-[var(--color-danger-text)]';
+      case 'warning': return 'border-[var(--color-warning-soft)] bg-[var(--color-warning-weak)] text-[var(--color-warning-text)]';
+      case 'info': return 'border-[var(--color-info-soft)] bg-[var(--color-info-weak)] text-[var(--color-info-text)]';
       case 'muted': return 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]';
       default: return 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]';
     }

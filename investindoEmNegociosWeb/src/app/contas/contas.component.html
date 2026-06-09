@@ -168,13 +168,13 @@
                 <tr class="border-b border-[var(--border)]/60 text-[var(--text)]">
                   <td class="py-2 pr-4">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
                   <td class="py-2 pr-4">
-                    <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                    <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
                       {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
                     </span>
                   </td>
                   <td class="py-2 pr-4">{{ tx.description }}</td>
                   <td class="py-2 pr-4">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</td>
-                  <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                  <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
                     {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
                   </td>
                 </tr>

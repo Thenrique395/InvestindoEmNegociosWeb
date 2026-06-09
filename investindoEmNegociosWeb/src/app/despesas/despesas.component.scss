@@ -12,7 +12,7 @@
 .expenses-summary-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 7%, transparent), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
   display: grid;
@@ -35,7 +35,7 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  border: 1px solid rgba(37, 99, 235, 0.14);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
   background: rgba(255, 255, 255, 0.82);
 
   svg {
@@ -52,9 +52,9 @@
 
 .expenses-summary-card__eyebrow {
   margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -62,40 +62,40 @@
 .expenses-summary-card__title {
   margin: 0.15rem 0 0;
   font-size: clamp(2rem, 3vw, 2.35rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .expenses-summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }
 
 .expenses-summary-card--warning .expenses-summary-card__icon {
   border-color: rgba(251, 191, 36, 0.18);
   background: rgba(251, 191, 36, 0.12);
-  color: var(--warning);
+  color: var(--warning-text);
 }
 
 .expenses-summary-card--info .expenses-summary-card__icon {
   border-color: rgba(56, 189, 248, 0.16);
   background: rgba(56, 189, 248, 0.12);
-  color: var(--info);
+  color: var(--info-text);
 }
 
 .expenses-summary-card--success .expenses-summary-card__icon {
-  border-color: rgba(34, 197, 94, 0.18);
-  background: rgba(34, 197, 94, 0.12);
-  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 18%, transparent);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--success-text);
 }
 
 .expenses-summary-card--warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.09), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--warning) 9%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .expenses-summary-card--info {
@@ -103,7 +103,7 @@
 }
 
 .expenses-summary-card--success {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--success) 8%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .expenses-shell {
@@ -130,27 +130,27 @@
 
 .expenses-hero__eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .expenses-hero__title {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 0.98;
-  font-weight: 650;
-  letter-spacing: -0.045em;
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .expenses-hero__text {
   margin: 0;
   max-inline-size: 62ch;
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
@@ -175,8 +175,8 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 72%, white);
   padding: 0.5rem 0.8rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-secondary);
 }
 
@@ -185,11 +185,11 @@
 }
 
 .expenses-comparison-pill__delta--up {
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .expenses-comparison-pill__delta--down {
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .expenses-comparison-pill__delta--flat {
@@ -210,8 +210,8 @@
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   padding: 0.7rem 1rem;
   color: var(--text);
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -239,24 +239,24 @@
 
 .expenses-total-card__eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .expenses-total-card__value {
   font-size: clamp(1.45rem, 2vw, 2rem);
-  line-height: 1;
+  line-height: var(--line-height-display);
   color: var(--text);
 }
 
 .expenses-total-card__text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.94rem;
-  line-height: 1.45;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
 }
 
 .expenses-total-card__actions {
@@ -314,7 +314,7 @@
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, var(--surface-2) 74%, white);
-  color: var(--primary);
+  color: var(--primary-text);
 
   svg {
     inline-size: 18px;
@@ -333,15 +333,15 @@
 }
 
 .expenses-total-card__action-copy strong {
-  font-size: 1rem;
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .expenses-total-card__action-copy small {
-  font-size: 0.84rem;
-  line-height: 1.4;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-control);
   color: var(--text-muted);
 }
 
@@ -367,7 +367,7 @@
   align-items: center;
   gap: 1rem;
   color: var(--text-secondary);
-  font-size: 0.92rem;
+  font-size: var(--font-size-body-sm);
 }
 
 .expenses-bulk__account {
@@ -382,7 +382,7 @@
     background: var(--surface);
     padding: 0 0.85rem;
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: var(--font-size-label);
   }
 }
 
@@ -398,9 +398,9 @@
   border-radius: var(--radius-pill);
   padding: 0.7rem 1.1rem;
   border: 1px solid var(--border);
-  font-size: 0.95rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -446,7 +446,7 @@
 .expenses-bulk__button--danger {
   border-color: color-mix(in srgb, var(--danger) 18%, transparent);
   background: color-mix(in srgb, var(--surface) 94%, white);
-  color: var(--danger);
+  color: var(--danger-text);
 
   &:hover:not(:disabled) {
     border-color: color-mix(in srgb, var(--danger) 30%, transparent);
@@ -471,9 +471,9 @@
 }
 
 .expenses-filter__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -482,18 +482,8 @@
 .expenses-filter input {
   min-height: 48px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
   padding: 0 1rem;
-  color: var(--text);
-  font-size: 0.94rem;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
-}
-
-.expenses-filter select:focus,
-.expenses-filter input:focus {
-  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+  font-size: var(--font-size-body-sm);
 }
 
 .expenses-list-wrap {
@@ -544,19 +534,19 @@
 
 .expenses-history-drawer__eyebrow {
   margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .expenses-history-drawer__title {
   margin: 0;
-  font-size: 2rem;
-  line-height: 1.02;
-  font-weight: 650;
-  letter-spacing: -0.03em;
+  font-size: var(--font-size-title-lg);
+  line-height: var(--line-height-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
   color: var(--text);
 }
 
@@ -586,7 +576,7 @@
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--primary) 24%, transparent);
   background: color-mix(in srgb, var(--surface) 92%, white);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .expenses-history-group {
@@ -601,17 +591,17 @@
 
 .expenses-history-group__title {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
 .expenses-history-group__note,
 .expenses-history-group__empty {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: var(--font-size-body-sm);
   color: var(--text-muted);
-  line-height: 1.45;
+  line-height: var(--line-height-body);
 }
 
 .expenses-history-group__list {
@@ -647,8 +637,8 @@
 }
 
 .expenses-history-item__name {
-  font-size: 1rem;
-  font-weight: 650;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -656,7 +646,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem 0.85rem;
-  font-size: 0.9rem;
+  font-size: var(--font-size-label);
   color: var(--text-muted);
 }
 
@@ -667,27 +657,27 @@
   min-height: 30px;
   border-radius: var(--radius-pill);
   padding: 0.3rem 0.7rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
 }
 
 .expenses-history-item__status--paid {
   border: 1px solid color-mix(in srgb, var(--success) 22%, transparent);
   background: color-mix(in srgb, var(--success) 12%, white);
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .expenses-history-item__status--pending {
   border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
   background: color-mix(in srgb, var(--warning) 10%, white);
-  color: color-mix(in srgb, var(--warning) 88%, black);
+  color: var(--warning-text);
 }
 
 .expenses-history-item__status--anticipated {
   border: 1px solid color-mix(in srgb, var(--info) 24%, transparent);
   background: color-mix(in srgb, var(--info) 10%, white);
-  color: color-mix(in srgb, var(--info) 80%, black);
+  color: var(--info-text);
 }
 
 .expenses-history-item__value-col {
@@ -697,8 +687,8 @@
 }
 
 .expenses-history-item__value {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
@@ -709,8 +699,8 @@
   background: color-mix(in srgb, var(--surface) 92%, white);
   padding: 0.6rem 0.95rem;
   color: var(--text);
-  font-size: 0.86rem;
-  font-weight: 650;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   transition:
     transform 160ms ease,
     border-color 160ms ease,

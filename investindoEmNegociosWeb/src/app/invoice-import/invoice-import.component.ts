@@ -374,9 +374,9 @@ type InvoiceExtract = {
 
     .invoice-import-modal__eyebrow {
       margin: 0;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 0.28em;
+      font-size: var(--font-size-label);
+      font-weight: var(--font-weight-bold);
+      letter-spacing: var(--letter-spacing-eyebrow);
       text-transform: uppercase;
       color: var(--text-soft);
     }
@@ -384,17 +384,17 @@ type InvoiceExtract = {
     .invoice-import-modal__title {
       margin: 0;
       font-size: clamp(2rem, 2.5vw, 2.7rem);
-      line-height: 0.98;
-      letter-spacing: -0.03em;
-      font-weight: 800;
+      line-height: var(--line-height-display);
+      letter-spacing: var(--letter-spacing-title);
+      font-weight: var(--font-weight-bold);
       color: var(--text);
     }
 
     .invoice-import-modal__subtitle {
       max-width: 58ch;
       margin: 0;
-      font-size: 1.05rem;
-      line-height: 1.65;
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
       color: var(--text-muted);
     }
 
@@ -463,15 +463,15 @@ type InvoiceExtract = {
 
     .invoice-import-modal__section-title {
       margin: 0;
-      font-size: 1.15rem;
-      font-weight: 800;
+      font-size: var(--font-size-body-lg);
+      font-weight: var(--font-weight-bold);
       color: var(--text);
     }
 
     .invoice-import-modal__section-text {
       margin: 0.35rem 0 0;
-      font-size: 0.98rem;
-      line-height: 1.6;
+      font-size: var(--font-size-body-sm);
+      line-height: var(--line-height-body);
       color: var(--text-muted);
     }
 
@@ -494,9 +494,9 @@ type InvoiceExtract = {
       justify-content: center;
       gap: 0.5rem;
       font-family: inherit;
-      font-size: 0.98rem;
-      font-weight: 700;
-      line-height: 1;
+      font-size: var(--font-size-body-sm);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-display);
       text-decoration: none;
       white-space: nowrap;
       cursor: pointer;
@@ -514,7 +514,7 @@ type InvoiceExtract = {
 
     .invoice-import-modal__button--primary {
       color: #fff;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      background: linear-gradient(135deg, var(--primary), var(--primary-text));
       box-shadow: 0 18px 30px rgb(37 99 235 / 0.22);
     }
 
@@ -555,20 +555,20 @@ type InvoiceExtract = {
 
     .invoice-import-dropzone__title {
       margin: 0;
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-bold);
       color: var(--text);
     }
 
     .invoice-import-dropzone__text,
     .invoice-import-dropzone__error {
       margin: 0.45rem 0 0;
-      font-size: 0.95rem;
+      font-size: var(--font-size-body-sm);
       color: var(--text-muted);
     }
 
     .invoice-import-dropzone__error {
-      color: var(--danger);
+      color: var(--danger-text);
     }
 
     .invoice-import-grid {
@@ -594,9 +594,9 @@ type InvoiceExtract = {
     .invoice-field__label,
     .invoice-summary-card__label {
       margin: 0;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 0.24em;
+      font-size: var(--font-size-label);
+      font-weight: var(--font-weight-bold);
+      letter-spacing: var(--letter-spacing-eyebrow);
       text-transform: uppercase;
       color: var(--text-soft);
     }
@@ -605,33 +605,30 @@ type InvoiceExtract = {
       min-height: 56px;
       width: 100%;
       border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: var(--surface-2);
       padding: 0 1rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
     }
 
     .invoice-field__control--table {
       min-height: 38px;
       border-radius: var(--radius-md);
-      font-size: 0.82rem;
+      font-size: var(--font-size-label);
       padding: 0 0.75rem;
       background: var(--surface);
     }
 
     .invoice-summary-card__value {
       margin: 0;
-      font-size: 1.45rem;
-      line-height: 1.05;
-      font-weight: 800;
+      font-size: var(--font-size-title);
+      line-height: var(--line-height-display);
+      font-weight: var(--font-weight-bold);
       color: var(--text);
     }
 
     .invoice-summary-card__value--small {
-      font-size: 1rem;
-      line-height: 1.45;
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
     }
 
     .invoice-table-card {
@@ -649,7 +646,7 @@ type InvoiceExtract = {
     .invoice-table-card__footnote {
       margin: 0;
       padding: 0.9rem 1rem 1rem;
-      font-size: 0.85rem;
+      font-size: var(--font-size-label);
       color: var(--text-muted);
       border-top: 1px solid var(--border);
     }
@@ -670,9 +667,9 @@ type InvoiceExtract = {
 
     .invoice-table th {
       padding: 0.9rem 1rem;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
+      font-size: var(--font-size-label);
+      font-weight: var(--font-weight-bold);
+      letter-spacing: var(--letter-spacing-label);
       text-transform: uppercase;
       color: var(--text-soft);
       white-space: nowrap;
@@ -680,8 +677,8 @@ type InvoiceExtract = {
 
     .invoice-table td {
       padding: 0.95rem 1rem;
-      font-size: 0.95rem;
-      line-height: 1.55;
+      font-size: var(--font-size-body-sm);
+      line-height: var(--line-height-body);
       color: var(--text);
       vertical-align: top;
       border-top: 1px solid var(--border);
@@ -695,7 +692,7 @@ type InvoiceExtract = {
     .invoice-table__hint {
       display: block;
       margin-top: 0.35rem;
-      font-size: 0.72rem;
+      font-size: var(--font-size-caption);
       color: var(--text-muted);
     }
 
@@ -708,8 +705,8 @@ type InvoiceExtract = {
     .invoice-import-modal__meta,
     .invoice-import-modal__context-line,
     .invoice-import-note {
-      font-size: 0.9rem;
-      line-height: 1.55;
+      font-size: var(--font-size-label);
+      line-height: var(--line-height-body);
       color: var(--text-muted);
     }
 
@@ -727,8 +724,8 @@ type InvoiceExtract = {
       margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
-      font-size: 0.82rem;
-      line-height: 1.7;
+      font-size: var(--font-size-label);
+      line-height: var(--line-height-body);
       color: var(--text);
     }
 
@@ -749,15 +746,15 @@ type InvoiceExtract = {
 
     .invoice-import-modal__footer-title {
       margin: 0;
-      font-size: 1rem;
-      font-weight: 800;
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-bold);
       color: var(--text);
     }
 
     .invoice-import-modal__footer-text {
       margin: 0;
-      font-size: 0.92rem;
-      line-height: 1.55;
+      font-size: var(--font-size-body-sm);
+      line-height: var(--line-height-body);
       color: var(--text-muted);
       max-width: 52ch;
     }

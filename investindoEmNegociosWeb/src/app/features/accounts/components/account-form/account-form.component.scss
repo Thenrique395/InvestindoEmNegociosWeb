@@ -18,17 +18,17 @@
 .account-panel__eyebrow {
   margin: 0 0 0.35rem;
   color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 .account-panel h2 {
   margin: 0;
   color: var(--text);
-  font-size: 1.2rem;
-  letter-spacing: -0.02em;
+  font-size: var(--font-size-body-lg);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .account-form-grid {
@@ -59,7 +59,7 @@
   align-items: center;
   gap: 0.55rem;
   padding: 0 0.95rem;
-  font-weight: 650;
+  font-weight: var(--font-weight-semibold);
 }
 
 .account-checkbox input {

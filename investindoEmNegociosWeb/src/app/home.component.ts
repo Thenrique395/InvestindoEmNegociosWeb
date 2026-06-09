@@ -187,8 +187,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   ];
   showInsightDetails = false;
-  private readonly expenseCategoryColors = ['#2563EB', '#0EA5E9', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6'];
-  private readonly incomeSourceColors = ['#22C55E', '#0EA5E9', '#2563EB', '#8B5CF6', '#F59E0B', '#14B8A6'];
+  private readonly expenseCategoryColors = ['var(--color-chart-series-1)', 'var(--color-chart-series-5)', 'var(--color-chart-series-2)', 'var(--color-chart-series-3)', 'var(--color-chart-expense)', 'var(--color-chart-series-4)'];
+  private readonly incomeSourceColors = ['var(--color-chart-income)', 'var(--color-chart-series-5)', 'var(--color-chart-series-1)', 'var(--color-chart-series-4)', 'var(--color-chart-series-3)', 'var(--color-chart-series-2)'];
 
   constructor(
     private db: ApiDataService,
@@ -527,37 +527,37 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get insightHealthToneClass(): string {
     const score = this.insightDiagnostics.healthScore;
-    if (score < 45) return 'text-rose-700 bg-rose-500/10 border-rose-300/60';
-    if (score < 70) return 'text-amber-700 bg-amber-500/10 border-amber-300/60';
-    return 'text-emerald-700 bg-emerald-500/10 border-emerald-300/60';
+    if (score < 45) return 'text-[var(--danger-text)] bg-rose-500/10 border-rose-300/60';
+    if (score < 70) return 'text-[var(--warning-text)] bg-amber-500/10 border-amber-300/60';
+    return 'text-[var(--success-text)] bg-emerald-500/10 border-emerald-300/60';
   }
 
   get insightRiskToneClass(): string {
     if (this.insightDiagnostics.riskDayLabel) {
-      return 'border-rose-300/60 bg-rose-500/10 text-rose-700';
+      return 'border-rose-300/60 bg-rose-500/10 text-[var(--danger-text)]';
     }
-    return 'border-emerald-300/60 bg-emerald-500/10 text-emerald-700';
+    return 'border-emerald-300/60 bg-emerald-500/10 text-[var(--success-text)]';
   }
 
   get insightOverdueToneClass(): string {
     const totalOverdue = this.insightDiagnostics.overdueExpensesCount + this.insightDiagnostics.overdueIncomesCount;
     if (totalOverdue > 0) {
-      return 'border-rose-300/60 bg-rose-500/10 text-rose-700';
+      return 'border-rose-300/60 bg-rose-500/10 text-[var(--danger-text)]';
     }
     return 'border-slate-300/60 bg-slate-500/10 text-slate-700';
   }
 
   get insightProjectedToneClass(): string {
     if (this.insightDiagnostics.projectedBalance < 0) {
-      return 'border-rose-300/60 bg-rose-500/10 text-rose-700';
+      return 'border-rose-300/60 bg-rose-500/10 text-[var(--danger-text)]';
     }
-    return 'border-sky-300/60 bg-sky-500/10 text-sky-700';
+    return 'border-sky-300/60 bg-sky-500/10 text-[var(--info-text)]';
   }
 
   get insightPriorityClass(): string {
-    if (this.insightPriority === 'Crítico') return 'border-rose-300/60 bg-rose-500/10 text-rose-700';
-    if (this.insightPriority === 'Atenção') return 'border-amber-300/60 bg-amber-500/10 text-amber-700';
-    return 'border-emerald-300/60 bg-emerald-500/10 text-emerald-700';
+    if (this.insightPriority === 'Crítico') return 'border-rose-300/60 bg-rose-500/10 text-[var(--danger-text)]';
+    if (this.insightPriority === 'Atenção') return 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]';
+    return 'border-emerald-300/60 bg-emerald-500/10 text-[var(--success-text)]';
   }
 
   get insightScoreGaugeWidth(): number {

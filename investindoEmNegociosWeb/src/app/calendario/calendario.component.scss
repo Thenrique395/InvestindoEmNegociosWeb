@@ -28,9 +28,9 @@
 .calendar-hero__eyebrow,
 .eyebrow {
   margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   color: var(--text-muted);
   text-transform: uppercase;
 }
@@ -38,18 +38,18 @@
 .calendar-hero__title {
   margin: 0;
   color: var(--text);
-  font-size: clamp(2rem, 3vw, 3rem);
-  font-weight: 650;
-  letter-spacing: -0.045em;
-  line-height: 0.98;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-display);
+  line-height: var(--line-height-display);
 }
 
 .calendar-hero__text {
   margin: 0;
   max-inline-size: 62ch;
   color: var(--text-secondary);
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
 }
 
 .muted {
@@ -73,8 +73,8 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.7rem 1rem;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
@@ -86,9 +86,9 @@
 
 .calendar-hero__nav-btn--primary {
   border-color: color-mix(in srgb, var(--primary) 36%, transparent);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 165, 233, 0.82));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 95%, transparent), color-mix(in srgb, var(--info) 82%, transparent));
   color: var(--on-primary);
-  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .calendar-total-card {
@@ -104,25 +104,25 @@
 .calendar-total-card__eyebrow {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 .calendar-total-card__value {
   color: var(--text);
   font-size: clamp(3rem, 5vw, 4.2rem);
-  font-weight: 700;
-  letter-spacing: -0.055em;
-  line-height: 0.9;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-display);
+  line-height: var(--line-height-display);
 }
 
 .calendar-total-card__text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.98rem;
-  line-height: 1.5;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
 }
 
 .calendar-total-card__legend {
@@ -130,8 +130,8 @@
   flex-wrap: wrap;
   gap: 0.55rem;
   color: var(--text-muted);
-  font-size: 0.82rem;
-  font-weight: 650;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
 }
 
 .calendar-total-card__legend span {
@@ -165,9 +165,9 @@
 }
 
 .calendar-toolbar__label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -182,8 +182,8 @@
   background: var(--surface);
   padding: 0 0.95rem;
   color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .calendar-toggle input {
@@ -199,8 +199,8 @@
   padding: 0 0.95rem;
   min-height: 48px;
   min-width: 180px;
-  font-size: 1rem;
-  font-weight: 550;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
 }
 
 .summary-grid {
@@ -212,7 +212,7 @@
 .summary-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 7%, transparent), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
   display: grid;
@@ -234,7 +234,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(37, 99, 235, 0.14);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
   background: rgba(255, 255, 255, 0.82);
 
   svg {
@@ -245,62 +245,62 @@
 
 .summary-card__icon--income {
   background: color-mix(in srgb, var(--success) 14%, white);
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .summary-card__icon--expense {
   background: color-mix(in srgb, var(--danger) 14%, white);
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .summary-card__icon--balance {
   background: color-mix(in srgb, var(--primary) 12%, white);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .summary-card__icon--warning {
   background: color-mix(in srgb, var(--warning) 16%, white);
-  color: var(--warning);
+  color: var(--warning-text);
 }
 
 .summary-card__label {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-label);
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-weight: 700;
+  letter-spacing: var(--letter-spacing-eyebrow);
+  font-weight: var(--font-weight-bold);
 }
 
 .summary-card__value {
   font-size: clamp(2rem, 3vw, 2.35rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
   color: var(--text);
 }
 
 .summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }
 
 .summary-card--income {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--success) 8%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .summary-card--expense {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--danger) 8%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .summary-card--balance {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 8%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .summary-card--warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.09), rgba(255, 255, 255, 0.98) 58%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--warning) 9%, transparent), rgba(255, 255, 255, 0.98) 58%);
 }
 
 .calendar-layout {
@@ -329,15 +329,15 @@
 .calendar-grid-wrap__head h2 {
   margin: 0.2rem 0 0;
   font-size: 1.5rem;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--letter-spacing-title);
   color: var(--text);
 }
 
 .calendar-grid-wrap__head .muted {
   max-inline-size: 34ch;
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
 }
 
 .weekdays {
@@ -350,10 +350,10 @@
 .weekdays span {
   padding: 0.8rem 0.45rem;
   text-align: center;
-  font-size: 0.76rem;
+  font-size: var(--font-size-caption);
   color: var(--text-muted);
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
 }
 
@@ -390,8 +390,8 @@
 }
 
 .day-cell--today .day-number {
-  color: var(--primary);
-  font-weight: 700;
+  color: var(--primary-text);
+  font-weight: var(--font-weight-bold);
 }
 
 .day-cell--selected {
@@ -399,8 +399,8 @@
 }
 
 .day-number {
-  font-size: 0.9rem;
-  font-weight: 650;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -441,7 +441,7 @@
 .day-panel h2 {
   margin: 0;
   font-size: 1.4rem;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .day-events {
@@ -460,19 +460,19 @@
 
 .event-card h3 {
   margin: 0;
-  font-size: 1.02rem;
-  letter-spacing: -0.02em;
+  font-size: var(--font-size-body);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .event-action {
   justify-self: start;
   border: 1px solid color-mix(in srgb, var(--success) 45%, var(--border));
-  color: var(--success);
+  color: var(--success-text);
   background: color-mix(in srgb, var(--success) 10%, transparent);
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.85rem;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
 }
 
 .event-action:disabled {
@@ -492,23 +492,23 @@
   align-items: center;
   border-radius: var(--radius-pill);
   padding: 0.32rem 0.62rem;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
 }
 
 .badge--expense {
   background: color-mix(in srgb, var(--danger) 15%, transparent);
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .badge--income {
   background: color-mix(in srgb, var(--success) 15%, transparent);
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .badge--card {
   background: color-mix(in srgb, var(--warning) 18%, transparent);
-  color: var(--warning);
+  color: var(--warning-text);
 }
 
 .empty {
@@ -516,5 +516,5 @@
   border-radius: var(--radius-xl);
   padding: 1rem;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: var(--font-size-body-sm);
 }
