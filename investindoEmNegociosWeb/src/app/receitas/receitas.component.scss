@@ -11,7 +11,7 @@
 
 .receitas-summary-card {
   border: 1px solid var(--border);
-  border-radius: 1.75rem;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
@@ -30,7 +30,7 @@
 .receitas-summary-card__icon {
   inline-size: 3rem;
   block-size: 3rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +61,7 @@
 
 .receitas-summary-card__eyebrow {
   margin: 0;
-  font-size: 11px;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -132,7 +132,7 @@
 
 .receitas-shell {
   border: 1px solid var(--border);
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   background: color-mix(in srgb, var(--surface) 96%, white);
   box-shadow: var(--shadow-md);
   padding: 1.6rem;
@@ -195,7 +195,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.55rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 72%, white);
   padding: 0.5rem 0.8rem;
@@ -224,7 +224,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid rgba(56, 189, 248, 0.28);
   background: rgba(56, 189, 248, 0.1);
   padding: 0.55rem 0.9rem;
@@ -242,7 +242,7 @@
 
 .receitas-hero__nav-btn {
   min-height: 46px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   padding: 0.7rem 1rem;
@@ -266,7 +266,7 @@
 
 .receitas-total-card {
   border: 1px solid var(--border);
-  border-radius: 28px;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
   box-shadow: var(--shadow-sm);
   padding: 1.45rem 1.4rem 1.3rem;
@@ -313,7 +313,7 @@
 }
 
 .receitas-total-card__action {
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   min-height: 58px;
   padding: 0.8rem 0.95rem;
@@ -347,7 +347,7 @@
 .receitas-total-card__action-icon {
   inline-size: 38px;
   block-size: 38px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -394,7 +394,7 @@
   justify-content: space-between;
   gap: 1rem;
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: var(--radius-2xl);
   background: color-mix(in srgb, var(--surface-2) 78%, white);
   padding: 1rem 1.1rem;
 }
@@ -415,7 +415,7 @@
 
   select {
     min-height: 38px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: var(--surface);
     padding: 0 0.85rem;
@@ -426,7 +426,7 @@
 
 .receitas-bulk__button {
   min-height: 44px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 0.7rem 1.1rem;
   border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
   background: linear-gradient(
@@ -485,14 +485,13 @@
 .receitas-filter select,
 .receitas-filter input {
   min-height: 60px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 76%, white);
   padding: 0 1.15rem;
   color: var(--text);
   font-size: 0.98rem;
   font-weight: 500;
-  outline: none;
 }
 
 .receitas-filter select:focus,
@@ -525,7 +524,7 @@
 .receitas-edit-received__dialog {
   position: relative;
   inline-size: min(100%, 520px);
-  border-radius: 28px;
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow-lg);
@@ -564,7 +563,7 @@
 .receitas-edit-received__close {
   inline-size: 42px;
   block-size: 42px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   color: var(--text-muted);
   display: inline-flex;
@@ -581,7 +580,7 @@
 .receitas-edit-received__secondary,
 .receitas-edit-received__primary {
   min-height: 48px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 0.85rem 1.35rem;
   font-size: 0.98rem;
   font-weight: 650;
@@ -602,49 +601,4 @@
   );
   color: white;
   box-shadow: 0 12px 26px color-mix(in srgb, var(--primary) 18%, transparent);
-}
-
-@media (max-width: 1100px) {
-  .receitas-summary-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .receitas-hero {
-    grid-template-columns: 1fr;
-  }
-
-  .receitas-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .receitas-filter--search {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 720px) {
-  .receitas-shell {
-    padding: 1.2rem;
-  }
-
-  .receitas-hero__title {
-    font-size: clamp(1.8rem, 9vw, 2.45rem);
-  }
-
-  .receitas-filters {
-    grid-template-columns: 1fr;
-  }
-
-  .receitas-filter--search {
-    grid-column: auto;
-  }
-
-  .receitas-edit-received__actions {
-    flex-direction: column-reverse;
-  }
-
-  .receitas-summary-card,
-  .receitas-total-card {
-    padding: 1.15rem;
-  }
 }

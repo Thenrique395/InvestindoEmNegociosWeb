@@ -15,14 +15,14 @@
 .sidebar__settings {
   min-height: 54px;
   padding: 0.65rem 1rem;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .sidebar__nav .nav-icon,
 .sidebar__settings .nav-icon {
   width: 37px;
   height: 37px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .sidebar__nav .nav-text,
@@ -56,7 +56,7 @@
 .nav-icon {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
 }
 
 .nav-text {

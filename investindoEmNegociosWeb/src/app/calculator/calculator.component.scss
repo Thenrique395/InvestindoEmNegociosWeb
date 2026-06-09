@@ -12,7 +12,7 @@
 
 .calculator-summary-card {
   border: 1px solid var(--border);
-  border-radius: 1.75rem;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
@@ -31,7 +31,7 @@
 .calculator-summary-card__icon {
   inline-size: 3rem;
   block-size: 3rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(37, 99, 235, 0.14);
   background: rgba(255, 255, 255, 0.82);
   display: inline-flex;
@@ -101,7 +101,7 @@
 
 .calculator-shell {
   border: 1px solid var(--border);
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   background: color-mix(in srgb, var(--surface) 96%, white);
   box-shadow: var(--shadow-md);
   padding: 1.6rem;
@@ -140,7 +140,7 @@
 
 .calculator-action-card {
   border: 1px solid var(--border);
-  border-radius: 28px;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
   box-shadow: var(--shadow-sm);
   padding: 1.45rem 1.4rem 1.3rem;
@@ -163,7 +163,7 @@
 
 .calculator-action-card__button {
   border: none;
-  border-radius: 1.15rem;
+  border-radius: var(--radius-xl);
   background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 82%, var(--success)));
   color: var(--on-primary);
   box-shadow: 0 16px 36px rgba(37, 99, 235, 0.22);
@@ -179,7 +179,7 @@
 .calculator-action-card__button-icon {
   inline-size: 2.5rem;
   block-size: 2.5rem;
-  border-radius: 0.9rem;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.18);
   display: inline-flex;
   align-items: center;
@@ -223,7 +223,7 @@
 
 .calc__selector button {
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: var(--radius-2xl);
   padding: 1rem;
   background: var(--surface);
   color: var(--text);
@@ -279,7 +279,7 @@
 .calc__selector .icon {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -295,7 +295,7 @@
   justify-content: center;
   min-height: 26px;
   padding: 0 0.65rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.72rem;
   font-weight: 800;
   color: var(--primary);
@@ -314,7 +314,7 @@
 
 .calc__panel {
   border: 1px solid var(--border);
-  border-radius: 26px;
+  border-radius: var(--radius-2xl);
   padding: 1.25rem;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
@@ -359,7 +359,7 @@ label {
 input {
   min-height: 48px;
   padding: 0.75rem 0.9rem;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
@@ -376,7 +376,7 @@ input:focus {
   min-height: 48px;
   border: none;
   padding: 0.75rem 1.05rem;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: var(--primary);
   color: var(--on-primary);
   font-weight: 750;
@@ -398,7 +398,7 @@ input:focus {
   margin-top: 0.25rem;
   padding: 1rem 0.85rem 2.2rem;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: var(--surface-2);
 }
 
@@ -406,7 +406,7 @@ input:focus {
   flex: 1;
   min-height: 20px;
   background: linear-gradient(180deg, rgba(37, 99, 235, 0.74) 0%, rgba(37, 99, 235, 0.28) 100%);
-  border-radius: 10px 10px 5px 5px;
+  border-radius: var(--radius-sm) var(--radius-sm) calc(var(--radius-sm) / 2) calc(var(--radius-sm) / 2);
   position: relative;
 }
 
@@ -433,7 +433,7 @@ input:focus {
 .table {
   margin-top: 0.35rem;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--surface);
 }
@@ -479,39 +479,4 @@ input:focus {
 
 .back-link:hover {
   text-decoration: underline;
-}
-
-@media (max-width: 1080px) {
-  .calculator-summary-grid,
-  .calculator-hero {
-    grid-template-columns: 1fr;
-  }
-
-  .calculator-summary-card {
-    min-height: auto;
-  }
-}
-
-@media (max-width: 720px) {
-  .calculator-shell {
-    border-radius: 24px;
-    padding: 1.1rem;
-  }
-
-  .calculator-hero__title {
-    font-size: 2rem;
-  }
-
-  .selector__grid,
-  .form {
-    grid-template-columns: 1fr;
-  }
-
-  .calc__selector button {
-    min-height: 118px;
-  }
-
-  .selector__copy {
-    padding-inline-end: 4.4rem;
-  }
 }

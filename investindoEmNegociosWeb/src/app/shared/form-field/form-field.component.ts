@@ -27,20 +27,18 @@ type FormFieldTone = 'default' | 'danger' | 'success';
       outline-offset: 2px;
     }
 
-    :host(.form-field--invalid) ::ng-deep input,
-    :host(.form-field--invalid) ::ng-deep select,
-    :host(.form-field--invalid) ::ng-deep textarea {
-      border-color: var(--color-danger) !important;
+    :host.form-field--invalid ::ng-deep input,
+    :host.form-field--invalid ::ng-deep select,
+    :host.form-field--invalid ::ng-deep textarea {
+      border-color: var(--color-danger);
       box-shadow: 0 0 0 3px var(--color-danger-weak);
-      outline: none;
     }
 
-    :host(.form-field--invalid) ::ng-deep input:focus,
-    :host(.form-field--invalid) ::ng-deep select:focus,
-    :host(.form-field--invalid) ::ng-deep textarea:focus {
-      border-color: var(--color-danger) !important;
+    :host.form-field--invalid ::ng-deep input:focus,
+    :host.form-field--invalid ::ng-deep select:focus,
+    :host.form-field--invalid ::ng-deep textarea:focus {
+      border-color: var(--color-danger);
       box-shadow: 0 0 0 4px var(--color-danger-soft);
-      outline: none;
     }
 
     @keyframes form-field-shake {

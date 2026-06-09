@@ -26,7 +26,7 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--spacing-1);
   position: relative;
   z-index: 1210;
 }
@@ -45,14 +45,14 @@
 .notif-trigger {
   width: 36px;
   height: 36px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: none;
 }
 
 .user-trigger {
   min-height: 36px;
   padding: 0.32rem 0.55rem;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: none;
 }
 
@@ -76,7 +76,7 @@
   min-width: 300px;
   gap: 0.6rem;
   padding: 0.75rem;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   box-shadow: 0 22px 54px rgba(15, 23, 42, 0.18);
 }
 
@@ -92,7 +92,7 @@
 
 .user-dropdown button {
   min-height: 36px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .user-dropdown__item {
@@ -123,7 +123,7 @@
   height: 38px;
   place-items: center;
   border: 1px solid rgba(37, 99, 235, 0.18);
-  border-radius: 13px;
+  border-radius: var(--radius-md);
   background: rgba(37, 99, 235, 0.08);
   color: var(--primary);
   font-size: 0.78rem;

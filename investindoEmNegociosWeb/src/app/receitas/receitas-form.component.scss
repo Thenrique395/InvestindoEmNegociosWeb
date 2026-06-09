@@ -20,7 +20,7 @@
   inline-size: min(860px, 100%);
   max-block-size: min(92vh, 980px);
   overflow-y: auto;
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface) 96%, white);
   box-shadow: var(--shadow-lg);
@@ -69,7 +69,7 @@
   inline-size: 44px;
   block-size: 44px;
   flex: 0 0 auto;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface) 90%, white);
   color: var(--text-muted);
@@ -151,14 +151,13 @@
 
 .income-field__control {
   min-height: 52px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 78%, white);
   padding: 0 1rem;
   color: var(--text);
   font-size: 1rem;
   font-weight: 550;
-  outline: none;
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
@@ -189,7 +188,7 @@
   justify-content: space-between;
   gap: 1rem;
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   padding: 1rem;
 }
@@ -221,7 +220,7 @@
 .income-toggle-card__track {
   position: absolute;
   inset: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-3) 80%, white);
   transition: border-color 160ms ease, background 160ms ease;
@@ -233,7 +232,7 @@
   inset-inline-start: 3px;
   inline-size: 16px;
   block-size: 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: white;
   box-shadow: var(--shadow-sm);
   transition: transform 160ms ease;
@@ -254,7 +253,7 @@
   align-items: center;
   gap: 0.75rem;
   justify-content: space-between;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   padding: 0.95rem 1rem;
@@ -284,7 +283,7 @@
   align-items: center;
   justify-content: center;
   min-height: 40px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   background: var(--surface);
   padding: 0.65rem 0.95rem;
@@ -300,7 +299,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   padding: 0.95rem 1rem;
@@ -328,7 +327,7 @@
 
 .income-form-modal__hint-action {
   min-height: 40px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   background: var(--surface);
   padding: 0.65rem 0.95rem;
@@ -348,7 +347,7 @@
 }
 
 .income-form-modal__summary {
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 76%, white);
   padding: 1rem;
@@ -381,7 +380,7 @@
 .modal-actions__secondary,
 .modal-actions__primary {
   min-height: 50px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 0.875rem 1.4rem;
   font-size: 1rem;
   font-weight: 650;
@@ -429,44 +428,4 @@
   opacity: 0.65;
   transform: none;
   box-shadow: none;
-}
-
-@media (max-width: 780px) {
-  .income-form-modal {
-    padding: 1rem 0.75rem;
-  }
-
-  .income-form-modal__header,
-  .income-form-modal__form {
-    padding-inline: 1.1rem;
-  }
-
-  .income-form-modal__grid--main {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .income-form-modal__dialog {
-    border-radius: 24px;
-  }
-
-  .income-form-modal__title {
-    font-size: 1.55rem;
-  }
-
-  .income-form-modal__subtitle {
-    font-size: 0.94rem;
-  }
-
-  .income-toggle-card,
-  .income-form-modal__warning,
-  .income-form-modal__hint-card {
-    align-items: flex-start;
-  }
-
-  .modal-actions {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
 }

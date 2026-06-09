@@ -1,5 +1,5 @@
 <section class="admin-users space-y-6 text-[var(--text)]">
-  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <header class="flex flex-col gap-3 flex-row items-center justify-between">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight">Controle de acessos</h1>
       <p class="mt-1 text-sm text-[var(--text-muted)]">Defina o nível de acesso de cada usuário.</p>
@@ -169,7 +169,7 @@
                         </div>
                       }
                       @if (featuresLoadingForUserId !== user.id) {
-                        <div class="grid gap-3 md:grid-cols-2">
+                        <div class="grid gap-3 grid-cols-2">
                           @for (feature of getFeatures(user.id); track trackByFeature($index, feature)) {
                             <label class="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3">
                               <div>

@@ -10,13 +10,11 @@
   }
 
   @if (isLogged && !isOnboardingRoute) {
-    <div class="shell relative grid min-h-screen grid-cols-[300px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)] max-md:grid-cols-1">
+    <div class="shell relative grid min-h-screen grid-cols-[300px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
       <app-sidebar
-        [sidebarOpen]="sidebarOpen"
         [isLightTheme]="isLightTheme"
         [brandName]="brandName"
         [currentRole]="currentRole"
-        (sidebarClose)="closeSidebar()"
         (routeReload)="reloadIfSame($event.path, $event.event)"
         (preferencesOpen)="goToPreferences($event)" />
       <div class="content min-w-0 grid min-h-[calc(100vh-2rem)] gap-4 bg-transparent" [ngClass]="isReceitasRoute ? 'gap-0' : ''">
@@ -33,7 +31,6 @@
           [displayName]="displayName"
           [currentRole]="currentRole"
           [isLightTheme]="isLightTheme"
-          (sidebarToggle)="toggleSidebar()"
           (themeToggle)="toggleTheme()"
           (notificationsToggle)="toggleNotifications()"
           (notificationsRefresh)="refreshNotifications()"
@@ -41,26 +38,9 @@
           (userMenuToggle)="toggleUserMenu()"
           (routeReload)="reloadIfSame($event.path, $event.event)"
           (logoutRequested)="logout()" />
-        <main class="main relative z-0 flex flex-col gap-8 p-[var(--space-3)]" [ngClass]="isReceitasRoute ? 'gap-4 px-[var(--space-3)] pb-[var(--space-3)] pt-0 -mt-12' : ''">
+        <main class="main relative z-0 flex flex-col gap-8 p-[var(--spacing-3)]" [ngClass]="isReceitasRoute ? 'gap-4 px-[var(--spacing-3)] pb-[var(--spacing-3)] pt-0 -mt-12' : ''">
           <router-outlet />
         </main>
-        @if (isLogged) {
-          <nav class="mobile-dock" aria-label="Navegação rápida">
-            <a routerLink="/dashboard" [class.active]="isActiveRoute('/dashboard')">Início</a>
-            @if (hasAccess('Basic')) {
-              <a routerLink="/despesas" [class.active]="isActiveRoute('/despesas')">Despesas</a>
-            }
-            @if (hasAccess('Basic')) {
-              <a routerLink="/receitas" [class.active]="isActiveRoute('/receitas')">Receitas</a>
-            }
-            @if (hasAccess('Basic')) {
-              <a routerLink="/cartoes" [class.active]="isActiveRoute('/cartoes')">Cartões</a>
-            }
-            @if (hasAccess('Basic')) {
-              <a routerLink="/metas" [class.active]="isActiveRoute('/metas')">Metas</a>
-            }
-          </nav>
-        }
       </div>
     </div>
   }

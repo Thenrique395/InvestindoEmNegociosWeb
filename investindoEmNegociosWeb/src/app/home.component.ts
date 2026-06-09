@@ -167,7 +167,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
       title: 'Cadastre sua primeira receita',
       description: 'Informe sua principal fonte para o app calcular seu saldo real.',
-      bullets: ['Salario, freelas ou beneficios', 'Defina se e fixa ou avulsa'],
+      bullets: ['Salário, freelas ou benefícios', 'Defina se é fixa ou avulsa'],
       ctaLabel: 'Cadastrar receita',
       ctaLink: '/receitas'
     },
@@ -351,12 +351,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     switch (this.insight.tone) {
       case 'danger':
         return [
-          'Revise despesas com vencimento proximo',
-          'Priorize cortar gastos variaveis',
-          'Antecipe receitas se possivel'
+          'Revise despesas com vencimento próximo',
+          'Priorize cortar gastos variáveis',
+          'Antecipe receitas se possível'
         ];
       case 'warn':
-        return ['Acompanhe os gastos da semana', 'Evite novas compras parceladas', 'Defina um limite diario'];
+        return ['Acompanhe os gastos da semana', 'Evite novas compras parceladas', 'Defina um limite diário'];
       case 'info':
         return ['Cadastre receitas e despesas principais', 'Crie sua primeira meta anual'];
       default:

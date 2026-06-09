@@ -1,7 +1,7 @@
 .panel {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--space-3);
+  padding: var(--spacing-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -43,7 +43,7 @@
 
 .privacy-pill {
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--surface-2);
   padding: 0.85rem 1rem;
   display: grid;
@@ -56,8 +56,8 @@
 
 .card {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2);
   background: var(--surface-2);
   display: grid;
   gap: 0.75rem;
@@ -70,7 +70,7 @@
 }
 
 .btn {
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   padding: 0.65rem 0.9rem;
   font-weight: 700;
@@ -115,7 +115,7 @@
 .file span {
   display: block;
   border: 1px dashed var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   padding: 0.65rem 0.8rem;
   color: var(--text);
@@ -150,7 +150,7 @@
 
 .field input {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   padding: 0.7rem 0.8rem;
   color: var(--text);

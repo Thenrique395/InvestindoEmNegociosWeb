@@ -20,7 +20,7 @@
 
 .filter-item {
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--surface);
   padding: 10px 12px;
 }
@@ -54,7 +54,7 @@
 
 .filters-footer {
   background: color-mix(in srgb, var(--surface-2) 70%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 10px 12px;
 }
 
@@ -81,9 +81,9 @@
 }
 
 .modal-kpi {
-  min-height: auto !important;
+  min-height: auto;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: var(--surface-2);
   padding: 12px;
 }
@@ -106,7 +106,7 @@
 
 .modal-section {
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: var(--surface-2);
   padding: 12px;
 }
@@ -143,11 +143,4 @@
   margin: 0;
   font-size: 0.875rem;
   color: var(--text);
-}
-
-@media (max-width: 640px) {
-  .modal-dl__row {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
 }

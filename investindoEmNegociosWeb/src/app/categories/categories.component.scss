@@ -11,7 +11,7 @@
 
 .categories-summary-card {
   border: 1px solid var(--border);
-  border-radius: 1.75rem;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.98) 56%);
   box-shadow: var(--shadow-sm);
   padding: 1.3rem 1.35rem 1.2rem;
@@ -30,7 +30,7 @@
 .categories-summary-card__icon {
   inline-size: 3rem;
   block-size: 3rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +122,7 @@
 
 .categories-shell {
   border: 1px solid var(--border);
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   background: color-mix(in srgb, var(--surface) 96%, white);
   box-shadow: var(--shadow-md);
   padding: 1.6rem;
@@ -161,7 +161,7 @@
 
 .categories-action-card {
   border: 1px solid var(--border);
-  border-radius: 28px;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
   box-shadow: var(--shadow-sm);
   padding: 1.45rem 1.4rem 1.3rem;
@@ -184,7 +184,7 @@
 
 .categories-action-card__button {
   border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
-  border-radius: 22px;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 165, 233, 0.82));
   color: var(--on-primary);
   display: grid;
@@ -199,7 +199,7 @@
 .categories-action-card__button-icon {
   inline-size: 42px;
   block-size: 42px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.16);
   display: grid;
   place-items: center;
@@ -237,7 +237,7 @@
 .categories-filter select {
   min-height: 54px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface-2) 78%, white);
   color: var(--text);
   padding: 0 1rem;
@@ -248,7 +248,7 @@
 
 .categories-add-card {
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   background: color-mix(in srgb, var(--surface-2) 54%, white);
   padding: 1.1rem;
   display: grid;
@@ -270,7 +270,7 @@
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   padding: 1.25rem;
   box-shadow: var(--shadow-sm);
   min-width: 0;
@@ -286,7 +286,7 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 74%, white);
   color: var(--text);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   min-height: 54px;
   padding: 0.85rem 1rem;
   text-align: left;
@@ -307,19 +307,19 @@
 }
 
 .add-card__header h3 {
-  margin: 0 0 var(--space-2) 0;
+  margin: 0 0 var(--spacing-2) 0;
 }
 
 .add-card__form {
   display: grid;
   grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
-  gap: var(--space-2);
+  gap: var(--spacing-2);
   align-items: end;
 }
 
 .add-card__form label {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--spacing-1);
   font-weight: 600;
   min-width: 0;
 }
@@ -328,7 +328,7 @@
 .add-card__form select {
   min-height: 48px;
   padding: 0 0.95rem;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -338,7 +338,7 @@
 
 .section-title {
   font-weight: 700;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--spacing-2);
 }
 
 /* category list styling migrated to Tailwind utilities */
@@ -371,8 +371,8 @@
 }
 
 .status {
-  padding: var(--space-2) var(--space-2);
-  border-radius: 12px;
+  padding: var(--spacing-2) var(--spacing-2);
+  border-radius: var(--radius-md);
   background: var(--surface-2);
   color: var(--text-muted);
 }
@@ -403,8 +403,8 @@
 .modal__card {
   position: relative;
   background: var(--surface);
-  border-radius: 18px;
-  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
   width: min(420px, 92vw);
   display: grid;
   gap: 1rem;
@@ -414,14 +414,14 @@
 
 .modal__card label {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--spacing-1);
   font-weight: 600;
 }
 
 .modal__card input,
 .modal__card select {
-  padding: var(--space-1) var(--space-2);
-  border-radius: 10px;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -431,40 +431,4 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
-}
-
-@media (max-width: 860px) {
-  .categories-summary-grid,
-  .categories-hero,
-  .categories-filters {
-    grid-template-columns: 1fr;
-  }
-
-  .categories-shell {
-    padding: 1.25rem;
-  }
-
-  .view-tabs {
-    grid-template-columns: 1fr;
-  }
-
-  .add-card__form {
-    grid-template-columns: 1fr;
-  }
-
-  .category-item {
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-  }
-
-  .category-item .tag,
-  .category-item .btn-danger {
-    grid-column: 2 / 3;
-    justify-self: start;
-  }
-
-  .admin-actions {
-    grid-column: 2 / 3;
-    justify-self: start;
-  }
 }

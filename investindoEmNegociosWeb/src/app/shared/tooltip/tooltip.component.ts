@@ -87,14 +87,6 @@ let nextTooltipId = 0;
       opacity: 1;
       visibility: visible;
     }
-    @media (max-width: 30rem) {
-      .tooltip__panel {
-        inset-inline-end: auto;
-        inset-inline-start: -0.25rem;
-        inline-size: min(15.625rem, 78vw);
-      }
-      .tooltip__arrow { inset-inline-start: 1rem; inset-inline-end: auto; }
-    }
   `
 })
 export class TooltipComponent {

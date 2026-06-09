@@ -1,7 +1,7 @@
 .panel {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--space-3);
+  padding: var(--spacing-3);
   background: var(--surface);
   box-shadow: var(--shadow-md);
   display: grid;
@@ -31,15 +31,15 @@
 
 .placeholder {
   border: 1px dashed var(--border);
-  border-radius: 12px;
-  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2);
   background: var(--surface-2);
 }
 
 .form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-2);
+  gap: var(--spacing-2);
 }
 
 .avatar-block {
@@ -48,13 +48,13 @@
   grid-template-columns: 120px 1fr;
   gap: 1rem;
   align-items: center;
-  padding: var(--space-1) 0;
+  padding: var(--spacing-1) 0;
 }
 
 .avatar-preview {
   width: 120px;
   height: 120px;
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--border);
   background: var(--surface-2);
   display: grid;
@@ -84,8 +84,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: var(--space-1) var(--space-2);
-  border-radius: 10px;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
@@ -106,15 +106,15 @@
 label {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--spacing-1);
   color: var(--text);
   font-weight: 600;
 }
 
 input,
 select {
-  padding: var(--space-2) var(--space-2);
-  border-radius: 10px;
+  padding: var(--spacing-2) var(--spacing-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -123,7 +123,7 @@ select {
 .panel__actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-2);
+  gap: var(--spacing-2);
 }
 
 .ghost {
@@ -131,6 +131,6 @@ select {
   border: 1px solid var(--border);
   color: var(--text);
   box-shadow: none;
-  padding: var(--space-2) var(--space-2);
-  border-radius: 10px;
+  padding: var(--spacing-2) var(--spacing-2);
+  border-radius: var(--radius-sm);
 }

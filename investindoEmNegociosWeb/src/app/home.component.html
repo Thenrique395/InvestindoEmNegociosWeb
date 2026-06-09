@@ -235,19 +235,19 @@
         </section>
       } @else {
         <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
           </div>
@@ -256,18 +256,18 @@
     } @else {
       <header class="flex flex-wrap items-start justify-between gap-3">
         <div class="max-w-[560px]">
-          <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
+          <p class="text-[0.75rem] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
           <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
             Visão geral de {{ mesAtualLabel }}
           </h1>
-          <p class="mt-1 text-[12px] text-[var(--text-muted)]">
+          <p class="mt-1 text-[0.875rem] text-[var(--text-muted)]">
             Combine receitas, despesas e cartões para saber o quanto pode gastar.
           </p>
         </div>
         <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
           <button
             type="button"
-            class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+            class="rounded-full border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.875rem] font-semibold transition"
             [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
             (click)="setPeriodo('month')"
             >
@@ -275,7 +275,7 @@
           </button>
           <button
             type="button"
-            class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+            class="rounded-full border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.875rem] font-semibold transition"
             [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
             (click)="setPeriodo('quarter')"
             >
@@ -283,7 +283,7 @@
           </button>
           <button
             type="button"
-            class="rounded-full border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[12px] font-semibold transition"
+            class="rounded-full border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.875rem] font-semibold transition"
             [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
             (click)="setPeriodo('year')"
             >
@@ -301,21 +301,21 @@
                   <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Disponível Real</p>
+              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Disponível Real</p>
               <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo disponível real">
                 i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
                   SDR = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.
                 </span>
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
             <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[11px] font-semibold text-sky-700">
+            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-sky-700">
               <span class="inline-block h-2 w-2 rounded-full bg-sky-500"></span>
               Em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}. Pendências: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}.
             </p>
-            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | currency: 'BRL':'symbol':'1.2-2' }}</p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
             <div class="mb-2 flex items-center gap-3">
@@ -325,21 +325,21 @@
                   <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Patrimônio líquido</p>
+              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Patrimônio líquido</p>
               <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre patrimônio líquido">
                 i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
                   Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.
                 </span>
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
             <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-emerald-700">
               <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
               Ativos: {{ patrimonioTotalAtivos | currency: 'BRL':'symbol':'1.2-2' }}. Passivos: {{ patrimonioPassivos | currency: 'BRL':'symbol':'1.2-2' }}.
             </p>
-            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | currency: 'BRL':'symbol':'1.2-2' }} · Ativos reais: {{ patrimonioEmAtivosReais | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | currency: 'BRL':'symbol':'1.2-2' }} · Ativos reais: {{ patrimonioEmAtivosReais | currency: 'BRL':'symbol':'1.2-2' }}</p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
             <div class="mb-2 flex items-center gap-3">
@@ -348,17 +348,17 @@
                   <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
+              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
               <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
                 i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
                   Total de receitas do mês: apenas receitas com status recebido no período selecionado.
                 </span>
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
             <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-3 py-1 text-[11px] font-semibold text-amber-700">
+            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-amber-700">
               <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
               Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}.
             </p>
@@ -370,17 +370,17 @@
                   <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
+              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
               <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
                 i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
                   Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.
                 </span>
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
             <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
+            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
             <div class="mb-2 flex items-center gap-3">
@@ -389,34 +389,34 @@
                   <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="m-0 flex-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
+              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
               <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
                 i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
                   Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.
                 </span>
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
             <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
-            <p class="mt-1 text-[11px] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
+            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
           </div>
         </div>
       } @else {
         <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
             <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
           </div>
@@ -424,11 +424,11 @@
       }
     }
     @if (hasAccess('Advanced') && accountBalances.length) {
-      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
-            <p class="m-0 text-[11px] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
+            <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}</p>
           </div>
           @if (hasAccess('Intermediate')) {
             <a routerLink="/contas" class="btn-ghost sm">Gerenciar contas</a>
@@ -436,23 +436,23 @@
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2">
           @for (account of accountBalances; track trackByIndex($index, account)) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
-              <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ account.name }}</p>
-              <p class="m-0 mt-1 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
-              <strong class="mt-2 block text-[14px] text-[var(--text)]">{{ account.currentBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
+              <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">{{ account.name }}</p>
+              <p class="m-0 mt-1 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
+              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ account.currentBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
             </article>
           }
         </div>
       </section>
     }
     @if (hasAccess('Advanced') && patrimonioHistoryPoints.length) {
-      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Evolução patrimonial</p>
-            <p class="m-0 text-[11px] text-[var(--text-muted)]">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
+            <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Evolução patrimonial</p>
+            <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
           </div>
-          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] text-[var(--text-muted)]">
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
             Atual: {{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}
           </span>
         </div>
@@ -463,36 +463,36 @@
                 <div class="w-full rounded-t-[10px] bg-[linear-gradient(180deg,rgba(16,185,129,0.28),rgba(16,185,129,0.9))]" [style.height.%]="(point.netWorth / patrimonioHistoryMax) * 100"></div>
               </div>
               <div class="mt-2 text-center">
-                <strong class="block text-[11px] text-[var(--text)]">{{ point.label }}</strong>
-                <span class="block text-[10px] text-[var(--text-muted)]">{{ point.netWorth | currency: 'BRL':'symbol':'1.0-0' }}</span>
+                <strong class="block text-[0.8125rem] text-[var(--text)]">{{ point.label }}</strong>
+                <span class="block text-[0.75rem] text-[var(--text-muted)]">{{ point.netWorth | currency: 'BRL':'symbol':'1.0-0' }}</span>
               </div>
             </article>
           }
         </div>
         @if (patrimonioHistoryEstimated) {
-          <p class="m-0 text-[11px] text-[var(--text-muted)]">
+          <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">
             Série estimada a partir do histórico disponível de contas, pagamentos e movimentos de investimento.
           </p>
         }
       </section>
     }
     @if (hasAccess('Intermediate') && debtSummary) {
-      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p class="m-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Mapa de dívidas</p>
-            <p class="m-0 text-[11px] text-[var(--text-muted)]">Composição oficial das obrigações em aberto.</p>
+            <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Mapa de dívidas</p>
+            <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Composição oficial das obrigações em aberto.</p>
           </div>
-          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] text-[var(--text-muted)]">
+          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
             Total: {{ debtSummary.totalDebt | currency: 'BRL':'symbol':'1.2-2' }}
           </span>
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
           @for (bucket of debtBuckets; track trackByIndex($index, bucket)) {
             <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-              <p class="m-0 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ bucket.label }}</p>
-              <strong class="mt-2 block text-[15px] text-[var(--text)]">{{ bucket.totalAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-              <p class="m-0 mt-1 text-[10px] text-[var(--text-muted)]">{{ bucket.itemsCount }} item(ns)</p>
+              <p class="m-0 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ bucket.label }}</p>
+              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ bucket.totalAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">{{ bucket.itemsCount }} item(ns)</p>
             </article>
           }
         </div>
@@ -502,8 +502,8 @@
               <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
                 <div class="flex flex-wrap items-start justify-between gap-2">
                   <div class="min-w-0">
-                    <strong class="block text-[12px] text-[var(--text)]">{{ item.title }}</strong>
-                    <p class="m-0 mt-1 text-[10px] text-[var(--text-muted)]">
+                    <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                    <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">
                       {{ item.family === 'card' ? 'Cartão' : 'Obrigação' }}@if (item.relatedName) {
                       <span> · {{ item.relatedName }}</span>
                       }@if (item.statementReference) {
@@ -512,8 +512,8 @@
                   </p>
                 </div>
                 <div class="text-right">
-                  <strong class="block text-[12px] text-[var(--text)]">{{ item.openAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-                  <span class="text-[10px] text-[var(--text-muted)]">vence {{ item.dueDate | date:'dd/MM' }}</span>
+                  <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.openAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                  <span class="text-[0.75rem] text-[var(--text-muted)]">vence {{ item.dueDate | date:'dd/MM' }}</span>
                 </div>
               </div>
             </article>
@@ -524,7 +524,7 @@
   }
   @if (!isBasicProfile && !isLoadingDashboard) {
     <section
-      class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]"
+      class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]"
     [ngClass]="insight.tone === 'warn'
       ? 'border-amber-400/40 border-l-amber-400 bg-amber-500/10'
       : insight.tone === 'danger'
@@ -540,13 +540,13 @@
           </svg>
         </div>
         <div>
-          <p class="text-[10px] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+          <p class="text-[0.75rem] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
           <h3 class="m-0 text-[var(--text-sm)] font-semibold">{{ insight.title }}</h3>
-          <p class="mt-1 text-[11px] text-[var(--text-muted)]">{{ insight.message }}</p>
+          <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">{{ insight.message }}</p>
           @if (insightAction) {
             <div class="mt-2">
               <a
-                class="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[11px] font-semibold text-[var(--text)] hover:border-[var(--primary)]"
+                class="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[0.8125rem] font-semibold text-[var(--text)] hover:border-[var(--primary)]"
                 [routerLink]="insightAction.route">
                 Ação recomendada: {{ insightAction.label }}
               </a>
@@ -556,7 +556,7 @@
             <div class="mt-2 flex flex-wrap gap-1.5">
               @for (item of insightHighlights; track trackByIndex($index, item)) {
                 <span
-                  class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
+                  class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px] text-[0.75rem] font-semibold text-[var(--text-secondary)]"
                   >
                   {{ item }}
                 </span>
@@ -569,48 +569,48 @@
     </section>
   }
   @if (!isBasicProfile && showInsightDetails) {
-    <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-3)] backdrop-blur-[2px]">
-      <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 sm:pb-[var(--space-3)]">
+    <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--spacing-3)] backdrop-blur-[2px]">
+      <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 pb-[var(--spacing-3)]">
         <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
           ×
         </button>
         <div class="flex flex-wrap items-center gap-2 pr-10">
           <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
-          <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" [ngClass]="insightPriorityClass">
+          <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.75rem] font-semibold uppercase tracking-[0.16em]" [ngClass]="insightPriorityClass">
             {{ insightPriority }}
           </span>
         </div>
         <h3 class="m-0 text-[var(--text-lg)] font-semibold">{{ insight.title }}</h3>
         <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">{{ insight.message }}</p>
         <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
-          <p class="m-0 text-[11px] font-semibold text-[var(--text)]">{{ insightActionSentence }}</p>
-          <p class="m-1 text-[10px] text-[var(--text-muted)]">{{ insightDeadlineLabel }}</p>
-          <p class="m-0 text-[10px] text-[var(--text-secondary)]">{{ insightShortGoal }}</p>
+          <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">{{ insightActionSentence }}</p>
+          <p class="m-1 text-[0.75rem] text-[var(--text-muted)]">{{ insightDeadlineLabel }}</p>
+          <p class="m-0 text-[0.75rem] text-[var(--text-secondary)]">{{ insightShortGoal }}</p>
         </div>
         @if (insightHighlights.length) {
           <div class="flex flex-wrap gap-1.5">
             @for (item of insightHighlights; track trackByIndex($index, item)) {
               <span
-                class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-semibold text-[var(--text-secondary)]"
+                class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] font-semibold text-[var(--text-secondary)]"
                 >
                 {{ item }}
               </span>
             }
           </div>
         }
-        <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)] shadow-[var(--shadow-sm)]">
+        <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
           <div class="flex items-center justify-between gap-2">
-            <p class="m-0 text-[11px] font-semibold text-[var(--text)]">Painel de risco</p>
-            <span class="text-[10px] text-[var(--text-muted)]">Atualização automática</span>
+            <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">Painel de risco</p>
+            <span class="text-[0.75rem] text-[var(--text-muted)]">Atualização automática</span>
           </div>
-          <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1.15fr_1fr]">
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
-              <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira</p>
+          <div class="grid grid-cols-1 gap-2 grid-cols-[1.15fr_1fr]">
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
+              <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira</p>
               <div class="mt-2 flex items-center justify-between gap-2">
-                <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-semibold" [ngClass]="insightHealthToneClass">
+                <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.875rem] font-semibold" [ngClass]="insightHealthToneClass">
                   {{ insightDiagnostics.healthScore }}/100
                 </strong>
-                <span class="text-[10px] text-[var(--text-muted)]">Score mensal</span>
+                <span class="text-[0.75rem] text-[var(--text-muted)]">Score mensal</span>
               </div>
               <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
                 <div class="h-full rounded-full transition-all duration-300"
@@ -619,8 +619,8 @@
               </div>
               @if (robotScoreBreakdown.length) {
                 <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-2">
-                  <p class="m-0 text-[10px] text-[var(--text-muted)]">Como chegamos nesse score:</p>
-                  <ul class="m-0 mt-1 list-disc pl-4 text-[10px] text-[var(--text-secondary)]">
+                  <p class="m-0 text-[0.75rem] text-[var(--text-muted)]">Como chegamos nesse score:</p>
+                  <ul class="m-0 mt-1 list-disc pl-4 text-[0.75rem] text-[var(--text-secondary)]">
                     @for (item of robotScoreBreakdown; track trackByIndex($index, item)) {
                       <li>{{ item }}</li>
                     }
@@ -629,22 +629,22 @@
               }
             </article>
             <div class="grid gap-2">
-              <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightRiskToneClass">
-                <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
-                <strong class="mt-2 block text-[13px] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
+              <article class="rounded-[12px] border p-[var(--spacing-1)]" [ngClass]="insightRiskToneClass">
+                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
+                <strong class="mt-2 block text-[0.9375rem] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
               </article>
-              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
-                <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
-                <strong class="mt-2 block text-[14px] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-                <p class="mt-1 text-[10px] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
+              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
+                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
+                <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                <p class="mt-1 text-[0.75rem] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
               </article>
             </div>
           </div>
-          <article class="rounded-[12px] border p-[var(--space-1)]" [ngClass]="insightOverdueToneClass">
+          <article class="rounded-[12px] border p-[var(--spacing-1)]" [ngClass]="insightOverdueToneClass">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p class="m-0 text-[10px] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
-                <strong class="mt-1 block text-[13px] font-semibold">
+                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
+                <strong class="mt-1 block text-[0.9375rem] font-semibold">
                   {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
                 </strong>
               </div>
@@ -653,7 +653,7 @@
               <div class="mt-2 grid gap-2">
                 @for (todo of insightTodoItems; track trackByIndex($index, todo)) {
                   <article
-                    class="rounded-[10px] border px-2 py-2 text-[11px]"
+                    class="rounded-[10px] border px-2 py-2 text-[0.8125rem]"
               [ngClass]="todo.severity === 'danger'
                 ? 'border-rose-300/60 bg-rose-500/10 text-rose-700'
                 : todo.severity === 'warn'
@@ -662,7 +662,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-2">
                       <p class="m-0 flex-1">{{ todo.text }}</p>
                       <a
-                        class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text)]"
+                        class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[0.75rem] font-semibold text-[var(--text)]"
                         [routerLink]="todo.route"
                         [queryParams]="todo.queryParams">
                         {{ todo.actionLabel }}
@@ -672,19 +672,19 @@
                 }
               </div>
             } @else {
-              <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem pendências acionáveis no momento.</p>
+              <p class="mt-2 text-[0.8125rem] text-[var(--text-muted)]">Sem pendências acionáveis no momento.</p>
             }
           </article>
           @if (cashflowProjection) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p class="m-0 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Simulação diária</p>
-                  <strong class="mt-1 block text-[13px] font-semibold text-[var(--text)]">
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Simulação diária</p>
+                  <strong class="mt-1 block text-[0.9375rem] font-semibold text-[var(--text)]">
                     Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | currency: 'BRL':'symbol':'1.2-2' }}
                   </strong>
                 </div>
-                <span class="text-[10px] text-[var(--text-muted)]">
+                <span class="text-[0.75rem] text-[var(--text-muted)]">
                   Menor saldo:
                   {{ cashflowProjection.lowestBalance | currency: 'BRL':'symbol':'1.2-2' }}
                 </span>
@@ -693,7 +693,7 @@
                 <div class="mt-2 grid gap-2">
                   @for (point of projectionHighlights; track trackByIndex($index, point)) {
                     <div
-                      class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[11px]"
+                      class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[0.8125rem]"
               [ngClass]="point.tone === 'danger'
                 ? 'border-rose-300/60 bg-rose-500/10 text-rose-700'
                 : point.tone === 'warn'
@@ -706,32 +706,32 @@
                   }
                 </div>
               } @else {
-                <p class="mt-2 text-[11px] text-[var(--text-muted)]">Sem eventos futuros no período selecionado.</p>
+                <p class="mt-2 text-[0.8125rem] text-[var(--text-muted)]">Sem eventos futuros no período selecionado.</p>
               }
             </article>
           }
         </div>
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
-            <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Comparação com mês anterior</p>
-            <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
+        <div class="grid grid-cols-1 gap-2 grid-cols-2">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">Comparação com mês anterior</p>
+            <ul class="m-0 mt-2 list-disc pl-[var(--spacing-2)] text-[0.8125rem] text-[var(--text-secondary)]">
               @for (item of insightComparison; track trackByIndex($index, item)) {
                 <li>{{ item }}</li>
               }
             </ul>
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
-            <p class="m-0 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">O que mudou hoje</p>
-            <ul class="m-0 mt-2 list-disc pl-[var(--space-2)] text-[11px] text-[var(--text-secondary)]">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">O que mudou hoje</p>
+            <ul class="m-0 mt-2 list-disc pl-[var(--spacing-2)] text-[0.8125rem] text-[var(--text-secondary)]">
               @for (item of insightChangesToday; track trackByIndex($index, item)) {
                 <li>{{ item }}</li>
               }
             </ul>
           </div>
         </div>
-        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-2)]">
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-2)]">
           <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
-          <ul class="mt-2 list-disc pl-[var(--space-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
+          <ul class="mt-2 list-disc pl-[var(--spacing-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
             @for (tip of insightTips; track trackByIndex($index, tip)) {
               <li>{{ tip }}</li>
             }
@@ -741,7 +741,7 @@
           <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
           <a class="btn-primary sm" routerLink="/despesas">Ver despesas</a>
         </div>
-        <div class="fixed inset-x-0 bottom-0 z-[2200] border-t border-[var(--border)] bg-[var(--surface)]/95 p-3 backdrop-blur sm:hidden">
+        <div class="fixed inset-x-0 bottom-0 z-[2200] border-t border-[var(--border)] bg-[var(--surface)]/95 p-3 backdrop-blur">
           <div class="mx-auto flex max-w-[620px] items-center justify-end gap-2">
             <button class="ghost sm" type="button" (click)="closeInsightDetails()">Fechar</button>
             <a class="btn-primary sm" routerLink="/despesas">Resolver agora</a>
@@ -751,13 +751,13 @@
     </div>
   }
   @if (!isBasicProfile && metasResumo.total) {
-    <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-1)]">
+    <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p class="text-[10px] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
-          <p class="text-[11px] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
+          <p class="text-[0.75rem] tracking-[0.18em] text-[var(--text-muted)]">Metas</p>
+          <p class="text-[0.8125rem] text-[var(--text-muted)]">Resumo rápido das metas anuais cadastradas.</p>
         </div>
-        <div class="flex flex-wrap gap-2 text-[11px] text-[var(--text-secondary)]">
+        <div class="flex flex-wrap gap-2 text-[0.8125rem] text-[var(--text-secondary)]">
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
             Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
           </span>
@@ -772,7 +772,7 @@
           </span>
         </div>
       </div>
-      <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--space-1)]">
+      <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">Metas ativas</p>
           <button
@@ -780,23 +780,23 @@
             class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
             aria-label="Como ler o resumo de metas">
             i
-            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
               Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano.
             </span>
             <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
           </button>
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
-          <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
             Planejadas <strong>{{ metasResumo.planned }}</strong>
           </div>
-          <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[rgba(14,165,233,0.35)] bg-[rgba(14,165,233,0.12)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
             Em andamento <strong>{{ metasResumo.inProgress }}</strong>
           </div>
-          <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[rgba(34,197,94,0.35)] bg-[rgba(34,197,94,0.12)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
             Concluídas <strong>{{ metasResumo.completed }}</strong>
           </div>
-          <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-[var(--space-1)] py-[var(--space-1)] text-center text-[11px] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
             Canceladas <strong>{{ metasResumo.canceled }}</strong>
           </div>
         </div>
@@ -804,37 +804,37 @@
           <div class="inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] p-1">
             <button
               type="button"
-              class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
+              class="rounded-full px-[var(--spacing-1)] py-[var(--spacing-1)] text-[0.8125rem] font-semibold text-[var(--text-muted)] transition"
               [ngClass]="metasVisao === 'progresso' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
               (click)="metasVisao = 'progresso'">
               Progresso
             </button>
             <button
               type="button"
-              class="rounded-full px-[var(--space-1)] py-[var(--space-1)] text-[11px] font-semibold text-[var(--text-muted)] transition"
+              class="rounded-full px-[var(--spacing-1)] py-[var(--spacing-1)] text-[0.8125rem] font-semibold text-[var(--text-muted)] transition"
               [ngClass]="metasVisao === 'aporte' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
               (click)="metasVisao = 'aporte'">
               Por meta
             </button>
           </div>
           @if (metasVisao === 'progresso') {
-            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]">
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)]">
               <div class="mb-2 h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
                 <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--info))]" [style.width.%]="metasResumo.progressoMedio"></div>
               </div>
-              <p class="text-[11px] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
+              <p class="text-[0.8125rem] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
             </div>
           }
           @if (metasVisao === 'aporte') {
-            <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-2)]">
+            <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)]">
               @if (metasDetalhe.length) {
                 <div class="grid gap-2">
                   @for (meta of metasDetalhe; track trackByIndex($index, meta)) {
                     <div class="grid gap-2">
                       <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="min-w-0">
-                          <strong class="block truncate text-[12px] text-[var(--text)]">{{ meta.title }}</strong>
-                          <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
+                          <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ meta.title }}</strong>
+                          <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
                             <span
                               class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]"
                               [ngClass]="meta.status === 'Completed' ? 'text-[var(--success)]' : meta.status === 'Canceled' ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)]'">
@@ -848,8 +848,8 @@
                           </div>
                         </div>
                         <div class="flex items-center gap-2">
-                          <span class="text-[11px] text-[var(--text-muted)]">{{ meta.progress | number:'1.0-0' }}%</span>
-                          <a class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/metas" aria-label="Ver detalhes da meta">
+                          <span class="text-[0.8125rem] text-[var(--text-muted)]">{{ meta.progress | number:'1.0-0' }}%</span>
+                          <a class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[0.875rem] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/metas" aria-label="Ver detalhes da meta">
                             ↗
                           </a>
                         </div>
@@ -859,11 +859,11 @@
                         <div class="h-full bg-[linear-gradient(90deg,rgba(148,163,184,0.45),rgba(148,163,184,0.2))]" [style.width.%]="100 - meta.progress"></div>
                       </div>
                       @if (meta.expectedMonthly) {
-                        <div class="text-[10px] text-[var(--text-muted)]">
+                        <div class="text-[0.75rem] text-[var(--text-muted)]">
                           Ritmo sugerido: <strong>{{ meta.expectedMonthly | currency: 'BRL':'symbol':'1.2-2' }}</strong> / mês
                         </div>
                       }
-                      <div class="flex flex-wrap justify-between gap-2 text-[11px] text-[var(--text-muted)]">
+                      <div class="flex flex-wrap justify-between gap-2 text-[0.8125rem] text-[var(--text-muted)]">
                         <span>Aportado: <strong>{{ meta.current | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
                         <span>Falta: <strong>{{ meta.remaining | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
                         <span>Alvo: <strong>{{ meta.target | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
@@ -872,7 +872,7 @@
                   }
                 </div>
               } @else {
-                <p class="text-[11px] text-[var(--text-muted)]">Nenhuma meta ativa com valor de alvo definido.</p>
+                <p class="text-[0.8125rem] text-[var(--text-muted)]">Nenhuma meta ativa com valor de alvo definido.</p>
               }
             </div>
           }
@@ -886,15 +886,15 @@
         <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
           <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
             <div class="grid gap-1">
-              <p class="m-0 text-[12px] text-[var(--text-muted)]">Resultado do mês</p>
-              <span class="text-[11px] text-[var(--text-muted)]">Saldo anterior + receitas recebidas - despesas</span>
+              <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Resultado do mês</p>
+              <span class="text-[0.8125rem] text-[var(--text-muted)]">Saldo anterior + receitas recebidas - despesas</span>
             </div>
             <button
               type="button"
               class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
               aria-label="Como ler o gráfico de resultado do mês">
               i
-              <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+              <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
                 Resultado considera somente receitas recebidas. Receitas pendentes aparecem separadas e não entram no saldo principal.
               </span>
               <span class="pointer-events-none absolute right-3 top-full z-10 mt-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
@@ -902,16 +902,16 @@
           </div>
           <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
             <div class="grid gap-1">
-              <span class="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
+              <span class="text-[0.8125rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
               <div class="flex items-center gap-2">
-                <span class="text-[20px] font-semibold text-[var(--text)]">
+                <span class="text-[1.25rem] font-semibold text-[var(--text)]">
                   {{ saldoPrincipal | currency: 'BRL':'symbol':'1.2-2' }}
                 </span>
-                <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[11px] text-[var(--text-muted)]">
+                <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.8125rem] text-[var(--text-muted)]">
                   Saldo ant. {{ saldoAnterior | currency: 'BRL':'symbol':'1.2-2' }} • Recebidas {{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }} • Despesas {{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}
                 </span>
               </div>
-              <span class="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-2 py-[2px] text-[10px] font-semibold text-amber-700">
+              <span class="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-2 py-[2px] text-[0.75rem] font-semibold text-amber-700">
                 <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
                 Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}
               </span>
@@ -925,7 +925,7 @@
                   class="h-full bg-[linear-gradient(90deg,var(--danger),rgba(239,68,68,0.35))]"
                 [style.width.%]="saldoDespesasPercentual"></div>
               </div>
-              <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-[var(--text-muted)]">
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[0.75rem] text-[var(--text-muted)]">
                 <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.08)] px-2 py-[2px]">
                   <span class="inline-block h-2 w-2 rounded-full bg-[rgba(34,197,94,0.9)]"></span>
                   Base disponível
@@ -946,7 +946,7 @@
         </div>
         <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1">
           <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-            <p class="m-0 text-[12px] text-[var(--text-muted)]">Despesas por categoria</p>
+            <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Despesas por categoria</p>
             @if (expenseCategorySlices.length) {
               <div class="grid gap-3">
                 <div class="expense-donut-wrap">
@@ -959,7 +959,7 @@
                 </div>
                 <div class="grid gap-2">
                   @for (item of expenseCategorySlices | slice:0:5; track trackByIndex($index, item)) {
-                    <div class="flex items-center justify-between text-[12px]">
+                    <div class="flex items-center justify-between text-[0.875rem]">
                       <span class="inline-flex min-w-0 items-center gap-2">
                         <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
                         <span class="truncate font-semibold">{{ item.label }}</span>
@@ -972,11 +972,11 @@
                 </div>
               </div>
             } @else {
-              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem despesas.</div>
+              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[0.8125rem] text-[var(--text-muted)]">Sem despesas.</div>
             }
           </div>
           <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-            <p class="m-0 text-[12px] text-[var(--text-muted)]">Receitas por categoria</p>
+            <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Receitas por categoria</p>
             @if (incomeSourceSlices.length) {
               <div class="grid gap-3">
                 <div class="expense-donut-wrap">
@@ -989,7 +989,7 @@
                 </div>
                 <div class="grid gap-2">
                   @for (item of incomeSourceSlices | slice:0:5; track trackByIndex($index, item)) {
-                    <div class="flex items-center justify-between text-[12px]">
+                    <div class="flex items-center justify-between text-[0.875rem]">
                       <span class="inline-flex min-w-0 items-center gap-2">
                         <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
                         <span class="truncate font-semibold">{{ item.label }}</span>
@@ -1002,7 +1002,7 @@
                 </div>
               </div>
             } @else {
-              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[11px] text-[var(--text-muted)]">Sem receitas por categoria.</div>
+              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[0.8125rem] text-[var(--text-muted)]">Sem receitas por categoria.</div>
             }
           </div>
         </div>
@@ -1010,12 +1010,12 @@
       <aside class="grid grid-rows-[auto_minmax(0,1fr)] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <div class="flex items-center justify-between">
           <div>
-            <p class="m-0 text-[13px] font-semibold text-[var(--text)]">Movimentos recentes</p>
-            <span class="text-[12px] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
+            <p class="m-0 text-[0.9375rem] font-semibold text-[var(--text)]">Movimentos recentes</p>
+            <span class="text-[0.875rem] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
           </div>
           <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
             i
-            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[11px] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
+            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
               Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido.
             </span>
             <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
@@ -1024,37 +1024,37 @@
         @if (recentTransactions.length) {
           <div class="grid gap-2 min-h-0 overflow-y-auto pr-1">
             @for (item of recentTransactions; track trackByIndex($index, item)) {
-              <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--space-1)] shadow-[var(--shadow-sm)]">
+              <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]">
                 <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
                   <span
-                    class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[12px] font-semibold text-[var(--text)]"
+                    class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[0.875rem] font-semibold text-[var(--text)]"
                     [ngClass]="item.type === 'income' ? 'bg-[rgba(34,197,94,0.2)] text-[var(--success)]' : 'bg-[rgba(239,68,68,0.2)] text-[var(--danger)]'">
                     {{ item.type === 'income' ? '↑' : '↓' }}
                   </span>
                   <div class="min-w-0">
                     <div class="flex items-center justify-between gap-2">
-                      <strong class="block truncate text-[12px]">{{ item.title }}</strong>
+                      <strong class="block truncate text-[0.875rem]">{{ item.title }}</strong>
                     </div>
-                    <div class="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-[var(--text-muted)]">
+                    <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
                       <span>{{ item.date }}</span>
                       <span class="opacity-70">•</span>
                       <span
-                        class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[10px] font-medium"
+                        class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] font-medium"
                         [ngClass]="item.status === 'Pago' ? 'text-[var(--success)]' : item.status === 'Pendente' ? 'text-[var(--warning)]' : 'text-[var(--text-secondary)]'">
                         {{ item.status }}
                       </span>
                       @if (item.recurring) {
-                        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--space-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
+                        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--spacing-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
                       }
                     </div>
                   </div>
                 </div>
                 <div class="flex flex-col items-end gap-2">
                   <div class="flex items-center gap-2">
-                    <div class="text-[13px] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
+                    <div class="text-[0.9375rem] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success)]' : 'text-[var(--danger)]'">
                       {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
                     </div>
-                    <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[12px] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
+                    <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[0.875rem] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
                       ↗
                     </a>
                   </div>
@@ -1063,7 +1063,7 @@
             }
           </div>
         } @else {
-          <p class="text-[11px] text-[var(--text-muted)]">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
+          <p class="text-[0.8125rem] text-[var(--text-muted)]">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
         }
       </aside>
     </div>

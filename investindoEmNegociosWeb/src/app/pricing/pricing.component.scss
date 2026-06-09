@@ -10,7 +10,7 @@
 .progression-card,
 .trust-card {
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: var(--radius-2xl);
   background: var(--surface);
 }
 
@@ -45,7 +45,7 @@
 
 .hero-points span {
   padding: 0.55rem 0.8rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--surface) 86%, transparent);
   border: 1px solid var(--border);
   color: var(--text);
@@ -64,7 +64,7 @@
   display: inline-flex;
   width: fit-content;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface-2);
   padding: 0.25rem;
 }
@@ -74,7 +74,7 @@
   background: transparent;
   color: var(--text-secondary);
   padding: 0.65rem 1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-weight: 700;
 }
 
@@ -88,7 +88,7 @@
   display: grid;
   gap: 0.45rem;
   padding: 1rem;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface) 86%, transparent);
 }
@@ -125,7 +125,7 @@
 .progression-step,
 .trust-grid article {
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 1rem;
   background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 82%, white), var(--surface));
 }
@@ -139,7 +139,7 @@
   display: inline-flex;
   width: fit-content;
   padding: 0.3rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--primary);
@@ -204,7 +204,7 @@
   gap: 0.45rem;
   padding: 0.95rem;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface-2) 84%, white);
 }
 
@@ -220,7 +220,7 @@
 
 .plan-badge {
   align-self: flex-start;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 0.35rem 0.7rem;
   background: color-mix(in srgb, var(--primary) 14%, var(--surface));
   color: var(--primary);
@@ -293,7 +293,7 @@
 .comparison-table {
   display: grid;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
@@ -341,7 +341,7 @@
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 0.9rem 1rem;
   border: 1px solid var(--border);
   font-weight: 800;
@@ -356,27 +356,4 @@
 .btn--ghost {
   background: var(--surface-2);
   color: var(--text);
-}
-
-@media (max-width: 980px) {
-  .pricing-hero,
-  .comparison-head,
-  .pricing-grid,
-  .progression-grid,
-  .trust-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .pricing-hero,
-  .comparison-head {
-    display: grid;
-  }
-
-  .comparison-row {
-    grid-template-columns: 1.2fr repeat(3, minmax(72px, 1fr));
-  }
-
-  .faq-grid {
-    grid-template-columns: 1fr;
-  }
 }

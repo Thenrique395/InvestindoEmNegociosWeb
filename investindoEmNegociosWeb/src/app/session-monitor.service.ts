@@ -15,7 +15,7 @@ export class SessionMonitorService {
   private readonly sessionIdleTimeoutMs = 60 * 60 * 1000;
   private readonly sessionRefreshWindowMs = 2 * 60 * 1000;
   private readonly sessionCheckIntervalMs = 30 * 1000;
-  private readonly activityEvents: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
+  private readonly activityEvents: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'scroll'];
   private lastActivityAt = Date.now();
   private monitorId: ReturnType<typeof setInterval> | null = null;
   private refreshInFlight = false;

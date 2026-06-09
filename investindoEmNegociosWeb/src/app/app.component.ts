@@ -1,5 +1,5 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd, RouterLink } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
@@ -20,7 +20,7 @@ import { AppSessionFacadeService } from './app-session-facade.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgClass, RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent],
+  imports: [NgClass, RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -39,7 +39,6 @@ export class AppComponent implements OnInit, OnDestroy {
   unreadCount = 0;
   notificationsLoading = false;
   notificationsError = '';
-  sidebarOpen = false;
   displayName = 'Usuário';
   avatarUrl = '';
   userInitials = 'U';
@@ -167,7 +166,6 @@ export class AppComponent implements OnInit, OnDestroy {
   onEscapeKey(): void {
     this.userMenuOpen = false;
     this.notificationsFacade.close();
-    this.sidebarOpen = false;
   }
 
   @HostListener('window:focus')
@@ -231,16 +229,8 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleSidebar(): void {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
-
   toggleTheme(): void {
     this.isLightTheme = this.themeService.toggle() === 'light';
-  }
-
-  closeSidebar(): void {
-    this.sidebarOpen = false;
   }
 
   refreshNotifications(): void {
@@ -265,8 +255,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   goToPreferences(event?: Event): void {
     event?.preventDefault();
-    this.closeSidebar();
-
     const currentPath = this.router.url.split('?')[0];
     if (currentPath === '/preferencias') {
       this.apiDataService.refresh();
@@ -312,7 +300,6 @@ export class AppComponent implements OnInit, OnDestroy {
   private closeTransientUi(): void {
     this.userMenuOpen = false;
     this.notificationsFacade.close();
-    this.sidebarOpen = false;
   }
 
   private resetUserContext(): void {

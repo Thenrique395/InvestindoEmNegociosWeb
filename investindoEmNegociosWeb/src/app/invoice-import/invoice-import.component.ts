@@ -353,7 +353,7 @@ type InvoiceExtract = {
       max-height: min(92vh, 1100px);
       overflow: auto;
       font-family: var(--font-sans, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
-      border-radius: 32px;
+      border-radius: var(--radius-2xl);
       border: 1px solid var(--border);
       background: var(--surface);
       box-shadow: var(--shadow-lg);
@@ -405,7 +405,7 @@ type InvoiceExtract = {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       border: 1px solid var(--border);
       background: var(--surface);
       color: var(--text-soft);
@@ -443,7 +443,7 @@ type InvoiceExtract = {
     .invoice-import-modal__section,
     .invoice-import-modal__sidecard {
       border: 1px solid var(--border);
-      border-radius: 28px;
+      border-radius: var(--radius-2xl);
       background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 3%, white), var(--surface));
       padding: 1.25rem;
     }
@@ -488,7 +488,7 @@ type InvoiceExtract = {
       border: 1px solid transparent;
       min-height: 48px;
       padding: 0 1.15rem;
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -542,7 +542,7 @@ type InvoiceExtract = {
 
     .invoice-import-dropzone {
       border: 1px dashed color-mix(in srgb, var(--brand) 16%, var(--border));
-      border-radius: 24px;
+      border-radius: var(--radius-2xl);
       background: var(--surface);
       padding: 2rem 1.25rem;
       text-align: center;
@@ -587,7 +587,7 @@ type InvoiceExtract = {
       gap: 0.55rem;
       padding: 1rem;
       border: 1px solid var(--border);
-      border-radius: 22px;
+      border-radius: var(--radius-2xl);
       background: var(--surface);
     }
 
@@ -604,7 +604,7 @@ type InvoiceExtract = {
     .invoice-field__control {
       min-height: 56px;
       width: 100%;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       background: var(--surface-2);
       padding: 0 1rem;
@@ -615,7 +615,7 @@ type InvoiceExtract = {
 
     .invoice-field__control--table {
       min-height: 38px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       font-size: 0.82rem;
       padding: 0 0.75rem;
       background: var(--surface);
@@ -636,7 +636,7 @@ type InvoiceExtract = {
 
     .invoice-table-card {
       border: 1px solid var(--border);
-      border-radius: 24px;
+      border-radius: var(--radius-2xl);
       background: var(--surface);
       overflow: hidden;
     }
@@ -717,7 +717,7 @@ type InvoiceExtract = {
       margin-top: 1rem;
       max-height: 540px;
       overflow: auto;
-      border-radius: 22px;
+      border-radius: var(--radius-2xl);
       border: 1px solid var(--border);
       background: var(--surface-2);
       padding: 1rem;
@@ -770,56 +770,9 @@ type InvoiceExtract = {
       flex-wrap: wrap;
     }
 
-    @media (max-width: 980px) {
-      .invoice-import-modal__layout {
-        grid-template-columns: 1fr;
-      }
 
-      .invoice-import-modal__rawtext {
-        max-height: 260px;
-      }
-    }
 
-    @media (max-width: 720px) {
-      .invoice-import-modal__header,
-      .invoice-import-modal__layout,
-      .invoice-import-modal__footer {
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
-      }
 
-      .invoice-import-modal__header {
-        padding-top: 1.25rem;
-      }
-
-      .invoice-import-modal__actions-inline {
-        width: 100%;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-      }
-
-      .invoice-import-modal__actions-inline .invoice-import-modal__button {
-        width: 100%;
-      }
-
-      .invoice-import-grid--selectors,
-      .invoice-import-grid--summary {
-        grid-template-columns: 1fr;
-      }
-
-      .invoice-import-modal__footer {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .invoice-import-modal__footer-actions {
-        width: 100%;
-      }
-
-      .invoice-import-modal__footer-actions .invoice-import-modal__button {
-        width: 100%;
-      }
-    }
   `]
 })
 export class InvoiceImportComponent implements OnChanges {

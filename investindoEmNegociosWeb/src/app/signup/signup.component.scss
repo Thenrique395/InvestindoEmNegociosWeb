@@ -9,7 +9,7 @@
 .signup-card {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--border) 86%, white);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   background: color-mix(in srgb, white 96%, #f8fafc);
   box-shadow: 0 20px 58px color-mix(in srgb, #0f172a 6%, transparent);
 }
@@ -113,7 +113,7 @@
   gap: 0.65rem;
   padding: 0.62rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(5, 26, 25, 0.38);
   box-shadow: 0 22px 54px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(18px);
@@ -123,7 +123,7 @@
   min-height: 42px;
   display: grid;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: rgba(255, 255, 255, 0.84);
   font-size: 0.82rem;
   font-weight: 900;
@@ -140,7 +140,7 @@
   min-width: 0;
   display: grid;
   place-items: center;
-  padding: clamp(var(--space-3), 5vw, var(--space-6));
+  padding: clamp(var(--spacing-3), 5vw, var(--spacing-6));
   background:
     radial-gradient(circle at 78% 14%, color-mix(in srgb, var(--success) 8%, transparent), transparent 26%),
     radial-gradient(circle at 18% 82%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 28%),
@@ -153,7 +153,7 @@
   gap: 1.45rem;
   padding: clamp(1.35rem, 2.6vw, 2rem);
   border: 1px solid color-mix(in srgb, var(--border) 82%, white);
-  border-radius: 34px;
+  border-radius: var(--radius-2xl);
   background: rgba(255, 255, 255, 0.82);
   box-shadow: 0 24px 70px color-mix(in srgb, #0f172a 8%, transparent);
   backdrop-filter: blur(16px);
@@ -178,7 +178,7 @@
   gap: 0.5rem;
   padding: 0.55rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: #f8fafc;
   color: var(--text);
   font-size: 0.95rem;
@@ -249,13 +249,12 @@
   width: 100%;
   min-height: 60px;
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: #f1f5f9;
   padding: 0 1.05rem;
   color: var(--text);
   font-size: 1.05rem;
   font-weight: 700;
-  outline: none;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
@@ -346,7 +345,7 @@
   justify-content: center;
   gap: 0.85rem;
   border: 1px solid var(--primary);
-  border-radius: 22px;
+  border-radius: var(--radius-2xl);
   background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 94%, white), var(--primary));
   color: white;
   font: inherit;
@@ -362,7 +361,7 @@
   height: 38px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: color-mix(in srgb, white 16%, transparent);
   font-size: 1.25rem;
 }
@@ -422,90 +421,4 @@
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
-}
-
-@media (max-width: 1080px) {
-  .signup-shell--page {
-    place-items: start center;
-  }
-
-  .signup-shell--page .signup-card {
-    max-width: none;
-    min-height: 100vh;
-    grid-template-columns: 1fr;
-  }
-
-  .signup-visual {
-    min-height: 460px;
-  }
-
-  .signup-panel {
-    align-content: start;
-  }
-}
-
-@media (max-width: 720px) {
-  .signup-shell--page {
-    padding: 0;
-  }
-
-  .signup-card,
-  .signup-shell--page .signup-card {
-    border-radius: 0;
-  }
-
-  .signup-visual {
-    min-height: 360px;
-    padding: 1.4rem;
-  }
-
-  .signup-visual__dock {
-    display: none;
-  }
-
-  .signup-visual__content h2,
-  .signup-panel__head h1 {
-    font-size: clamp(2.5rem, 13vw, 3.5rem);
-  }
-
-  .signup-panel {
-    padding: 1.25rem;
-  }
-
-  .signup-form {
-    border-radius: 24px;
-  }
-}
-
-@media (max-width: 460px) {
-  .signup-shell--page {
-    padding: 0;
-  }
-
-  .signup-card,
-  .signup-shell--page .signup-card {
-    border-radius: 0;
-  }
-
-  .signup-visual {
-    padding: 1.1rem;
-  }
-
-  .signup-visual__content h2,
-  .signup-panel__head h1 {
-    font-size: clamp(2.18rem, 15vw, 2.9rem);
-  }
-
-  .signup-panel {
-    padding: 1rem;
-  }
-
-  .signup-panel__card {
-    padding: 1rem;
-  }
-
-  .signup-form__submit {
-    min-height: 60px;
-    width: 100%;
-  }
 }

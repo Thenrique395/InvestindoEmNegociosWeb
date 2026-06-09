@@ -1,6 +1,6 @@
 .receitas-table {
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -109,7 +109,7 @@
   position: relative;
   inline-size: 42px;
   block-size: 42px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
   background: color-mix(in srgb, var(--surface-2) 76%, white);
   color: var(--text-secondary);
@@ -147,7 +147,7 @@
   inset-block-end: calc(100% + 10px);
   transform: translateX(-50%) translateY(4px);
   padding: 0.45rem 0.65rem;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--text) 90%, white);
   color: white;
   font-size: 0.76rem;
@@ -190,7 +190,7 @@
 .receitas-table__spinner {
   inline-size: 16px;
   block-size: 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 2px solid var(--border);
   border-top-color: var(--primary);
   animation: receitas-spin 0.8s linear infinite;
@@ -199,11 +199,5 @@
 @keyframes receitas-spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 900px) {
-  .receitas-table__table {
-    min-width: 880px;
   }
 }

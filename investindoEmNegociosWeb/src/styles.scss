@@ -21,15 +21,15 @@
   --text: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
-  --text-xs: 10.5px;
-  --text-sm: 12px;
-  --text-md: 13.5px;
-  --text-lg: 16px;
-  --text-xl: 17.5px;
-  --text-2xl: 21px;
-  --text-3xl: 26px;
-  --text-4xl: 32px;
-  --text-5xl: 42px;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
   --primary: #2563eb;
   --on-primary: #f8fafc;
   --success: #22c55e;
@@ -37,9 +37,10 @@
   --info: #0ea5e9;
   --warning: #f59e0b;
   --control-h: 42px;
-  --control-pad: var(--space-1) var(--space-2);
+  --control-pad: var(--spacing-1) var(--spacing-2);
   --shadow-sm: 0 10px 20px rgba(15, 23, 42, 0.08);
   --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.12);
+  --shadow-lg: 0 24px 70px rgba(15, 23, 42, 0.18);
   --overlay: rgba(4, 20, 28, 0.7);
   --primary-10: color-mix(in srgb, var(--primary) 12%, transparent);
   --primary-20: color-mix(in srgb, var(--primary) 22%, transparent);
@@ -74,6 +75,7 @@
   --overlay: rgba(2, 6, 23, 0.82);
   --shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.28);
   --shadow-md: 0 20px 48px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 28px 76px rgba(0, 0, 0, 0.48);
 }
 
 body {
@@ -81,4 +83,80 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
+}
+
+:where(button, a, input, select, textarea, [role='button']):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 72%, white);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}
+
+:root[data-theme='dark'] {
+  .basic-home-hero__copy,
+  .basic-home-guidance,
+  .basic-home-actions,
+  .basic-home-kpi,
+  .basic-home-month,
+  .basic-home-summary-card,
+  .basic-home-insight-card,
+  .basic-home-recent-card,
+  .receitas-summary-card,
+  .expenses-summary-card,
+  .cards-summary-card,
+  .receitas-total-card,
+  .expenses-total-card,
+  .cards-total-card,
+  .receitas-shell,
+  .expenses-shell,
+  .cards-shell,
+  .cards-statements,
+  .cards-modal__dialog,
+  .cards-modal__section,
+  .cards-purchases__row,
+  .cards-statements__item,
+  .cards-preview__meta-item,
+  .pricing-page article,
+  .progression-card,
+  .comparison-card,
+  .trust-card {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .receitas-summary-card__icon,
+  .expenses-summary-card__icon,
+  .cards-summary-card__icon,
+  .cards-field__control,
+  .cards-field__input,
+  .cards-filter select,
+  .cards-filter input,
+  input,
+  select,
+  textarea {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .text-sky-700 {
+    color: #7dd3fc;
+  }
+
+  .text-emerald-700 {
+    color: #86efac;
+  }
+
+  .text-amber-700 {
+    color: #fcd34d;
+  }
 }

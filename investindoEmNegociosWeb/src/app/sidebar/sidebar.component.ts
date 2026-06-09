@@ -45,12 +45,10 @@ type SidebarNavItem = {
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
-  @Input({ required: true }) sidebarOpen = false;
   @Input({ required: true }) isLightTheme = false;
   @Input({ required: true }) brandName = '';
   @Input() currentRole: UserRole | null = null;
 
-  @Output() sidebarClose = new EventEmitter<void>();
   @Output() routeReload = new EventEmitter<SidebarRouteReload>();
   @Output() preferencesOpen = new EventEmitter<Event | undefined>();
 
@@ -75,15 +73,15 @@ export class SidebarComponent {
   ];
 
   private readonly primaryLinkClass =
-    'group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[48px]';
+    'group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]';
   private readonly compactLinkClass =
-    'group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--space-2)] py-[var(--space-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] max-md:min-h-[44px]';
+    'group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]';
   private readonly activeLinkClass =
     'border-[rgba(37,99,235,0.45)] bg-[rgba(37,99,235,0.15)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.25)]';
   private readonly primaryIconClass =
-    'nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[38px] max-md:w-[38px] max-md:rounded-[12px]';
+    'nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition';
   private readonly compactIconClass =
-    'nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition max-md:h-[34px] max-md:w-[34px] max-md:rounded-[10px]';
+    'nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition';
   private readonly activeIconByTone: Record<string, string> = {
     primary: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--primary)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.15)]',
     danger: 'border-[var(--border-strong)] bg-[var(--surface-3)] !text-[var(--danger)] shadow-[inset_0_0_0_1px_rgba(239,68,68,0.18)]',
@@ -124,12 +122,8 @@ export class SidebarComponent {
 
   itemTextClass(item: SidebarNavItem): string {
     return item.size === 'primary'
-      ? 'nav-text text-[var(--text-md)] font-semibold max-md:text-[var(--text-sm)]'
-      : 'nav-text text-[var(--text-sm)] font-semibold max-md:text-[var(--text-xs)]';
-  }
-
-  closeSidebar(): void {
-    this.sidebarClose.emit();
+      ? 'nav-text text-[var(--text-md)] font-semibold'
+      : 'nav-text text-[var(--text-sm)] font-semibold';
   }
 
   reloadIfSame(path: string, event?: Event): void {
