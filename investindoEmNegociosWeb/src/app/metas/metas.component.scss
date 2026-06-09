@@ -77,8 +77,8 @@
 .modal__eyebrow {
   margin: 0;
   color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-card-eyebrow);
+  font-weight: var(--font-weight-card-eyebrow);
   letter-spacing: var(--letter-spacing-eyebrow);
   line-height: var(--line-height-tight);
   text-transform: uppercase;
@@ -88,8 +88,8 @@
   display: block;
   margin-top: 0.15rem;
   color: var(--text);
-  font-size: clamp(2rem, 3vw, 2.35rem);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
   letter-spacing: var(--letter-spacing-display);
   line-height: var(--line-height-display);
 }
@@ -98,8 +98,8 @@
   margin: 0;
   max-width: 28ch;
   color: var(--text-muted);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-card-body);
+  font-weight: var(--font-weight-card-body);
   line-height: var(--line-height-body);
 }
 

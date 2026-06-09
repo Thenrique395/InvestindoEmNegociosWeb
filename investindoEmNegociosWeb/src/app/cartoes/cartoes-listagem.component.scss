@@ -155,34 +155,11 @@
 .cards-list__action {
   inline-size: 2rem;
   block-size: 2rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
-  color: var(--text-secondary);
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
 
   svg {
     inline-size: 0.95rem;
     block-size: 0.95rem;
   }
-}
-
-.cards-list__action:hover,
-.cards-list__action:focus-visible {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--primary) 26%, transparent);
-  background: color-mix(in srgb, var(--surface) 88%, white);
-  color: var(--primary-text);
-}
-
-.cards-list__action--danger:hover,
-.cards-list__action--danger:focus-visible {
-  border-color: color-mix(in srgb, var(--danger) 24%, transparent);
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
-  color: var(--danger-text);
 }
 
 .cards-list__summary {

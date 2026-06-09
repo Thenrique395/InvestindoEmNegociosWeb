@@ -261,7 +261,8 @@
 
 .basic-home-kpi__title {
   margin: 0.35rem 0 0;
-  font-size: clamp(1.6rem, 2vw, 2rem);
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
   line-height: var(--line-height-display);
   color: var(--text);
 }
@@ -405,7 +406,8 @@
 .basic-home-summary-card__title,
 .basic-home-recent-card__title {
   margin: 0.35rem 0 0;
-  font-size: var(--font-size-title);
+  font-size: var(--font-size-card-title);
+  font-weight: var(--font-weight-card-title);
   line-height: var(--line-height-tight);
   color: var(--text);
 }

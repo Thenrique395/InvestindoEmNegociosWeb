@@ -63,8 +63,8 @@
 .assistant-summary-card__title {
   margin: 0.15rem 0 0;
   color: var(--text);
-  font-size: clamp(1.65rem, 2.4vw, 2.05rem);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
   letter-spacing: var(--letter-spacing-display);
   line-height: var(--line-height-display);
 }
@@ -72,7 +72,8 @@
 .assistant-summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-card-body);
+  font-weight: var(--font-weight-card-body);
   line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }

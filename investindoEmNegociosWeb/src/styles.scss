@@ -197,7 +197,18 @@ body {
   opacity: 1;
 }
 
-:where(.btn, .btn-primary, .btn-ghost, .btn-danger, .btn-cancel, .ghost) {
+:where(
+  .btn,
+  .btn-primary,
+  .btn-ghost,
+  .btn-danger,
+  .btn-cancel,
+  .ghost,
+  .goal-card__button,
+  .modal__button,
+  .account-card__action,
+  .invoice-import-modal__button
+) {
   min-height: var(--control-height);
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
@@ -213,6 +224,138 @@ body {
   text-decoration: none;
   cursor: pointer;
   transition: var(--control-transition);
+}
+
+:where(
+  .receitas-table__icon-action,
+  .expenses-table__icon-action,
+  .cards-list__action
+) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-md);
+  background: var(--control-background);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--control-transition);
+}
+
+:where(
+  .receitas-table__icon-action,
+  .expenses-table__icon-action,
+  .cards-list__action
+):hover:not(:disabled),
+:where(
+  .receitas-table__icon-action,
+  .expenses-table__icon-action,
+  .cards-list__action
+):focus-visible {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--primary) 26%, transparent);
+  background: var(--control-background-focus);
+  color: var(--primary-text);
+}
+
+:where(
+  .receitas-table__icon-action--danger,
+  .expenses-table__icon-action--danger,
+  .cards-list__action--danger
+):hover:not(:disabled),
+:where(
+  .receitas-table__icon-action--danger,
+  .expenses-table__icon-action--danger,
+  .cards-list__action--danger
+):focus-visible {
+  border-color: color-mix(in srgb, var(--danger) 24%, transparent);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  color: var(--danger-text);
+}
+
+:where(
+  .income-field__label,
+  .expense-field__label,
+  .goals-field__label,
+  .cards-field__label,
+  .form-field__label
+) {
+  color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-control);
+}
+
+:where(
+  .income-field__error,
+  .expense-field__error,
+  .onboarding-field__error,
+  .login-modal__error,
+  .signup-form__error,
+  .error-text,
+  .form-field__message--danger
+) {
+  color: var(--danger-text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-control);
+}
+
+:where(
+  .expense-field__hint,
+  .form-field__hint,
+  .field-hint,
+  .form-field__message
+) {
+  color: var(--text-muted);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-control);
+}
+
+:where(.form-field__message--success) {
+  color: var(--success-text);
+}
+
+body [class*='summary-card__eyebrow'],
+body [class*='total-card__eyebrow'],
+body [class*='action-card__eyebrow'],
+body [class*='goal-card__eyebrow'] {
+  font-size: var(--font-size-card-eyebrow);
+  font-weight: var(--font-weight-card-eyebrow);
+  line-height: var(--line-height-control);
+  letter-spacing: var(--letter-spacing-eyebrow);
+}
+
+body [class*='summary-card__title'],
+body [class*='summary-card__value'],
+body [class*='total-card__value'],
+body .basic-home-kpi__title {
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+body [class*='action-card__title'],
+body [class*='insight-card__title'],
+body [class*='recent-card__title'],
+body [class*='cards-list__title'],
+body [class*='goal-card__title'] {
+  font-size: var(--font-size-card-title);
+  font-weight: var(--font-weight-card-title);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+body [class*='summary-card__note'],
+body [class*='total-card__text'],
+body [class*='action-card__text'],
+body [class*='goal-card__description'] {
+  font-size: var(--font-size-card-body);
+  font-weight: var(--font-weight-card-body);
+  line-height: var(--line-height-body);
 }
 
 :where(.btn, .btn-primary, .btn-ghost, .btn-danger, .btn-cancel, .ghost).sm {

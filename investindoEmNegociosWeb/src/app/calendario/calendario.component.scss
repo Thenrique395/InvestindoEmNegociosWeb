@@ -273,7 +273,8 @@
 }
 
 .summary-card__value {
-  font-size: clamp(2rem, 3vw, 2.35rem);
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
   line-height: var(--line-height-display);
   letter-spacing: var(--letter-spacing-display);
   color: var(--text);
@@ -282,7 +283,8 @@
 .summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-card-body);
+  font-weight: var(--font-weight-card-body);
   line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }

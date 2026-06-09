@@ -52,8 +52,8 @@
 
 .expenses-summary-card__eyebrow {
   margin: 0;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-card-eyebrow);
+  font-weight: var(--font-weight-card-eyebrow);
   letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
   color: var(--text-muted);
@@ -61,8 +61,8 @@
 
 .expenses-summary-card__title {
   margin: 0.15rem 0 0;
-  font-size: clamp(2rem, 3vw, 2.35rem);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
   line-height: var(--line-height-display);
   letter-spacing: var(--letter-spacing-display);
   color: var(--text);
@@ -71,7 +71,8 @@
 .expenses-summary-card__note {
   margin: 0;
   color: var(--text-muted);
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-card-body);
+  font-weight: var(--font-weight-card-body);
   line-height: var(--line-height-body);
   max-inline-size: 28ch;
 }
@@ -247,7 +248,8 @@
 }
 
 .expenses-total-card__value {
-  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-size: var(--font-size-card-metric);
+  font-weight: var(--font-weight-card-metric);
   line-height: var(--line-height-display);
   color: var(--text);
 }

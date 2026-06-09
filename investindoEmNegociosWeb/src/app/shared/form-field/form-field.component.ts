@@ -57,14 +57,14 @@ type FormFieldTone = 'default' | 'danger' | 'success';
   template: `
     <label class="grid gap-2 text-sm font-semibold text-[var(--color-text)]">
       <span class="flex items-center justify-between gap-2">
-        <span class="inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--color-danger-text)]' : ''">
+        <span class="form-field__label inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--color-danger-text)]' : ''">
           {{ label() }}
           @if (required()) {
             <span class="text-[var(--color-danger-text)]" aria-hidden="true">*</span>
           }
         </span>
         @if (hint()) {
-          <small class="font-medium text-[var(--color-text-muted)]">{{ hint() }}</small>
+          <small class="form-field__hint">{{ hint() }}</small>
         }
       </span>
     
@@ -94,8 +94,8 @@ export class FormFieldComponent {
 
   readonly messageClass = computed(() => {
     const tone = this.hasError() ? 'danger' : this.tone();
-    if (tone === 'danger') return 'text-xs font-medium text-[var(--color-danger-text)]';
-    if (tone === 'success') return 'text-xs font-medium text-[var(--color-success-text)]';
-    return 'text-xs font-medium text-[var(--color-text-muted)]';
+    if (tone === 'danger') return 'form-field__message form-field__message--danger';
+    if (tone === 'success') return 'form-field__message form-field__message--success';
+    return 'form-field__message';
   });
 }

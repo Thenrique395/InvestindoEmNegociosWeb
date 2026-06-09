@@ -143,24 +143,12 @@
   grid-column: 1 / -1;
 }
 
-.income-field__label {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  color: var(--text);
-}
-
 .income-field__control {
   min-height: 52px;
   border-radius: var(--radius-lg);
   padding: 0 1rem;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
-}
-
-.income-field__error {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  color: #e11d48;
 }
 
 .income-form-modal__stack {

@@ -143,30 +143,12 @@
   grid-column: 1 / -1;
 }
 
-.expense-field__label {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  color: var(--text);
-}
-
 .expense-field__control {
   min-height: 52px;
   border-radius: var(--radius-lg);
   padding: 0 1rem;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
-}
-
-.expense-field__hint {
-  font-size: var(--font-size-label);
-  line-height: var(--line-height-control);
-  color: var(--text-muted);
-}
-
-.expense-field__error {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  color: #e11d48;
 }
 
 .expense-form-modal__stack {

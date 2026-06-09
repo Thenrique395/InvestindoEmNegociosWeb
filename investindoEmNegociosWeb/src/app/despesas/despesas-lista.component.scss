@@ -113,33 +113,13 @@
 }
 
 .expenses-table__icon-action {
-  position: relative;
   inline-size: 42px;
   block-size: 42px;
-  border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 76%, white);
-  color: var(--text-secondary);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    background 160ms ease,
-    color 160ms ease;
 
   svg {
     inline-size: 18px;
     block-size: 18px;
   }
-}
-
-.expenses-table__icon-action:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--primary) 22%, transparent);
-  background: color-mix(in srgb, var(--surface) 92%, white);
-  color: var(--primary-text);
 }
 
 .expenses-table__icon-action::after {
