@@ -91,7 +91,7 @@
   margin: 0;
   color: white;
   max-width: 9ch;
-  font-size: clamp(3.25rem, 5.6vw, 6.5rem);
+  font-size: clamp(2.5rem, 4.2vw, 4.2rem);
   line-height: var(--line-height-display);
   letter-spacing: var(--letter-spacing-display);
   font-weight: var(--font-weight-medium);
@@ -199,7 +199,7 @@
 .signup-panel__head h1 {
   margin: 0;
   color: var(--text);
-  font-size: clamp(3.35rem, 4.8vw, 5.1rem);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
   line-height: var(--line-height-display);
   letter-spacing: var(--letter-spacing-display);
   font-weight: var(--font-weight-medium);
@@ -247,7 +247,7 @@
 
 .signup-form__input {
   width: 100%;
-  min-height: 60px;
+  min-height: 50px;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background: #f1f5f9;
@@ -333,7 +333,7 @@
 }
 
 .signup-form__submit {
-  min-height: 64px;
+  min-height: 52px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -351,8 +351,8 @@
 }
 
 .signup-form__submit span {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-md);
@@ -415,4 +415,20 @@
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+}
+
+@media (max-width: 1100px) {
+  .signup-shell--page .signup-card {
+    grid-template-columns: 1fr;
+  }
+
+  .signup-visual {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .signup-panel {
+    padding: 1.25rem;
+  }
 }

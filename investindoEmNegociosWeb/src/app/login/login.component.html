@@ -75,7 +75,7 @@
           </label>
 
           <div class="login-form__links">
-            <button type="button" (click)="openForgotPasswordModal($event)">Esqueci minha senha</button>
+            <a routerLink="/forgot-password">Esqueci minha senha</a>
           </div>
 
           <button type="submit" class="login-form__submit" [disabled]="loading">
@@ -91,57 +91,4 @@
       </section>
     </main>
   </div>
-
-  @if (showForgotPasswordModal) {
-    <div class="login-modal" role="presentation" (click)="closeForgotPasswordModal()">
-      <section
-        class="login-modal__card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="forgot-title"
-        (click)="$event.stopPropagation()">
-        <button
-          class="login-modal__close"
-          type="button"
-          aria-label="Fechar recuperação de senha"
-          [disabled]="forgotLoading"
-          (click)="closeForgotPasswordModal()">
-          ×
-        </button>
-        <p class="login-eyebrow">Recuperação de senha</p>
-        <h2 id="forgot-title">Esqueci minha senha</h2>
-        <p>
-          Informe o e-mail da sua conta. Se ele estiver cadastrado, enviaremos um link de redefinição.
-        </p>
-        @if (forgotSuccess) {
-          <div class="login-modal__success">
-            Enviamos as instruções para o e-mail informado.
-          </div>
-        }
-        @if (!forgotSuccess) {
-          <form class="login-form login-form--modal" (ngSubmit)="submitForgotPassword()">
-            <label class="login-form__field">
-              <span>E-mail</span>
-              <div class="login-form__input-shell">
-                <input
-                  [(ngModel)]="forgotEmail"
-                  name="forgotEmail"
-                  type="email"
-                  placeholder="Digite seu e-mail"
-                  autocomplete="email"
-                  required />
-              </div>
-            </label>
-            @if (forgotError) {
-              <p class="login-modal__error">{{ forgotError }}</p>
-            }
-            <button type="submit" class="login-form__submit" [disabled]="forgotLoading">
-              <span class="login-form__submit-icon" aria-hidden="true">→</span>
-              <span>{{ forgotLoading ? 'Enviando...' : 'Enviar link' }}</span>
-            </button>
-          </form>
-        }
-      </section>
-    </div>
-  }
 </section>

@@ -19,11 +19,6 @@ export class LoginComponent implements OnInit {
   password = '';
   loading = false;
   showPassword = false;
-  forgotEmail = '';
-  forgotLoading = false;
-  forgotSuccess = false;
-  forgotError = '';
-  showForgotPasswordModal = false;
 
   constructor(
     private auth: AuthService,
@@ -34,12 +29,6 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
-      if (params.get('forgotPassword') === '1') {
-        this.openForgotPasswordModal();
-      }
-    });
-
     if (this.route.snapshot.queryParamMap.get('created') === '1') {
       this.uiFeedback.success('Conta criada. Faça login para continuar.');
       this.router.navigate([], {
@@ -53,53 +42,6 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
-  }
-
-  openForgotPasswordModal(event?: Event): void {
-    event?.preventDefault();
-    this.forgotEmail = this.email;
-    this.forgotError = '';
-    this.forgotSuccess = false;
-    this.showForgotPasswordModal = true;
-  }
-
-  closeForgotPasswordModal(): void {
-    if (this.forgotLoading) return;
-    this.showForgotPasswordModal = false;
-    this.forgotError = '';
-    this.forgotSuccess = false;
-    if (this.route.snapshot.queryParamMap.get('forgotPassword') === '1') {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { forgotPassword: null },
-        queryParamsHandling: 'merge',
-        replaceUrl: true
-      });
-    }
-  }
-
-  submitForgotPassword(): void {
-    if (this.forgotLoading) return;
-    this.forgotError = '';
-    if (!this.forgotEmail || !this.forgotEmail.includes('@')) {
-      this.forgotError = 'Informe um e-mail válido.';
-      this.uiFeedback.warning(this.forgotError);
-      return;
-    }
-
-    this.forgotLoading = true;
-    this.auth.forgotPassword(this.forgotEmail).subscribe({
-      next: () => {
-        this.forgotLoading = false;
-        this.forgotSuccess = true;
-        this.uiFeedback.success('Se o e-mail existir, enviaremos instruções para redefinir sua senha.');
-      },
-      error: (err: unknown) => {
-        this.forgotLoading = false;
-        this.forgotError = err instanceof Error ? err.message : 'Falha ao solicitar recuperação de senha.';
-        this.uiFeedback.error(this.forgotError);
-      }
-    });
   }
 
   onSubmit(): void {
