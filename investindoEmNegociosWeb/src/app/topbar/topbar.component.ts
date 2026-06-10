@@ -33,9 +33,11 @@ export class TopbarComponent {
   @Input({ required: true }) userInitials = 'U';
   @Input({ required: true }) displayName = 'Usuário';
   @Input({ required: true }) isLightTheme = true;
+  @Input({ required: true }) financialValuesHidden = false;
   @Input() currentRole: UserRole | null = null;
 
   @Output() themeToggle = new EventEmitter<void>();
+  @Output() financialValuesToggle = new EventEmitter<void>();
   @Output() notificationsToggle = new EventEmitter<void>();
   @Output() notificationsRefresh = new EventEmitter<void>();
   @Output() notificationRead = new EventEmitter<TopbarNotificationRead>();

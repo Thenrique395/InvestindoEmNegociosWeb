@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FinancialAssistantChatResponse, FinancialAssistantPromptContextResponse, FinancialAssistantService } from '../financial-assistant.service';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-assistant',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AppCurrencyPipe],
   templateUrl: './assistant.component.html',
   styleUrl: './assistant.component.scss'
 })

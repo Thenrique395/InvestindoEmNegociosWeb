@@ -125,7 +125,7 @@
             </td>
             <td class="expenses-table__item expenses-table__item--muted">{{ d.vencimento || '—' }}</td>
             <td class="expenses-table__item expenses-table__item--value">
-              <span class="expenses-table__amount">R$ {{ d.valor | number:'1.2-2' }}</span>
+              <span class="expenses-table__amount">{{ d.valor | appCurrency }}</span>
               @if (d.parcelasTotal) {
                 <small class="expenses-table__recurrence">{{ d.parcelaNumero }}/{{ d.parcelasTotal }}</small>
               }

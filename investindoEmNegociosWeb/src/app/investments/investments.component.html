@@ -53,8 +53,8 @@
             <span class="hint__panel">Soma do valor atual de todas as posições ativas (quantidade x preço médio).</span>
           </button>
         </div>
-        <strong>{{ patrimonioAtual | currency: 'BRL':'symbol':'1.2-2' }}</strong>
-        <small>Valor investido: {{ aporteTotal | currency: 'BRL':'symbol':'1.2-2' }}</small>
+        <strong>{{ patrimonioAtual | appCurrency }}</strong>
+        <small>Valor investido: {{ aporteTotal | appCurrency }}</small>
       </article>
       <article class="card executive-card">
         <div class="executive-card__head">
@@ -74,9 +74,9 @@
           </button>
         </div>
         <strong [class.success]="crescimentoEstimado >= 0" [class.danger]="crescimentoEstimado < 0">
-          {{ crescimentoEstimado | currency: 'BRL':'symbol':'1.2-2' }}
+          {{ crescimentoEstimado | appCurrency }}
         </strong>
-        <small>Aportes no mês: {{ aporteMes | currency: 'BRL':'symbol':'1.2-2' }}</small>
+        <small>Aportes no mês: {{ aporteMes | appCurrency }}</small>
       </article>
       <article class="card executive-card">
         <div class="executive-card__head">
@@ -95,7 +95,7 @@
             <span class="hint__panel">Total acumulado de dividendos, JCP e rendimentos registrados na carteira.</span>
           </button>
         </div>
-        <strong class="success">{{ proventosTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+        <strong class="success">{{ proventosTotal | appCurrency }}</strong>
         <small>{{ totalPosicoesAtivas }} posição(ões) ativa(s)</small>
       </article>
       <article class="card executive-card">
@@ -166,9 +166,9 @@
                     </div>
                   </div>
                   <span class="chart-hover-tip">
-                    Aplicado: {{ item.aplicado | currency:'BRL':'symbol':'1.2-2' }}<br />
-                    Ganho: {{ item.ganho | currency:'BRL':'symbol':'1.2-2' }}<br />
-                    Total: {{ item.total | currency:'BRL':'symbol':'1.2-2' }}
+                    Aplicado: {{ item.aplicado | appCurrency }}<br />
+                    Ganho: {{ item.ganho | appCurrency }}<br />
+                    Total: {{ item.total | appCurrency }}
                   </span>
                   <small class="patrimony-x-label">{{ item.label }}</small>
                 </div>
@@ -211,11 +211,11 @@
                     </div>
                     <span>{{ item.percent | number:'1.1-1' }}%</span>
                   </div>
-                  <small>{{ item.value | currency:'BRL':'symbol':'1.2-2' }}</small>
+                  <small>{{ item.value | appCurrency }}</small>
                   <span class="chart-hover-tip">
                     {{ item.label }}<br />
                     Participação: {{ item.percent | number:'1.1-1' }}%<br />
-                    Valor: {{ item.value | currency:'BRL':'symbol':'1.2-2' }}
+                    Valor: {{ item.value | appCurrency }}
                   </span>
                 </div>
               }
@@ -266,7 +266,10 @@
         </select>
       </div>
       @if (!sortedPositions.length) {
-        <div class="empty">Nenhuma posição para os filtros atuais.</div>
+        <app-empty-state
+          icon="$"
+          title="Nenhuma posição encontrada"
+          description="Ajuste os filtros ou cadastre um ativo para começar a acompanhar sua carteira." />
       }
       @if (sortedPositions.length) {
         <div class="table-wrap">
@@ -305,13 +308,13 @@
                     </span>
                   </td>
                   <td>{{ p.quantity }}</td>
-                  <td>{{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ p.avgPrice | appCurrency }}</td>
                   <td>
                     @if (marketPrice(p) !== null) {
-                      <span>{{ marketPrice(p) | currency: 'BRL':'symbol':'1.2-2' }}</span>
+                      <span>{{ marketPrice(p) | appCurrency }}</span>
                     } @else {
                       <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
-                        {{ p.avgPrice | currency: 'BRL':'symbol':'1.2-2' }}*
+                        {{ p.avgPrice | appCurrency }}*
                       </span>
                     }
                   </td>
@@ -322,13 +325,13 @@
                       <span class="muted">-</span>
                     }
                   </td>
-                  <td>{{ valorAtualPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ valorAtualPosicao(p) | appCurrency }}</td>
                   <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
                   <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
                     {{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%
                   </td>
                   <td [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">
-                    {{ resultadoPosicao(p) | currency: 'BRL':'symbol':'1.2-2' }}
+                    {{ resultadoPosicao(p) | appCurrency }}
                   </td>
                   <td>
                     <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
@@ -375,11 +378,11 @@
         </div>
         <div class="consolidacao-chart">
           <div class="consolidacao-axis">
-            <span>{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
-            <span>{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
+            <span>{{ consolidacaoChartMax | appCurrency }}</span>
+            <span>{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
             <span>R$ 0</span>
-            <span>-{{ (consolidacaoChartMax / 2) | currency:'BRL':'symbol':'1.0-0' }}</span>
-            <span>-{{ consolidacaoChartMax | currency:'BRL':'symbol':'1.0-0' }}</span>
+            <span>-{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
+            <span>-{{ consolidacaoChartMax | appCurrency }}</span>
           </div>
           <div class="consolidacao-plot">
             <div class="consolidacao-grid-lines">
@@ -395,11 +398,11 @@
                     <span
                       class="bar compra"
                       [style.height.%]="(item.compras / consolidacaoChartMax) * 50"
-                    [attr.title]="'Compras: ' + (item.compras | currency:'BRL':'symbol':'1.2-2')"></span>
+                    [attr.title]="'Compras: ' + (item.compras | appCurrency)"></span>
                     <span
                       class="bar venda"
                       [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"
-                    [attr.title]="'Vendas: ' + (item.vendas | currency:'BRL':'symbol':'1.2-2')"></span>
+                    [attr.title]="'Vendas: ' + (item.vendas | appCurrency)"></span>
                   </div>
                   <small>{{ item.label }}</small>
                 </div>
@@ -442,8 +445,8 @@
                     <td>{{ investimentoTipoLabel(row.investmentType) }}</td>
                     <td [class.success]="row.ordem === 'Compra'" [class.danger]="row.ordem === 'Venda'">{{ row.ordem }}</td>
                     <td>{{ row.quantity | number:'1.0-4' }}</td>
-                    <td>{{ row.unitPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
-                    <td>{{ row.total | currency:'BRL':'symbol':'1.2-2' }}</td>
+                    <td>{{ row.unitPrice | appCurrency }}</td>
+                    <td>{{ row.total | appCurrency }}</td>
                     <td>{{ row.quantityAfter | number:'1.0-4' }}</td>
                     <td>{{ row.date | date:'dd/MM/yyyy' }}</td>
                     <td><span class="status-pill" [class.zeroed]="row.source === 'Manual'">{{ row.source }}</span></td>
@@ -487,7 +490,7 @@
                         <span class="legend__dot" [style.background]="item.color"></span>
                         <strong>{{ item.label }}</strong>
                       </div>
-                      <span>{{ item.value | currency: 'BRL':'symbol':'1.2-2' }}</span>
+                      <span>{{ item.value | appCurrency }}</span>
                     </div>
                     <small>{{ item.percent | number:'1.0-1' }}%</small>
                   </div>
@@ -598,11 +601,11 @@
         <div class="proventos-summary">
           <div class="proventos-summary__row">
             <small>Média mensal (12 meses)</small>
-            <strong>{{ proventosMedia12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
+            <strong>{{ proventosMedia12Meses | appCurrency }}</strong>
           </div>
           <div class="proventos-summary__row">
             <small>Total em 12 meses</small>
-            <strong>{{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</strong>
+            <strong>{{ proventosTotal12Meses | appCurrency }}</strong>
           </div>
           <div class="proventos-summary__row">
             <small>Ativos pagadores</small>
@@ -628,7 +631,7 @@
                 <span
                   class="bar provento"
                   [style.height.%]="(item.total / proventosMensaisMax) * 100"
-                [attr.title]="item.label + ': ' + (item.total | currency:'BRL':'symbol':'1.2-2')"></span>
+                [attr.title]="item.label + ': ' + (item.total | appCurrency)"></span>
               </div>
               <small>{{ item.label }}</small>
             </div>
@@ -644,7 +647,7 @@
         <div class="section-head__title">
           <h3>Ativos que pagam proventos</h3>
         </div>
-        <span class="muted">Total: {{ proventosTotal12Meses | currency:'BRL':'symbol':'1.2-2' }}</span>
+        <span class="muted">Total: {{ proventosTotal12Meses | appCurrency }}</span>
       </div>
       @if (!proventosPorAtivo12Meses.length) {
         <div class="empty">Sem proventos registrados no período.</div>
@@ -655,7 +658,7 @@
             <div class="income-item">
               <div class="income-item__top">
                 <strong>{{ item.asset }}</strong>
-                <span>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</span>
+                <span>{{ item.total | appCurrency }}</span>
               </div>
               <div class="progress-bar slim">
                 <span [style.width.%]="(item.total / proventosTotal12Meses) * 100"></span>
@@ -872,7 +875,7 @@
         }
         <div class="launch-total">
           <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
-          <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | appCurrency }}</strong>
         </div>
         <div class="actions">
           <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
@@ -909,7 +912,7 @@
         </div>
         <div class="launch-total">
           <span>Valor total</span>
-          <strong>{{ movimentoValorTotal | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          <strong>{{ movimentoValorTotal | appCurrency }}</strong>
         </div>
         <div class="actions">
           <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
@@ -977,7 +980,7 @@
                         <td>{{ row.type }}</td>
                         <td>{{ row.asset }}</td>
                         <td>{{ row.quantity }}</td>
-                        <td>{{ row.avgPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
+                        <td>{{ row.avgPrice | appCurrency }}</td>
                         <td>{{ row.account }}</td>
                       </tr>
                     }
@@ -995,11 +998,11 @@
             </article>
             <article class="card executive-card">
               <p class="label">Total em posições</p>
-              <strong>{{ b3Preview.totals.positions | currency:'BRL':'symbol':'1.2-2' }}</strong>
+              <strong>{{ b3Preview.totals.positions | appCurrency }}</strong>
             </article>
             <article class="card executive-card">
               <p class="label">Proventos</p>
-              <strong>{{ b3Preview.totals.incomes | currency:'BRL':'symbol':'1.2-2' }}</strong>
+              <strong>{{ b3Preview.totals.incomes | appCurrency }}</strong>
             </article>
             <article class="card executive-card">
               <p class="label">Negociações</p>
@@ -1024,8 +1027,8 @@
                       <td>{{ p.product }}</td>
                       <td>{{ p.institution }}</td>
                       <td>{{ p.quantity }}</td>
-                      <td>{{ p.closingPrice | currency:'BRL':'symbol':'1.2-2' }}</td>
-                      <td>{{ p.updatedValue | currency:'BRL':'symbol':'1.2-2' }}</td>
+                      <td>{{ p.closingPrice | appCurrency }}</td>
+                      <td>{{ p.updatedValue | appCurrency }}</td>
                     </tr>
                   }
                 </tbody>

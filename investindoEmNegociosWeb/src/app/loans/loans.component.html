@@ -9,7 +9,7 @@
         </span>
         <div class="loans-summary-card__copy">
           <p class="loans-summary-card__eyebrow">Saldo aberto</p>
-          <h3 class="loans-summary-card__title">{{ totalOpenBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          <h3 class="loans-summary-card__title">{{ totalOpenBalance | appCurrency }}</h3>
         </div>
       </div>
       <p class="loans-summary-card__note">Valor ainda pendente nos contratos cadastrados.</p>
@@ -23,7 +23,7 @@
         </span>
         <div class="loans-summary-card__copy">
           <p class="loans-summary-card__eyebrow">Parcelas/mês</p>
-          <h3 class="loans-summary-card__title">{{ totalMonthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          <h3 class="loans-summary-card__title">{{ totalMonthlyPayment | appCurrency }}</h3>
         </div>
       </div>
       <p class="loans-summary-card__note">Compromisso mensal estimado pelos contratos ativos.</p>
@@ -67,7 +67,7 @@
     </div>
 
   @if (error) {
-    <div class="feedback error">{{ error }}</div>
+    <app-ui-state type="error" title="Não foi possível concluir a operação." [description]="error" retryLabel="Tentar novamente" (retry)="load()" />
   }
   @if (success) {
     <div class="feedback success">{{ success }}</div>
@@ -98,9 +98,9 @@
       <article class="card">
         <h2>Simulação</h2>
         <div class="kpis">
-          <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Custo total</span><strong>{{ s.totalCost | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-          <div><span>Juros totais</span><strong>{{ s.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+          <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | appCurrency }}</strong></div>
+          <div><span>Custo total</span><strong>{{ s.totalCost | appCurrency }}</strong></div>
+          <div><span>Juros totais</span><strong>{{ s.totalInterest | appCurrency }}</strong></div>
         </div>
         <div class="table-wrap">
           <table>
@@ -110,10 +110,10 @@
                 <tr>
                   <td>{{ item.installmentNo }}</td>
                   <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ item.principalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-                  <td>{{ item.interestAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-                  <td>{{ item.totalAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-                  <td>{{ item.endingBalance | currency:'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ item.principalAmount | appCurrency }}</td>
+                  <td>{{ item.interestAmount | appCurrency }}</td>
+                  <td>{{ item.totalAmount | appCurrency }}</td>
+                  <td>{{ item.endingBalance | appCurrency }}</td>
                 </tr>
               }
             </tbody>
@@ -126,10 +126,13 @@
   <article class="card">
     <h2>Contratos cadastrados</h2>
     @if (loading) {
-      <p class="muted">Carregando...</p>
+      <app-ui-state type="loading" />
     }
     @if (!loading && !contracts.length) {
-      <p class="muted">Nenhum empréstimo cadastrado.</p>
+      <app-empty-state
+        icon="$"
+        title="Nenhum empréstimo cadastrado"
+        description="Simule e crie o primeiro contrato para acompanhar parcelas e saldo aberto." />
     }
     @if (contracts.length) {
       <div class="contract-list">
@@ -138,13 +141,13 @@
             <div class="contract__head">
               <div>
                 <h3>{{ contract.title }}</h3>
-                <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | currency:'BRL':'symbol':'1.2-2' }}</p>
+                <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | appCurrency }}</p>
               </div>
               <div class="pill">{{ contract.status }}</div>
             </div>
             <div class="kpis compact">
-              <div><span>Parcela</span><strong>{{ contract.monthlyPayment | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-              <div><span>Juros totais</span><strong>{{ contract.totalInterest | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>Parcela</span><strong>{{ contract.monthlyPayment | appCurrency }}</strong></div>
+              <div><span>Juros totais</span><strong>{{ contract.totalInterest | appCurrency }}</strong></div>
               <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
             </div>
           </section>

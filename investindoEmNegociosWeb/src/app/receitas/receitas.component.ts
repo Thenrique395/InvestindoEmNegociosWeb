@@ -23,11 +23,12 @@ import {
   parseLocaleDate,
   parseLocalizedNumber
 } from '../utils/locale-utils';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, AppCurrencyPipe],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })

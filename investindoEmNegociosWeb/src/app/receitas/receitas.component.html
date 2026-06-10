@@ -10,7 +10,7 @@
           </span>
           <div class="receitas-summary-card__copy">
             <p class="receitas-summary-card__eyebrow">Recebidas</p>
-            <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pagosValor | number:'1.2-2' }}</h3>
+            <h3 class="receitas-summary-card__title">{{ statusResumo.pagosValor | appCurrency }}</h3>
           </div>
           <app-tooltip label="Mais informações sobre receitas recebidas" text="Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos." />
         </div>
@@ -29,7 +29,7 @@
           </span>
           <div class="receitas-summary-card__copy">
             <p class="receitas-summary-card__eyebrow">Pendentes</p>
-            <h3 class="receitas-summary-card__title">R$ {{ statusResumo.pendentesValor | number:'1.2-2' }}</h3>
+            <h3 class="receitas-summary-card__title">{{ statusResumo.pendentesValor | appCurrency }}</h3>
           </div>
           <app-tooltip label="Mais informações sobre receitas pendentes" text="Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos." />
         </div>
@@ -103,7 +103,7 @@
                   @if (comparison.isNew) {
                     Sem base anterior
                   } @else {
-                    {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
+                    {{ comparison.delta > 0 ? '+' : '' }}{{ comparison.deltaAbs | appCurrency }}
                     ({{ comparison.percent | number:'1.0-0' }}%)
                   }
                 </span>
@@ -132,12 +132,12 @@
 
       <aside class="receitas-total-card">
         <p class="receitas-total-card__eyebrow">Total do mês</p>
-        <strong class="receitas-total-card__value">R$ {{ totalRendas | number:'1.2-2' }}</strong>
+        <strong class="receitas-total-card__value">{{ totalRendas | appCurrency }}</strong>
         <p class="receitas-total-card__text">Total de receitas registradas neste período, considerando entradas recorrentes e avulsas.</p>
         @if (hasAccess('Basic')) {
           <div class="receitas-total-card__split">
-            <span>Recorrentes: <strong>R$ {{ totalRecorrentes | number:'1.2-2' }}</strong></span>
-            <span>Avulsas: <strong>R$ {{ totalAvulsas | number:'1.2-2' }}</strong></span>
+            <span>Recorrentes: <strong>{{ totalRecorrentes | appCurrency }}</strong></span>
+            <span>Avulsas: <strong>{{ totalAvulsas | appCurrency }}</strong></span>
           </div>
         }
         <div class="receitas-total-card__actions">

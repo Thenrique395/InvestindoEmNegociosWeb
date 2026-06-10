@@ -62,14 +62,14 @@
                 </span>
                 <div class="basic-home-kpi__title-wrap">
                   <p class="basic-home-kpi__eyebrow">Quanto sobra</p>
-                  <h2 class="basic-home-kpi__title">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+                  <h2 class="basic-home-kpi__title">{{ saldoDisponivelReal | appCurrency }}</h2>
                 </div>
                 <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre quanto sobra agora">
                   ?
                   <span class="basic-home-tooltip__content">Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.</span>
                 </button>
               </div>
-              <p class="basic-home-kpi__support">Disponível em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }} · Pendências do mês: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}</p>
+              <p class="basic-home-kpi__support">Disponível em contas: {{ totalSaldoContas | appCurrency }} · Pendências do mês: {{ pendenciasCaixa | appCurrency }}</p>
             </article>
             <article class="basic-home-kpi basic-home-kpi--income">
               <div class="basic-home-kpi__head">
@@ -80,14 +80,14 @@
                 </span>
                 <div class="basic-home-kpi__title-wrap">
                   <p class="basic-home-kpi__eyebrow">Quanto entrou</p>
-                  <h2 class="basic-home-kpi__title">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+                  <h2 class="basic-home-kpi__title">{{ totalRendas | appCurrency }}</h2>
                 </div>
                 <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre entradas do mês">
                   ?
                   <span class="basic-home-tooltip__content">Entradas do mês: considera só receitas já recebidas dentro do período selecionado.</span>
                 </button>
               </div>
-              <p class="basic-home-kpi__support">Ainda a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+              <p class="basic-home-kpi__support">Ainda a receber: {{ totalRendasPendentes | appCurrency }}</p>
             </article>
             <article class="basic-home-kpi basic-home-kpi--expense">
               <div class="basic-home-kpi__head">
@@ -98,14 +98,14 @@
                 </span>
                 <div class="basic-home-kpi__title-wrap">
                   <p class="basic-home-kpi__eyebrow">Quanto saiu</p>
-                  <h2 class="basic-home-kpi__title">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+                  <h2 class="basic-home-kpi__title">{{ totalDespesas | appCurrency }}</h2>
                 </div>
                 <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre saídas do mês">
                   ?
                   <span class="basic-home-tooltip__content">Saídas do mês: soma de despesas com vencimento dentro do período selecionado.</span>
                 </button>
               </div>
-              <p class="basic-home-kpi__support">Compras no cartão: {{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</p>
+              <p class="basic-home-kpi__support">Compras no cartão: {{ totalDividaCartoes | appCurrency }}</p>
             </article>
           </div>
           <section class="basic-home-month">
@@ -170,15 +170,15 @@
                 <div class="basic-home-summary-card__rows">
                   <div class="basic-home-summary-card__row basic-home-summary-card__row--income">
                     <span>Entrou</span>
-                    <strong>{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                    <strong>{{ totalRendas | appCurrency }}</strong>
                   </div>
                   <div class="basic-home-summary-card__row basic-home-summary-card__row--expense">
                     <span>Saiu</span>
-                    <strong>{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                    <strong>{{ totalDespesas | appCurrency }}</strong>
                   </div>
                   <div class="basic-home-summary-card__row basic-home-summary-card__row--available">
                     <span>Sobra hoje</span>
-                    <strong>{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                    <strong>{{ saldoDisponivelReal | appCurrency }}</strong>
                   </div>
                   <div class="basic-home-summary-card__row basic-home-summary-card__row--pending">
                     <span>Pendente a receber</span>
@@ -221,7 +221,7 @@
                           </span>
                         </div>
                         <strong [ngClass]="item.type === 'income' ? 'basic-home-recent-card__amount--income' : 'basic-home-recent-card__amount--expense'">
-                          {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+                          {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
                         </strong>
                       </div>
                     }
@@ -310,12 +310,12 @@
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoDisponivelReal | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoDisponivelReal | appCurrency }}</h2>
             <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-[var(--info-text)]">
               <span class="inline-block h-2 w-2 rounded-full bg-sky-500"></span>
-              Em contas: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}. Pendências: {{ pendenciasCaixa | currency: 'BRL':'symbol':'1.2-2' }}.
+              Em contas: {{ totalSaldoContas | appCurrency }}. Pendências: {{ pendenciasCaixa | appCurrency }}.
             </p>
-            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | appCurrency }}</p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
             <div class="mb-2 flex items-center gap-3">
@@ -334,12 +334,12 @@
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ patrimonioLiquido | appCurrency }}</h2>
             <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-[var(--success-text)]">
               <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-              Ativos: {{ patrimonioTotalAtivos | currency: 'BRL':'symbol':'1.2-2' }}. Passivos: {{ patrimonioPassivos | currency: 'BRL':'symbol':'1.2-2' }}.
+              Ativos: {{ patrimonioTotalAtivos | appCurrency }}. Passivos: {{ patrimonioPassivos | appCurrency }}.
             </p>
-            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | currency: 'BRL':'symbol':'1.2-2' }} · Ativos reais: {{ patrimonioEmAtivosReais | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | appCurrency }} · Ativos reais: {{ patrimonioEmAtivosReais | appCurrency }}</p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
             <div class="mb-2 flex items-center gap-3">
@@ -357,10 +357,10 @@
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | appCurrency }}</h2>
             <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-[var(--warning-text)]">
               <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-              Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}.
+              Pendente a receber: {{ totalRendasPendentes | appCurrency }}.
             </p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
@@ -379,7 +379,7 @@
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | appCurrency }}</h2>
             <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
           </div>
           <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
@@ -398,7 +398,7 @@
                 <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
               </button>
             </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | currency: 'BRL':'symbol':'1.2-2' }}</h2>
+            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | appCurrency }}</h2>
             <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
           </div>
         </div>
@@ -428,7 +428,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
-            <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | currency: 'BRL':'symbol':'1.2-2' }}</p>
+            <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | appCurrency }}</p>
           </div>
           @if (hasAccess('Intermediate')) {
             <a routerLink="/contas" class="btn-ghost sm">Gerenciar contas</a>
@@ -439,7 +439,7 @@
             <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
               <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">{{ account.name }}</p>
               <p class="m-0 mt-1 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
-              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ account.currentBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ account.currentBalance | appCurrency }}</strong>
             </article>
           }
         </div>
@@ -453,7 +453,7 @@
             <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
           </div>
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
-            Atual: {{ patrimonioLiquido | currency: 'BRL':'symbol':'1.2-2' }}
+            Atual: {{ patrimonioLiquido | appCurrency }}
           </span>
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(72px,1fr))] gap-2">
@@ -464,7 +464,7 @@
               </div>
               <div class="mt-2 text-center">
                 <strong class="block text-[0.8125rem] text-[var(--text)]">{{ point.label }}</strong>
-                <span class="block text-[0.75rem] text-[var(--text-muted)]">{{ point.netWorth | currency: 'BRL':'symbol':'1.0-0' }}</span>
+                <span class="block text-[0.75rem] text-[var(--text-muted)]">{{ point.netWorth | appCurrency }}</span>
               </div>
             </article>
           }
@@ -484,14 +484,14 @@
             <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Composição oficial das obrigações em aberto.</p>
           </div>
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
-            Total: {{ debtSummary.totalDebt | currency: 'BRL':'symbol':'1.2-2' }}
+            Total: {{ debtSummary.totalDebt | appCurrency }}
           </span>
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
           @for (bucket of debtBuckets; track trackByIndex($index, bucket)) {
             <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
               <p class="m-0 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ bucket.label }}</p>
-              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ bucket.totalAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ bucket.totalAmount | appCurrency }}</strong>
               <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">{{ bucket.itemsCount }} item(ns)</p>
             </article>
           }
@@ -512,7 +512,7 @@
                   </p>
                 </div>
                 <div class="text-right">
-                  <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.openAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                  <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.openAmount | appCurrency }}</strong>
                   <span class="text-[0.75rem] text-[var(--text-muted)]">vence {{ item.dueDate | date:'dd/MM' }}</span>
                 </div>
               </div>
@@ -635,7 +635,7 @@
               </article>
               <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
                 <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
-                <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | appCurrency }}</strong>
                 <p class="mt-1 text-[0.75rem] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
               </article>
             </div>
@@ -681,12 +681,12 @@
                 <div>
                   <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Simulação diária</p>
                   <strong class="mt-1 block text-[0.9375rem] font-semibold text-[var(--text)]">
-                    Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | currency: 'BRL':'symbol':'1.2-2' }}
+                    Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | appCurrency }}
                   </strong>
                 </div>
                 <span class="text-[0.75rem] text-[var(--text-muted)]">
                   Menor saldo:
-                  {{ cashflowProjection.lowestBalance | currency: 'BRL':'symbol':'1.2-2' }}
+                  {{ cashflowProjection.lowestBalance | appCurrency }}
                 </span>
               </div>
               @if (projectionHighlights.length) {
@@ -700,8 +700,8 @@
                   ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
                   : 'border-emerald-300/60 bg-emerald-500/10 text-[var(--success-text)]'">
                       <strong>{{ point.dateLabel }}</strong>
-                      <span>+{{ point.incomesAmount | currency: 'BRL':'symbol':'1.2-2' }} / -{{ point.expensesAmount | currency: 'BRL':'symbol':'1.2-2' }}</span>
-                      <strong>{{ point.closingBalance | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+                      <span>+{{ point.incomesAmount | appCurrency }} / -{{ point.expensesAmount | appCurrency }}</span>
+                      <strong>{{ point.closingBalance | appCurrency }}</strong>
                     </div>
                   }
                 </div>
@@ -759,13 +759,13 @@
         </div>
         <div class="flex flex-wrap gap-2 text-[0.8125rem] text-[var(--text-secondary)]">
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-            Alvo: <strong>{{ metasResumo.targetTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+            Alvo: <strong>{{ metasResumo.targetTotal | appCurrency }}</strong>
           </span>
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-            Acumulado: <strong>{{ metasResumo.acumuladoTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+            Acumulado: <strong>{{ metasResumo.acumuladoTotal | appCurrency }}</strong>
           </span>
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
-            Falta: <strong>{{ metasResumo.faltanteTotal | currency: 'BRL':'symbol':'1.2-2' }}</strong>
+            Falta: <strong>{{ metasResumo.faltanteTotal | appCurrency }}</strong>
           </span>
           <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px]">
             Progresso médio: <strong>{{ metasResumo.progressoMedio | number : "1.0-0" }}%</strong>
@@ -860,13 +860,13 @@
                       </div>
                       @if (meta.expectedMonthly) {
                         <div class="text-[0.75rem] text-[var(--text-muted)]">
-                          Ritmo sugerido: <strong>{{ meta.expectedMonthly | currency: 'BRL':'symbol':'1.2-2' }}</strong> / mês
+                          Ritmo sugerido: <strong>{{ meta.expectedMonthly | appCurrency }}</strong> / mês
                         </div>
                       }
                       <div class="flex flex-wrap justify-between gap-2 text-[0.8125rem] text-[var(--text-muted)]">
-                        <span>Aportado: <strong>{{ meta.current | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-                        <span>Falta: <strong>{{ meta.remaining | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
-                        <span>Alvo: <strong>{{ meta.target | currency: 'BRL':'symbol':'1.2-2' }}</strong></span>
+                        <span>Aportado: <strong>{{ meta.current | appCurrency }}</strong></span>
+                        <span>Falta: <strong>{{ meta.remaining | appCurrency }}</strong></span>
+                        <span>Alvo: <strong>{{ meta.target | appCurrency }}</strong></span>
                       </div>
                     </div>
                   }
@@ -905,15 +905,15 @@
               <span class="text-[0.8125rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
               <div class="flex items-center gap-2">
                 <span class="text-[1.25rem] font-semibold text-[var(--text)]">
-                  {{ saldoPrincipal | currency: 'BRL':'symbol':'1.2-2' }}
+                  {{ saldoPrincipal | appCurrency }}
                 </span>
                 <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.8125rem] text-[var(--text-muted)]">
-                  Saldo ant. {{ saldoAnterior | currency: 'BRL':'symbol':'1.2-2' }} • Recebidas {{ totalRendas | currency: 'BRL':'symbol':'1.2-2' }} • Despesas {{ totalDespesas | currency: 'BRL':'symbol':'1.2-2' }}
+                  Saldo ant. {{ saldoAnterior | appCurrency }} • Recebidas {{ totalRendas | appCurrency }} • Despesas {{ totalDespesas | appCurrency }}
                 </span>
               </div>
               <span class="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-2 py-[2px] text-[0.75rem] font-semibold text-[var(--warning-text)]">
                 <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-                Pendente a receber: {{ totalRendasPendentes | currency: 'BRL':'symbol':'1.2-2' }}
+                Pendente a receber: {{ totalRendasPendentes | appCurrency }}
               </span>
             </div>
             <div class="mt-3 grid gap-2">
@@ -953,7 +953,7 @@
                   <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuicao de despesas por categoria">
                     <div class="expense-donut__center">
                       <small>Total</small>
-                      <strong>{{ expenseCategoryTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
+                      <strong>{{ expenseCategoryTotal | appCurrency }}</strong>
                     </div>
                   </div>
                 </div>
@@ -983,7 +983,7 @@
                   <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuicao de receitas por categoria">
                     <div class="expense-donut__center">
                       <small>Total</small>
-                      <strong>{{ incomeSourceTotal | currency: 'BRL':'symbol':'1.0-0' }}</strong>
+                      <strong>{{ incomeSourceTotal | appCurrency }}</strong>
                     </div>
                   </div>
                 </div>
@@ -1052,7 +1052,7 @@
                 <div class="flex flex-col items-end gap-2">
                   <div class="flex items-center gap-2">
                     <div class="text-[0.9375rem] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                      {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | currency: 'BRL':'symbol':'1.2-2' }}
+                      {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
                     </div>
                     <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[0.875rem] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
                       ↗

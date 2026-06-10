@@ -10,7 +10,7 @@
           </span>
           <div class="assistant-summary-card__copy">
             <p class="assistant-summary-card__eyebrow">SDR</p>
-            <h3 class="assistant-summary-card__title">{{ c.realBalance.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+            <h3 class="assistant-summary-card__title">{{ c.realBalance.realAvailableBalance | appCurrency }}</h3>
           </div>
         </div>
         <p class="assistant-summary-card__note">Saldo disponível real usado no contexto da conversa.</p>
@@ -24,7 +24,7 @@
           </span>
           <div class="assistant-summary-card__copy">
             <p class="assistant-summary-card__eyebrow">Dívida</p>
-            <h3 class="assistant-summary-card__title">{{ c.debts.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</h3>
+            <h3 class="assistant-summary-card__title">{{ c.debts.totalDebt | appCurrency }}</h3>
           </div>
         </div>
         <p class="assistant-summary-card__note">Compromissos considerados nas recomendações.</p>
@@ -38,7 +38,7 @@
           </span>
           <div class="assistant-summary-card__copy">
             <p class="assistant-summary-card__eyebrow">Patrimônio</p>
-            <h3 class="assistant-summary-card__title">{{ c.netWorth.netWorth | currency:'BRL':'symbol':'1.2-2' }}</h3>
+            <h3 class="assistant-summary-card__title">{{ c.netWorth.netWorth | appCurrency }}</h3>
           </div>
         </div>
         <p class="assistant-summary-card__note">Base patrimonial consolidada para análise.</p>

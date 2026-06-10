@@ -2,6 +2,19 @@
   <div class="topbar__slogan text-[var(--text-sm)] font-medium text-[var(--text-muted)]">{{ brandSlogan }}</div>
   <div class="topbar__actions flex min-w-0 flex-1 items-center justify-end gap-[var(--spacing-2)]">
     <button
+      class="privacy-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
+      type="button"
+      (click)="financialValuesToggle.emit()"
+      [attr.aria-pressed]="financialValuesHidden"
+      [attr.aria-label]="financialValuesHidden ? 'Exibir valores financeiros' : 'Ocultar valores financeiros'"
+      [attr.title]="financialValuesHidden ? 'Exibir valores financeiros' : 'Ocultar valores financeiros'">
+      @if (financialValuesHidden) {
+        <span aria-hidden="true">◌</span>
+      } @else {
+        <span aria-hidden="true">◉</span>
+      }
+    </button>
+    <button
       class="theme-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
       type="button"
       (click)="themeToggle.emit()"
@@ -66,7 +79,7 @@
         (click)="userMenuToggle.emit()">
         <span class="avatar grid h-9 w-9 place-items-center rounded-full border border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
           @if (avatarUrl) {
-            <img class="h-full w-full rounded-full object-cover" [src]="avatarUrl" alt="Avatar" />
+            <img class="h-full w-full rounded-full object-cover" [src]="avatarUrl" [alt]="displayName + ' — foto de perfil'" />
           }
           @if (!avatarUrl) {
             <span>{{ userInitials }}</span>

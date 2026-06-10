@@ -131,7 +131,7 @@
               <div class="income-form-modal__hint-card">
                 <div class="income-form-modal__hint-copy">
                   <span class="income-form-modal__hint-title">Último valor usado para esta fonte</span>
-                  <p class="income-form-modal__hint-text">R$ {{ valorSugestao | number:'1.2-2' }}</p>
+                  <p class="income-form-modal__hint-text">{{ valorSugestao | appCurrency }}</p>
                 </div>
                 <button
                   type="button"

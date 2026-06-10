@@ -9,7 +9,7 @@
         </span>
         <div class="snapshots-summary-card__copy">
           <p class="snapshots-summary-card__eyebrow">SDR atual</p>
-          <h3 class="snapshots-summary-card__title">{{ latestRealBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          <h3 class="snapshots-summary-card__title">{{ latestRealBalance | appCurrency }}</h3>
         </div>
       </div>
       <p class="snapshots-summary-card__note">Saldo disponível real do snapshot mais recente.</p>
@@ -23,7 +23,7 @@
         </span>
         <div class="snapshots-summary-card__copy">
           <p class="snapshots-summary-card__eyebrow">Projeção</p>
-          <h3 class="snapshots-summary-card__title">{{ latestProjectedBalance | currency:'BRL':'symbol':'1.2-2' }}</h3>
+          <h3 class="snapshots-summary-card__title">{{ latestProjectedBalance | appCurrency }}</h3>
         </div>
       </div>
       <p class="snapshots-summary-card__note">Visão projetada do mês fechado mais recente.</p>
@@ -85,10 +85,10 @@
               <span class="pill">{{ item.riskClassification }} · {{ item.riskScore }}/100</span>
             </div>
             <div class="grid">
-              <div><span>SDR</span><strong>{{ item.realAvailableBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-              <div><span>Projeção</span><strong>{{ item.projectedBalance | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-              <div><span>Dívida</span><strong>{{ item.totalDebt | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
-              <div><span>Patrimônio</span><strong>{{ item.netWorth | currency:'BRL':'symbol':'1.2-2' }}</strong></div>
+              <div><span>SDR</span><strong>{{ item.realAvailableBalance | appCurrency }}</strong></div>
+              <div><span>Projeção</span><strong>{{ item.projectedBalance | appCurrency }}</strong></div>
+              <div><span>Dívida</span><strong>{{ item.totalDebt | appCurrency }}</strong></div>
+              <div><span>Patrimônio</span><strong>{{ item.netWorth | appCurrency }}</strong></div>
             </div>
             <p class="muted">{{ item.primaryInsight }}</p>
           </section>

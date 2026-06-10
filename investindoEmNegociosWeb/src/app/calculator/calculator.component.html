@@ -163,7 +163,7 @@
             @if (jurosResultado) {
               <p class="result">
                 Valor futuro:
-                <strong>R$ {{ jurosResultado | number : "1.2-2" }}</strong>
+                <strong>{{ jurosResultado | number : "1.2-2" }}</strong>
               </p>
             }
             @if (jurosSeries.length) {
@@ -186,7 +186,7 @@
               @for (item of jurosSeries; track trackByIndex($index, item)) {
                 <div class="table__row">
                   <span>{{ item.mes }}</span>
-                  <span>R$ {{ item.valor | number : "1.2-2" }}</span>
+                  <span>{{ item.valor | appCurrency }}</span>
                 </div>
               }
             </div>
@@ -205,11 +205,11 @@
                     class="table__row table__row--wide"
                     >
                     <span>{{ ano.ano }}</span>
-                    <span>R$ {{ ano.aporteAno | number : "1.2-2" }}</span>
-                    <span>R$ {{ ano.jurosAno | number : "1.2-2" }}</span>
-                    <span>R$ {{ ano.totalInvestido | number : "1.2-2" }}</span>
-                    <span>R$ {{ ano.totalJuros | number : "1.2-2" }}</span>
-                    <span>R$ {{ ano.totalAcumulado | number : "1.2-2" }}</span>
+                    <span>{{ ano.aporteAno | appCurrency }}</span>
+                    <span>{{ ano.jurosAno | appCurrency }}</span>
+                    <span>{{ ano.totalInvestido | appCurrency }}</span>
+                    <span>{{ ano.totalJuros | appCurrency }}</span>
+                    <span>{{ ano.totalAcumulado | appCurrency }}</span>
                   </div>
                 }
               </div>
@@ -241,7 +241,7 @@
             </form>
             @if (valorObjetivoReserva) {
               <div class="result">
-                <p>Valor alvo: <strong>R$ {{ valorObjetivoReserva | number : '1.2-2' }}</strong></p>
+                <p>Valor alvo: <strong>{{ valorObjetivoReserva | appCurrency }}</strong></p>
                 @if (mesesParaAtingir) {
                   <p>Tempo estimado: <strong>{{ mesesParaAtingir }} meses</strong></p>
                 }
@@ -279,7 +279,7 @@
             @if (patrimonioAposentadoria) {
               <div class="result">
                 Patrimônio estimado:
-                <strong>R$ {{ patrimonioAposentadoria | number : "1.2-2" }}</strong>
+                <strong>{{ patrimonioAposentadoria | appCurrency }}</strong>
               </div>
             }
           }
@@ -321,7 +321,7 @@
             @if (jurosSimplesResultado) {
               <p class="result">
                 Juros simples:
-                <strong>R$ {{ jurosSimplesResultado | number : "1.2-2" }}</strong>
+                <strong>{{ jurosSimplesResultado | appCurrency }}</strong>
               </p>
             }
             @if (jurosSimplesResultado) {
@@ -332,7 +332,7 @@
                 </div>
                 <div class="table__row">
                   <span>{{ mesesSimples }} meses</span>
-                  <span>R$ {{ jurosSimplesResultado | number : "1.2-2" }}</span>
+                  <span>{{ jurosSimplesResultado | appCurrency }}</span>
                 </div>
               </div>
             }
@@ -363,7 +363,7 @@
             @if (rendaResultado) {
               <p class="result">
                 Receita mensal estimada:
-                <strong>R$ {{ rendaResultado | number : "1.2-2" }}</strong>
+                <strong>{{ rendaResultado | appCurrency }}</strong>
               </p>
             }
             @if (rendaResultado) {
@@ -385,8 +385,8 @@
                 <span>Receita (mês)</span>
               </div>
               <div class="table__row">
-                <span>R$ {{ patrimonio | number : "1.0-0" }}</span>
-                <span>R$ {{ rendaResultado | number : "1.2-2" }}</span>
+                <span>{{ patrimonio | appCurrency }}</span>
+                <span>{{ rendaResultado | appCurrency }}</span>
               </div>
             </div>
             @if (rendaResultado) {
@@ -398,7 +398,7 @@
                 @for (mes of rendaMeses; track trackByIndex($index, mes)) {
                   <div class="table__row">
                     <span>{{ mes }}</span>
-                    <span>R$ {{ rendaResultado | number : "1.2-2" }}</span>
+                    <span>{{ rendaResultado | appCurrency }}</span>
                   </div>
                 }
               </div>
@@ -461,7 +461,7 @@
                 @for (item of milhaoSeries; track trackByIndex($index, item)) {
                   <div class="table__row">
                     <span>{{ item.mes }}</span>
-                    <span>R$ {{ item.valor | number : "1.2-2" }}</span>
+                    <span>{{ item.valor | appCurrency }}</span>
                   </div>
                 }
               </div>
@@ -501,8 +501,8 @@
             </form>
             @if (custoFinanciamentoTotal) {
               <div class="result">
-                <p>Financiamento: <strong>R$ {{ custoFinanciamentoTotal | number : "1.2-2" }}</strong></p>
-                <p>Aluguel total: <strong>R$ {{ custoAluguelTotal | number : "1.2-2" }}</strong></p>
+                <p>Financiamento: <strong>{{ custoFinanciamentoTotal | appCurrency }}</strong></p>
+                <p>Aluguel total: <strong>{{ custoAluguelTotal | appCurrency }}</strong></p>
                 @if (pontoEquilibrioMeses) {
                   <p>Ponto de equilíbrio: <strong>{{ pontoEquilibrioMeses }} meses</strong></p>
                 }
@@ -539,8 +539,8 @@
             </form>
             @if (resultadoPoupanca) {
               <div class="result">
-                <p>Poupança: <strong>R$ {{ resultadoPoupanca | number : "1.2-2" }}</strong></p>
-                <p>Selic: <strong>R$ {{ resultadoSelic | number : "1.2-2" }}</strong></p>
+                <p>Poupança: <strong>{{ resultadoPoupanca | appCurrency }}</strong></p>
+                <p>Selic: <strong>{{ resultadoSelic | appCurrency }}</strong></p>
               </div>
             }
           }
@@ -566,7 +566,7 @@
             </form>
             @if (totalPrazo) {
               <div class="result">
-                <p>Total a prazo: <strong>R$ {{ totalPrazo | number : "1.2-2" }}</strong></p>
+                <p>Total a prazo: <strong>{{ totalPrazo | appCurrency }}</strong></p>
                 <p>Taxa implícita: <strong>{{ taxaEfetivaPrazo | number : "1.2-2" }}% ao mês</strong></p>
               </div>
             }
@@ -605,9 +605,9 @@
             </form>
             @if (resultadoCdi) {
               <div class="result">
-                <p>CDI: <strong>R$ {{ resultadoCdi | number : "1.2-2" }}</strong></p>
-                <p>Prefixado: <strong>R$ {{ resultadoPrefixado | number : "1.2-2" }}</strong></p>
-                <p>IPCA+: <strong>R$ {{ resultadoIpca | number : "1.2-2" }}</strong></p>
+                <p>CDI: <strong>{{ resultadoCdi | appCurrency }}</strong></p>
+                <p>Prefixado: <strong>{{ resultadoPrefixado | appCurrency }}</strong></p>
+                <p>IPCA+: <strong>{{ resultadoIpca | appCurrency }}</strong></p>
               </div>
             }
           }

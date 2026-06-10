@@ -31,7 +31,9 @@
           [displayName]="displayName"
           [currentRole]="currentRole"
           [isLightTheme]="isLightTheme"
+          [financialValuesHidden]="financialValuesHidden"
           (themeToggle)="toggleTheme()"
+          (financialValuesToggle)="toggleFinancialValues()"
           (notificationsToggle)="toggleNotifications()"
           (notificationsRefresh)="refreshNotifications()"
           (notificationRead)="markNotificationRead($event.item, $event.event)"
@@ -39,7 +41,9 @@
           (routeReload)="reloadIfSame($event.path, $event.event)"
           (logoutRequested)="logout()" />
         <main class="main relative z-0 flex flex-col gap-8 p-[var(--spacing-3)]" [ngClass]="isReceitasRoute ? 'gap-4 px-[var(--spacing-3)] pb-[var(--spacing-3)] pt-0 -mt-12' : ''">
-          <router-outlet />
+          <div class="route-view" [class.route-view--enter]="routeTransitionActive">
+            <router-outlet />
+          </div>
         </main>
       </div>
     </div>
@@ -47,13 +51,17 @@
 
   @if (isLogged && isOnboardingRoute) {
     <main class="onboarding-route-main">
-      <router-outlet />
+      <div class="route-view" [class.route-view--enter]="routeTransitionActive">
+        <router-outlet />
+      </div>
     </main>
   }
 
   @if (showPublicExperience) {
     <main class="main">
-      <router-outlet />
+      <div class="route-view" [class.route-view--enter]="routeTransitionActive">
+        <router-outlet />
+      </div>
     </main>
   }
 

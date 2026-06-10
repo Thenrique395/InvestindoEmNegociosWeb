@@ -10,7 +10,7 @@
         </span>
         <div class="accounts-summary-card__copy">
           <p class="accounts-summary-card__eyebrow">Saldo consolidado</p>
-          <h3 class="accounts-summary-card__title">R$ {{ totalBalance | number:'1.2-2' }}</h3>
+          <h3 class="accounts-summary-card__title">{{ totalBalance | appCurrency }}</h3>
         </div>
       </div>
       <p class="accounts-summary-card__note">Soma atual das contas cadastradas.</p>
@@ -175,7 +175,7 @@
                   <td class="py-2 pr-4">{{ tx.description }}</td>
                   <td class="py-2 pr-4">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</td>
                   <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                    {{ tx.kind === 'Credit' ? '+' : '-' }}R$ {{ tx.amount | number:'1.2-2' }}
+                    {{ tx.kind === 'Credit' ? '+' : '-' }}{{ tx.amount | appCurrency }}
                   </td>
                 </tr>
               }

@@ -11,7 +11,7 @@
         </span>
         <div class="goals-summary-card__copy">
           <p class="goals-summary-card__eyebrow">Meta total</p>
-          <h3 class="goals-summary-card__title">R$ {{ totalMetaAmount | number : '1.2-2' }}</h3>
+          <h3 class="goals-summary-card__title">{{ totalMetaAmount | appCurrency }}</h3>
         </div>
       </div>
       <p class="goals-summary-card__note">Valor planejado nas metas filtradas.</p>
@@ -26,7 +26,7 @@
         </span>
         <div class="goals-summary-card__copy">
           <p class="goals-summary-card__eyebrow">Acumulado</p>
-          <h3 class="goals-summary-card__title">R$ {{ totalCurrentAmount | number : '1.2-2' }}</h3>
+          <h3 class="goals-summary-card__title">{{ totalCurrentAmount | appCurrency }}</h3>
         </div>
       </div>
       <p class="goals-summary-card__note">{{ averageProgress }}% de progresso médio.</p>
@@ -158,7 +158,7 @@
                   <div class="goal-card__progress">
                     <div class="goal-card__progress-head">
                       <span>{{ progresso(meta) }}% concluída</span>
-                      <strong>Falta R$ {{ goalRemaining(meta) | number : '1.2-2' }}</strong>
+                      <strong>Falta {{ goalRemaining(meta) | appCurrency }}</strong>
                     </div>
                     <div class="goal-card__bar">
                       <span [style.width.%]="progresso(meta)"></span>
@@ -167,16 +167,16 @@
                   <div class="goal-card__metrics" aria-label="Resumo financeiro da meta">
                     <span>
                       <small>Meta</small>
-                      <strong>R$ {{ meta.targetAmount | number : '1.2-2' }}</strong>
+                      <strong>{{ meta.targetAmount | appCurrency }}</strong>
                     </span>
                     <span>
                       <small>Acumulado</small>
-                      <strong>R$ {{ meta.currentAmount | number : '1.2-2' }}</strong>
+                      <strong>{{ meta.currentAmount | appCurrency }}</strong>
                     </span>
                     <span>
                       <small>Aporte</small>
                       @if (meta.expectedMonthly) {
-                        <strong>R$ {{ meta.expectedMonthly | number : '1.2-2' }}</strong>
+                        <strong>{{ meta.expectedMonthly | appCurrency }}</strong>
                       } @else {
                         <strong>Sem previsão</strong>
                       }
@@ -346,11 +346,11 @@
           <div class="goal-action-summary">
             <div>
               <span>Acumulado atual</span>
-              <strong>R$ {{ metaSelecionada.currentAmount | number : '1.2-2' }}</strong>
+              <strong>{{ metaSelecionada.currentAmount | appCurrency }}</strong>
             </div>
             <div>
               <span>Falta para concluir</span>
-              <strong>R$ {{ goalRemaining(metaSelecionada) | number : '1.2-2' }}</strong>
+              <strong>{{ goalRemaining(metaSelecionada) | appCurrency }}</strong>
             </div>
           </div>
         }
@@ -420,11 +420,11 @@
           <div class="goal-history-summary">
             <div>
               <span>Total acumulado</span>
-              <strong>R$ {{ historicoMeta.currentAmount | number : '1.2-2' }}</strong>
+              <strong>{{ historicoMeta.currentAmount | appCurrency }}</strong>
             </div>
             <div>
               <span>Meta planejada</span>
-              <strong>R$ {{ historicoMeta.targetAmount | number : '1.2-2' }}</strong>
+              <strong>{{ historicoMeta.targetAmount | appCurrency }}</strong>
             </div>
             <div>
               <span>Progresso</span>
@@ -442,7 +442,7 @@
                 </div>
                 <div class="history__amount">
                   <span>Aporte</span>
-                  <strong>R$ {{ c.amount | number:'1.2-2' }}</strong>
+                  <strong>{{ c.amount | appCurrency }}</strong>
                 </div>
                 <p class="history__note">{{ c.note || 'Sem observação' }}</p>
               </div>

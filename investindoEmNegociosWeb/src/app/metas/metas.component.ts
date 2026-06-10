@@ -7,6 +7,7 @@ import { formatLocaleDateFromIso, formatNumberValue, parseLocalizedNumber } from
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 type GoalKind = 'ALL' | 'DESPESA' | 'RECEITA' | 'INVESTIMENTO' | 'GERAL';
 type GoalSection = {
@@ -19,7 +20,7 @@ type GoalSection = {
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })

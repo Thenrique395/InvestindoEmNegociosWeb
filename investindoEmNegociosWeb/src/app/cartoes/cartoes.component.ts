@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, DatePipe, DecimalPipe } from '@angular/common';
+import { UpperCasePipe, DatePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
@@ -13,6 +13,9 @@ import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
 import { CardsStore } from '../cards.store';
 import { FormState } from '../utils/form-state';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -23,10 +26,12 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     FormsModule,
     UpperCasePipe,
     DatePipe,
-    DecimalPipe,
     CartoesListagemComponent,
     DigitOnlyDirective,
-    TooltipComponent
+    TooltipComponent,
+    EmptyStateComponent,
+    UiStateComponent,
+    AppCurrencyPipe
 ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']

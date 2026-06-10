@@ -19,11 +19,12 @@ import { AccountFormComponent } from '../features/accounts/components/account-fo
 import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
 import { AccountTransferComponent, AccountTransferFormValue } from '../features/accounts/components/account-transfer/account-transfer.component';
 import { AccountImportComponent } from '../features/accounts/components/account-import/account-import.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent],
+  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent, AppCurrencyPipe],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })

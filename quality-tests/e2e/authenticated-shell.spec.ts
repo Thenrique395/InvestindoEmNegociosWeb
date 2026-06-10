@@ -21,12 +21,28 @@ test.describe('authenticated app shell', () => {
     await expect(page.getByText('Separe R$ 300,00 para reforçar a reserva.')).toBeVisible();
     await expect(page.getByText('Simulação diária')).toBeVisible();
     await expect(page.getByText('Menor saldo:')).toBeVisible();
-    await page.getByRole('button', { name: 'Fechar', exact: true }).click();
+    await page.getByRole('button', { name: 'Fechar detalhes' }).click();
 
     await page.getByRole('button', { name: 'Trimestral' }).click();
     await expect(page.getByRole('heading', { level: 1, name: /Trimestre/i })).toBeVisible();
     await page.getByRole('button', { name: 'Anual' }).click();
     await expect(page.getByRole('heading', { level: 1, name: /Ano de 2026/i })).toBeVisible();
+  });
+
+  test('oculta e restaura valores financeiros pelo topbar', async ({ page }) => {
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+
+    const hideValues = page.getByRole('button', { name: 'Ocultar valores financeiros' });
+    await expect(hideValues).toBeVisible();
+    await hideValues.click();
+
+    await expect(page.getByText('••••••').first()).toBeVisible();
+    const showValues = page.getByRole('button', { name: 'Exibir valores financeiros' });
+    await expect(showValues).toBeVisible();
+    await showValues.click();
+
+    await expect(page.getByRole('button', { name: 'Ocultar valores financeiros' })).toBeVisible();
+    await expect(page.getByText('••••••')).toHaveCount(0);
   });
 
   test('mantem fallback local na home quando resumos oficiais falham', async ({ page }) => {
@@ -57,7 +73,7 @@ test.describe('authenticated app shell', () => {
   test('abre contas e exibe extrato importado', async ({ page }) => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: 'Contas' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Controle saldos e transferências' })).toBeVisible();
     await page.getByRole('button', { name: 'Extrato' }).first().click();
 
     await expect(page.getByRole('heading', { level: 2, name: /Extrato: Conta principal/i })).toBeVisible();

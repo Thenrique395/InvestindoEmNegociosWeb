@@ -40,7 +40,7 @@
           <div class="cards-list__summary">
             <div class="cards-list__summary-chip">
               <span class="cards-list__summary-label">Limite</span>
-              <strong class="cards-list__summary-value">R$ {{ c.limiteCredito | number:'1.2-2' }}</strong>
+              <strong class="cards-list__summary-value">{{ c.limiteCredito | appCurrency }}</strong>
             </div>
             <div class="cards-list__summary-chip">
               <span class="cards-list__summary-label">Ciclo</span>

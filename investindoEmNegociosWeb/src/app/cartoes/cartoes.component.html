@@ -26,7 +26,7 @@
         </span>
         <div class="cards-summary-card__copy">
           <p class="cards-summary-card__eyebrow">Limite total</p>
-          <h3 class="cards-summary-card__title">R$ {{ totalLimit | number:'1.2-2' }}</h3>
+          <h3 class="cards-summary-card__title">{{ totalLimit | appCurrency }}</h3>
         </div>
         <app-tooltip label="Mais informações sobre limite total" text="Soma do limite de crédito de todos os cartões cadastrados para o usuário atual." />
       </div>
@@ -67,7 +67,7 @@
 
       <aside class="cards-total-card">
         <p class="cards-total-card__eyebrow">Visão consolidada</p>
-        <strong class="cards-total-card__value">R$ {{ totalOpenStatements | number:'1.2-2' }}</strong>
+        <strong class="cards-total-card__value">{{ totalOpenStatements | appCurrency }}</strong>
         <p class="cards-total-card__text">Total em aberto nas faturas carregadas para o cartão selecionado.</p>
         <div class="cards-total-card__actions">
           <button type="button" class="cards-total-card__action cards-total-card__action--primary" (click)="abrirModal()">
@@ -129,10 +129,13 @@
       </div>
 
       @if (statementLoading) {
-        <p class="cards-statements__feedback">Carregando faturas...</p>
+        <app-ui-state type="loading" title="Carregando faturas..." />
       }
       @if (!statementLoading && !statementCycles.length) {
-        <p class="cards-statements__feedback">Nenhuma fatura encontrada para os filtros selecionados.</p>
+        <app-empty-state
+          icon="$"
+          title="Nenhuma fatura encontrada"
+          description="Ajuste os filtros ou registre compras para acompanhar as próximas faturas." />
       }
 
       @if (!statementLoading && statementCycles.length) {
@@ -149,15 +152,15 @@
               <div class="cards-statements__metrics">
                 <div class="cards-statements__metric">
                   <span>Total</span>
-                  <strong>R$ {{ cycle.totalAmount | number:'1.2-2' }}</strong>
+                  <strong>{{ cycle.totalAmount | appCurrency }}</strong>
                 </div>
                 <div class="cards-statements__metric cards-statements__metric--success">
                   <span>Pago</span>
-                  <strong>R$ {{ cycle.totalPaid | number:'1.2-2' }}</strong>
+                  <strong>{{ cycle.totalPaid | appCurrency }}</strong>
                 </div>
                 <div class="cards-statements__metric cards-statements__metric--danger">
                   <span>Em aberto</span>
-                  <strong>R$ {{ cycle.totalOpen | number:'1.2-2' }}</strong>
+                  <strong>{{ cycle.totalOpen | appCurrency }}</strong>
                 </div>
               </div>
             </article>
@@ -176,9 +179,10 @@
         </div>
 
         @if (!selectedCardExpenses.length) {
-          <p class="cards-purchases__empty">
-            Nenhuma compra encontrada para este cartão nos filtros atuais.
-          </p>
+          <app-empty-state
+            icon="$"
+            title="Nenhuma compra encontrada"
+            description="Não há compras deste cartão nos filtros atuais." />
         }
 
         @if (selectedCardExpenses.length) {
@@ -196,7 +200,7 @@
                 </div>
                 <span class="cards-purchases__pill">Parcela {{ cardExpenseInstallmentLabel(expense) }}</span>
                 <span class="cards-purchases__pill cards-purchases__pill--status">{{ cardExpenseStatusLabel(expense) }}</span>
-                <strong class="cards-purchases__amount">R$ {{ expense.valor | number:'1.2-2' }}</strong>
+                <strong class="cards-purchases__amount">{{ expense.valor | appCurrency }}</strong>
                 <span class="cards-purchases__date">Vence {{ expense.vencimento }}</span>
               </article>
             }

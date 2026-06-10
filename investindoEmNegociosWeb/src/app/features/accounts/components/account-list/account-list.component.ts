@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { AccountResponse, AccountType } from '../../models/account.models';
 import { EmptyStateComponent } from '../../../../empty-state/empty-state.component';
 import { UiStateComponent } from '../../../../ui-state/ui-state.component';
+import { AppCurrencyPipe } from '../../../../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-account-list',
   standalone: true,
-  imports: [CommonModule, EmptyStateComponent, UiStateComponent],
+  imports: [CommonModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe],
   templateUrl: './account-list.component.html',
   styleUrl: './account-list.component.scss'
 })

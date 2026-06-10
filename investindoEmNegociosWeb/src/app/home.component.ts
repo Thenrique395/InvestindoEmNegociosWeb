@@ -13,6 +13,7 @@ import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ProfileService } from './profile.service';
 import { NotificationsService, NotificationItem } from './notifications.service';
+import { AppCurrencyPipe } from './shared/app-currency.pipe';
 
 type InsightDiagnostics = {
   healthScore: number;
@@ -39,7 +40,7 @@ type InsightTodoItem = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule],
+  imports: [CommonModule, DecimalPipe, RouterModule, AppCurrencyPipe],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   InvestmentsService,
@@ -15,6 +15,8 @@ import { maskMoneyInput } from '../utils/input-mask';
 import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
@@ -54,7 +56,7 @@ const DEFAULT_TARGET_ALLOCATION: Record<AllocationInvestmentType, number> = { RF
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, CurrencyPipe],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

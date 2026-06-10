@@ -1,15 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { StoredIncome } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, DigitOnlyDirective, RouterLink],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink, AppCurrencyPipe],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })

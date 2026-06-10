@@ -40,7 +40,7 @@
           </div>
           <div class="account-card__balance">
             <span>Saldo atual</span>
-            <strong>R$ {{ account.currentBalance | number:'1.2-2' }}</strong>
+            <strong>{{ account.currentBalance | appCurrency }}</strong>
           </div>
           <div class="account-card__actions">
             <button type="button" class="account-card__action account-card__action--primary" (click)="selectAccount.emit(account.id)">Extrato</button>

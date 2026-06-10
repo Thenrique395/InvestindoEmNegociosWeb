@@ -16,6 +16,7 @@ import { PublicNavigationService } from './public-navigation.service';
 import { UserContextFacadeService } from './user-context-facade.service';
 import { UserPreferencesFacadeService } from './user-preferences-facade.service';
 import { AppSessionFacadeService } from './app-session-facade.service';
+import { FinancialPrivacyService } from './financial-privacy.service';
 
 @Component({
   selector: 'app-root',
@@ -43,6 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
   avatarUrl = '';
   userInitials = 'U';
   feedbackMessage: UiFeedbackMessage | null = null;
+  routeTransitionActive = true;
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
@@ -62,7 +64,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private publicNavigation: PublicNavigationService,
     private userContextFacade: UserContextFacadeService,
     private userPreferencesFacade: UserPreferencesFacadeService,
-    private appSession: AppSessionFacadeService
+    private appSession: AppSessionFacadeService,
+    private financialPrivacy: FinancialPrivacyService
   ) {
     this.isBrowser = this.appSession.isBrowserEnvironment();
     this.sub = this.router.events.subscribe((event) => {
@@ -75,6 +78,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const theme = this.themeService.init();
     this.isLightTheme = theme === 'light';
+    this.financialPrivacy.init();
     this.userPreferencesFacade.initFromStorage();
     if (this.isLogged && !this.isOnboardingRoute) this.ensureUserContext();
     this.appSession.startMonitoring(() => this.handleExpiredSession());
@@ -233,6 +237,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isLightTheme = this.themeService.toggle() === 'light';
   }
 
+  get financialValuesHidden(): boolean {
+    return this.financialPrivacy.hidden();
+  }
+
+  toggleFinancialValues(): void {
+    this.financialPrivacy.toggle();
+  }
+
   refreshNotifications(): void {
     this.notificationsFacade.refresh();
   }
@@ -275,6 +287,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private handleNavigationEnd(event: NavigationEnd): void {
+    this.restartRouteTransition();
     const currentPath = event.urlAfterRedirects.split('?')[0];
     this.isLoginRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
     this.isReceitasRoute = currentPath.startsWith('/receitas');
@@ -300,6 +313,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private closeTransientUi(): void {
     this.userMenuOpen = false;
     this.notificationsFacade.close();
+  }
+
+  private restartRouteTransition(): void {
+    if (!this.isBrowser) return;
+
+    this.routeTransitionActive = false;
+    requestAnimationFrame(() => {
+      this.routeTransitionActive = true;
+    });
   }
 
   private resetUserContext(): void {

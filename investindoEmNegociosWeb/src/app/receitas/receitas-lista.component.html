@@ -132,7 +132,7 @@
             <td class="receitas-table__item receitas-table__item--name">{{ r.fonte }}</td>
             <td class="receitas-table__item receitas-table__item--muted">{{ r.categoria || 'Sem categoria' }}</td>
             <td class="receitas-table__item receitas-table__item--value">
-              <span class="receitas-table__amount">R$ {{ r.valor | number:'1.2-2' }}</span>
+              <span class="receitas-table__amount">{{ r.valor | appCurrency }}</span>
             </td>
             <td class="receitas-table__item receitas-table__item--muted">{{ r.recebimento || '—' }}</td>
             <td class="receitas-table__item receitas-table__item--muted">{{ r.fixa ? 'Recorrente' : 'Avulsa' }}</td>

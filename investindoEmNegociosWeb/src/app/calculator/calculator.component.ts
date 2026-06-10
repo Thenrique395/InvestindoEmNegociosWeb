@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 type CalculatorType =
   | 'jurosCompostos'
@@ -53,7 +54,7 @@ interface CalcItem {
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, RouterLink],
+  imports: [FormsModule, DecimalPipe, RouterLink, AppCurrencyPipe],
   templateUrl: './calculator.component.html',
   styleUrls: ['./calculator.component.scss']
 })

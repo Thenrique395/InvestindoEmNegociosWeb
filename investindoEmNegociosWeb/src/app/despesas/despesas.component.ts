@@ -28,6 +28,7 @@ import {
   parseLocaleDate,
   parseLocalizedNumber
 } from '../utils/locale-utils';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-despesas',
@@ -40,7 +41,8 @@ import {
     DespesasListaComponent,
     DespesasFormComponent,
     InvoiceImportComponent,
-    TooltipComponent
+    TooltipComponent,
+    AppCurrencyPipe
 ],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss']

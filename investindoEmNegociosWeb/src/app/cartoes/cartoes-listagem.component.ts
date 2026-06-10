@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DecimalPipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgClass, DecimalPipe],
+  imports: [NgClass, AppCurrencyPipe],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })

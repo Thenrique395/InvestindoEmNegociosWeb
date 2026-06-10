@@ -10,7 +10,7 @@
         </span>
         <div class="expenses-summary-card__copy">
           <p class="expenses-summary-card__eyebrow">Pendentes</p>
-          <h3 class="expenses-summary-card__title">R$ {{ totalPendentes | number:'1.2-2' }}</h3>
+          <h3 class="expenses-summary-card__title">{{ totalPendentes | appCurrency }}</h3>
         </div>
         <app-tooltip label="Mais informações sobre despesas pendentes" text="Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas." />
       </div>
@@ -26,7 +26,7 @@
         </span>
         <div class="expenses-summary-card__copy">
           <p class="expenses-summary-card__eyebrow">Antecipadas</p>
-          <h3 class="expenses-summary-card__title">R$ {{ totalAntecipadas | number:'1.2-2' }}</h3>
+          <h3 class="expenses-summary-card__title">{{ totalAntecipadas | appCurrency }}</h3>
         </div>
         <app-tooltip label="Mais informações sobre despesas antecipadas" text="Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período." />
       </div>
@@ -42,7 +42,7 @@
         </span>
         <div class="expenses-summary-card__copy">
           <p class="expenses-summary-card__eyebrow">Pagas</p>
-          <h3 class="expenses-summary-card__title">R$ {{ totalPagas | number:'1.2-2' }}</h3>
+          <h3 class="expenses-summary-card__title">{{ totalPagas | appCurrency }}</h3>
         </div>
         <app-tooltip label="Mais informações sobre despesas pagas" text="Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações." />
       </div>
@@ -75,7 +75,7 @@
                   @if (comparison.isNew) {
                     Sem base anterior
                   } @else {
-                    {{ comparison.delta > 0 ? '+' : '' }}R$ {{ comparison.deltaAbs | number:'1.2-2' }}
+                    {{ comparison.delta > 0 ? '+' : '' }}{{ comparison.deltaAbs | appCurrency }}
                     ({{ comparison.percent | number:'1.0-0' }}%)
                   }
                 </span>
@@ -98,7 +98,7 @@
 
       <aside class="expenses-total-card">
         <p class="expenses-total-card__eyebrow">Total do mês</p>
-        <strong class="expenses-total-card__value">R$ {{ totalMes() | number:'1.2-2' }}</strong>
+        <strong class="expenses-total-card__value">{{ totalMes() | appCurrency }}</strong>
         <p class="expenses-total-card__text">Soma das despesas pagas, antecipadas e pendentes registradas neste período.</p>
         <div class="expenses-total-card__actions">
           <button type="button" class="expenses-total-card__action expenses-total-card__action--ghost" (click)="abrirImportFatura()">
@@ -375,7 +375,7 @@
                     </div>
                   </div>
                   <div class="expenses-history-item__value-col">
-                    <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
+                    <strong class="expenses-history-item__value">{{ h.valor | appCurrency }}</strong>
                     <button
                       type="button"
                       class="expenses-history-item__action"
@@ -422,7 +422,7 @@
                     </div>
                   </div>
                   <div class="expenses-history-item__value-col">
-                    <strong class="expenses-history-item__value">R$ {{ h.valor | number:'1.2-2' }}</strong>
+                    <strong class="expenses-history-item__value">{{ h.valor | appCurrency }}</strong>
                   </div>
                 </article>
               }

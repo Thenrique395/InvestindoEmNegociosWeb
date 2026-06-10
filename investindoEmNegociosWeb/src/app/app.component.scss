@@ -107,6 +107,32 @@
   top: calc(var(--header-h) + 5.25rem);
 }
 
+.route-view {
+  min-width: 0;
+}
+
+.route-view--enter {
+  animation: route-view-enter 160ms ease-out both;
+}
+
+@keyframes route-view-enter {
+  from {
+    opacity: 0.35;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-view--enter {
+    animation: none;
+  }
+}
+
 
 
 .brand-green {

@@ -2,11 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoansService, LoanContractRequest, LoanContractResponse, LoanSimulationResponse } from '../loans.service';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-loans',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe],
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.scss'
 })

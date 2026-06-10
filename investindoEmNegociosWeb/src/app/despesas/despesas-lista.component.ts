@@ -1,14 +1,14 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { StoredExpense } from '../data/api-data.service';
 import { expenseStatusLabel } from '../utils/status';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-despesas-lista',
   standalone: true,
-  imports: [DecimalPipe, StatusBadgeComponent, EmptyStateComponent],
+  imports: [StatusBadgeComponent, EmptyStateComponent, AppCurrencyPipe],
   templateUrl: './despesas-lista.component.html',
   styleUrls: ['./despesas-lista.component.scss']
 })
