@@ -1,53 +1,44 @@
 <section class="calendar-page">
   <section class="summary-grid">
-    <article class="summary-card summary-card--income">
-      <div class="summary-card__head">
-        <span class="summary-card__icon summary-card__icon--income">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="summary-card__label">Receitas do mês</p>
-      </div>
-      <strong class="summary-card__value">{{ formatCurrency(monthIncomeTotal) }}</strong>
-      <p class="summary-card__note">Entradas previstas para {{ monthTitle }}.</p>
-    </article>
-    <article class="summary-card summary-card--expense">
-      <div class="summary-card__head">
-        <span class="summary-card__icon summary-card__icon--expense">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="summary-card__label">Despesas do mês</p>
-      </div>
-      <strong class="summary-card__value">{{ formatCurrency(monthExpenseTotal) }}</strong>
-      <p class="summary-card__note">Saídas registradas para o período atual.</p>
-    </article>
-    <article class="summary-card summary-card--balance">
-      <div class="summary-card__head">
-        <span class="summary-card__icon summary-card__icon--balance">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M6 16c1.5 2 3.5 3 6 3 3.5 0 6-2 6-6 0-3.2-2.3-5.5-5.7-5.5H6.5M6 16V9m0 7h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="summary-card__label">Saldo previsto</p>
-      </div>
-      <strong class="summary-card__value">{{ formatCurrency(monthProjectedBalance) }}</strong>
-      <p class="summary-card__note">Diferença entre o que entra e o que sai.</p>
-    </article>
-    <article class="summary-card summary-card--warning">
-      <div class="summary-card__head">
-        <span class="summary-card__icon summary-card__icon--warning">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <p class="summary-card__label">Pendências abertas</p>
-      </div>
-      <strong class="summary-card__value">{{ monthOpenCount }}</strong>
-      <p class="summary-card__note">Próximos 7 dias: {{ upcomingDueCount }}</p>
-    </article>
+    <app-stat-card
+      tone="success"
+      eyebrow="Receitas do mês"
+      [value]="formatCurrency(monthIncomeTotal)"
+      [note]="'Entradas previstas para ' + monthTitle + '.'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+
+    <app-stat-card
+      tone="danger"
+      eyebrow="Despesas do mês"
+      [value]="formatCurrency(monthExpenseTotal)"
+      note="Saídas registradas para o período atual.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+
+    <app-stat-card
+      tone="info"
+      eyebrow="Saldo previsto"
+      [value]="formatCurrency(monthProjectedBalance)"
+      note="Diferença entre o que entra e o que sai.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M6 16c1.5 2 3.5 3 6 3 3.5 0 6-2 6-6 0-3.2-2.3-5.5-5.7-5.5H6.5M6 16V9m0 7h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+
+    <app-stat-card
+      tone="warning"
+      eyebrow="Pendências abertas"
+      [value]="monthOpenCount.toString()"
+      [note]="'Próximos 7 dias: ' + upcomingDueCount">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
   </section>
 
   <section class="calendar-shell">

@@ -15,6 +15,10 @@ import { incomeStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
+import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
+import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -28,7 +32,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, AppCurrencyPipe],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, StatCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, AppCurrencyPipe],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss']
 })

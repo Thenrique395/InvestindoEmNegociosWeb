@@ -12,10 +12,11 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { CardDto, CardPayload, CardStatementCycleDto } from '../cards.service';
 import { CardsStore } from '../cards.store';
 import { FormState } from '../utils/form-state';
-import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -28,10 +29,11 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     DatePipe,
     CartoesListagemComponent,
     DigitOnlyDirective,
-    TooltipComponent,
     EmptyStateComponent,
     UiStateComponent,
-    AppCurrencyPipe
+    AppCurrencyPipe,
+    StatCardComponent,
+    PeriodHeroComponent
 ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']
@@ -85,6 +87,12 @@ export class CartoesComponent implements OnInit, OnDestroy {
     if (!this.cards.length || this.nextClosingDay == null) return null;
     const sameDayCard = this.cards.find((card) => Number(card.diaFechamento) === this.nextClosingDay);
     return sameDayCard ? Number(sameDayCard.diaVencimento) || null : null;
+  }
+
+  get nextClosingNote(): string {
+    return this.nextDueDay
+      ? `Vencimento associado no dia ${this.nextDueDay}.`
+      : 'Cadastre um cartão para acompanhar ciclo de fechamento e vencimento.';
   }
 
   get totalOpenStatements(): number {

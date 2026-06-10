@@ -18,6 +18,10 @@ import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
+import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
+import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import {
   formatLocaleDate,
   formatMonthLabelFromKey,
@@ -42,6 +46,10 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     DespesasFormComponent,
     InvoiceImportComponent,
     TooltipComponent,
+    StatCardComponent,
+    ComparisonPillComponent,
+    PeriodTotalCardComponent,
+    PeriodHeroComponent,
     AppCurrencyPipe
 ],
   templateUrl: './despesas.component.html',

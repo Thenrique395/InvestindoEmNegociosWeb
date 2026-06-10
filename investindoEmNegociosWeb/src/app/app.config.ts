@@ -2,7 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection, LOCALE_ID } from '@angul
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import localeEn from '@angular/common/locales/en';
-import { provideRouter, RouteReuseStrategy, withRouterConfig, withPreloading } from '@angular/router';
+import { provideRouter, RouteReuseStrategy, withRouterConfig, withPreloading, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -22,7 +22,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({ onSameUrlNavigation: 'reload' }),
-      withPreloading(SelectivePreloadingStrategy)
+      withPreloading(SelectivePreloadingStrategy),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })
     ),
     provideClientHydration(),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),

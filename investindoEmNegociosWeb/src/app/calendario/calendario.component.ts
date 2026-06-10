@@ -6,6 +6,7 @@ import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data
 import { formatCurrencyValue, formatLocaleDate, formatMonthYearLabel, parseLocaleDate } from '../utils/locale-utils';
 import { InstallmentStatus } from '../types/money-types';
 import { AccountsService } from '../accounts.service';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 
 type CalendarEventType = 'expense' | 'income' | 'card-due';
 
@@ -32,7 +33,7 @@ interface CalendarCell {
 @Component({
   selector: 'app-calendario',
   standalone: true,
-  imports: [NgClass, FormsModule],
+  imports: [NgClass, FormsModule, StatCardComponent],
   templateUrl: './calendario.component.html',
   styleUrls: ['./calendario.component.scss']
 })

@@ -52,61 +52,40 @@
             </article>
           </div>
           <div class="basic-home-kpis">
-            <article class="basic-home-kpi basic-home-kpi--primary">
-              <div class="basic-home-kpi__head">
-                <span class="basic-home-kpi__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                    <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-                    <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <div class="basic-home-kpi__title-wrap">
-                  <p class="basic-home-kpi__eyebrow">Quanto sobra</p>
-                  <h2 class="basic-home-kpi__title">{{ saldoDisponivelReal | appCurrency }}</h2>
-                </div>
-                <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre quanto sobra agora">
-                  ?
-                  <span class="basic-home-tooltip__content">Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.</span>
-                </button>
-              </div>
-              <p class="basic-home-kpi__support">Disponível em contas: {{ totalSaldoContas | appCurrency }} · Pendências do mês: {{ pendenciasCaixa | appCurrency }}</p>
-            </article>
-            <article class="basic-home-kpi basic-home-kpi--income">
-              <div class="basic-home-kpi__head">
-                <span class="basic-home-kpi__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                    <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <div class="basic-home-kpi__title-wrap">
-                  <p class="basic-home-kpi__eyebrow">Quanto entrou</p>
-                  <h2 class="basic-home-kpi__title">{{ totalRendas | appCurrency }}</h2>
-                </div>
-                <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre entradas do mês">
-                  ?
-                  <span class="basic-home-tooltip__content">Entradas do mês: considera só receitas já recebidas dentro do período selecionado.</span>
-                </button>
-              </div>
-              <p class="basic-home-kpi__support">Ainda a receber: {{ totalRendasPendentes | appCurrency }}</p>
-            </article>
-            <article class="basic-home-kpi basic-home-kpi--expense">
-              <div class="basic-home-kpi__head">
-                <span class="basic-home-kpi__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                    <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <div class="basic-home-kpi__title-wrap">
-                  <p class="basic-home-kpi__eyebrow">Quanto saiu</p>
-                  <h2 class="basic-home-kpi__title">{{ totalDespesas | appCurrency }}</h2>
-                </div>
-                <button type="button" class="basic-home-tooltip" aria-label="Mais informacoes sobre saídas do mês">
-                  ?
-                  <span class="basic-home-tooltip__content">Saídas do mês: soma de despesas com vencimento dentro do período selecionado.</span>
-                </button>
-              </div>
-              <p class="basic-home-kpi__support">Compras no cartão: {{ totalDividaCartoes | appCurrency }}</p>
-            </article>
+            <app-stat-card
+              tone="primary"
+              eyebrow="Quanto sobra"
+              [value]="saldoDisponivelReal | appCurrency"
+              note="Disponível em contas: {{ totalSaldoContas | appCurrency }} · Pendências do mês: {{ pendenciasCaixa | appCurrency }}"
+              tooltipLabel="Mais informações sobre quanto sobra agora"
+              tooltipText="Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.">
+              <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </app-stat-card>
+            <app-stat-card
+              tone="success"
+              eyebrow="Quanto entrou"
+              [value]="totalRendas | appCurrency"
+              note="Ainda a receber: {{ totalRendasPendentes | appCurrency }}"
+              tooltipLabel="Mais informações sobre entradas do mês"
+              tooltipText="Entradas do mês: considera só receitas já recebidas dentro do período selecionado.">
+              <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </app-stat-card>
+            <app-stat-card
+              tone="danger"
+              eyebrow="Quanto saiu"
+              [value]="totalDespesas | appCurrency"
+              note="Compras no cartão: {{ totalDividaCartoes | appCurrency }}"
+              tooltipLabel="Mais informações sobre saídas do mês"
+              tooltipText="Saídas do mês: soma de despesas com vencimento dentro do período selecionado.">
+              <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </app-stat-card>
           </div>
           <section class="basic-home-month">
             <div class="basic-home-month__copy">

@@ -1,132 +1,95 @@
 <div class="expenses-page">
   <section class="expenses-summary-grid">
-    <article class="expenses-summary-card expenses-summary-card--warning">
-      <div class="expenses-summary-card__head">
-        <span class="expenses-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
-          </svg>
-        </span>
-        <div class="expenses-summary-card__copy">
-          <p class="expenses-summary-card__eyebrow">Pendentes</p>
-          <h3 class="expenses-summary-card__title">{{ totalPendentes | appCurrency }}</h3>
-        </div>
-        <app-tooltip label="Mais informações sobre despesas pendentes" text="Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas." />
-      </div>
-      <p class="expenses-summary-card__note">Contas abertas para o período atual.</p>
-    </article>
+    <app-stat-card
+      tone="warning"
+      eyebrow="Pendentes"
+      [value]="totalPendentes | appCurrency"
+      note="Contas abertas para o período atual."
+      tooltipLabel="Mais informações sobre despesas pendentes"
+      tooltipText="Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+      </svg>
+    </app-stat-card>
 
-    <article class="expenses-summary-card expenses-summary-card--info">
-      <div class="expenses-summary-card__head">
-        <span class="expenses-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M6 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="expenses-summary-card__copy">
-          <p class="expenses-summary-card__eyebrow">Antecipadas</p>
-          <h3 class="expenses-summary-card__title">{{ totalAntecipadas | appCurrency }}</h3>
-        </div>
-        <app-tooltip label="Mais informações sobre despesas antecipadas" text="Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período." />
-      </div>
-      <p class="expenses-summary-card__note">Pagamentos feitos antes do vencimento.</p>
-    </article>
+    <app-stat-card
+      tone="info"
+      eyebrow="Antecipadas"
+      [value]="totalAntecipadas | appCurrency"
+      note="Pagamentos feitos antes do vencimento."
+      tooltipLabel="Mais informações sobre despesas antecipadas"
+      tooltipText="Total de despesas antecipadas no mês: parcelas pagas antes do vencimento que ainda pertencem ao período.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M6 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
 
-    <article class="expenses-summary-card expenses-summary-card--success">
-      <div class="expenses-summary-card__head">
-        <span class="expenses-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="expenses-summary-card__copy">
-          <p class="expenses-summary-card__eyebrow">Pagas</p>
-          <h3 class="expenses-summary-card__title">{{ totalPagas | appCurrency }}</h3>
-        </div>
-        <app-tooltip label="Mais informações sobre despesas pagas" text="Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações." />
-      </div>
-      <p class="expenses-summary-card__note">Saídas já liquidadas neste período.</p>
-    </article>
+    <app-stat-card
+      tone="success"
+      eyebrow="Pagas"
+      [value]="totalPagas | appCurrency"
+      note="Saídas já liquidadas neste período."
+      tooltipLabel="Mais informações sobre despesas pagas"
+      tooltipText="Total de despesas pagas no mês: contas liquidadas no período selecionado, incluindo pagamentos à vista e antecipações.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
   </section>
 
   <section class="expenses-shell">
-    <div class="expenses-hero">
-      <div class="expenses-hero__main">
-        <p class="expenses-hero__eyebrow">Despesas do período</p>
-        <h2 class="expenses-hero__title">Despesas de {{ mesAtualLabel | titlecase }}</h2>
-        <p class="expenses-hero__text">
-          Veja o que já saiu, compare com o mês anterior e registre novas despesas sem perder o contexto do período.
-        </p>
-
-        <div class="expenses-hero__toolbar">
-          @if (previousComparison; as comparison) {
-            <div class="expenses-hero__comparison">
-              <span class="expenses-comparison-pill">
-                <span class="expenses-comparison-pill__label">Comparado a {{ comparison.month }}</span>
-                <app-tooltip label="Mais informações sobre comparativo de despesas" text="Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução." size="sm" />
-                <span
-                  class="expenses-comparison-pill__delta"
-                [ngClass]="comparison.trend === 'up'
-                  ? 'expenses-comparison-pill__delta--up'
-                  : comparison.trend === 'down'
-                    ? 'expenses-comparison-pill__delta--down'
-                    : 'expenses-comparison-pill__delta--flat'">
-                  @if (comparison.isNew) {
-                    Sem base anterior
-                  } @else {
-                    {{ comparison.delta > 0 ? '+' : '' }}{{ comparison.deltaAbs | appCurrency }}
-                    ({{ comparison.percent | number:'1.0-0' }}%)
-                  }
-                </span>
-              </span>
-            </div>
+    <app-period-hero
+      eyebrow="Despesas do período"
+      title="Despesas de {{ mesAtualLabel | titlecase }}"
+      description="Veja o que já saiu, compare com o mês anterior e registre novas despesas sem perder o contexto do período."
+      (previousMonth)="mesAnterior()"
+      (nextMonth)="proximoMes()">
+      @if (previousComparison; as comparison) {
+        <app-comparison-pill
+          hero-toolbar-start
+          [label]="'Comparado a ' + comparison.month"
+          [trend]="comparison.trend"
+          polarity="lower-is-better">
+          <app-tooltip label="Mais informações sobre comparativo de despesas" text="Mostra a diferença do total de despesas deste mês em relação ao mês anterior. Valores positivos indicam aumento; negativos indicam redução." size="sm" />
+          @if (comparison.isNew) {
+            Sem base anterior
+          } @else {
+            {{ comparison.delta > 0 ? '+' : '' }}{{ comparison.deltaAbs | appCurrency }}
+            ({{ comparison.percent | number:'1.0-0' }}%)
           }
+        </app-comparison-pill>
+      }
 
-          <div class="expenses-hero__nav">
-            <button type="button" class="expenses-hero__nav-btn" (click)="mesAnterior()">
-              <span aria-hidden="true">←</span>
-              <span>Mês anterior</span>
-            </button>
-            <button type="button" class="expenses-hero__nav-btn" (click)="proximoMes()">
-              <span>Próximo mês</span>
-              <span aria-hidden="true">→</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <aside class="expenses-total-card">
-        <p class="expenses-total-card__eyebrow">Total do mês</p>
-        <strong class="expenses-total-card__value">{{ totalMes() | appCurrency }}</strong>
-        <p class="expenses-total-card__text">Soma das despesas pagas, antecipadas e pendentes registradas neste período.</p>
-        <div class="expenses-total-card__actions">
-          <button type="button" class="expenses-total-card__action expenses-total-card__action--ghost" (click)="abrirImportFatura()">
-            <span class="expenses-total-card__action-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M14 3v6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span class="expenses-total-card__action-copy">
-              <strong>Importar fatura</strong>
-              <small>Trazer lançamentos do cartão para este período.</small>
-            </span>
-          </button>
-          <button type="button" class="expenses-total-card__action expenses-total-card__action--primary" (click)="abrirModal()">
-            <span class="expenses-total-card__action-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span class="expenses-total-card__action-copy">
-              <strong>Adicionar despesa</strong>
-              <small>Registrar uma nova saída manualmente.</small>
-            </span>
-          </button>
-        </div>
-      </aside>
-    </div>
+      <app-period-total-card
+        hero-aside
+        [value]="totalMes() | appCurrency"
+        description="Soma das despesas pagas, antecipadas e pendentes registradas neste período.">
+        <button total-card-actions type="button" class="period-total-card__action period-total-card__action--ghost" (click)="abrirImportFatura()">
+          <span class="period-total-card__action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M14 3v6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="period-total-card__action-copy">
+            <strong>Importar fatura</strong>
+            <small>Trazer lançamentos do cartão para este período.</small>
+          </span>
+        </button>
+        <button total-card-actions type="button" class="period-total-card__action period-total-card__action--primary" (click)="abrirModal()">
+          <span class="period-total-card__action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="period-total-card__action-copy">
+            <strong>Adicionar despesa</strong>
+            <small>Registrar uma nova saída manualmente.</small>
+          </span>
+        </button>
+      </app-period-total-card>
+    </app-period-hero>
 
     @if (selecionados.length) {
       <div class="expenses-bulk">

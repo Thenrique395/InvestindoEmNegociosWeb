@@ -1,61 +1,44 @@
 <section class="accounts-page">
   <section class="accounts-summary-grid">
-    <article class="accounts-summary-card accounts-summary-card--primary">
-      <div class="accounts-summary-card__head">
-        <span class="accounts-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-            <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-          </svg>
-        </span>
-        <div class="accounts-summary-card__copy">
-          <p class="accounts-summary-card__eyebrow">Saldo consolidado</p>
-          <h3 class="accounts-summary-card__title">{{ totalBalance | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="accounts-summary-card__note">Soma atual das contas cadastradas.</p>
-    </article>
+    <app-stat-card
+      tone="primary"
+      eyebrow="Saldo consolidado"
+      [value]="totalBalance | appCurrency"
+      note="Soma atual das contas cadastradas.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+        <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+      </svg>
+    </app-stat-card>
 
-    <article class="accounts-summary-card accounts-summary-card--success">
-      <div class="accounts-summary-card__head">
-        <span class="accounts-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="accounts-summary-card__copy">
-          <p class="accounts-summary-card__eyebrow">Contas ativas</p>
-          <h3 class="accounts-summary-card__title">{{ activeAccountsCount }}</h3>
-        </div>
-      </div>
-      <p class="accounts-summary-card__note">{{ accounts.length }} conta(s) cadastrada(s) no total.</p>
-    </article>
+    <app-stat-card
+      tone="success"
+      eyebrow="Contas ativas"
+      [value]="activeAccountsCount.toString()"
+      [note]="accounts.length + ' conta(s) cadastrada(s) no total.'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
 
-    <article class="accounts-summary-card accounts-summary-card--info">
-      <div class="accounts-summary-card__head">
-        <span class="accounts-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="accounts-summary-card__copy">
-          <p class="accounts-summary-card__eyebrow">Extrato</p>
-          <h3 class="accounts-summary-card__title">{{ transactions.length }}</h3>
-        </div>
-      </div>
-      <p class="accounts-summary-card__note">{{ selectedAccountLabel }}</p>
-    </article>
+    <app-stat-card
+      tone="info"
+      eyebrow="Extrato"
+      [value]="transactions.length.toString()"
+      [note]="selectedAccountLabel">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
   </section>
 
   <section class="accounts-shell">
-    <div class="accounts-hero">
-      <div class="accounts-hero__main">
-        <p class="accounts-hero__eyebrow">Contas e movimentações</p>
-        <h2 class="accounts-hero__title">Controle saldos e transferências</h2>
-        <p class="accounts-hero__text">Cadastre contas, acompanhe saldo atual por movimentações e importe extratos quando precisar reconciliar o mês.</p>
-      </div>
-
-      <aside class="accounts-action-card">
+    <app-period-hero
+      eyebrow="Contas e movimentações"
+      title="Controle saldos e transferências"
+      description="Cadastre contas, acompanhe saldo atual por movimentações e importe extratos quando precisar reconciliar o mês."
+      [showNavigation]="false">
+      <aside hero-aside class="accounts-action-card">
         <p class="accounts-action-card__eyebrow">Próxima ação</p>
         <strong class="accounts-action-card__title">{{ editingId ? 'Finalizar edição' : 'Cadastrar conta' }}</strong>
         <p class="accounts-action-card__text">Mantenha as contas atualizadas para que o saldo real do dashboard fique consistente.</p>
@@ -67,7 +50,7 @@
           </span>
         </button>
       </aside>
-    </div>
+    </app-period-hero>
 
   @if (error) {
     <p class="accounts-feedback accounts-feedback--error">

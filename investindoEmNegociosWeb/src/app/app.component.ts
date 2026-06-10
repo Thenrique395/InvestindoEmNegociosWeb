@@ -1,6 +1,5 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { NgClass } from '@angular/common';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { UserRole } from './roles';
@@ -21,7 +20,7 @@ import { FinancialPrivacyService } from './financial-privacy.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgClass, RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent],
+  imports: [RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -30,7 +29,6 @@ export class AppComponent implements OnInit, OnDestroy {
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
   isLoginRoute = false;
-  isReceitasRoute = false;
   isLightTheme = false;
   showSignupModal = false;
   signupAlert = '';
@@ -290,7 +288,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.restartRouteTransition();
     const currentPath = event.urlAfterRedirects.split('?')[0];
     this.isLoginRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
-    this.isReceitasRoute = currentPath.startsWith('/receitas');
     this.closeTransientUi();
 
     if (this.isLogged) {

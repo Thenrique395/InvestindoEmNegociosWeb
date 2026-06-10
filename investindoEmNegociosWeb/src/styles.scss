@@ -131,6 +131,10 @@
   --shadow-lg: 0 28px 76px rgba(0, 0, 0, 0.48);
 }
 
+html {
+  font-size: 14px;
+}
+
 body {
   margin: 0;
   background: var(--bg);

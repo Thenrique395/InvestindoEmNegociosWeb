@@ -1,160 +1,117 @@
 <div class="receitas-page">
   @if (hasAccess('Basic')) {
     <section class="receitas-summary-grid">
-      <article class="receitas-summary-card receitas-summary-card--success">
-        <div class="receitas-summary-card__head">
-          <span class="receitas-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="receitas-summary-card__copy">
-            <p class="receitas-summary-card__eyebrow">Recebidas</p>
-            <h3 class="receitas-summary-card__title">{{ statusResumo.pagosValor | appCurrency }}</h3>
-          </div>
-          <app-tooltip label="Mais informações sobre receitas recebidas" text="Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos." />
-        </div>
-        <p class="receitas-summary-card__note">
-          Entradas já confirmadas neste período.
-          <span class="receitas-summary-card__meta">· {{ statusResumo.pagos }} lançamento(s)</span>
-        </p>
-      </article>
-      <article class="receitas-summary-card receitas-summary-card--warning">
-        <div class="receitas-summary-card__head">
-          <span class="receitas-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
-            </svg>
-          </span>
-          <div class="receitas-summary-card__copy">
-            <p class="receitas-summary-card__eyebrow">Pendentes</p>
-            <h3 class="receitas-summary-card__title">{{ statusResumo.pendentesValor | appCurrency }}</h3>
-          </div>
-          <app-tooltip label="Mais informações sobre receitas pendentes" text="Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos." />
-        </div>
-        <p class="receitas-summary-card__note">
-          Valores previstos que ainda não entraram.
-          <span class="receitas-summary-card__meta">· {{ statusResumo.pendentes }} lançamento(s)</span>
-        </p>
-      </article>
-      <article class="receitas-summary-card receitas-summary-card--info">
-        <div class="receitas-summary-card__head">
-          <span class="receitas-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="receitas-summary-card__copy">
-            <p class="receitas-summary-card__eyebrow">Comparativo</p>
-            <h3 class="receitas-summary-card__title">
-              {{
-              previousComparison.isNew
-              ? 'Novo'
-              : (previousComparison.delta > 0 ? '+' : previousComparison.delta < 0 ? '-' : '') +
-              'R$ ' +
-              (previousComparison.deltaAbs | number:'1.2-2')
-              }}
-            </h3>
-          </div>
-          <app-tooltip label="Mais informações sobre comparativo de receitas" text="Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução." />
-        </div>
-        <p class="receitas-summary-card__note">
-          Como este mês está ficando frente ao anterior.
-          <span
-            class="receitas-summary-card__delta"
+      <app-stat-card
+        tone="success"
+        eyebrow="Recebidas"
+        [value]="statusResumo.pagosValor | appCurrency"
+        note="Entradas já confirmadas neste período."
+        tooltipLabel="Mais informações sobre receitas recebidas"
+        tooltipText="Total de receitas já recebidas no mês selecionado. Aqui entram os lançamentos confirmados e pagos.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span stat-note class="text-[var(--color-text-muted)] text-[length:var(--font-size-label)] font-semibold"> · {{ statusResumo.pagos }} lançamento(s)</span>
+      </app-stat-card>
+
+      <app-stat-card
+        tone="warning"
+        eyebrow="Pendentes"
+        [value]="statusResumo.pendentesValor | appCurrency"
+        note="Valores previstos que ainda não entraram."
+        tooltipLabel="Mais informações sobre receitas pendentes"
+        tooltipText="Total de receitas pendentes do mês: valores previstos para o período que ainda não foram recebidos.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+        </svg>
+        <span stat-note class="text-[var(--color-text-muted)] text-[length:var(--font-size-label)] font-semibold"> · {{ statusResumo.pendentes }} lançamento(s)</span>
+      </app-stat-card>
+
+      <app-stat-card
+        tone="info"
+        eyebrow="Comparativo"
+        [value]="previousComparison.isNew
+          ? 'Novo'
+          : (previousComparison.delta > 0 ? '+' : previousComparison.delta < 0 ? '-' : '') +
+            'R$ ' +
+            (previousComparison.deltaAbs | number:'1.2-2')"
+        note="Como este mês está ficando frente ao anterior."
+        tooltipLabel="Mais informações sobre comparativo de receitas"
+        tooltipText="Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span
+          stat-note
+          class="text-[length:var(--font-size-label)] font-bold"
           [ngClass]="previousComparison.trend === 'up'
-            ? 'receitas-summary-card__delta--up'
+            ? 'text-[var(--color-success-text)]'
             : previousComparison.trend === 'down'
-              ? 'receitas-summary-card__delta--down'
-              : 'receitas-summary-card__delta--flat'">
-            · {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
-            @if (!previousComparison.isNew) {
-              <span>({{ previousComparison.percent | number:'1.0-0' }}%)</span>
-            }
-            · {{ previousComparison.monthLabel }}
-          </span>
-        </p>
-      </article>
+              ? 'text-[var(--color-danger-text)]'
+              : 'text-[var(--color-text-muted)]'">
+          · {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
+          @if (!previousComparison.isNew) {
+            <span>({{ previousComparison.percent | number:'1.0-0' }}%)</span>
+          }
+          · {{ previousComparison.monthLabel }}
+        </span>
+      </app-stat-card>
     </section>
   }
 
   <section class="receitas-shell">
-    <div class="receitas-hero">
-      <div class="receitas-hero__main">
-        <p class="receitas-hero__eyebrow">Receitas do período</p>
-        <h2 class="receitas-hero__title">Receitas de {{ mesAtualLabel }}</h2>
-        <p class="receitas-hero__text">
-          Acompanhe o que já entrou, compare com o mês anterior e registre novas receitas sem perder o contexto do período.
-        </p>
-
-        <div class="receitas-hero__toolbar">
-          @if (previousComparison; as comparison) {
-            <div class="receitas-hero__comparison">
-              <span class="receitas-comparison-pill">
-                <span class="receitas-comparison-pill__label">Comparado a {{ comparison.monthLabel }}</span>
-                <app-tooltip label="Mais informações sobre comparativo de receitas" text="Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução." size="sm" />
-                <span
-                [ngClass]="comparison.trend === 'up'
-                  ? 'receitas-comparison-pill__delta--up'
-                  : comparison.trend === 'down'
-                    ? 'receitas-comparison-pill__delta--down'
-                    : 'receitas-comparison-pill__delta--flat'">
-                  @if (comparison.isNew) {
-                    Sem base anterior
-                  } @else {
-                    {{ comparison.delta > 0 ? '+' : '' }}{{ comparison.deltaAbs | appCurrency }}
-                    ({{ comparison.percent | number:'1.0-0' }}%)
-                  }
-                </span>
-              </span>
-            </div>
+    <app-period-hero
+      eyebrow="Receitas do período"
+      title="Receitas de {{ mesAtualLabel }}"
+      description="Acompanhe o que já entrou, compare com o mês anterior e registre novas receitas sem perder o contexto do período."
+      (previousMonth)="mesAnterior()"
+      (nextMonth)="proximoMes()">
+      @if (previousComparison; as comparison) {
+        <app-comparison-pill
+          hero-toolbar-start
+          [label]="'Comparado a ' + comparison.monthLabel"
+          [trend]="comparison.trend"
+          polarity="higher-is-better">
+          <app-tooltip label="Mais informações sobre comparativo de receitas" text="Mostra a diferença do total de receitas deste mês em relação ao mês anterior. Valores positivos indicam aumento e negativos indicam redução." size="sm" />
+          @if (comparison.isNew) {
+            Sem base anterior
+          } @else {
+            {{ comparison.delta > 0 ? '+' : '' }}{{ comparison.deltaAbs | appCurrency }}
+            ({{ comparison.percent | number:'1.0-0' }}%)
           }
+        </app-comparison-pill>
+      }
 
-          <div class="receitas-hero__nav">
-            <button type="button" class="receitas-hero__nav-btn" (click)="mesAnterior()">
-              <span aria-hidden="true">←</span>
-              <span>Mês anterior</span>
-            </button>
-            <button type="button" class="receitas-hero__nav-btn" (click)="proximoMes()">
-              <span>Próximo mês</span>
-              <span aria-hidden="true">→</span>
-            </button>
-          </div>
-
-          @if (focusMode !== 'none') {
-            <div class="receitas-focus-pill">
-              <span>{{ focusBadgeLabel }}</span>
-            </div>
-          }
+      @if (focusMode !== 'none') {
+        <div hero-toolbar-end class="receitas-focus-pill">
+          <span>{{ focusBadgeLabel }}</span>
         </div>
-      </div>
+      }
 
-      <aside class="receitas-total-card">
-        <p class="receitas-total-card__eyebrow">Total do mês</p>
-        <strong class="receitas-total-card__value">{{ totalRendas | appCurrency }}</strong>
-        <p class="receitas-total-card__text">Total de receitas registradas neste período, considerando entradas recorrentes e avulsas.</p>
+      <app-period-total-card
+        hero-aside
+        [value]="totalRendas | appCurrency"
+        description="Total de receitas registradas neste período, considerando entradas recorrentes e avulsas.">
         @if (hasAccess('Basic')) {
-          <div class="receitas-total-card__split">
+          <div total-card-extra class="receitas-total-card__split">
             <span>Recorrentes: <strong>{{ totalRecorrentes | appCurrency }}</strong></span>
             <span>Avulsas: <strong>{{ totalAvulsas | appCurrency }}</strong></span>
           </div>
         }
-        <div class="receitas-total-card__actions">
-          <button type="button" class="receitas-total-card__action receitas-total-card__action--primary" (click)="abrirModal()">
-            <span class="receitas-total-card__action-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span class="receitas-total-card__action-copy">
-              <strong>Adicionar receita</strong>
-              <small>Registrar uma nova entrada manualmente.</small>
-            </span>
-          </button>
-        </div>
-      </aside>
-    </div>
+        <button total-card-actions type="button" class="period-total-card__action period-total-card__action--primary" (click)="abrirModal()">
+          <span class="period-total-card__action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="period-total-card__action-copy">
+            <strong>Adicionar receita</strong>
+            <small>Registrar uma nova entrada manualmente.</small>
+          </span>
+        </button>
+      </app-period-total-card>
+    </app-period-hero>
 
     @if (selecionados.length) {
       <div class="receitas-bulk">

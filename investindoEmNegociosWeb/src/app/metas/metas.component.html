@@ -1,64 +1,45 @@
 <section class="goals-page">
   <section class="goals-summary-grid">
-    <article class="goals-summary-card goals-summary-card--primary">
-      <div class="goals-summary-card__head">
-        <span class="goals-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" />
-            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
-            <path d="M12 2v4M12 18v4M2 12h4M18 12h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-          </svg>
-        </span>
-        <div class="goals-summary-card__copy">
-          <p class="goals-summary-card__eyebrow">Meta total</p>
-          <h3 class="goals-summary-card__title">{{ totalMetaAmount | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="goals-summary-card__note">Valor planejado nas metas filtradas.</p>
-    </article>
+    <app-stat-card
+      tone="primary"
+      eyebrow="Meta total"
+      [value]="totalMetaAmount | appCurrency"
+      note="Valor planejado nas metas filtradas.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" />
+        <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+    </app-stat-card>
 
-    <article class="goals-summary-card goals-summary-card--success">
-      <div class="goals-summary-card__head">
-        <span class="goals-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="goals-summary-card__copy">
-          <p class="goals-summary-card__eyebrow">Acumulado</p>
-          <h3 class="goals-summary-card__title">{{ totalCurrentAmount | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="goals-summary-card__note">{{ averageProgress }}% de progresso médio.</p>
-    </article>
+    <app-stat-card
+      tone="success"
+      eyebrow="Acumulado"
+      [value]="totalCurrentAmount | appCurrency"
+      [note]="averageProgress + '% de progresso médio.'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
 
-    <article class="goals-summary-card goals-summary-card--warning">
-      <div class="goals-summary-card__head">
-        <span class="goals-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="goals-summary-card__copy">
-          <p class="goals-summary-card__eyebrow">Ativas</p>
-          <h3 class="goals-summary-card__title">{{ totalMetasAtivas }}</h3>
-        </div>
-      </div>
-      <p class="goals-summary-card__note">{{ completedGoals }} concluída(s) no filtro atual.</p>
-    </article>
+    <app-stat-card
+      tone="warning"
+      eyebrow="Ativas"
+      [value]="totalMetasAtivas.toString()"
+      [note]="completedGoals + ' concluída(s) no filtro atual.'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
   </section>
 
   <section class="goals-shell">
-    <div class="goals-hero">
-      <div class="goals-hero__main">
-        <p class="goals-hero__eyebrow">Metas financeiras</p>
-        <h2 class="goals-hero__title">Acompanhe seus objetivos com clareza</h2>
-        <p class="goals-hero__text">
-          Organize metas anuais, acompanhe o avanço de cada uma e registre aportes sem perder o contexto.
-        </p>
-      </div>
-
-      <aside class="goals-action-card">
+    <app-period-hero
+      eyebrow="Metas financeiras"
+      title="Acompanhe seus objetivos com clareza"
+      description="Organize metas anuais, acompanhe o avanço de cada uma e registre aportes sem perder o contexto."
+      [showNavigation]="false">
+      <aside hero-aside class="goals-action-card">
         <p class="goals-action-card__eyebrow">Próxima ação</p>
         <strong class="goals-action-card__title">Criar ou atualizar uma meta</strong>
         <p class="goals-action-card__text">Use metas para transformar objetivos financeiros em acompanhamento real.</p>
@@ -70,7 +51,7 @@
           </span>
         </button>
       </aside>
-    </div>
+    </app-period-hero>
 
     <div class="goals-filters">
       <label class="goals-filter">
