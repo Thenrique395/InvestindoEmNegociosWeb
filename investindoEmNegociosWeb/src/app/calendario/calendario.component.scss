@@ -13,19 +13,6 @@
   gap: 1.3rem;
 }
 
-.calendar-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
-  gap: 1.6rem;
-  align-items: start;
-}
-
-.calendar-hero__main {
-  display: grid;
-  gap: 1rem;
-}
-
-.calendar-hero__eyebrow,
 .eyebrow {
   margin: 0;
   font-size: var(--font-size-caption);
@@ -35,32 +22,8 @@
   text-transform: uppercase;
 }
 
-.calendar-hero__title {
-  margin: 0;
-  color: var(--text);
-  font-size: var(--font-size-display);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-display);
-  line-height: var(--line-height-display);
-}
-
-.calendar-hero__text {
-  margin: 0;
-  max-inline-size: 62ch;
-  color: var(--text-secondary);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-}
-
 .muted {
   color: var(--text-muted);
-}
-
-.calendar-hero__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  justify-content: flex-start;
 }
 
 .calendar-hero__nav-btn {

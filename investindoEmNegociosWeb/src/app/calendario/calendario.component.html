@@ -42,27 +42,15 @@
   </section>
 
   <section class="calendar-shell">
-    <div class="calendar-hero">
-      <div class="calendar-hero__main">
-        <p class="calendar-hero__eyebrow">Calendário financeiro</p>
-        <h2 class="calendar-hero__title">Calendário de {{ monthTitle }}</h2>
-        <p class="calendar-hero__text">
-          Acompanhe vencimentos, receitas e compromissos do mês em uma visão diária e organizada.
-        </p>
-        <div class="calendar-hero__nav">
-          <button type="button" class="calendar-hero__nav-btn" (click)="previousMonth()">
-            <span aria-hidden="true">←</span>
-            <span>Mês anterior</span>
-          </button>
-          <button type="button" class="calendar-hero__nav-btn calendar-hero__nav-btn--primary" (click)="goToToday()">Hoje</button>
-          <button type="button" class="calendar-hero__nav-btn" (click)="nextMonth()">
-            <span>Próximo mês</span>
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
-      </div>
+    <app-period-hero
+      eyebrow="Calendário financeiro"
+      title="Calendário de {{ monthTitle }}"
+      description="Acompanhe vencimentos, receitas e compromissos do mês em uma visão diária e organizada."
+      (previousMonth)="previousMonth()"
+      (nextMonth)="nextMonth()">
+      <button hero-toolbar-end type="button" class="calendar-hero__nav-btn calendar-hero__nav-btn--primary" (click)="goToToday()">Hoje</button>
 
-      <aside class="calendar-total-card">
+      <aside hero-aside class="calendar-total-card">
         <p class="calendar-total-card__eyebrow">Dia selecionado</p>
         <strong class="calendar-total-card__value">{{ visibleEvents.length }}</strong>
         <p class="calendar-total-card__text">{{ selectedDateLabel }}</p>
@@ -72,7 +60,7 @@
           <span><i class="dot dot--card"></i>Cartões</span>
         </div>
       </aside>
-    </div>
+    </app-period-hero>
 
     <div class="calendar-toolbar">
       <div class="calendar-toolbar__group">
