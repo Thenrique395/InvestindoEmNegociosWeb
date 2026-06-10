@@ -9,13 +9,16 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { CategoriesStore } from '../categories.store';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { FormState } from '../utils/form-state';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 
 type CategoryFormField = 'name' | 'scope' | 'type';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormFieldComponent],
+  imports: [CommonModule, FormsModule, FormFieldComponent, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss']
 })

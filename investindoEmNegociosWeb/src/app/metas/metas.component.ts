@@ -10,6 +10,7 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 
 type GoalKind = 'ALL' | 'DESPESA' | 'RECEITA' | 'INVESTIMENTO' | 'GERAL';
 type GoalSection = {
@@ -22,7 +23,7 @@ type GoalSection = {
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent],
+  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })

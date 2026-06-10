@@ -14,7 +14,6 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.goals-action-card__eyebrow,
 .goals-section__eyebrow,
 .goals-filter__label,
 .goal-card__eyebrow,
@@ -38,92 +37,12 @@
   gap: 1.35rem;
 }
 
-.goals-action-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  padding: 1.5rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), color-mix(in srgb, var(--primary) 6%, transparent));
-  box-shadow: var(--shadow-sm);
-  display: grid;
-  gap: 1rem;
-}
-
-.goals-action-card__title {
-  display: block;
-  margin: 0;
-  color: var(--text);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-title);
-  line-height: var(--line-height-display);
-}
-
-.goals-action-card__text {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body);
-}
-
-.goals-action-card__button,
 .modal__button--primary,
 .goal-card__button--primary {
   border: 1px solid color-mix(in srgb, var(--primary) 55%, transparent);
   background: linear-gradient(135deg, var(--primary), #4f83ff);
   color: #fff;
   box-shadow: 0 18px 34px color-mix(in srgb, var(--primary) 24%, transparent);
-}
-
-.goals-action-card__button {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  min-height: 5.5rem;
-  width: 100%;
-  padding: 1rem 1.05rem;
-  align-items: center;
-  gap: 0.95rem;
-  border-radius: var(--radius-2xl);
-  text-align: left;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-}
-
-.goals-action-card__button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 22px 38px color-mix(in srgb, var(--primary) 28%, transparent);
-}
-
-.goals-action-card__button-icon {
-  display: inline-flex;
-  inline-size: 3rem;
-  block-size: 3rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: var(--font-size-title);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-display);
-}
-
-.goals-action-card__button-copy {
-  display: grid;
-  gap: 0.2rem;
-}
-
-.goals-action-card__button-copy strong {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-display);
-}
-
-.goals-action-card__button-copy small {
-  color: inherit;
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body);
-  opacity: 0.94;
 }
 
 .goals-filters {
@@ -473,8 +392,7 @@
 }
 
 .goal-card__button:hover,
-.modal__button:hover,
-.goals-action-card__button:hover {
+.modal__button:hover {
   transform: translateY(-1px);
 }
 

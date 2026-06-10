@@ -1,70 +1,53 @@
 <section class="loans-page">
   <section class="loans-summary-grid">
-    <article class="loans-summary-card loans-summary-card--warning">
-      <div class="loans-summary-card__head">
-        <span class="loans-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="loans-summary-card__copy">
-          <p class="loans-summary-card__eyebrow">Saldo aberto</p>
-          <h3 class="loans-summary-card__title">{{ totalOpenBalance | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="loans-summary-card__note">Valor ainda pendente nos contratos cadastrados.</p>
-    </article>
-    <article class="loans-summary-card loans-summary-card--primary">
-      <div class="loans-summary-card__head">
-        <span class="loans-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="loans-summary-card__copy">
-          <p class="loans-summary-card__eyebrow">Parcelas/mês</p>
-          <h3 class="loans-summary-card__title">{{ totalMonthlyPayment | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="loans-summary-card__note">Compromisso mensal estimado pelos contratos ativos.</p>
-    </article>
-    <article class="loans-summary-card loans-summary-card--info">
-      <div class="loans-summary-card__head">
-        <span class="loans-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="loans-summary-card__copy">
-          <p class="loans-summary-card__eyebrow">Parcelas abertas</p>
-          <h3 class="loans-summary-card__title">{{ totalOpenInstallments }}</h3>
-        </div>
-      </div>
-      <p class="loans-summary-card__note">{{ contracts.length }} contrato(s) acompanhado(s).</p>
-    </article>
+    <app-stat-card
+      tone="warning"
+      eyebrow="Saldo aberto"
+      [value]="totalOpenBalance | appCurrency"
+      note="Valor ainda pendente nos contratos cadastrados.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+    <app-stat-card
+      tone="primary"
+      eyebrow="Parcelas/mês"
+      [value]="totalMonthlyPayment | appCurrency"
+      note="Compromisso mensal estimado pelos contratos ativos.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+    <app-stat-card
+      tone="info"
+      eyebrow="Parcelas abertas"
+      [value]="totalOpenInstallments.toString()"
+      [note]="contracts.length + ' contrato(s) acompanhado(s).'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
   </section>
 
   <section class="loans-shell">
-    <div class="loans-hero">
-      <div class="loans-hero__main">
-        <p class="loans-hero__eyebrow">Planejamento de passivos</p>
-        <h2 class="loans-hero__title">Empréstimos e amortização</h2>
-        <p class="loans-hero__text">Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização dentro do contexto financeiro.</p>
-      </div>
-
-      <aside class="loans-action-card">
-        <p class="loans-action-card__eyebrow">Próxima ação</p>
-        <strong class="loans-action-card__title">Simular antes de contratar</strong>
-        <p class="loans-action-card__text">Revise parcela, custo total e juros antes de salvar o contrato.</p>
-        <button class="loans-action-card__button" type="button" (click)="simulate()">
-          <span class="loans-action-card__button-icon" aria-hidden="true">→</span>
-          <span class="loans-action-card__button-copy">
+    <app-period-hero
+      eyebrow="Planejamento de passivos"
+      title="Empréstimos e amortização"
+      description="Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização dentro do contexto financeiro."
+      [showNavigation]="false">
+      <app-period-action-card
+        hero-aside
+        title="Simular antes de contratar"
+        description="Revise parcela, custo total e juros antes de salvar o contrato.">
+        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="simulate()">
+          <span class="period-total-card__action-icon" aria-hidden="true">→</span>
+          <span class="period-total-card__action-copy">
             <strong>Simular contrato</strong>
             <small>Calcular parcelas com os dados preenchidos.</small>
           </span>
         </button>
-      </aside>
-    </div>
+      </app-period-action-card>
+    </app-period-hero>
 
   @if (error) {
     <app-ui-state type="error" title="Não foi possível concluir a operação." [description]="error" retryLabel="Tentar novamente" (retry)="load()" />

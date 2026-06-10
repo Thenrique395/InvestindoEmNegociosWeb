@@ -17,6 +17,9 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 
 type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
@@ -56,7 +59,7 @@ const DEFAULT_TARGET_ALLOCATION: Record<AllocationInvestmentType, number> = { RF
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,70 +1,53 @@
 <section class="snapshots-page">
   <section class="snapshots-summary-grid">
-    <article class="snapshots-summary-card snapshots-summary-card--primary">
-      <div class="snapshots-summary-card__head">
-        <span class="snapshots-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="snapshots-summary-card__copy">
-          <p class="snapshots-summary-card__eyebrow">SDR atual</p>
-          <h3 class="snapshots-summary-card__title">{{ latestRealBalance | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="snapshots-summary-card__note">Saldo disponível real do snapshot mais recente.</p>
-    </article>
-    <article class="snapshots-summary-card snapshots-summary-card--info">
-      <div class="snapshots-summary-card__head">
-        <span class="snapshots-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="snapshots-summary-card__copy">
-          <p class="snapshots-summary-card__eyebrow">Projeção</p>
-          <h3 class="snapshots-summary-card__title">{{ latestProjectedBalance | appCurrency }}</h3>
-        </div>
-      </div>
-      <p class="snapshots-summary-card__note">Visão projetada do mês fechado mais recente.</p>
-    </article>
-    <article class="snapshots-summary-card snapshots-summary-card--warning">
-      <div class="snapshots-summary-card__head">
-        <span class="snapshots-summary-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <div class="snapshots-summary-card__copy">
-          <p class="snapshots-summary-card__eyebrow">Risco</p>
-          <h3 class="snapshots-summary-card__title">{{ latestRiskScore }}/100</h3>
-        </div>
-      </div>
-      <p class="snapshots-summary-card__note">{{ latestSnapshot?.riskClassification || 'Sem snapshot gerado' }}</p>
-    </article>
+    <app-stat-card
+      tone="primary"
+      eyebrow="SDR atual"
+      [value]="latestRealBalance | appCurrency"
+      note="Saldo disponível real do snapshot mais recente.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+    <app-stat-card
+      tone="info"
+      eyebrow="Projeção"
+      [value]="latestProjectedBalance | appCurrency"
+      note="Visão projetada do mês fechado mais recente.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
+    <app-stat-card
+      tone="warning"
+      eyebrow="Risco"
+      [value]="latestRiskScore + '/100'"
+      [note]="latestSnapshot?.riskClassification || 'Sem snapshot gerado'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-stat-card>
   </section>
 
   <section class="snapshots-shell">
-    <div class="snapshots-hero">
-      <div class="snapshots-hero__main">
-        <p class="snapshots-hero__eyebrow">Fechamento mensal</p>
-        <h2 class="snapshots-hero__title">Snapshots mensais</h2>
-        <p class="snapshots-hero__text">Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco.</p>
-      </div>
-
-      <aside class="snapshots-action-card">
-        <p class="snapshots-action-card__eyebrow">Próxima ação</p>
-        <strong class="snapshots-action-card__title">Gerar fechamento</strong>
-        <p class="snapshots-action-card__text">Atualize o retrato do mês para comparar risco, patrimônio e projeção.</p>
-        <button class="snapshots-action-card__button" type="button" (click)="generateCurrentMonth()" [disabled]="generating">
-          <span class="snapshots-action-card__button-icon" aria-hidden="true">+</span>
-          <span class="snapshots-action-card__button-copy">
+    <app-period-hero
+      eyebrow="Fechamento mensal"
+      title="Snapshots mensais"
+      description="Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco."
+      [showNavigation]="false">
+      <app-period-action-card
+        hero-aside
+        title="Gerar fechamento"
+        description="Atualize o retrato do mês para comparar risco, patrimônio e projeção.">
+        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="generateCurrentMonth()" [disabled]="generating">
+          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
+          <span class="period-total-card__action-copy">
             <strong>{{ generating ? 'Gerando...' : 'Gerar snapshot' }}</strong>
             <small>Registrar o fechamento do mês atual.</small>
           </span>
         </button>
-      </aside>
-    </div>
+      </app-period-action-card>
+    </app-period-hero>
 
   @if (error) {
     <div class="feedback error">{{ error }}</div>

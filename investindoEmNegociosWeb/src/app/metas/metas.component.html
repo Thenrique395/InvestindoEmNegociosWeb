@@ -39,18 +39,18 @@
       title="Acompanhe seus objetivos com clareza"
       description="Organize metas anuais, acompanhe o avanço de cada uma e registre aportes sem perder o contexto."
       [showNavigation]="false">
-      <aside hero-aside class="goals-action-card">
-        <p class="goals-action-card__eyebrow">Próxima ação</p>
-        <strong class="goals-action-card__title">Criar ou atualizar uma meta</strong>
-        <p class="goals-action-card__text">Use metas para transformar objetivos financeiros em acompanhamento real.</p>
-        <button type="button" class="goals-action-card__button" (click)="abrirModal()">
-          <span class="goals-action-card__button-icon" aria-hidden="true">+</span>
-          <span class="goals-action-card__button-copy">
+      <app-period-action-card
+        hero-aside
+        title="Criar ou atualizar uma meta"
+        description="Use metas para transformar objetivos financeiros em acompanhamento real.">
+        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="abrirModal()">
+          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
+          <span class="period-total-card__action-copy">
             <strong>Adicionar meta</strong>
             <small>Definir objetivo, valor e prazo para acompanhar evolução.</small>
           </span>
         </button>
-      </aside>
+      </app-period-action-card>
     </app-period-hero>
 
     <div class="goals-filters">

@@ -1,120 +1,88 @@
 <section class="categories-page">
   @if (!isAdmin || activeView === 'user') {
     <section class="categories-summary-grid">
-      <article class="categories-summary-card categories-summary-card--primary">
-        <div class="categories-summary-card__head">
-          <span class="categories-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M4 6a2 2 0 0 1 2-2h4v4a2 2 0 1 0 4 0V4h4a2 2 0 0 1 2 2v4h-4a2 2 0 1 0 0 4h4v4a2 2 0 0 1-2 2h-4v-4a2 2 0 1 0-4 0v4H6a2 2 0 0 1-2-2v-4h4a2 2 0 1 0 0-4H4V6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="categories-summary-card__copy">
-            <p class="categories-summary-card__eyebrow">Total visíveis</p>
-            <h3 class="categories-summary-card__title">{{ userMetrics.total }}</h3>
-          </div>
-        </div>
-        <p class="categories-summary-card__note">Categorias disponíveis para classificar lançamentos.</p>
-      </article>
-      <article class="categories-summary-card categories-summary-card--info">
-        <div class="categories-summary-card__head">
-          <span class="categories-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-              <path d="M12 8v8M8 10l4-2 4 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="categories-summary-card__copy">
-            <p class="categories-summary-card__eyebrow">Padrão</p>
-            <h3 class="categories-summary-card__title">{{ userMetrics.padrao }}</h3>
-          </div>
-        </div>
-        <p class="categories-summary-card__note">Categorias do sistema já prontas para uso.</p>
-      </article>
-      <article class="categories-summary-card categories-summary-card--success">
-        <div class="categories-summary-card__head">
-          <span class="categories-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg>
-          </span>
-          <div class="categories-summary-card__copy">
-            <p class="categories-summary-card__eyebrow">Personalizadas</p>
-            <h3 class="categories-summary-card__title">{{ userMetrics.personalizadas }}</h3>
-          </div>
-        </div>
-        <p class="categories-summary-card__note">Regras criadas para a sua organização financeira.</p>
-      </article>
+      <app-stat-card
+        tone="primary"
+        eyebrow="Total visíveis"
+        value="{{ userMetrics.total }}"
+        note="Categorias disponíveis para classificar lançamentos.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 6a2 2 0 0 1 2-2h4v4a2 2 0 1 0 4 0V4h4a2 2 0 0 1 2 2v4h-4a2 2 0 1 0 0 4h4v4a2 2 0 0 1-2 2h-4v-4a2 2 0 1 0-4 0v4H6a2 2 0 0 1-2-2v-4h4a2 2 0 1 0 0-4H4V6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-stat-card>
+      <app-stat-card
+        tone="info"
+        eyebrow="Padrão"
+        value="{{ userMetrics.padrao }}"
+        note="Categorias do sistema já prontas para uso.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+          <path d="M12 8v8M8 10l4-2 4 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-stat-card>
+      <app-stat-card
+        tone="success"
+        eyebrow="Personalizadas"
+        value="{{ userMetrics.personalizadas }}"
+        note="Regras criadas para a sua organização financeira.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </app-stat-card>
     </section>
   }
 
   @if (isAdmin && activeView === 'admin') {
     <section class="categories-summary-grid">
-      <article class="categories-summary-card categories-summary-card--primary">
-        <div class="categories-summary-card__head">
-          <span class="categories-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M4 7h16M4 17h16M7 7v10M17 7v10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="categories-summary-card__copy">
-            <p class="categories-summary-card__eyebrow">Total visíveis</p>
-            <h3 class="categories-summary-card__title">{{ adminMetrics.total }}</h3>
-          </div>
-        </div>
-        <p class="categories-summary-card__note">Categorias padrão exibidas no filtro atual.</p>
-      </article>
-      <article class="categories-summary-card categories-summary-card--success">
-        <div class="categories-summary-card__head">
-          <span class="categories-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="categories-summary-card__copy">
-            <p class="categories-summary-card__eyebrow">Ativas</p>
-            <h3 class="categories-summary-card__title">{{ adminMetrics.ativas }}</h3>
-          </div>
-        </div>
-        <p class="categories-summary-card__note">Disponíveis para todos os usuários.</p>
-      </article>
-      <article class="categories-summary-card categories-summary-card--warning">
-        <div class="categories-summary-card__head">
-          <span class="categories-summary-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <div class="categories-summary-card__copy">
-            <p class="categories-summary-card__eyebrow">Inativas</p>
-            <h3 class="categories-summary-card__title">{{ adminMetrics.inativas }}</h3>
-          </div>
-        </div>
-        <p class="categories-summary-card__note">Mantidas no sistema, mas fora do uso comum.</p>
-      </article>
+      <app-stat-card
+        tone="primary"
+        eyebrow="Total visíveis"
+        value="{{ adminMetrics.total }}"
+        note="Categorias padrão exibidas no filtro atual.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 7h16M4 17h16M7 7v10M17 7v10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-stat-card>
+      <app-stat-card
+        tone="success"
+        eyebrow="Ativas"
+        value="{{ adminMetrics.ativas }}"
+        note="Disponíveis para todos os usuários.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-stat-card>
+      <app-stat-card
+        tone="warning"
+        eyebrow="Inativas"
+        value="{{ adminMetrics.inativas }}"
+        note="Mantidas no sistema, mas fora do uso comum.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-stat-card>
     </section>
   }
 
   <section class="categories-shell">
-    <div class="categories-hero">
-      <div class="categories-hero__main">
-        <p class="categories-hero__eyebrow">Gerenciar categorias</p>
-        <h2 class="categories-hero__title">Organize receitas e despesas</h2>
-        <p class="categories-hero__text">Categorias padrão são compartilhadas; crie as suas e use as do sistema quando quiser.</p>
-      </div>
-
-      <aside class="categories-action-card">
-        <p class="categories-action-card__eyebrow">Próxima ação</p>
-        <strong class="categories-action-card__title">Criar uma categoria</strong>
-        <p class="categories-action-card__text">Use categorias para deixar relatórios, filtros e importações mais claros.</p>
-        <button type="button" class="categories-action-card__button" (click)="abrirModal()">
-          <span class="categories-action-card__button-icon" aria-hidden="true">+</span>
-          <span class="categories-action-card__button-copy">
+    <app-period-hero
+      eyebrow="Gerenciar categorias"
+      title="Organize receitas e despesas"
+      description="Categorias padrão são compartilhadas; crie as suas e use as do sistema quando quiser."
+      [showNavigation]="false">
+      <app-period-action-card
+        hero-aside
+        title="Criar uma categoria"
+        description="Use categorias para deixar relatórios, filtros e importações mais claros.">
+        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="abrirModal()">
+          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
+          <span class="period-total-card__action-copy">
             <strong>Nova categoria</strong>
             <small>Adicionar uma classificação personalizada.</small>
           </span>
         </button>
-      </aside>
-    </div>
+      </app-period-action-card>
+    </app-period-hero>
 
     <div class="categories-filters">
       <label class="categories-filter categories-filter--search">

@@ -2,11 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MonthlyFinancialSnapshotResponse, MonthlySnapshotsService } from '../monthly-snapshots.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 
 @Component({
   selector: 'app-monthly-snapshots',
   standalone: true,
-  imports: [CommonModule, AppCurrencyPipe],
+  imports: [CommonModule, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './monthly-snapshots.component.html',
   styleUrl: './monthly-snapshots.component.scss'
 })

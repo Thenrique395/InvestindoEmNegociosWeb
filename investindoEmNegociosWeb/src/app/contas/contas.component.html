@@ -38,18 +38,18 @@
       title="Controle saldos e transferências"
       description="Cadastre contas, acompanhe saldo atual por movimentações e importe extratos quando precisar reconciliar o mês."
       [showNavigation]="false">
-      <aside hero-aside class="accounts-action-card">
-        <p class="accounts-action-card__eyebrow">Próxima ação</p>
-        <strong class="accounts-action-card__title">{{ editingId ? 'Finalizar edição' : 'Cadastrar conta' }}</strong>
-        <p class="accounts-action-card__text">Mantenha as contas atualizadas para que o saldo real do dashboard fique consistente.</p>
-        <button type="button" class="accounts-action-card__button" (click)="startCreate()">
-          <span class="accounts-action-card__button-icon" aria-hidden="true">+</span>
-          <span class="accounts-action-card__button-copy">
+      <app-period-action-card
+        hero-aside
+        [title]="editingId ? 'Finalizar edição' : 'Cadastrar conta'"
+        description="Mantenha as contas atualizadas para que o saldo real do dashboard fique consistente.">
+        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="startCreate()">
+          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
+          <span class="period-total-card__action-copy">
             <strong>Nova conta</strong>
             <small>Limpar o formulário e começar um novo cadastro.</small>
           </span>
         </button>
-      </aside>
+      </app-period-action-card>
     </app-period-hero>
 
   @if (error) {

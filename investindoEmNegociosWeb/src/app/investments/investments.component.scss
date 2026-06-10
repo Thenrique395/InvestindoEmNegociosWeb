@@ -21,98 +21,6 @@
   gap: 1.3rem;
 }
 
-.investments-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
-  gap: 1.6rem;
-  align-items: start;
-}
-
-.investments-hero__main {
-  display: grid;
-  gap: 1rem;
-}
-
-.investments-hero__eyebrow,
-.investments-action-card__eyebrow {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-}
-
-.investments-hero__title {
-  margin: 0;
-  color: var(--text);
-  font-size: var(--font-size-display);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-display);
-  line-height: var(--line-height-display);
-}
-
-.investments-hero__text {
-  margin: 0;
-  max-inline-size: 62ch;
-  color: var(--text-secondary);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-}
-
-.investments-action-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
-  box-shadow: var(--shadow-sm);
-  padding: 1.45rem 1.4rem 1.3rem;
-  display: grid;
-  gap: 0.95rem;
-}
-
-.investments-action-card__title {
-  color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
-}
-
-.investments-action-card__text {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
-}
-
-.investments-action-card__actions {
-  display: grid;
-  gap: 0.7rem;
-}
-
-.investments-action-card__button {
-  min-height: 52px;
-  border-radius: var(--radius-lg);
-  padding: 0 1rem;
-  font-weight: var(--font-weight-bold);
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-}
-
-.investments-action-card__button:hover {
-  transform: translateY(-1px);
-}
-
-.investments-action-card__button--primary {
-  border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 95%, transparent), color-mix(in srgb, var(--info) 82%, transparent));
-  color: var(--on-primary);
-  box-shadow: 0 16px 32px color-mix(in srgb, var(--primary) 20%, transparent);
-}
-
-.investments-action-card__button--ghost {
-  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 74%, white);
-  color: var(--text);
-}
-
 .tabs {
   display: flex;
   align-items: center;
@@ -193,30 +101,6 @@
   border-radius: var(--radius-2xl);
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 7%, transparent), rgba(255, 255, 255, 0.98) 56%);
   padding: 1.3rem 1.35rem 1.2rem;
-}
-
-.executive-card__head {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.kpi-icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
-  background: rgba(255, 255, 255, 0.82);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-label);
-}
-
-.kpi-icon svg {
-  width: 1.45rem;
-  height: 1.45rem;
-  color: var(--primary-text);
 }
 
 .executive-card strong {
@@ -1021,8 +905,7 @@
   margin: 0;
 }
 
-.section-head__title,
-.label-row {
+.section-head__title {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;

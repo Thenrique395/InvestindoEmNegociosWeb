@@ -13,15 +13,6 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.accounts-action-card__eyebrow {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-}
-
 .accounts-shell {
   border: 1px solid var(--border);
   border-radius: var(--radius-2xl);
@@ -30,64 +21,6 @@
   padding: 1.6rem;
   display: grid;
   gap: 1.3rem;
-}
-
-.accounts-action-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
-  box-shadow: var(--shadow-sm);
-  padding: 1.45rem 1.4rem 1.3rem;
-  display: grid;
-  gap: 0.95rem;
-}
-
-.accounts-action-card__title {
-  color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
-}
-
-.accounts-action-card__text {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
-}
-
-.accounts-action-card__button {
-  border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 95%, transparent), color-mix(in srgb, var(--info) 82%, transparent));
-  color: var(--on-primary);
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.85rem;
-  align-items: center;
-  padding: 0.85rem 1rem;
-  text-align: left;
-  box-shadow: 0 16px 32px color-mix(in srgb, var(--primary) 20%, transparent);
-}
-
-.accounts-action-card__button-icon {
-  inline-size: 42px;
-  block-size: 42px;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.16);
-  display: grid;
-  place-items: center;
-  font-size: var(--font-size-title-sm);
-  font-weight: var(--font-weight-bold);
-}
-
-.accounts-action-card__button-copy {
-  display: grid;
-  gap: 0.12rem;
-}
-
-.accounts-action-card__button-copy strong,
-.accounts-action-card__button-copy small {
-  color: inherit;
 }
 
 .accounts-feedback {
