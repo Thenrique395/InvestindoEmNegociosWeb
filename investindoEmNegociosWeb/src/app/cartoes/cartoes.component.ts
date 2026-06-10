@@ -17,6 +17,7 @@ import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -33,7 +34,8 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     UiStateComponent,
     AppCurrencyPipe,
     StatCardComponent,
-    PeriodHeroComponent
+    PeriodHeroComponent,
+    PeriodTotalCardComponent
 ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss']

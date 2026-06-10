@@ -45,24 +45,23 @@
       title="Seus cartões e ciclos de fatura"
       description="Cadastre cartões, acompanhe o limite somado e veja como as faturas estão se organizando por competência."
       [showNavigation]="false">
-      <aside hero-aside class="cards-total-card">
-        <p class="cards-total-card__eyebrow">Visão consolidada</p>
-        <strong class="cards-total-card__value">{{ totalOpenStatements | appCurrency }}</strong>
-        <p class="cards-total-card__text">Total em aberto nas faturas carregadas para o cartão selecionado.</p>
-        <div class="cards-total-card__actions">
-          <button type="button" class="cards-total-card__action cards-total-card__action--primary" (click)="abrirModal()">
-            <span class="cards-total-card__action-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span class="cards-total-card__action-copy">
-              <strong>Adicionar cartão</strong>
-              <small>Registrar um novo cartão com limite e ciclo.</small>
-            </span>
-          </button>
-        </div>
-      </aside>
+      <app-period-total-card
+        hero-aside
+        eyebrow="Visão consolidada"
+        [value]="totalOpenStatements | appCurrency"
+        description="Total em aberto nas faturas carregadas para o cartão selecionado.">
+        <button total-card-actions type="button" class="period-total-card__action period-total-card__action--primary" (click)="abrirModal()">
+          <span class="period-total-card__action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="period-total-card__action-copy">
+            <strong>Adicionar cartão</strong>
+            <small>Registrar um novo cartão com limite e ciclo.</small>
+          </span>
+        </button>
+      </app-period-total-card>
     </app-period-hero>
 
     <app-cartoes-listagem

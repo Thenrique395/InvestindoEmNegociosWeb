@@ -75,7 +75,7 @@
   --chart-series-3: #d97706;
   --chart-series-4: #7c3aed;
   --chart-series-5: #0891b2;
-  --control-h: 42px;
+  --control-h: 2.625rem;
   --control-pad: var(--spacing-1) var(--spacing-2);
   --shadow-sm: 0 10px 20px rgba(15, 23, 42, 0.08);
   --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.12);
@@ -515,18 +515,10 @@ body [class*='goal-card__description'] {
 :root[data-theme='dark'] {
   .basic-home-hero__copy,
   .basic-home-guidance,
-  .basic-home-actions,
-  .basic-home-kpi,
   .basic-home-month,
   .basic-home-summary-card,
   .basic-home-insight-card,
   .basic-home-recent-card,
-  .receitas-summary-card,
-  .expenses-summary-card,
-  .cards-summary-card,
-  .receitas-total-card,
-  .expenses-total-card,
-  .cards-total-card,
   .receitas-shell,
   .expenses-shell,
   .cards-shell,
@@ -544,9 +536,6 @@ body [class*='goal-card__description'] {
     border-color: var(--border);
   }
 
-  .receitas-summary-card__icon,
-  .expenses-summary-card__icon,
-  .cards-summary-card__icon,
   .cards-field__control,
   .cards-field__input,
   .cards-filter select,
