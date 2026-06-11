@@ -24,11 +24,11 @@ import {
   createExpenseDraft,
   createIncomeDraft,
   isoToBr,
-  maskCpf,
   maskPhone,
   toStoredCard,
   todayIso
 } from './onboarding.helpers';
+import { cpfValidator, maskCpf } from '../utils/cpf.utils';
 import { OnboardingDraftService } from './onboarding-draft.service';
 
 @Component({
@@ -99,6 +99,7 @@ export class OnboardingComponent implements OnInit {
     }
   ];
   accountReady = false;
+  hasDocument = false;
   accountForm: AccountRequest = {
     name: '',
     type: 'Checking',
@@ -150,7 +151,7 @@ export class OnboardingComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
-      document: ['', [Validators.required, this.cpfValidator()]],
+      document: ['', [Validators.required, cpfValidator()]],
       phone: ['', [Validators.required, this.phoneValidator()]],
       birthDate: ['', [Validators.required, this.birthDateRangeValidator()]],
       city: ['', [Validators.required, this.noBlankValidator()]],
@@ -412,12 +413,7 @@ export class OnboardingComponent implements OnInit {
 
   onCpfInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
-    const masked = digits
-      .replace(/^(\d{3})(\d)/, '$1.$2')
-      .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
-      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-
+    const masked = maskCpf(input.value);
     this.form.get('document')?.setValue(masked, { emitEvent: false });
   }
 
@@ -723,7 +719,6 @@ export class OnboardingComponent implements OnInit {
 
   private normalizePayload() {
     const raw = this.form.value;
-    const docDigits = (raw.document as string).replace(/\D/g, '').slice(0, 11);
     const phoneDigits = (raw.phone as string).replace(/\D/g, '').slice(0, 11);
     const formattedPhone =
       phoneDigits.length === 11
@@ -733,7 +728,6 @@ export class OnboardingComponent implements OnInit {
 
     return {
       fullName: (raw.fullName as string).trim(),
-      document: docDigits,
       phone: formattedPhone,
       birthDate: birthDateIso,
       avatarUrl: '',
@@ -792,32 +786,6 @@ export class OnboardingComponent implements OnInit {
         }
       });
     }
-  }
-
-  private cpfValidator(): ValidatorFn {
-    return (control: AbstractControl) => {
-      const digits = (control.value || '').toString().replace(/\D/g, '');
-      if (!digits) return null;
-      if (digits.length !== 11) return { cpf: true };
-      if (/^(\d)\1{10}$/.test(digits)) return { cpf: true };
-
-      const firstVerifier = this.calculateCpfVerifier(digits.slice(0, 9), 10);
-      const secondVerifier = this.calculateCpfVerifier(digits.slice(0, 10), 11);
-
-      const isValid =
-        Number(digits[9]) === firstVerifier &&
-        Number(digits[10]) === secondVerifier;
-
-      return isValid ? null : { cpf: true };
-    };
-  }
-
-  private calculateCpfVerifier(base: string, startWeight: number): number {
-    const sum = base
-      .split('')
-      .reduce((acc, digit, index) => acc + Number(digit) * (startWeight - index), 0);
-    const remainder = sum % 11;
-    return remainder < 2 ? 0 : 11 - remainder;
   }
 
   private phoneValidator(): ValidatorFn {
@@ -917,6 +885,12 @@ export class OnboardingComponent implements OnInit {
           this.carryOverDay = savedCarryOver;
         } else if (!this.canEditCarryOverDay) {
           this.carryOverDay = 1;
+        }
+
+        this.hasDocument = !!data.document;
+        if (this.hasDocument) {
+          this.form.get('document')?.clearValidators();
+          this.form.get('document')?.updateValueAndValidity();
         }
 
         if (!prefillForm) return;

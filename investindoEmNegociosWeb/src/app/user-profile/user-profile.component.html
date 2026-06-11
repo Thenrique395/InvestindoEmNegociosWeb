@@ -34,8 +34,8 @@
       <input type="email" [(ngModel)]="email" placeholder="email@exemplo.com" />
     </label>
     <label>
-      Documento
-      <input type="text" [(ngModel)]="documento" placeholder="CPF/CNPJ" />
+      CPF
+      <input type="text" [ngModel]="documento" [readonly]="true" placeholder="CPF" />
     </label>
     <label>
       Avatar (URL)

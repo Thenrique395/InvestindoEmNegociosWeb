@@ -87,7 +87,6 @@ export class UserProfileComponent implements OnInit {
   salvarPerfil(): void {
     const payload: Partial<UserProfile> = {
       fullName: this.nome,
-      document: this.documento,
       phone: this.telefone,
       birthDate: this.dataNascimento || null,
       avatarUrl: this.avatarUrl,

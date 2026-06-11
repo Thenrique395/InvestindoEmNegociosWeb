@@ -330,13 +330,20 @@
                   <small class="onboarding-field__error">{{ err }}</small>
                 }
               </label>
-              <label class="onboarding-field">
-                <span>CPF</span>
-                <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
-                @if (getControlError('document'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
+              @if (hasDocument) {
+                <label class="onboarding-field">
+                  <span>CPF</span>
+                  <input type="text" formControlName="document" [readonly]="true" />
+                </label>
+              } @else {
+                <label class="onboarding-field">
+                  <span>CPF</span>
+                  <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
+                  @if (getControlError('document'); as err) {
+                    <small class="onboarding-field__error">{{ err }}</small>
+                  }
+                </label>
+              }
               <label class="onboarding-field">
                 <span>Telefone</span>
                 <input type="tel" formControlName="phone" placeholder="(81) 91234-1234" (input)="onPhoneInput($event)" />

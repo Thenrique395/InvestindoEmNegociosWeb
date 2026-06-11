@@ -78,6 +78,29 @@
           </label>
 
           <label class="signup-form__field">
+            <span>CPF</span>
+            <input
+              class="signup-form__input"
+              [class.signup-form__input--invalid]="hasControlError('cpf')"
+              [attr.aria-invalid]="hasControlError('cpf')"
+              type="text"
+              inputmode="numeric"
+              formControlName="cpf"
+              (input)="onCpfInput($event)"
+              placeholder="000.000.000-00"
+              autocomplete="off" />
+            @if (hasError('cpf', 'required')) {
+              <small class="signup-form__error">Informe seu CPF.</small>
+            }
+            @if (hasError('cpf', 'cpf')) {
+              <small class="signup-form__error">CPF inválido.</small>
+            }
+            @if (hasError('cpf', 'documentInUse')) {
+              <small class="signup-form__error">CPF já está em uso.</small>
+            }
+          </label>
+
+          <label class="signup-form__field">
             <span>Senha</span>
             <div class="signup-form__input-shell" [class.signup-form__input-shell--invalid]="hasControlError('senha')">
               <input

@@ -4,7 +4,6 @@ import {
   createExpenseDraft,
   createIncomeDraft,
   isoToBr,
-  maskCpf,
   maskPhone,
   toStoredCard
 } from './onboarding.helpers';
@@ -38,9 +37,7 @@ describe('onboarding helpers', () => {
     });
   });
 
-  it('mascara cpf e telefone', () => {
-    expect(maskCpf('01587610493')).toBe('015.876.104-93');
-    expect(maskCpf('01587610493000')).toBe('015.876.104-93');
+  it('mascara telefone', () => {
     expect(maskPhone('81995257823')).toBe('(81) 99525-7823');
     expect(maskPhone('81')).toBe('(81');
   });

@@ -18,6 +18,12 @@ export interface RegisterPayload {
   nome: string;
   email: string;
   senha: string;
+  cpf: string;
+}
+
+export interface CheckAvailabilityResponse {
+  emailExists: boolean;
+  documentExists: boolean;
 }
 
 type ProblemDetailsLike = {
@@ -72,11 +78,22 @@ export class AuthService {
     const body = {
       name: payload.nome.trim(),
       email: payload.email.trim().toLowerCase(),
-      password: payload.senha
+      password: payload.senha,
+      document: (payload.cpf || '').replace(/\D/g, '')
     };
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/register`, body)
       .pipe(catchError((err) => this.wrapError(err, 'Erro ao criar conta.')));
+  }
+
+  checkAvailability(email?: string, cpf?: string) {
+    const body = {
+      email: email ? email.trim().toLowerCase() : null,
+      document: cpf ? cpf.replace(/\D/g, '') : null
+    };
+    return this.http
+      .post<CheckAvailabilityResponse>(`${this.baseUrl}/check-availability`, body)
+      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível verificar a disponibilidade.', false, false)));
   }
 
   forgotPassword(email: string) {
@@ -244,6 +261,9 @@ export class AuthService {
     if (status === 401 && mapUnauthorizedToLogin) {
       message = 'E-mail ou senha inválidos.';
       code = 'unauthorized';
+    } else if (typeof detail === 'string' && detail.includes('CPF já está em uso')) {
+      code = 'documentInUse';
+      message = 'CPF já está em uso.';
     } else if (status === 409 || (typeof detail === 'string' && detail.includes('E-mail já está em uso'))) {
       code = 'emailInUse';
       message = 'E-mail já está em uso.';

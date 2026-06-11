@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validator
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, RegisterPayload } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { cpfValidator, maskCpf } from '../utils/cpf.utils';
 
 @Component({
   selector: 'app-signup',
@@ -31,6 +32,7 @@ export class SignupComponent {
       {
         nome: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
+        cpf: ['', [Validators.required, cpfValidator()]],
         senha: ['', [Validators.required, Validators.minLength(6)]],
         confirmarSenha: ['', [Validators.required]],
         aceitarTermos: [false, Validators.requiredTrue]
@@ -68,13 +70,22 @@ export class SignupComponent {
       error: (err: unknown) => {
         // eslint-disable-next-line no-console
         console.error('Signup error', err);
-        if (err && typeof err === 'object' && 'code' in err && (err as { code?: string }).code === 'emailInUse') {
+        const code = err && typeof err === 'object' && 'code' in err ? (err as { code?: string }).code : undefined;
+        if (code === 'emailInUse') {
           this.form.get('email')?.setErrors({ emailInUse: true });
+        }
+        if (code === 'documentInUse') {
+          this.form.get('cpf')?.setErrors({ documentInUse: true });
         }
         this.uiFeedback.error(this.getSignupErrorMessage(err));
         this.loading = false;
       }
     });
+  }
+
+  onCpfInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.form.get('cpf')?.setValue(maskCpf(input.value), { emitEvent: false });
   }
 
   togglePasswordVisibility(): void {
@@ -85,12 +96,12 @@ export class SignupComponent {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  hasControlError(control: 'nome' | 'email' | 'senha' | 'confirmarSenha' | 'aceitarTermos'): boolean {
+  hasControlError(control: 'nome' | 'email' | 'cpf' | 'senha' | 'confirmarSenha' | 'aceitarTermos'): boolean {
     const ctrl = this.form.get(control);
     return !!ctrl && ctrl.touched && ctrl.invalid;
   }
 
-  hasError(control: 'nome' | 'email' | 'senha' | 'confirmarSenha' | 'aceitarTermos', type: string): boolean {
+  hasError(control: 'nome' | 'email' | 'cpf' | 'senha' | 'confirmarSenha' | 'aceitarTermos', type: string): boolean {
     const ctrl = this.form.get(control);
     return !!ctrl && ctrl.touched && ctrl.hasError(type);
   }
@@ -116,6 +127,10 @@ export class SignupComponent {
 
     if (error?.code === 'emailInUse') {
       return 'Este e-mail já está em uso. Use outro e-mail ou entre na sua conta.';
+    }
+
+    if (error?.code === 'documentInUse') {
+      return 'Este CPF já está em uso. Verifique os dados ou entre na sua conta.';
     }
 
     if (error?.status && error.status >= 500) {

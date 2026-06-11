@@ -1,23 +1,57 @@
 <section class="checkout-page">
-  <section class="checkout-hero">
+  <header class="checkout-header">
     <div>
       <p class="eyebrow">Checkout</p>
-      <h1>Confirme o plano, continue sua compra e ative a assinatura</h1>
-      <p class="lead">
-        O checkout agora mantém a escolha do plano e deixa claro o próximo passo: entrar, confirmar e ativar o acesso
-        certo para o seu momento financeiro.
-      </p>
+      <h1>Finalize sua assinatura</h1>
     </div>
-    <a class="link-back" routerLink="/planos">Voltar para planos</a>
-  </section>
+    <a class="link-back" routerLink="/planos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Voltar para planos
+    </a>
+  </header>
+
+  <nav class="checkout-stepper" aria-label="Etapas da contratação">
+    <div class="checkout-stepper__step is-complete">
+      <span class="checkout-stepper__circle" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </span>
+      <span class="checkout-stepper__label">Plano</span>
+    </div>
+    <span class="checkout-stepper__line is-complete"></span>
+    <div class="checkout-stepper__step" [class.is-complete]="isLogged" [class.is-active]="!isLogged">
+      <span class="checkout-stepper__circle" aria-hidden="true">
+        @if (isLogged) {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        } @else {
+          2
+        }
+      </span>
+      <span class="checkout-stepper__label">Sua conta</span>
+    </div>
+    <span class="checkout-stepper__line" [class.is-complete]="isLogged"></span>
+    <div class="checkout-stepper__step" [class.is-active]="isLogged">
+      <span class="checkout-stepper__circle" aria-hidden="true">3</span>
+      <span class="checkout-stepper__label">{{ selectedPlan.code === 'basic' ? 'Ativação' : 'Pagamento' }}</span>
+    </div>
+  </nav>
 
   <section class="checkout-grid">
     <article class="checkout-card">
       <div class="checkout-card__section">
         <div class="section-head">
-          <div>
-            <p class="eyebrow">1. Escolha final</p>
-            <h2>Revise ou troque o plano</h2>
+          <div class="checkout-card__heading">
+            <span class="checkout-step checkout-step--primary">1</span>
+            <div>
+              <p class="eyebrow">Plano</p>
+              <h2>Escolha o plano ideal</h2>
+            </div>
           </div>
           <div class="billing-switch" role="group" aria-label="Periodicidade">
             <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Monthly'" (click)="selectCycle('Monthly')">
@@ -36,11 +70,46 @@
               class="plan-option"
               [class.is-active]="plan.code === selectedPlan.code"
               (click)="selectPlan(plan.code)">
-              <div>
-                <strong>{{ plan.name }}</strong>
-                <span>{{ plan.description }}</span>
+              <div class="plan-option__top">
+                <div [class]="'plan-option__icon ' + planIconVariants[plan.code]" aria-hidden="true">
+                  @switch (plan.code) {
+                    @case ('basic') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m7.5 4.27 9 5.15"/>
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                        <path d="m3.3 7 8.7 5 8.7-5"/>
+                        <path d="M12 22V12"/>
+                      </svg>
+                    }
+                    @case ('intermediate') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="21" x2="4" y2="14"/>
+                        <line x1="4" y1="10" x2="4" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12" y2="3"/>
+                        <line x1="20" y1="21" x2="20" y2="16"/>
+                        <line x1="20" y1="12" x2="20" y2="3"/>
+                        <line x1="1" y1="14" x2="7" y2="14"/>
+                        <line x1="9" y1="8" x2="15" y2="8"/>
+                        <line x1="17" y1="16" x2="23" y2="16"/>
+                      </svg>
+                    }
+                    @case ('advanced') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                        <polyline points="16 7 22 7 22 13"/>
+                      </svg>
+                    }
+                  }
+                </div>
+                <span class="plan-option__radio" aria-hidden="true"></span>
               </div>
-              <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
+              <strong class="plan-option__name">{{ plan.name }}</strong>
+              <p class="plan-option__desc">{{ plan.description }}</p>
+              <div class="plan-option__price">
+                <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
+                <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+              </div>
             </button>
           }
         </div>
@@ -48,35 +117,241 @@
 
       @if (!isLogged) {
         <div class="checkout-card__section">
-          <p class="eyebrow">2. Identificação</p>
-          <h2>Crie sua conta para continuar</h2>
+          <div class="checkout-card__heading">
+            <span class="checkout-step checkout-step--info">2</span>
+            <div>
+              <p class="eyebrow">Dados pessoais</p>
+              <h2>Informe seus dados</h2>
+            </div>
+          </div>
           <p class="muted">
-            A seleção do plano já fica salva. Depois do login, você volta para este checkout e conclui a ativação.
+            A seleção do plano já fica salva. Se você já tiver conta, identificamos automaticamente e basta entrar
+            para continuar.
           </p>
-          <app-signup (signedUp)="handleSignedUp()"></app-signup>
+
+          <form class="account-form" [formGroup]="accountForm" (ngSubmit)="onAccountStepSubmit()" novalidate>
+            <label class="account-form__field">
+              <span>Nome completo</span>
+              <input
+                class="account-form__input"
+                [class.account-form__input--invalid]="hasAccountError('nome')"
+                [attr.aria-invalid]="hasAccountError('nome')"
+                type="text"
+                formControlName="nome"
+                placeholder="Digite seu nome completo"
+                autocomplete="name" />
+              @if (hasAccountFieldError('nome', 'required')) {
+                <small class="account-form__error">Informe seu nome.</small>
+              }
+              @if (hasAccountFieldError('nome', 'minlength')) {
+                <small class="account-form__error">Use ao menos 2 caracteres.</small>
+              }
+            </label>
+
+            <label class="account-form__field">
+              <span>E-mail</span>
+              <input
+                class="account-form__input"
+                [class.account-form__input--invalid]="hasAccountError('email')"
+                [attr.aria-invalid]="hasAccountError('email')"
+                type="email"
+                formControlName="email"
+                (input)="resetAccountCheck()"
+                placeholder="Digite seu e-mail"
+                autocomplete="email" />
+              @if (hasAccountFieldError('email', 'required')) {
+                <small class="account-form__error">Informe um e-mail.</small>
+              }
+              @if (hasAccountFieldError('email', 'email')) {
+                <small class="account-form__error">Digite um e-mail válido.</small>
+              }
+              @if (hasAccountFieldError('email', 'emailInUse')) {
+                <small class="account-form__error">E-mail já está em uso.</small>
+              }
+            </label>
+
+            <label class="account-form__field">
+              <span>CPF</span>
+              <input
+                class="account-form__input"
+                [class.account-form__input--invalid]="hasAccountError('cpf')"
+                [attr.aria-invalid]="hasAccountError('cpf')"
+                type="text"
+                inputmode="numeric"
+                formControlName="cpf"
+                (input)="onAccountCpfInput($event)"
+                placeholder="000.000.000-00"
+                autocomplete="off" />
+              @if (hasAccountFieldError('cpf', 'required')) {
+                <small class="account-form__error">Informe seu CPF.</small>
+              }
+              @if (hasAccountFieldError('cpf', 'cpf')) {
+                <small class="account-form__error">CPF inválido.</small>
+              }
+              @if (hasAccountFieldError('cpf', 'documentInUse')) {
+                <small class="account-form__error">CPF já está em uso.</small>
+              }
+            </label>
+
+            @if (accountExists) {
+              <div class="account-exists-notice">
+                <p>Já encontramos uma conta com esses dados. Entre para continuar direto para o pagamento.</p>
+                <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
+              </div>
+            }
+
+            @if (showRegistrationFields) {
+              <label class="account-form__field">
+                <span>Senha</span>
+                <div class="account-form__input-shell" [class.account-form__input-shell--invalid]="hasAccountError('senha')">
+                  <input
+                    class="account-form__input"
+                    [attr.aria-invalid]="hasAccountError('senha')"
+                    [type]="showPassword ? 'text' : 'password'"
+                    formControlName="senha"
+                    placeholder="Digite sua senha"
+                    autocomplete="new-password" />
+                  <button
+                    class="account-form__toggle"
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                    [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                    {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+                  </button>
+                </div>
+                @if (hasAccountFieldError('senha', 'required')) {
+                  <small class="account-form__error">Informe uma senha.</small>
+                }
+                @if (hasAccountFieldError('senha', 'minlength')) {
+                  <small class="account-form__error">Use ao menos 6 caracteres.</small>
+                }
+              </label>
+
+              <label class="account-form__field">
+                <span>Confirmar senha</span>
+                <div
+                  class="account-form__input-shell"
+                  [class.account-form__input-shell--invalid]="hasAccountError('confirmarSenha') || hasAccountPasswordMismatch()">
+                  <input
+                    class="account-form__input"
+                    [attr.aria-invalid]="hasAccountError('confirmarSenha') || hasAccountPasswordMismatch()"
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    formControlName="confirmarSenha"
+                    placeholder="Confirme sua senha"
+                    autocomplete="new-password" />
+                  <button
+                    class="account-form__toggle"
+                    type="button"
+                    (click)="toggleConfirmPasswordVisibility()"
+                    [attr.aria-label]="showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'">
+                    {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
+                  </button>
+                </div>
+                @if (hasAccountFieldError('confirmarSenha', 'required')) {
+                  <small class="account-form__error">Confirme sua senha.</small>
+                }
+                @if (hasAccountPasswordMismatch()) {
+                  <small class="account-form__error">As senhas precisam ser iguais.</small>
+                }
+              </label>
+
+              <label class="account-form__terms" [class.account-form__terms--invalid]="hasAccountError('aceitarTermos')">
+                <input type="checkbox" formControlName="aceitarTermos" />
+                <span>Li e aceito os termos de uso e a política de privacidade.</span>
+              </label>
+              @if (hasAccountFieldError('aceitarTermos', 'required')) {
+                <small class="account-form__error">Aceite os termos para continuar.</small>
+              }
+            }
+
+            <button class="account-form__submit" type="submit" [disabled]="processing || checkingAvailability">
+              @if (showRegistrationFields) {
+                {{ processing ? 'Criando conta...' : 'Criar conta e continuar' }}
+              } @else {
+                {{ checkingAvailability ? 'Verificando...' : 'Continuar' }}
+              }
+            </button>
+          </form>
+
           <div class="checkout-card__footer">
             <span>Já possui cadastro?</span>
             <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
+          </div>
+        </div>
+      } @else {
+        <div class="checkout-card__section">
+          <div class="checkout-card__heading">
+            <span class="checkout-step checkout-step--success">2</span>
+            <div>
+              <p class="eyebrow">Sua conta</p>
+              <h2>Conta confirmada</h2>
+            </div>
+          </div>
+          <div class="account-summary">
+            <div class="account-summary__avatar" aria-hidden="true">{{ userInitial }}</div>
+            <div class="account-summary__info">
+              <strong>{{ userName }}</strong>
+              <span>{{ userEmail }}</span>
+            </div>
+            @if (currentPlan) {
+              <span class="account-summary__badge">Plano atual: {{ currentPlan.name }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (isLogged && selectedPlan.code !== 'basic') {
+        <div class="checkout-card__section">
+          <div class="checkout-card__heading">
+            <span class="checkout-step checkout-step--info">3</span>
+            <div>
+              <p class="eyebrow">Forma de pagamento</p>
+              <h2>Pagamento com cartão de crédito</h2>
+            </div>
+          </div>
+          <div class="payment-method">
+            <div class="payment-method__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <strong>Cartão de crédito</strong>
+              <span>Os dados do cartão são informados na próxima etapa, em ambiente seguro processado pela Stripe.</span>
+            </div>
           </div>
         </div>
       }
 
       @if (isLogged) {
         <div class="checkout-card__section">
-          <p class="eyebrow">2. Confirmação</p>
-          <h2>{{ selectedPlan.code === 'basic' ? 'Ative o plano gratuito' : 'Finalize a contratação' }}</h2>
+          <div class="checkout-card__heading">
+            <span class="checkout-step checkout-step--success">{{ confirmationStepNumber }}</span>
+            <div>
+              <p class="eyebrow">Confirmação</p>
+              <h2>{{ selectedPlan.code === 'basic' ? 'Ative o plano gratuito' : 'Confirme e finalize o pagamento' }}</h2>
+            </div>
+          </div>
           <p class="muted">
             {{ selectedPlan.code === 'basic'
             ? 'Seu acesso é ativado imediatamente ao confirmar.'
-            : 'Neste ambiente, a contratação é concluída pelo fluxo interno de assinatura já conectado ao backend.' }}
+            : 'Confirme abaixo para ir ao ambiente seguro de pagamento e concluir sua assinatura.' }}
           </p>
+
           <div class="activation-panel">
             <div>
               <strong>Plano selecionado</strong>
               <span>{{ selectedPlan.name }} • {{ selectedCycle === 'Yearly' ? 'cobrança anual' : 'cobrança mensal' }}</span>
             </div>
-            <button type="button" class="btn-primary" [disabled]="processing" (click)="activatePlan()">
-              {{ processing ? 'Processando...' : (selectedPlan.code === 'basic' ? 'Ativar plano' : 'Confirmar e ativar assinatura') }}
+            <button type="button" class="btn-primary activation-panel__cta" [disabled]="processing" (click)="activatePlan()">
+              {{ processing ? 'Processando...' : (selectedPlan.code === 'basic' ? 'Ativar plano' : 'Ir para pagamento') }}
+              @if (!processing) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              }
             </button>
           </div>
         </div>
@@ -84,52 +359,47 @@
     </article>
 
     <aside class="summary-card">
-      <p class="summary-card__kicker">Resumo da contratação</p>
-      <h2>{{ selectedPlan.name }}</h2>
-      <p class="summary-card__audience">{{ selectedPlan.audience }}</p>
-
-      <div class="summary-price">
-        <strong>{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
-        <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+      <div class="summary-card__head">
+        <p class="summary-card__kicker">Resumo da contratação</p>
+        <h2>{{ selectedPlan.name }}</h2>
+        <p class="summary-card__audience">{{ selectedPlan.audience }}</p>
       </div>
 
-      <p class="summary-highlight">{{ selectedPlan.highlight }}</p>
+      <div class="summary-price-box">
+        <div class="summary-price">
+          <strong>{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+        </div>
+        <p class="summary-highlight">{{ selectedPlan.highlight }}</p>
+      </div>
 
       <div class="summary-section">
-        <h3>Você leva agora</h3>
-        <ul>
+        <h3>O que está incluído</h3>
+        <ul class="summary-features">
           @for (feature of selectedPlan.features; track feature) {
-            <li>{{ feature }}</li>
+            <li>
+              <span class="price-card__check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              {{ feature }}
+            </li>
           }
-        </ul>
-      </div>
-
-      <div class="summary-section summary-section--steps">
-        <h3>Próximos passos</h3>
-        <ol>
-          <li>Escolher plano e periodicidade</li>
-          <li>{{ isLogged ? 'Confirmar a contratação agora' : 'Criar conta ou entrar para continuar' }}</li>
-          <li>Ativar a assinatura no fluxo interno</li>
-          <li>Começar onboarding e configuração financeira</li>
-        </ol>
-      </div>
-
-      <div class="summary-section">
-        <h3>Termos comerciais</h3>
-        <ul>
-          <li>Cobrança recorrente em {{ selectedCycle === 'Yearly' ? 'base anual' : 'base mensal' }}</li>
-          <li>Renovação automática até cancelamento</li>
-          <li>Falhas de pagamento podem suspender renovação e exigir nova ação</li>
-          <li>Cancelamento e atualização de método de pagamento ficam disponíveis na área de assinatura</li>
         </ul>
       </div>
 
       @if (selectedPlan.code !== 'basic') {
         <div class="summary-note">
-          O checkout comercial já direciona a contratação até a ativação da assinatura. Se você ainda não estiver logado,
-          sua escolha permanece salva até voltar para concluir.
+          Se você ainda não estiver logado, sua escolha de plano permanece salva até voltar para concluir a contratação.
         </div>
       }
+
+      <p class="summary-terms">
+        Cobrança recorrente em {{ selectedCycle === 'Yearly' ? 'base anual' : 'base mensal' }}, com renovação automática
+        até cancelamento. Falhas de pagamento podem suspender a renovação. Cancelamento e atualização do método de
+        pagamento ficam disponíveis na área de assinatura.
+      </p>
     </aside>
   </section>
 </section>
