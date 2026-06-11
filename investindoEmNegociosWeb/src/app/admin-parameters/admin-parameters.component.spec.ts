@@ -1,5 +1,6 @@
 import { of, throwError } from 'rxjs';
 import { AdminParametersComponent } from './admin-parameters.component';
+import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 
 describe('AdminParametersComponent', () => {
   function createComponent(overrides?: { adminParameters?: any; uiFeedback?: any }) {
@@ -186,9 +187,7 @@ describe('AdminParametersComponent', () => {
   });
 
   it('deve formatar erro de conexão', () => {
-    const { component } = createComponent();
-
-    expect((component as any).resolveErrorMessage({ status: 0 }, 'fallback')).toBe('Falha de conexão com o servidor.');
+    expect(resolveApiErrorMessage({ status: 0 }, 'fallback')).toBe('Falha de conexão com o servidor.');
   });
 
   it('deve reverter toggle de forma de pagamento quando a API falhar', () => {

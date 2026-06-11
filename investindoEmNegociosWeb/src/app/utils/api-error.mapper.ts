@@ -1,3 +1,10 @@
+export function resolveApiErrorMessage(err: any, fallback: string): string {
+  if (err?.status === 0) return 'Falha de conexão com o servidor.';
+  const detail = err?.error?.detail || err?.error?.title || err?.error?.message || err?.message;
+  const status = err?.status ? ` (HTTP ${err.status})` : '';
+  return detail ? `${detail}${status}` : `${fallback}${status}`;
+}
+
 export function mapApiErrors<T extends string>(
   error: any,
   mapping: Record<string, T>

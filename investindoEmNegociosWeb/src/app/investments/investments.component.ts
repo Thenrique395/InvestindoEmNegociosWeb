@@ -13,6 +13,7 @@ import {
 import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
 import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
+import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
@@ -1026,7 +1027,7 @@ export class InvestmentsComponent implements OnInit {
         this.showAlocacaoConfig = false;
         this.uiFeedback.success('Alocação alvo salva.');
       },
-      error: (err) => this.uiFeedback.error(this.resolveHttpError(err, 'Falha ao salvar alocação alvo.'))
+      error: (err) => this.uiFeedback.error(resolveApiErrorMessage(err, 'Falha ao salvar alocação alvo.'))
     });
   }
 
@@ -1182,7 +1183,7 @@ export class InvestmentsComponent implements OnInit {
       this.closeCadastroModal();
       this.carregarPosicoes();
     } catch (err: any) {
-      this.uiFeedback.error(this.resolveHttpError(err, 'Falha ao registrar venda.'));
+      this.uiFeedback.error(resolveApiErrorMessage(err, 'Falha ao registrar venda.'));
     }
   }
 
@@ -1492,12 +1493,6 @@ export class InvestmentsComponent implements OnInit {
       .replace(/[\u0300-\u036f]/g, '')
       .trim()
       .toLowerCase();
-  }
-
-  private resolveHttpError(err: any, fallback: string): string {
-    const status = err?.status ? ` (${err.status})` : '';
-    const detail = err?.error?.detail || err?.error?.title || err?.error?.message || err?.message;
-    return detail ? `${detail}${status}` : fallback;
   }
 
   private scrollToSection(id: string): void {

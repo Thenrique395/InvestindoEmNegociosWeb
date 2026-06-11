@@ -5,6 +5,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin, RobotSettings, ScalabilityRuntime } from '../admin-parameters.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 
 @Component({
   selector: 'app-admin-parameters',
@@ -177,7 +178,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Bandeira cadastrada com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao cadastrar a bandeira.'));
+        this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao cadastrar a bandeira.'));
       },
       complete: () => {
         this.savingCreateBrand = false;
@@ -232,7 +233,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Forma de pagamento cadastrada com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao cadastrar a forma de pagamento.'));
+        this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao cadastrar a forma de pagamento.'));
       },
       complete: () => {
         this.savingCreateMethod = false;
@@ -257,7 +258,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Instituição cadastrada com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao cadastrar a instituição.'));
+        this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao cadastrar a instituição.'));
       },
       complete: () => {
         this.savingCreateInstitution = false;
@@ -275,7 +276,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Notificações globais atualizadas com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao salvar notificações.'));
+        this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao salvar notificações.'));
       },
       complete: () => {
         this.savingNotificationSettings = false;
@@ -298,7 +299,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Agendamento dos robôs atualizado com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao salvar agendamento dos robôs.'));
+        this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao salvar agendamento dos robôs.'));
       },
       complete: () => {
         this.savingRobotSettings = false;
@@ -322,7 +323,7 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success(`E-mail de teste enviado para ${result.to}.`);
       },
       error: (err) => {
-        this.uiFeedback.error(this.resolveErrorMessage(err, 'Erro ao enviar e-mail de teste.'));
+        this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao enviar e-mail de teste.'));
       },
       complete: () => {
         this.sendingTestEmail = false;
@@ -493,13 +494,6 @@ export class AdminParametersComponent implements OnInit {
     });
   }
 
-  private resolveErrorMessage(err: any, fallback: string): string {
-    const detail = err?.error?.detail || err?.error?.title;
-    if (detail) return detail;
-    if (err?.status === 0) return 'Falha de conexão com o servidor.';
-    if (err?.status) return `${fallback} (HTTP ${err.status}).`;
-    return fallback;
-  }
   trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
