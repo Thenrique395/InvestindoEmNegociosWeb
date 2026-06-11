@@ -8,6 +8,21 @@ import { Router, RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
+import {
+  buildConicGradient,
+  calculateInsightHealthScore,
+  dateKey,
+  estimateRiskDayFromCurrentData,
+  formatCurrency,
+  formatDelta,
+  getFinancialGoalLabel,
+  hasCriticalOverdueExpenseContext,
+  isExpenseOpen,
+  isIncomePending,
+  isIncomeReceived,
+  rangeEndDate,
+  resolveInsightShortGoal
+} from './utils/home-insight.utils';
 import { AccountsService, AccountResponse, CashflowProjectionResponse, DebtSummaryResponse, InsightEngineItemResponse, InsightEngineResponse, NetWorthHistoryResponse, NetWorthSummaryResponse, RealAvailableBalanceResponse, RecommendationEngineResponse, RiskBotAssessmentResponse } from './accounts.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
@@ -420,7 +435,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const highlights = [
       `Cobertura atual: ${(payload?.currentCoverage ?? this.insightDiagnostics.currentCoverage).toFixed(0)}%`,
       `Cobertura projetada: ${(payload?.projectedCoverage ?? this.insightDiagnostics.projectedCoverage).toFixed(0)}%`,
-      `Saldo projetado: ${this.formatCurrency(payload?.projectedBalance ?? this.insightDiagnostics.projectedBalance)}`
+      `Saldo projetado: ${formatCurrency(payload?.projectedBalance ?? this.insightDiagnostics.projectedBalance)}`
     ];
     const firstRecommendation = payload?.recommendations?.[0];
     const action =
@@ -515,7 +530,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.insightPriority =
       primary.priority === 'critical' ? 'Crítico' : primary.priority === 'warning' ? 'Atenção' : 'Estável';
     this.insightActionSentence = primary.action;
-    this.insightShortGoal = this.resolveInsightShortGoal(primary);
+    this.insightShortGoal = resolveInsightShortGoal(primary);
     this.insightHighlights = primary.highlights || [];
     this.insightAction = this.resolveInsightAction(primary);
     this.insightTodoItems = this.resolveRecommendationTodoItems(primary.recommendations || []);
@@ -989,7 +1004,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     range: { startKey: string; endKey: string } = this.getPeriodRange()
   ): number {
     return lista
-      .filter((r) => this.isDateInRange(r.recebimento, range) && this.isIncomeReceived(r.status))
+      .filter((r) => this.isDateInRange(r.recebimento, range) && isIncomeReceived(r.status))
       .reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 
@@ -998,26 +1013,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     range: { startKey: string; endKey: string } = this.getPeriodRange()
   ): number {
     return lista
-      .filter((r) => this.isDateInRange(r.recebimento, range) && this.isIncomePending(r.status))
+      .filter((r) => this.isDateInRange(r.recebimento, range) && isIncomePending(r.status))
       .reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 
   private calcularSaldoAnterior(range: { startKey: string; endKey: string }): number {
     const receitasRecebidasAntes = this.incomesRaw
-      .filter((r) => this.isBeforeRange(r.recebimento, range) && this.isIncomeReceived(r.status))
+      .filter((r) => this.isBeforeRange(r.recebimento, range) && isIncomeReceived(r.status))
       .reduce((sum, r) => sum + (r.valor || 0), 0);
     const despesasAntes = this.expensesRaw
       .filter((d) => this.isBeforeRange(d.vencimento, range))
       .reduce((sum, d) => sum + (d.valor || 0), 0);
     return receitasRecebidasAntes - despesasAntes;
-  }
-
-  private isIncomeReceived(status?: string): boolean {
-    return status === 'PAID' || status === 'PARTIALLY_PAID' || status === 'ANTICIPATED';
-  }
-
-  private isIncomePending(status?: string): boolean {
-    return !status || status === 'OPEN';
   }
 
   private isBeforeRange(date: string, range: { startKey: string; endKey: string }): boolean {
@@ -1060,46 +1067,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       percent: this.expenseCategoryTotal > 0 ? (item.total / this.expenseCategoryTotal) * 100 : 0,
       color: this.expenseCategoryColors[index % this.expenseCategoryColors.length]
     }));
-    this.expenseCategoryChartBackground = this.buildCategoryChartBackground();
+    this.expenseCategoryChartBackground = buildConicGradient(this.expenseCategorySlices);
     this.incomeSourceTotal = incomeData.reduce((sum, item) => sum + item.total, 0);
     this.incomeSourceSlices = incomeData.map((item, index) => ({
       ...item,
       percent: this.incomeSourceTotal > 0 ? (item.total / this.incomeSourceTotal) * 100 : 0,
       color: this.incomeSourceColors[index % this.incomeSourceColors.length]
     }));
-    this.incomeSourceChartBackground = this.buildIncomeChartBackground();
-  }
-
-  private buildCategoryChartBackground(): string {
-    if (!this.expenseCategorySlices.length || this.expenseCategoryTotal <= 0) {
-      return 'conic-gradient(var(--surface-3) 0deg 360deg)';
-    }
-
-    let start = 0;
-    const parts = this.expenseCategorySlices.map((item) => {
-      const end = start + (item.percent / 100) * 360;
-      const segment = `${item.color} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`;
-      start = end;
-      return segment;
-    });
-
-    return `conic-gradient(${parts.join(', ')})`;
-  }
-
-  private buildIncomeChartBackground(): string {
-    if (!this.incomeSourceSlices.length || this.incomeSourceTotal <= 0) {
-      return 'conic-gradient(var(--surface-3) 0deg 360deg)';
-    }
-
-    let start = 0;
-    const parts = this.incomeSourceSlices.map((item) => {
-      const end = start + (item.percent / 100) * 360;
-      const segment = `${item.color} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`;
-      start = end;
-      return segment;
-    });
-
-    return `conic-gradient(${parts.join(', ')})`;
+    this.incomeSourceChartBackground = buildConicGradient(this.incomeSourceSlices);
   }
 
   private updateRecentTransactions(): void {
@@ -1530,9 +1505,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     if (this.insightDiagnostics.overdueExpensesCount > 0) {
-      const overdueCritical = this.hasCriticalOverdueExpenseContext(
+      const overdueCritical = hasCriticalOverdueExpenseContext(
         this.insightDiagnostics.overdueExpensesCount,
-        this.insightDiagnostics.overdueExpensesAmount
+        this.insightDiagnostics.overdueExpensesAmount,
+        this.saldoBaseDisponivel,
+        this.saldoPrincipal
       );
       this.setInsight(
         'Despesas vencidas em aberto',
@@ -1541,10 +1518,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           : `Você tem ${this.insightDiagnostics.overdueExpensesCount} despesa(s) vencida(s), mas há saldo para quitar. Pague e dê baixa no sistema.`,
         overdueCritical ? 'danger' : 'warn',
         [
-          `Recebidas: ${this.formatCurrency(this.totalRendas)}`,
-          `Despesas: ${this.formatCurrency(this.totalDespesas)}`,
-          `Saldo principal: ${this.formatCurrency(this.saldoPrincipal)}`,
-          `Atrasado: ${this.formatCurrency(this.insightDiagnostics.overdueExpensesAmount)}`
+          `Recebidas: ${formatCurrency(this.totalRendas)}`,
+          `Despesas: ${formatCurrency(this.totalDespesas)}`,
+          `Saldo principal: ${formatCurrency(this.saldoPrincipal)}`,
+          `Atrasado: ${formatCurrency(this.insightDiagnostics.overdueExpensesAmount)}`
         ],
         { label: 'Quitar despesas vencidas', route: '/despesas' }
       );
@@ -1569,8 +1546,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'warn',
         [
           `Cobertura atual: ${this.coberturaDespesasPercentual.toFixed(0)}%`,
-          `Pendente: ${this.formatCurrency(this.totalRendasPendentes)}`,
-          `Saldo projetado: ${this.formatCurrency(this.saldoProjetadoComPendencias)}`
+          `Pendente: ${formatCurrency(this.totalRendasPendentes)}`,
+          `Saldo projetado: ${formatCurrency(this.saldoProjetadoComPendencias)}`
         ],
         { label: 'Confirmar recebimentos', route: '/receitas' }
       );
@@ -1583,9 +1560,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Marque o recebimento para o valor entrar no saldo principal e refletir no resultado do mês.',
         'info',
         [
-          `Pendente: ${this.formatCurrency(this.totalRendasPendentes)}`,
-          `Saldo atual: ${this.formatCurrency(this.saldoPrincipal)}`,
-          `Saldo projetado: ${this.formatCurrency(this.saldoProjetadoComPendencias)}`
+          `Pendente: ${formatCurrency(this.totalRendasPendentes)}`,
+          `Saldo atual: ${formatCurrency(this.saldoPrincipal)}`,
+          `Saldo projetado: ${formatCurrency(this.saldoProjetadoComPendencias)}`
         ],
         { label: 'Marcar como recebido', route: '/receitas' }
       );
@@ -1598,8 +1575,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Cadastre ou confirme uma receita recebida para atualizar o saldo principal.',
         'danger',
         [
-          `Despesas: ${this.formatCurrency(this.totalDespesas)}`,
-          `Saldo principal: ${this.formatCurrency(this.saldoPrincipal)}`
+          `Despesas: ${formatCurrency(this.totalDespesas)}`,
+          `Saldo principal: ${formatCurrency(this.saldoPrincipal)}`
         ],
         { label: 'Cadastrar receita', route: '/receitas' }
       );
@@ -1612,9 +1589,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Priorize cortar despesas variáveis ou antecipar receitas.',
         'danger',
         [
-          `Saldo atual: ${this.formatCurrency(this.saldoPrincipal)}`,
+          `Saldo atual: ${formatCurrency(this.saldoPrincipal)}`,
           `Cobertura: ${this.coberturaDespesasPercentual.toFixed(0)}%`,
-          `Pendente: ${this.formatCurrency(this.totalRendasPendentes)}`
+          `Pendente: ${formatCurrency(this.totalRendasPendentes)}`
         ],
         { label: 'Revisar despesas', route: '/despesas' }
       );
@@ -1628,8 +1605,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Mais de 85% da sua renda recebida já está comprometida neste mês.',
         'danger',
         [
-          `Recebidas: ${this.formatCurrency(this.totalRendas)}`,
-          `Despesas: ${this.formatCurrency(this.totalDespesas)}`,
+          `Recebidas: ${formatCurrency(this.totalRendas)}`,
+          `Despesas: ${formatCurrency(this.totalDespesas)}`,
           `Comprometido: ${(taxaGasto * 100).toFixed(0)}%`
         ],
         { label: 'Ajustar gastos do mês', route: '/despesas' }
@@ -1643,8 +1620,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Mais de 70% da sua renda recebida já foi usada.',
         'warn',
         [
-          `Recebidas: ${this.formatCurrency(this.totalRendas)}`,
-          `Despesas: ${this.formatCurrency(this.totalDespesas)}`,
+          `Recebidas: ${formatCurrency(this.totalRendas)}`,
+          `Despesas: ${formatCurrency(this.totalDespesas)}`,
           `Comprometido: ${(taxaGasto * 100).toFixed(0)}%`
         ],
         { label: 'Rever categorias de despesa', route: '/despesas' }
@@ -1658,8 +1635,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'O total em cartões passou de 30% da sua renda recebida no mês.',
         'warn',
         [
-          `Dívida cartões: ${this.formatCurrency(this.totalDividaCartoes)}`,
-          `Recebidas: ${this.formatCurrency(this.totalRendas)}`
+          `Dívida cartões: ${formatCurrency(this.totalDividaCartoes)}`,
+          `Recebidas: ${formatCurrency(this.totalRendas)}`
         ],
         { label: 'Analisar cartões', route: '/cartoes' }
       );
@@ -1675,8 +1652,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Seus gastos aumentaram mais de 20% em relação ao mês anterior.',
         'warn',
         [
-          `Mês atual: ${this.formatCurrency(atual)}`,
-          `Mês anterior: ${this.formatCurrency(anterior)}`
+          `Mês atual: ${formatCurrency(atual)}`,
+          `Mês anterior: ${formatCurrency(anterior)}`
         ],
         { label: 'Comparar despesas', route: '/despesas' }
       );
@@ -1689,8 +1666,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         'Com saldo positivo, você pode planejar um objetivo maior.',
         'info',
         [
-          `Saldo principal: ${this.formatCurrency(this.saldoPrincipal)}`,
-          `Pendente: ${this.formatCurrency(this.totalRendasPendentes)}`
+          `Saldo principal: ${formatCurrency(this.saldoPrincipal)}`,
+          `Pendente: ${formatCurrency(this.totalRendasPendentes)}`
         ],
         { label: 'Criar meta', route: '/metas' }
       );
@@ -1702,9 +1679,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       'Você manteve o saldo positivo e as despesas sob controle.',
       'ok',
       [
-        `Saldo principal: ${this.formatCurrency(this.saldoPrincipal)}`,
+        `Saldo principal: ${formatCurrency(this.saldoPrincipal)}`,
         `Cobertura: ${this.coberturaDespesasPercentual.toFixed(0)}%`,
-        `Pendente: ${this.formatCurrency(this.totalRendasPendentes)}`
+        `Pendente: ${formatCurrency(this.totalRendasPendentes)}`
       ],
       { label: 'Acompanhar metas', route: '/metas' }
     );
@@ -1717,7 +1694,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     highlights: string[] = [],
     action: { label: string; route: string } | null = null
   ): void {
-    const goalLabel = this.getFinancialGoalLabel();
+    const goalLabel = getFinancialGoalLabel(this.financialGoal);
     const enriched = goalLabel ? [...highlights, `Objetivo: ${goalLabel}`] : highlights;
     this.insight = { title, message, tone };
     this.insightHighlights = enriched;
@@ -1733,11 +1710,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const openExpenses = this.expensesRaw.filter((expense) => {
       if (!this.isDateInRange(expense.vencimento, range)) return false;
-      return this.isExpenseOpen(expense.status);
+      return isExpenseOpen(expense.status);
     });
     const openIncomes = this.incomesRaw.filter((income) => {
       if (!this.isDateInRange(income.recebimento, range)) return false;
-      return this.isIncomePending(income.status);
+      return isIncomePending(income.status);
     });
 
     const overdueExpenses = openExpenses.filter((expense) => {
@@ -1765,8 +1742,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     const projectedCoverage = pendingExpensesAmount > 0 ? ((accountsBalance + pendingIncomesAmount) / pendingExpensesAmount) * 100 : 100;
     const riskDay = this.cashflowProjection?.riskDate
       ? new Date(`${this.cashflowProjection.riskDate}T00:00:00`)
-      : this.estimateRiskDayFromCurrentData(startOfToday, range, accountsBalance, openIncomes, openExpenses);
-    const healthScore = this.calculateInsightHealthScore(
+      : estimateRiskDayFromCurrentData(startOfToday, range, accountsBalance, openIncomes, openExpenses);
+    const healthScore = calculateInsightHealthScore(
       this.totalRendas,
       this.totalRendasPendentes,
       this.totalDespesas,
@@ -1805,7 +1782,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ): void {
     if (
       projectedBalance < 0 ||
-      this.hasCriticalOverdueExpenseContext(overdueExpensesCount, overdueExpensesAmount)
+      hasCriticalOverdueExpenseContext(overdueExpensesCount, overdueExpensesAmount, this.saldoBaseDisponivel, this.saldoPrincipal)
     ) {
       this.insightPriority = 'Crítico';
       return;
@@ -1824,9 +1801,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     overdueIncomesCount: number
   ): void {
     if (overdueExpensesCount > 0) {
-      const overdueCritical = this.hasCriticalOverdueExpenseContext(
+      const overdueCritical = hasCriticalOverdueExpenseContext(
         overdueExpensesCount,
-        overdueExpensesAmount
+        overdueExpensesAmount,
+        this.saldoBaseDisponivel,
+        this.saldoPrincipal
       );
       this.insightActionSentence = overdueCritical
         ? `Pague ${overdueExpensesCount} despesa(s) atrasada(s) hoje para evitar agravamento do caixa.`
@@ -1850,7 +1829,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     overdueExpensesCount: number
   ): void {
     if (projectedBalance < 0) {
-      this.insightShortGoal = `Meta de curto prazo: recuperar ${this.formatCurrency(Math.abs(projectedBalance))} para fechar o mês em zero.`;
+      this.insightShortGoal = `Meta de curto prazo: recuperar ${formatCurrency(Math.abs(projectedBalance))} para fechar o mês em zero.`;
       return;
     }
     if (overdueExpensesCount > 0) {
@@ -1858,7 +1837,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
     if (dueSoonExpenseAmount > 0) {
-      this.insightShortGoal = `Meta de curto prazo: reservar ${this.formatCurrency(dueSoonExpenseAmount)} para os próximos 5 dias.`;
+      this.insightShortGoal = `Meta de curto prazo: reservar ${formatCurrency(dueSoonExpenseAmount)} para os próximos 5 dias.`;
       return;
     }
     this.insightShortGoal = `Meta de curto prazo: manter saúde financeira acima de 70/100 até o fim do mês.`;
@@ -1898,17 +1877,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     const prevReceived = this.somarRendasMes(this.incomesRaw, { startKey: prevKey, endKey: prevKey });
 
     this.insightComparison = [
-      `Despesas: ${this.formatDelta(currentExpenses, prevExpenses)}`,
-      `Receitas recebidas: ${this.formatDelta(currentReceived, prevReceived)}`
+      `Despesas: ${formatDelta(currentExpenses, prevExpenses)}`,
+      `Receitas recebidas: ${formatDelta(currentReceived, prevReceived)}`
     ];
-  }
-
-  private formatDelta(current: number, previous: number): string {
-    if (previous <= 0 && current > 0) return `novo no mês (${this.formatCurrency(current)})`;
-    if (previous <= 0 && current <= 0) return 'sem variação';
-    const deltaPercent = ((current - previous) / previous) * 100;
-    const trend = deltaPercent > 0 ? '+' : '';
-    return `${trend}${deltaPercent.toFixed(0)}% vs mês anterior`;
   }
 
   private updateInsightChangesToday(today: Date): void {
@@ -1916,14 +1887,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       const date = parseLocaleDate(expense.vencimento);
       return !!date && date.toDateString() === today.toDateString();
     });
-    const pendingDueTodayExpenses = dueTodayExpenses.filter((expense) => this.isExpenseOpen(expense.status));
+    const pendingDueTodayExpenses = dueTodayExpenses.filter((expense) => isExpenseOpen(expense.status));
 
     const dueTodayIncomes = this.incomesRaw.filter((income) => {
       const date = parseLocaleDate(income.recebimento);
       return !!date && date.toDateString() === today.toDateString();
     });
-    const pendingDueTodayIncomes = dueTodayIncomes.filter((income) => this.isIncomePending(income.status));
-    const receivedTodayIncomes = dueTodayIncomes.filter((income) => this.isIncomeReceived(income.status));
+    const pendingDueTodayIncomes = dueTodayIncomes.filter((income) => isIncomePending(income.status));
+    const receivedTodayIncomes = dueTodayIncomes.filter((income) => isIncomeReceived(income.status));
 
     const changes: string[] = [];
     if (pendingDueTodayExpenses.length > 0) {
@@ -1934,7 +1905,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     if (receivedTodayIncomes.length > 0) {
       const totalReceivedToday = receivedTodayIncomes.reduce((sum, income) => sum + (income.valor || 0), 0);
-      changes.push(`Recebimentos de hoje: ${this.formatCurrency(totalReceivedToday)} confirmados.`);
+      changes.push(`Recebimentos de hoje: ${formatCurrency(totalReceivedToday)} confirmados.`);
     }
     if (changes.length === 0) {
       changes.push('Nenhuma mudança crítica registrada hoje.');
@@ -1991,7 +1962,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       const last = overdueExpenses[overdueExpenses.length - 1].date.toLocaleDateString('pt-BR');
       const count = overdueExpenses.length;
       const overdueAmount = overdueExpenses.reduce((sum, item) => sum + (item.item.valor || 0), 0);
-      const overdueCritical = this.hasCriticalOverdueExpenseContext(count, overdueAmount);
+      const overdueCritical = hasCriticalOverdueExpenseContext(count, overdueAmount, this.saldoBaseDisponivel, this.saldoPrincipal);
       const period = first === last ? first : `${first} a ${last}`;
       todos.push({
         id: 'overdue-expenses',
@@ -2019,92 +1990,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     this.insightTodoItems = todos.slice(0, 4);
-  }
-
-  private hasCriticalOverdueExpenseContext(overdueExpensesCount: number, overdueExpensesAmount: number): boolean {
-    if (overdueExpensesCount <= 0) return false;
-    const amount = Math.max(overdueExpensesAmount || 0, 0);
-    const availableNow = Math.max(this.saldoBaseDisponivel || 0, 0);
-    return availableNow < amount || this.saldoPrincipal < 0;
-  }
-
-  private calculateInsightHealthScore(
-    incomeReceived: number,
-    incomePending: number,
-    expenseTotal: number,
-    overdueExpensesCount: number,
-    overdueIncomesCount: number,
-    dueSoonExpenseAmount: number,
-    projectedBalance: number
-  ): number {
-    let score = 100;
-
-    if (overdueExpensesCount > 0) score -= Math.min(35, overdueExpensesCount * 12);
-    if (overdueIncomesCount > 0) score -= Math.min(20, overdueIncomesCount * 8);
-    if (incomeReceived <= 0 && incomePending > 0) score -= 20;
-    if (expenseTotal > 0 && incomeReceived > 0 && incomeReceived / expenseTotal < 0.6) score -= 15;
-    if (dueSoonExpenseAmount > incomeReceived && dueSoonExpenseAmount > 0) score -= 10;
-    if (projectedBalance < 0) score -= 20;
-
-    return Math.max(0, Math.min(100, score));
-  }
-
-  private estimateRiskDayFromCurrentData(
-    today: Date,
-    range: { startKey: string; endKey: string },
-    initialBalance: number,
-    openIncomes: StoredIncome[],
-    openExpenses: StoredExpense[]
-  ): Date | null {
-    let runningBalance = initialBalance;
-    const entries = new Map<string, number>();
-    const endDate = this.rangeEndDate(range.endKey);
-
-    for (const income of openIncomes) {
-      const date = parseLocaleDate(income.recebimento);
-      if (!date) continue;
-      const effectiveDate = date < today ? today : date;
-      const key = this.dateKey(effectiveDate);
-      entries.set(key, (entries.get(key) ?? 0) + (income.valor || 0));
-    }
-
-    for (const expense of openExpenses) {
-      const date = parseLocaleDate(expense.vencimento);
-      if (!date) continue;
-      const effectiveDate = date < today ? today : date;
-      const key = this.dateKey(effectiveDate);
-      entries.set(key, (entries.get(key) ?? 0) - (expense.valor || 0));
-    }
-
-    for (let cursor = new Date(today); cursor <= endDate; cursor.setDate(cursor.getDate() + 1)) {
-      const key = this.dateKey(cursor);
-      const delta = entries.get(key) ?? 0;
-      runningBalance += delta;
-      if (runningBalance < 0) {
-        return new Date(cursor);
-      }
-    }
-
-    return null;
-  }
-
-  private rangeEndDate(endKey: string): Date {
-    const [yearText, monthText] = endKey.split('-');
-    const year = Number(yearText);
-    const month = Number(monthText);
-    const lastDay = new Date(year, month, 0);
-    return new Date(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate());
-  }
-
-  private dateKey(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  private isExpenseOpen(status?: string): boolean {
-    return !status || status === 'OPEN' || status === 'PARTIALLY_PAID';
   }
 
   private resolveInsightAction(primary: InsightEngineItemResponse): { label: string; route: string } | null {
@@ -2147,37 +2032,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }));
   }
 
-  private resolveInsightShortGoal(primary: InsightEngineItemResponse): string {
-    if (primary.family === 'patrimonial') {
-      return 'Meta de curto prazo: transformar a folga atual em avanço patrimonial.';
-    }
-    if (primary.family === 'structural') {
-      return 'Meta de curto prazo: reduzir a pressão estrutural das despesas recorrentes.';
-    }
-    if (primary.family === 'preventive') {
-      return 'Meta de curto prazo: atravessar a próxima janela de vencimentos sem apertos.';
-    }
-    return 'Meta de curto prazo: estabilizar o caixa antes do próximo fechamento.';
-  }
-
-  private formatCurrency(value: number): string {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  private getFinancialGoalLabel(): string | null {
-    switch (this.financialGoal) {
-      case 'vida-financeira':
-        return 'Melhorar vida financeira';
-      case 'sair-dividas':
-        return 'Sair das dívidas';
-      case 'comecar-investir':
-        return 'Começar a investir';
-      case 'reserva-emergencia':
-        return 'Criar reserva de emergência';
-      default:
-        return null;
-    }
-  }
   trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
