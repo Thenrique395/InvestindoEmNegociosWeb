@@ -21,6 +21,20 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import {
+  AllocationInvestmentType,
+  BenchmarkKey,
+  DEFAULT_TARGET_ALLOCATION,
+  benchmarkMonthPercent,
+  isAllocationType,
+  isCurrentMonth,
+  isProventoMovement,
+  mapTargetAllocationResponse,
+  normalize,
+  parseCsvRows,
+  positionCurrentValue,
+  positionNetContributed
+} from '../utils/investments.utils';
 
 type FormMode = 'create' | 'movement';
 type CadastroOperacao = 'COMPRA' | 'VENDA';
@@ -42,7 +56,6 @@ type ConsolidacaoMovimentoRow = {
   date: string;
   source: 'B3' | 'Manual';
 };
-type BenchmarkKey = 'CDI' | 'IPCA' | 'IFIX' | 'IBOV' | 'SMLL' | 'IDIV' | 'IVVB11';
 type RentabilidadeMonthPoint = {
   key: string;
   year: number;
@@ -53,10 +66,6 @@ type RentabilidadeMonthPoint = {
   carteiraAc: number;
   benchmarkAc: number;
 };
-type AllocationInvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
-
-const DEFAULT_TARGET_ALLOCATION: Record<AllocationInvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
-
 @Component({
   selector: 'app-investments',
   standalone: true,
@@ -191,8 +200,9 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get aporteMes(): number {
+    const now = new Date();
     return this.positions.reduce((sum, pos) => {
-      const movimentosMes = pos.movements.filter((mov) => this.isCurrentMonth(mov.date));
+      const movimentosMes = pos.movements.filter((mov) => isCurrentMonth(mov.date, now));
       return (
         sum +
         movimentosMes
@@ -203,8 +213,9 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get resgateMes(): number {
+    const now = new Date();
     return this.positions.reduce((sum, pos) => {
-      const movimentosMes = pos.movements.filter((mov) => this.isCurrentMonth(mov.date));
+      const movimentosMes = pos.movements.filter((mov) => isCurrentMonth(mov.date, now));
       return (
         sum +
         movimentosMes
@@ -240,12 +251,12 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get filteredPositions(): InvestmentPosition[] {
-    const text = this.normalize(this.searchTerm);
+    const text = normalize(this.searchTerm);
     return this.positions.filter((p) => {
       const typeOk = this.filterType === 'ALL' || p.type === this.filterType;
       const accountOk = this.filterAccount === 'ALL' || (p.account || '').trim() === this.filterAccount;
       const statusOk = this.filterStatus === 'ALL' || (this.filterStatus === 'ACTIVE' ? p.quantity > 0 : p.quantity <= 0);
-      const textOk = !text || this.normalize(p.asset).includes(text) || this.normalize(p.account || '').includes(text) || this.normalize(p.category || '').includes(text);
+      const textOk = !text || normalize(p.asset).includes(text) || normalize(p.account || '').includes(text) || normalize(p.category || '').includes(text);
       return typeOk && accountOk && statusOk && textOk;
     });
   }
@@ -256,8 +267,8 @@ export class InvestmentsComponent implements OnInit {
     list.sort((a, b) => {
       const statusA = a.quantity > 0 ? 1 : 0;
       const statusB = b.quantity > 0 ? 1 : 0;
-      const valueA = this.positionCurrentValue(a);
-      const valueB = this.positionCurrentValue(b);
+      const valueA = positionCurrentValue(a);
+      const valueB = positionCurrentValue(b);
       const resultA = this.resultadoPosicao(a);
       const resultB = this.resultadoPosicao(b);
       const portfolioA = this.percentualNaCarteira(a);
@@ -396,10 +407,10 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get distribuicaoPorTipo(): { key: InvestmentType; label: string; value: number; percent: number }[] {
-    const total = this.filteredPositions.reduce((sum, p) => sum + this.positionCurrentValue(p), 0);
+    const total = this.filteredPositions.reduce((sum, p) => sum + positionCurrentValue(p), 0);
     return this.tipos
       .map((tipo) => {
-        const value = this.filteredPositions.filter((p) => p.type === tipo.value).reduce((sum, p) => sum + this.positionCurrentValue(p), 0);
+        const value = this.filteredPositions.filter((p) => p.type === tipo.value).reduce((sum, p) => sum + positionCurrentValue(p), 0);
         return { key: tipo.value, label: tipo.label, value, percent: total > 0 ? (value / total) * 100 : 0 };
       })
       .filter((item) => item.value > 0)
@@ -600,7 +611,7 @@ export class InvestmentsComponent implements OnInit {
     const byMonth = new Map(months.map((m) => [m.key, m]));
     for (const pos of this.positions) {
       for (const mov of pos.movements || []) {
-        if (!mov?.date || !this.isProventoMovement(mov.type)) continue;
+        if (!mov?.date || !isProventoMovement(mov.type)) continue;
         const [year, month] = mov.date.split('T')[0].split('-');
         const bucket = byMonth.get(`${year}-${month}`);
         if (!bucket) continue;
@@ -631,7 +642,7 @@ export class InvestmentsComponent implements OnInit {
 
     for (const pos of this.positions) {
       for (const mov of pos.movements || []) {
-        if (!mov?.date || !this.isProventoMovement(mov.type)) continue;
+        if (!mov?.date || !isProventoMovement(mov.type)) continue;
         const movDate = new Date(mov.date);
         if (Number.isNaN(movDate.getTime()) || movDate < limitDate) continue;
         const value = (mov.quantity || 0) * (mov.price || 0);
@@ -670,12 +681,8 @@ export class InvestmentsComponent implements OnInit {
     return this.proventosPorAtivo.reduce((sum, item) => sum + item.total, 0);
   }
 
-  private isProventoMovement(type: MovementType): boolean {
-    return type === 'DIVIDENDO' || type === 'JCP' || type === 'RENDIMENTO';
-  }
-
   get aporteTotal(): number {
-    return this.positions.reduce((sum, pos) => sum + this.positionNetContributed(pos), 0);
+    return this.positions.reduce((sum, pos) => sum + positionNetContributed(pos), 0);
   }
 
   get crescimentoEstimado(): number {
@@ -742,7 +749,7 @@ export class InvestmentsComponent implements OnInit {
         const value = (mov.quantity || 0) * (mov.price || 0);
         if (mov.type === 'COMPRA' || mov.type === 'APORTE') bucket.aporte += value;
         if (mov.type === 'VENDA' || mov.type === 'RESGATE') bucket.resgate += value;
-        if (this.isProventoMovement(mov.type)) bucket.proventos += value;
+        if (isProventoMovement(mov.type)) bucket.proventos += value;
       }
     }
 
@@ -750,7 +757,7 @@ export class InvestmentsComponent implements OnInit {
     let baseCapital = 0;
     let carteiraAc = 0;
     let benchmarkAc = 0;
-    const benchmarkMesFixo = this.benchmarkMonthPercent(this.rentabilidadeBenchmark);
+    const benchmarkMesFixo = benchmarkMonthPercent(this.rentabilidadeBenchmark);
 
     for (const [key, bucket] of monthMap) {
       const [yearText, monthText] = key.split('-');
@@ -893,19 +900,6 @@ export class InvestmentsComponent implements OnInit {
       .join(' ');
   }
 
-  private benchmarkMonthPercent(key: BenchmarkKey): number {
-    const monthly: Record<BenchmarkKey, number> = {
-      CDI: 0.85,
-      IPCA: 0.45,
-      IFIX: 0.7,
-      IBOV: 1.1,
-      SMLL: 1.25,
-      IDIV: 0.95,
-      IVVB11: 1.05
-    };
-    return monthly[key] ?? 0.85;
-  }
-
   get consolidacaoSeries(): ConsolidacaoBucket[] {
     const now = new Date();
     const start = new Date(now.getFullYear() - this.consolidacaoHorizonteAnos + 1, now.getMonth(), 1);
@@ -944,7 +938,7 @@ export class InvestmentsComponent implements OnInit {
     const rows: ConsolidacaoMovimentoRow[] = [];
     const horizonStart = new Date();
     horizonStart.setFullYear(horizonStart.getFullYear() - this.consolidacaoHorizonteAnos);
-    const text = this.normalize(this.consolidacaoSearchTerm);
+    const text = normalize(this.consolidacaoSearchTerm);
 
     for (const pos of this.positions) {
       if (this.consolidacaoTipoFiltro !== 'ALL' && pos.type !== this.consolidacaoTipoFiltro) continue;
@@ -961,7 +955,7 @@ export class InvestmentsComponent implements OnInit {
 
         if (date < horizonStart) continue;
         const source: 'B3' | 'Manual' = (entry.mov.note || '').toUpperCase().includes('B3') ? 'B3' : 'Manual';
-        if (text && !this.normalize(pos.asset).includes(text)) continue;
+        if (text && !normalize(pos.asset).includes(text)) continue;
 
         rows.push({
           id: `${pos.id}-${entry.idx}`,
@@ -999,7 +993,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get allocationTypes(): Array<{ value: AllocationInvestmentType; label: string }> {
-    return this.tipos.filter((t): t is { value: AllocationInvestmentType; label: string } => this.isAllocationType(t.value));
+    return this.tipos.filter((t): t is { value: AllocationInvestmentType; label: string } => isAllocationType(t.value));
   }
 
   get targetAllocationTotal(): number {
@@ -1023,7 +1017,7 @@ export class InvestmentsComponent implements OnInit {
       cripto: this.targetAllocation.CRIPTO
     }).subscribe({
       next: (response) => {
-        this.targetAllocation = this.mapTargetAllocationResponse(response);
+        this.targetAllocation = mapTargetAllocationResponse(response);
         this.showAlocacaoConfig = false;
         this.uiFeedback.success('Alocação alvo salva.');
       },
@@ -1091,15 +1085,15 @@ export class InvestmentsComponent implements OnInit {
   }
 
   valorAtualPosicao(pos: InvestmentPosition): number {
-    return this.positionCurrentValue(pos);
+    return positionCurrentValue(pos);
   }
 
   resultadoPosicao(pos: InvestmentPosition): number {
-    return this.positionCurrentValue(pos) - this.positionNetContributed(pos);
+    return positionCurrentValue(pos) - positionNetContributed(pos);
   }
 
   resultadoPosicaoPercentual(pos: InvestmentPosition): number {
-    const base = this.positionNetContributed(pos);
+    const base = positionNetContributed(pos);
     return base ? (this.resultadoPosicao(pos) / base) * 100 : 0;
   }
 
@@ -1352,7 +1346,7 @@ export class InvestmentsComponent implements OnInit {
 
     try {
       const text = await file.text();
-      const rows = this.parseCsvRows(text);
+      const rows = parseCsvRows(text);
       if (!rows.length) throw new Error('CSV vazio ou inválido.');
 
       this.csvPreviewRows = rows.slice(0, 10);
@@ -1408,7 +1402,7 @@ export class InvestmentsComponent implements OnInit {
   private carregarAlocacaoTarget(): void {
     this.investments.getAllocationTarget().subscribe({
       next: (target) => {
-        this.targetAllocation = this.mapTargetAllocationResponse(target);
+        this.targetAllocation = mapTargetAllocationResponse(target);
       },
       error: () => {
         this.targetAllocation = { ...DEFAULT_TARGET_ALLOCATION };
@@ -1422,77 +1416,6 @@ export class InvestmentsComponent implements OnInit {
 
   private parseValor(raw: string): number {
     return parseLocalizedNumber(raw);
-  }
-
-  private parseCsvRows(text: string): InvestmentPositionRequest[] {
-    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-    if (lines.length < 2) return [];
-
-    const delimiter = lines[0].includes(';') ? ';' : ',';
-    const headers = lines[0].split(delimiter).map((h) => this.normalize(h));
-    const idx = (name: string) => headers.indexOf(this.normalize(name));
-
-    const typeI = idx('type');
-    const assetI = idx('asset');
-    const qtyI = idx('quantity');
-    const avgI = idx('avgprice');
-    const openedI = idx('openedat');
-    const accountI = idx('account');
-    const categoryI = idx('category');
-    const noteI = idx('note');
-
-    if ([typeI, assetI, qtyI, avgI, openedI, accountI].some((i) => i < 0)) {
-      throw new Error('Cabeçalho CSV inválido. Esperado: type,asset,quantity,avgPrice,openedAt,account,category,note');
-    }
-
-    const validTypes = new Set<InvestmentType>(['RF', 'ACOES', 'FUNDOS', 'CRIPTO', 'IMOVEL', 'VEICULO']);
-    return lines.slice(1).map((line) => {
-      const cols = line.split(delimiter).map((c) => c.trim());
-      const type = (cols[typeI] || '').toUpperCase() as InvestmentType;
-      if (!validTypes.has(type)) throw new Error(`Tipo inválido no CSV: ${cols[typeI]}`);
-
-      const quantity = parseLocalizedNumber(cols[qtyI] || '0');
-      const avgPrice = parseLocalizedNumber(cols[avgI] || '0');
-      if (!quantity || !avgPrice) throw new Error(`Quantidade/preço inválidos para ativo ${cols[assetI]}`);
-
-      return {
-        type,
-        asset: cols[assetI],
-        quantity,
-        avgPrice,
-        openedAt: cols[openedI],
-        account: cols[accountI],
-        category: cols[categoryI] || '',
-        note: noteI >= 0 ? cols[noteI] || null : null
-      };
-    });
-  }
-
-  private positionCurrentValue(pos: InvestmentPosition): number {
-    const market = this.marketPrice(pos);
-    const price = market && market > 0 ? market : (pos.avgPrice || 0);
-    return (pos.quantity || 0) * price;
-  }
-
-  private positionNetContributed(pos: InvestmentPosition): number {
-    // Base da posição para "Rent. atual" e "Resultado":
-    // quantidade atual x preço médio atual.
-    return (pos.quantity || 0) * (pos.avgPrice || 0);
-  }
-
-  private isCurrentMonth(iso: string): boolean {
-    if (!iso) return false;
-    const [year, month] = iso.split('T')[0].split('-').map(Number);
-    const now = new Date();
-    return !!year && !!month && year === now.getFullYear() && month === now.getMonth() + 1;
-  }
-
-  private normalize(value: string): string {
-    return (value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim()
-      .toLowerCase();
   }
 
   private scrollToSection(id: string): void {
@@ -1521,25 +1444,6 @@ export class InvestmentsComponent implements OnInit {
     if (!exists) {
       window.localStorage.setItem(this.tabStorageKey, this.activeTab);
     }
-  }
-
-  private normalizeAllocationValue(value: unknown, fallback: number): number {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed)) return fallback;
-    return Math.min(100, Math.max(0, parsed));
-  }
-
-  private isAllocationType(type: InvestmentType): type is AllocationInvestmentType {
-    return type === 'RF' || type === 'ACOES' || type === 'FUNDOS' || type === 'CRIPTO';
-  }
-
-  private mapTargetAllocationResponse(target: { rf: number; acoes: number; fundos: number; cripto: number }): Record<AllocationInvestmentType, number> {
-    return {
-      RF: this.normalizeAllocationValue(target.rf, DEFAULT_TARGET_ALLOCATION.RF),
-      ACOES: this.normalizeAllocationValue(target.acoes, DEFAULT_TARGET_ALLOCATION.ACOES),
-      FUNDOS: this.normalizeAllocationValue(target.fundos, DEFAULT_TARGET_ALLOCATION.FUNDOS),
-      CRIPTO: this.normalizeAllocationValue(target.cripto, DEFAULT_TARGET_ALLOCATION.CRIPTO)
-    };
   }
 
   trackByIndex(index: number, _item?: unknown): number {

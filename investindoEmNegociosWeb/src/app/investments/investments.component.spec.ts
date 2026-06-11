@@ -1,6 +1,7 @@
 import { of, throwError } from 'rxjs';
 import { InvestmentsComponent } from './investments.component';
 import { InvestmentPosition } from '../investments.service';
+import { parseCsvRows } from '../utils/investments.utils';
 
 describe('InvestmentsComponent', () => {
   function createComponent(overrides?: {
@@ -153,14 +154,13 @@ describe('InvestmentsComponent', () => {
   });
 
   it('deve aceitar IMOVEL e VEICULO no parseCsvRows', () => {
-    const { component } = createComponent();
     const csv = [
       'type;asset;quantity;avgPrice;openedAt;account;category;note',
       'IMOVEL;Casa;1;250000;2026-01-01;Patrimonio;Imovel;Manual',
       'VEICULO;Carro;1;80000;2026-01-01;Patrimonio;Veiculo;Manual'
     ].join('\n');
 
-    const rows = (component as any).parseCsvRows(csv);
+    const rows = parseCsvRows(csv);
 
     expect(rows.length).toBe(2);
     expect(rows[0].type).toBe('IMOVEL');
@@ -168,9 +168,7 @@ describe('InvestmentsComponent', () => {
   });
 
   it('deve rejeitar CSV com cabeçalho inválido', () => {
-    const { component } = createComponent();
-
-    expect(() => (component as any).parseCsvRows('asset;quantity\nPETR4;10')).toThrow();
+    expect(() => parseCsvRows('asset;quantity\nPETR4;10')).toThrow();
   });
 
   it('deve importar CSV e atualizar contagem', async () => {
