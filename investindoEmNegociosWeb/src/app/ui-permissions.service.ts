@@ -20,6 +20,18 @@ export class UiPermissionsService {
     return this.can(APP_FEATURE_KEYS.accountsManage);
   }
 
+  canImportAccounts(): boolean {
+    return this.can(APP_FEATURE_KEYS.accountsImport);
+  }
+
+  canViewCardStatements(): boolean {
+    return this.can(APP_FEATURE_KEYS.cardsStatementsRead);
+  }
+
+  canImportInvoices(): boolean {
+    return this.can(APP_FEATURE_KEYS.invoiceImportAccess);
+  }
+
   canReadCards(): boolean {
     return this.can(APP_FEATURE_KEYS.cardsRead);
   }

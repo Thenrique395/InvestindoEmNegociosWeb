@@ -23,6 +23,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { UiPermissionsService } from '../ui-permissions.service';
 
 @Component({
   selector: 'app-contas',
@@ -70,7 +71,8 @@ export class ContasComponent implements OnInit {
 
   constructor(
     private readonly accountsStore: AccountsStore,
-    private readonly categoriesService: CategoriesService
+    private readonly categoriesService: CategoriesService,
+    private readonly uiPermissions: UiPermissionsService
   ) {
     effect(() => {
       this.accounts = this.accountsStore.accounts();
@@ -112,6 +114,14 @@ export class ContasComponent implements OnInit {
 
   get selectedAccountLabel(): string {
     return this.selectedAccount?.name || 'Nenhuma conta selecionada';
+  }
+
+  get canManageAccounts(): boolean {
+    return this.uiPermissions.canManageAccounts();
+  }
+
+  get canImportAccounts(): boolean {
+    return this.uiPermissions.canImportAccounts();
   }
 
   loadAccounts(): void {

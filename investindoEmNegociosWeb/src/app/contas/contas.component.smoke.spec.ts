@@ -5,6 +5,7 @@ import { ContasComponent } from './contas.component';
 import { AccountResponse } from '../accounts.service';
 import { AccountsStore } from '../accounts.store';
 import { CategoriesService } from '../categories.service';
+import { UiPermissionsService } from '../ui-permissions.service';
 
 class AccountsStoreMock {
   accountsState = signal<AccountResponse[]>([]);
@@ -47,6 +48,14 @@ class CategoriesServiceMock {
   list = jasmine.createSpy('list').and.returnValue(of([]));
 }
 
+class UiPermissionsServiceMock {
+  can = jasmine.createSpy('can').and.returnValue(true);
+  canManageAccounts = jasmine.createSpy('canManageAccounts').and.returnValue(true);
+  canImportAccounts = jasmine.createSpy('canImportAccounts').and.returnValue(true);
+  canViewCardStatements = jasmine.createSpy('canViewCardStatements').and.returnValue(true);
+  canImportInvoices = jasmine.createSpy('canImportInvoices').and.returnValue(true);
+}
+
 describe('ContasComponent smoke', () => {
   let component: ContasComponent;
   let store: AccountsStoreMock;
@@ -56,7 +65,11 @@ describe('ContasComponent smoke', () => {
     store = new AccountsStoreMock();
     categoriesService = new CategoriesServiceMock();
     component = TestBed.runInInjectionContext(() =>
-      new ContasComponent(store as unknown as AccountsStore, categoriesService as unknown as CategoriesService)
+      new ContasComponent(
+        store as unknown as AccountsStore,
+        categoriesService as unknown as CategoriesService,
+        new UiPermissionsServiceMock() as unknown as UiPermissionsService
+      )
     );
   });
 

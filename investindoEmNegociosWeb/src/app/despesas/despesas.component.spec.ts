@@ -9,7 +9,8 @@ function createComponent(): DespesasComponent {
     {} as any,
     {} as any,
     { getRole: () => null } as any,
-    {} as any
+    {} as any,
+    { canImportInvoices: () => true } as any
   );
 }
 

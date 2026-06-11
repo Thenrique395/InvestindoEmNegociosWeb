@@ -107,44 +107,46 @@
         </div>
       </div>
 
-      @if (statementLoading) {
-        <app-ui-state type="loading" title="Carregando faturas..." />
-      }
-      @if (!statementLoading && !statementCycles.length) {
-        <app-empty-state
-          icon="$"
-          title="Nenhuma fatura encontrada"
-          description="Ajuste os filtros ou registre compras para acompanhar as próximas faturas." />
-      }
+      @if (canViewCardStatements) {
+        @if (statementLoading) {
+          <app-ui-state type="loading" title="Carregando faturas..." />
+        }
+        @if (!statementLoading && !statementCycles.length) {
+          <app-empty-state
+            icon="$"
+            title="Nenhuma fatura encontrada"
+            description="Ajuste os filtros ou registre compras para acompanhar as próximas faturas." />
+        }
 
-      @if (!statementLoading && statementCycles.length) {
-        <div class="cards-statements__list">
-          @for (cycle of statementCycles; track trackByStatement($index, cycle)) {
-            <article class="cards-statements__item">
-              <div class="cards-statements__item-head">
-                <div>
-                  <h4 class="cards-statements__item-title">Ciclo {{ statementMonthLabel(cycle.statementMonth) }}/{{ cycle.statementYear }}</h4>
-                  <p class="cards-statements__item-copy">Fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} · vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}</p>
+        @if (!statementLoading && statementCycles.length) {
+          <div class="cards-statements__list">
+            @for (cycle of statementCycles; track trackByStatement($index, cycle)) {
+              <article class="cards-statements__item">
+                <div class="cards-statements__item-head">
+                  <div>
+                    <h4 class="cards-statements__item-title">Ciclo {{ statementMonthLabel(cycle.statementMonth) }}/{{ cycle.statementYear }}</h4>
+                    <p class="cards-statements__item-copy">Fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} · vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}</p>
+                  </div>
+                  <span class="cards-statements__item-badge">{{ cycle.itemsCount }} lançamento(s)</span>
                 </div>
-                <span class="cards-statements__item-badge">{{ cycle.itemsCount }} lançamento(s)</span>
-              </div>
-              <div class="cards-statements__metrics">
-                <div class="cards-statements__metric">
-                  <span>Total</span>
-                  <strong>{{ cycle.totalAmount | appCurrency }}</strong>
+                <div class="cards-statements__metrics">
+                  <div class="cards-statements__metric">
+                    <span>Total</span>
+                    <strong>{{ cycle.totalAmount | appCurrency }}</strong>
+                  </div>
+                  <div class="cards-statements__metric cards-statements__metric--success">
+                    <span>Pago</span>
+                    <strong>{{ cycle.totalPaid | appCurrency }}</strong>
+                  </div>
+                  <div class="cards-statements__metric cards-statements__metric--danger">
+                    <span>Em aberto</span>
+                    <strong>{{ cycle.totalOpen | appCurrency }}</strong>
+                  </div>
                 </div>
-                <div class="cards-statements__metric cards-statements__metric--success">
-                  <span>Pago</span>
-                  <strong>{{ cycle.totalPaid | appCurrency }}</strong>
-                </div>
-                <div class="cards-statements__metric cards-statements__metric--danger">
-                  <span>Em aberto</span>
-                  <strong>{{ cycle.totalOpen | appCurrency }}</strong>
-                </div>
-              </div>
-            </article>
-          }
-        </div>
+              </article>
+            }
+          </div>
+        }
       }
 
       <section class="cards-purchases">

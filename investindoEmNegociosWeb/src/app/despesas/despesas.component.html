@@ -65,18 +65,20 @@
         hero-aside
         [value]="totalMes() | appCurrency"
         description="Soma das despesas pagas, antecipadas e pendentes registradas neste período.">
-        <button total-card-actions type="button" class="period-total-card__action period-total-card__action--ghost" (click)="abrirImportFatura()">
-          <span class="period-total-card__action-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M14 3v6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          <span class="period-total-card__action-copy">
-            <strong>Importar fatura</strong>
-            <small>Trazer lançamentos do cartão para este período.</small>
-          </span>
-        </button>
+        @if (canImportInvoices) {
+          <button total-card-actions type="button" class="period-total-card__action period-total-card__action--ghost" (click)="abrirImportFatura()">
+            <span class="period-total-card__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M14 3v6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="period-total-card__action-copy">
+              <strong>Importar fatura</strong>
+              <small>Trazer lançamentos do cartão para este período.</small>
+            </span>
+          </button>
+        }
         <button total-card-actions type="button" class="period-total-card__action period-total-card__action--primary" (click)="abrirModal()">
           <span class="period-total-card__action-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" role="presentation">

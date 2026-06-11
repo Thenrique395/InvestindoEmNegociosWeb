@@ -38,6 +38,7 @@
       title="Controle saldos e transferências"
       description="Cadastre contas, acompanhe saldo atual por movimentações e importe extratos quando precisar reconciliar o mês."
       [showNavigation]="false">
+    @if (canManageAccounts) {
       <app-period-action-card
         hero-aside
         [title]="editingId ? 'Finalizar edição' : 'Cadastrar conta'"
@@ -50,6 +51,7 @@
           </span>
         </button>
       </app-period-action-card>
+    }
     </app-period-hero>
 
   @if (error) {
@@ -58,29 +60,32 @@
     </p>
   }
 
-    <div class="accounts-workspace">
-      <app-account-form
-        [form]="form"
-        [editingId]="editingId"
-        [saving]="saving"
-        [accountTypes]="accountTypes"
-        (save)="save()"
-        (clear)="startCreate()">
-      </app-account-form>
+    @if (canManageAccounts) {
+      <div class="accounts-workspace">
+        <app-account-form
+          [form]="form"
+          [editingId]="editingId"
+          [saving]="saving"
+          [accountTypes]="accountTypes"
+          (save)="save()"
+          (clear)="startCreate()">
+        </app-account-form>
 
-      <app-account-transfer
-        [accounts]="accounts"
-        [value]="transferForm"
-        [transferring]="transferring"
-        (valueChange)="onTransferChange($event)"
-        (submitTransfer)="transfer()">
-      </app-account-transfer>
-    </div>
+        <app-account-transfer
+          [accounts]="accounts"
+          [value]="transferForm"
+          [transferring]="transferring"
+          (valueChange)="onTransferChange($event)"
+          (submitTransfer)="transfer()">
+        </app-account-transfer>
+      </div>
+    }
 
     <section class="accounts-list-card">
       <app-account-list
         [accounts]="accounts"
         [loading]="loading"
+        [canManage]="canManageAccounts"
         (refresh)="loadAccounts()"
         (create)="startCreate()"
         (selectAccount)="selectAccount($event)"
@@ -104,26 +109,28 @@
         </label>
         <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
       </div>
-      <app-account-import
-        [ofxFileName]="ofxFileName"
-        [extractingOfx]="extractingOfx"
-        [importingOfx]="importingOfx"
-        [ofxExtract]="ofxExtract"
-        [duplicateCount]="duplicateCount()"
-        [categories]="categories"
-        [extractingCsv]="extractingCsv"
-        [importingCsv]="importingCsv"
-        [csvExtract]="csvExtract"
-        [csvSkipDuplicates]="csvSkipDuplicates"
-        (ofxSelected)="onOfxSelected($event)"
-        (csvSelected)="onCsvSelected($event)"
-        (clearOfx)="clearOfxState()"
-        (clearCsv)="clearCsvState()"
-        (importOfx)="importOfx()"
-        (importCsv)="importCsv()"
-        (csvSkipDuplicatesChange)="csvSkipDuplicates = $event"
-        (categoryChanged)="onImportCategoryChanged($event)">
-      </app-account-import>
+      @if (canImportAccounts) {
+        <app-account-import
+          [ofxFileName]="ofxFileName"
+          [extractingOfx]="extractingOfx"
+          [importingOfx]="importingOfx"
+          [ofxExtract]="ofxExtract"
+          [duplicateCount]="duplicateCount()"
+          [categories]="categories"
+          [extractingCsv]="extractingCsv"
+          [importingCsv]="importingCsv"
+          [csvExtract]="csvExtract"
+          [csvSkipDuplicates]="csvSkipDuplicates"
+          (ofxSelected)="onOfxSelected($event)"
+          (csvSelected)="onCsvSelected($event)"
+          (clearOfx)="clearOfxState()"
+          (clearCsv)="clearCsvState()"
+          (importOfx)="importOfx()"
+          (importCsv)="importCsv()"
+          (csvSkipDuplicatesChange)="csvSkipDuplicates = $event"
+          (categoryChanged)="onImportCategoryChanged($event)">
+        </app-account-import>
+      }
       @if (loadingTransactions) {
         <app-ui-state type="loading" title="Carregando extrato..."></app-ui-state>
       }

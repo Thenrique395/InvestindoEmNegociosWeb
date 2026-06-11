@@ -16,6 +16,7 @@ import { AppCurrencyPipe } from '../../../../shared/app-currency.pipe';
 export class AccountListComponent {
   @Input() accounts: AccountResponse[] = [];
   @Input() loading = false;
+  @Input() canManage = true;
 
   @Output() refresh = new EventEmitter<void>();
   @Output() create = new EventEmitter<void>();

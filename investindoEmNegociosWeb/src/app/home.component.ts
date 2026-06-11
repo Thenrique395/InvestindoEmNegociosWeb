@@ -1281,7 +1281,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadProjection(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.cashflowProjection = null;
       return;
     }

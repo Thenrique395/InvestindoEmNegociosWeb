@@ -11,6 +11,7 @@ export const APP_FEATURE_KEYS = {
 
   accountsRead: 'feature.accounts.read',
   accountsManage: 'feature.accounts.manage',
+  accountsImport: 'feature.accounts.import',
 
   cardsRead: 'feature.cards.read',
   cardsCreateUpdate: 'feature.cards.create-update',
@@ -62,6 +63,7 @@ const BASIC_FEATURES: AppFeatureKey[] = [
 const INTERMEDIATE_FEATURES: AppFeatureKey[] = [
   ...BASIC_FEATURES,
   APP_FEATURE_KEYS.accountsManage,
+  APP_FEATURE_KEYS.accountsImport,
   APP_FEATURE_KEYS.cardsStatementsRead,
   APP_FEATURE_KEYS.categoriesManage,
   APP_FEATURE_KEYS.invoiceImportAccess

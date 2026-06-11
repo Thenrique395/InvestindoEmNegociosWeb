@@ -16,6 +16,7 @@ import { LookupsService } from '../lookups.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { expenseStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { UiPermissionsService } from '../ui-permissions.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
@@ -113,11 +114,16 @@ export class DespesasComponent implements OnInit, OnDestroy {
     private accountsService: AccountsService,
     private lookupsService: LookupsService,
     private authService: AuthService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private uiPermissions: UiPermissionsService
   ) {}
 
   get currentRole(): UserRole | null {
     return this.authService.getRole();
+  }
+
+  get canImportInvoices(): boolean {
+    return this.uiPermissions.canImportInvoices();
   }
 
   get canChooseAccount(): boolean {

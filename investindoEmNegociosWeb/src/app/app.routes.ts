@@ -96,7 +96,7 @@ export const routes: Routes = [
   {
     path: 'contas',
     canActivate: [authGuard, roleGuard],
-    data: { feature: APP_FEATURE_KEYS.accountsManage, preload: false },
+    data: { feature: APP_FEATURE_KEYS.accountsRead, preload: false },
     loadComponent: () => import('./contas/contas.component').then((m) => m.ContasComponent),
   },
   {

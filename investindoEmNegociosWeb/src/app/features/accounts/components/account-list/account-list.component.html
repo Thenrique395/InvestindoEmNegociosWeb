@@ -12,12 +12,19 @@
   }
 
   @if (!loading && !hasAccounts) {
-    <app-empty-state
-      title="Nenhuma conta cadastrada"
-      description="Crie sua primeira conta"
-      ctaLabel="Criar conta"
-      (action)="create.emit()">
-    </app-empty-state>
+    @if (canManage) {
+      <app-empty-state
+        title="Nenhuma conta cadastrada"
+        description="Crie sua primeira conta"
+        ctaLabel="Criar conta"
+        (action)="create.emit()">
+      </app-empty-state>
+    } @else {
+      <app-empty-state
+        title="Nenhuma conta cadastrada"
+        description="Nenhuma conta foi cadastrada ainda.">
+      </app-empty-state>
+    }
   }
 
   @if (!loading && hasAccounts) {
@@ -44,8 +51,10 @@
           </div>
           <div class="account-card__actions">
             <button type="button" class="account-card__action account-card__action--primary" (click)="selectAccount.emit(account.id)">Extrato</button>
-            <button type="button" class="account-card__action" (click)="edit.emit(account)">Editar</button>
-            <button type="button" class="account-card__action account-card__action--danger" (click)="remove.emit(account)">Remover</button>
+            @if (canManage) {
+              <button type="button" class="account-card__action" (click)="edit.emit(account)">Editar</button>
+              <button type="button" class="account-card__action account-card__action--danger" (click)="remove.emit(account)">Remover</button>
+            }
           </div>
         </article>
       }

@@ -18,6 +18,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
+import { UiPermissionsService } from '../ui-permissions.service';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -97,6 +98,10 @@ export class CartoesComponent implements OnInit, OnDestroy {
       : 'Cadastre um cartão para acompanhar ciclo de fechamento e vencimento.';
   }
 
+  get canViewCardStatements(): boolean {
+    return this.uiPermissions.canViewCardStatements();
+  }
+
   get totalOpenStatements(): number {
     return this.statementCycles.reduce((sum, cycle) => sum + (cycle.totalOpen || 0), 0);
   }
@@ -141,7 +146,8 @@ export class CartoesComponent implements OnInit, OnDestroy {
     private db: ApiDataService,
     private lookupsStore: LookupsStore,
     private cardsStore: CardsStore,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private uiPermissions: UiPermissionsService
   ) {
     effect(() => {
       const activeBrands = this.lookupsStore.cardBrands().filter((b) => b.isActive !== false);
@@ -172,6 +178,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
       }
 
       if (
+        this.canViewCardStatements &&
         nextStatementCardId &&
         !statementsLoading &&
         (statementCardChanged || loadedStatementCardId !== nextStatementCardId) &&
@@ -429,6 +436,8 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   loadStatementCycles(): void {
+    if (!this.canViewCardStatements) return;
+
     if (!this.statementCardId) {
       this.statementCycles = [];
       this.autoLoadedStatementCardId = null;
