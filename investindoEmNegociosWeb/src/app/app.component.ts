@@ -11,6 +11,7 @@ import { ThemeService } from './theme.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { TopbarComponent } from './topbar/topbar.component';
 import { PublicHeaderComponent } from './public-header/public-header.component';
+import { PublicFooterComponent } from './public-footer/public-footer.component';
 import { PublicNavigationService } from './public-navigation.service';
 import { UserContextFacadeService } from './user-context-facade.service';
 import { UserPreferencesFacadeService } from './user-preferences-facade.service';
@@ -20,7 +21,7 @@ import { FinancialPrivacyService } from './financial-privacy.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent],
+  imports: [RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

@@ -8,10 +8,9 @@
 
 .signup-card {
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--border) 86%, white);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, white 96%, #f8fafc);
-  box-shadow: 0 20px 58px color-mix(in srgb, #0f172a 6%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .signup-shell--page {
@@ -19,10 +18,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  background:
-    radial-gradient(circle at 10% 14%, color-mix(in srgb, var(--primary) 10%, transparent), transparent 28%),
-    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--success) 10%, transparent), transparent 25%),
-    linear-gradient(180deg, #f8fafc 0%, #ffffff 54%, #f8fafc 100%);
+  background: var(--bg);
 }
 
 .signup-shell--page .signup-card {
@@ -44,28 +40,7 @@
   gap: clamp(1.2rem, 2vw, 2rem);
   padding: clamp(2.25rem, 5vw, 5.25rem);
   color: white;
-  background:
-    linear-gradient(180deg, rgba(6, 18, 23, 0.7) 0%, rgba(6, 18, 23, 0.2) 42%, rgba(4, 47, 46, 0.9) 100%),
-    linear-gradient(90deg, rgba(4, 47, 46, 0.78), rgba(4, 47, 46, 0.08) 54%),
-    url('/assets/login/office-portrait.jpg') center top / cover no-repeat;
-}
-
-.signup-visual::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(1, 22, 20, 0.62) 0%, rgba(1, 22, 20, 0.14) 56%, rgba(1, 22, 20, 0.06) 100%),
-    radial-gradient(circle at 18% 82%, color-mix(in srgb, var(--success) 32%, transparent), transparent 34%);
-  pointer-events: none;
-}
-
-.signup-visual::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
-  pointer-events: none;
+  background: var(--text);
 }
 
 .signup-visual > * {
@@ -113,17 +88,15 @@
   gap: 0.65rem;
   padding: 0.62rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   background: rgba(5, 26, 25, 0.38);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px);
 }
 
 .signup-visual__dock span {
   min-height: 42px;
   display: grid;
   place-items: center;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   color: rgba(255, 255, 255, 0.84);
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-bold);
@@ -141,10 +114,7 @@
   display: grid;
   place-items: center;
   padding: clamp(var(--spacing-3), 5vw, var(--spacing-6));
-  background:
-    radial-gradient(circle at 78% 14%, color-mix(in srgb, var(--success) 8%, transparent), transparent 26%),
-    radial-gradient(circle at 18% 82%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 28%),
-    linear-gradient(180deg, var(--bg) 0%, var(--surface) 52%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .signup-panel__card {
@@ -152,11 +122,9 @@
   display: grid;
   gap: 1.45rem;
   padding: clamp(1.35rem, 2.6vw, 2rem);
-  border: 1px solid color-mix(in srgb, var(--border) 82%, white);
-  border-radius: var(--radius-2xl);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 24px 70px color-mix(in srgb, #0f172a 8%, transparent);
-  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .signup-panel__topline {
@@ -178,8 +146,8 @@
   gap: 0.5rem;
   padding: 0.55rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: #f8fafc;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
   color: var(--text);
   font-size: var(--font-size-body-sm);
   transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
@@ -339,15 +307,14 @@
   justify-content: center;
   gap: 0.85rem;
   border: 1px solid var(--primary);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 94%, white), var(--primary));
+  border-radius: var(--radius-md);
+  background: var(--primary);
   color: white;
   font: inherit;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-bold);
-  box-shadow: 0 18px 34px color-mix(in srgb, var(--primary) 24%, transparent);
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  transition: transform 0.18s ease, opacity 0.18s ease;
 }
 
 .signup-form__submit span {
@@ -361,17 +328,13 @@
 }
 
 .signup-form__submit:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 22px 42px color-mix(in srgb, var(--primary) 28%, transparent);
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 .signup-form__submit:disabled {
   opacity: 0.66;
   cursor: not-allowed;
-}
-
-.signup-form__submit[aria-disabled='true']:not(:disabled) {
-  box-shadow: 0 12px 34px color-mix(in srgb, var(--primary) 16%, transparent);
 }
 
 .signup-form__login {
@@ -401,6 +364,10 @@
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+}
+
+.signup-shell:not(.signup-shell--page) .signup-panel__topline {
+  display: none;
 }
 
 .signup-shell:not(.signup-shell--page) .signup-panel__head h1 {

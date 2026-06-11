@@ -1,0 +1,33 @@
+<footer class="public-footer">
+  <div class="public-footer__brand">
+    <img
+      [src]="logoSrc"
+      [alt]="brandName()"
+      width="36"
+      height="36"
+      loading="lazy"
+      decoding="async" />
+    <div>
+      <strong>{{ brandName() }}</strong>
+      <span>{{ brandSlogan() }}</span>
+    </div>
+  </div>
+
+  <nav class="public-footer__column" aria-label="Produto">
+    <p>Produto</p>
+    @for (link of productLinks; track link.href) {
+      <a [href]="link.href">{{ link.label }}</a>
+    }
+  </nav>
+
+  <nav class="public-footer__column" aria-label="Conta">
+    <p>Conta</p>
+    @for (link of accountLinks; track link.href) {
+      <a [routerLink]="link.href">{{ link.label }}</a>
+    }
+  </nav>
+
+  <div class="public-footer__bottom">
+    <span>© {{ currentYear }} {{ brandName() }} — Gestão financeira pessoal.</span>
+  </div>
+</footer>

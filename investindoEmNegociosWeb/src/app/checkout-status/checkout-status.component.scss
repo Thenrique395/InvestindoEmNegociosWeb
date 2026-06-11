@@ -7,12 +7,11 @@
 .status-card {
   width: min(100%, 760px);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-lg);
   background: var(--surface);
   padding: clamp(1.2rem, 2vw, 2rem);
   display: grid;
   gap: 1rem;
-  box-shadow: var(--shadow-md);
 }
 
 .status-page--success .status-card {
@@ -72,9 +71,15 @@
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--info) 70%, var(--primary)));
+  background: var(--primary);
   border-color: transparent;
   color: #fff;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.btn--primary:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 .btn--ghost {

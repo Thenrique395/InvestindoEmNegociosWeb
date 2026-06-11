@@ -2,21 +2,22 @@
   <section id="produto" class="hero">
     <div class="hero__content">
       <p class="eyebrow">Investindo em Negócios</p>
-      <h1>Seu mês financeiro claro, sem planilha manual</h1>
+      <h1>Saia da planilha e veja seu mês com clareza</h1>
       <p class="hero__lead">
-        Acompanhe entradas, saídas, cartões e metas em uma leitura única para decidir melhor antes do mês apertar.
+        Lançamentos, cartões e metas em um só painel. Você sabe o que entrou, o que saiu e o que ainda
+        precisa de atenção antes do mês apertar.
       </p>
       <div class="hero__actions">
         <a routerLink="/register" class="button button--primary">
-          Criar conta gratuita
+          Criar conta grátis
           <span aria-hidden="true">→</span>
         </a>
-        <a href="/#como-funciona" class="button button--secondary">Ver como funciona</a>
+        <a routerLink="/planos" class="button button--secondary">Ver planos</a>
       </div>
-      <div class="hero__signals" aria-label="Principais benefícios">
-        <span>Leitura mensal simples</span>
-        <span>Cartões e faturas no fluxo</span>
-        <span>Metas sem perder contexto</span>
+      <div class="hero__signals" aria-label="Por que começar agora">
+        <span>Plano Essencial sem custo</span>
+        <span>Sem conectar conta bancária</span>
+        <span>Cancele quando quiser</span>
       </div>
     </div>
 
@@ -140,27 +141,72 @@
   <section id="como-funciona" class="section section--steps">
     <div class="section__intro">
       <p class="eyebrow">Como funciona</p>
-      <h2>Do primeiro lançamento à leitura do mês em poucos passos</h2>
+      <h2>Da primeira anotação à leitura do mês, em três passos</h2>
       <p>
-        A experiência foi pensada para sair da planilha e transformar registros soltos em uma visão financeira útil.
+        Sem importação obrigatória, sem integração bancária. Você começa do seu jeito e o painel
+        organiza o resto.
       </p>
     </div>
     <div class="steps-grid">
       <article>
+        <div class="step-icon step-icon--primary" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M12 12v6"/>
+            <path d="M9 15h6"/>
+          </svg>
+        </div>
         <span>01</span>
         <h3>Cadastre sua base</h3>
-        <p>Informe contas, entradas, despesas recorrentes e cartões para montar a primeira leitura do mês.</p>
+        <p>Contas, receitas, despesas recorrentes e cartões — leva poucos minutos para montar a primeira leitura.</p>
       </article>
       <article>
+        <div class="step-icon step-icon--info" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+            <path d="m9 16 2 2 4-4"/>
+          </svg>
+        </div>
         <span>02</span>
         <h3>Acompanhe a rotina</h3>
-        <p>Use calendário, categorias e faturas para entender o que entrou, o que saiu e o que ainda vence.</p>
+        <p>Calendário, categorias e faturas mostram o que entrou, o que saiu e o que ainda vence.</p>
       </article>
       <article>
+        <div class="step-icon step-icon--success" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="5"/>
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+          </svg>
+        </div>
         <span>03</span>
         <h3>Decida o próximo passo</h3>
         <p>Veja sinais de atenção, metas e projeções antes do mês fechar no aperto.</p>
       </article>
+    </div>
+  </section>
+
+  <section id="para-quem-e" class="section">
+    <div class="section__intro">
+      <p class="eyebrow">Para quem é</p>
+      <h2>Feito para rotinas financeiras diferentes</h2>
+      <p>O painel se adapta ao que você precisa acompanhar agora — e cresce junto com sua rotina.</p>
+    </div>
+
+    <div class="personas-grid">
+      @for (persona of personas; track persona.title) {
+        <article class="persona-card">
+          <h3>{{ persona.title }}</h3>
+          <p>{{ persona.description }}</p>
+          <div class="persona-card__tags">
+            @for (module of persona.modules; track module) {
+              <span [class]="tagVariant(module)">{{ module }}</span>
+            }
+          </div>
+        </article>
+      }
     </div>
   </section>
 
@@ -177,32 +223,89 @@
 
     <div class="feature-grid">
       <article class="feature-card feature-card--large">
-        <div class="feature-card__mock feature-card__mock--calendar">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
+        <div class="feature-card__icon feature-card__icon--primary" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1"/>
+            <rect x="14" y="3" width="7" height="5" rx="1"/>
+            <rect x="14" y="12" width="7" height="9" rx="1"/>
+            <rect x="3" y="16" width="7" height="5" rx="1"/>
+          </svg>
+        </div>
+        <div class="feature-card__mock feature-card__mock--dashboard">
+          <div class="feature-card__mock-kpis">
+            <span class="feature-card__mock-kpi feature-card__mock-kpi--green">
+              <em>Receitas</em>
+              <strong>R$ 11.000</strong>
+            </span>
+            <span class="feature-card__mock-kpi feature-card__mock-kpi--red">
+              <em>Despesas</em>
+              <strong>R$ 2.620</strong>
+            </span>
+            <span class="feature-card__mock-kpi feature-card__mock-kpi--blue">
+              <em>Saldo</em>
+              <strong>R$ 8.380</strong>
+            </span>
+          </div>
+          <div class="feature-card__mock-bars" aria-hidden="true">
+            <span style="height: 38%"></span>
+            <span style="height: 72%"></span>
+            <span style="height: 54%"></span>
+            <span style="height: 90%"></span>
+            <span style="height: 46%"></span>
+            <span style="height: 64%"></span>
+          </div>
         </div>
         <p class="eyebrow">Dashboard</p>
-        <h3>Entenda o saldo real sem montar cálculo manual</h3>
+        <h3>Saiba o que sobra sem montar cálculo manual</h3>
         <p>Resumo de entradas, saídas, pendências e situação do mês em uma leitura direta.</p>
       </article>
       <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--warning" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <path d="M2 10h20"/>
+          </svg>
+        </div>
         <p class="eyebrow">Cartões</p>
-        <h3>Fatura e compras dentro do mesmo fluxo</h3>
+        <h3>Fatura e compras no mesmo fluxo</h3>
         <p>Organize vencimento, fechamento, parcelas e impacto no caixa.</p>
       </article>
       <article class="feature-card feature-card--dark">
+        <div class="feature-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="5"/>
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+          </svg>
+        </div>
         <p class="eyebrow">Metas</p>
         <h3>Progresso visível para não perder o objetivo</h3>
         <p>Defina prazo, acompanhe aportes e identifique desvios antes de comprometer o plano.</p>
       </article>
       <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--info" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+        </div>
         <p class="eyebrow">Calendário</p>
         <h3>Receitas e despesas no tempo certo</h3>
         <p>Veja vencimentos, recebimentos e compromissos financeiros por data.</p>
       </article>
       <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--primary" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2"/>
+            <line x1="8" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="11" x2="8" y2="11"/>
+            <line x1="12" y1="11" x2="12" y2="11"/>
+            <line x1="16" y1="11" x2="16" y2="11"/>
+            <line x1="8" y1="15" x2="8" y2="15"/>
+            <line x1="12" y1="15" x2="12" y2="15"/>
+            <line x1="16" y1="15" x2="16" y2="15"/>
+          </svg>
+        </div>
         <p class="eyebrow">Calculadoras</p>
         <h3>Simulações simples para decisões melhores</h3>
         <p>Use cenários de juros, metas, aposentadoria e renda para planejar com mais clareza.</p>
@@ -210,52 +313,137 @@
     </div>
   </section>
 
+  <section id="seguranca" class="section section--trust">
+    <div class="section__intro">
+      <p class="eyebrow">Segurança e confiança</p>
+      <h2>Seus dados, sob seu controle</h2>
+      <p>Sem letras miúdas: você decide o que cadastrar, o que mostrar e o que exportar.</p>
+    </div>
+
+    <div class="trust-list">
+      @for (point of trustPoints; track point.title) {
+        <article class="trust-item">
+          <span class="trust-item__icon" aria-hidden="true">
+            @switch (point.icon) {
+              @case ('lock') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="11" width="16" height="9" rx="2"/>
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                </svg>
+              }
+              @case ('shield') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>
+                  <path d="M9 12l2 2 4-4"/>
+                </svg>
+              }
+              @case ('eye') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+              @case ('export') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 16V4"/>
+                  <path d="M7 9l5-5 5 5"/>
+                  <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+                </svg>
+              }
+            }
+          </span>
+          <div>
+            <h3>{{ point.title }}</h3>
+            <p>{{ point.description }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
   <section id="planos" class="section section--pricing">
     <div class="section__intro">
       <p class="eyebrow">Planos</p>
-      <h2>Comece simples e avance conforme sua maturidade financeira</h2>
+      <h2>Comece simples e avance conforme sua rotina cresce</h2>
       <p>Os planos liberam mais profundidade sem mudar a forma de usar o sistema.</p>
     </div>
 
     <div class="pricing-grid">
-      <article class="price-card">
-        <p class="price-card__label">Basic</p>
-        <h3>Base financeira</h3>
-        <strong>Para começar</strong>
-        <ul>
-          <li>Dashboard mensal</li>
-          <li>Receitas e despesas</li>
-          <li>Calendário</li>
-          <li>Calculadoras</li>
-        </ul>
-      </article>
-      <article class="price-card price-card--featured">
-        <p class="price-card__label">Intermediate</p>
-        <h3>Controle do mês</h3>
-        <strong>Mais escolhido</strong>
-        <ul>
-          <li>Tudo do Basic</li>
-          <li>Cartões e contas</li>
-          <li>Metas financeiras</li>
-          <li>Leitura mais completa do mês</li>
-        </ul>
-      </article>
-      <article class="price-card">
-        <p class="price-card__label">Advanced</p>
-        <h3>Patrimônio</h3>
-        <strong>Para evoluir</strong>
-        <ul>
-          <li>Tudo do Intermediate</li>
-          <li>Investimentos</li>
-          <li>Visão patrimonial</li>
-          <li>Recursos avançados</li>
-        </ul>
-      </article>
+      @for (plan of plans; track plan.code) {
+        <article class="price-card" [class.price-card--featured]="plan.recommended">
+          @if (plan.recommended) {
+            <span class="price-card__badge">Mais escolhido</span>
+          }
+          <div [class]="'feature-card__icon ' + planIconVariants[plan.code]" aria-hidden="true">
+            @switch (plan.code) {
+              @case ('basic') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m7.5 4.27 9 5.15"/>
+                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                  <path d="m3.3 7 8.7 5 8.7-5"/>
+                  <path d="M12 22V12"/>
+                </svg>
+              }
+              @case ('intermediate') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="4" y1="21" x2="4" y2="14"/>
+                  <line x1="4" y1="10" x2="4" y2="3"/>
+                  <line x1="12" y1="21" x2="12" y2="12"/>
+                  <line x1="12" y1="8" x2="12" y2="3"/>
+                  <line x1="20" y1="21" x2="20" y2="16"/>
+                  <line x1="20" y1="12" x2="20" y2="3"/>
+                  <line x1="1" y1="14" x2="7" y2="14"/>
+                  <line x1="9" y1="8" x2="15" y2="8"/>
+                  <line x1="17" y1="16" x2="23" y2="16"/>
+                </svg>
+              }
+              @case ('advanced') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                  <polyline points="16 7 22 7 22 13"/>
+                </svg>
+              }
+            }
+          </div>
+          <p class="price-card__label">{{ plan.name }}</p>
+          <h3>{{ plan.salesHeadline }}</h3>
+          <strong class="price-card__price">
+            {{ plan.monthlyPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}<span>/mês</span>
+          </strong>
+          <ul>
+            @for (feature of plan.features.slice(0, 4); track feature) {
+              <li>
+                <span class="price-card__check" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                {{ feature }}
+              </li>
+            }
+          </ul>
+        </article>
+      }
     </div>
 
     <div class="section__actions">
       <a routerLink="/planos" class="button button--primary">Comparar planos</a>
-      <a routerLink="/register" class="button button--secondary">Criar conta gratuita</a>
+      <a routerLink="/register" class="button button--secondary">Criar conta grátis</a>
+    </div>
+  </section>
+
+  <section class="section section--creator">
+    <div class="creator-note">
+      <p class="eyebrow">Por que esse projeto existe</p>
+      <h2>Construído para resolver um problema real: o meu</h2>
+      <p>
+        O Investindo em Negócios nasceu da mesma frustração que talvez você já tenha sentido: planilhas que
+        ficam desatualizadas, faturas de cartão que chegam de surpresa e metas que somem no meio do caminho.
+      </p>
+      <p>
+        Em vez de mais um app genérico, o objetivo foi criar um painel direto, que mostra o que importa sobre
+        o seu mês sem exigir que você vire especialista em finanças para usar.
+      </p>
     </div>
   </section>
 
@@ -275,20 +463,20 @@
         <p>A proposta é organizar a rotina financeira em uma leitura simples. Você pode usar para controle pessoal, MEI, autônomo ou pequeno negócio.</p>
       </details>
       <details>
-        <summary>Consigo usar só o plano Basic?</summary>
-        <p>Sim. O Basic já libera a base do controle mensal, com dashboard, receitas, despesas, calendário e calculadoras.</p>
+        <summary>Consigo usar só o plano Essencial?</summary>
+        <p>Sim. O Essencial já libera a base do controle mensal: dashboard, receitas, despesas, metas, calendário e calculadoras, sem custo.</p>
       </details>
       <details>
-        <summary>Consigo usar para cartão de crédito?</summary>
-        <p>Sim. Nos planos com cartões habilitados você acompanha faturas, vencimentos, compras parceladas e impacto no caixa do mês.</p>
+        <summary>Quando vale subir para o Controle?</summary>
+        <p>Quando cartão, fatura e contas com saldo real passarem a fazer parte da sua rotina — o Controle conecta tudo isso ao mesmo painel.</p>
       </details>
       <details>
         <summary>Meus dados ficam seguros?</summary>
-        <p>O sistema usa autenticação e acesso protegido. Você mantém sua base no app sem precisar informar senha de banco para começar.</p>
+        <p>O sistema usa autenticação própria e acesso protegido. Você não precisa informar senha de banco para começar a usar.</p>
       </details>
       <details>
         <summary>Posso cancelar quando quiser?</summary>
-        <p>Sim. A ideia é deixar o uso simples desde o cadastro até a gestão do plano, sem prender sua rotina financeira a um processo complicado.</p>
+        <p>Sim. A gestão do plano fica disponível dentro do app, sem precisar de processos complicados para cancelar.</p>
       </details>
     </div>
   </section>
@@ -298,7 +486,42 @@
       <p class="eyebrow">Vamos começar</p>
       <h2>Seu próximo mês pode ser mais claro que o último.</h2>
       <p>Monte sua base financeira e acompanhe entradas, saídas, cartões e metas em um só lugar.</p>
+      <ul class="final-cta__signals">
+        <li>
+          <span class="final-cta__signal-icon final-cta__signal-icon--success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          Sem cartão de crédito
+        </li>
+        <li>
+          <span class="final-cta__signal-icon final-cta__signal-icon--info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          Cancele quando quiser
+        </li>
+        <li>
+          <span class="final-cta__signal-icon final-cta__signal-icon--warning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          Comece em minutos
+        </li>
+      </ul>
     </div>
-    <a routerLink="/register" class="button button--primary">Criar conta agora</a>
+    <div class="final-cta__actions">
+      <a routerLink="/register" class="button button--primary button--lg">
+        Criar conta agora
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+      <a routerLink="/planos" class="button button--ghost">Ver planos</a>
+    </div>
   </section>
 </section>

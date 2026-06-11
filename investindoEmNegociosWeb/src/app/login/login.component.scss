@@ -5,34 +5,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  background:
-    radial-gradient(circle at 8% 12%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 26%),
-    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--success) 10%, transparent), transparent 24%),
-    linear-gradient(180deg, var(--bg) 0%, var(--surface) 52%, var(--bg) 100%);
-}
-
-.login-shell__aura {
-  position: absolute;
-  border-radius: var(--radius-pill);
-  filter: blur(72px);
-  opacity: 0.22;
-  pointer-events: none;
-}
-
-.login-shell__aura--left {
-  width: 380px;
-  height: 380px;
-  left: -140px;
-  bottom: 8%;
-  background: color-mix(in srgb, var(--primary) 42%, transparent);
-}
-
-.login-shell__aura--right {
-  width: 360px;
-  height: 360px;
-  right: -120px;
-  top: 8%;
-  background: color-mix(in srgb, var(--success) 34%, transparent);
+  background: var(--bg);
 }
 
 .login-card {
@@ -68,27 +41,7 @@
   gap: clamp(1.4rem, 2vw, 2rem);
   padding: clamp(2.25rem, 5vw, 5.25rem);
   border-right: 1px solid var(--border);
-  background:
-    linear-gradient(135deg, rgba(7, 16, 37, 0.92), rgba(15, 23, 42, 0.56) 52%, rgba(7, 16, 37, 0.88)),
-    url('/assets/login/finance-workspace.jpg') center / cover no-repeat;
-}
-
-.login-visual::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--primary) 38%, transparent), transparent 30%),
-    radial-gradient(circle at 82% 84%, color-mix(in srgb, var(--success) 24%, transparent), transparent 34%);
-  pointer-events: none;
-}
-
-.login-visual::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  pointer-events: none;
+  background: var(--text);
 }
 
 .login-visual > * {
@@ -135,9 +88,8 @@
   gap: 0.35rem;
   padding: 1.1rem 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(16px);
 }
 
 .login-visual__proof span,
@@ -165,10 +117,7 @@
   display: grid;
   place-items: center;
   padding: clamp(2.25rem, 5vw, 5.5rem);
-  background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary) 4%, transparent) 100%),
-    radial-gradient(circle at 82% 10%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 28%),
-    linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .login-panel {
@@ -177,10 +126,8 @@
   gap: 1.45rem;
   padding: clamp(1.35rem, 2.6vw, 2rem);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  box-shadow: 0 24px 70px color-mix(in srgb, #0f172a 8%, transparent);
-  backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .login-main__topline {
@@ -203,7 +150,7 @@
   gap: 0.5rem;
   padding: 0.55rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   background: var(--surface-2);
   color: var(--text);
   font-size: var(--font-size-body-sm);
@@ -324,20 +271,19 @@
   justify-content: center;
   gap: 0.85rem;
   border: 1px solid var(--primary);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 94%, white), var(--primary));
+  border-radius: var(--radius-md);
+  background: var(--primary);
   color: white;
   font: inherit;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-bold);
-  box-shadow: 0 18px 34px color-mix(in srgb, var(--primary) 24%, transparent);
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  transition: transform 0.18s ease, opacity 0.18s ease;
 }
 
 .login-form__submit:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 22px 42px color-mix(in srgb, var(--primary) 28%, transparent);
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 .login-form__submit:disabled {

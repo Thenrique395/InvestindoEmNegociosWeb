@@ -181,18 +181,17 @@
   width: min(1080px, 94vw);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
 }
 
 .signup-modal__left {
-  background: radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 45%),
-    linear-gradient(160deg, var(--surface-2), var(--surface));
+  background: var(--text);
   padding: clamp(var(--spacing-3), 3vw, var(--spacing-4));
-  color: var(--text);
+  color: white;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-2);
@@ -200,13 +199,14 @@
 
 .signup-modal__left h2 {
   margin: 0;
+  color: white;
   font-size: clamp(1.5rem, 2vw, 2rem);
 }
 
 .signup-modal__left ul {
   margin: 0.25rem 0 0 0;
   padding-left: 0;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.78);
   display: grid;
   gap: 0.3rem;
   list-style: none;

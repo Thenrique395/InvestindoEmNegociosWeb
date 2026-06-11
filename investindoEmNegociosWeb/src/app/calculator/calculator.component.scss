@@ -12,9 +12,8 @@
 
 .calculator-shell {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   padding: 1.6rem;
   display: grid;
   gap: 1.3rem;
@@ -42,7 +41,7 @@
 
 .calc__selector button {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-lg);
   padding: 1rem;
   background: var(--surface);
   color: var(--text);
@@ -56,13 +55,12 @@
   align-items: start;
   gap: 0.85rem;
   position: relative;
-  box-shadow: var(--shadow-sm);
 }
 
 .calc__selector button:hover {
-  border-color: color-mix(in srgb, var(--primary) 32%, var(--border));
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
 }
 
 .selector__item--disabled {
@@ -73,7 +71,7 @@
 .selector__item--disabled:hover {
   border-color: var(--border);
   transform: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 .selector__copy {
@@ -114,7 +112,7 @@
   justify-content: center;
   min-height: 26px;
   padding: 0 0.65rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-bold);
   color: var(--primary-text);
@@ -133,10 +131,9 @@
 
 .calc__panel {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-lg);
   padding: 1.25rem;
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
   display: grid;
   gap: 1rem;
 }
@@ -200,7 +197,12 @@ input:focus {
   color: var(--on-primary);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
-  box-shadow: 0 12px 26px color-mix(in srgb, var(--primary) 20%, transparent);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.btn-primary.sm:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 .result {
@@ -224,7 +226,7 @@ input:focus {
 .chart__bar {
   flex: 1;
   min-height: 20px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 74%, transparent) 0%, color-mix(in srgb, var(--primary) 28%, transparent) 100%);
+  background: var(--primary);
   border-radius: var(--radius-sm) var(--radius-sm) calc(var(--radius-sm) / 2) calc(var(--radius-sm) / 2);
   position: relative;
 }
@@ -242,11 +244,11 @@ input:focus {
 }
 
 .chart__bar--renda {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--success) 68%, transparent) 0%, color-mix(in srgb, var(--success) 24%, transparent) 100%);
+  background: var(--success);
 }
 
 .chart__bar--patrimonio {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 76%, transparent) 0%, color-mix(in srgb, var(--primary) 26%, transparent) 100%);
+  background: var(--primary);
 }
 
 .table {

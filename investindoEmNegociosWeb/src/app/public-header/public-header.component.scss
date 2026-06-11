@@ -14,7 +14,6 @@
   padding: 0 clamp(var(--spacing-3), 2.5vw, var(--spacing-6));
   background: var(--surface);
   border-radius: 0;
-  box-shadow: var(--shadow-sm);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
@@ -60,10 +59,7 @@
 
 .menu a:hover,
 .menu a.active {
-  color: var(--text);
-  background: var(--surface-2);
-  transform: translateY(-1px);
-  border: 1px solid var(--border-strong);
+  color: var(--primary);
 }
 
 .header__actions {

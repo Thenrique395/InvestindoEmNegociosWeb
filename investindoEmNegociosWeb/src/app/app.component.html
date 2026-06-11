@@ -65,6 +65,13 @@
     </main>
   }
 
+  @if (showPublicExperience && !isLoginRoute) {
+    <app-public-footer
+      [brandName]="brandName"
+      [brandSlogan]="brandSlogan"
+      [isLightTheme]="isLightTheme" />
+  }
+
   @if (signupAlert) {
     <div class="global-alert success">
       {{ signupAlert }}
