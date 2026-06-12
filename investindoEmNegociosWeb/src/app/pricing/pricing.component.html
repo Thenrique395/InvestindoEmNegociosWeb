@@ -42,7 +42,40 @@
     <div class="progression-grid">
       @for (step of commercialSteps; track step; let index = $index) {
         <article class="progression-step">
-          <span class="progression-step__index">0{{ index + 1 }}</span>
+          <div class="progression-step__head">
+            <div [class]="'plan-card__icon ' + step.icon" aria-hidden="true">
+              @switch (index) {
+                @case (0) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m7.5 4.27 9 5.15"/>
+                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                    <path d="m3.3 7 8.7 5 8.7-5"/>
+                    <path d="M12 22V12"/>
+                  </svg>
+                }
+                @case (1) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"/>
+                    <line x1="4" y1="10" x2="4" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12" y2="3"/>
+                    <line x1="20" y1="21" x2="20" y2="16"/>
+                    <line x1="20" y1="12" x2="20" y2="3"/>
+                    <line x1="1" y1="14" x2="7" y2="14"/>
+                    <line x1="9" y1="8" x2="15" y2="8"/>
+                    <line x1="17" y1="16" x2="23" y2="16"/>
+                  </svg>
+                }
+                @case (2) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                    <polyline points="16 7 22 7 22 13"/>
+                  </svg>
+                }
+              }
+            </div>
+            <span class="progression-step__index">0{{ index + 1 }}</span>
+          </div>
           <h3>{{ step.title }}</h3>
           <p>{{ step.copy }}</p>
         </article>
@@ -54,15 +87,48 @@
     @for (plan of plans; track plan) {
       <article class="plan-card" [class.plan-card--featured]="plan.recommended">
         <div class="plan-card__top">
-          <div>
-            <p class="plan-card__audience">{{ plan.audience }}</p>
-            <h2>{{ plan.name }}</h2>
-            <p class="plan-card__description">{{ plan.description }}</p>
+          <div class="plan-card__heading">
+            <div [class]="'plan-card__icon ' + planIconVariants[plan.code]" aria-hidden="true">
+              @switch (plan.code) {
+                @case ('basic') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m7.5 4.27 9 5.15"/>
+                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                    <path d="m3.3 7 8.7 5 8.7-5"/>
+                    <path d="M12 22V12"/>
+                  </svg>
+                }
+                @case ('intermediate') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"/>
+                    <line x1="4" y1="10" x2="4" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12" y2="3"/>
+                    <line x1="20" y1="21" x2="20" y2="16"/>
+                    <line x1="20" y1="12" x2="20" y2="3"/>
+                    <line x1="1" y1="14" x2="7" y2="14"/>
+                    <line x1="9" y1="8" x2="15" y2="8"/>
+                    <line x1="17" y1="16" x2="23" y2="16"/>
+                  </svg>
+                }
+                @case ('advanced') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                    <polyline points="16 7 22 7 22 13"/>
+                  </svg>
+                }
+              }
+            </div>
+            <div>
+              <p class="plan-card__audience">{{ plan.audience }}</p>
+              <h2>{{ plan.name }}</h2>
+            </div>
           </div>
           @if (plan.recommended) {
             <span class="plan-badge">Mais escolhido</span>
           }
         </div>
+        <p class="plan-card__description">{{ plan.description }}</p>
         <div class="plan-price">
           <strong>{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
           <span>/ {{ cycle === 'Yearly' ? 'ano' : 'mês' }}</span>
@@ -125,9 +191,25 @@
       @for (row of comparisonRows; track row) {
         <div class="comparison-row" role="row">
           <div role="cell">{{ row.label }}</div>
-          <div role="cell">{{ row.values[0] }}</div>
-          <div role="cell">{{ row.values[1] }}</div>
-          <div role="cell">{{ row.values[2] }}</div>
+          @for (value of row.values; track value) {
+            <div role="cell">
+              @if (value === 'Sim') {
+                <span class="comparison-icon comparison-icon--yes" aria-label="Sim">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+              } @else if (value === 'Não') {
+                <span class="comparison-icon comparison-icon--no" aria-label="Não">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </span>
+              } @else {
+                {{ value }}
+              }
+            </div>
+          }
         </div>
       }
     </div>
@@ -140,14 +222,41 @@
     </div>
     <div class="trust-grid">
       <article>
+        <div class="trust-grid__icon plan-card__icon--info" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m7.5 4.27 9 5.15"/>
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/>
+            <path d="M12 22V12"/>
+          </svg>
+        </div>
         <strong>Essencial</strong>
         <p>Se você quer parar de se perder e criar uma base simples sem pagar para testar.</p>
       </article>
       <article>
+        <div class="trust-grid__icon plan-card__icon--primary" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"/>
+            <line x1="4" y1="10" x2="4" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12" y2="3"/>
+            <line x1="20" y1="21" x2="20" y2="16"/>
+            <line x1="20" y1="12" x2="20" y2="3"/>
+            <line x1="1" y1="14" x2="7" y2="14"/>
+            <line x1="9" y1="8" x2="15" y2="8"/>
+            <line x1="17" y1="16" x2="23" y2="16"/>
+          </svg>
+        </div>
         <strong>Controle</strong>
         <p>Se você usa cartão, precisa prever vencimentos e quer saber com mais clareza o que sobra no mês.</p>
       </article>
       <article>
+        <div class="trust-grid__icon plan-card__icon--success" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
         <strong>Patrimônio</strong>
         <p>Se você já controla a rotina e quer transformar acompanhamento mensal em visão patrimonial.</p>
       </article>

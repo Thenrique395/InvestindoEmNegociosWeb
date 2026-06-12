@@ -37,7 +37,7 @@ test.describe('authenticated finance modules', () => {
     await page.locator('.plan-card').filter({ has: page.getByRole('heading', { level: 3, name: 'Intermediate' }) }).getByRole('button', { name: 'Trocar para este plano' }).click();
 
     await expect(page).toHaveURL(/\/checkout\?plan=intermediate&cycle=Yearly/);
-    await expect(page.getByRole('heading', { level: 1, name: /confirme o plano/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /finalize sua assinatura/i })).toBeVisible();
   });
 
   test('carrega segurança e revoga sessões ativas', async ({ page }) => {

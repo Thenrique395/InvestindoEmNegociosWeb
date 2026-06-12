@@ -13,18 +13,26 @@ import { MARKETING_PLANS, MarketingBillingCycle } from '../marketing-plans';
 export class PricingComponent {
   cycle: MarketingBillingCycle = 'Monthly';
   plans = MARKETING_PLANS;
+  readonly planIconVariants: Record<string, string> = {
+    basic: 'plan-card__icon--info',
+    intermediate: 'plan-card__icon--primary',
+    advanced: 'plan-card__icon--success'
+  };
   commercialSteps = [
     {
       title: 'Começar',
-      copy: 'Use o Essencial para sair do improviso e validar a rotina sem custo.'
+      copy: 'Use o Essencial para sair do improviso e validar a rotina sem custo.',
+      icon: 'plan-card__icon--info'
     },
     {
       title: 'Prever',
-      copy: 'Suba para Controle quando cartão, vencimentos e saldo real passarem a pesar no seu mês.'
+      copy: 'Suba para Controle quando cartão, vencimentos e saldo real passarem a pesar no seu mês.',
+      icon: 'plan-card__icon--primary'
     },
     {
       title: 'Evoluir',
-      copy: 'Vá para Patrimônio quando a sua rotina já estiver madura e a meta virar crescimento financeiro.'
+      copy: 'Vá para Patrimônio quando a sua rotina já estiver madura e a meta virar crescimento financeiro.',
+      icon: 'plan-card__icon--success'
     }
   ];
   comparisonRows = [

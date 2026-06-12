@@ -140,6 +140,12 @@
   gap: 0.5rem;
 }
 
+.progression-step__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .progression-step__index {
   display: inline-flex;
   width: fit-content;
@@ -163,6 +169,20 @@
   margin: 0;
   color: var(--text-secondary);
   line-height: var(--line-height-body);
+}
+
+.trust-grid__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 0.4rem;
+  border-radius: var(--radius-md);
+}
+
+.trust-grid__icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .plan-card {
@@ -191,7 +211,43 @@
 .plan-card__top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 0.75rem;
+}
+
+.plan-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.plan-card__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+}
+
+.plan-card__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.plan-card__icon--primary {
+  background: var(--primary-10);
+  color: var(--primary);
+}
+
+.plan-card__icon--info {
+  background: var(--info-10);
+  color: var(--info);
+}
+
+.plan-card__icon--success {
+  background: var(--success-10);
+  color: var(--success);
 }
 
 .plan-card__audience {
@@ -326,6 +382,29 @@
 .comparison-row > div:not(:first-child) {
   text-align: center;
   font-weight: var(--font-weight-bold);
+}
+
+.comparison-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+}
+
+.comparison-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.comparison-icon--yes {
+  background: var(--success-10);
+  color: var(--success);
+}
+
+.comparison-icon--no {
+  background: var(--surface-2);
+  color: var(--text-muted);
 }
 
 .comparison-row--head > div {

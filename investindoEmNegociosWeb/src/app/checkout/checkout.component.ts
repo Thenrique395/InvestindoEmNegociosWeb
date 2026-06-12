@@ -22,6 +22,7 @@ export class CheckoutComponent {
   selectedPlan: MarketingPlan = findMarketingPlan(null);
   selectedCycle: MarketingBillingCycle = 'Monthly';
   processing = false;
+  currentStep = 1;
 
   accountForm: FormGroup;
   checkingAvailability = false;
@@ -95,6 +96,41 @@ export class CheckoutComponent {
 
   get confirmationStepNumber(): number {
     return this.selectedPlan.code === 'basic' ? 3 : 4;
+  }
+
+  get paymentStepNumber(): number | null {
+    return this.selectedPlan.code === 'basic' ? null : 3;
+  }
+
+  get stepperItems(): { step: number; label: string }[] {
+    const items: { step: number; label: string }[] = [
+      { step: 1, label: 'Plano' },
+      { step: 2, label: 'Sua conta' }
+    ];
+    if (this.paymentStepNumber) {
+      items.push({ step: this.paymentStepNumber, label: 'Pagamento' });
+    }
+    items.push({
+      step: this.confirmationStepNumber,
+      label: this.selectedPlan.code === 'basic' ? 'Ativação' : 'Confirmação'
+    });
+    return items;
+  }
+
+  goToStep(step: number): void {
+    this.currentStep = step;
+  }
+
+  continueFromPlan(): void {
+    this.currentStep = 2;
+  }
+
+  continueFromAccount(): void {
+    this.currentStep = this.paymentStepNumber ?? this.confirmationStepNumber;
+  }
+
+  continueFromPayment(): void {
+    this.currentStep = this.confirmationStepNumber;
   }
 
   selectPlan(planCode: string): void {
@@ -254,6 +290,7 @@ export class CheckoutComponent {
         this.authService.applySession(res);
         this.processing = false;
         this.uiFeedback.success('Conta criada com sucesso.');
+        this.continueFromAccount();
       },
       error: (err: unknown) => {
         this.processing = false;

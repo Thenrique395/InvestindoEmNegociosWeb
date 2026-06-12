@@ -14,317 +14,387 @@
   </header>
 
   <nav class="checkout-stepper" aria-label="Etapas da contratação">
-    <div class="checkout-stepper__step is-complete">
-      <span class="checkout-stepper__circle" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-      </span>
-      <span class="checkout-stepper__label">Plano</span>
-    </div>
-    <span class="checkout-stepper__line is-complete"></span>
-    <div class="checkout-stepper__step" [class.is-complete]="isLogged" [class.is-active]="!isLogged">
-      <span class="checkout-stepper__circle" aria-hidden="true">
-        @if (isLogged) {
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        } @else {
-          2
-        }
-      </span>
-      <span class="checkout-stepper__label">Sua conta</span>
-    </div>
-    <span class="checkout-stepper__line" [class.is-complete]="isLogged"></span>
-    <div class="checkout-stepper__step" [class.is-active]="isLogged">
-      <span class="checkout-stepper__circle" aria-hidden="true">3</span>
-      <span class="checkout-stepper__label">{{ selectedPlan.code === 'basic' ? 'Ativação' : 'Pagamento' }}</span>
-    </div>
+    @for (item of stepperItems; track item.step) {
+      <div class="checkout-stepper__step" [class.is-complete]="currentStep > item.step" [class.is-active]="currentStep === item.step">
+        <span class="checkout-stepper__circle" aria-hidden="true">
+          @if (currentStep > item.step) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            {{ item.step }}
+          }
+        </span>
+        <span class="checkout-stepper__label">{{ item.label }}</span>
+      </div>
+      @if (!$last) {
+        <span class="checkout-stepper__line" [class.is-complete]="currentStep > item.step"></span>
+      }
+    }
   </nav>
 
   <section class="checkout-grid">
     <article class="checkout-card">
-      <div class="checkout-card__section">
-        <div class="section-head">
-          <div class="checkout-card__heading">
-            <span class="checkout-step checkout-step--primary">1</span>
-            <div>
-              <p class="eyebrow">Plano</p>
-              <h2>Escolha o plano ideal</h2>
-            </div>
-          </div>
-          <div class="billing-switch" role="group" aria-label="Periodicidade">
-            <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Monthly'" (click)="selectCycle('Monthly')">
-              Mensal
-            </button>
-            <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Yearly'" (click)="selectCycle('Yearly')">
-              Anual
-            </button>
-          </div>
-        </div>
-
-        <div class="plan-picker">
-          @for (plan of plans; track plan) {
-            <button
-              type="button"
-              class="plan-option"
-              [class.is-active]="plan.code === selectedPlan.code"
-              (click)="selectPlan(plan.code)">
-              <div class="plan-option__top">
-                <div [class]="'plan-option__icon ' + planIconVariants[plan.code]" aria-hidden="true">
-                  @switch (plan.code) {
-                    @case ('basic') {
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m7.5 4.27 9 5.15"/>
-                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-                        <path d="m3.3 7 8.7 5 8.7-5"/>
-                        <path d="M12 22V12"/>
-                      </svg>
-                    }
-                    @case ('intermediate') {
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="4" y1="21" x2="4" y2="14"/>
-                        <line x1="4" y1="10" x2="4" y2="3"/>
-                        <line x1="12" y1="21" x2="12" y2="12"/>
-                        <line x1="12" y1="8" x2="12" y2="3"/>
-                        <line x1="20" y1="21" x2="20" y2="16"/>
-                        <line x1="20" y1="12" x2="20" y2="3"/>
-                        <line x1="1" y1="14" x2="7" y2="14"/>
-                        <line x1="9" y1="8" x2="15" y2="8"/>
-                        <line x1="17" y1="16" x2="23" y2="16"/>
-                      </svg>
-                    }
-                    @case ('advanced') {
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-                        <polyline points="16 7 22 7 22 13"/>
-                      </svg>
-                    }
-                  }
-                </div>
-                <span class="plan-option__radio" aria-hidden="true"></span>
-              </div>
-              <strong class="plan-option__name">{{ plan.name }}</strong>
-              <p class="plan-option__desc">{{ plan.description }}</p>
-              <div class="plan-option__price">
-                <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
-                <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
-              </div>
-            </button>
-          }
-        </div>
-      </div>
-
-      @if (!isLogged) {
+      @if (currentStep === 1) {
         <div class="checkout-card__section">
-          <div class="checkout-card__heading">
-            <span class="checkout-step checkout-step--info">2</span>
-            <div>
-              <p class="eyebrow">Dados pessoais</p>
-              <h2>Informe seus dados</h2>
+          <div class="section-head">
+            <div class="checkout-card__heading">
+              <span class="checkout-step checkout-step--primary">1</span>
+              <div>
+                <p class="eyebrow">Plano</p>
+                <h2>Escolha o plano ideal</h2>
+              </div>
+            </div>
+            <div class="billing-switch" role="group" aria-label="Periodicidade">
+              <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Monthly'" (click)="selectCycle('Monthly')">
+                Mensal
+              </button>
+              <button type="button" class="billing-switch__item" [class.is-active]="selectedCycle === 'Yearly'" (click)="selectCycle('Yearly')">
+                Anual
+              </button>
             </div>
           </div>
-          <p class="muted">
-            A seleção do plano já fica salva. Se você já tiver conta, identificamos automaticamente e basta entrar
-            para continuar.
-          </p>
 
-          <form class="account-form" [formGroup]="accountForm" (ngSubmit)="onAccountStepSubmit()" novalidate>
-            <label class="account-form__field">
-              <span>Nome completo</span>
-              <input
-                class="account-form__input"
-                [class.account-form__input--invalid]="hasAccountError('nome')"
-                [attr.aria-invalid]="hasAccountError('nome')"
-                type="text"
-                formControlName="nome"
-                placeholder="Digite seu nome completo"
-                autocomplete="name" />
-              @if (hasAccountFieldError('nome', 'required')) {
-                <small class="account-form__error">Informe seu nome.</small>
-              }
-              @if (hasAccountFieldError('nome', 'minlength')) {
-                <small class="account-form__error">Use ao menos 2 caracteres.</small>
-              }
-            </label>
-
-            <label class="account-form__field">
-              <span>E-mail</span>
-              <input
-                class="account-form__input"
-                [class.account-form__input--invalid]="hasAccountError('email')"
-                [attr.aria-invalid]="hasAccountError('email')"
-                type="email"
-                formControlName="email"
-                (input)="resetAccountCheck()"
-                placeholder="Digite seu e-mail"
-                autocomplete="email" />
-              @if (hasAccountFieldError('email', 'required')) {
-                <small class="account-form__error">Informe um e-mail.</small>
-              }
-              @if (hasAccountFieldError('email', 'email')) {
-                <small class="account-form__error">Digite um e-mail válido.</small>
-              }
-              @if (hasAccountFieldError('email', 'emailInUse')) {
-                <small class="account-form__error">E-mail já está em uso.</small>
-              }
-            </label>
-
-            <label class="account-form__field">
-              <span>CPF</span>
-              <input
-                class="account-form__input"
-                [class.account-form__input--invalid]="hasAccountError('cpf')"
-                [attr.aria-invalid]="hasAccountError('cpf')"
-                type="text"
-                inputmode="numeric"
-                formControlName="cpf"
-                (input)="onAccountCpfInput($event)"
-                placeholder="000.000.000-00"
-                autocomplete="off" />
-              @if (hasAccountFieldError('cpf', 'required')) {
-                <small class="account-form__error">Informe seu CPF.</small>
-              }
-              @if (hasAccountFieldError('cpf', 'cpf')) {
-                <small class="account-form__error">CPF inválido.</small>
-              }
-              @if (hasAccountFieldError('cpf', 'documentInUse')) {
-                <small class="account-form__error">CPF já está em uso.</small>
-              }
-            </label>
-
-            @if (accountExists) {
-              <div class="account-exists-notice">
-                <p>Já encontramos uma conta com esses dados. Entre para continuar direto para o pagamento.</p>
-                <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
-              </div>
-            }
-
-            @if (showRegistrationFields) {
-              <label class="account-form__field">
-                <span>Senha</span>
-                <div class="account-form__input-shell" [class.account-form__input-shell--invalid]="hasAccountError('senha')">
-                  <input
-                    class="account-form__input"
-                    [attr.aria-invalid]="hasAccountError('senha')"
-                    [type]="showPassword ? 'text' : 'password'"
-                    formControlName="senha"
-                    placeholder="Digite sua senha"
-                    autocomplete="new-password" />
-                  <button
-                    class="account-form__toggle"
-                    type="button"
-                    (click)="togglePasswordVisibility()"
-                    [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
-                    {{ showPassword ? 'Ocultar' : 'Mostrar' }}
-                  </button>
+          <div class="plan-picker">
+            @for (plan of plans; track plan) {
+              <button
+                type="button"
+                class="plan-option"
+                [class.is-active]="plan.code === selectedPlan.code"
+                (click)="selectPlan(plan.code)">
+                <div class="plan-option__top">
+                  <div [class]="'plan-option__icon ' + planIconVariants[plan.code]" aria-hidden="true">
+                    @switch (plan.code) {
+                      @case ('basic') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m7.5 4.27 9 5.15"/>
+                          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                          <path d="m3.3 7 8.7 5 8.7-5"/>
+                          <path d="M12 22V12"/>
+                        </svg>
+                      }
+                      @case ('intermediate') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="4" y1="21" x2="4" y2="14"/>
+                          <line x1="4" y1="10" x2="4" y2="3"/>
+                          <line x1="12" y1="21" x2="12" y2="12"/>
+                          <line x1="12" y1="8" x2="12" y2="3"/>
+                          <line x1="20" y1="21" x2="20" y2="16"/>
+                          <line x1="20" y1="12" x2="20" y2="3"/>
+                          <line x1="1" y1="14" x2="7" y2="14"/>
+                          <line x1="9" y1="8" x2="15" y2="8"/>
+                          <line x1="17" y1="16" x2="23" y2="16"/>
+                        </svg>
+                      }
+                      @case ('advanced') {
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                          <polyline points="16 7 22 7 22 13"/>
+                        </svg>
+                      }
+                    }
+                  </div>
+                  <span class="plan-option__radio" aria-hidden="true"></span>
                 </div>
-                @if (hasAccountFieldError('senha', 'required')) {
-                  <small class="account-form__error">Informe uma senha.</small>
-                }
-                @if (hasAccountFieldError('senha', 'minlength')) {
-                  <small class="account-form__error">Use ao menos 6 caracteres.</small>
-                }
-              </label>
-
-              <label class="account-form__field">
-                <span>Confirmar senha</span>
-                <div
-                  class="account-form__input-shell"
-                  [class.account-form__input-shell--invalid]="hasAccountError('confirmarSenha') || hasAccountPasswordMismatch()">
-                  <input
-                    class="account-form__input"
-                    [attr.aria-invalid]="hasAccountError('confirmarSenha') || hasAccountPasswordMismatch()"
-                    [type]="showConfirmPassword ? 'text' : 'password'"
-                    formControlName="confirmarSenha"
-                    placeholder="Confirme sua senha"
-                    autocomplete="new-password" />
-                  <button
-                    class="account-form__toggle"
-                    type="button"
-                    (click)="toggleConfirmPasswordVisibility()"
-                    [attr.aria-label]="showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'">
-                    {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
-                  </button>
+                <strong class="plan-option__name">{{ plan.name }}</strong>
+                <p class="plan-option__desc">{{ plan.description }}</p>
+                <div class="plan-option__price">
+                  <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
+                  <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
                 </div>
-                @if (hasAccountFieldError('confirmarSenha', 'required')) {
-                  <small class="account-form__error">Confirme sua senha.</small>
-                }
-                @if (hasAccountPasswordMismatch()) {
-                  <small class="account-form__error">As senhas precisam ser iguais.</small>
-                }
-              </label>
-
-              <label class="account-form__terms" [class.account-form__terms--invalid]="hasAccountError('aceitarTermos')">
-                <input type="checkbox" formControlName="aceitarTermos" />
-                <span>Li e aceito os termos de uso e a política de privacidade.</span>
-              </label>
-              @if (hasAccountFieldError('aceitarTermos', 'required')) {
-                <small class="account-form__error">Aceite os termos para continuar.</small>
-              }
+              </button>
             }
+          </div>
 
-            <button class="account-form__submit" type="submit" [disabled]="processing || checkingAvailability">
-              @if (showRegistrationFields) {
-                {{ processing ? 'Criando conta...' : 'Criar conta e continuar' }}
-              } @else {
-                {{ checkingAvailability ? 'Verificando...' : 'Continuar' }}
-              }
+          <div class="step-actions">
+            <button type="button" class="btn-primary step-actions__cta" (click)="continueFromPlan()">
+              Continuar
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
             </button>
-          </form>
-
-          <div class="checkout-card__footer">
-            <span>Já possui cadastro?</span>
-            <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
           </div>
         </div>
       } @else {
-        <div class="checkout-card__section">
-          <div class="checkout-card__heading">
-            <span class="checkout-step checkout-step--success">2</span>
-            <div>
-              <p class="eyebrow">Sua conta</p>
-              <h2>Conta confirmada</h2>
-            </div>
+        <div class="checkout-card__section step-summary">
+          <div class="step-summary__icon step-summary__icon--success" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
           </div>
-          <div class="account-summary">
-            <div class="account-summary__avatar" aria-hidden="true">{{ userInitial }}</div>
-            <div class="account-summary__info">
-              <strong>{{ userName }}</strong>
-              <span>{{ userEmail }}</span>
-            </div>
-            @if (currentPlan) {
-              <span class="account-summary__badge">Plano atual: {{ currentPlan.name }}</span>
-            }
+          <div class="step-summary__content">
+            <p class="eyebrow">Plano</p>
+            <strong>{{ selectedPlan.name }} · {{ selectedCycle === 'Yearly' ? 'cobrança anual' : 'cobrança mensal' }}</strong>
+            <span>{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} / {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
           </div>
+          <button type="button" class="text-link step-summary__edit" (click)="goToStep(1)">Trocar</button>
         </div>
       }
 
-      @if (isLogged && selectedPlan.code !== 'basic') {
-        <div class="checkout-card__section">
-          <div class="checkout-card__heading">
-            <span class="checkout-step checkout-step--info">3</span>
-            <div>
-              <p class="eyebrow">Forma de pagamento</p>
-              <h2>Pagamento com cartão de crédito</h2>
+      @if (currentStep === 2) {
+        @if (!isLogged) {
+          <div class="checkout-card__section">
+            <div class="checkout-card__heading">
+              <span class="checkout-step checkout-step--info">2</span>
+              <div>
+                <p class="eyebrow">Dados pessoais</p>
+                <h2>Informe seus dados</h2>
+              </div>
+            </div>
+            <p class="muted">
+              A seleção do plano já fica salva. Se você já tiver conta, identificamos automaticamente e basta entrar
+              para continuar.
+            </p>
+
+            <form class="account-form" [formGroup]="accountForm" (ngSubmit)="onAccountStepSubmit()" novalidate>
+              <label class="account-form__field">
+                <span>Nome completo</span>
+                <input
+                  class="account-form__input"
+                  [class.account-form__input--invalid]="hasAccountError('nome')"
+                  [attr.aria-invalid]="hasAccountError('nome')"
+                  type="text"
+                  formControlName="nome"
+                  placeholder="Digite seu nome completo"
+                  autocomplete="name" />
+                @if (hasAccountFieldError('nome', 'required')) {
+                  <small class="account-form__error">Informe seu nome.</small>
+                }
+                @if (hasAccountFieldError('nome', 'minlength')) {
+                  <small class="account-form__error">Use ao menos 2 caracteres.</small>
+                }
+              </label>
+
+              <label class="account-form__field">
+                <span>E-mail</span>
+                <input
+                  class="account-form__input"
+                  [class.account-form__input--invalid]="hasAccountError('email')"
+                  [attr.aria-invalid]="hasAccountError('email')"
+                  type="email"
+                  formControlName="email"
+                  (input)="resetAccountCheck()"
+                  placeholder="Digite seu e-mail"
+                  autocomplete="email" />
+                @if (hasAccountFieldError('email', 'required')) {
+                  <small class="account-form__error">Informe um e-mail.</small>
+                }
+                @if (hasAccountFieldError('email', 'email')) {
+                  <small class="account-form__error">Digite um e-mail válido.</small>
+                }
+                @if (hasAccountFieldError('email', 'emailInUse')) {
+                  <small class="account-form__error">E-mail já está em uso.</small>
+                }
+              </label>
+
+              <label class="account-form__field">
+                <span>CPF</span>
+                <input
+                  class="account-form__input"
+                  [class.account-form__input--invalid]="hasAccountError('cpf')"
+                  [attr.aria-invalid]="hasAccountError('cpf')"
+                  type="text"
+                  inputmode="numeric"
+                  formControlName="cpf"
+                  (input)="onAccountCpfInput($event)"
+                  placeholder="000.000.000-00"
+                  autocomplete="off" />
+                @if (hasAccountFieldError('cpf', 'required')) {
+                  <small class="account-form__error">Informe seu CPF.</small>
+                }
+                @if (hasAccountFieldError('cpf', 'cpf')) {
+                  <small class="account-form__error">CPF inválido.</small>
+                }
+                @if (hasAccountFieldError('cpf', 'documentInUse')) {
+                  <small class="account-form__error">CPF já está em uso.</small>
+                }
+              </label>
+
+              @if (accountExists) {
+                <div class="account-exists-notice">
+                  <p>Já encontramos uma conta com esses dados. Entre para continuar direto para o pagamento.</p>
+                  <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
+                </div>
+              }
+
+              @if (showRegistrationFields) {
+                <label class="account-form__field">
+                  <span>Senha</span>
+                  <div class="account-form__input-shell" [class.account-form__input-shell--invalid]="hasAccountError('senha')">
+                    <input
+                      class="account-form__input"
+                      [attr.aria-invalid]="hasAccountError('senha')"
+                      [type]="showPassword ? 'text' : 'password'"
+                      formControlName="senha"
+                      placeholder="Digite sua senha"
+                      autocomplete="new-password" />
+                    <button
+                      class="account-form__toggle"
+                      type="button"
+                      (click)="togglePasswordVisibility()"
+                      [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+                      {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+                  @if (hasAccountFieldError('senha', 'required')) {
+                    <small class="account-form__error">Informe uma senha.</small>
+                  }
+                  @if (hasAccountFieldError('senha', 'minlength')) {
+                    <small class="account-form__error">Use ao menos 6 caracteres.</small>
+                  }
+                </label>
+
+                <label class="account-form__field">
+                  <span>Confirmar senha</span>
+                  <div
+                    class="account-form__input-shell"
+                    [class.account-form__input-shell--invalid]="hasAccountError('confirmarSenha') || hasAccountPasswordMismatch()">
+                    <input
+                      class="account-form__input"
+                      [attr.aria-invalid]="hasAccountError('confirmarSenha') || hasAccountPasswordMismatch()"
+                      [type]="showConfirmPassword ? 'text' : 'password'"
+                      formControlName="confirmarSenha"
+                      placeholder="Confirme sua senha"
+                      autocomplete="new-password" />
+                    <button
+                      class="account-form__toggle"
+                      type="button"
+                      (click)="toggleConfirmPasswordVisibility()"
+                      [attr.aria-label]="showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'">
+                      {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                  </div>
+                  @if (hasAccountFieldError('confirmarSenha', 'required')) {
+                    <small class="account-form__error">Confirme sua senha.</small>
+                  }
+                  @if (hasAccountPasswordMismatch()) {
+                    <small class="account-form__error">As senhas precisam ser iguais.</small>
+                  }
+                </label>
+
+                <label class="account-form__terms" [class.account-form__terms--invalid]="hasAccountError('aceitarTermos')">
+                  <input type="checkbox" formControlName="aceitarTermos" />
+                  <span>Li e aceito os termos de uso e a política de privacidade.</span>
+                </label>
+                @if (hasAccountFieldError('aceitarTermos', 'required')) {
+                  <small class="account-form__error">Aceite os termos para continuar.</small>
+                }
+              }
+
+              <button class="account-form__submit" type="submit" [disabled]="processing || checkingAvailability">
+                @if (showRegistrationFields) {
+                  {{ processing ? 'Criando conta...' : 'Criar conta e continuar' }}
+                } @else {
+                  {{ checkingAvailability ? 'Verificando...' : 'Continuar' }}
+                }
+              </button>
+            </form>
+
+            <div class="checkout-card__footer">
+              <span>Já possui cadastro?</span>
+              <button type="button" class="text-link" (click)="continueToLogin()">Entrar para continuar</button>
             </div>
           </div>
-          <div class="payment-method">
-            <div class="payment-method__icon" aria-hidden="true">
+        } @else {
+          <div class="checkout-card__section">
+            <div class="checkout-card__heading">
+              <span class="checkout-step checkout-step--success">2</span>
+              <div>
+                <p class="eyebrow">Sua conta</p>
+                <h2>Conta confirmada</h2>
+              </div>
+            </div>
+            <div class="account-summary">
+              <div class="account-summary__avatar" aria-hidden="true">{{ userInitial }}</div>
+              <div class="account-summary__info">
+                <strong>{{ userName }}</strong>
+                <span>{{ userEmail }}</span>
+              </div>
+              @if (currentPlan) {
+                <span class="account-summary__badge">Plano atual: {{ currentPlan.name }}</span>
+              }
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn-primary step-actions__cta" (click)="continueFromAccount()">
+                Continuar
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+      } @else if (currentStep > 2) {
+        <div class="checkout-card__section step-summary">
+          <div class="step-summary__icon step-summary__icon--success" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="step-summary__content">
+            <p class="eyebrow">Sua conta</p>
+            <strong>{{ userName }}</strong>
+            <span>{{ userEmail }}</span>
+          </div>
+          <button type="button" class="text-link step-summary__edit" (click)="goToStep(2)">Trocar</button>
+        </div>
+      }
+
+      @if (paymentStepNumber) {
+        @if (currentStep === paymentStepNumber) {
+          <div class="checkout-card__section">
+            <div class="checkout-card__heading">
+              <span class="checkout-step checkout-step--info">{{ paymentStepNumber }}</span>
+              <div>
+                <p class="eyebrow">Forma de pagamento</p>
+                <h2>Pagamento com cartão de crédito</h2>
+              </div>
+            </div>
+            <div class="payment-method">
+              <div class="payment-method__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/>
+                  <line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+              </div>
+              <div>
+                <strong>Cartão de crédito</strong>
+                <span>Os dados do cartão são informados na próxima etapa, em ambiente seguro processado pela Stripe.</span>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn-primary step-actions__cta" (click)="continueFromPayment()">
+                Continuar
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        } @else if (currentStep > paymentStepNumber) {
+          <div class="checkout-card__section step-summary">
+            <div class="step-summary__icon step-summary__icon--info" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="5" width="20" height="14" rx="2"/>
                 <line x1="2" y1="10" x2="22" y2="10"/>
               </svg>
             </div>
-            <div>
+            <div class="step-summary__content">
+              <p class="eyebrow">Forma de pagamento</p>
               <strong>Cartão de crédito</strong>
-              <span>Os dados do cartão são informados na próxima etapa, em ambiente seguro processado pela Stripe.</span>
+              <span>Processado em ambiente seguro pela Stripe</span>
             </div>
+            <button type="button" class="text-link step-summary__edit" (click)="goToStep(paymentStepNumber)">Trocar</button>
           </div>
-        </div>
+        }
       }
 
-      @if (isLogged) {
+      @if (currentStep === confirmationStepNumber) {
         <div class="checkout-card__section">
           <div class="checkout-card__heading">
             <span class="checkout-step checkout-step--success">{{ confirmationStepNumber }}</span>

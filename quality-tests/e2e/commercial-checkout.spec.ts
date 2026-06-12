@@ -9,7 +9,7 @@ test.describe('commercial checkout', () => {
     await page.getByRole('link', { name: /Escolher Controle/i }).click();
 
     await expect(page).toHaveURL(/\/checkout\?plan=intermediate&cycle=Monthly/);
-    await expect(page.getByRole('heading', { level: 1, name: /confirme o plano/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /finalize sua assinatura/i })).toBeVisible();
   });
 
   test('finaliza o retorno do checkout pago com status real vindo do backend', async ({ page }) => {
@@ -28,7 +28,7 @@ test.describe('commercial checkout', () => {
           checkoutId: '11111111-1111-1111-1111-111111111111',
           provider: 'stripe',
           status: 'Pending',
-          checkoutUrl: 'http://127.0.0.1:4200/checkout/sucesso?session_id=cs_test_123&checkout_id=11111111-1111-1111-1111-111111111111',
+          checkoutUrl: 'http://127.0.0.1:4300/checkout/sucesso?session_id=cs_test_123&checkout_id=11111111-1111-1111-1111-111111111111',
           planCode: 'advanced',
           billingCycle: 'Yearly',
           amount: 599,
@@ -112,7 +112,10 @@ test.describe('commercial checkout', () => {
 
     await page.goto('/checkout?plan=advanced&cycle=Yearly', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('button', { name: /Confirmar e ativar assinatura/i }).click();
+    await page.getByRole('button', { name: /^Continuar$/i }).first().click();
+    await page.getByRole('button', { name: /^Continuar$/i }).first().click();
+    await page.getByRole('button', { name: /^Continuar$/i }).first().click();
+    await page.getByRole('button', { name: /Ir para pagamento/i }).click();
 
     await expect(page).toHaveURL(/\/checkout\/sucesso/);
     await expect(page.getByRole('heading', { level: 1, name: /Patrimônio ativado com sucesso/i })).toBeVisible();
