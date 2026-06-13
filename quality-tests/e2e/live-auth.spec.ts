@@ -147,12 +147,12 @@ test.describe('live auth flow', () => {
     const last4 = user.email.match(/(\d+)/)?.[1]?.slice(-4) || '4242';
 
     await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 2, name: 'Meus cartões' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Seus cartões e ciclos de fatura' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Adicionar cartão' }).first().click();
     await page.getByLabel('Número do cartão').fill(`5555 4444 3333 ${last4}`);
-    await page.getByLabel('Nome impresso no cartão').fill(`Cartao Live ${last4}`);
-    await page.getByLabel('Banco (opcional)').fill('Banco Live');
+    await page.getByLabel('Nome do cartão').fill(`Cartao Live ${last4}`);
+    await page.getByLabel('Banco').fill('Banco Live');
     await page.getByLabel('Limite de crédito').fill('850000');
     await page.getByLabel('Dia do fechamento').fill('12');
     await page.getByLabel('Dia do vencimento').fill('20');
@@ -160,7 +160,7 @@ test.describe('live auth flow', () => {
 
     await expect(page.getByText(`Cartao Live ${last4}`)).toBeVisible({ timeout: 20000 });
     await expect(page.getByText(`•••• ${last4}`)).toBeVisible({ timeout: 20000 });
-    await expect(page.getByText('Fatura por competência')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 3, name: 'Como suas compras entram na fatura' })).toBeVisible();
   });
 
   test('exibe a conta principal real e respeita a restricao do plano Basic', async ({ page }, testInfo) => {
@@ -168,20 +168,18 @@ test.describe('live auth flow', () => {
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { level: 1, name: 'Contas' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Minhas contas' })).toBeVisible();
     await expect(page.getByRole('heading', { level: 3, name: 'Conta principal' })).toBeVisible();
 
-    await page.getByLabel('Nome').fill('Reserva bloqueada live');
-    await page.getByLabel('Saldo inicial').fill('300');
-    await page.getByRole('button', { name: 'Criar conta' }).click();
-    await expect(page.getByText('No plano Basic a conta principal é gerenciada automaticamente. Faça upgrade para criar ou editar contas.')).toBeVisible({ timeout: 20000 });
-    await expect(page.getByRole('heading', { level: 3, name: 'Conta principal' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 3, name: 'Reserva bloqueada live' })).toHaveCount(0);
+    // No plano Basic a criação de contas não fica disponível na UI.
+    await expect(page.getByRole('button', { name: 'Nova conta' })).toHaveCount(0);
 
     const principalAccount = page.locator('article').filter({ hasText: 'Conta principal' });
-    await principalAccount.getByRole('button', { name: 'Ver extrato' }).click();
+    await principalAccount.getByRole('button', { name: 'Extrato' }).click();
     await expect(page.getByRole('heading', { level: 2, name: /Extrato: Conta principal/i })).toBeVisible();
-    await expect(page.getByRole('cell', { name: 'Salario teste live' }).first()).toBeVisible({ timeout: 20000 });
-    await expect(page.getByRole('cell', { name: 'Mercado teste live' }).first()).toBeVisible({ timeout: 20000 });
+
+    // Receita/despesa do onboarding entram como lançamentos, não como transações da conta;
+    // o extrato da conta começa vazio para a conta principal recém-criada.
+    await expect(page.getByText('Nenhuma movimentação')).toBeVisible({ timeout: 20000 });
   });
 });
