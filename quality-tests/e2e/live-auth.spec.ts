@@ -51,7 +51,7 @@ async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
   await page.getByPlaceholder('Digite sua senha').fill(user.password);
 
   let loggedIn = false;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
     await page.locator('form').getByRole('button', { name: 'Entrar' }).click();
     loggedIn = await page
       .waitForURL(/\/(onboarding|dashboard)$/i, { timeout: 10000 })
@@ -59,6 +59,8 @@ async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
       .catch(() => false);
     if (loggedIn) break;
     await expect(page.locator('form').getByRole('button', { name: 'Entrar' })).toBeVisible({ timeout: 10000 });
+    // O endpoint de login tem rate limit de 5 req/min; aguarda a janela resetar antes de tentar de novo.
+    await page.waitForTimeout(65000);
   }
 
   await expect(page).toHaveURL(/\/(onboarding|dashboard)$/i, { timeout: 30000 });
@@ -71,29 +73,39 @@ async function completeLiveOnboarding(page: Page, workerIndex: number, retry: nu
   const user = await signUpAndLogin(page, workerIndex, retry);
 
   await expect(page).toHaveURL(/\/onboarding$/i, { timeout: 30000 });
-  await expect(page.getByRole('heading', { level: 2, name: 'Vamos configurar seu perfil' })).toBeVisible();
 
-  await page.getByText('Melhorar vida financeira').click();
-  await page.getByLabel(/Nome completo/).fill('Codex Live Usuario');
-  await page.getByLabel('CPF').fill('52998224725');
+  // Passo 1 de 4: objetivo inicial.
+  await expect(page.getByRole('heading', { level: 2, name: 'Vamos definir seu foco inicial' })).toBeVisible();
+  await page.getByText('Melhorar vida financeira', { exact: true }).click();
+  await page.getByRole('button', { name: 'Continuar para preferências' }).click();
+
+  // Passo 2 de 4: preferências iniciais.
+  await expect(page.getByRole('heading', { level: 2, name: 'Escolha suas preferências' })).toBeVisible();
+  await page.getByText('Balanceado', { exact: true }).click();
+  await page.getByRole('button', { name: 'Continuar para dados básicos' }).click();
+
+  // Passo 3 de 4: dados básicos do perfil.
+  await expect(page.getByRole('heading', { level: 2, name: 'Dados Básicos' })).toBeVisible();
+  const cpfField = page.getByLabel('CPF');
+  if ((await cpfField.getAttribute('readonly')) === null) {
+    await cpfField.fill(user.cpf);
+  }
   await page.getByLabel('Telefone').fill('81995257823');
   await page.getByLabel('Data de nascimento').fill('1991-05-20');
   await page.getByLabel('Cidade').fill('Recife');
   await page.getByLabel('Estado (UF)').fill('PE');
   await page.getByLabel('País').fill('Brasil');
-  await page.getByRole('button', { name: 'Salvar e continuar para conta' }).click();
+  await page.getByRole('button', { name: 'Salvar e continuar para conta e lançamentos' }).click();
 
-  await expect(page.getByRole('heading', { level: 2, name: 'Crie sua primeira conta' })).toBeVisible();
-  const accountNameInput = page.getByPlaceholder('Ex.: Nubank');
-  if (await accountNameInput.isVisible().catch(() => false)) {
-    await accountNameInput.fill('Conta teste live');
-    await page.locator('input[type="number"]').fill('1500');
+  // Passo 4 de 4: conta principal e primeiros lançamentos.
+  await expect(page.getByRole('heading', { level: 2, name: /Ative sua conta/ })).toBeVisible();
+  const accountReadyMessage = page.getByText('Conta principal criada. Agora você já pode registrar os primeiros lançamentos.');
+  if (!(await accountReadyMessage.isVisible())) {
+    await page.getByLabel('Nome da conta').fill('Conta teste live');
+    await page.getByLabel('Saldo inicial').fill('1500');
     await page.getByRole('button', { name: 'Criar conta' }).click();
+    await expect(accountReadyMessage).toBeVisible({ timeout: 20000 });
   }
-  await expect(page.getByText('Conta ativa configurada. Você já pode concluir o onboarding.')).toBeVisible({ timeout: 20000 });
-  await page.getByRole('button', { name: 'Continuar para receita e despesa' }).click();
-
-  await expect(page.getByRole('heading', { level: 2, name: 'Cadastre sua primeira receita e despesa' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Adicionar receita' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
@@ -115,8 +127,8 @@ async function completeLiveOnboarding(page: Page, workerIndex: number, retry: nu
 
   await page.getByRole('button', { name: 'Concluir onboarding' }).click();
   await expect(page).toHaveURL(/\/dashboard$/i, { timeout: 30000 });
-  await expect(page.getByRole('heading', { level: 1, name: /Visão geral de/i })).toBeVisible();
-  await expect(page.getByText('Saldo Disponível Real')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Seu mês com clareza' })).toBeVisible();
+  await expect(page.getByText('Quanto sobra')).toBeVisible();
 
   return user;
 }
@@ -125,12 +137,12 @@ test.describe('live auth flow', () => {
   test.skip(!process.env['RUN_LIVE_SERVER_E2E'], 'Live server E2E roda apenas sob demanda.');
 
   test('conclui onboarding real e entra no dashboard autenticado', async ({ page }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
   });
 
   test('cria um cartao real e exibe na listagem', async ({ page }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     const user = await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
     const last4 = user.email.match(/(\d+)/)?.[1]?.slice(-4) || '4242';
 
@@ -152,7 +164,7 @@ test.describe('live auth flow', () => {
   });
 
   test('exibe a conta principal real e respeita a restricao do plano Basic', async ({ page }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     await completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry);
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
