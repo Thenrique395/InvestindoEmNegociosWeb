@@ -4,4 +4,4 @@ const runtimeEnv =
     ? String(process.env['API_BASE_URL']).trim().replace(/\/$/, '')
     : '';
 
-export const API_BASE_URL = runtimeEnv || 'http://35.174.50.187:5059/api/v1';
+export const API_BASE_URL = runtimeEnv || 'http://35.174.50.187:5060/api/v1';
