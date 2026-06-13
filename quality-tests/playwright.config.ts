@@ -15,7 +15,11 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: appBaseUrl,
-    launchOptions: slowMo > 0 ? { slowMo } : undefined,
+    launchOptions: {
+      ...(slowMo > 0 ? { slowMo } : {}),
+      // Porta 5060 (backend DEV) é tratada como "unsafe port" (SIP) pelo Chrome.
+      args: ['--explicitly-allowed-ports=5060']
+    },
     trace: 'retain-on-failure'
   },
   webServer: shouldStartServer

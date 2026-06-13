@@ -47,8 +47,8 @@ async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
   await page.goto('/login', { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveURL(/\/login$/);
 
-  await page.getByLabel('Email').fill(user.email);
-  await page.getByLabel('Senha').fill(user.password);
+  await page.getByLabel('E-mail').fill(user.email);
+  await page.getByPlaceholder('Digite sua senha').fill(user.password);
 
   let loggedIn = false;
   for (let attempt = 0; attempt < 3; attempt += 1) {
