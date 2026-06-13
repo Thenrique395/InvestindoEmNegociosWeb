@@ -1,11 +1,30 @@
 import { expect, test, type Page } from '@playwright/test';
 
+function calculateCpfVerifier(base: string, startWeight: number): number {
+  const sum = base
+    .split('')
+    .reduce((acc, digit, index) => acc + Number(digit) * (startWeight - index), 0);
+  const remainder = sum % 11;
+  return remainder < 2 ? 0 : 11 - remainder;
+}
+
+function buildValidCpf(seed: string): string {
+  let base = seed.replace(/\D/g, '').padEnd(9, '0').slice(-9);
+  if (/^(\d)\1{8}$/.test(base)) {
+    base = `1${base.slice(1)}`;
+  }
+  const firstVerifier = calculateCpfVerifier(base, 10);
+  const secondVerifier = calculateCpfVerifier(`${base}${firstVerifier}`, 11);
+  return `${base}${firstVerifier}${secondVerifier}`;
+}
+
 function buildLiveUser(workerIndex: number, retry: number) {
   const uniqueSuffix = `${Date.now()}${workerIndex}${retry}`;
   return {
     email: `codex.live.${uniqueSuffix}@example.com`,
     password: `Codex@${uniqueSuffix.slice(-8)}`,
-    fullName: `Codex Live ${uniqueSuffix.slice(-6)}`
+    fullName: `Codex Live ${uniqueSuffix.slice(-6)}`,
+    cpf: buildValidCpf(uniqueSuffix)
   };
 }
 
@@ -17,6 +36,7 @@ async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
 
   await page.getByLabel('Nome completo').fill(user.fullName);
   await page.getByLabel('E-mail').fill(user.email);
+  await page.getByLabel('CPF').fill(user.cpf);
   await page.getByPlaceholder('Digite sua senha').fill(user.password);
   await page.getByPlaceholder('Confirme sua senha').fill(user.password);
   await page.getByLabel('Li e aceito os termos de uso e a política de privacidade.').check();
