@@ -35,7 +35,7 @@ export interface IncomeMonthSummary {
 
 @Injectable({ providedIn: 'root' })
 export class ReceitasSummaryService {
-  private readonly baseUrl = `${API_BASE_URL}/receitas/summary`;
+  private readonly baseUrl = `${API_BASE_URL}/incomes/summary`;
 
   constructor(private http: HttpClient) {}
 

@@ -30,15 +30,17 @@ export class IncomesPage {
     await expect(this.createForm().getByLabel('Categoria')).toContainText(name);
   }
 
-  async createIncome(name: string, categoryName: string, amount: string, recurring = false) {
+  async createIncome(name: string, categoryName: string, amount: string, recurring = false, receivedDateDDMMYYYY = '09032026') {
     const form = this.createForm();
     await form.getByRole('textbox', { name: 'Fonte', exact: true }).fill(name);
     await form.getByLabel('Categoria').selectOption({ label: categoryName });
     if (recurring) {
-      await form.getByLabel('Receita recorrente mensal').check();
+      // O input real é "sr-only" (escondido visualmente; a UI usa um switch customizado),
+      // então o Playwright não o considera "visible" para a ação check() padrão.
+      await form.getByLabel('Receita recorrente').check({ force: true });
     }
     await form.getByLabel('Valor (R$)').fill(amount);
-    await form.getByLabel('Data de recebimento (DD/MM/AAAA)').fill('09032026');
+    await form.getByLabel('Data de recebimento').fill(receivedDateDDMMYYYY);
     const response = this.page.waitForResponse((res) => res.request().method() === 'POST' && res.url().includes('/plans'));
     await form.getByRole('button', { name: 'Salvar receita' }).click();
     await expect.poll(async () => (await response).ok()).toBeTruthy();
@@ -83,11 +85,18 @@ export class IncomesPage {
     await expect.poll(async () => (await response).ok()).toBeTruthy();
   }
 
-  async deleteIncome(name: string) {
-    const response = this.page.waitForResponse((res) => res.request().method() === 'DELETE' && res.url().includes('/plans/'));
+  async deleteIncome(name: string, recurring = false) {
     await this.rowByName(name).getByRole('button', { name: 'Excluir' }).click();
-    await expect(this.page.getByRole('heading', { level: 3, name })).toBeVisible();
-    await this.page.getByRole('button', { name: 'Excluir recorrência' }).click();
-    await expect.poll(async () => (await response).ok()).toBeTruthy();
+    await expect(this.page.getByRole('heading', { level: 3, name: 'Confirmar remoção' })).toBeVisible();
+
+    if (recurring) {
+      const response = this.page.waitForResponse((res) => res.request().method() === 'DELETE' && res.url().includes('/plans/'));
+      await this.page.getByRole('button', { name: 'Encerrar recorrência' }).click();
+      await expect.poll(async () => (await response).ok()).toBeTruthy();
+    } else {
+      const response = this.page.waitForResponse((res) => res.request().method() === 'DELETE' && res.url().includes('/installments/'));
+      await this.page.getByRole('button', { name: 'Excluir receita' }).click();
+      await expect.poll(async () => (await response).ok()).toBeTruthy();
+    }
   }
 }

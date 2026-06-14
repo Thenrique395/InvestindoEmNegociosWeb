@@ -218,10 +218,28 @@
   justify-content: center;
 }
 
+.receitas-edit-received__title {
+  margin: 0;
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--text);
+}
+
 .receitas-edit-received__actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+}
+
+.receitas-edit-received__danger {
+  min-height: 48px;
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1.35rem;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid color-mix(in srgb, var(--danger) 16%, transparent);
+  background: var(--danger);
+  color: white;
 }
 
 .receitas-edit-received__secondary,

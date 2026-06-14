@@ -33,12 +33,12 @@ export class ExpensesPage {
     await expect(this.createForm().getByLabel('Categoria')).toContainText(name);
   }
 
-  async createExpense(name: string, categoryName: string, amount: string) {
+  async createExpense(name: string, categoryName: string, amount: string, dueDateDDMMYYYY = '09032026') {
     const form = this.createForm();
     await form.getByLabel('Nome da despesa').fill(name);
     await form.getByLabel('Categoria').selectOption({ label: categoryName });
     await form.getByLabel('Valor (R$)').fill(amount);
-    await form.getByLabel('Primeiro vencimento (DD/MM/AAAA)').fill('09032026');
+    await form.getByLabel('Primeiro vencimento').fill(dueDateDDMMYYYY);
     const response = this.page.waitForResponse((res) => res.request().method() === 'POST' && res.url().includes('/plans'));
     await form.getByRole('button', { name: 'Salvar despesa' }).click();
     await expect.poll(async () => (await response).ok()).toBeTruthy();
@@ -67,7 +67,7 @@ export class ExpensesPage {
 
   async openEdit(name: string) {
     await this.rowByName(name).getByRole('button', { name: 'Editar' }).click();
-    await expect(this.page.getByRole('heading', { level: 3, name: 'Editar lançamento' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 3, name: 'Atualize este lançamento' })).toBeVisible();
   }
 
   async saveExpenseEdit(name: string, amount: string) {
@@ -75,7 +75,16 @@ export class ExpensesPage {
     await form.getByLabel('Nome da despesa').fill(name);
     await form.getByLabel('Valor (R$)').fill(amount);
     const response = this.page.waitForResponse((res) => res.request().method() === 'PUT' && res.url().includes('/plans/'));
-    await form.getByRole('button', { name: 'Editar despesa' }).click();
+    await form.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect.poll(async () => (await response).ok()).toBeTruthy();
+  }
+
+  async deleteExpense(name: string) {
+    // Para uma despesa avulsa simples (sem parcelas/recorrência), openRemocao() em
+    // despesas.component.ts não exibe o modal `confirmRemocao` — remove direto via
+    // removerDespesa() -> removeExpenseInstallment().
+    const response = this.page.waitForResponse((res) => res.request().method() === 'DELETE' && res.url().includes('/installments/'));
+    await this.rowByName(name).getByRole('button', { name: 'Excluir' }).click();
     await expect.poll(async () => (await response).ok()).toBeTruthy();
   }
 

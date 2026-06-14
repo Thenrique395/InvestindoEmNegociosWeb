@@ -242,3 +242,54 @@
     </div>
   </div>
 }
+
+@if (showDeleteModal) {
+  <div class="receitas-edit-received">
+    <div class="receitas-edit-received__backdrop" (click)="fecharModalExcluir()"></div>
+    <div class="receitas-edit-received__dialog">
+      <div class="receitas-edit-received__head">
+        <div class="receitas-edit-received__copy">
+          <p class="receitas-edit-received__eyebrow">Excluir receita</p>
+          <h3 class="receitas-edit-received__title">Confirmar remoção</h3>
+          @if (deleteIsRecurring) {
+            <p class="receitas-edit-received__text">
+              A receita <strong>{{ deleteFonte }}</strong> é recorrente. Deseja excluir apenas este mês ou encerrar a
+              recorrência?
+            </p>
+          } @else {
+            <p class="receitas-edit-received__text">
+              Tem certeza que deseja excluir a receita <strong>{{ deleteFonte }}</strong>? Essa ação não pode ser
+              desfeita.
+            </p>
+          }
+        </div>
+        <button
+          class="receitas-edit-received__close"
+          type="button"
+          (click)="fecharModalExcluir()"
+          aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" focusable="false" role="presentation" width="18" height="18">
+            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="receitas-edit-received__actions">
+        @if (deleteIsRecurring) {
+          <button type="button" class="receitas-edit-received__secondary" (click)="confirmarExcluirSomenteEsta()">
+            Somente este mês
+          </button>
+          <button type="button" class="receitas-edit-received__danger" (click)="confirmarExcluirRecorrencia()">
+            Encerrar recorrência
+          </button>
+        } @else {
+          <button type="button" class="receitas-edit-received__secondary" (click)="fecharModalExcluir()">
+            Cancelar
+          </button>
+          <button type="button" class="receitas-edit-received__danger" (click)="confirmarExcluirSomenteEsta()">
+            Excluir receita
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

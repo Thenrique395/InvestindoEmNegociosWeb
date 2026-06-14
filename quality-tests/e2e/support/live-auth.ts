@@ -25,12 +25,31 @@ const PROFILE_ENV_MAP: Record<LiveProfile, { email: string; password: string }> 
   }
 };
 
+function calculateCpfVerifier(base: string, startWeight: number): number {
+  const sum = base
+    .split('')
+    .reduce((acc, digit, index) => acc + Number(digit) * (startWeight - index), 0);
+  const remainder = sum % 11;
+  return remainder < 2 ? 0 : 11 - remainder;
+}
+
+function buildValidCpf(seed: string): string {
+  let base = seed.replace(/\D/g, '').padEnd(9, '0').slice(-9);
+  if (/^(\d)\1{8}$/.test(base)) {
+    base = `1${base.slice(1)}`;
+  }
+  const firstVerifier = calculateCpfVerifier(base, 10);
+  const secondVerifier = calculateCpfVerifier(`${base}${firstVerifier}`, 11);
+  return `${base}${firstVerifier}${secondVerifier}`;
+}
+
 export function buildLiveUser(workerIndex: number, retry: number) {
   const uniqueSuffix = `${Date.now()}${workerIndex}${retry}`;
   return {
     email: `codex.live.${uniqueSuffix}@example.com`,
     password: `Codex@${uniqueSuffix.slice(-8)}`,
-    fullName: `Codex Live ${uniqueSuffix.slice(-6)}`
+    fullName: `Codex Live ${uniqueSuffix.slice(-6)}`,
+    cpf: buildValidCpf(uniqueSuffix)
   };
 }
 
@@ -112,6 +131,7 @@ export async function signUpAndLogin(page: Page, workerIndex: number, retry: num
 
   await page.getByLabel('Nome completo').fill(user.fullName);
   await page.getByLabel('E-mail').fill(user.email);
+  await page.getByLabel('CPF').fill(user.cpf);
   await page.getByPlaceholder('Digite sua senha').fill(user.password);
   await page.getByPlaceholder('Confirme sua senha').fill(user.password);
   await page.getByLabel('Li e aceito os termos de uso e a política de privacidade.').check();
@@ -138,61 +158,41 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
   const user = await signUpAndLogin(page, workerIndex, retry);
 
   await expect(page).toHaveURL(/\/onboarding$/i, { timeout: 30000 });
-  await expect(page.getByRole('heading', { level: 2, name: 'Vamos configurar seu perfil' })).toBeVisible();
 
-  await page.getByText('Melhorar vida financeira').click();
-  await page.getByLabel(/Nome completo/).fill('Codex Live Usuario');
-  await page.getByLabel('CPF').fill('52998224725');
+  // Passo 1 de 4: objetivo inicial.
+  await expect(page.getByRole('heading', { level: 2, name: 'Vamos definir seu foco inicial' })).toBeVisible();
+  await page.getByText('Melhorar vida financeira', { exact: true }).click();
+  await page.getByRole('button', { name: 'Continuar para preferências' }).click();
+
+  // Passo 2 de 4: preferências iniciais.
+  await expect(page.getByRole('heading', { level: 2, name: 'Escolha suas preferências' })).toBeVisible();
+  await page.getByText('Balanceado', { exact: true }).click();
+  await page.getByRole('button', { name: 'Continuar para dados básicos' }).click();
+
+  // Passo 3 de 4: dados básicos do perfil.
+  await expect(page.getByRole('heading', { level: 2, name: 'Dados Básicos' })).toBeVisible();
+  const cpfField = page.getByLabel('CPF');
+  if ((await cpfField.getAttribute('readonly')) === null) {
+    await cpfField.fill(user.cpf);
+  }
   await page.getByLabel('Telefone').fill('81995257823');
   await page.getByLabel('Data de nascimento').fill('1991-05-20');
   await page.getByLabel('Cidade').fill('Recife');
   await page.getByLabel('Estado (UF)').fill('PE');
   await page.getByLabel('País').fill('Brasil');
+  await page.getByRole('button', { name: 'Salvar e continuar para conta e lançamentos' }).click();
 
-  let movedToAccountStep = false;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await page.getByRole('button', { name: 'Salvar e continuar para conta' }).click();
-    movedToAccountStep = await page
-      .getByRole('heading', { level: 2, name: 'Crie sua primeira conta' })
-      .waitFor({ state: 'visible', timeout: 10000 })
-      .then(() => true)
-      .catch(() => false);
-    if (movedToAccountStep) break;
-    await expect(page.getByRole('button', { name: 'Salvar e continuar para conta' })).toBeEnabled({ timeout: 10000 });
-  }
-
-  await expect(page.getByRole('heading', { level: 2, name: 'Crie sua primeira conta' })).toBeVisible();
-  const accountNameInput = page.getByPlaceholder('Ex.: Nubank');
-  if (await accountNameInput.isVisible().catch(() => false)) {
-    await accountNameInput.fill('Conta teste live');
-    await page.locator('input[type="number"]').fill('1500');
+  // Passo 4 de 4: conta principal e primeiros lançamentos.
+  await expect(page.getByRole('heading', { level: 2, name: /Ative sua conta/ })).toBeVisible();
+  const accountReadyMessage = page.getByText('Conta principal criada. Agora você já pode registrar os primeiros lançamentos.');
+  if (!(await accountReadyMessage.isVisible())) {
+    await page.getByLabel('Nome da conta').fill('Conta teste live');
+    await page.getByLabel('Saldo inicial').fill('1500');
     await page.getByRole('button', { name: 'Criar conta' }).click();
+    await expect(accountReadyMessage).toBeVisible({ timeout: 20000 });
   }
-  await expect(page.getByText('Conta ativa configurada. Você já pode concluir o onboarding.')).toBeVisible({ timeout: 20000 });
-  await page.getByRole('button', { name: 'Continuar para receita e despesa' }).click();
 
-  await expect(page.getByRole('heading', { level: 2, name: 'Cadastre sua primeira receita e despesa' })).toBeVisible();
-
-  const openIncomeModal = async () => {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      const button = page.getByRole('button', { name: 'Adicionar receita' });
-      const visible = await button.isVisible().catch(() => false);
-      if (!visible) {
-        await page.reload({ waitUntil: 'domcontentloaded' });
-        await expect(page.getByRole('heading', { level: 2, name: 'Cadastre sua primeira receita e despesa' })).toBeVisible();
-      }
-      await page.getByRole('button', { name: 'Adicionar receita' }).click();
-      const opened = await page
-        .getByRole('heading', { level: 3, name: 'Adicionar receita' })
-        .waitFor({ state: 'visible', timeout: 8000 })
-        .then(() => true)
-        .catch(() => false);
-      if (opened) return;
-      await expect(page.getByRole('button', { name: 'Adicionar receita' })).toBeVisible({ timeout: 10000 });
-    }
-  };
-
-  await openIncomeModal();
+  await page.getByRole('button', { name: 'Adicionar receita' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
   await page.getByLabel('Fonte').fill('Salario teste live');
   await page.locator('select[name="categoria"]').first().selectOption({ index: 1 });
@@ -201,20 +201,7 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
   await page.getByRole('button', { name: 'Salvar receita' }).click();
   await expect(page.getByText('Receita inicial cadastrada.')).toBeVisible({ timeout: 20000 });
 
-  const openExpenseModal = async () => {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      await page.getByRole('button', { name: 'Adicionar despesa' }).click();
-      const opened = await page
-        .getByRole('heading', { level: 3, name: 'Adicionar lançamento' })
-        .waitFor({ state: 'visible', timeout: 8000 })
-        .then(() => true)
-        .catch(() => false);
-      if (opened) return;
-      await expect(page.getByRole('button', { name: 'Adicionar despesa' })).toBeVisible({ timeout: 10000 });
-    }
-  };
-
-  await openExpenseModal();
+  await page.getByRole('button', { name: 'Adicionar despesa' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
   await page.getByLabel('Nome da despesa').fill('Mercado teste live');
   await page.locator('select[name="categoria"]').last().selectOption({ index: 1 });
@@ -225,8 +212,8 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
 
   await page.getByRole('button', { name: 'Concluir onboarding' }).click();
   await expect(page).toHaveURL(/\/dashboard$/i, { timeout: 30000 });
-  await expect(page.getByRole('heading', { level: 1, name: /Visão geral de/i })).toBeVisible();
-  await expect(page.getByText('Saldo Disponível Real')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Seu mês com clareza' })).toBeVisible();
+  await expect(page.getByText('Quanto sobra')).toBeVisible();
 
   return user;
 }
