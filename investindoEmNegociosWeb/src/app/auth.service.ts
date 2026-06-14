@@ -133,7 +133,6 @@ export class AuthService {
 
   getAccessToken(): string | null {
     if (this.isAccessTokenExpired()) {
-      this.clearSession();
       return null;
     }
     return this.getStorageItem('access_token');
@@ -177,7 +176,7 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getAccessToken();
+    return !!this.getStorageItem('access_token') && !!this.getRefreshToken();
   }
 
   isAccessTokenExpired(): boolean {

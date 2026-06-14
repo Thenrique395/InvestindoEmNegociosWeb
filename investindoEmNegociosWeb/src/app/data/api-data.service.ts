@@ -306,7 +306,7 @@ export class ApiDataService {
   }
 
   refresh(force = false): void {
-    if (!this.authService.getAccessToken()) {
+    if (!this.authService.isAuthenticated()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
       this.incomeSummarySubject.next(null);
       return;
@@ -366,7 +366,7 @@ export class ApiDataService {
   }
 
   refreshIncomes(month?: string, force = false): void {
-    if (!this.authService.getAccessToken()) {
+    if (!this.authService.isAuthenticated()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });
       this.incomeSummarySubject.next(null);
        this.incomesLoadingSubject.next(false);

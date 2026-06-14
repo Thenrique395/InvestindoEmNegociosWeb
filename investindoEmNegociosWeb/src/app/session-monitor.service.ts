@@ -12,7 +12,7 @@ type SessionMonitorOptions = {
 @Injectable({ providedIn: 'root' })
 export class SessionMonitorService {
   private readonly isBrowser: boolean;
-  private readonly sessionIdleTimeoutMs = 60 * 60 * 1000;
+  private readonly sessionIdleTimeoutMs = 10 * 60 * 1000;
   private readonly sessionRefreshWindowMs = 2 * 60 * 1000;
   private readonly sessionCheckIntervalMs = 30 * 1000;
   private readonly activityEvents: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'scroll'];
@@ -105,6 +105,10 @@ export class SessionMonitorService {
       return;
     }
 
+    // A partir daqui o usuário tem access token e refresh token salvos. O access
+    // token pode já ter expirado (ex.: aba ficou em segundo plano e este timer não
+    // rodou por mais de 15min) — isso não significa sessão inválida, apenas que o
+    // refresh abaixo precisa ser feito antes de qualquer outra checagem.
     const now = Date.now();
     const idleMs = now - this.lastActivityAt;
     if (idleMs >= this.sessionIdleTimeoutMs) {
