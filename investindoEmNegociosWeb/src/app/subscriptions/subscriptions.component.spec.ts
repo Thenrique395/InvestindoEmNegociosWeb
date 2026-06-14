@@ -65,8 +65,6 @@ describe('SubscriptionsComponent', () => {
           name: 'Teste',
           email: 'teste@teste.com',
           role: 'Intermediate',
-          token: 'jwt',
-          refreshToken: 'refresh',
           expiresAt: '2026-03-14T11:00:00Z'
         },
         notes: ['nota']
@@ -90,8 +88,6 @@ describe('SubscriptionsComponent', () => {
           name: 'Teste',
           email: 'teste@teste.com',
           role: 'Basic',
-          token: 'jwt-basic',
-          refreshToken: 'refresh-basic',
           expiresAt: '2026-03-14T11:00:00Z'
         },
         notes: ['nota']
