@@ -1,4 +1,4 @@
-import { setLocaleSettings } from './locale-settings';
+import { getLocaleSettings, setLocaleSettings } from './locale-settings';
 import {
   allowOnlyDigitsKeydown,
   formatCurrencyFromDigits,
@@ -8,6 +8,12 @@ import {
 } from './input-mask';
 
 describe('input-mask utils', () => {
+  const original = { ...getLocaleSettings() };
+
+  afterEach(() => {
+    setLocaleSettings(original);
+  });
+
   it('formata moeda a partir de digitos', () => {
     setLocaleSettings({ locale: 'pt-BR', currency: 'BRL' });
     expect(formatCurrencyFromDigits('1234')).toBe('12,34');
