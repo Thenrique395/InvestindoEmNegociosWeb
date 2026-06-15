@@ -9,6 +9,8 @@ export interface AuthResponse {
   name: string;
   email: string;
   role: UserRole;
+  token: string;
+  refreshToken: string;
   expiresAt: string;
 }
 
@@ -49,13 +51,17 @@ export class AuthService {
     );
   }
 
-  refresh() {
+  refresh(refreshToken?: string) {
     if (this.refreshInFlight$) {
       return this.refreshInFlight$;
     }
 
+    const token = refreshToken || this.getRefreshToken();
+    if (!token) {
+      return throwError(() => new Error('Sessão expirada. Faça login novamente.'));
+    }
     const request$ = this.http
-      .post<AuthResponse>(`${this.baseUrl}/refresh`, {})
+      .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken: token })
       .pipe(
         map((res) => this.persistSession(res)),
         catchError((err) => this.wrapError(err, 'Sessão expirada. Faça login novamente.', false, false)),
@@ -112,7 +118,9 @@ export class AuthService {
   }
 
   private persistSession(res: AuthResponse): AuthResponse {
+    this.setStorageItem('access_token', res.token);
     if (res.role) this.setStorageItem('user_role', res.role);
+    if (res.refreshToken) this.setStorageItem('refresh_token', res.refreshToken);
     if (res.expiresAt) this.setStorageItem('access_expires_at', res.expiresAt);
     if (res.name) this.setStorageItem('user_name', res.name);
     if (res.email) this.setStorageItem('user_email', res.email);
@@ -123,8 +131,31 @@ export class AuthService {
     return this.persistSession(res);
   }
 
+  getAccessToken(): string | null {
+    if (this.isAccessTokenExpired()) {
+      return null;
+    }
+    return this.getStorageItem('access_token');
+  }
+
+  getRefreshToken(): string | null {
+    return this.getStorageItem('refresh_token');
+  }
+
   getRole(): UserRole | null {
-    return parseRole(this.getStorageItem('user_role'));
+    const stored = parseRole(this.getStorageItem('user_role'));
+    if (stored) return stored;
+
+    const tokenRole = parseRole(this.readRoleFromToken(this.getAccessToken()));
+    if (tokenRole) {
+      this.setStorageItem('user_role', tokenRole);
+      return tokenRole;
+    }
+    if (this.getAccessToken()) {
+      this.setStorageItem('user_role', 'Basic');
+      return 'Basic';
+    }
+    return null;
   }
 
   getUserName(): string {
@@ -136,7 +167,8 @@ export class AuthService {
   }
 
   clearSession(): void {
-    this.http.post<void>(`${this.baseUrl}/logout`, {}).subscribe({ error: () => void 0 });
+    this.removeStorageItem('access_token');
+    this.removeStorageItem('refresh_token');
     this.removeStorageItem('access_expires_at');
     this.removeStorageItem('user_role');
     this.removeStorageItem('user_name');
@@ -144,25 +176,72 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getStorageItem('user_role') && !!this.getStorageItem('access_expires_at');
+    return !!this.getStorageItem('access_token') && !!this.getRefreshToken();
   }
 
   isAccessTokenExpired(): boolean {
+    const token = this.getStorageItem('access_token');
+    if (!token) return true;
+
     const expiresAt = this.getStorageItem('access_expires_at');
-    if (!expiresAt) return true;
+    if (expiresAt) {
+      const exp = new Date(expiresAt).getTime();
+      if (Number.isFinite(exp)) {
+        return Date.now() >= exp;
+      }
+    }
 
-    const exp = new Date(expiresAt).getTime();
-    if (!Number.isFinite(exp)) return true;
+    const jwtExp = this.readExpFromToken(token);
+    if (jwtExp) {
+      return Date.now() >= jwtExp * 1000;
+    }
 
-    return Date.now() >= exp;
+    return false;
   }
 
   getAccessTokenExpiresAtMs(): number | null {
-    const expiresAt = this.getStorageItem('access_expires_at');
-    if (!expiresAt) return null;
+    const token = this.getStorageItem('access_token');
+    if (!token) return null;
 
-    const exp = new Date(expiresAt).getTime();
-    return Number.isFinite(exp) ? exp : null;
+    const expiresAt = this.getStorageItem('access_expires_at');
+    if (expiresAt) {
+      const exp = new Date(expiresAt).getTime();
+      if (Number.isFinite(exp)) return exp;
+    }
+
+    const jwtExp = this.readExpFromToken(token);
+    return jwtExp ? jwtExp * 1000 : null;
+  }
+
+  private readRoleFromToken(token: string | null): string | null {
+    if (!token || typeof atob === 'undefined') return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
+
+    try {
+      const decoded = JSON.parse(atob(padded));
+      return decoded?.role || decoded?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private readExpFromToken(token: string | null): number | null {
+    if (!token || typeof atob === 'undefined') return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
+    try {
+      const decoded = JSON.parse(atob(padded));
+      return Number(decoded?.exp) || null;
+    } catch {
+      return null;
+    }
   }
 
   private wrapError(

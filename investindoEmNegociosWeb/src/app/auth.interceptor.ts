@@ -4,15 +4,6 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { UiFeedbackService } from './ui-feedback.service';
-import { API_BASE_URL } from './api.config';
-
-const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
-
-function readCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-  return match ? decodeURIComponent(match[1]) : null;
-}
 
 let lastForbiddenFeedbackAt = 0;
 let lastServerErrorFeedbackAt = 0;
@@ -62,6 +53,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   const feedback = inject(UiFeedbackService);
+  const token = auth.getAccessToken();
   const isAuthRequest =
     req.url.includes('/auth/login') ||
     req.url.includes('/auth/register') ||
@@ -69,22 +61,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     req.url.includes('/auth/forgot-password') ||
     req.url.includes('/auth/reset-password');
 
-  const isApiRequest = req.url.startsWith(API_BASE_URL);
+  const withAuth = token && !isAuthRequest
+    ? req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+    : req;
 
-  const buildOutgoing = () => {
-    if (!isApiRequest) return req;
-
-    const headers: Record<string, string> = {};
-    if (MUTATING_METHODS.has(req.method)) {
-      const csrfToken = readCookie('XSRF-TOKEN');
-      if (csrfToken) {
-        headers['X-XSRF-TOKEN'] = csrfToken;
-      }
-    }
-    return req.clone({ withCredentials: true, setHeaders: headers });
-  };
-
-  return next(buildOutgoing()).pipe(
+  return next(withAuth).pipe(
     catchError((err: HttpErrorResponse) => {
       if (err.status === 403 && !isAuthRequest) {
         if (!shouldThrottle(lastForbiddenFeedbackAt, 4000)) {
@@ -106,7 +91,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      if (!auth.isAuthenticated()) {
+      const refreshToken = auth.getRefreshToken();
+      if (!refreshToken) {
         auth.clearSession();
         if (!router.url.startsWith('/login')) {
           router.navigateByUrl('/login');
@@ -114,8 +100,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      return auth.refresh().pipe(
-        switchMap(() => next(buildOutgoing())),
+      return auth.refresh(refreshToken).pipe(
+        switchMap((res) => {
+          const retry = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${res.token}`
+            }
+          });
+          return next(retry);
+        }),
         catchError((refreshErr) => {
           auth.clearSession();
           if (!router.url.startsWith('/login')) {

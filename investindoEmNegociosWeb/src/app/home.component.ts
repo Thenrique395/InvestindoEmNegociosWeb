@@ -976,7 +976,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get isLogged(): boolean {
-    return this.authService.isAuthenticated();
+    return !!this.storage?.getItem('access_token');
   }
 
   private atualizarSaldo(): void {
@@ -1411,6 +1411,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     return key >= range.startKey && key <= range.endKey;
   }
 
+  private get storage(): Storage | null {
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+      ? window.localStorage
+      : null;
+  }
 
   private atualizarMetas(goals: Goal[]): void {
     const planned = goals.filter((g) => g.status === 'Planned').length;

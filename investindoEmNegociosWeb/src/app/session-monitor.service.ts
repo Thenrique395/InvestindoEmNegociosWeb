@@ -122,8 +122,16 @@ export class SessionMonitorService {
     const remainingMs = expiresAtMs - now;
     if (remainingMs > this.sessionRefreshWindowMs) return;
 
+    const refreshToken = this.authService.getRefreshToken();
+    if (!refreshToken) {
+      if (remainingMs <= 0) {
+        this.expireSession('Sessão expirada. Faça login novamente.');
+      }
+      return;
+    }
+
     this.refreshInFlight = true;
-    this.authService.refresh().subscribe({
+    this.authService.refresh(refreshToken).subscribe({
       next: () => {
         this.refreshInFlight = false;
       },
