@@ -49,7 +49,7 @@
     </div>
   }
 
-  @if (isLogged && isOnboardingRoute) {
+  @if (isOnboardingRoute) {
     <main class="onboarding-route-main">
       <div class="route-view" [class.route-view--enter]="routeTransitionActive">
         <router-outlet />

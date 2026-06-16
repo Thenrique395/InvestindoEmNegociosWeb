@@ -12,14 +12,13 @@ type SessionMonitorOptions = {
 @Injectable({ providedIn: 'root' })
 export class SessionMonitorService {
   private readonly isBrowser: boolean;
-  private readonly sessionIdleTimeoutMs = 10 * 60 * 1000;
+  private readonly sessionIdleTimeoutMs = 15 * 60 * 1000;
   private readonly sessionRefreshWindowMs = 2 * 60 * 1000;
   private readonly sessionCheckIntervalMs = 30 * 1000;
   private readonly activityEvents: Array<keyof WindowEventMap> = ['click', 'keydown', 'mousemove', 'scroll'];
   private lastActivityAt = Date.now();
   private monitorId: ReturnType<typeof setInterval> | null = null;
   private refreshInFlight = false;
-  private expiryRedirectScheduled = false;
   private options: SessionMonitorOptions | null = null;
 
   constructor(
@@ -58,15 +57,6 @@ export class SessionMonitorService {
     this.lastActivityAt = Date.now();
   }
 
-  scheduleExpiredSessionRedirect(): void {
-    if (!this.isBrowser || this.expiryRedirectScheduled) return;
-    this.expiryRedirectScheduled = true;
-    setTimeout(() => {
-      this.expiryRedirectScheduled = false;
-      this.expireSession('Sessão expirada. Faça login novamente.');
-    }, 0);
-  }
-
   private registerActivityListeners(): void {
     if (!this.isBrowser || typeof window === 'undefined') return;
     this.activityEvents.forEach((eventName) => {
@@ -86,7 +76,9 @@ export class SessionMonitorService {
   };
 
   private expireSession(message: string): void {
-    this.authService.clearSession();
+    if (this.authService.isAuthenticated()) {
+      this.authService.clearSession();
+    }
     this.options?.onSessionExpired();
     this.refreshInFlight = false;
     if (!this.router.url.startsWith('/login')) {
@@ -99,16 +91,9 @@ export class SessionMonitorService {
     if (!this.isBrowser) return;
 
     if (!this.authService.isAuthenticated()) {
-      if (this.options?.isProtectedRoute()) {
-        this.expireSession('Sessão expirada. Faça login novamente.');
-      }
       return;
     }
 
-    // A partir daqui o usuário tem access token e refresh token salvos. O access
-    // token pode já ter expirado (ex.: aba ficou em segundo plano e este timer não
-    // rodou por mais de 15min) — isso não significa sessão inválida, apenas que o
-    // refresh abaixo precisa ser feito antes de qualquer outra checagem.
     const now = Date.now();
     const idleMs = now - this.lastActivityAt;
     if (idleMs >= this.sessionIdleTimeoutMs) {
@@ -137,7 +122,6 @@ export class SessionMonitorService {
       },
       error: () => {
         this.refreshInFlight = false;
-        this.expireSession('Sessão expirada. Faça login novamente.');
       }
     });
   }

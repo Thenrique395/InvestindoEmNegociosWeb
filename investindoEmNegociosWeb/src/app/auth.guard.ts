@@ -27,6 +27,12 @@ export const authGuard: CanActivateFn = (_route, state) => {
 
   return onboarding.getStatus().pipe(
     map((status) => status.completed ? true : router.parseUrl('/onboarding')),
-    catchError(() => of(router.parseUrl('/onboarding')))
+    catchError((err: unknown) => {
+      const status = (err as { status?: number })?.status;
+      if (!status || status === 401 || status === 403) {
+        return of(router.parseUrl('/login'));
+      }
+      return of(router.parseUrl('/onboarding'));
+    })
   );
 };

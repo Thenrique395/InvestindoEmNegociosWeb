@@ -132,9 +132,6 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    if (this.isAccessTokenExpired()) {
-      return null;
-    }
     return this.getStorageItem('access_token');
   }
 

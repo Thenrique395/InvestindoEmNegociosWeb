@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
@@ -50,6 +51,9 @@ function shouldThrottle(lastFeedbackAt: number, throttleMs: number): boolean {
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+    return next(req);
+  }
   const auth = inject(AuthService);
   const router = inject(Router);
   const feedback = inject(UiFeedbackService);

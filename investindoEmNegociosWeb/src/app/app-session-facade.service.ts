@@ -38,11 +38,7 @@ export class AppSessionFacadeService {
   }
 
   isAuthenticated(): boolean {
-    const authenticated = this.authService.isAuthenticated();
-    if (!authenticated && this.isBrowser && this.isProtectedRoute(this.getCurrentPath())) {
-      this.sessionMonitor.scheduleExpiredSessionRedirect();
-    }
-    return authenticated;
+    return this.authService.isAuthenticated();
   }
 
   isPublicLayoutRoute(): boolean {
