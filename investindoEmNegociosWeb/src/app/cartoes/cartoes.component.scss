@@ -92,7 +92,7 @@
   padding: 0.9rem 1rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
+  background-color: color-mix(in srgb, var(--surface-2) 78%, white);
   font: inherit;
   color: var(--text);
 }

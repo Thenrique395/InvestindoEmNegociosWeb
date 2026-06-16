@@ -152,6 +152,18 @@ body {
   font-family: inherit;
 }
 
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: var(--control-h);
+  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 1rem;
+  cursor: pointer;
+}
+
 :where(
   .income-field__control,
   .expense-field__control,
@@ -546,6 +558,10 @@ body [class*='goal-card__description'] {
     background: var(--surface-2);
     color: var(--text);
     border-color: var(--border);
+  }
+
+  select:not([multiple]) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   }
 
 }

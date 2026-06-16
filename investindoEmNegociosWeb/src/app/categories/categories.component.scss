@@ -50,7 +50,7 @@
   min-height: 54px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
+  background-color: color-mix(in srgb, var(--surface-2) 78%, white);
   color: var(--text);
   padding: 0 1rem;
   font-size: var(--font-size-body);
@@ -142,7 +142,7 @@
   padding: 0 0.95rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  background: var(--surface);
+  background-color: var(--surface);
   color: var(--text);
   width: 100%;
 }
@@ -235,7 +235,7 @@
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  background: var(--surface);
+  background-color: var(--surface);
   color: var(--text);
 }
 

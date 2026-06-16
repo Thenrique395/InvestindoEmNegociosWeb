@@ -157,7 +157,7 @@
 .calendar-toolbar select {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--surface-2) 78%, white);
+  background-color: color-mix(in srgb, var(--surface-2) 78%, white);
   color: var(--text);
   padding: 0 0.95rem;
   min-height: 48px;

@@ -572,10 +572,10 @@
   min-height: 58px;
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-  background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 92%, var(--surface-2)));
+  background-color: var(--surface);
   color: var(--text);
   padding: 0.9rem 1rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .onboarding-field input:focus,
