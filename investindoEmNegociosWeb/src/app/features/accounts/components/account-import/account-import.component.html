@@ -93,7 +93,7 @@
                   [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
                   (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
                   <option [ngValue]="null">Sem categoria</option>
-                  @for (category of categoriesForItem(item); track category) {
+                  @for (category of categoriesForItem(item); track category.id) {
                     <option [ngValue]="category.id">
                       {{ category.name }}
                     </option>
@@ -163,7 +163,7 @@
                   [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
                   (ngModelChange)="onCategoryChange(item, $event, 'CSV')">
                   <option [ngValue]="null">Sem categoria</option>
-                  @for (category of categoriesForItem(item); track category) {
+                  @for (category of categoriesForItem(item); track category.id) {
                     <option [ngValue]="category.id">
                       {{ category.name }}
                     </option>

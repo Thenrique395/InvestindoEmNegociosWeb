@@ -68,8 +68,6 @@ export class SignupComponent {
         this.uiFeedback.success('Conta criada com sucesso. Faça login para entrar.');
       },
       error: (err: unknown) => {
-        // eslint-disable-next-line no-console
-        console.error('Signup error', err);
         const code = err && typeof err === 'object' && 'code' in err ? (err as { code?: string }).code : undefined;
         if (code === 'emailInUse') {
           this.form.get('email')?.setErrors({ emailInUse: true });

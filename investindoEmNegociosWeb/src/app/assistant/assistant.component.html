@@ -68,7 +68,7 @@
 
     @if (conversation.length) {
       <article class="conversation">
-        @for (item of conversation; track item) {
+        @for (item of conversation; track $index) {
           <section class="bubble">
             <p class="bubble__q">{{ item.question }}</p>
             <p class="bubble__a">{{ item.answer }}</p>

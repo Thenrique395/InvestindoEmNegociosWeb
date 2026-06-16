@@ -537,14 +537,12 @@ export class ReceitasComponent implements OnInit, OnDestroy {
           next: (all) => {
             this.categorias = filtraReceitas(all || []);
           },
-          error: (err) => {
-            console.error('Falha ao carregar categorias de receita', err);
+          error: () => {
             this.categorias = [];
           }
         });
       },
-      error: (err) => {
-        console.error('Falha ao carregar categorias de receita', err);
+      error: () => {
         this.categorias = [];
       }
     });

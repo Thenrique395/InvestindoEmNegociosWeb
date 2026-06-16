@@ -18,7 +18,7 @@
           [ngModel]="value.fromAccountId"
           (ngModelChange)="update('fromAccountId', $event)"
           class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm">
-          @for (account of accounts; track account) {
+          @for (account of accounts; track account.id) {
             <option [ngValue]="account.id" [disabled]="!account.isActive">
               {{ account.name }}
             </option>
@@ -31,7 +31,7 @@
           [ngModel]="value.toAccountId"
           (ngModelChange)="update('toAccountId', $event)"
           class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-sm">
-          @for (account of accounts; track account) {
+          @for (account of accounts; track account.id) {
             <option [ngValue]="account.id" [disabled]="!account.isActive || account.id === value.fromAccountId">
               {{ account.name }}
             </option>

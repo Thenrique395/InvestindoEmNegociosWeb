@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="plans-grid">
-      @for (plan of vm.plans; track plan) {
+      @for (plan of vm.plans; track plan.code) {
         <article class="plan-card" [class.plan-card--current]="plan.current" [class.plan-card--recommended]="plan.recommended">
           <div class="plan-card__header">
             <div>
