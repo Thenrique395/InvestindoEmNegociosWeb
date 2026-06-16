@@ -15,10 +15,13 @@ import {
   InsightEngineResponse,
   NetWorthHistoryResponse,
   NetWorthSummaryResponse,
+  PagedResult,
   RealAvailableBalanceResponse,
   RecommendationEngineResponse,
   RiskBotAssessmentResponse,
 } from '../models/account.models';
+
+export type { PagedResult };
 
 export interface OfxTransactionPreview {
   postedAt: string;
@@ -228,6 +231,13 @@ export class AccountsService {
     if (options.fromUtc) params = params.set('fromUtc', options.fromUtc);
     if (options.toUtc) params = params.set('toUtc', options.toUtc);
     return this.http.get<AccountTransactionResponse[]>(`${this.baseUrl}/${id}/transactions`, { params });
+  }
+
+  listTransactionsPaged(id: string, options: { fromUtc?: string; toUtc?: string; page?: number; pageSize?: number } = {}): Observable<PagedResult<AccountTransactionResponse>> {
+    let params = new HttpParams().set('page', options.page ?? 1).set('pageSize', options.pageSize ?? 50);
+    if (options.fromUtc) params = params.set('fromUtc', options.fromUtc);
+    if (options.toUtc) params = params.set('toUtc', options.toUtc);
+    return this.http.get<PagedResult<AccountTransactionResponse>>(`${this.baseUrl}/${id}/transactions`, { params });
   }
 
   transfer(payload: AccountTransferRequest): Observable<AccountTransferResponse> {

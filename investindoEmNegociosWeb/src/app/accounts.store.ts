@@ -10,7 +10,8 @@ import {
   CsvExtractResponse,
   OfxExtractResponse,
   OfxImportRequest,
-  OfxImportResult
+  OfxImportResult,
+  PagedResult
 } from './accounts.service';
 
 type AccountsState = {
@@ -23,6 +24,11 @@ type AccountsState = {
 type TransactionsState = {
   accountId: string | null;
   data: AccountTransactionResponse[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNextPage: boolean;
   loading: boolean;
   error: string | null;
 };
@@ -30,6 +36,8 @@ type TransactionsState = {
 type TransactionFilter = {
   fromUtc?: string;
   toUtc?: string;
+  page?: number;
+  pageSize?: number;
 };
 
 const initialAccountsState = (): AccountsState => ({
@@ -42,6 +50,11 @@ const initialAccountsState = (): AccountsState => ({
 const initialTransactionsState = (): TransactionsState => ({
   accountId: null,
   data: [],
+  totalCount: 0,
+  page: 1,
+  pageSize: 50,
+  totalPages: 0,
+  hasNextPage: false,
   loading: false,
   error: null
 });
@@ -65,6 +78,11 @@ export class AccountsStore {
   });
 
   readonly transactions = computed(() => this.transactionsState().data);
+  readonly transactionsTotalCount = computed(() => this.transactionsState().totalCount);
+  readonly transactionsPage = computed(() => this.transactionsState().page);
+  readonly transactionsPageSize = computed(() => this.transactionsState().pageSize);
+  readonly transactionsTotalPages = computed(() => this.transactionsState().totalPages);
+  readonly transactionsHasNextPage = computed(() => this.transactionsState().hasNextPage);
   readonly transactionsLoading = computed(() => this.transactionsState().loading);
   readonly transactionsError = computed(() => this.transactionsState().error);
 
@@ -106,11 +124,23 @@ export class AccountsStore {
     }
 
     this.currentTransactionFilter = filter;
-    this.transactionsState.set({ accountId, data: [], loading: true, error: null });
-    this.accountsService.listTransactions(accountId, filter)
+    const page = filter.page ?? 1;
+    const pageSize = filter.pageSize ?? 50;
+    this.transactionsState.set({ accountId, data: [], totalCount: 0, page, pageSize, totalPages: 0, hasNextPage: false, loading: true, error: null });
+    this.accountsService.listTransactionsPaged(accountId, { ...filter, page, pageSize })
       .pipe(finalize(() => this.patchTransactions({ loading: false })))
       .subscribe({
-        next: (data) => this.transactionsState.set({ accountId, data: data || [], loading: false, error: null }),
+        next: (paged: PagedResult<AccountTransactionResponse>) => this.transactionsState.set({
+          accountId,
+          data: paged.items || [],
+          totalCount: paged.totalCount,
+          page: paged.page,
+          pageSize: paged.pageSize,
+          totalPages: paged.totalPages,
+          hasNextPage: paged.hasNextPage,
+          loading: false,
+          error: null
+        }),
         error: () => this.patchTransactions({ error: 'Falha ao carregar extrato da conta.' })
       });
   }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, finalize, map, shareReplay, throwError } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 import { API_BASE_URL } from './api.config';
 import { parseRole, UserRole } from './roles';
 
@@ -211,31 +212,22 @@ export class AuthService {
   }
 
   private readRoleFromToken(token: string | null): string | null {
-    if (!token || typeof atob === 'undefined') return null;
-    const parts = token.split('.');
-    if (parts.length < 2) return null;
-
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
-
+    if (!token) return null;
     try {
-      const decoded = JSON.parse(atob(padded));
-      return decoded?.role || decoded?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
+      const decoded = jwtDecode<Record<string, unknown>>(token);
+      return (decoded['role'] as string | undefined)
+        ?? (decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string | undefined)
+        ?? null;
     } catch {
       return null;
     }
   }
 
   private readExpFromToken(token: string | null): number | null {
-    if (!token || typeof atob === 'undefined') return null;
-    const parts = token.split('.');
-    if (parts.length < 2) return null;
-
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
+    if (!token) return null;
     try {
-      const decoded = JSON.parse(atob(padded));
-      return Number(decoded?.exp) || null;
+      const decoded = jwtDecode<{ exp?: number }>(token);
+      return decoded.exp ?? null;
     } catch {
       return null;
     }

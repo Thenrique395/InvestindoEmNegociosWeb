@@ -40,6 +40,11 @@ export class ContasComponent implements OnInit {
   accounts: AccountResponse[] = [];
   selectedAccountId: string | null = null;
   transactions: AccountTransactionResponse[] = [];
+  transactionsTotalCount = 0;
+  transactionsPage = 1;
+  transactionsPageSize = 50;
+  transactionsTotalPages = 0;
+  transactionsHasNextPage = false;
   loadingTransactions = false;
 
   fromInput = '';
@@ -90,6 +95,11 @@ export class ContasComponent implements OnInit {
 
     effect(() => {
       this.transactions = this.accountsStore.transactions();
+      this.transactionsTotalCount = this.accountsStore.transactionsTotalCount();
+      this.transactionsPage = this.accountsStore.transactionsPage();
+      this.transactionsPageSize = this.accountsStore.transactionsPageSize();
+      this.transactionsTotalPages = this.accountsStore.transactionsTotalPages();
+      this.transactionsHasNextPage = this.accountsStore.transactionsHasNextPage();
       this.loadingTransactions = this.accountsStore.transactionsLoading();
       this.error = this.accountsStore.transactionsError() || this.error;
     });
@@ -196,7 +206,7 @@ export class ContasComponent implements OnInit {
     this.loadTransactions();
   }
 
-  loadTransactions(): void {
+  loadTransactions(page = 1): void {
     if (!this.selectedAccountId) {
       this.transactions = [];
       return;
@@ -204,8 +214,15 @@ export class ContasComponent implements OnInit {
 
     this.accountsStore.loadTransactions(this.selectedAccountId, {
       fromUtc: this.fromInput ? new Date(this.fromInput).toISOString() : undefined,
-      toUtc: this.toInput ? new Date(this.toInput).toISOString() : undefined
+      toUtc: this.toInput ? new Date(this.toInput).toISOString() : undefined,
+      page,
+      pageSize: this.transactionsPageSize
     });
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.transactionsTotalPages) return;
+    this.loadTransactions(page);
   }
 
   onTransferChange(value: AccountTransferFormValue): void {

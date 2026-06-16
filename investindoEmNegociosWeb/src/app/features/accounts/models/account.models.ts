@@ -2,6 +2,15 @@ export type AccountType = 'Checking' | 'Savings' | 'DigitalWallet' | 'Cash' | 'O
 export type AccountTransactionKind = 'Credit' | 'Debit';
 export type AccountTransactionType = 'Income' | 'Expense' | 'Transfer';
 
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
 export interface AccountRequest {
   name: string;
   type: AccountType;

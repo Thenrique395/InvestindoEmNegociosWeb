@@ -172,6 +172,27 @@
             </tbody>
           </table>
         </div>
+        @if (transactionsTotalPages > 1) {
+          <div class="flex items-center justify-between pt-3 text-sm text-[var(--text-muted)]">
+            <span>{{ transactionsTotalCount }} movimentações · página {{ transactionsPage }} de {{ transactionsTotalPages }}</span>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="btn-ghost sm"
+                [disabled]="transactionsPage <= 1"
+                (click)="goToPage(transactionsPage - 1)">
+                ← Anterior
+              </button>
+              <button
+                type="button"
+                class="btn-ghost sm"
+                [disabled]="!transactionsHasNextPage"
+                (click)="goToPage(transactionsPage + 1)">
+                Próxima →
+              </button>
+            </div>
+          </div>
+        }
       }
     </app-section-card>
   }
