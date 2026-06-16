@@ -121,7 +121,7 @@ export class ApiDataService {
     const payload = this.toPlanPayloadFromExpense(expense);
     this.plans.create(payload).subscribe({
       next: () => this.refresh(),
-      error: (err) => console.error('Falha ao criar despesa', err)
+      error: () => {}
     });
   }
 
@@ -130,7 +130,6 @@ export class ApiDataService {
     const existing = current.expenses.find((e) => e.id === _id);
     const planId = _data.planId || existing?.planId;
     if (!planId) {
-      console.warn('Update de despesa ignorado: planId não encontrado.');
       return;
     }
 
@@ -148,7 +147,7 @@ export class ApiDataService {
     const payload = this.toPlanPayloadFromExpense(merged);
     this.plans.update(planId, payload).subscribe({
       next: () => this.refresh(),
-      error: (err) => console.error('Falha ao atualizar despesa', err)
+      error: () => {}
     });
   }
 
@@ -174,7 +173,7 @@ export class ApiDataService {
       .pipe(switchMap(() => this.plans.create(payload)))
       .subscribe({
         next: () => this.refresh(),
-        error: (err) => console.error('Falha ao atualizar parcela de despesa', err)
+        error: () => {}
       });
   }
 
@@ -185,14 +184,14 @@ export class ApiDataService {
   removeExpenseSeries(planId: string): void {
     this.plans.delete(planId).subscribe({
       next: () => this.refresh(),
-      error: (err) => console.error('Falha ao remover série de despesas', err)
+      error: () => {}
     });
   }
 
   removeExpenseInstallment(installmentId: string): void {
     this.installments.delete(installmentId).subscribe({
       next: () => this.refresh(),
-      error: (err) => console.error('Falha ao remover parcela de despesa', err)
+      error: () => {}
     });
   }
 
@@ -233,7 +232,7 @@ export class ApiDataService {
   removeCard(id: string): void {
     this.cardsApi.delete(id).subscribe({
       next: () => this.refresh(),
-      error: (err) => console.error('Falha ao remover cartão', err)
+      error: () => {}
     });
   }
 
@@ -241,7 +240,7 @@ export class ApiDataService {
     const payload = this.toPlanPayloadFromIncome(income);
     this.plans.create(payload).subscribe({
       next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: (err) => console.error('Falha ao criar receita', err)
+      error: () => {}
     });
   }
 
@@ -257,21 +256,21 @@ export class ApiDataService {
 
     this.plans.update(planId, payload).subscribe({
       next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: (err) => console.error('Falha ao atualizar receita', err)
+      error: () => {}
     });
   }
 
   removeIncome(planId: string): void {
     this.plans.delete(planId).subscribe({
       next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: (err) => console.error('Falha ao remover receita', err)
+      error: () => {}
     });
   }
 
   removeIncomeInstallment(installmentId: string): void {
     this.installments.delete(installmentId).subscribe({
       next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: (err) => console.error('Falha ao remover parcela de receita', err)
+      error: () => {}
     });
   }
 
@@ -358,7 +357,7 @@ export class ApiDataService {
         const mappedCards = this.mapCards(cards);
         this.dbSubject.next({ incomes, expenses, cards: mappedCards });
       },
-      error: (err) => console.error('Falha ao carregar dados do backend', err),
+      error: () => {},
       complete: () => {
         this.refreshInFlight = false;
       }
@@ -456,7 +455,7 @@ export class ApiDataService {
         });
         this.enrichIncomeMetadataInBackground();
       },
-      error: (err) => console.error('Falha ao carregar receitas do backend', err)
+      error: () => {}
     });
   }
 

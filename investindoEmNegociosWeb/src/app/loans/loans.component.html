@@ -89,7 +89,7 @@
           <table>
             <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
             <tbody>
-              @for (item of s.installments.slice(0, 6); track item) {
+              @for (item of s.installments.slice(0, 6); track item.id) {
                 <tr>
                   <td>{{ item.installmentNo }}</td>
                   <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
@@ -119,7 +119,7 @@
     }
     @if (contracts.length) {
       <div class="contract-list">
-        @for (contract of contracts; track contract) {
+        @for (contract of contracts; track contract.id) {
           <section class="contract">
             <div class="contract__head">
               <div>

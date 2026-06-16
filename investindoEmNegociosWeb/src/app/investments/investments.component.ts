@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -182,14 +183,14 @@ export class InvestmentsComponent implements OnInit {
     { value: 'VENDA', label: 'Venda' }
   ];
 
-  constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService) {}
+  constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService, private readonly destroyRef: DestroyRef) {}
 
   ngOnInit(): void {
     this.restoreTab();
     this.carregarAlocacaoTarget();
     this.carregarMeta();
     this.carregarPosicoes();
-    this.lookups.institutions('Broker').subscribe({
+    this.lookups.institutions('Broker').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (items) => (this.institutions = items || []),
       error: () => (this.institutions = [])
     });
@@ -1382,7 +1383,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   private carregarMeta(): void {
-    this.investments.getGoal().subscribe({
+    this.investments.getGoal().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (goal) => {
         if (!goal) return;
         this.metaPatrimonio = goal.targetAmount || 0;
@@ -1392,7 +1393,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   private carregarPosicoes(): void {
-    this.investments.listPositions().subscribe({
+    this.investments.listPositions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.positions = list;
       }
@@ -1400,7 +1401,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   private carregarAlocacaoTarget(): void {
-    this.investments.getAllocationTarget().subscribe({
+    this.investments.getAllocationTarget().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (target) => {
         this.targetAllocation = mapTargetAllocationResponse(target);
       },

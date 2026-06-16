@@ -308,7 +308,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.isLogged) {
       this.subGoals = this.goalsService.list(this.dataAtual.getFullYear()).subscribe({
         next: (goals) => this.atualizarMetas(goals),
-        error: (err) => console.error('Falha ao carregar metas', err)
+        error: () => this.atualizarMetas([])
       });
     }
   }
@@ -971,7 +971,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.totalDividaCartoes = total ?? 0;
         this.updateInsight();
       },
-      error: (err) => console.error('Falha ao carregar dívida dos cartões', err)
+      error: () => {}
     });
   }
 
