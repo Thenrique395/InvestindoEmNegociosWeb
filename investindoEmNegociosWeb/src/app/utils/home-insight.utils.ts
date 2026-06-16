@@ -1,9 +1,9 @@
 import { StoredExpense, StoredIncome } from '../data/api-data.service';
 import { InsightEngineItemResponse } from '../accounts.service';
-import { parseLocaleDate } from './locale-utils';
+import { formatCurrencyValue, parseLocaleDate } from './locale-utils';
 
 export function formatCurrency(value: number): string {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return formatCurrencyValue(value);
 }
 
 export function formatDelta(current: number, previous: number): string {

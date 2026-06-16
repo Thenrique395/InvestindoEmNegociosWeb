@@ -620,7 +620,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
   private moverParaMesAtual(ids: string[], novaDataIso: string, status: StoredExpense['status']): void {
     const targetDate = new Date(novaDataIso);
     const targetKey = this.mesKeyFromDate(targetDate);
-    const novaData = this.formatDate(targetDate);
+    const novaData = formatLocaleDate(targetDate);
 
     const novoMapa: Record<string, StoredExpense[]> = {};
     Object.entries(this.despesasPorMes).forEach(([key, lista]) => {
@@ -699,7 +699,7 @@ export class DespesasComponent implements OnInit, OnDestroy {
         categoria: this.resolveCategoriaNome(this.novaDespesa),
         categoryId: this.novaDespesa.categoryId ?? null,
         valor: Number(valorParcela.toFixed(2)),
-        vencimento: this.formatDate(dataBase),
+        vencimento: formatLocaleDate(dataBase),
         cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
         parcelaNumero: parcelas > 1 ? 1 : undefined,
         parcelasTotal: parcelas > 1 ? parcelas : undefined,
@@ -973,10 +973,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
     const lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
     const day = Math.min(baseDay, lastDayOfTargetMonth);
     return new Date(targetYear, targetMonth, day);
-  }
-
-  private formatDate(date: Date): string {
-    return formatLocaleDate(date);
   }
 
   private resetarFormulario(): void {

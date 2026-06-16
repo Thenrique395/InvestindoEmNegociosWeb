@@ -1143,8 +1143,8 @@ export class InvestmentsComponent implements OnInit {
       this.showCadastro = false;
       this.carregarPosicoes();
       this.uiFeedback.success('Posição cadastrada com compra inicial registrada.');
-    } catch (err: any) {
-      this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar posição.');
+    } catch (err: unknown) {
+      this.uiFeedback.error(resolveApiErrorMessage(err, 'Falha ao cadastrar posição.'));
     }
   }
 
@@ -1176,7 +1176,7 @@ export class InvestmentsComponent implements OnInit {
       this.uiFeedback.success('Venda registrada com sucesso.');
       this.closeCadastroModal();
       this.carregarPosicoes();
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.uiFeedback.error(resolveApiErrorMessage(err, 'Falha ao registrar venda.'));
     }
   }
@@ -1357,8 +1357,8 @@ export class InvestmentsComponent implements OnInit {
 
       this.uiFeedback.success(`Importação CSV concluída: ${this.csvImported} posição(ões).`);
       this.carregarPosicoes();
-    } catch (err: any) {
-      this.csvError = err?.error?.detail || err?.message || 'Falha ao importar CSV.';
+    } catch (err: unknown) {
+      this.csvError = resolveApiErrorMessage(err, 'Falha ao importar CSV.');
     } finally {
       this.csvLoading = false;
       input.value = '';

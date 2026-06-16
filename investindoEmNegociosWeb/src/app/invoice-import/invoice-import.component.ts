@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import { InvoiceImportService, InvoiceReconciliationResponse } from '../invoice-import.service';
 import { FormsModule } from '@angular/forms';
@@ -790,7 +790,7 @@ export class InvoiceImportComponent implements OnChanges {
   extract: InvoiceExtract = { items: [] };
   reconciliation: InvoiceReconciliationResponse | null = null;
 
-  private invoiceImport = inject(InvoiceImportService);
+  constructor(private readonly invoiceImport: InvoiceImportService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['cards'] && !this.selectedCardId && this.cards.length) {

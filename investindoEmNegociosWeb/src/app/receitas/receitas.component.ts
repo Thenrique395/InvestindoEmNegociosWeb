@@ -300,7 +300,7 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     this.erroData = '';
     const recebimentoNormalizado = this.recebimentoInput
       ? this.normalizaData(this.recebimentoInput)
-      : this.formatDate(this.dataAtual);
+      : formatLocaleDate(this.dataAtual);
 
     this.saving = true;
     let ok = false;
@@ -584,10 +584,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
 
   private parseData(value: string): Date | null {
     return parseLocaleDate(value);
-  }
-
-  private formatDate(date: Date): string {
-    return formatLocaleDate(date);
   }
 
   private getUltimoValorParaFonte(fonte: string): number | null {

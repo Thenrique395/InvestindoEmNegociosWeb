@@ -271,7 +271,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
       this.bandeira = this.brands[0].id.toString();
     }
     this.cardForm.reset();
-    this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
+    this.limiteCreditoInput = formatCurrencyValue(this.limiteCredito);
     this.mostrarModal = true;
   }
 
@@ -328,7 +328,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     this.nome = card.nome;
     this.banco = card.banco || '';
     this.limiteCredito = card.limiteCredito ?? 0;
-    this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
+    this.limiteCreditoInput = formatCurrencyValue(this.limiteCredito);
     this.diaFechamento = card.diaFechamento ?? 1;
     this.diaVencimento = card.diaVencimento ?? 1;
   }
@@ -391,7 +391,7 @@ export class CartoesComponent implements OnInit, OnDestroy {
     const digits = (value || '').replace(/[^\d]/g, '');
     const number = Number(digits) / 100;
     this.limiteCredito = Number.isFinite(number) ? number : 0;
-    this.limiteCreditoInput = this.formatCurrency(this.limiteCredito);
+    this.limiteCreditoInput = formatCurrencyValue(this.limiteCredito);
   }
 
   onDiaChange(value: string, field: 'fechamento' | 'vencimento'): void {
@@ -424,10 +424,6 @@ export class CartoesComponent implements OnInit, OnDestroy {
     } else {
       this.diaVencimento = clamped;
     }
-  }
-
-  private formatCurrency(value: number): string {
-    return formatCurrencyValue(value);
   }
 
   tituloBandeira(id: string): string {

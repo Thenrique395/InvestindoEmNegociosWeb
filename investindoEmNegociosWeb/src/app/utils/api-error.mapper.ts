@@ -1,17 +1,20 @@
-export function resolveApiErrorMessage(err: any, fallback: string): string {
-  if (err?.status === 0) return 'Falha de conexão com o servidor.';
-  const detail = err?.error?.detail || err?.error?.title || err?.error?.message || err?.message;
-  const status = err?.status ? ` (HTTP ${err.status})` : '';
+export function resolveApiErrorMessage(err: unknown, fallback: string): string {
+  const e = err as Record<string, unknown>;
+  if (e?.['status'] === 0) return 'Falha de conexão com o servidor.';
+  const apiError = e?.['error'] as Record<string, unknown> | undefined;
+  const detail = apiError?.['detail'] || apiError?.['title'] || apiError?.['message'] || e?.['message'];
+  const status = e?.['status'] ? ` (HTTP ${e['status']})` : '';
   return detail ? `${detail}${status}` : `${fallback}${status}`;
 }
 
 export function mapApiErrors<T extends string>(
-  error: any,
+  error: unknown,
   mapping: Record<string, T>
 ): Partial<Record<T, string>> {
   const result: Partial<Record<T, string>> = {};
 
-  const apiErrors = error?.error?.errors;
+  const e = error as Record<string, unknown> | undefined;
+  const apiErrors = (e?.['error'] as Record<string, unknown> | undefined)?.['errors'];
   if (!apiErrors) return result;
 
   Object.keys(apiErrors).forEach((key) => {
