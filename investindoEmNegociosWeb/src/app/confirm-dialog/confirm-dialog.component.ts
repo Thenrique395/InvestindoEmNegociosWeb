@@ -1,5 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 type ConfirmVariant = 'primary' | 'warning' | 'danger';
 
@@ -8,7 +7,8 @@ type ConfirmVariant = 'primary' | 'warning' | 'danger';
   standalone: true,
   imports: [],
   templateUrl: './confirm-dialog.component.html',
-  styleUrls: ['./confirm-dialog.component.scss']
+  styleUrls: ['./confirm-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmDialogComponent {
   @Input() title = 'Confirmar ação';

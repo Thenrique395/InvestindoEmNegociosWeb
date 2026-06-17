@@ -109,13 +109,13 @@ textarea {
   min-height: 44px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--surface-2);
+  background-color: var(--surface-2);
   color: var(--text);
   padding: 0 0.85rem;
   font: inherit;
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-semibold);
-  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
 }
 
 textarea {
@@ -127,7 +127,7 @@ select:focus,
 input:focus,
 textarea:focus {
   border-color: color-mix(in srgb, var(--primary) 70%, transparent);
-  background: var(--surface);
+  background-color: var(--surface);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 

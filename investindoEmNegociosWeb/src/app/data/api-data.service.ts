@@ -416,7 +416,7 @@ export class ApiDataService {
         const installmentStatusMap = new Map(
           (incomeInstallments || []).map((inst) => [
             inst.id,
-            (((inst as any)?.status || '').toString().toUpperCase() as InstallmentStatus) || 'OPEN'
+            ((inst.status || '').toString().toUpperCase() as InstallmentStatus) || 'OPEN'
           ])
         );
         const previousById = new Map(currentState.incomes.map((income) => [income.id, income]));
@@ -540,7 +540,7 @@ export class ApiDataService {
       const plan = lookup.get(inst.planId);
       const categoryId = plan?.categoryId ?? null;
       const categoria = categoryMap?.get(categoryId || '') || 'Sem categoria';
-      const rawStatus = (inst as any)?.status || '';
+      const rawStatus = inst.status || '';
       const status = (rawStatus || '').toString().toUpperCase() as InstallmentStatus;
       return {
         id: inst.id,
@@ -568,11 +568,11 @@ export class ApiDataService {
     const lookup = new Map(plans.map((p) => [p.id, p]));
     return installments.map((inst) => {
       const plan = lookup.get(inst.planId);
-      const categoryId = (plan as any)?.categoryId ?? (plan as any)?.CategoryId ?? null;
+      const categoryId = plan?.categoryId ?? null;
       const categoria = categoryMap.get(categoryId || '') || 'Outros';
       const isSeries = (plan?.installmentsCount ?? 0) > 1;
       const isRecurring = plan?.schedule === 'Recurring';
-      const rawStatus = (inst as any)?.status || '';
+      const rawStatus = inst.status || '';
       const status = (rawStatus || '').toString().toUpperCase() as InstallmentStatus;
       return {
         id: inst.id,
@@ -590,11 +590,11 @@ export class ApiDataService {
         fixa: isRecurring,
         fixaMeses: isRecurring ? null : undefined,
         status: status || 'OPEN',
-        statementYear: (inst as any)?.statementYear ?? null,
-        statementMonth: (inst as any)?.statementMonth ?? null,
-        statementCloseDate: (inst as any)?.statementCloseDate ?? null,
-        statementDueDate: (inst as any)?.statementDueDate ?? null,
-        statementReference: (inst as any)?.statementReference ?? null
+        statementYear: inst.statementYear ?? null,
+        statementMonth: inst.statementMonth ?? null,
+        statementCloseDate: inst.statementCloseDate ?? null,
+        statementDueDate: inst.statementDueDate ?? null,
+        statementReference: inst.statementReference ?? null
       };
     });
   }

@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 type FooterLink = {
@@ -11,7 +11,8 @@ type FooterLink = {
   standalone: true,
   imports: [RouterLink],
   templateUrl: './public-footer.component.html',
-  styleUrls: ['./public-footer.component.scss']
+  styleUrls: ['./public-footer.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicFooterComponent {
   readonly brandName = input.required<string>();

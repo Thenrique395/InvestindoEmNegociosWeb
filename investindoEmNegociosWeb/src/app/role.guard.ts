@@ -1,4 +1,4 @@
-import { inject, PLATFORM_ID } from '@angular/core';
+import { inject, isDevMode, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -29,7 +29,7 @@ export const roleGuard: CanActivateFn = (route) => {
   }
 
   if (feature && !AVAILABLE_FEATURES.has(feature)) {
-    console.warn(`[roleGuard] Feature key not registered in APP_FEATURE_KEYS: ${feature}`);
+    if (isDevMode()) console.warn(`[roleGuard] Feature key not registered in APP_FEATURE_KEYS: ${feature}`);
     return router.parseUrl('/dashboard') as UrlTree;
   }
 
