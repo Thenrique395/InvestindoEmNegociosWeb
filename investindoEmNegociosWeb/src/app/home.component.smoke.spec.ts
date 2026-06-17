@@ -12,7 +12,8 @@ function createComponent(): HomeComponent {
     { getRole: () => 'Basic' } as any,
     { getProfile: () => of(null) } as any,
     { list: () => of([]) } as any,
-    { navigateByUrl: jasmine.createSpy() } as any
+    { navigateByUrl: jasmine.createSpy() } as any,
+    { onDestroy: () => {} } as any
   );
 }
 

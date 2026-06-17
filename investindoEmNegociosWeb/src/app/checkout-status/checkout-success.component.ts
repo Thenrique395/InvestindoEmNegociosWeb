@@ -1,5 +1,6 @@
 
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { BillingCheckoutStatusResponse, BillingService } from '../billing.service';
@@ -10,7 +11,8 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
   standalone: true,
   imports: [RouterLink],
   templateUrl: './checkout-success.component.html',
-  styleUrl: './checkout-status.component.scss'
+  styleUrl: './checkout-status.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckoutSuccessComponent {
   plan: MarketingPlan = findMarketingPlan(null);
@@ -23,7 +25,10 @@ export class CheckoutSuccessComponent {
     private readonly billingService: BillingService,
     private readonly authService: AuthService
   ) {
-    route.queryParamMap.subscribe((params) => {
+    const cdr = inject(ChangeDetectorRef);
+    const destroyRef = inject(DestroyRef);
+
+    route.queryParamMap.pipe(takeUntilDestroyed(destroyRef)).subscribe((params) => {
       const sessionId = params.get('session_id');
       const checkoutId = params.get('checkout_id');
       this.plan = findMarketingPlan(params.get('plan'));
@@ -37,6 +42,7 @@ export class CheckoutSuccessComponent {
 
       if (!request$) {
         this.loading = false;
+        cdr.markForCheck();
         return;
       }
 
@@ -49,9 +55,11 @@ export class CheckoutSuccessComponent {
             this.authService.refresh().subscribe({ error: () => void 0 });
           }
           this.loading = false;
+          cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
+          cdr.markForCheck();
         }
       });
     });

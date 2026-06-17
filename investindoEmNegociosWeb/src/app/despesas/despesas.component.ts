@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TitleCasePipe, DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
@@ -54,9 +55,10 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     AppCurrencyPipe
 ],
   templateUrl: './despesas.component.html',
-  styleUrls: ['./despesas.component.scss']
+  styleUrls: ['./despesas.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DespesasComponent implements OnInit, OnDestroy {
+export class DespesasComponent implements OnInit {
   private readonly brandFallbackMap: Record<string, string> = {
     '1': 'VISA',
     '2': 'MASTERCARD',
@@ -90,8 +92,6 @@ export class DespesasComponent implements OnInit, OnDestroy {
   editando: { id: string; planId?: string; isParcela: boolean; isRecorrente: boolean } | null = null;
   confirmEdicao: { isRecorrente: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number; isRecurring?: boolean } | null = null;
-  private sub?: Subscription;
-  private categoriasSub?: Subscription;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
@@ -115,7 +115,9 @@ export class DespesasComponent implements OnInit, OnDestroy {
     private lookupsService: LookupsService,
     private authService: AuthService,
     private uiFeedback: UiFeedbackService,
-    private uiPermissions: UiPermissionsService
+    private uiPermissions: UiPermissionsService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   get currentRole(): UserRole | null {
@@ -135,12 +137,13 @@ export class DespesasComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sub = this.db.expenses$.subscribe((lista) => {
+    this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expensesCache = lista;
       this.rebuildDespesas();
+      this.cdr.markForCheck();
     });
 
-    this.categoriasSub = this.categoriesService.list('Expense').subscribe({
+    this.categoriesService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         const filtradas = (data || []).filter((item) => {
           const applies = (item.appliesTo || '').toString().toLowerCase();
@@ -154,15 +157,17 @@ export class DespesasComponent implements OnInit, OnDestroy {
           this.novaDespesa = { ...this.novaDespesa, categoryId: resolvedId, categoria: resolvedName };
         }
         this.rebuildDespesas();
+        this.cdr.markForCheck();
       },
       error: () => {
         this.categorias = [];
         this.categoriaMap = new Map();
         this.rebuildDespesas();
+        this.cdr.markForCheck();
       }
     });
 
-    this.db.cards$.subscribe((cards) => {
+    this.db.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((cards) => {
       this.cartoes = cards;
       if (this.cartoes.length && !this.cartaoSelecionadoId) {
         this.cartaoSelecionadoId = this.cartoes[0].id;
@@ -170,21 +175,24 @@ export class DespesasComponent implements OnInit, OnDestroy {
       if (!this.cartoes.length) {
         this.cartaoSelecionadoId = null;
       }
+      this.cdr.markForCheck();
     });
 
-    this.accountsService.list().subscribe({
+    this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (items) => {
         this.contas = (items || []).filter((c) => c.isActive);
         this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
+        this.cdr.markForCheck();
       },
       error: () => {
         this.contas = [];
         this.contaBaixaId = null;
         this.accountsService.setDefaultAccountId(null);
+        this.cdr.markForCheck();
       }
     });
 
-    this.lookupsService.cardBrands().subscribe({
+    this.lookupsService.cardBrands().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (brands) => {
         const nextMap: Record<string, string> = {};
         for (const brand of brands || []) {
@@ -193,16 +201,13 @@ export class DespesasComponent implements OnInit, OnDestroy {
           if (readable) nextMap[idKey] = readable;
         }
         this.cardBrandMap = nextMap;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.cardBrandMap = {};
+        this.cdr.markForCheck();
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-    this.categoriasSub?.unsubscribe();
   }
 
   get mesAtualLabel(): string {

@@ -1,5 +1,6 @@
 
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BillingCheckoutStatusResponse, BillingService } from '../billing.service';
 import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../marketing-plans';
@@ -9,7 +10,8 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
   standalone: true,
   imports: [RouterLink],
   templateUrl: './checkout-pending.component.html',
-  styleUrl: './checkout-status.component.scss'
+  styleUrl: './checkout-status.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckoutPendingComponent {
   plan: MarketingPlan = findMarketingPlan(null);
@@ -17,7 +19,10 @@ export class CheckoutPendingComponent {
   status: BillingCheckoutStatusResponse | null = null;
 
   constructor(route: ActivatedRoute, private readonly billingService: BillingService) {
-    route.queryParamMap.subscribe((params) => {
+    const cdr = inject(ChangeDetectorRef);
+    const destroyRef = inject(DestroyRef);
+
+    route.queryParamMap.pipe(takeUntilDestroyed(destroyRef)).subscribe((params) => {
       const checkoutId = params.get('checkout_id');
       this.plan = findMarketingPlan(params.get('plan'));
       this.cycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
@@ -27,6 +32,7 @@ export class CheckoutPendingComponent {
           this.status = status;
           this.plan = findMarketingPlan(status.planCode);
           this.cycle = status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly';
+          cdr.markForCheck();
         },
         error: () => void 0
       });

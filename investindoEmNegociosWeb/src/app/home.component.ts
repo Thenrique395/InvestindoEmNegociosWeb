@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
@@ -60,12 +61,7 @@ type InsightTodoItem = {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  private subExpenses?: Subscription;
-  private subIncomes?: Subscription;
-  private subCards?: Subscription;
-  private subGoals?: Subscription;
-  private subAccounts?: Subscription;
+export class HomeComponent implements OnInit {
   private subRealBalance?: Subscription;
   private subDebtSummary?: Subscription;
   private subNetWorth?: Subscription;
@@ -74,8 +70,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   private subRiskAssessment?: Subscription;
   private subInsights?: Subscription;
   private subRecommendations?: Subscription;
-  private subProfile?: Subscription;
-  private subNotifications?: Subscription;
   private latestRobotInsight: NotificationItem | null = null;
   private expensesLoaded = false;
   private incomesLoaded = false;
@@ -216,12 +210,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private profileService: ProfileService,
     private notificationsService: NotificationsService,
-    private router: Router
+    private router: Router,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
     if (this.isLogged) {
-      this.subProfile = this.profileService.getProfile().subscribe({
+      this.profileService.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (profile) => {
           this.financialGoal = profile?.financialGoal || null;
           this.updateInsight();
@@ -230,7 +225,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.financialGoal = null;
         }
       });
-      this.onboardingService.getStatus().subscribe({
+      this.onboardingService.getStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (status) => {
           if (!status.completed) {
             this.router.navigateByUrl('/onboarding');
@@ -248,14 +243,14 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.onboardingLoaded = true;
         }
       });
-      this.subNotifications = this.notificationsService.list(false, 20).subscribe({
+      this.notificationsService.list(false, 20).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (items) => this.consumeRobotInsight(items || []),
         error: () => {
           this.robotInsightTips = [];
         }
       });
     }
-    this.subExpenses = this.db.expenses$.subscribe((lista) => {
+    this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expensesLoaded = true;
       this.expensesRaw = lista;
       this.totalDespesas = this.somarDespesasMes(lista);
@@ -265,7 +260,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.updateRecentTransactions();
       this.updateInsight();
     });
-    this.subIncomes = this.db.incomes$.subscribe((lista) => {
+    this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.incomesLoaded = true;
       this.incomesRaw = lista;
       this.totalRendas = this.somarRendasMes(lista);
@@ -275,11 +270,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.updateRecentTransactions();
       this.updateInsight();
     });
-    this.subCards = this.db.cards$.subscribe((lista) => {
+    this.db.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.cards = lista;
     });
     if (this.isLogged) {
-      this.subAccounts = this.accountsService.list().subscribe({
+      this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (accounts) => {
           this.accountBalances = (accounts || []).filter((a) => a.isActive);
           this.accountsService.resolveDefaultAccountId(this.accountBalances);
@@ -306,29 +301,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
     }
     if (this.isLogged) {
-      this.subGoals = this.goalsService.list(this.dataAtual.getFullYear()).subscribe({
+      this.goalsService.list(this.dataAtual.getFullYear()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (goals) => this.atualizarMetas(goals),
         error: () => this.atualizarMetas([])
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subExpenses?.unsubscribe();
-    this.subIncomes?.unsubscribe();
-    this.subCards?.unsubscribe();
-    this.subGoals?.unsubscribe();
-    this.subAccounts?.unsubscribe();
-    this.subRealBalance?.unsubscribe();
-    this.subDebtSummary?.unsubscribe();
-    this.subNetWorth?.unsubscribe();
-    this.subNetWorthHistory?.unsubscribe();
-    this.subProjection?.unsubscribe();
-    this.subRiskAssessment?.unsubscribe();
-    this.subInsights?.unsubscribe();
-    this.subRecommendations?.unsubscribe();
-    this.subProfile?.unsubscribe();
-    this.subNotifications?.unsubscribe();
   }
 
   get mesAtualLabel(): string {
@@ -1210,6 +1187,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subRealBalance?.unsubscribe();
     this.subRealBalance = this.accountsService
       .getRealAvailableBalance(this.periodo, this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
           this.realBalanceSummary = summary;
@@ -1231,6 +1209,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subDebtSummary?.unsubscribe();
     this.subDebtSummary = this.accountsService
       .getDebtSummary(this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
           this.debtSummary = summary;
@@ -1251,6 +1230,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subNetWorth?.unsubscribe();
     this.subNetWorth = this.accountsService
       .getNetWorthSummary(this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
           this.netWorthSummary = summary;
@@ -1270,6 +1250,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subNetWorthHistory?.unsubscribe();
     this.subNetWorthHistory = this.accountsService
       .getNetWorthHistory(6, this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (history) => {
           this.netWorthHistory = history;
@@ -1289,6 +1270,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subProjection?.unsubscribe();
     this.subProjection = this.accountsService
       .getProjection(this.periodo, this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (projection) => {
           this.cashflowProjection = projection;
@@ -1310,6 +1292,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subRiskAssessment?.unsubscribe();
     this.subRiskAssessment = this.accountsService
       .getRiskAssessment(this.periodo, this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (assessment) => {
           this.riskAssessment = assessment;
@@ -1332,6 +1315,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subInsights?.unsubscribe();
     this.subInsights = this.accountsService
       .getInsights(this.periodo, this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (insights) => {
           this.insightEngine = insights;
@@ -1355,6 +1339,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subRecommendations?.unsubscribe();
     this.subRecommendations = this.accountsService
       .getRecommendations(this.periodo, this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (recommendations) => {
           this.recommendationEngine = recommendations;

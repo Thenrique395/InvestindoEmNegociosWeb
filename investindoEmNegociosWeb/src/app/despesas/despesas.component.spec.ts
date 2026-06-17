@@ -10,7 +10,9 @@ function createComponent(): DespesasComponent {
     {} as any,
     { getRole: () => null } as any,
     {} as any,
-    { canImportInvoices: () => true } as any
+    { canImportInvoices: () => true } as any,
+    { markForCheck: jasmine.createSpy('markForCheck') } as any,
+    { onDestroy: () => {} } as any
   );
 }
 

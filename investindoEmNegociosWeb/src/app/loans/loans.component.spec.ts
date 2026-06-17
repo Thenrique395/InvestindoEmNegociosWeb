@@ -45,7 +45,8 @@ describe('LoansComponent', () => {
       }))
     };
 
-    return { component: new LoansComponent(loansService), loansService };
+    const cdr = { markForCheck: jasmine.createSpy('markForCheck') } as any;
+    return { component: new LoansComponent(loansService, cdr), loansService };
   }
 
   it('deve carregar contratos ao iniciar', () => {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoansService, LoanContractRequest, LoanContractResponse, LoanSimulationResponse } from '../loans.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
@@ -14,7 +14,8 @@ import { PeriodActionCardComponent } from '../shared/period-action-card/period-a
   standalone: true,
   imports: [CommonModule, FormsModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './loans.component.html',
-  styleUrl: './loans.component.scss'
+  styleUrl: './loans.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoansComponent implements OnInit {
   contracts: LoanContractResponse[] = [];
@@ -34,7 +35,10 @@ export class LoansComponent implements OnInit {
     paymentDay: 10
   };
 
-  constructor(private readonly loansService: LoansService) {}
+  constructor(
+    private readonly loansService: LoansService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -58,10 +62,12 @@ export class LoansComponent implements OnInit {
       next: (items) => {
         this.contracts = items;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Falha ao carregar empréstimos.';
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -70,8 +76,8 @@ export class LoansComponent implements OnInit {
     this.error = '';
     this.success = '';
     this.loansService.simulate(this.form).subscribe({
-      next: (result) => (this.simulation = result),
-      error: (err) => (this.error = err?.error?.detail || 'Falha ao simular empréstimo.')
+      next: (result) => { this.simulation = result; this.cdr.markForCheck(); },
+      error: (err) => { this.error = err?.error?.detail || 'Falha ao simular empréstimo.'; this.cdr.markForCheck(); }
     });
   }
 
@@ -85,10 +91,12 @@ export class LoansComponent implements OnInit {
         this.simulation = null;
         this.success = 'Empréstimo criado com cronograma calculado.';
         this.saving = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Falha ao criar empréstimo.';
         this.saving = false;
+        this.cdr.markForCheck();
       }
     });
   }

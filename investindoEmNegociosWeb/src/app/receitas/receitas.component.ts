@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
@@ -34,9 +35,10 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
   standalone: true,
   imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, StatCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, AppCurrencyPipe],
   templateUrl: './receitas.component.html',
-  styleUrls: ['./receitas.component.scss']
+  styleUrls: ['./receitas.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReceitasComponent implements OnInit, OnDestroy {
+export class ReceitasComponent implements OnInit {
   dataAtual = new Date();
   rendasAll: StoredIncome[] = [];
   summary: IncomeSummaryState | null = null;
@@ -50,10 +52,6 @@ export class ReceitasComponent implements OnInit, OnDestroy {
   valorSugestao: number | null = null;
   saving = false;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
-  private sub?: Subscription;
-  private summarySub?: Subscription;
-  private incomesLoadingSub?: Subscription;
-  private routeSub?: Subscription;
   showDeleteModal = false;
   deletePlanId: string | null = null;
   deleteInstallmentId: string | null = null;
@@ -83,11 +81,13 @@ export class ReceitasComponent implements OnInit, OnDestroy {
     private categoriesService: CategoriesService,
     private uiFeedback: UiFeedbackService,
     private accountsService: AccountsService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
-    this.routeSub = this.route.queryParamMap.subscribe((params) => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const focus = (params.get('focus') || '').toLowerCase();
       if (focus === 'pending') {
         this.focusMode = 'pending';
@@ -95,29 +95,25 @@ export class ReceitasComponent implements OnInit, OnDestroy {
       } else {
         this.focusMode = 'none';
       }
+      this.cdr.markForCheck();
     });
 
     this.loadingMes = true;
     this.db.refreshIncomes(this.mesKey());
     this.loadCategorias();
-    this.sub = this.db.incomes$.subscribe((lista) => {
+    this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.rendasAll = [...lista];
       this.valorSugestao = this.getUltimoValorParaFonte(this.novaRenda.fonte);
+      this.cdr.markForCheck();
     });
-    this.summarySub = this.db.incomeSummary$.subscribe((summary) => {
+    this.db.incomeSummary$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((summary) => {
       this.summary = summary;
+      this.cdr.markForCheck();
     });
-    this.incomesLoadingSub = this.db.incomesLoading$.subscribe((loading) => {
+    this.db.incomesLoading$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((loading) => {
       this.loadingMes = loading;
+      this.cdr.markForCheck();
     });
-
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-    this.summarySub?.unsubscribe();
-    this.incomesLoadingSub?.unsubscribe();
-    this.routeSub?.unsubscribe();
   }
 
   get currentRole(): UserRole | null {

@@ -25,7 +25,9 @@ function buildComponent(cardsStoreMock: any = {}) {
     } as any,
     cardsStore as any,
     { error: jasmine.createSpy(), success: jasmine.createSpy(), info: jasmine.createSpy() } as any,
-    { canViewCardStatements: () => true } as any
+    { canViewCardStatements: () => true } as any,
+    { markForCheck: jasmine.createSpy('markForCheck') } as any,
+    { onDestroy: () => {} } as any
   ));
 
   return { component, cardsStore };
@@ -78,7 +80,9 @@ describe('CartoesComponent smoke', () => {
       lookupsStore as any,
       cardsStore as any,
       { error: jasmine.createSpy(), success: jasmine.createSpy(), info: jasmine.createSpy() } as any,
-      { canViewCardStatements: () => true } as any
+      { canViewCardStatements: () => true } as any,
+      { markForCheck: jasmine.createSpy('markForCheck') } as any,
+      { onDestroy: () => {} } as any
     ));
 
     component.ngOnInit();

@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
 import { formatCurrencyValue, formatLocaleDate, formatMonthYearLabel, parseLocaleDate } from '../utils/locale-utils';
 import { InstallmentStatus } from '../types/money-types';
@@ -36,14 +36,12 @@ interface CalendarCell {
   standalone: true,
   imports: [NgClass, FormsModule, StatCardComponent, PeriodHeroComponent],
   templateUrl: './calendario.component.html',
-  styleUrls: ['./calendario.component.scss']
+  styleUrls: ['./calendario.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CalendarioComponent implements OnInit, OnDestroy {
+export class CalendarioComponent implements OnInit {
   currentMonth = new Date();
   selectedDate = new Date();
-  private expensesSub?: Subscription;
-  private incomesSub?: Subscription;
-  private cardsSub?: Subscription;
 
   private expenses: StoredExpense[] = [];
   private incomes: StoredIncome[] = [];
@@ -60,30 +58,32 @@ export class CalendarioComponent implements OnInit, OnDestroy {
 
   weekdays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
 
-  constructor(private dataService: ApiDataService, private accountsService: AccountsService) {}
+  constructor(
+    private dataService: ApiDataService,
+    private accountsService: AccountsService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     this.defaultAccountId = this.accountsService.getDefaultAccountId();
-    this.expensesSub = this.dataService.expenses$.subscribe((items) => {
+    this.dataService.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.expenses = items || [];
       this.rebuildEvents();
+      this.cdr.markForCheck();
     });
 
-    this.incomesSub = this.dataService.incomes$.subscribe((items) => {
+    this.dataService.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.incomes = items || [];
       this.rebuildEvents();
+      this.cdr.markForCheck();
     });
 
-    this.cardsSub = this.dataService.cards$.subscribe((items) => {
+    this.dataService.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.cards = items || [];
       this.rebuildEvents();
+      this.cdr.markForCheck();
     });
-  }
-
-  ngOnDestroy(): void {
-    this.expensesSub?.unsubscribe();
-    this.incomesSub?.unsubscribe();
-    this.cardsSub?.unsubscribe();
   }
 
   get monthTitle(): string {

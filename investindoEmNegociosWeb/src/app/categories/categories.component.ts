@@ -1,4 +1,4 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
@@ -20,7 +20,8 @@ type CategoryFormField = 'name' | 'scope' | 'type';
   standalone: true,
   imports: [CommonModule, FormsModule, FormFieldComponent, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './categories.component.html',
-  styleUrls: ['./categories.component.scss']
+  styleUrls: ['./categories.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoriesComponent implements OnInit {
   categorias: CategoryDto[] = [];
@@ -61,7 +62,8 @@ export class CategoriesComponent implements OnInit {
     private categoriesService: CategoriesService,
     private adminCategoriesService: AdminCategoriesService,
     private authService: AuthService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     effect(() => {
       this.categorias = this.categoriesStore.categories();
@@ -149,12 +151,13 @@ export class CategoriesComponent implements OnInit {
   loadAdmin(): void {
     this.adminLoading = true;
     this.adminCategoriesService.list(this.includeInactive).subscribe({
-      next: (data) => (this.adminCategories = data),
+      next: (data) => { this.adminCategories = data; this.cdr.markForCheck(); },
       error: () => {
         this.uiFeedback.error('Não foi possível carregar as categorias padrão.');
         this.adminLoading = false;
+        this.cdr.markForCheck();
       },
-      complete: () => (this.adminLoading = false)
+      complete: () => { this.adminLoading = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -208,12 +211,14 @@ export class CategoriesComponent implements OnInit {
             this.categoriesService.invalidateCache();
             this.categoriesStore.refresh();
             this.uiFeedback.success('Categoria padrão adicionada com sucesso.');
+            this.cdr.markForCheck();
           },
           error: () => {
             this.uiFeedback.error('Erro ao adicionar categoria padrão.');
             this.saving = false;
+            this.cdr.markForCheck();
           },
-          complete: () => (this.saving = false)
+          complete: () => { this.saving = false; this.cdr.markForCheck(); }
         });
       return;
     }
@@ -225,12 +230,14 @@ export class CategoriesComponent implements OnInit {
         this.resetCategoryForm();
         this.showModal = false;
         this.uiFeedback.success('Categoria adicionada com sucesso.');
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.uiFeedback.error(err?.error ?? 'Erro ao adicionar categoria.');
         this.saving = false;
+        this.cdr.markForCheck();
       },
-      complete: () => (this.saving = false)
+      complete: () => { this.saving = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -256,6 +263,7 @@ export class CategoriesComponent implements OnInit {
         this.categorias = this.categorias.filter((c) => c.id !== cat.id);
         this.categoriesStore.refresh();
         this.uiFeedback.success('Categoria removida com sucesso.');
+        this.cdr.markForCheck();
       },
       error: (err) => this.uiFeedback.error(err?.error ?? 'Não foi possível remover a categoria.')
     });
@@ -292,12 +300,14 @@ export class CategoriesComponent implements OnInit {
         this.loadAdmin();
         this.categoriesService.invalidateCache();
         this.categoriesStore.refresh();
+        this.cdr.markForCheck();
       },
       error: () => {
         this.uiFeedback.error('Não foi possível salvar a categoria padrão.');
         this.adminSaving = false;
+        this.cdr.markForCheck();
       },
-      complete: () => (this.adminSaving = false)
+      complete: () => { this.adminSaving = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -311,12 +321,14 @@ export class CategoriesComponent implements OnInit {
         category.isActive = updated.isActive;
         this.categoriesService.invalidateCache();
         this.categoriesStore.refresh();
+        this.cdr.markForCheck();
       },
       error: () => {
         category.isActive = !next;
         this.uiFeedback.error('Não foi possível atualizar o status.');
+        this.cdr.markForCheck();
       },
-      complete: () => (this.adminSaving = false)
+      complete: () => { this.adminSaving = false; this.cdr.markForCheck(); }
     });
   }
 

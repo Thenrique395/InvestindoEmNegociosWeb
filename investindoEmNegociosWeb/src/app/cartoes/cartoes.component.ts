@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, effect } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, effect } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { UpperCasePipe, DatePipe } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
 import { CardBrandLookup, InstitutionLookup } from '../lookups.service';
@@ -39,9 +39,10 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     PeriodTotalCardComponent
 ],
   templateUrl: './cartoes.component.html',
-  styleUrls: ['./cartoes.component.scss']
+  styleUrls: ['./cartoes.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CartoesComponent implements OnInit, OnDestroy {
+export class CartoesComponent implements OnInit {
   bandeira: string = '';
   numero = '';
   nome = '';
@@ -140,14 +141,14 @@ export class CartoesComponent implements OnInit, OnDestroy {
     const current = this.brands.find((b) => String(b.id) === String(this.bandeira));
     return current?.name || '';
   }
-  private expensesSub?: Subscription;
-
   constructor(
     private db: ApiDataService,
     private lookupsStore: LookupsStore,
     private cardsStore: CardsStore,
     private uiFeedback: UiFeedbackService,
-    private uiPermissions: UiPermissionsService
+    private uiPermissions: UiPermissionsService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
   ) {
     effect(() => {
       const activeBrands = this.lookupsStore.cardBrands().filter((b) => b.isActive !== false);
@@ -204,16 +205,13 @@ export class CartoesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.expensesSub = this.db.expenses$.subscribe((lista) => {
+    this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expenses = lista;
+      this.cdr.markForCheck();
     });
     this.lookupsStore.loadCardBrands();
     this.lookupsStore.loadInstitutions('Bank');
     this.cardsStore.load(undefined, true);
-  }
-
-  ngOnDestroy(): void {
-    this.expensesSub?.unsubscribe();
   }
 
   get numeroFormatado(): string {
