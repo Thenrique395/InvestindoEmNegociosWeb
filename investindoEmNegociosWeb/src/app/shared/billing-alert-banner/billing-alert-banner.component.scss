@@ -1,0 +1,52 @@
+.billing-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1.25rem;
+  border-bottom: 1px solid transparent;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.billing-banner--danger {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+  color: var(--danger);
+}
+
+.billing-banner--warning {
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+  color: color-mix(in srgb, var(--warning) 80%, var(--text));
+}
+
+.billing-banner__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.billing-banner__title {
+  white-space: nowrap;
+}
+
+.billing-banner__msg {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.billing-banner__action {
+  white-space: nowrap;
+  font-weight: var(--font-weight-bold);
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  color: inherit;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

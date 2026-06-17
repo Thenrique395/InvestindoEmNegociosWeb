@@ -1,3 +1,37 @@
+.subscription-alert {
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+
+  strong {
+    display: block;
+  }
+
+  span {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  .btn {
+    margin-top: 0.25rem;
+    justify-self: start;
+  }
+}
+
+.subscription-alert--danger {
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  color: var(--danger);
+}
+
+.subscription-alert--warning {
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+  color: color-mix(in srgb, var(--warning) 80%, var(--text));
+}
+
 .billing-toggle {
   display: flex;
   gap: 0.5rem;

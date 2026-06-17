@@ -17,11 +17,12 @@ import { UserContextFacadeService } from './user-context-facade.service';
 import { UserPreferencesFacadeService } from './user-preferences-facade.service';
 import { AppSessionFacadeService } from './app-session-facade.service';
 import { FinancialPrivacyService } from './financial-privacy.service';
+import { BillingAlertBannerComponent } from './shared/billing-alert-banner/billing-alert-banner.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent],
+  imports: [RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent, BillingAlertBannerComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

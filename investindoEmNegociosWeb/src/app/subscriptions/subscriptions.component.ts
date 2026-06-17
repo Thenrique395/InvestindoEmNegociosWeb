@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { BillingService } from '../billing.service';
@@ -11,9 +12,10 @@ import { UiFeedbackService } from '../ui-feedback.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './subscriptions.component.html',
-  styleUrl: './subscriptions.component.scss'
+  styleUrl: './subscriptions.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SubscriptionsComponent {
+export class SubscriptionsComponent implements OnInit {
   catalog: SubscriptionCatalogResponse | null = null;
   loading = true;
   changingPlanCode: string | null = null;
@@ -26,9 +28,41 @@ export class SubscriptionsComponent {
     private readonly authService: AuthService,
     private readonly billingService: BillingService,
     private readonly router: Router,
-    private readonly uiFeedback: UiFeedbackService
-  ) {
+    private readonly uiFeedback: UiFeedbackService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
+  ) {}
+
+  ngOnInit(): void {
     this.load();
+  }
+
+  get subscriptionStatus(): string {
+    return (this.catalog?.current.status || '').toLowerCase();
+  }
+
+  get isPastDue(): boolean {
+    return this.subscriptionStatus === 'pastdue';
+  }
+
+  get isExpired(): boolean {
+    return this.subscriptionStatus === 'expired';
+  }
+
+  get accessUntilLabel(): string | null {
+    const renewsAt = this.catalog?.current.renewsAt;
+    if (!renewsAt) return null;
+    return new Date(renewsAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  get showCancelButton(): boolean {
+    const c = this.catalog?.current;
+    return !!c && c.autoRenew && this.subscriptionStatus === 'active' && c.planCode !== 'basic';
+  }
+
+  get showPortalButton(): boolean {
+    const c = this.catalog?.current;
+    return !!c && c.planCode !== 'basic' && !this.isExpired;
   }
 
   selectCycle(cycle: 'Monthly' | 'Yearly'): void {
@@ -45,72 +79,89 @@ export class SubscriptionsComponent {
     }
 
     this.changingPlanCode = plan.code;
-    this.subscriptionsService.change(plan.code, this.changingCycle).subscribe({
-      next: (response) => {
-        this.authService.applySession(response.session);
-        this.catalog = {
-          current: response.current,
-          plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
-          notes: response.notes
-        };
-        this.uiFeedback.success(`Plano alterado para ${response.current.planName}.`);
-      },
-      error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao alterar plano.');
-      },
-      complete: () => {
-        this.changingPlanCode = null;
-      }
-    });
+    this.subscriptionsService.change(plan.code, this.changingCycle)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.authService.applySession(response.session);
+          this.catalog = {
+            current: response.current,
+            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            notes: response.notes
+          };
+          this.uiFeedback.success(`Plano alterado para ${response.current.planName}.`);
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.uiFeedback.error(err?.error?.detail || 'Falha ao alterar plano.');
+          this.cdr.markForCheck();
+        },
+        complete: () => {
+          this.changingPlanCode = null;
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   openPortal(): void {
     if (this.openingPortal) return;
     this.openingPortal = true;
-    this.billingService.createPortalSession().subscribe({
-      next: (response) => {
-        window.location.href = response.url;
-      },
-      error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Não foi possível abrir o portal de cobrança.');
-        this.openingPortal = false;
-      }
-    });
+    this.billingService.createPortalSession()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          window.location.href = response.url;
+        },
+        error: (err) => {
+          this.uiFeedback.error(err?.error?.detail || 'Não foi possível abrir o portal de cobrança.');
+          this.openingPortal = false;
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   cancel(): void {
     if (this.cancelling) return;
     this.cancelling = true;
-    this.subscriptionsService.cancel().subscribe({
-      next: (response) => {
-        this.authService.applySession(response.session);
-        this.catalog = {
-          current: response.current,
-          plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
-          notes: this.catalog?.notes ?? []
-        };
-        this.uiFeedback.success('Renovação automática cancelada. Seu acesso segue ativo até o fim do ciclo atual.');
-      },
-      error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao cancelar o plano.');
-      },
-      complete: () => {
-        this.cancelling = false;
-      }
-    });
+    this.subscriptionsService.cancel()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.authService.applySession(response.session);
+          this.catalog = {
+            current: response.current,
+            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            notes: this.catalog?.notes ?? []
+          };
+          this.uiFeedback.success('Renovação automática cancelada. Seu acesso segue ativo até o fim do ciclo atual.');
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.uiFeedback.error(err?.error?.detail || 'Falha ao cancelar o plano.');
+          this.cdr.markForCheck();
+        },
+        complete: () => {
+          this.cancelling = false;
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   private load(): void {
     this.loading = true;
-    this.subscriptionsService.getCatalog().subscribe({
-      next: (catalog) => {
-        this.catalog = catalog;
-        this.loading = false;
-      },
-      error: () => {
-        this.catalog = null;
-        this.loading = false;
-      }
-    });
+    this.subscriptionsService.getCatalog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (catalog) => {
+          this.catalog = catalog;
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.catalog = null;
+          this.loading = false;
+          this.cdr.markForCheck();
+        }
+      });
   }
 }

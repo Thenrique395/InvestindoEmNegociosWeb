@@ -16,6 +16,27 @@
   }
 
   @if (catalog; as vm) {
+    @if (isPastDue) {
+      <div class="subscription-alert subscription-alert--danger" role="alert">
+        <strong>Pagamento em atraso</strong>
+        <span>Há uma cobrança pendente. Acesse o portal de cobrança para atualizar seu meio de pagamento e evitar a suspensão do acesso.</span>
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="openingPortal" (click)="openPortal()">
+          {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
+        </button>
+      </div>
+    }
+    @if (isExpired) {
+      <div class="subscription-alert subscription-alert--danger" role="alert">
+        <strong>Assinatura expirada</strong>
+        <span>Seu acesso premium foi encerrado. Contrate um novo plano para restaurar todos os recursos.</span>
+      </div>
+    }
+    @if (!vm.current.autoRenew && !isPastDue && !isExpired && accessUntilLabel) {
+      <div class="subscription-alert subscription-alert--warning" role="alert">
+        <strong>Renovação cancelada</strong>
+        <span>A renovação automática está desativada. Seu acesso premium permanece ativo até {{ accessUntilLabel }}.</span>
+      </div>
+    }
     <div class="privacy-strip">
       <div class="privacy-pill">
         <strong>{{ vm.current.planName }}</strong>
@@ -31,7 +52,7 @@
       </div>
       <div class="privacy-pill">
         <strong>{{ vm.current.renewsAt ? (vm.current.renewsAt | date:'dd/MM/yyyy') : '—' }}</strong>
-        <span>Próxima virada</span>
+        <span>{{ vm.current.autoRenew ? 'Próxima virada' : 'Acesso ativo até' }}</span>
       </div>
     </div>
     <div class="plans-grid">
@@ -80,7 +101,7 @@
         </article>
       }
     </div>
-    @if (vm.current.planCode !== 'basic') {
+    @if (showPortalButton) {
       <div class="card">
         <h3>Gerenciar cobrança</h3>
         <p class="muted">Atualize meio de pagamento, trate cobrança pendente e acompanhe a renovação pelo portal seguro do provedor.</p>
@@ -89,7 +110,7 @@
         </button>
       </div>
     }
-    @if (vm.current.planCode !== 'basic') {
+    @if (showCancelButton) {
       <div class="card">
         <h3>Cancelar renovação</h3>
         <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>

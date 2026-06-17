@@ -4,18 +4,34 @@
     <h1>Não foi possível ativar o plano {{ plan.name }}</h1>
     <p class="lead">{{ message }}</p>
 
-    <div class="status-panel">
-      <h2>Como seguir</h2>
-      <ul>
-        <li>Revise se sua sessão ainda está ativa</li>
-        <li>Tente novamente a contratação</li>
-        <li>Se persistir, finalize pela área de assinatura após o login</li>
-      </ul>
-    </div>
-
-    <div class="status-actions">
-      <a class="btn btn--primary" [routerLink]="['/checkout']" [queryParams]="{ plan: plan.code, cycle: cycle }">Tentar novamente</a>
-      <a class="btn btn--ghost" routerLink="/assinatura">Ir para minha assinatura</a>
-    </div>
+    @if (status?.canOpenPortal) {
+      <div class="status-panel">
+        <h2>Pagamento recusado?</h2>
+        <p>Se o problema é o meio de pagamento, acesse o portal de cobrança para atualizá-lo e tente novamente.</p>
+        <div class="status-actions">
+          <button type="button" class="btn btn--primary" [disabled]="openingPortal" (click)="openPortal()">
+            {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
+          </button>
+          @if (status.canRetry) {
+            <a class="btn btn--ghost" [routerLink]="['/checkout']" [queryParams]="{ plan: plan.code, cycle: cycle }">Tentar novamente</a>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="status-panel">
+        <h2>Como seguir</h2>
+        <ul>
+          <li>Verifique se sua sessão ainda está ativa</li>
+          <li>Confira os dados do cartão e tente novamente</li>
+          <li>Se o problema persistir, entre em contato com o suporte</li>
+        </ul>
+      </div>
+      <div class="status-actions">
+        @if (status?.canRetry ?? true) {
+          <a class="btn btn--primary" [routerLink]="['/checkout']" [queryParams]="{ plan: plan.code, cycle: cycle }">Tentar novamente</a>
+        }
+        <a class="btn btn--ghost" routerLink="/assinatura">Ir para minha assinatura</a>
+      </div>
+    }
   </div>
 </section>

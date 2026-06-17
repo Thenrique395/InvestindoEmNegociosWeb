@@ -1,0 +1,9 @@
+@if (alert) {
+  <div class="billing-banner billing-banner--{{ alert.level }}" role="alert">
+    <div class="billing-banner__body">
+      <strong class="billing-banner__title">{{ alert.title }}</strong>
+      <span class="billing-banner__msg">{{ alert.message }}</span>
+    </div>
+    <a routerLink="/assinatura" class="billing-banner__action">Gerenciar assinatura</a>
+  </div>
+}
