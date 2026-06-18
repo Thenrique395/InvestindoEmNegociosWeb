@@ -46,6 +46,7 @@ export class CartoesComponent implements OnInit {
   bandeira: string = '';
   numero = '';
   nome = '';
+  apelido = '';
   banco = '';
   limiteCredito = 0;
   limiteCreditoInput = '';
@@ -233,7 +234,7 @@ export class CartoesComponent implements OnInit {
     const payload: CardPayload = {
       brandId: Number(this.bandeira),
       holderName: this.nome,
-      nickname: this.nome,
+      nickname: this.apelido.trim() || undefined,
       last4: this.numero.replace(/\D/g, '').slice(-4),
       bank: this.banco || null,
       creditLimit: this.limiteCredito,
@@ -282,6 +283,7 @@ export class CartoesComponent implements OnInit {
     this.bandeira = this.brands[0]?.id ? String(this.brands[0].id) : '';
     this.numero = '';
     this.nome = '';
+    this.apelido = '';
     this.banco = '';
     this.limiteCredito = 0;
     this.limiteCreditoInput = '';
@@ -323,7 +325,8 @@ export class CartoesComponent implements OnInit {
     this.mostrarModal = true;
     this.bandeira = card.bandeira;
     this.numero = this.formatarNumeroEntrada(card.numero.replace(/\D/g, ''));
-    this.nome = card.nome;
+    this.nome = card.holderName || card.nome;
+    this.apelido = card.nome !== (card.holderName || card.nome) ? card.nome : '';
     this.banco = card.banco || '';
     this.limiteCredito = card.limiteCredito ?? 0;
     this.limiteCreditoInput = formatCurrencyValue(this.limiteCredito);
@@ -483,6 +486,7 @@ export class CartoesComponent implements OnInit {
       bandeira: String(card.brandId),
       numero: card.last4,
       nome: card.nickname || card.holderName,
+      holderName: card.holderName,
       banco: card.bank ?? null,
       limiteCredito: card.creditLimit ?? 0,
       diaFechamento: card.statementCloseDay ?? 1,

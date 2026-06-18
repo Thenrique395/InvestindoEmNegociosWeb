@@ -38,6 +38,7 @@ export interface StoredCard {
   bandeira: string;
   numero: string;
   nome: string;
+  holderName?: string;
   banco?: string | null;
   limiteCredito: number;
   diaFechamento: number;

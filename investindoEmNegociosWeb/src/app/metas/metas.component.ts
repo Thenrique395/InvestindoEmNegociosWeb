@@ -132,6 +132,33 @@ export class MetasComponent implements OnInit {
     return this.metaTipos.find((tipo) => tipo.id === this.metaTipo)?.label ?? 'Geral';
   }
 
+  get labelValorMeta(): string {
+    switch (this.metaTipo) {
+      case 'DESPESA': return 'Teto de gastos';
+      case 'RECEITA': return 'Meta de receita';
+      case 'INVESTIMENTO': return 'Valor a acumular';
+      default: return 'Valor da meta';
+    }
+  }
+
+  get labelMensal(): string {
+    switch (this.metaTipo) {
+      case 'DESPESA': return 'Limite mensal (opcional)';
+      case 'RECEITA': return 'Receita mensal esperada';
+      case 'INVESTIMENTO': return 'Aporte mensal previsto';
+      default: return 'Aporte mensal previsto';
+    }
+  }
+
+  get placeholderValorMeta(): string {
+    switch (this.metaTipo) {
+      case 'DESPESA': return 'Ex.: 3.000,00 por mês';
+      case 'RECEITA': return 'Ex.: 15.000,00 no ano';
+      case 'INVESTIMENTO': return 'Ex.: 50.000,00';
+      default: return 'Ex.: 12.000,00';
+    }
+  }
+
   get metaPreviewNome(): string {
     return this.metaNome.trim() || 'Nome da meta';
   }

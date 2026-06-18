@@ -261,8 +261,12 @@
                   </div>
                 </label>
                 <label class="cards-field">
-                  <span class="cards-field__label">Nome do cartão</span>
-                  <input class="cards-field__control" [(ngModel)]="nome" name="nome" placeholder="Ex.: Cartão principal" required />
+                  <span class="cards-field__label">Nome no cartão</span>
+                  <input class="cards-field__control" [(ngModel)]="nome" name="nome" placeholder="Ex.: JOAO P SANTOS" required />
+                </label>
+                <label class="cards-field">
+                  <span class="cards-field__label">Apelido (opcional)</span>
+                  <input class="cards-field__control" [(ngModel)]="apelido" name="apelido" placeholder="Ex.: Nubank pessoal" />
                 </label>
                 <label class="cards-field">
                   <span class="cards-field__label">Banco</span>
@@ -369,6 +373,10 @@
               </div>
             </div>
             <div class="cards-preview__meta">
+              <div class="cards-preview__meta-item">
+                <span>Apelido</span>
+                <strong>{{ apelido || nome || '—' }}</strong>
+              </div>
               <div class="cards-preview__meta-item">
                 <span>Limite informado</span>
                 <strong>{{ limiteCreditoInput || 'R$ 0,00' }}</strong>

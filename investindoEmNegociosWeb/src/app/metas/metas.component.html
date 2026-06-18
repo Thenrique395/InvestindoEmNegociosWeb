@@ -245,11 +245,11 @@
               </div>
               <div class="goals-modal__grid goals-modal__grid--financial">
                 <label class="goals-field">
-                  <span class="goals-field__label">Valor da meta</span>
-                  <input class="goals-field__control" type="text" [(ngModel)]="metaValor" name="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 12.000,00" />
+                  <span class="goals-field__label">{{ labelValorMeta }}</span>
+                  <input class="goals-field__control" type="text" [(ngModel)]="metaValor" name="metaValor" digitOnly (input)="formatarValor()" inputmode="numeric" pattern="[0-9]*" [placeholder]="placeholderValorMeta" />
                 </label>
                 <label class="goals-field">
-                  <span class="goals-field__label">Aporte mensal previsto</span>
+                  <span class="goals-field__label">{{ labelMensal }}</span>
                   <input class="goals-field__control" type="text" [(ngModel)]="metaMensal" name="metaMensal" digitOnly (input)="formatarMensal()" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 2.000,00" />
                 </label>
                 <label class="goals-field">
