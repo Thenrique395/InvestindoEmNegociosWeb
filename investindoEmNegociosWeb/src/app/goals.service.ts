@@ -5,6 +5,7 @@ import { API_BASE_URL } from './api.config';
 import { applyListQuery, ListQuery } from './api-query';
 
 export type GoalStatus = 'Planned' | 'InProgress' | 'Completed' | 'Canceled';
+export type GoalKind = 'General' | 'Expense' | 'Income' | 'Investment';
 
 export interface Goal {
   id: string;
@@ -14,6 +15,7 @@ export interface Goal {
   year: number;
   description?: string | null;
   status: GoalStatus;
+  kind: GoalKind;
   createdAt: string;
   updatedAt: string;
   expectedMonthly: number;
@@ -29,6 +31,7 @@ export interface CreateGoalRequest {
   status: GoalStatus;
   expectedMonthly: number;
   targetDate?: string | null;
+  kind: GoalKind;
 }
 
 export interface GoalContribution {

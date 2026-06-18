@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GoalsService, Goal, GoalStatus, GoalContribution } from '../goals.service';
+import { GoalsService, Goal, GoalStatus, GoalKind, GoalContribution } from '../goals.service';
 import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/input-mask';
 import { formatLocaleDateFromIso, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
@@ -12,9 +12,9 @@ import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 
-type GoalKind = 'ALL' | 'DESPESA' | 'RECEITA' | 'INVESTIMENTO' | 'GERAL';
+type MetaFiltroKind = 'ALL' | GoalKind;
 type GoalSection = {
-  kind: Exclude<GoalKind, 'ALL'>;
+  kind: GoalKind;
   label: string;
   subtitle: string;
   metas: Goal[];
@@ -29,7 +29,7 @@ type GoalSection = {
 })
 export class MetasComponent implements OnInit {
   mostrarModal = false;
-  metaTipo: Exclude<GoalKind, 'ALL'> = 'GERAL';
+  metaTipo: GoalKind = 'General';
   metaNome = '';
   metaValor = '';
   metaAno = String(new Date().getFullYear());
@@ -40,12 +40,12 @@ export class MetasComponent implements OnInit {
   anos: number[] = [];
   filtroAno: number | 'ALL' = 'ALL';
   filtroStatus: GoalStatus | 'ALL' = 'ALL';
-  filtroTipo: GoalKind = 'ALL';
+  filtroTipo: MetaFiltroKind = 'ALL';
   metaTipos = [
-    { id: 'DESPESA' as const, label: 'Despesas' },
-    { id: 'RECEITA' as const, label: 'Receitas' },
-    { id: 'INVESTIMENTO' as const, label: 'Investimentos' },
-    { id: 'GERAL' as const, label: 'Geral' }
+    { id: 'Expense' as GoalKind, label: 'Despesas' },
+    { id: 'Income' as GoalKind, label: 'Receitas' },
+    { id: 'Investment' as GoalKind, label: 'Investimentos' },
+    { id: 'General' as GoalKind, label: 'Geral' }
   ];
   statusLista = [
     { id: 'Planned' as GoalStatus, label: 'Planejada' },
@@ -129,33 +129,33 @@ export class MetasComponent implements OnInit {
   }
 
   get metaTipoLabel(): string {
-    return this.metaTipos.find((tipo) => tipo.id === this.metaTipo)?.label ?? 'Geral';
+    return this.metaTipos.find((t) => t.id === this.metaTipo)?.label ?? 'Geral';
   }
 
   get labelValorMeta(): string {
     switch (this.metaTipo) {
-      case 'DESPESA': return 'Teto de gastos';
-      case 'RECEITA': return 'Meta de receita';
-      case 'INVESTIMENTO': return 'Valor a acumular';
-      default: return 'Valor da meta';
+      case 'Expense':    return 'Teto de gastos';
+      case 'Income':     return 'Meta de receita';
+      case 'Investment': return 'Valor a acumular';
+      default:           return 'Valor da meta';
     }
   }
 
   get labelMensal(): string {
     switch (this.metaTipo) {
-      case 'DESPESA': return 'Limite mensal (opcional)';
-      case 'RECEITA': return 'Receita mensal esperada';
-      case 'INVESTIMENTO': return 'Aporte mensal previsto';
-      default: return 'Aporte mensal previsto';
+      case 'Expense':    return 'Limite mensal (opcional)';
+      case 'Income':     return 'Receita mensal esperada';
+      case 'Investment': return 'Aporte mensal previsto';
+      default:           return 'Aporte mensal previsto';
     }
   }
 
   get placeholderValorMeta(): string {
     switch (this.metaTipo) {
-      case 'DESPESA': return 'Ex.: 3.000,00 por mês';
-      case 'RECEITA': return 'Ex.: 15.000,00 no ano';
-      case 'INVESTIMENTO': return 'Ex.: 50.000,00';
-      default: return 'Ex.: 12.000,00';
+      case 'Expense':    return 'Ex.: 3.000,00 por mês';
+      case 'Income':     return 'Ex.: 15.000,00 no ano';
+      case 'Investment': return 'Ex.: 50.000,00';
+      default:           return 'Ex.: 12.000,00';
     }
   }
 
@@ -176,20 +176,20 @@ export class MetasComponent implements OnInit {
   }
 
   get metasPorSecao(): GoalSection[] {
-    const grouped = new Map<Exclude<GoalKind, 'ALL'>, Goal[]>();
-    const order: Exclude<GoalKind, 'ALL'>[] = ['DESPESA', 'RECEITA', 'INVESTIMENTO', 'GERAL'];
+    const grouped = new Map<GoalKind, Goal[]>();
+    const order: GoalKind[] = ['Expense', 'Income', 'Investment', 'General'];
     order.forEach((kind) => grouped.set(kind, []));
 
     this.metas
       .slice()
       .sort((a, b) => this.compareMetas(a, b))
-      .forEach((meta) => grouped.get(this.extrairTipoMeta(meta.description))?.push(meta));
+      .forEach((meta) => grouped.get(meta.kind ?? 'General')?.push(meta));
 
-    const sectionMeta: Record<Exclude<GoalKind, 'ALL'>, { label: string; subtitle: string }> = {
-      DESPESA: { label: 'Metas de despesas', subtitle: 'Controle de gastos e teto por período.' },
-      RECEITA: { label: 'Metas de receitas', subtitle: 'Aumento de entradas e previsibilidade mensal.' },
-      INVESTIMENTO: { label: 'Metas de investimentos', subtitle: 'Acúmulo patrimonial e aportes recorrentes.' },
-      GERAL: { label: 'Metas gerais', subtitle: 'Objetivos financeiros complementares.' }
+    const sectionMeta: Record<GoalKind, { label: string; subtitle: string }> = {
+      Expense:    { label: 'Metas de despesas',      subtitle: 'Controle de gastos e teto por período.' },
+      Income:     { label: 'Metas de receitas',      subtitle: 'Aumento de entradas e previsibilidade mensal.' },
+      Investment: { label: 'Metas de investimentos', subtitle: 'Acúmulo patrimonial e aportes recorrentes.' },
+      General:    { label: 'Metas gerais',           subtitle: 'Objetivos financeiros complementares.' }
     };
 
     return order
@@ -223,11 +223,11 @@ export class MetasComponent implements OnInit {
   abrirModalEditar(meta: Goal): void {
     this.editando = true;
     this.metaSelecionada = meta;
-    this.metaTipo = this.extrairTipoMeta(meta.description);
+    this.metaTipo = meta.kind ?? 'General';
     this.metaNome = meta.title;
     this.metaValor = formatNumberValue(meta.targetAmount);
     this.metaAno = String(meta.year);
-    this.metaDescricao = this.limparDescricaoMeta(meta.description) || '';
+    this.metaDescricao = meta.description || '';
     this.metaMensal = meta.expectedMonthly
       ? formatNumberValue(meta.expectedMonthly)
       : '';
@@ -258,10 +258,11 @@ export class MetasComponent implements OnInit {
       targetAmount: valor,
       currentAmount: this.metaSelecionada?.currentAmount ?? 0,
       year: ano,
-      description: this.montarDescricaoMeta(this.metaDescricao, this.metaTipo),
+      description: this.metaDescricao.trim() || null,
       status: (this.metaSelecionada?.status as GoalStatus) ?? ('Planned' as GoalStatus),
       expectedMonthly: this.parseValor(this.metaMensal),
-      targetDate: this.toTargetDate()
+      targetDate: this.toTargetDate(),
+      kind: this.metaTipo
     };
 
     this.saving = true;
@@ -416,7 +417,8 @@ export class MetasComponent implements OnInit {
       description: goal.description ?? null,
       status,
       expectedMonthly: goal.expectedMonthly,
-      targetDate: goal.targetDate ?? null
+      targetDate: goal.targetDate ?? null,
+      kind: goal.kind ?? 'General' as GoalKind
     };
     this.goalsService.update(goal.id, payload).subscribe({
       next: (updated) => {
@@ -474,7 +476,7 @@ export class MetasComponent implements OnInit {
     this.goalsService.list(ano, status).subscribe({
       next: (lista) => {
         this.metas = lista
-          .filter((meta) => this.filtroTipo === 'ALL' || this.extrairTipoMeta(meta.description) === this.filtroTipo);
+          .filter((meta) => this.filtroTipo === 'ALL' || (meta.kind ?? 'General') === this.filtroTipo);
         this.loading = false;
         this.metas.forEach((m) => this.carregarContribuicoes(m.id));
       },
@@ -525,7 +527,7 @@ export class MetasComponent implements OnInit {
   }
 
   private resetarForm(): void {
-    this.metaTipo = 'GERAL';
+    this.metaTipo = 'General';
     this.metaNome = '';
     this.metaValor = '';
     this.metaMensal = '';
@@ -537,51 +539,24 @@ export class MetasComponent implements OnInit {
   }
 
   tipoMetaLabel(meta: Goal): string {
-    const tipo = this.extrairTipoMeta(meta.description);
-    switch (tipo) {
-      case 'DESPESA':
-        return 'Controle de Despesas';
-      case 'RECEITA':
-        return 'Meta de Receitas';
-      case 'INVESTIMENTO':
-        return 'Meta de Investimentos';
-      default:
-        return 'Meta Geral';
+    switch (meta.kind) {
+      case 'Expense':    return 'Controle de Despesas';
+      case 'Income':     return 'Meta de Receitas';
+      case 'Investment': return 'Meta de Investimentos';
+      default:           return 'Meta Geral';
     }
   }
 
   descricaoMeta(meta: Goal): string | null {
-    return this.limparDescricaoMeta(meta.description);
-  }
-
-  private montarDescricaoMeta(descricao: string, tipo: Exclude<GoalKind, 'ALL'>): string | null {
-    const clean = (descricao || '').trim();
-    const tag = `[TIPO:${tipo}]`;
-    return clean ? `${tag} ${clean}` : tag;
-  }
-
-  private extrairTipoMeta(description?: string | null): Exclude<GoalKind, 'ALL'> {
-    const normalized = (description || '').toUpperCase();
-    if (normalized.includes('[TIPO:DESPESA]')) return 'DESPESA';
-    if (normalized.includes('[TIPO:RECEITA]')) return 'RECEITA';
-    if (normalized.includes('[TIPO:INVESTIMENTO]')) return 'INVESTIMENTO';
-    return 'GERAL';
-  }
-
-  private limparDescricaoMeta(description?: string | null): string | null {
-    if (!description) return description ?? null;
-    return description.replace(/\[TIPO:[A-Z]+\]\s*/i, '').trim() || null;
+    return meta.description?.trim() || null;
   }
 
   private compareMetas(a: Goal, b: Goal): number {
-    const typeOrder: Record<Exclude<GoalKind, 'ALL'>, number> = {
-      DESPESA: 0,
-      RECEITA: 1,
-      INVESTIMENTO: 2,
-      GERAL: 3
+    const typeOrder: Record<GoalKind, number> = {
+      Expense: 0, Income: 1, Investment: 2, General: 3
     };
-    const aType = this.extrairTipoMeta(a.description);
-    const bType = this.extrairTipoMeta(b.description);
+    const aType = a.kind ?? 'General';
+    const bType = b.kind ?? 'General';
     const byType = typeOrder[aType] - typeOrder[bType];
     if (byType !== 0) return byType;
 
