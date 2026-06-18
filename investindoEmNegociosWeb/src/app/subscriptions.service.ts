@@ -28,6 +28,7 @@ export interface CurrentSubscription {
   startedAt: string;
   renewsAt?: string | null;
   cancelledAt?: string | null;
+  isTrial?: boolean;
 }
 
 export interface SubscriptionCatalogResponse {
@@ -58,5 +59,13 @@ export class SubscriptionsService {
 
   cancel() {
     return this.http.post<SubscriptionChangeResponse>(`${this.baseUrl}/cancel`, {});
+  }
+
+  requestRefund() {
+    return this.http.post<SubscriptionChangeResponse>(`${this.baseUrl}/refund`, {});
+  }
+
+  requestTrial() {
+    return this.http.post<SubscriptionChangeResponse>(`${this.baseUrl}/request-trial`, {});
   }
 }

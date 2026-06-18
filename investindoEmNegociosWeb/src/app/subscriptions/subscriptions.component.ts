@@ -22,6 +22,8 @@ export class SubscriptionsComponent implements OnInit {
   changingCycle: 'Monthly' | 'Yearly' = 'Monthly';
   cancelling = false;
   openingPortal = false;
+  requestingTrial = false;
+  requestingRefund = false;
 
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
@@ -62,7 +64,20 @@ export class SubscriptionsComponent implements OnInit {
 
   get showPortalButton(): boolean {
     const c = this.catalog?.current;
-    return !!c && c.planCode !== 'basic' && !this.isExpired;
+    return !!c && c.planCode !== 'basic' && !this.isExpired && !c.isTrial;
+  }
+
+  get showTrialButton(): boolean {
+    const c = this.catalog?.current;
+    return !!c && c.planCode === 'basic' && this.subscriptionStatus === 'active';
+  }
+
+  get showRefundButton(): boolean {
+    const c = this.catalog?.current;
+    if (!c || c.planCode === 'basic' || c.isTrial) return false;
+    if (this.subscriptionStatus !== 'active') return false;
+    const days = (Date.now() - new Date(c.startedAt).getTime()) / 86_400_000;
+    return days <= 7;
   }
 
   selectCycle(cycle: 'Monthly' | 'Yearly'): void {
@@ -142,6 +157,56 @@ export class SubscriptionsComponent implements OnInit {
         },
         complete: () => {
           this.cancelling = false;
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  requestTrial(): void {
+    if (this.requestingTrial) return;
+    this.requestingTrial = true;
+    this.subscriptionsService.requestTrial()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.authService.applySession(response.session);
+          this.catalog = {
+            current: response.current,
+            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            notes: response.notes
+          };
+          this.uiFeedback.success('Período de teste ativado! Aproveite 7 dias de acesso Advanced.');
+          this.requestingTrial = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.uiFeedback.error(err?.error?.detail || 'Não foi possível ativar o período de teste.');
+          this.requestingTrial = false;
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  requestRefund(): void {
+    if (this.requestingRefund) return;
+    this.requestingRefund = true;
+    this.subscriptionsService.requestRefund()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.authService.applySession(response.session);
+          this.catalog = {
+            current: response.current,
+            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            notes: response.notes
+          };
+          this.uiFeedback.success('Reembolso solicitado. O estorno será processado em até 5 dias úteis.');
+          this.requestingRefund = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.uiFeedback.error(err?.error?.detail || 'Não foi possível processar o reembolso.');
+          this.requestingRefund = false;
           this.cdr.markForCheck();
         }
       });

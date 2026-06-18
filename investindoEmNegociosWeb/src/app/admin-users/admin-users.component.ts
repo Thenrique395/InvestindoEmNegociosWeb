@@ -34,6 +34,10 @@ export class AdminUsersComponent implements OnInit {
   featuresLoadingForUserId: string | null = null;
   featureSavingKey: string | null = null;
   readonly featureModeOptions: Array<'inherit' | 'enabled' | 'disabled'> = ['inherit', 'enabled', 'disabled'];
+  trialOpenForUserId: string | null = null;
+  trialPlanCode = 'advanced';
+  trialDays = 7;
+  grantingTrial = false;
   private featuresByUserId: Record<string, AdminUserFeatureAccess[]> = {};
   private pendingAction: { kind: 'toggle'; user: AdminUserRow; nextActive: boolean } | { kind: 'delete'; user: AdminUserRow } | null = null;
 
@@ -274,6 +278,38 @@ export class AdminUsersComponent implements OnInit {
     this.confirmVariant = data.variant || 'warning';
     this.pendingAction = pending;
     this.confirmOpen = true;
+  }
+
+  openTrial(user: AdminUserRow): void {
+    if (this.trialOpenForUserId === user.id) {
+      this.trialOpenForUserId = null;
+      return;
+    }
+    this.trialPlanCode = 'advanced';
+    this.trialDays = 7;
+    this.trialOpenForUserId = user.id;
+  }
+
+  cancelTrial(): void {
+    this.trialOpenForUserId = null;
+  }
+
+  submitTrial(user: AdminUserRow): void {
+    if (this.grantingTrial) return;
+    if (!this.trialPlanCode || this.trialDays < 1 || this.trialDays > 365) return;
+    this.grantingTrial = true;
+    this.adminUsers.grantTrial(user.id, this.trialPlanCode, this.trialDays).subscribe({
+      next: () => {
+        this.uiFeedback.success(`Trial de ${this.trialDays} dias (${this.trialPlanCode}) concedido a ${user.name || user.email}.`);
+        this.trialOpenForUserId = null;
+      },
+      error: (err) => {
+        this.uiFeedback.error(err?.error?.detail || 'Não foi possível conceder o trial.');
+      },
+      complete: () => {
+        this.grantingTrial = false;
+      }
+    });
   }
 
   private syncDirty(user: AdminUserRow): void {

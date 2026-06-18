@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_BASE_URL } from './api.config';
 import { UserRole } from './roles';
+import { SubscriptionChangeResponse } from './subscriptions.service';
 
 export interface AdminUserSummary {
   id: string;
@@ -51,5 +52,9 @@ export class AdminUsersService {
 
   clearFeatureOverride(id: string, featureKey: string) {
     return this.http.delete<AdminUserFeatureAccess[]>(`${this.baseUrl}/${id}/features/${encodeURIComponent(featureKey)}`);
+  }
+
+  grantTrial(id: string, planCode: string, days: number) {
+    return this.http.post<SubscriptionChangeResponse>(`${this.baseUrl}/${id}/trial`, { planCode, days });
   }
 }

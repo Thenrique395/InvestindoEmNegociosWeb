@@ -140,6 +140,13 @@
                     </button>
                     <button
                       type="button"
+                      class="btn-secondary sm"
+                      (click)="openTrial(user)"
+                      [disabled]="savingId === user.id || deletingId === user.id || grantingTrial">
+                      Trial
+                    </button>
+                    <button
+                      type="button"
                       class="btn-danger sm"
                       (click)="removeUser(user)"
                       [disabled]="savingId === user.id || deletingId === user.id">
@@ -159,6 +166,51 @@
                   </div>
                 </td>
               </tr>
+              @if (trialOpenForUserId === user.id) {
+                <tr>
+                  <td colspan="6" class="px-6 pb-4">
+                    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+                      <p class="mb-3 text-sm font-semibold text-[var(--text)]">Conceder trial para {{ user.name || user.email }}</p>
+                      <div class="flex flex-wrap items-end gap-3">
+                        <div class="flex flex-col gap-1">
+                          <label class="text-xs text-[var(--text-muted)]">Plano</label>
+                          <select
+                            class="h-9 min-w-[140px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+                            [(ngModel)]="trialPlanCode"
+                            [disabled]="grantingTrial">
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                          </select>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                          <label class="text-xs text-[var(--text-muted)]">Dias (1–365)</label>
+                          <input
+                            type="number"
+                            class="h-9 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
+                            [(ngModel)]="trialDays"
+                            min="1"
+                            max="365"
+                            [disabled]="grantingTrial" />
+                        </div>
+                        <button
+                          type="button"
+                          class="btn-primary sm"
+                          (click)="submitTrial(user)"
+                          [disabled]="grantingTrial || trialDays < 1 || trialDays > 365">
+                          {{ grantingTrial ? 'Concedendo...' : 'Conceder' }}
+                        </button>
+                        <button
+                          type="button"
+                          class="btn-secondary sm"
+                          (click)="cancelTrial()"
+                          [disabled]="grantingTrial">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
               @if (featuresOpenForUserId === user.id) {
                 <tr>
                   <td colspan="6" class="px-6 pb-4">

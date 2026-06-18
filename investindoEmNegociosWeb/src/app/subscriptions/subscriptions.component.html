@@ -37,10 +37,18 @@
         <span>A renovação automática está desativada. Seu acesso premium permanece ativo até {{ accessUntilLabel }}.</span>
       </div>
     }
+    @if (vm.current.isTrial) {
+      <div class="subscription-alert subscription-alert--warning" role="alert">
+        <strong>Período de teste ativo</strong>
+        <span>Você está no período de teste gratuito do plano Advanced.
+          @if (accessUntilLabel) { Acesso ativo até {{ accessUntilLabel }}. }
+        </span>
+      </div>
+    }
     <div class="privacy-strip">
       <div class="privacy-pill">
         <strong>{{ vm.current.planName }}</strong>
-        <span>Plano atual</span>
+        <span>{{ vm.current.isTrial ? 'Plano (trial)' : 'Plano atual' }}</span>
       </div>
       <div class="privacy-pill">
         <strong>{{ vm.current.role }}</strong>
@@ -116,6 +124,24 @@
         <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
         <button type="button" class="btn btn--danger" [disabled]="cancelling" (click)="cancel()">
           {{ cancelling ? 'Cancelando...' : 'Cancelar renovação' }}
+        </button>
+      </div>
+    }
+    @if (showRefundButton) {
+      <div class="card">
+        <h3>Direito de arrependimento</h3>
+        <p class="muted">Dentro dos 7 dias após a contratação, você pode solicitar o cancelamento com reembolso integral (Lei 8.078/90, Art. 49). O acesso é encerrado imediatamente.</p>
+        <button type="button" class="btn btn--danger" [disabled]="requestingRefund" (click)="requestRefund()">
+          {{ requestingRefund ? 'Processando...' : 'Cancelar com reembolso' }}
+        </button>
+      </div>
+    }
+    @if (showTrialButton) {
+      <div class="card">
+        <h3>Experimentar grátis</h3>
+        <p class="muted">Ative 7 dias de acesso ao plano Advanced sem custo. Disponível uma vez por conta, sem compromisso de compra.</p>
+        <button type="button" class="btn btn--primary" [disabled]="requestingTrial" (click)="requestTrial()">
+          {{ requestingTrial ? 'Ativando...' : 'Iniciar período de teste' }}
         </button>
       </div>
     }
