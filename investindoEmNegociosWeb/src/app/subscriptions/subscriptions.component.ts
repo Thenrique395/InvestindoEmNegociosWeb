@@ -51,6 +51,21 @@ export class SubscriptionsComponent implements OnInit {
     return this.subscriptionStatus === 'expired';
   }
 
+  get isPastDueCritical(): boolean {
+    if (!this.isPastDue) return false;
+    const renewsAt = this.catalog?.current.renewsAt;
+    if (!renewsAt) return false;
+    return (Date.now() - new Date(renewsAt).getTime()) / 86_400_000 >= 6;
+  }
+
+  get gracePeriodEndsAtLabel(): string | null {
+    if (!this.isPastDue) return null;
+    const renewsAt = this.catalog?.current.renewsAt;
+    if (!renewsAt) return null;
+    const endsAt = new Date(new Date(renewsAt).getTime() + 7 * 86_400_000);
+    return endsAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
   get accessUntilLabel(): string | null {
     const renewsAt = this.catalog?.current.renewsAt;
     if (!renewsAt) return null;

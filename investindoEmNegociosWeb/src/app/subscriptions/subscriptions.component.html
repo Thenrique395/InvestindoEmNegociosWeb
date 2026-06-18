@@ -17,18 +17,27 @@
 
   @if (catalog; as vm) {
     @if (isPastDue) {
-      <div class="subscription-alert subscription-alert--danger" role="alert">
-        <strong>Pagamento em atraso</strong>
-        <span>Há uma cobrança pendente. Acesse o portal de cobrança para atualizar seu meio de pagamento e evitar a suspensão do acesso.</span>
+      <div class="subscription-alert" [class.subscription-alert--danger]="isPastDueCritical" [class.subscription-alert--warning]="!isPastDueCritical" role="alert">
+        <strong>{{ isPastDueCritical ? 'Acesso premium em risco' : 'Pagamento em atraso' }}</strong>
+        <span>
+          @if (isPastDueCritical) {
+            Último dia para regularizar o pagamento.
+          } @else {
+            Há uma cobrança pendente. Atualize sua forma de pagamento para manter o acesso premium.
+          }
+          @if (gracePeriodEndsAtLabel) {
+            O acesso será encerrado em <strong>{{ gracePeriodEndsAtLabel }}</strong> caso não haja regularização.
+          }
+        </span>
         <button type="button" class="btn btn--ghost btn--sm" [disabled]="openingPortal" (click)="openPortal()">
-          {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
+          {{ openingPortal ? 'Abrindo portal...' : 'Atualizar forma de pagamento' }}
         </button>
       </div>
     }
     @if (isExpired) {
       <div class="subscription-alert subscription-alert--danger" role="alert">
-        <strong>Assinatura expirada</strong>
-        <span>Seu acesso premium foi encerrado. Contrate um novo plano para restaurar todos os recursos.</span>
+        <strong>Acesso premium encerrado</strong>
+        <span>Não conseguimos confirmar o pagamento e seu acesso voltou para o plano Essencial. Contrate um novo plano para restaurar todos os recursos.</span>
       </div>
     }
     @if (!vm.current.autoRenew && !isPastDue && !isExpired && accessUntilLabel) {
@@ -59,8 +68,13 @@
         <span>Renovação</span>
       </div>
       <div class="privacy-pill">
-        <strong>{{ vm.current.renewsAt ? (vm.current.renewsAt | date:'dd/MM/yyyy') : '—' }}</strong>
-        <span>{{ vm.current.autoRenew ? 'Próxima virada' : 'Acesso ativo até' }}</span>
+        @if (isPastDue && gracePeriodEndsAtLabel) {
+          <strong>{{ gracePeriodEndsAtLabel }}</strong>
+          <span>Prazo para regularizar</span>
+        } @else {
+          <strong>{{ vm.current.renewsAt ? (vm.current.renewsAt | date:'dd/MM/yyyy') : '—' }}</strong>
+          <span>{{ vm.current.autoRenew ? 'Próxima virada' : 'Acesso ativo até' }}</span>
+        }
       </div>
     </div>
     <div class="plans-grid">
