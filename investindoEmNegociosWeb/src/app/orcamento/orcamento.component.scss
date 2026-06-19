@@ -1,0 +1,48 @@
+.orcamento-page {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.page-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  h1 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.budget-summary {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.inline-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+
+  input {
+    flex: 1;
+    min-width: 10rem;
+  }
+}
+
+.negative { color: var(--color-danger, #dc2626); }
+.over-budget { color: var(--color-danger, #dc2626); font-weight: 600; }
+.text-right { text-align: right; }

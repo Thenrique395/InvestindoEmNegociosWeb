@@ -1,0 +1,60 @@
+<section class="relatorios-page">
+  <header class="page-header">
+    <div class="page-header__nav">
+      <button type="button" class="btn-ghost btn--sm" (click)="prevMonth()">← Anterior</button>
+      <h1>Relatório · {{ monthName }} {{ year }}</h1>
+      <button type="button" class="btn-ghost btn--sm" (click)="nextMonth()">Próximo →</button>
+    </div>
+    @if (report) {
+      <button type="button" class="btn-ghost btn--sm" (click)="exportCsv()">Exportar CSV</button>
+    }
+  </header>
+
+  @if (loading) {
+    <app-ui-state type="loading" />
+  }
+
+  @if (!loading && report) {
+    <div class="summary-grid kpis">
+      <div><span>Receitas</span><strong class="positive">{{ report.totalIncome | appCurrency }}</strong></div>
+      <div><span>Despesas</span><strong class="negative">{{ report.totalExpenses | appCurrency }}</strong></div>
+      <div [class.negative]="report.netBalance < 0"><span>Saldo líquido</span><strong>{{ report.netBalance | appCurrency }}</strong></div>
+      <div><span>Taxa de poupança</span><strong>{{ report.savingsRate | number:'1.1-1' }}%</strong></div>
+    </div>
+
+    <article class="card">
+      <h2>Despesas por categoria</h2>
+      @if (!report.expensesByCategory.length) {
+        <app-empty-state icon="$" title="Sem despesas registradas" description="Não há despesas pagas neste período para exibir no relatório." />
+      }
+      @if (report.expensesByCategory.length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th class="text-right">Valor</th>
+                <th class="text-right">% do total</th>
+                <th>Barra</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cat of report.expensesByCategory; track cat.categoryName) {
+                <tr>
+                  <td>{{ cat.categoryName }}</td>
+                  <td class="text-right">{{ cat.amount | appCurrency }}</td>
+                  <td class="text-right">{{ cat.percentageOfTotal | number:'1.1-1' }}%</td>
+                  <td>
+                    <div class="progress-bar">
+                      <div class="progress-bar__fill" [style.width.%]="cat.percentageOfTotal"></div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  }
+</section>

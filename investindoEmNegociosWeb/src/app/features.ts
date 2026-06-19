@@ -23,6 +23,10 @@ export const APP_FEATURE_KEYS = {
 
   invoiceImportAccess: 'feature.invoice-import.access',
 
+  budgetAccess: 'feature.budget.access',
+  scenariosAccess: 'feature.scenarios.access',
+  reportsAccess: 'feature.reports.access',
+
   adminUsersManage: 'feature.admin.users.manage',
   adminParametersManage: 'feature.admin.parameters.manage',
   adminRobotsManage: 'feature.admin.robots.manage',
@@ -66,7 +70,10 @@ const INTERMEDIATE_FEATURES: AppFeatureKey[] = [
   APP_FEATURE_KEYS.accountsImport,
   APP_FEATURE_KEYS.cardsStatementsRead,
   APP_FEATURE_KEYS.categoriesManage,
-  APP_FEATURE_KEYS.invoiceImportAccess
+  APP_FEATURE_KEYS.invoiceImportAccess,
+  APP_FEATURE_KEYS.budgetAccess,
+  APP_FEATURE_KEYS.scenariosAccess,
+  APP_FEATURE_KEYS.reportsAccess
 ];
 
 const ADVANCED_FEATURES: AppFeatureKey[] = [

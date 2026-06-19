@@ -25,7 +25,10 @@ type SidebarIcon =
   | 'calculator'
   | 'admin'
   | 'parameters'
-  | 'robot';
+  | 'robot'
+  | 'budget'
+  | 'scenario'
+  | 'report';
 
 type SidebarNavItem = {
   label: string;
@@ -66,6 +69,9 @@ export class SidebarComponent {
     { label: 'Empréstimos', path: '/emprestimos', icon: 'loan', minRole: 'Intermediate', size: 'compact', activeTone: 'warning' },
     { label: 'Snapshots', path: '/snapshots', icon: 'snapshot', minRole: 'Intermediate', size: 'compact' },
     { label: 'Assistente', path: '/assistente', icon: 'assistant', minRole: 'Intermediate', size: 'compact', activeTone: 'info' },
+    { label: 'Orçamento', path: '/orcamento', icon: 'budget', feature: this.features.budgetAccess, size: 'compact' },
+    { label: 'Simulador', path: '/simulador', icon: 'scenario', feature: this.features.scenariosAccess, size: 'compact' },
+    { label: 'Relatórios', path: '/relatorios', icon: 'report', feature: this.features.reportsAccess, size: 'compact' },
     { label: 'Calculadoras', path: '/calculadora', icon: 'calculator', minRole: 'Basic', size: 'compact' },
     { label: 'Admin', path: '/admin/usuarios', icon: 'admin', feature: this.features.adminUsersManage, size: 'compact' },
     { label: 'Parâmetros', path: '/admin/parametros', icon: 'parameters', feature: this.features.adminParametersManage, size: 'compact' },

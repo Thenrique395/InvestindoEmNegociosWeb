@@ -145,6 +145,38 @@
               <div><span>Juros totais</span><strong>{{ contract.totalInterest | appCurrency }}</strong></div>
               <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
             </div>
+            <div class="contract__toggle">
+              <button type="button" class="btn-ghost btn--sm" (click)="toggleInstallments(contract.id)">
+                {{ expandedContractId === contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
+              </button>
+            </div>
+            @if (expandedContractId === contract.id) {
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>#</th><th>Vencimento</th><th>Total</th><th>Saldo restante</th><th>Situação</th><th></th></tr></thead>
+                  <tbody>
+                    @for (inst of contract.installments; track inst.id) {
+                      <tr [class.row--paid]="inst.status === 'Paid'">
+                        <td>{{ inst.installmentNo }}</td>
+                        <td>{{ inst.dueDate | date:'dd/MM/yyyy' }}</td>
+                        <td>{{ inst.totalAmount | appCurrency }}</td>
+                        <td>{{ inst.endingBalance | appCurrency }}</td>
+                        <td><span class="pill" [class.pill--success]="inst.status === 'Paid'">{{ inst.status === 'Paid' ? 'Pago' : 'Em aberto' }}</span></td>
+                        <td>
+                          @if (inst.status === 'Open') {
+                            <button type="button" class="btn-primary btn--sm" (click)="payInstallment(contract, inst.id)" [disabled]="payingInstallment === inst.id">
+                              {{ payingInstallment === inst.id ? '...' : 'Pagar' }}
+                            </button>
+                          } @else {
+                            <span class="muted text--sm">{{ inst.paidAt | date:'dd/MM/yy' }}</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
           </section>
         }
       </div>

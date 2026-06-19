@@ -1,0 +1,51 @@
+.relatorios-page {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.page-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  h1 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.summary-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--color-border, #e5e7eb);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 6rem;
+
+  &__fill {
+    height: 100%;
+    background: var(--color-primary, #4f46e5);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+}
+
+.positive { color: var(--color-success, #16a34a); }
+.negative { color: var(--color-danger, #dc2626); }
+.text-right { text-align: right; }

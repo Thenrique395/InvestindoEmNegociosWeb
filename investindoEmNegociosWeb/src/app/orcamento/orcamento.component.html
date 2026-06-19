@@ -1,0 +1,82 @@
+<section class="orcamento-page">
+  <header class="page-header">
+    <div class="page-header__nav">
+      <button type="button" class="btn-ghost btn--sm" (click)="prevMonth()">← Anterior</button>
+      <h1>Orçamento · {{ monthName }} {{ year }}</h1>
+      <button type="button" class="btn-ghost btn--sm" (click)="nextMonth()">Próximo →</button>
+    </div>
+    @if (budget) {
+      <button type="button" class="btn-ghost btn--sm" (click)="exportCsv()">Exportar CSV</button>
+    }
+  </header>
+
+  @if (loading) {
+    <app-ui-state type="loading" />
+  }
+
+  @if (!loading && budget) {
+    <div class="budget-summary kpis">
+      <div><span>Planejado</span><strong>{{ budget.totalPlanned | appCurrency }}</strong></div>
+      <div><span>Realizado</span><strong>{{ budget.totalRealized | appCurrency }}</strong></div>
+      <div [class.negative]="budget.totalVariance < 0"><span>Variação</span><strong>{{ budget.totalVariance | appCurrency }}</strong></div>
+    </div>
+
+    <article class="card">
+      <h2>Adicionar categoria</h2>
+      <div class="inline-form">
+        <input type="text" placeholder="Nome da categoria" [(ngModel)]="newCategory" />
+        <input type="number" placeholder="Valor planejado" [(ngModel)]="newAmount" min="0" step="0.01" />
+        <button type="button" class="btn-primary" (click)="addItem()" [disabled]="saving || !newCategory || !newAmount">
+          {{ saving ? 'Salvando...' : 'Adicionar' }}
+        </button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Categorias</h2>
+      @if (!budget.items.length) {
+        <app-empty-state icon="$" title="Nenhuma categoria no orçamento" description="Adicione categorias e defina valores planejados para o mês." />
+      }
+      @if (budget.items.length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th class="text-right">Planejado</th>
+                <th class="text-right">Realizado</th>
+                <th class="text-right">Variação</th>
+                <th class="text-right">% uso</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of budget.items; track item.id) {
+                <tr>
+                  <td>{{ item.categoryName }}</td>
+                  <td class="text-right">{{ item.plannedAmount | appCurrency }}</td>
+                  <td class="text-right">{{ item.realizedAmount | appCurrency }}</td>
+                  <td class="text-right" [class.negative]="item.variance < 0">{{ item.variance | appCurrency }}</td>
+                  <td class="text-right">
+                    @if (item.plannedAmount > 0) {
+                      <span [class.over-budget]="item.realizedAmount > item.plannedAmount">
+                        {{ (item.realizedAmount / item.plannedAmount * 100) | number:'1.0-0' }}%
+                      </span>
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>
+                    <button type="button" class="btn-ghost btn--sm btn--danger" (click)="removeItem(item)" [disabled]="deletingId === item.id">
+                      {{ deletingId === item.id ? '...' : 'Remover' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  }
+</section>

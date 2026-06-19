@@ -12,7 +12,7 @@
           <button type="button" class="btn btn--primary" [disabled]="openingPortal" (click)="openPortal()">
             {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
           </button>
-          @if (status.canRetry) {
+          @if (status?.canRetry) {
             <a class="btn btn--ghost" [routerLink]="['/checkout']" [queryParams]="{ plan: plan.code, cycle: cycle }">Tentar novamente</a>
           }
         </div>

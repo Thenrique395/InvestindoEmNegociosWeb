@@ -26,6 +26,8 @@ export class LoansComponent implements OnInit {
   saving = false;
   deleting: string | null = null;
   editingId: string | null = null;
+  payingInstallment: string | null = null;
+  expandedContractId: string | null = null;
   error = '';
   success = '';
 
@@ -167,6 +169,34 @@ export class LoansComponent implements OnInit {
       error: (err) => {
         this.uiFeedback.error(err?.error?.detail || 'Falha ao excluir contrato.');
         this.deleting = null;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  toggleInstallments(contractId: string): void {
+    this.expandedContractId = this.expandedContractId === contractId ? null : contractId;
+    this.cdr.markForCheck();
+  }
+
+  payInstallment(contract: LoanContractResponse, installmentId: string): void {
+    if (this.payingInstallment) return;
+    this.payingInstallment = installmentId;
+    this.loansService.payInstallment(contract.id, installmentId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (updated) => {
+        this.contracts = this.contracts.map(c => {
+          if (c.id !== contract.id) return c;
+          const installments = c.installments.map(i => i.id === updated.id ? updated : i);
+          const openInstallments = installments.filter(i => i.status === 'Open');
+          return { ...c, installments, openInstallments: openInstallments.length, openBalance: openInstallments.reduce((s, i) => s + i.totalAmount, 0) };
+        });
+        this.payingInstallment = null;
+        this.uiFeedback.success('Parcela registrada como paga.');
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.uiFeedback.error(err?.error?.detail || 'Falha ao pagar parcela.');
+        this.payingInstallment = null;
         this.cdr.markForCheck();
       }
     });

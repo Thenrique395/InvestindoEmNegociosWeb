@@ -1,0 +1,96 @@
+<section class="cenarios-page">
+  <header class="page-header">
+    <h1>Simulador de Cenários</h1>
+    <p class="muted">Projete o impacto de receita extra, despesas ou poupança no seu fluxo de caixa.</p>
+  </header>
+
+  <article class="card">
+    <h2>Parâmetros</h2>
+    <div class="params-grid">
+      <label>
+        Receita extra mensal
+        <input type="number" min="0" step="100" [(ngModel)]="params.extraMonthlyIncome" />
+      </label>
+      <label>
+        Despesa extra mensal
+        <input type="number" min="0" step="100" [(ngModel)]="params.extraMonthlyExpense" />
+      </label>
+      <label>
+        Taxa de poupança (%)
+        <input type="number" min="0" max="100" step="1" [(ngModel)]="params.savingsRatePercent" />
+      </label>
+      <label>
+        Período
+        <select [(ngModel)]="params.period">
+          <option value="month">Este mês</option>
+          <option value="quarter">Próximos 3 meses</option>
+          <option value="semester">Próximos 6 meses</option>
+          <option value="year">Próximos 12 meses</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-primary" (click)="simulate()" [disabled]="loading">
+        {{ loading ? 'Simulando...' : 'Simular cenário' }}
+      </button>
+    </div>
+  </article>
+
+  @if (error) {
+    <div class="feedback error">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <app-ui-state type="loading" />
+  }
+
+  @if (!loading && result) {
+    <div class="results-grid">
+      <article class="card result-card">
+        <h3>Saldo projetado (base)</h3>
+        <strong class="amount">{{ result.baseProjectedClosingBalance | appCurrency }}</strong>
+        <p class="muted">Sem alterações no comportamento atual.</p>
+      </article>
+      <article class="card result-card result-card--highlight">
+        <h3>Saldo projetado (cenário)</h3>
+        <strong class="amount">{{ result.scenarioProjectedClosingBalance | appCurrency }}</strong>
+        <p class="muted">Impacto: <strong>{{ impactSign }}{{ result.impactAmount | appCurrency }}</strong></p>
+      </article>
+      <article class="card result-card">
+        <h3>Potencial de poupança mensal</h3>
+        <strong class="amount">{{ result.monthlySavingsPotential | appCurrency }}</strong>
+        <p class="muted">Com os parâmetros informados.</p>
+      </article>
+    </div>
+
+    @if (result.scenarioPoints.length > 0) {
+      <article class="card">
+        <h2>Projeção diária</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th class="text-right">Saldo base</th>
+                <th class="text-right">Saldo cenário</th>
+                <th class="text-right">Diferença</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (point of result.scenarioPoints.slice(0, 14); track point.date) {
+                <tr>
+                  <td>{{ point.date | date:'dd/MM' }}</td>
+                  <td class="text-right">{{ point.baseClosingBalance | appCurrency }}</td>
+                  <td class="text-right">{{ point.scenarioClosingBalance | appCurrency }}</td>
+                  <td class="text-right" [class.positive]="point.scenarioClosingBalance >= point.baseClosingBalance" [class.negative]="point.scenarioClosingBalance < point.baseClosingBalance">
+                    {{ (point.scenarioClosingBalance - point.baseClosingBalance) | appCurrency }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    }
+  }
+</section>

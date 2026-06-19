@@ -1,0 +1,38 @@
+.cenarios-page {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.params-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.result-card {
+  text-align: center;
+
+  .amount {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+  }
+
+  &--highlight {
+    border: 2px solid var(--color-primary, #4f46e5);
+  }
+}
+
+.positive { color: var(--color-success, #16a34a); }
+.negative { color: var(--color-danger, #dc2626); }
+.text-right { text-align: right; }

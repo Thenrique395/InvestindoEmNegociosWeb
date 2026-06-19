@@ -80,4 +80,8 @@ export class LoansService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${API_BASE_URL}/loans/${id}`);
   }
+
+  payInstallment(contractId: string, installmentId: string): Observable<LoanInstallmentResponse> {
+    return this.http.post<LoanInstallmentResponse>(`${API_BASE_URL}/loans/${contractId}/installments/${installmentId}/pay`, {});
+  }
 }

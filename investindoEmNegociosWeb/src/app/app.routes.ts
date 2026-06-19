@@ -155,6 +155,24 @@ export const routes: Routes = [
     loadComponent: () => import('./assistant/assistant.component').then((m) => m.AssistantComponent),
   },
   {
+    path: 'orcamento',
+    canActivate: [authGuard, roleGuard],
+    data: { feature: APP_FEATURE_KEYS.budgetAccess, preload: false },
+    loadComponent: () => import('./orcamento/orcamento.component').then((m) => m.OrcamentoComponent),
+  },
+  {
+    path: 'simulador',
+    canActivate: [authGuard, roleGuard],
+    data: { feature: APP_FEATURE_KEYS.scenariosAccess, preload: false },
+    loadComponent: () => import('./cenarios/cenarios.component').then((m) => m.CenariosComponent),
+  },
+  {
+    path: 'relatorios',
+    canActivate: [authGuard, roleGuard],
+    data: { feature: APP_FEATURE_KEYS.reportsAccess, preload: false },
+    loadComponent: () => import('./relatorios/relatorios.component').then((m) => m.RelatoriosComponent),
+  },
+  {
     path: 'assinatura',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },
