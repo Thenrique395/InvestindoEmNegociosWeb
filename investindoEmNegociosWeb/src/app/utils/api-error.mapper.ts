@@ -14,7 +14,7 @@ export function mapApiErrors<T extends string>(
   const result: Partial<Record<T, string>> = {};
 
   const e = error as Record<string, unknown> | undefined;
-  const apiErrors = (e?.['error'] as Record<string, unknown> | undefined)?.['errors'];
+  const apiErrors = (e?.['error'] as Record<string, unknown> | undefined)?.['errors'] as Record<string, unknown> | undefined;
   if (!apiErrors) return result;
 
   Object.keys(apiErrors).forEach((key) => {

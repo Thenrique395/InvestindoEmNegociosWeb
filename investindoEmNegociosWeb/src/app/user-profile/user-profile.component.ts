@@ -51,7 +51,7 @@ export class UserProfileComponent implements OnInit {
         : 1;
       this.intelligenceMode = p.intelligenceMode === 'C' ? 'C' : 'B';
       this.idioma = p.language || 'pt-BR';
-      this.email = ''; // email viria de outro endpoint; placeholder
+      this.email = p.email || '';
     });
   }
 

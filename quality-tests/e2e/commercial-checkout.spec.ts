@@ -121,4 +121,104 @@ test.describe('commercial checkout', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Patrimônio ativado com sucesso/i })).toBeVisible();
     await expect(page.getByText(/status real do pagamento/i)).toBeVisible();
   });
+
+  test('exibe tela de falha com motivo e opcao de retry quando checkout retornar Failed', async ({ page }) => {
+    const checkoutId = '22222222-2222-2222-2222-222222222222';
+
+    await page.route(`**/api/v1/billing/checkout-status/${checkoutId}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          checkoutId,
+          provider: 'stripe',
+          status: 'Failed',
+          planCode: 'intermediate',
+          billingCycle: 'Monthly',
+          amount: 2990,
+          currency: 'BRL',
+          requiresLogin: false,
+          canRetry: true,
+          canOpenPortal: false,
+          subscriptionActive: false,
+          autoRenew: false,
+          failureReason: 'Cartão recusado pela operadora.',
+          expiresAt: null, completedAt: null, renewsAt: null, cancelledAt: null, refundedAt: null
+        })
+      });
+    });
+
+    await page.goto(`/checkout/falha?checkout_id=${checkoutId}&plan=intermediate&cycle=Monthly`, { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByRole('heading', { level: 1, name: /Não foi possível ativar/i })).toBeVisible();
+    await expect(page.getByText(/Cartão recusado pela operadora/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /Tentar novamente/i })).toBeVisible();
+  });
+
+  test('exibe tela pendente aguardando confirmacao do gateway', async ({ page }) => {
+    const checkoutId = '33333333-3333-3333-3333-333333333333';
+
+    await page.route(`**/api/v1/billing/checkout-status/${checkoutId}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          checkoutId,
+          provider: 'stripe',
+          status: 'Pending',
+          planCode: 'intermediate',
+          billingCycle: 'Monthly',
+          amount: 2990,
+          currency: 'BRL',
+          requiresLogin: false,
+          canRetry: false,
+          canOpenPortal: false,
+          subscriptionActive: false,
+          autoRenew: false,
+          failureReason: null,
+          expiresAt: null, completedAt: null, renewsAt: null, cancelledAt: null, refundedAt: null
+        })
+      });
+    });
+
+    await page.goto(`/checkout/pendente?checkout_id=${checkoutId}&plan=intermediate&cycle=Monthly`, { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByRole('heading', { level: 1, name: /Falta concluir a ativação/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Entrar para concluir/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Voltar ao checkout/i })).toBeVisible();
+  });
+
+  test('exibe opcao de portal de cobranca na tela de falha quando pagamento for recusado pelo gateway', async ({ page }) => {
+    const checkoutId = '44444444-4444-4444-4444-444444444444';
+
+    await page.route(`**/api/v1/billing/checkout-status/${checkoutId}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          checkoutId,
+          provider: 'stripe',
+          status: 'Failed',
+          planCode: 'advanced',
+          billingCycle: 'Yearly',
+          amount: 59900,
+          currency: 'BRL',
+          requiresLogin: false,
+          canRetry: false,
+          canOpenPortal: true,
+          subscriptionActive: false,
+          autoRenew: false,
+          failureReason: 'Fundos insuficientes.',
+          expiresAt: null, completedAt: null, renewsAt: null, cancelledAt: null, refundedAt: null
+        })
+      });
+    });
+
+    await page.goto(`/checkout/falha?checkout_id=${checkoutId}&plan=advanced&cycle=Yearly`, { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByRole('heading', { level: 1, name: /Não foi possível ativar/i })).toBeVisible();
+    await expect(page.getByText(/Pagamento recusado/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Abrir portal de cobrança/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Tentar novamente/i })).not.toBeVisible();
+  });
 });

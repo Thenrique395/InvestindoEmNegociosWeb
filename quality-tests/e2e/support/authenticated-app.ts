@@ -1278,6 +1278,37 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'PUT' && path.match(/^\/api\/v1\/loans\/[^/]+$/)) {
+    const loanId = path.split('/')[4];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const loan = state.loans.find((item) => item.id === loanId);
+    if (!loan) {
+      await json(route, { title: 'Contrato não encontrado', detail: 'O contrato informado não existe ou não pertence ao usuário.' }, 404);
+      return;
+    }
+    loan.title = payload.title ?? loan.title;
+    loan.principalAmount = Number(payload.principalAmount ?? loan.principalAmount);
+    loan.annualInterestRate = Number(payload.annualInterestRate ?? loan.annualInterestRate);
+    loan.termMonths = Number(payload.termMonths ?? loan.termMonths);
+    loan.amortizationType = payload.amortizationType ?? loan.amortizationType;
+    loan.startDate = payload.startDate ?? loan.startDate;
+    loan.paymentDay = Number(payload.paymentDay ?? loan.paymentDay);
+    await json(route, loan);
+    return;
+  }
+
+  if (method === 'DELETE' && path.match(/^\/api\/v1\/loans\/[^/]+$/)) {
+    const loanId = path.split('/')[4];
+    const idx = state.loans.findIndex((item) => item.id === loanId);
+    if (idx === -1) {
+      await json(route, { title: 'Contrato não encontrado', detail: 'O contrato informado não existe ou não pertence ao usuário.' }, 404);
+      return;
+    }
+    state.loans.splice(idx, 1);
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
   if (method === 'POST' && path === '/api/v1/monthlysnapshots/generate') {
     const payload = JSON.parse(route.request().postData() || '{}');
     const month = Number(payload.month || 1);

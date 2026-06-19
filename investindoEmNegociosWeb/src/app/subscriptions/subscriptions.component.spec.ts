@@ -102,8 +102,10 @@ describe('SubscriptionsComponent', () => {
     const router = overrides?.router ?? { navigate: jasmine.createSpy() };
     const uiFeedback = overrides?.uiFeedback ?? { success: jasmine.createSpy(), error: jasmine.createSpy() };
 
+    const cdr = { markForCheck: jasmine.createSpy() } as any;
+    const destroyRef = { onDestroy: jasmine.createSpy() } as any;
     return {
-      component: new SubscriptionsComponent(subscriptionsService, authService, billingService, router, uiFeedback),
+      component: new SubscriptionsComponent(subscriptionsService, authService, billingService, router, uiFeedback, cdr, destroyRef),
       subscriptionsService,
       authService,
       billingService,

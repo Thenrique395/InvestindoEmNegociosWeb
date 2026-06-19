@@ -21,9 +21,9 @@
         <strong>{{ isPastDueCritical ? 'Acesso premium em risco' : 'Pagamento em atraso' }}</strong>
         <span>
           @if (isPastDueCritical) {
-            Último dia para regularizar o pagamento.
+            Último dia para regularizar o pagamento antes do encerramento do acesso premium.
           } @else {
-            Há uma cobrança pendente. Atualize sua forma de pagamento para manter o acesso premium.
+            Atualize sua forma de pagamento para continuar com todos os recursos premium.
           }
           @if (gracePeriodEndsAtLabel) {
             O acesso será encerrado em <strong>{{ gracePeriodEndsAtLabel }}</strong> caso não haja regularização.
@@ -37,7 +37,8 @@
     @if (isExpired) {
       <div class="subscription-alert subscription-alert--danger" role="alert">
         <strong>Acesso premium encerrado</strong>
-        <span>Não conseguimos confirmar o pagamento e seu acesso voltou para o plano Essencial. Contrate um novo plano para restaurar todos os recursos.</span>
+        <span>Como não conseguimos confirmar o pagamento, seu acesso voltou para o plano Essencial. Você pode reativar seu plano premium a qualquer momento.</span>
+        <a class="btn btn--ghost btn--sm" routerLink="/planos">Reativar plano</a>
       </div>
     }
     @if (!vm.current.autoRenew && !isPastDue && !isExpired && accessUntilLabel) {

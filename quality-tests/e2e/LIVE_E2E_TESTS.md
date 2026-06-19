@@ -279,6 +279,70 @@ localmente (`http://127.0.0.1:4300` por padrão) com mocks/fixtures, conforme de
 - `post-deploy-frontend.spec.ts` — checagens pós-deploy do frontend (smoke contra ambiente
   publicado).
 
+## Cobertura pendente — próximos testes live
+
+Áreas ainda sem cobertura live. Usar como backlog ao criar novos specs.
+
+### Billing e assinatura
+
+| Fluxo | Arquivo sugerido | Observação |
+| --- | --- | --- |
+| Checkout Stripe completo (redirect → webhook → plano ativado) | `live-billing.spec.ts` | Requer Stripe ativado em PRD; usar conta de teste Stripe para simular pagamento |
+| Portal de cobrança Stripe (alterar cartão, cancelar renovação) | `live-billing.spec.ts` | Verifica redirect para `stripe.com/billing/portal` e retorno ao app |
+| Solicitação de reembolso dentro da janela de arrependimento | `live-billing.spec.ts` | `POST /billing/refund` em até 7 dias da ativação |
+| Trial de plano Advanced (ativar, verificar role, expirar) | `live-billing.spec.ts` | `POST /billing/trial` → verifica `UserRole.Advanced` → verifica bloqueio após `TrialUsedAt` |
+| Downgrade automático após fim da janela de graça | `live-billing.spec.ts` | Difícil de testar live; candidato a teste de integração backend |
+
+### Assistente financeiro
+
+| Fluxo | Arquivo sugerido | Observação |
+| --- | --- | --- |
+| Enviar mensagem ao assistente e receber resposta | `live-assistant.spec.ts` | Verifica que o chat responde com conteúdo não vazio |
+| Assistente bloqueado para plano Basic | `live-assistant.spec.ts` | Usuário Basic deve ver mensagem de upgrade, não resposta do assistente |
+
+### Importações OFX / CSV
+
+| Fluxo | Arquivo sugerido | Observação |
+| --- | --- | --- |
+| Importar fatura OFX de cartão (Intermediate+) | `live-imports.spec.ts` | Upload de arquivo OFX de teste → verifica lançamentos importados em `/despesas` |
+| Importar extrato CSV de conta (Intermediate+) | `live-imports.spec.ts` | Upload de arquivo CSV → verifica transações importadas |
+| Bloqueio de importação para plano Basic | `live-imports.spec.ts` | Usuário Basic deve ver aviso de upgrade ao tentar importar |
+
+### Patrimônio e investimentos (Advanced)
+
+| Fluxo | Arquivo sugerido | Observação |
+| --- | --- | --- |
+| Criar e listar ativo de investimento real | `live-advanced.spec.ts` | Já parcialmente coberto em `live-role-writeflows.spec.ts` — expandir |
+| Snapshot patrimonial mensal | `live-advanced.spec.ts` | Já parcialmente coberto em `live-finance-modules.spec.ts` — verificar campos |
+| Verificar patrimônio líquido consolidado no wealth | `live-advanced.spec.ts` | Tela de wealth com totais de contas + investimentos |
+
+### Cenários de erro por módulo
+
+#### Autenticação
+
+| Cenário | Arquivo sugerido |
+| --- | --- |
+| Login com senha incorreta → mensagem de erro visível | `live-auth-errors.spec.ts` |
+| Tentativa de cadastro com e-mail já existente → erro 409 | `live-auth-errors.spec.ts` |
+| Rate limit de `/auth` atingido (5 req/min) → erro 429 + retry automático no helper | `live-auth-errors.spec.ts` |
+| Token expirado → refresh automático sem logout | `live-auth-errors.spec.ts` |
+
+#### Billing
+
+| Cenário | Arquivo sugerido |
+| --- | --- |
+| Tentar iniciar checkout sem plano valid → erro 400 | `live-billing-errors.spec.ts` |
+| Reembolso fora da janela (> 7 dias) → erro 422 | `live-billing-errors.spec.ts` |
+| Trial já utilizado → erro 422 com mensagem clara | `live-billing-errors.spec.ts` |
+
+#### Importações
+
+| Cenário | Arquivo sugerido |
+| --- | --- |
+| Upload de arquivo OFX inválido → mensagem de erro | `live-imports.spec.ts` |
+| Upload de CSV com colunas erradas → erro de validação | `live-imports.spec.ts` |
+| Importação duplicada → sistema identifica e avisa | `live-imports.spec.ts` |
+
 ## Como adicionar novos testes "live"
 
 1. Use `completeLiveOnboarding(page, testInfo.workerIndex, testInfo.retry)` do

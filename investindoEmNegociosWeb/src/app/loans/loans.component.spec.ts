@@ -42,11 +42,15 @@ describe('LoansComponent', () => {
         openInstallments: 24,
         createdAt: '2026-03-14T10:00:00Z',
         installments: []
-      }))
+      })),
+      update: jasmine.createSpy(),
+      delete: jasmine.createSpy()
     };
 
+    const uiFeedback = { success: jasmine.createSpy(), error: jasmine.createSpy() } as any;
     const cdr = { markForCheck: jasmine.createSpy('markForCheck') } as any;
-    return { component: new LoansComponent(loansService, cdr), loansService };
+    const destroyRef = { onDestroy: jasmine.createSpy() } as any;
+    return { component: new LoansComponent(loansService, uiFeedback, cdr, destroyRef), loansService, uiFeedback };
   }
 
   it('deve carregar contratos ao iniciar', () => {
@@ -84,7 +88,7 @@ describe('LoansComponent', () => {
     expect(ctx.loansService.create).toHaveBeenCalledWith(ctx.component.form);
     expect(ctx.component.contracts[0].id).toBe('c1');
     expect(ctx.component.simulation).toBeNull();
-    expect(ctx.component.success).toContain('Empréstimo criado');
+    expect(ctx.uiFeedback.success).toHaveBeenCalledWith(jasmine.stringContaining('Empréstimo criado'));
     expect(ctx.component.saving).toBeFalse();
   });
 
@@ -92,7 +96,9 @@ describe('LoansComponent', () => {
     const loansService = {
       list: jasmine.createSpy().and.returnValue(of([])),
       simulate: jasmine.createSpy().and.returnValue(of(null)),
-      create: jasmine.createSpy().and.returnValue(throwError(() => ({ error: { detail: 'Falha ao criar' } })))
+      create: jasmine.createSpy().and.returnValue(throwError(() => ({ error: { detail: 'Falha ao criar' } }))),
+      update: jasmine.createSpy(),
+      delete: jasmine.createSpy()
     };
     const ctx = createComponent({ loansService });
 

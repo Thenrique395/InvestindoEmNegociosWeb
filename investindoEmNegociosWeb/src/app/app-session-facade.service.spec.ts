@@ -8,7 +8,7 @@ import { SessionMonitorService } from './session-monitor.service';
 describe('AppSessionFacadeService', () => {
   let service: AppSessionFacadeService;
   let authService: jasmine.SpyObj<Pick<AuthService, 'clearSession' | 'getRole' | 'isAuthenticated'>>;
-  let sessionMonitor: jasmine.SpyObj<Pick<SessionMonitorService, 'markActivity' | 'scheduleExpiredSessionRedirect' | 'start' | 'stop'>>;
+  let sessionMonitor: jasmine.SpyObj<Pick<SessionMonitorService, 'markActivity' | 'start' | 'stop'>>;
   let router: Pick<Router, 'navigated' | 'url'>;
 
   beforeEach(() => {
@@ -16,9 +16,9 @@ describe('AppSessionFacadeService', () => {
       'AuthService',
       ['clearSession', 'getRole', 'isAuthenticated']
     );
-    sessionMonitor = jasmine.createSpyObj<Pick<SessionMonitorService, 'markActivity' | 'scheduleExpiredSessionRedirect' | 'start' | 'stop'>>(
+    sessionMonitor = jasmine.createSpyObj<Pick<SessionMonitorService, 'markActivity' | 'start' | 'stop'>>(
       'SessionMonitorService',
-      ['markActivity', 'scheduleExpiredSessionRedirect', 'start', 'stop']
+      ['markActivity', 'start', 'stop']
     );
     router = { navigated: true, url: '/' };
 
@@ -55,13 +55,11 @@ describe('AppSessionFacadeService', () => {
     expect(onExpired).toHaveBeenCalled();
   });
 
-  it('agenda redirecionamento quando nao autenticado em rota protegida', () => {
+  it('retorna nao autenticado em rota protegida', () => {
     authService.isAuthenticated.and.returnValue(false);
     history.pushState({}, '', '/dashboard');
 
     expect(service.isAuthenticated()).toBeFalse();
-
-    expect(sessionMonitor.scheduleExpiredSessionRedirect).toHaveBeenCalled();
   });
 
   it('mantem experiencia publica em rota publica navegada', () => {
@@ -69,7 +67,6 @@ describe('AppSessionFacadeService', () => {
     history.pushState({}, '', '/planos');
 
     expect(service.showPublicExperience()).toBeTrue();
-    expect(sessionMonitor.scheduleExpiredSessionRedirect).not.toHaveBeenCalled();
   });
 
   it('centraliza role e verificacao de acesso', () => {

@@ -29,8 +29,9 @@ describe('InvestmentsComponent', () => {
       warning: jasmine.createSpy()
     };
 
+    const destroyRef = { onDestroy: jasmine.createSpy() } as any;
     return {
-      component: new InvestmentsComponent(investments, lookups, uiFeedback),
+      component: new InvestmentsComponent(investments, lookups, uiFeedback, destroyRef),
       investments,
       lookups,
       uiFeedback

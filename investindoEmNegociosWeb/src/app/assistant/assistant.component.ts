@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { FinancialAssistantChatResponse, FinancialAssistantPromptContextResponse, FinancialAssistantService } from '../financial-assistant.service';
+import { FinancialAssistantPromptContextResponse, FinancialAssistantService } from '../financial-assistant.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
@@ -12,28 +13,38 @@ import { PeriodActionCardComponent } from '../shared/period-action-card/period-a
   standalone: true,
   imports: [CommonModule, FormsModule, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
   templateUrl: './assistant.component.html',
-  styleUrl: './assistant.component.scss'
+  styleUrl: './assistant.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssistantComponent implements OnInit {
   context: FinancialAssistantPromptContextResponse | null = null;
-  conversation: FinancialAssistantChatResponse[] = [];
   question = '';
   loading = false;
   sending = false;
   error = '';
 
-  constructor(private readonly assistantService: FinancialAssistantService) {}
+  get conversation() {
+    return this.assistantService.conversation;
+  }
+
+  constructor(
+    private readonly assistantService: FinancialAssistantService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
-    this.assistantService.context().subscribe({
+    this.assistantService.context().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (context) => {
         this.context = context;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Falha ao carregar contexto do assistente.';
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -42,16 +53,18 @@ export class AssistantComponent implements OnInit {
     if (!this.question.trim()) return;
     this.sending = true;
     this.error = '';
-    this.assistantService.chat(this.question).subscribe({
+    this.assistantService.chat(this.question).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
-        this.conversation = [...this.conversation, response];
+        this.assistantService.addMessage(response);
         this.context = response.context;
         this.question = '';
         this.sending = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Falha ao conversar com o assistente.';
         this.sending = false;
+        this.cdr.markForCheck();
       }
     });
   }

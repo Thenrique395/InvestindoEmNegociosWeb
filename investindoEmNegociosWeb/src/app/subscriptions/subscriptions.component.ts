@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { BillingService } from '../billing.service';
 import { SubscriptionsService, SubscriptionCatalogResponse, SubscriptionPlan } from '../subscriptions.service';
@@ -10,7 +10,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './subscriptions.component.html',
   styleUrl: './subscriptions.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -79,7 +79,7 @@ export class SubscriptionsComponent implements OnInit {
 
   get showPortalButton(): boolean {
     const c = this.catalog?.current;
-    return !!c && c.planCode !== 'basic' && !this.isExpired && !c.isTrial;
+    return !!c && c.planCode !== 'basic' && !c.isTrial;
   }
 
   get showTrialButton(): boolean {

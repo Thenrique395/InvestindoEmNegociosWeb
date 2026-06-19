@@ -10,6 +10,7 @@ interface BillingAlert {
   level: AlertLevel;
   title: string;
   message: string;
+  action: string;
 }
 
 @Component({
@@ -52,15 +53,17 @@ export class BillingAlertBannerComponent implements OnInit {
       return {
         level: 'danger',
         title: 'Pagamento em atraso',
-        message: 'Há uma cobrança pendente na sua assinatura. Atualize seu meio de pagamento para manter o acesso.'
+        message: 'Atualize sua forma de pagamento para continuar com todos os recursos premium.',
+        action: 'Atualizar pagamento'
       };
     }
 
     if (status === 'expired') {
       return {
         level: 'danger',
-        title: 'Assinatura expirada',
-        message: 'Sua assinatura expirou e o acesso foi reduzido para o plano Basic. Contrate um novo plano para restaurar.'
+        title: 'Acesso premium encerrado',
+        message: 'Seu acesso voltou para o plano Essencial. Reative o plano premium para restaurar todos os recursos.',
+        action: 'Reativar plano'
       };
     }
 
@@ -72,7 +75,8 @@ export class BillingAlertBannerComponent implements OnInit {
         return {
           level: 'warning',
           title: 'Acesso encerra em breve',
-          message: `A renovação automática está desativada. Seu acesso premium termina em ${dateStr}.`
+          message: `A renovação automática está desativada. Seu acesso premium termina em ${dateStr}.`,
+          action: 'Gerenciar assinatura'
         };
       }
     }

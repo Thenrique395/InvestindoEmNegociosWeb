@@ -13,6 +13,7 @@ describe('UserContextFacadeService', () => {
 
   const profile: UserProfile = {
     userId: 'user-1',
+    email: 'tiago@example.com',
     fullName: 'Tiago Henrique dos Santos',
     document: '01587610493',
     phone: '81995257823',

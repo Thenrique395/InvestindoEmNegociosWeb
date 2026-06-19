@@ -72,4 +72,12 @@ export class LoansService {
   create(request: LoanContractRequest): Observable<LoanContractResponse> {
     return this.http.post<LoanContractResponse>(`${API_BASE_URL}/loans`, request);
   }
+
+  update(id: string, request: LoanContractRequest): Observable<LoanContractResponse> {
+    return this.http.put<LoanContractResponse>(`${API_BASE_URL}/loans/${id}`, request);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${API_BASE_URL}/loans/${id}`);
+  }
 }

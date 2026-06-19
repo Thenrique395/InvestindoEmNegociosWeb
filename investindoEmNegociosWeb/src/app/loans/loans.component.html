@@ -58,7 +58,7 @@
 
   <div class="grid">
     <article class="card form-card">
-      <h2>Novo contrato</h2>
+      <h2>{{ editingId ? 'Editar contrato' : 'Novo contrato' }}</h2>
       <label>Título<input [(ngModel)]="form.title" /></label>
       <label>Principal<input type="number" [(ngModel)]="form.principalAmount" /></label>
       <label>Juros ao ano (%)<input type="number" step="0.01" [(ngModel)]="form.annualInterestRate" /></label>
@@ -72,8 +72,14 @@
       <label>Data inicial<input type="date" [(ngModel)]="form.startDate" /></label>
       <label>Dia de pagamento<input type="number" min="1" max="28" [(ngModel)]="form.paymentDay" /></label>
       <div class="actions">
-        <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
-        <button class="btn-primary" type="button" (click)="create()" [disabled]="saving">{{ saving ? 'Salvando...' : 'Criar contrato' }}</button>
+        @if (editingId) {
+          <button class="btn-ghost" type="button" (click)="cancelEdit()">Cancelar</button>
+        } @else {
+          <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
+        }
+        <button class="btn-primary" type="button" (click)="create()" [disabled]="saving">
+          {{ saving ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
+        </button>
       </div>
     </article>
 
@@ -126,7 +132,13 @@
                 <h3>{{ contract.title }}</h3>
                 <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | appCurrency }}</p>
               </div>
-              <div class="pill">{{ contract.status }}</div>
+              <div class="contract__actions">
+                <div class="pill">{{ contract.status }}</div>
+                <button type="button" class="btn-ghost btn--sm" (click)="edit(contract)" [disabled]="!!deleting">Editar</button>
+                <button type="button" class="btn-danger btn--sm" (click)="remove(contract)" [disabled]="deleting === contract.id || !!editingId">
+                  {{ deleting === contract.id ? 'Excluindo...' : 'Excluir' }}
+                </button>
+              </div>
             </div>
             <div class="kpis compact">
               <div><span>Parcela</span><strong>{{ contract.monthlyPayment | appCurrency }}</strong></div>

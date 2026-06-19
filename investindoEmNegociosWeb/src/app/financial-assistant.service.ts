@@ -27,6 +27,20 @@ export interface FinancialAssistantChatResponse {
 
 @Injectable({ providedIn: 'root' })
 export class FinancialAssistantService {
+  private _conversation: FinancialAssistantChatResponse[] = [];
+
+  get conversation(): FinancialAssistantChatResponse[] {
+    return this._conversation;
+  }
+
+  addMessage(msg: FinancialAssistantChatResponse): void {
+    this._conversation = [...this._conversation, msg];
+  }
+
+  clearConversation(): void {
+    this._conversation = [];
+  }
+
   constructor(private readonly http: HttpClient) {}
 
   context(referenceDate?: string): Observable<FinancialAssistantPromptContextResponse> {
