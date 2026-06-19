@@ -78,6 +78,48 @@ type LoanContract = {
   installments: LoanInstallment[];
 };
 
+type InvestmentMovement = {
+  id: string;
+  type: string;
+  quantity: number;
+  price: number;
+  date: string;
+  note?: string;
+};
+
+type InvestmentPosition = {
+  id: string;
+  type: string;
+  asset: string;
+  quantity: number;
+  avgPrice: number;
+  openedAt: string;
+  account: string;
+  category?: string;
+  note?: string;
+  movements: InvestmentMovement[];
+  marketSymbol?: string | null;
+  marketPrice?: number | null;
+  marketChangePercent?: number | null;
+  marketName?: string | null;
+  marketLogoUrl?: string | null;
+  marketSource?: string | null;
+  marketProvider?: string | null;
+};
+
+type InvestmentGoal = {
+  id: string;
+  targetAmount: number;
+};
+
+type InvestmentAllocationTarget = {
+  rf: number;
+  acoes: number;
+  fundos: number;
+  cripto: number;
+  total: number;
+};
+
 type MonthlySnapshot = {
   id: string;
   year: number;
@@ -305,6 +347,33 @@ const initialCards: Card[] = [
 
 const initialLoans: LoanContract[] = [];
 
+const initialInvestmentPositions: InvestmentPosition[] = [
+  {
+    id: 'pos-1',
+    type: 'RF',
+    asset: 'Tesouro IPCA+ 2029',
+    quantity: 2,
+    avgPrice: 600,
+    openedAt: '2026-01-15T10:00:00Z',
+    account: 'Corretora Alpha',
+    category: 'Renda Fixa',
+    movements: [
+      { id: 'mov-1', type: 'APORTE', quantity: 2, price: 600, date: '2026-01-15' }
+    ],
+    marketSymbol: null,
+    marketPrice: null,
+    marketChangePercent: null,
+    marketName: null,
+    marketLogoUrl: null,
+    marketSource: null,
+    marketProvider: null
+  }
+];
+
+const initialInvestmentGoal: InvestmentGoal = { id: 'goal-1', targetAmount: 50000 };
+
+const initialAllocationTarget: InvestmentAllocationTarget = { rf: 60, acoes: 20, fundos: 10, cripto: 5, total: 95 };
+
 const initialSnapshots: MonthlySnapshot[] = [
   {
     id: 'snapshot-1',
@@ -508,6 +577,9 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     accountTransactions: structuredClone(initialAccountTransactions),
     cards: structuredClone(initialCards),
     loans: structuredClone(initialLoans),
+    investmentPositions: structuredClone(initialInvestmentPositions),
+    investmentGoal: structuredClone(initialInvestmentGoal) as InvestmentGoal | null,
+    allocationTarget: structuredClone(initialAllocationTarget),
     snapshots: structuredClone(initialSnapshots),
     cardStatements: structuredClone(baseCardStatements),
     adminCardBrands: structuredClone(initialAdminCardBrands),
@@ -733,6 +805,9 @@ async function fulfillApi(route: Route, state: {
   accountTransactions: Record<string, AccountTransaction[]>;
   cards: Card[];
   loans: LoanContract[];
+  investmentPositions: InvestmentPosition[];
+  investmentGoal: InvestmentGoal | null;
+  allocationTarget: InvestmentAllocationTarget;
   snapshots: MonthlySnapshot[];
   cardStatements: typeof baseCardStatements;
   adminCardBrands: AdminCardBrand[];
@@ -1305,6 +1380,129 @@ async function fulfillApi(route: Route, state: {
       return;
     }
     state.loans.splice(idx, 1);
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
+  if (path === '/api/v1/investments/positions' && method !== 'POST') {
+    await json(route, state.investmentPositions);
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/investments/positions') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const created: InvestmentPosition = {
+      id: crypto.randomUUID(),
+      type: payload.type,
+      asset: payload.asset,
+      quantity: Number(payload.quantity || 0),
+      avgPrice: Number(payload.avgPrice || 0),
+      openedAt: payload.openedAt || new Date().toISOString(),
+      account: payload.account,
+      category: payload.category || undefined,
+      note: payload.note || undefined,
+      movements: [],
+      marketSymbol: null,
+      marketPrice: null,
+      marketChangePercent: null,
+      marketName: null,
+      marketLogoUrl: null,
+      marketSource: null,
+      marketProvider: null
+    };
+    state.investmentPositions.push(created);
+    await json(route, created, 201);
+    return;
+  }
+
+  if (method === 'POST' && path.match(/^\/api\/v1\/investments\/positions\/[^/]+\/movements$/)) {
+    const posId = path.split('/')[5];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const pos = state.investmentPositions.find((item) => item.id === posId);
+    if (!pos) {
+      await json(route, { detail: 'Posição não encontrada.' }, 404);
+      return;
+    }
+    const movement: InvestmentMovement = {
+      id: crypto.randomUUID(),
+      type: payload.type,
+      quantity: Number(payload.quantity || 0),
+      price: Number(payload.price || 0),
+      date: payload.date || new Date().toISOString().slice(0, 10),
+      note: payload.note || undefined
+    };
+    pos.movements.push(movement);
+    await json(route, movement, 201);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/investments\/positions\/[^/]+$/) && !path.includes('/movements')) {
+    const posId = path.split('/')[5];
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const pos = state.investmentPositions.find((item) => item.id === posId);
+    if (!pos) {
+      await json(route, { detail: 'Posição não encontrada.' }, 404);
+      return;
+    }
+    pos.type = payload.type ?? pos.type;
+    pos.asset = payload.asset ?? pos.asset;
+    pos.quantity = Number(payload.quantity ?? pos.quantity);
+    pos.avgPrice = Number(payload.avgPrice ?? pos.avgPrice);
+    pos.openedAt = payload.openedAt ?? pos.openedAt;
+    pos.account = payload.account ?? pos.account;
+    pos.category = payload.category ?? pos.category;
+    pos.note = payload.note ?? pos.note;
+    await json(route, pos);
+    return;
+  }
+
+  if (method === 'DELETE' && path.match(/^\/api\/v1\/investments\/positions\/[^/]+$/)) {
+    const posId = path.split('/')[5];
+    const idx = state.investmentPositions.findIndex((item) => item.id === posId);
+    if (idx === -1) {
+      await json(route, { detail: 'Posição não encontrada.' }, 404);
+      return;
+    }
+    state.investmentPositions.splice(idx, 1);
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
+  if (path === '/api/v1/investments/goal') {
+    if (method === 'PUT') {
+      const payload = JSON.parse(route.request().postData() || '{}');
+      if (!state.investmentGoal) {
+        state.investmentGoal = { id: crypto.randomUUID(), targetAmount: Number(payload.targetAmount || 0) };
+      } else {
+        state.investmentGoal.targetAmount = Number(payload.targetAmount ?? state.investmentGoal.targetAmount);
+      }
+      await json(route, state.investmentGoal);
+    } else {
+      await json(route, state.investmentGoal);
+    }
+    return;
+  }
+
+  if (path === '/api/v1/investments/allocation-target') {
+    if (method === 'PUT') {
+      const payload = JSON.parse(route.request().postData() || '{}');
+      state.allocationTarget.rf = Number(payload.rf ?? state.allocationTarget.rf);
+      state.allocationTarget.acoes = Number(payload.acoes ?? state.allocationTarget.acoes);
+      state.allocationTarget.fundos = Number(payload.fundos ?? state.allocationTarget.fundos);
+      state.allocationTarget.cripto = Number(payload.cripto ?? state.allocationTarget.cripto);
+      state.allocationTarget.total = state.allocationTarget.rf + state.allocationTarget.acoes + state.allocationTarget.fundos + state.allocationTarget.cripto;
+      await json(route, state.allocationTarget);
+    } else {
+      await json(route, state.allocationTarget);
+    }
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/subscriptions/retry-payment') {
+    if (state.subscriptionCatalog.current.status !== 'PastDue') {
+      await json(route, { detail: 'Só é possível tentar novamente quando há pagamento em atraso.' }, 400);
+      return;
+    }
     await route.fulfill({ status: 204, body: '' });
     return;
   }

@@ -68,4 +68,8 @@ export class SubscriptionsService {
   requestTrial() {
     return this.http.post<SubscriptionChangeResponse>(`${this.baseUrl}/request-trial`, {});
   }
+
+  retryPayment() {
+    return this.http.post<void>(`${this.baseUrl}/retry-payment`, {});
+  }
 }

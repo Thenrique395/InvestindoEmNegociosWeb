@@ -32,6 +32,11 @@
         <button type="button" class="btn btn--ghost btn--sm" [disabled]="openingPortal" (click)="openPortal()">
           {{ openingPortal ? 'Abrindo portal...' : 'Atualizar forma de pagamento' }}
         </button>
+        @if (showRetryButton) {
+          <button type="button" class="btn btn--ghost btn--sm" [disabled]="retrying" (click)="retryPayment()">
+            {{ retrying ? 'Processando...' : 'Tentar novamente' }}
+          </button>
+        }
       </div>
     }
     @if (isExpired) {

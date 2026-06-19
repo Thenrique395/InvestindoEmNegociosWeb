@@ -24,6 +24,7 @@ export class SubscriptionsComponent implements OnInit {
   openingPortal = false;
   requestingTrial = false;
   requestingRefund = false;
+  retrying = false;
 
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
@@ -85,6 +86,10 @@ export class SubscriptionsComponent implements OnInit {
   get showTrialButton(): boolean {
     const c = this.catalog?.current;
     return !!c && c.planCode === 'basic' && this.subscriptionStatus === 'active';
+  }
+
+  get showRetryButton(): boolean {
+    return this.isPastDue;
   }
 
   get showRefundButton(): boolean {
@@ -222,6 +227,25 @@ export class SubscriptionsComponent implements OnInit {
         error: (err) => {
           this.uiFeedback.error(err?.error?.detail || 'Não foi possível processar o reembolso.');
           this.requestingRefund = false;
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  retryPayment(): void {
+    if (this.retrying) return;
+    this.retrying = true;
+    this.subscriptionsService.retryPayment()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.uiFeedback.success('Pagamento enviado. Seu acesso será reativado assim que a confirmação chegar.');
+          this.retrying = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.uiFeedback.error(err?.error?.detail || 'Não foi possível processar o pagamento.');
+          this.retrying = false;
           this.cdr.markForCheck();
         }
       });
