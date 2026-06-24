@@ -76,17 +76,17 @@ export class CalculatorComponent implements OnDestroy {
     { id: 'jurosCompostos', title: 'Juros Compostos', subtitle: 'Poder dos juros ao longo do tempo', category: 'financeiras', implemented: true, icon: 'calculate' },
     { id: 'renda', title: 'Calculadora de Receitas', subtitle: 'Receita mensal sobre patrimônio', category: 'financeiras', implemented: true, icon: 'savings' },
     { id: 'milhao', title: 'Primeiro Milhão', subtitle: 'Quando chego a R$ 1 mi?', category: 'financeiras', implemented: true, icon: 'military_tech' },
-    { id: 'rescisao', title: 'Rescisão Trabalhista', subtitle: 'Verbas rescisórias', category: 'trabalhistas', implemented: false, icon: 'gavel' },
+    { id: 'rescisao', title: 'Rescisão Trabalhista', subtitle: 'Verbas rescisórias', category: 'trabalhistas', implemented: true, icon: 'gavel' },
     { id: 'irIsencao', title: 'Isenção de IR', subtitle: 'Verifique elegibilidade', category: 'trabalhistas', implemented: false, icon: 'policy' },
     { id: 'salarioRealidade', title: 'Salário x realidade', subtitle: 'Comparativo regional', category: 'trabalhistas', implemented: false, icon: 'public' },
     { id: 'seguroDesemprego', title: 'Seguro-desemprego', subtitle: 'Cálculo de parcelas', category: 'trabalhistas', implemented: false, icon: 'fact_check' },
     { id: 'horasExtras', title: 'Horas extras', subtitle: 'Adicional e reflexos', category: 'trabalhistas', implemented: false, icon: 'schedule' },
-    { id: 'fgts', title: 'FGTS', subtitle: 'Depósitos e saque', category: 'trabalhistas', implemented: false, icon: 'account_balance' },
-    { id: 'inss', title: 'INSS', subtitle: 'Faixas e descontos', category: 'trabalhistas', implemented: false, icon: 'balance' },
-    { id: 'feriasProporcionais', title: 'Férias proporcionais', subtitle: 'Dias devidos', category: 'trabalhistas', implemented: false, icon: 'beach_access' },
-    { id: 'decimoTerceiro', title: 'Décimo terceiro', subtitle: 'Proporcional e integral', category: 'trabalhistas', implemented: false, icon: 'card_giftcard' },
-    { id: 'custoClt', title: 'Custo CLT x PJ', subtitle: 'Comparativo empregador', category: 'trabalhistas', implemented: false, icon: 'work' },
-    { id: 'ferias', title: 'Férias', subtitle: 'Ganho e descontos', category: 'trabalhistas', implemented: false, icon: 'luggage' }
+    { id: 'fgts', title: 'FGTS', subtitle: 'Depósitos e saque', category: 'trabalhistas', implemented: true, icon: 'account_balance' },
+    { id: 'inss', title: 'INSS', subtitle: 'Faixas e descontos', category: 'trabalhistas', implemented: true, icon: 'balance' },
+    { id: 'feriasProporcionais', title: 'Férias proporcionais', subtitle: 'Dias devidos', category: 'trabalhistas', implemented: true, icon: 'beach_access' },
+    { id: 'decimoTerceiro', title: 'Décimo terceiro', subtitle: 'Proporcional e integral', category: 'trabalhistas', implemented: true, icon: 'card_giftcard' },
+    { id: 'custoClt', title: 'Custo CLT x PJ', subtitle: 'Comparativo empregador', category: 'trabalhistas', implemented: true, icon: 'work' },
+    { id: 'ferias', title: 'Férias', subtitle: 'Ganho e descontos', category: 'trabalhistas', implemented: true, icon: 'luggage' }
   ];
 
   // Juros compostos
@@ -169,6 +169,59 @@ export class CalculatorComponent implements OnDestroy {
   resultadoCdi = 0;
   resultadoPrefixado = 0;
   resultadoIpca = 0;
+
+  // INSS
+  salarioInss = 3000;
+  inssResultado = 0;
+  liquidoInss = 0;
+
+  // FGTS
+  salarioFgts = 3000;
+  mesesFgts = 12;
+  depositoMensalFgts = 0;
+  totalFgts = 0;
+  multaFgtsResultado = 0;
+
+  // Férias
+  salarioFerias = 3000;
+  diasVendidosFerias = 0;
+  valorFeriasGozadas = 0;
+  valorAbonoFerias = 0;
+  totalFerias = 0;
+
+  // Férias proporcionais
+  salarioFeriasProporcionais = 3000;
+  mesesFeriasProporcionais = 6;
+  valorFeriasProporcionais = 0;
+
+  // Décimo terceiro
+  salarioDecimoTerceiro = 3000;
+  mesesDecimoTerceiro = 12;
+  brutoDecimoTerceiro = 0;
+  inssDecimoTerceiro = 0;
+  liquidoDecimoTerceiro = 0;
+
+  // Custo CLT x PJ
+  salarioClt = 5000;
+  aliquotaSimplesPj = 6;
+  encargosCltResultado = 0;
+  custoTotalCltResultado = 0;
+  liquidoPjResultado = 0;
+
+  // Rescisão trabalhista
+  salarioRescisao = 3000;
+  mesesNoAnoRescisao = 6;
+  anosCompletosRescisao = 2;
+  temFeriasVencidasRescisao = false;
+  saldoFgtsRescisao = 0;
+  tipoRescisao: 'sem_justa_causa' | 'pedido_demissao' | 'acordo' = 'sem_justa_causa';
+  feriasVencidasRescisaoResultado = 0;
+  feriasProporcionaisRescisaoResultado = 0;
+  decimoProporcionalRescisaoResultado = 0;
+  avisoPrevioDiasResultado = 0;
+  avisoPrevioValorResultado = 0;
+  multaFgtsRescisaoResultado = 0;
+  totalBrutoRescisaoResultado = 0;
 
   constructor(private route: ActivatedRoute, private router: Router) {
     this.sub = this.route.paramMap.subscribe((params) => {
@@ -334,6 +387,102 @@ export class CalculatorComponent implements OnDestroy {
     const n = i === 0 ? FV / Math.max(PMT, 1) : Math.log((FV * i) / PMT + 1) / Math.log(1 + i);
     this.mesesMilhao = Math.ceil(n);
     this.milhaoSeries = this.geraSerieMilhao();
+  }
+
+  calcularInssCalculadora(): void {
+    this.inssResultado = this.calcularInss(Math.max(0, this.salarioInss));
+    this.liquidoInss = Math.max(0, this.salarioInss) - this.inssResultado;
+  }
+
+  calcularFgts(): void {
+    const salario = Math.max(0, this.salarioFgts);
+    const meses = Math.max(1, this.mesesFgts);
+    this.depositoMensalFgts = salario * 0.08;
+    this.totalFgts = this.depositoMensalFgts * meses;
+    this.multaFgtsResultado = this.totalFgts * 0.4;
+  }
+
+  calcularFerias(): void {
+    const salario = Math.max(0, this.salarioFerias);
+    const diasVendidos = Math.min(10, Math.max(0, this.diasVendidosFerias));
+    const diasGozados = 30 - diasVendidos;
+    this.valorFeriasGozadas = (salario / 30) * diasGozados * (4 / 3);
+    this.valorAbonoFerias = (salario / 30) * diasVendidos * (4 / 3);
+    this.totalFerias = this.valorFeriasGozadas + this.valorAbonoFerias;
+  }
+
+  calcularFeriasProporcionais(): void {
+    const salario = Math.max(0, this.salarioFeriasProporcionais);
+    const meses = Math.min(12, Math.max(0, this.mesesFeriasProporcionais));
+    this.valorFeriasProporcionais = (salario / 12) * meses * (4 / 3);
+  }
+
+  calcularDecimoTerceiro(): void {
+    const salario = Math.max(0, this.salarioDecimoTerceiro);
+    const meses = Math.min(12, Math.max(0, this.mesesDecimoTerceiro));
+    this.brutoDecimoTerceiro = meses === 12 ? salario : (salario / 12) * meses;
+    this.inssDecimoTerceiro = this.calcularInss(this.brutoDecimoTerceiro);
+    this.liquidoDecimoTerceiro = this.brutoDecimoTerceiro - this.inssDecimoTerceiro;
+  }
+
+  calcularCustoClt(): void {
+    const salario = Math.max(0, this.salarioClt);
+    const aliquotaPj = Math.max(0, this.aliquotaSimplesPj) / 100;
+    const fgts = 0.08;
+    const inssPatronal = 0.2;
+    const decimoProvisao = 1 / 12;
+    const feriasProvisao = (1 / 12) * (4 / 3);
+    this.encargosCltResultado = salario * (fgts + inssPatronal + decimoProvisao + feriasProvisao);
+    this.custoTotalCltResultado = salario + this.encargosCltResultado;
+    this.liquidoPjResultado = this.custoTotalCltResultado * (1 - aliquotaPj);
+  }
+
+  calcularRescisao(): void {
+    const salario = Math.max(0, this.salarioRescisao);
+    const meses = Math.min(12, Math.max(0, this.mesesNoAnoRescisao));
+    const anos = Math.max(0, this.anosCompletosRescisao);
+    const saldoFgts = Math.max(0, this.saldoFgtsRescisao);
+    const tipo = this.tipoRescisao;
+
+    this.feriasVencidasRescisaoResultado = this.temFeriasVencidasRescisao ? salario * (4 / 3) : 0;
+    this.feriasProporcionaisRescisaoResultado = (salario / 12) * meses * (4 / 3);
+    this.decimoProporcionalRescisaoResultado = (salario / 12) * meses;
+
+    this.avisoPrevioDiasResultado = 30 + Math.min(60, anos * 3);
+    const avisoIntegral = (salario / 30) * this.avisoPrevioDiasResultado;
+    const fatorAviso = tipo === 'sem_justa_causa' ? 1 : tipo === 'acordo' ? 0.5 : 0;
+    this.avisoPrevioValorResultado = avisoIntegral * fatorAviso;
+
+    const fatorMulta = tipo === 'sem_justa_causa' ? 0.4 : tipo === 'acordo' ? 0.2 : 0;
+    this.multaFgtsRescisaoResultado = saldoFgts * fatorMulta;
+
+    this.totalBrutoRescisaoResultado =
+      this.feriasVencidasRescisaoResultado +
+      this.feriasProporcionaisRescisaoResultado +
+      this.decimoProporcionalRescisaoResultado +
+      this.avisoPrevioValorResultado +
+      this.multaFgtsRescisaoResultado;
+  }
+
+  private calcularInss(baseValor: number): number {
+    // Tabela INSS 2024 (progressiva por faixa, não alíquota única sobre o total) — revisar
+    // anualmente, os limites de faixa mudam todo ano.
+    const faixas = [
+      { limite: 1412.0, aliquota: 0.075 },
+      { limite: 2666.68, aliquota: 0.09 },
+      { limite: 4000.03, aliquota: 0.12 },
+      { limite: 7786.02, aliquota: 0.14 }
+    ];
+    let contribuicao = 0;
+    let limiteAnterior = 0;
+    for (const faixa of faixas) {
+      const baseFaixa = Math.max(0, Math.min(baseValor, faixa.limite) - limiteAnterior);
+      contribuicao += baseFaixa * faixa.aliquota;
+      limiteAnterior = faixa.limite;
+      if (baseValor <= faixa.limite) break;
+    }
+    if (baseValor > 7786.02) contribuicao = 908.86; // teto de contribuição 2024
+    return contribuicao;
   }
 
   private calculaSerie(aporteInicial: number, aporteMensal: number, taxaMensalPercent: number, meses: number): number {

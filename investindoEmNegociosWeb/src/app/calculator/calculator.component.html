@@ -595,6 +595,237 @@
               </div>
             }
           }
+          @case ('inss') {
+            <div class="panel__title">
+              <h3>INSS</h3>
+              <p class="muted">Contribuição progressiva por faixa (tabela 2024).</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioInss" name="salarioInss" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularInssCalculadora()">Calcular</button>
+            </form>
+            @if (inssResultado) {
+              <div class="result">
+                <p>Contribuição INSS: <strong>{{ inssResultado | appCurrency }}</strong></p>
+                <p>Salário líquido: <strong>{{ liquidoInss | appCurrency }}</strong></p>
+              </div>
+            }
+            <div class="table">
+              <div class="table__head">
+                <span>Faixa</span>
+                <span>Alíquota</span>
+              </div>
+              <div class="table__row"><span>Até R$ 1.412,00</span><span>7,5%</span></div>
+              <div class="table__row"><span>R$ 1.412,01 a R$ 2.666,68</span><span>9%</span></div>
+              <div class="table__row"><span>R$ 2.666,69 a R$ 4.000,03</span><span>12%</span></div>
+              <div class="table__row"><span>R$ 4.000,04 a R$ 7.786,02</span><span>14%</span></div>
+              <div class="table__row"><span>Acima de R$ 7.786,02</span><span>teto: R$ 908,86</span></div>
+            </div>
+          }
+          @case ('fgts') {
+            <div class="panel__title">
+              <h3>FGTS</h3>
+              <p class="muted">Depósitos mensais (8% do salário) e multa rescisória.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioFgts" name="salarioFgts" />
+              </label>
+              <label>
+                Meses de depósito
+                <input type="number" [(ngModel)]="mesesFgts" name="mesesFgts" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularFgts()">Calcular</button>
+            </form>
+            @if (totalFgts) {
+              <div class="result">
+                <p>Depósito mensal: <strong>{{ depositoMensalFgts | appCurrency }}</strong></p>
+                <p>Total depositado: <strong>{{ totalFgts | appCurrency }}</strong></p>
+                <p>Multa rescisória (40%, se demissão sem justa causa): <strong>{{ multaFgtsResultado | appCurrency }}</strong></p>
+              </div>
+            }
+          }
+          @case ('ferias') {
+            <div class="panel__title">
+              <h3>Férias</h3>
+              <p class="muted">Valor de férias gozadas e abono pecuniário, com 1/3 constitucional.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioFerias" name="salarioFerias" />
+              </label>
+              <label>
+                Dias vendidos (abono, 0 a 10)
+                <input type="number" [(ngModel)]="diasVendidosFerias" name="diasVendidosFerias" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularFerias()">Calcular</button>
+            </form>
+            @if (totalFerias) {
+              <div class="result">
+                <p>Férias gozadas + 1/3: <strong>{{ valorFeriasGozadas | appCurrency }}</strong></p>
+                <p>Abono pecuniário + 1/3: <strong>{{ valorAbonoFerias | appCurrency }}</strong></p>
+                <p>Total: <strong>{{ totalFerias | appCurrency }}</strong></p>
+              </div>
+            }
+          }
+          @case ('feriasProporcionais') {
+            <div class="panel__title">
+              <h3>Férias proporcionais</h3>
+              <p class="muted">Para quem ainda não completou 12 meses de período aquisitivo.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioFeriasProporcionais" name="salarioFeriasProporcionais" />
+              </label>
+              <label>
+                Meses trabalhados (0 a 12)
+                <input type="number" [(ngModel)]="mesesFeriasProporcionais" name="mesesFeriasProporcionais" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularFeriasProporcionais()">Calcular</button>
+            </form>
+            @if (valorFeriasProporcionais) {
+              <div class="result">
+                <p>Férias proporcionais + 1/3: <strong>{{ valorFeriasProporcionais | appCurrency }}</strong></p>
+              </div>
+            }
+          }
+          @case ('decimoTerceiro') {
+            <div class="panel__title">
+              <h3>Décimo terceiro</h3>
+              <p class="muted">Proporcional ou integral, com desconto de INSS.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioDecimoTerceiro" name="salarioDecimoTerceiro" />
+              </label>
+              <label>
+                Meses trabalhados no ano (1 a 12)
+                <input type="number" [(ngModel)]="mesesDecimoTerceiro" name="mesesDecimoTerceiro" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularDecimoTerceiro()">Calcular</button>
+            </form>
+            @if (brutoDecimoTerceiro) {
+              <div class="result">
+                <p>Valor bruto: <strong>{{ brutoDecimoTerceiro | appCurrency }}</strong></p>
+                <p>Desconto INSS: <strong>{{ inssDecimoTerceiro | appCurrency }}</strong></p>
+                <p>Valor líquido: <strong>{{ liquidoDecimoTerceiro | appCurrency }}</strong></p>
+              </div>
+            }
+          }
+          @case ('custoClt') {
+            <div class="panel__title">
+              <h3>Custo CLT x PJ</h3>
+              <p class="muted">Custo total do empregador em CLT vs. valor líquido equivalente em PJ.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — usa alíquotas de referência
+              (FGTS 8%, INSS patronal 20%, provisão de 13º e férias) e não substitui cálculo
+              trabalhista/contábil oficial do regime tributário real da empresa.
+            </p>
+            <form class="form">
+              <label>
+                Salário CLT bruto (R$)
+                <input type="number" [(ngModel)]="salarioClt" name="salarioClt" />
+              </label>
+              <label>
+                Alíquota efetiva do Simples (PJ, %)
+                <input type="number" step="0.1" [(ngModel)]="aliquotaSimplesPj" name="aliquotaSimplesPj" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularCustoClt()">Calcular</button>
+            </form>
+            @if (custoTotalCltResultado) {
+              <div class="result">
+                <p>Encargos CLT (estimado): <strong>{{ encargosCltResultado | appCurrency }}</strong></p>
+                <p>Custo total empregador (CLT): <strong>{{ custoTotalCltResultado | appCurrency }}</strong></p>
+                <p>Líquido equivalente em PJ (mesmo custo): <strong>{{ liquidoPjResultado | appCurrency }}</strong></p>
+              </div>
+            }
+          }
+          @case ('rescisao') {
+            <div class="panel__title">
+              <h3>Rescisão Trabalhista</h3>
+              <p class="muted">Verbas rescisórias por tipo de saída.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não inclui desconto de INSS/IRRF
+              sobre as verbas, não substitui cálculo trabalhista/contábil oficial; consulte RH
+              ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioRescisao" name="salarioRescisao" />
+              </label>
+              <label>
+                Meses trabalhados no ano atual (0 a 12)
+                <input type="number" [(ngModel)]="mesesNoAnoRescisao" name="mesesNoAnoRescisao" />
+              </label>
+              <label>
+                Anos completos de empresa
+                <input type="number" [(ngModel)]="anosCompletosRescisao" name="anosCompletosRescisao" />
+              </label>
+              <label>
+                Saldo total de FGTS depositado (R$)
+                <input type="number" [(ngModel)]="saldoFgtsRescisao" name="saldoFgtsRescisao" />
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" [(ngModel)]="temFeriasVencidasRescisao" name="temFeriasVencidasRescisao" />
+                Tem férias vencidas
+              </label>
+              <label>
+                Tipo de rescisão
+                <select [(ngModel)]="tipoRescisao" name="tipoRescisao">
+                  <option value="sem_justa_causa">Sem justa causa (demissão pela empresa)</option>
+                  <option value="pedido_demissao">Pedido de demissão</option>
+                  <option value="acordo">Acordo (distrato, Art. 484-A)</option>
+                </select>
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularRescisao()">Calcular</button>
+            </form>
+            @if (totalBrutoRescisaoResultado) {
+              <div class="table">
+                <div class="table__head">
+                  <span>Verba</span>
+                  <span>Valor</span>
+                </div>
+                <div class="table__row"><span>Férias vencidas + 1/3</span><span>{{ feriasVencidasRescisaoResultado | appCurrency }}</span></div>
+                <div class="table__row"><span>Férias proporcionais + 1/3</span><span>{{ feriasProporcionaisRescisaoResultado | appCurrency }}</span></div>
+                <div class="table__row"><span>13º proporcional</span><span>{{ decimoProporcionalRescisaoResultado | appCurrency }}</span></div>
+                <div class="table__row"><span>Aviso prévio ({{ avisoPrevioDiasResultado }} dias)</span><span>{{ avisoPrevioValorResultado | appCurrency }}</span></div>
+                <div class="table__row"><span>Multa FGTS</span><span>{{ multaFgtsRescisaoResultado | appCurrency }}</span></div>
+              </div>
+              <div class="result">
+                <p>Total bruto estimado: <strong>{{ totalBrutoRescisaoResultado | appCurrency }}</strong></p>
+              </div>
+            }
+          }
         }
       </div>
     } @else {
