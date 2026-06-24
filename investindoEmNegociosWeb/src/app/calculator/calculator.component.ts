@@ -77,10 +77,10 @@ export class CalculatorComponent implements OnDestroy {
     { id: 'renda', title: 'Calculadora de Receitas', subtitle: 'Receita mensal sobre patrimônio', category: 'financeiras', implemented: true, icon: 'savings' },
     { id: 'milhao', title: 'Primeiro Milhão', subtitle: 'Quando chego a R$ 1 mi?', category: 'financeiras', implemented: true, icon: 'military_tech' },
     { id: 'rescisao', title: 'Rescisão Trabalhista', subtitle: 'Verbas rescisórias', category: 'trabalhistas', implemented: true, icon: 'gavel' },
-    { id: 'irIsencao', title: 'Isenção de IR', subtitle: 'Verifique elegibilidade', category: 'trabalhistas', implemented: false, icon: 'policy' },
-    { id: 'salarioRealidade', title: 'Salário x realidade', subtitle: 'Comparativo regional', category: 'trabalhistas', implemented: false, icon: 'public' },
-    { id: 'seguroDesemprego', title: 'Seguro-desemprego', subtitle: 'Cálculo de parcelas', category: 'trabalhistas', implemented: false, icon: 'fact_check' },
-    { id: 'horasExtras', title: 'Horas extras', subtitle: 'Adicional e reflexos', category: 'trabalhistas', implemented: false, icon: 'schedule' },
+    { id: 'irIsencao', title: 'Isenção de IR', subtitle: 'Verifique elegibilidade', category: 'trabalhistas', implemented: true, icon: 'policy' },
+    { id: 'salarioRealidade', title: 'Salário x realidade', subtitle: 'Comparativo regional', category: 'trabalhistas', implemented: true, icon: 'public' },
+    { id: 'seguroDesemprego', title: 'Seguro-desemprego', subtitle: 'Cálculo de parcelas', category: 'trabalhistas', implemented: true, icon: 'fact_check' },
+    { id: 'horasExtras', title: 'Horas extras', subtitle: 'Adicional e reflexos', category: 'trabalhistas', implemented: true, icon: 'schedule' },
     { id: 'fgts', title: 'FGTS', subtitle: 'Depósitos e saque', category: 'trabalhistas', implemented: true, icon: 'account_balance' },
     { id: 'inss', title: 'INSS', subtitle: 'Faixas e descontos', category: 'trabalhistas', implemented: true, icon: 'balance' },
     { id: 'feriasProporcionais', title: 'Férias proporcionais', subtitle: 'Dias devidos', category: 'trabalhistas', implemented: true, icon: 'beach_access' },
@@ -222,6 +222,42 @@ export class CalculatorComponent implements OnDestroy {
   avisoPrevioValorResultado = 0;
   multaFgtsRescisaoResultado = 0;
   totalBrutoRescisaoResultado = 0;
+
+  // Isenção de IR
+  salarioIrIsencao = 3000;
+  dependentesIrIsencao = 0;
+  baseCalculoIr = 0;
+  isentoIr = true;
+  irrfResultado = 0;
+
+  // Salário x realidade
+  salarioRealidadeBruto = 3000;
+  despesasMensaisRealidade = 2000;
+  salarioLiquidoRealidade = 0;
+  saldoAposDespesasRealidade = 0;
+  salariosMinimosRealidade = 0;
+  percentualComprometidoRealidade = 0;
+
+  // Seguro-desemprego
+  mediaSalarialSeguroDesemprego = 2000;
+  mesesTrabalhadosSeguroDesemprego = 18;
+  solicitacoesAnterioresSeguroDesemprego: '0' | '1' | '2' = '0';
+  parcelasSeguroDesemprego = 0;
+  valorParcelaSeguroDesemprego = 0;
+  totalSeguroDesemprego = 0;
+
+  // Horas extras
+  salarioHorasExtras = 3000;
+  jornadaMensalHorasExtras = 220;
+  quantidadeHorasExtras = 10;
+  adicionalHorasExtras = 50;
+  diasUteisHorasExtras = 25;
+  diasDescansoHorasExtras = 5;
+  valorHoraNormalResultado = 0;
+  valorHoraExtraResultado = 0;
+  totalHorasExtrasResultado = 0;
+  reflexoDsrResultado = 0;
+  totalComReflexoResultado = 0;
 
   constructor(private route: ActivatedRoute, private router: Router) {
     this.sub = this.route.paramMap.subscribe((params) => {
@@ -462,6 +498,88 @@ export class CalculatorComponent implements OnDestroy {
       this.decimoProporcionalRescisaoResultado +
       this.avisoPrevioValorResultado +
       this.multaFgtsRescisaoResultado;
+  }
+
+  calcularIsencaoIr(): void {
+    const salario = Math.max(0, this.salarioIrIsencao);
+    const dependentes = Math.max(0, this.dependentesIrIsencao);
+    const inss = this.calcularInss(salario);
+    this.baseCalculoIr = Math.max(0, salario - inss - dependentes * 189.59);
+
+    // Tabela IRRF mensal 2024 (método "parcela a deduzir", oficial)
+    const faixas = [
+      { limite: 2259.2, aliquota: 0, deduzir: 0 },
+      { limite: 2826.65, aliquota: 0.075, deduzir: 169.44 },
+      { limite: 3751.05, aliquota: 0.15, deduzir: 381.44 },
+      { limite: 4664.68, aliquota: 0.225, deduzir: 662.77 },
+      { limite: Infinity, aliquota: 0.275, deduzir: 896.0 }
+    ];
+    const faixa = faixas.find((f) => this.baseCalculoIr <= f.limite) ?? faixas[faixas.length - 1];
+    this.isentoIr = faixa.aliquota === 0;
+    this.irrfResultado = this.isentoIr ? 0 : this.baseCalculoIr * faixa.aliquota - faixa.deduzir;
+  }
+
+  calcularSalarioRealidade(): void {
+    const salario = Math.max(0, this.salarioRealidadeBruto);
+    const despesas = Math.max(0, this.despesasMensaisRealidade);
+    this.salarioLiquidoRealidade = salario - this.calcularInss(salario);
+    this.saldoAposDespesasRealidade = this.salarioLiquidoRealidade - despesas;
+    this.salariosMinimosRealidade = salario / 1412;
+    this.percentualComprometidoRealidade =
+      this.salarioLiquidoRealidade > 0 ? (despesas / this.salarioLiquidoRealidade) * 100 : 0;
+  }
+
+  calcularSeguroDesemprego(): void {
+    const media = Math.max(0, this.mediaSalarialSeguroDesemprego);
+    const meses = Math.max(0, this.mesesTrabalhadosSeguroDesemprego);
+    const solicitacoes = this.solicitacoesAnterioresSeguroDesemprego;
+
+    const tabelas: Record<'0' | '1' | '2', { min: number; parcelas: number }[]> = {
+      '0': [
+        { min: 24, parcelas: 5 },
+        { min: 12, parcelas: 4 }
+      ],
+      '1': [
+        { min: 24, parcelas: 5 },
+        { min: 12, parcelas: 4 },
+        { min: 9, parcelas: 3 }
+      ],
+      '2': [
+        { min: 24, parcelas: 5 },
+        { min: 12, parcelas: 4 },
+        { min: 6, parcelas: 3 }
+      ]
+    };
+    const faixa = tabelas[solicitacoes].find((f) => meses >= f.min);
+    this.parcelasSeguroDesemprego = faixa?.parcelas ?? 0;
+
+    const salarioMinimo = 1412.0;
+    let valorParcela: number;
+    if (media <= 2041.38) {
+      valorParcela = media * 0.8;
+    } else if (media <= 3402.18) {
+      valorParcela = 1633.11 + (media - 2041.38) * 0.5;
+    } else {
+      valorParcela = 2313.74;
+    }
+    this.valorParcelaSeguroDesemprego = Math.max(salarioMinimo, valorParcela);
+    this.totalSeguroDesemprego =
+      this.parcelasSeguroDesemprego > 0 ? this.valorParcelaSeguroDesemprego * this.parcelasSeguroDesemprego : 0;
+  }
+
+  calcularHorasExtras(): void {
+    const salario = Math.max(0, this.salarioHorasExtras);
+    const jornada = Math.max(1, this.jornadaMensalHorasExtras);
+    const horas = Math.max(0, this.quantidadeHorasExtras);
+    const adicional = Math.max(0, this.adicionalHorasExtras) / 100;
+    const diasUteis = Math.max(1, this.diasUteisHorasExtras);
+    const diasDescanso = Math.max(0, this.diasDescansoHorasExtras);
+
+    this.valorHoraNormalResultado = salario / jornada;
+    this.valorHoraExtraResultado = this.valorHoraNormalResultado * (1 + adicional);
+    this.totalHorasExtrasResultado = this.valorHoraExtraResultado * horas;
+    this.reflexoDsrResultado = (this.totalHorasExtrasResultado / diasUteis) * diasDescanso;
+    this.totalComReflexoResultado = this.totalHorasExtrasResultado + this.reflexoDsrResultado;
   }
 
   private calcularInss(baseValor: number): number {

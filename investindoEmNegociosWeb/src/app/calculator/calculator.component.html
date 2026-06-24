@@ -826,6 +826,152 @@
               </div>
             }
           }
+          @case ('irIsencao') {
+            <div class="panel__title">
+              <h3>Isenção de IR</h3>
+              <p class="muted">Verifique se sua renda mensal está isenta de retenção na fonte.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioIrIsencao" name="salarioIrIsencao" />
+              </label>
+              <label>
+                Número de dependentes
+                <input type="number" [(ngModel)]="dependentesIrIsencao" name="dependentesIrIsencao" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularIsencaoIr()">Calcular</button>
+            </form>
+            @if (baseCalculoIr) {
+              <div class="result">
+                <p>Base de cálculo: <strong>{{ baseCalculoIr | appCurrency }}</strong></p>
+                @if (isentoIr) {
+                  <p><strong>Isento de retenção na fonte.</strong></p>
+                } @else {
+                  <p>Não isento — IRRF estimado: <strong>{{ irrfResultado | appCurrency }}</strong></p>
+                }
+              </div>
+            }
+          }
+          @case ('salarioRealidade') {
+            <div class="panel__title">
+              <h3>Salário x realidade</h3>
+              <p class="muted">Poder de compra real considerando suas despesas mensais.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioRealidadeBruto" name="salarioRealidadeBruto" />
+              </label>
+              <label>
+                Despesas mensais médias (R$)
+                <input type="number" [(ngModel)]="despesasMensaisRealidade" name="despesasMensaisRealidade" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularSalarioRealidade()">Calcular</button>
+            </form>
+            @if (salarioLiquidoRealidade) {
+              <div class="result">
+                <p>Salário líquido (após INSS): <strong>{{ salarioLiquidoRealidade | appCurrency }}</strong></p>
+                <p>Saldo após despesas: <strong>{{ saldoAposDespesasRealidade | appCurrency }}</strong></p>
+                <p>Equivale a <strong>{{ salariosMinimosRealidade | number: '1.1-1' }}</strong> salários mínimos (2024)</p>
+                <p>Comprometimento da renda com despesas: <strong>{{ percentualComprometidoRealidade | number: '1.0-1' }}%</strong></p>
+              </div>
+            }
+          }
+          @case ('seguroDesemprego') {
+            <div class="panel__title">
+              <h3>Seguro-desemprego</h3>
+              <p class="muted">Número de parcelas e valor estimado.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — tabela vigente, pode mudar por
+              ato normativo; não substitui cálculo trabalhista/contábil oficial; consulte RH
+              ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Média dos últimos 3 salários (R$)
+                <input type="number" [(ngModel)]="mediaSalarialSeguroDesemprego" name="mediaSalarialSeguroDesemprego" />
+              </label>
+              <label>
+                Meses trabalhados nos últimos 36
+                <input type="number" [(ngModel)]="mesesTrabalhadosSeguroDesemprego" name="mesesTrabalhadosSeguroDesemprego" />
+              </label>
+              <label>
+                Solicitações anteriores
+                <select [(ngModel)]="solicitacoesAnterioresSeguroDesemprego" name="solicitacoesAnterioresSeguroDesemprego">
+                  <option value="0">Primeira solicitação</option>
+                  <option value="1">Segunda solicitação</option>
+                  <option value="2">Terceira solicitação ou mais</option>
+                </select>
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularSeguroDesemprego()">Calcular</button>
+            </form>
+            @if (parcelasSeguroDesemprego) {
+              <div class="result">
+                <p>Parcelas: <strong>{{ parcelasSeguroDesemprego }}</strong></p>
+                <p>Valor por parcela: <strong>{{ valorParcelaSeguroDesemprego | appCurrency }}</strong></p>
+                <p>Total a receber: <strong>{{ totalSeguroDesemprego | appCurrency }}</strong></p>
+              </div>
+            } @else {
+              <p class="muted">Sem direito ao benefício com os meses trabalhados informados.</p>
+            }
+          }
+          @case ('horasExtras') {
+            <div class="panel__title">
+              <h3>Horas extras</h3>
+              <p class="muted">Adicional e reflexo no DSR.</p>
+            </div>
+            <p class="muted">
+              Estimativa simplificada para fins educacionais — o reflexo no DSR é aproximado e
+              varia conforme o calendário real do mês; não substitui cálculo
+              trabalhista/contábil oficial; consulte RH ou contador antes de decisões reais.
+            </p>
+            <form class="form">
+              <label>
+                Salário bruto (R$)
+                <input type="number" [(ngModel)]="salarioHorasExtras" name="salarioHorasExtras" />
+              </label>
+              <label>
+                Jornada mensal (horas)
+                <input type="number" [(ngModel)]="jornadaMensalHorasExtras" name="jornadaMensalHorasExtras" />
+              </label>
+              <label>
+                Horas extras no mês
+                <input type="number" [(ngModel)]="quantidadeHorasExtras" name="quantidadeHorasExtras" />
+              </label>
+              <label>
+                Adicional (%)
+                <input type="number" [(ngModel)]="adicionalHorasExtras" name="adicionalHorasExtras" />
+              </label>
+              <label>
+                Dias úteis no mês
+                <input type="number" [(ngModel)]="diasUteisHorasExtras" name="diasUteisHorasExtras" />
+              </label>
+              <label>
+                Dias de descanso/feriados no mês
+                <input type="number" [(ngModel)]="diasDescansoHorasExtras" name="diasDescansoHorasExtras" />
+              </label>
+              <button type="button" class="btn-primary sm" (click)="calcularHorasExtras()">Calcular</button>
+            </form>
+            @if (totalHorasExtrasResultado) {
+              <div class="result">
+                <p>Valor da hora normal: <strong>{{ valorHoraNormalResultado | appCurrency }}</strong></p>
+                <p>Valor da hora extra: <strong>{{ valorHoraExtraResultado | appCurrency }}</strong></p>
+                <p>Total horas extras: <strong>{{ totalHorasExtrasResultado | appCurrency }}</strong></p>
+                <p>Reflexo no DSR (aproximado): <strong>{{ reflexoDsrResultado | appCurrency }}</strong></p>
+                <p>Total com reflexo: <strong>{{ totalComReflexoResultado | appCurrency }}</strong></p>
+              </div>
+            }
+          }
         }
       </div>
     } @else {
