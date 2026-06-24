@@ -50,7 +50,7 @@ jobs:
       EXPECTED_API_BASE_URL: ${{ inputs.expected_api_base_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
