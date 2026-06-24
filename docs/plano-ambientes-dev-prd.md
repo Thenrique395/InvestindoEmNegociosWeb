@@ -40,7 +40,7 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 - [x] Padronizar estrategia de branch: `main` entrega DEV; PRD e promovido manualmente pelo workflow de producao.
 - [x] Padronizar portas da API: DEV publica em `5059` e PRD publica em `5060`; a API continua ouvindo em `5059` dentro do container.
 - [x] Definir modelo oficial de deploy: por enquanto sera `compose` unico com variaveis por ambiente.
-- [x] Remover fallback fixo do frontend para `http://35.174.50.187:5059/api/v1` e exigir `API_BASE_URL` correta por ambiente.
+- [ ] Remover fallback fixo do frontend para `http://35.174.50.187:5059/api/v1` e exigir `API_BASE_URL` correta por ambiente. Fallback ainda presente em `api.config.ts:7`, apontando para DEV (`5059`); PRD (`5060`) esta pausado desde 2026-06-15.
 - [x] Adicionar validacao pos-deploy do frontend para garantir que a tela abriu e chamou a API certa.
 
 ### Ainda pendente ou nao confirmado
@@ -56,10 +56,13 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 - [ ] Validar frontend PRD apontando para API PRD.
 - [ ] Validar fluxo completo em cada ambiente: pagina publica, login, dashboard, despesas, receitas, cartoes e logout.
 - [ ] Definir dominios finais ou manter estrategia por portas ate a publicacao oficial.
+- [ ] Ambiente PRD (porta `5060`) esta PAUSADO desde 2026-06-15 — ver `../../docs/DECISIONS/2026-06-15-pausar-ambiente-prd-focar-dev.md`; retomar somente apos decisao explicita.
 
 ## 1. Banco de Dados
 
 Separar o banco vem primeiro porque ele define o isolamento real dos dados. Se DEV e PRD usarem o mesmo banco, qualquer teste no DEV ainda pode afetar dados do ambiente estavel.
+
+**Atencao:** no servidor atual, os bancos `meu_mentor_db` e `meu_mentor_prd` tem papeis invertidos (o que parece DEV e PRD e vice-versa) — validar nomes reais antes de qualquer migracao ou script. Ver `InvestindoEmNegociosApi/docs/DEPLOY_GITHUB_ENVIRONMENTS.md`.
 
 ### 1.1. Criar bancos separados
 

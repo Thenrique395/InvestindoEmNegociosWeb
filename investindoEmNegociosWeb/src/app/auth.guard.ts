@@ -29,9 +29,11 @@ export const authGuard: CanActivateFn = (_route, state) => {
     map((status) => status.completed ? true : router.parseUrl('/onboarding')),
     catchError((err: unknown) => {
       const status = (err as { status?: number })?.status;
-      if (!status || status === 401 || status === 403) {
+      if (status === 401 || status === 403) {
         return of(router.parseUrl('/login'));
       }
+      // Erro sem status HTTP (rede instável, erro genérico) não significa sessão inválida —
+      // não desloga o usuário por um erro ambíguo, segura no onboarding.
       return of(router.parseUrl('/onboarding'));
     })
   );

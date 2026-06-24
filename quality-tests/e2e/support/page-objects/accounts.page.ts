@@ -51,7 +51,7 @@ export class AccountsPage {
   async transfer(origin: string, destination: string, amount: string, description: string) {
     await this.page.getByLabel('Conta origem').selectOption({ label: origin });
     await this.page.getByLabel('Conta destino').selectOption({ label: destination });
-    await this.page.getByLabel('Valor').fill(amount);
+    await this.page.getByLabel('Valor', { exact: true }).fill(amount);
     await this.page.getByLabel('Descrição (opcional)').fill(description);
     await this.page.getByRole('button', { name: 'Transferir agora' }).click();
   }

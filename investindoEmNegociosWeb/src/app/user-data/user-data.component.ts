@@ -33,6 +33,11 @@ export class UserDataComponent {
     confirmationText: ''
   };
 
+  get canImportData(): boolean {
+    const role = this.authService.getRole();
+    return role === 'Intermediate' || role === 'Advanced' || role === 'Admin';
+  }
+
   constructor(
     private readonly portabilityService: DataPortabilityService,
     private readonly profileService: ProfileService,

@@ -172,6 +172,7 @@ export class CartoesComponent implements OnInit {
       const loadedStatementCardId = this.cardsStore.statementsCardId();
       const statementsLoading = this.cardsStore.statementsLoading();
       this.statementCardId = nextStatementCardId;
+      this.cdr.markForCheck();
 
       if (!mappedCards.length) {
         this.statementCycles = [];
@@ -202,7 +203,9 @@ export class CartoesComponent implements OnInit {
       if (error) {
         this.uiFeedback.error(error);
       }
+      this.cdr.markForCheck();
     });
+
   }
 
   ngOnInit(): void {
@@ -297,7 +300,11 @@ export class CartoesComponent implements OnInit {
       this.uiFeedback.error('Não é possível remover este cartão; existem despesas vinculadas a ele.');
       return;
     }
-    this.cardsStore.delete(id, () => this.setAlerta('Cartão removido com sucesso.', 2500, 'success'));
+    this.cardsStore.delete(
+      id,
+      () => this.setAlerta('Cartão removido com sucesso.', 2500, 'success'),
+      () => this.uiFeedback.error('Falha ao remover cartão.')
+    );
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {

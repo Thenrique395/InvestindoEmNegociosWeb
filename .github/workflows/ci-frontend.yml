@@ -29,3 +29,7 @@ jobs:
 
       - name: Frontend quality gate
         run: bash ./scripts/quality-frontend.sh
+
+      - name: npm audit (informativo, não bloqueia o build)
+        working-directory: investindoEmNegociosWeb
+        run: npm audit --audit-level=high || true

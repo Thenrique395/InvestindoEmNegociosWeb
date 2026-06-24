@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, finalize, map, shareReplay, throwError } from 'rxjs';
-import { jwtDecode } from 'jwt-decode';
+import { Observable, catchError, finalize, map, of, shareReplay, throwError } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import { parseRole, UserRole } from './roles';
 
-export interface AuthResponse {
+export interface AuthSessionResponse {
   userId: string;
   name: string;
   email: string;
   role: UserRole;
-  token: string;
-  refreshToken: string;
   expiresAt: string;
 }
 
@@ -37,32 +34,32 @@ type ProblemDetailsLike = {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly baseUrl = `${API_BASE_URL}/auth`;
-  private refreshInFlight$?: Observable<AuthResponse>;
+  private refreshInFlight$?: Observable<AuthSessionResponse>;
 
   constructor(private http: HttpClient) {}
 
+  // O JWT em si fica só no cookie httpOnly (access_token/refresh_token), nunca acessível
+  // ao JS — o backend define os cookies na resposta. Aqui só guardamos os metadados
+  // não-sensíveis (role/nome/email/expiração) que vêm no corpo, para a UI decidir o que
+  // mostrar sem precisar ler o token.
   login(email: string, password: string) {
     const body = {
       email: email.trim().toLowerCase(),
       password: password
     };
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, body).pipe(
+    return this.http.post<AuthSessionResponse>(`${this.baseUrl}/login`, body).pipe(
       map((res) => this.persistSession(res)),
       catchError((err) => this.wrapError(err, 'Erro ao autenticar.'))
     );
   }
 
-  refresh(refreshToken?: string) {
+  refresh() {
     if (this.refreshInFlight$) {
       return this.refreshInFlight$;
     }
 
-    const token = refreshToken || this.getRefreshToken();
-    if (!token) {
-      return throwError(() => new Error('Sessão expirada. Faça login novamente.'));
-    }
     const request$ = this.http
-      .post<AuthResponse>(`${this.baseUrl}/refresh`, { refreshToken: token })
+      .post<AuthSessionResponse>(`${this.baseUrl}/refresh`, {})
       .pipe(
         map((res) => this.persistSession(res)),
         catchError((err) => this.wrapError(err, 'Sessão expirada. Faça login novamente.', false, false)),
@@ -83,7 +80,7 @@ export class AuthService {
       document: (payload.cpf || '').replace(/\D/g, '')
     };
     return this.http
-      .post<AuthResponse>(`${this.baseUrl}/register`, body)
+      .post<AuthSessionResponse>(`${this.baseUrl}/register`, body)
       .pipe(catchError((err) => this.wrapError(err, 'Erro ao criar conta.')));
   }
 
@@ -118,42 +115,20 @@ export class AuthService {
       .pipe(catchError((err) => this.wrapError(err, 'Não foi possível redefinir a senha. Verifique o link e tente novamente.', false, false)));
   }
 
-  private persistSession(res: AuthResponse): AuthResponse {
-    this.setStorageItem('access_token', res.token);
+  private persistSession(res: AuthSessionResponse): AuthSessionResponse {
     if (res.role) this.setStorageItem('user_role', res.role);
-    if (res.refreshToken) this.setStorageItem('refresh_token', res.refreshToken);
     if (res.expiresAt) this.setStorageItem('access_expires_at', res.expiresAt);
     if (res.name) this.setStorageItem('user_name', res.name);
     if (res.email) this.setStorageItem('user_email', res.email);
     return res;
   }
 
-  applySession(res: AuthResponse): AuthResponse {
+  applySession(res: AuthSessionResponse): AuthSessionResponse {
     return this.persistSession(res);
   }
 
-  getAccessToken(): string | null {
-    return this.getStorageItem('access_token');
-  }
-
-  getRefreshToken(): string | null {
-    return this.getStorageItem('refresh_token');
-  }
-
   getRole(): UserRole | null {
-    const stored = parseRole(this.getStorageItem('user_role'));
-    if (stored) return stored;
-
-    const tokenRole = parseRole(this.readRoleFromToken(this.getAccessToken()));
-    if (tokenRole) {
-      this.setStorageItem('user_role', tokenRole);
-      return tokenRole;
-    }
-    if (this.getAccessToken()) {
-      this.setStorageItem('user_role', 'Basic');
-      return 'Basic';
-    }
-    return null;
+    return parseRole(this.getStorageItem('user_role'));
   }
 
   getUserName(): string {
@@ -164,73 +139,35 @@ export class AuthService {
     return this.getStorageItem('user_email') || '';
   }
 
+  // Best-effort: pede ao backend para limpar os cookies httpOnly (access_token/refresh_token)
+  // — o JS não consegue apagá-los diretamente. Mesmo se a chamada falhar (rede, etc.),
+  // os metadados locais são removidos de qualquer forma.
   clearSession(): void {
-    this.removeStorageItem('access_token');
-    this.removeStorageItem('refresh_token');
-    this.removeStorageItem('access_expires_at');
     this.removeStorageItem('user_role');
     this.removeStorageItem('user_name');
     this.removeStorageItem('user_email');
+    this.removeStorageItem('access_expires_at');
+    this.http.post<void>(`${this.baseUrl}/logout`, {}).pipe(catchError(() => of(undefined))).subscribe();
   }
 
   isAuthenticated(): boolean {
-    return !!this.getStorageItem('access_token') && !!this.getRefreshToken();
+    return !!this.getStorageItem('user_role');
   }
 
   isAccessTokenExpired(): boolean {
-    const token = this.getStorageItem('access_token');
-    if (!token) return true;
-
     const expiresAt = this.getStorageItem('access_expires_at');
-    if (expiresAt) {
-      const exp = new Date(expiresAt).getTime();
-      if (Number.isFinite(exp)) {
-        return Date.now() >= exp;
-      }
-    }
+    if (!expiresAt) return !this.isAuthenticated();
 
-    const jwtExp = this.readExpFromToken(token);
-    if (jwtExp) {
-      return Date.now() >= jwtExp * 1000;
-    }
-
-    return false;
+    const exp = new Date(expiresAt).getTime();
+    if (!Number.isFinite(exp)) return false;
+    return Date.now() >= exp;
   }
 
   getAccessTokenExpiresAtMs(): number | null {
-    const token = this.getStorageItem('access_token');
-    if (!token) return null;
-
     const expiresAt = this.getStorageItem('access_expires_at');
-    if (expiresAt) {
-      const exp = new Date(expiresAt).getTime();
-      if (Number.isFinite(exp)) return exp;
-    }
-
-    const jwtExp = this.readExpFromToken(token);
-    return jwtExp ? jwtExp * 1000 : null;
-  }
-
-  private readRoleFromToken(token: string | null): string | null {
-    if (!token) return null;
-    try {
-      const decoded = jwtDecode<Record<string, unknown>>(token);
-      return (decoded['role'] as string | undefined)
-        ?? (decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string | undefined)
-        ?? null;
-    } catch {
-      return null;
-    }
-  }
-
-  private readExpFromToken(token: string | null): number | null {
-    if (!token) return null;
-    try {
-      const decoded = jwtDecode<{ exp?: number }>(token);
-      return decoded.exp ?? null;
-    } catch {
-      return null;
-    }
+    if (!expiresAt) return null;
+    const exp = new Date(expiresAt).getTime();
+    return Number.isFinite(exp) ? exp : null;
   }
 
   private wrapError(

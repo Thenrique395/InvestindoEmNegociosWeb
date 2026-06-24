@@ -5,7 +5,7 @@ export class AssistantPage {
 
   async goto() {
     await this.page.goto('/assistente', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('heading', { level: 1, name: 'Assistente' })).toBeVisible();
+    await expect(this.page.getByText('Assistente financeiro').first()).toBeVisible();
   }
 
   async expectContextLoaded() {

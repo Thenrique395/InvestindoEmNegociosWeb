@@ -64,7 +64,12 @@ async function signUpAndLogin(page: Page, workerIndex: number, retry: number) {
   }
 
   await expect(page).toHaveURL(/\/(onboarding|dashboard)$/i, { timeout: 30000 });
-  await expect.poll(async () => page.evaluate(() => !!window.localStorage.getItem('access_token'))).toBeTruthy();
+  // access_token agora é cookie httpOnly — não dá para ler via page.evaluate(); confirmamos
+  // via API de automação do Playwright, que tem acesso ao cookie jar do browser.
+  await expect.poll(async () => {
+    const cookies = await page.context().cookies();
+    return cookies.some((cookie) => cookie.name === 'access_token');
+  }).toBeTruthy();
 
   return user;
 }

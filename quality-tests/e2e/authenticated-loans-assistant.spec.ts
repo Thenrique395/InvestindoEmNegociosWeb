@@ -10,7 +10,7 @@ test.describe('empréstimos — edição e exclusão', () => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
     await page.getByLabel('Título').fill('Empréstimo Original');
-    await page.getByRole('button', { name: 'Simular' }).click();
+    await page.getByRole('button', { name: 'Simular', exact: true }).click();
     await expect(page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
     await page.getByRole('button', { name: 'Criar contrato' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Empréstimo Original' })).toBeVisible();
@@ -29,7 +29,7 @@ test.describe('empréstimos — edição e exclusão', () => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
     await page.getByLabel('Título').fill('Contrato para Excluir');
-    await page.getByRole('button', { name: 'Simular' }).click();
+    await page.getByRole('button', { name: 'Simular', exact: true }).click();
     await expect(page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
     await page.getByRole('button', { name: 'Criar contrato' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Excluir' })).toBeVisible();
@@ -44,7 +44,7 @@ test.describe('empréstimos — edição e exclusão', () => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
     await page.getByLabel('Título').fill('Contrato para Cancelar Edição');
-    await page.getByRole('button', { name: 'Simular' }).click();
+    await page.getByRole('button', { name: 'Simular', exact: true }).click();
     await page.getByRole('button', { name: 'Criar contrato' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Cancelar Edição' })).toBeVisible();
 
@@ -64,7 +64,7 @@ test.describe('assistente financeiro', () => {
   test('carrega contexto e responde uma pergunta', async ({ page }) => {
     await page.goto('/assistente', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { name: /assistente financeiro/i })).toBeVisible();
+    await expect(page.getByText('Assistente financeiro')).toBeVisible();
 
     const textarea = page.getByLabel('Pergunta');
     await textarea.fill('Qual é meu maior risco financeiro neste mês?');
@@ -74,7 +74,7 @@ test.describe('assistente financeiro', () => {
     await expect(page.locator('.bubble__a').first()).toContainText('Seu maior risco');
   });
 
-  test('histórico da conversa persiste ao navegar e voltar', async ({ page }) => {
+  test('histórico da conversa persiste ao navegar via sidebar e voltar', async ({ page }) => {
     await page.goto('/assistente', { waitUntil: 'domcontentloaded' });
 
     const textarea = page.getByLabel('Pergunta');
@@ -82,9 +82,10 @@ test.describe('assistente financeiro', () => {
     await page.getByRole('button', { name: 'Perguntar' }).click();
 
     await expect(page.locator('.bubble__q').first()).toContainText('Como está meu patrimônio?');
+    await expect(page.locator('.bubble__a').first()).toContainText('Seu maior risco');
 
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.goto('/assistente', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('link', { name: /dashboard|início|home/i }).first().click();
+    await page.getByRole('link', { name: /assistente/i }).first().click();
 
     await expect(page.locator('.bubble__q').first()).toContainText('Como está meu patrimônio?');
     await expect(page.locator('.bubble__a').first()).toBeVisible();

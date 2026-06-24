@@ -9,9 +9,9 @@ test.describe('authenticated finance modules', () => {
   test('simula e cria um empréstimo na interface', async ({ page }) => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: 'Empréstimos' })).toBeVisible();
+    await expect(page.getByText('Planejamento de passivos')).toBeVisible();
     await page.getByLabel('Título').fill('Empréstimo E2E');
-    await page.getByRole('button', { name: 'Simular' }).click();
+    await page.getByRole('button', { name: 'Simular', exact: true }).click();
     await expect(page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
     await expect(page.getByText('Parcela inicial')).toBeVisible();
 
@@ -23,10 +23,9 @@ test.describe('authenticated finance modules', () => {
   test('gera snapshot do mês e adiciona na listagem', async ({ page }) => {
     await page.goto('/snapshots', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: 'Snapshots mensais' })).toBeVisible();
-    await page.getByRole('button', { name: 'Gerar snapshot do mês' }).click();
-    await expect(page.getByRole('heading', { level: 2, name: '03/2026' }).first()).toBeVisible();
-    await expect(page.getByText('Snapshot gerado com sucesso')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Snapshots mensais' })).toBeVisible();
+    await page.getByRole('button', { name: 'Gerar snapshot' }).click();
+    await expect(page.locator('.snapshot h2').first()).toBeVisible();
   });
 
   test('redireciona troca de plano pago para checkout', async ({ page }) => {

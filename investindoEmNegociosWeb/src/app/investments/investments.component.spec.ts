@@ -30,8 +30,9 @@ describe('InvestmentsComponent', () => {
     };
 
     const destroyRef = { onDestroy: jasmine.createSpy() } as any;
+    const cdr = { markForCheck: jasmine.createSpy() } as any;
     return {
-      component: new InvestmentsComponent(investments, lookups, uiFeedback, destroyRef),
+      component: new InvestmentsComponent(investments, lookups, uiFeedback, destroyRef, cdr),
       investments,
       lookups,
       uiFeedback

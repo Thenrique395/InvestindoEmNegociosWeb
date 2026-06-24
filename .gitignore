@@ -5,6 +5,7 @@
 /coverage/
 /e2e/test-output/
 /quality-tests/test-results/
+/test-results/
 /quality-tests/playwright-report/
 /quality-tests/.lighthouseci/
 /quality-tests/node_modules/

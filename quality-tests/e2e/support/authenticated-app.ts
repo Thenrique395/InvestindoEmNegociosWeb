@@ -272,6 +272,20 @@ type AdminCategory = {
   createdAt: string;
 };
 
+type BudgetItem = {
+  id: string;
+  categoryName: string;
+  plannedAmount: number;
+  realizedAmount: number;
+  variance: number;
+};
+
+type ScenarioProjectionPoint = {
+  date: string;
+  baseClosingBalance: number;
+  scenarioClosingBalance: number;
+};
+
 const initialAccounts: Account[] = [
   {
     id: accountPrimaryId,
@@ -594,6 +608,7 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
     categories: structuredClone(options.categories ?? initialCategories),
     adminCategories: structuredClone(options.adminCategories ?? initialAdminCategories),
     plans: [] as Plan[],
+    budgetItems: [] as BudgetItem[],
     role,
     profileName: options.profileName || 'Henrique Santos',
     email: options.email || 'usuario.e2e@example.com',
@@ -786,9 +801,9 @@ export async function setupAuthenticatedApp(page: Page, options: SetupAuthentica
   };
 
   if (!options.skipSession) {
+    // O JWT em si vive só no cookie httpOnly (não lido pelo app); aqui só precisamos dos
+    // metadados não-sensíveis que `AuthService` guarda em localStorage para isAuthenticated()/getRole().
     await page.addInitScript(({ token, profileName, email }) => {
-      window.localStorage.setItem('access_token', token);
-      window.localStorage.setItem('refresh_token', 'refresh-token');
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       window.localStorage.setItem('user_role', payload.role);
       window.localStorage.setItem('user_name', profileName);
@@ -833,6 +848,7 @@ async function fulfillApi(route: Route, state: {
   categories: Category[];
   adminCategories: AdminCategory[];
   plans: Plan[];
+  budgetItems: BudgetItem[];
   role: UserRole;
   profileName: string;
   email: string;
@@ -1330,23 +1346,44 @@ async function fulfillApi(route: Route, state: {
   if (method === 'POST' && path === '/api/v1/loans') {
     const payload = JSON.parse(route.request().postData() || '{}');
     const createdAt = new Date().toISOString();
+    const contractId = crypto.randomUUID();
+    const termMonths = Number(payload.termMonths || 3);
+    const principal = Number(payload.principalAmount || 12000);
+    const monthlyPayment = 550;
+    const numInstallments = Math.min(termMonths, 3);
+    const installments: LoanInstallment[] = Array.from({ length: numInstallments }, (_, i) => {
+      const due = new Date();
+      due.setMonth(due.getMonth() + i + 1);
+      return {
+        id: `${contractId}-inst-${i + 1}`,
+        installmentNo: i + 1,
+        dueDate: due.toISOString().split('T')[0],
+        beginningBalance: principal - i * (principal / numInstallments),
+        principalAmount: Number((principal / numInstallments * 0.8).toFixed(2)),
+        interestAmount: Number((monthlyPayment * 0.2).toFixed(2)),
+        totalAmount: monthlyPayment,
+        endingBalance: Number((principal - (i + 1) * (principal / numInstallments)).toFixed(2)),
+        status: 'Open',
+        paidAt: null
+      };
+    });
     const created = {
-      id: crypto.randomUUID(),
+      id: contractId,
       title: payload.title,
-      principalAmount: Number(payload.principalAmount || 0),
+      principalAmount: principal,
       annualInterestRate: Number(payload.annualInterestRate || 0),
-      termMonths: Number(payload.termMonths || 1),
+      termMonths,
       amortizationType: payload.amortizationType || 'Price',
       startDate: payload.startDate,
       paymentDay: Number(payload.paymentDay || 10),
-      monthlyPayment: 550,
-      totalCost: 13200,
-      totalInterest: 1200,
+      monthlyPayment,
+      totalCost: monthlyPayment * termMonths,
+      totalInterest: monthlyPayment * termMonths - principal,
       status: 'Active',
-      openBalance: 13200,
-      openInstallments: Number(payload.termMonths || 1),
+      openBalance: principal,
+      openInstallments: numInstallments,
       createdAt,
-      installments: []
+      installments
     };
     state.loans.unshift(created);
     await json(route, created, 201);
@@ -1925,6 +1962,93 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'POST' && path.match(/^\/api\/v1\/loans\/[^/]+\/installments\/[^/]+\/pay$/)) {
+    const parts = path.split('/');
+    const contractId = parts[4];
+    const installmentId = parts[6];
+    const loan = state.loans.find((item) => item.id === contractId);
+    if (!loan) {
+      await json(route, { title: 'Contrato não encontrado', detail: 'O contrato informado não existe.' }, 404);
+      return;
+    }
+    const installment = loan.installments.find((item) => item.id === installmentId);
+    if (!installment) {
+      await json(route, { title: 'Parcela não encontrada', detail: 'A parcela informada não existe.' }, 404);
+      return;
+    }
+    if (installment.status === 'Paid') {
+      await json(route, { title: 'Parcela já paga', detail: 'Esta parcela já foi paga.' }, 409);
+      return;
+    }
+    installment.status = 'Paid';
+    installment.paidAt = new Date().toISOString();
+    loan.openInstallments = Math.max(0, loan.openInstallments - 1);
+    await json(route, installment);
+    return;
+  }
+
+  if (method === 'PUT' && path.match(/^\/api\/v1\/budget\/\d+\/\d+\/items$/)) {
+    const parts = path.split('/');
+    const year = Number(parts[4]);
+    const month = Number(parts[5]);
+    const items: Array<{ categoryName: string; plannedAmount: number }> = JSON.parse(route.request().postData() || '[]');
+    for (const item of items) {
+      const existing = state.budgetItems.find((b) => b.categoryName === item.categoryName);
+      if (existing) {
+        existing.plannedAmount = Number(item.plannedAmount);
+        existing.variance = existing.plannedAmount - existing.realizedAmount;
+      } else {
+        state.budgetItems.push({
+          id: crypto.randomUUID(),
+          categoryName: item.categoryName,
+          plannedAmount: Number(item.plannedAmount),
+          realizedAmount: 0,
+          variance: Number(item.plannedAmount)
+        });
+      }
+    }
+    const totalPlanned = state.budgetItems.reduce((s, b) => s + b.plannedAmount, 0);
+    const totalRealized = state.budgetItems.reduce((s, b) => s + b.realizedAmount, 0);
+    await json(route, { year, month, totalPlanned, totalRealized, totalVariance: totalPlanned - totalRealized, items: state.budgetItems });
+    return;
+  }
+
+  if (method === 'DELETE' && path.match(/^\/api\/v1\/budget\/items\/[^/]+$/)) {
+    const itemId = path.split('/')[5];
+    state.budgetItems = state.budgetItems.filter((b) => b.id !== itemId);
+    await route.fulfill({ status: 204, body: '' });
+    return;
+  }
+
+  if (method === 'POST' && path === '/api/v1/scenarios/simulate') {
+    const payload = JSON.parse(route.request().postData() || '{}');
+    const extraMonthlyIncome = Number(payload.extraMonthlyIncome || 0);
+    const extraMonthlyExpense = Number(payload.extraMonthlyExpense || 0);
+    const savingsRatePercent = Number(payload.savingsRatePercent || 0);
+    const baseBalance = 6780;
+    const impactAmount = (extraMonthlyIncome - extraMonthlyExpense) + (baseBalance * savingsRatePercent / 100);
+    const basePoints: ScenarioProjectionPoint[] = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      return { date: d.toISOString().split('T')[0], baseClosingBalance: baseBalance + i * 50, scenarioClosingBalance: baseBalance + i * 50 };
+    });
+    const scenarioPoints: ScenarioProjectionPoint[] = basePoints.map((p, i) => ({
+      ...p,
+      scenarioClosingBalance: p.baseClosingBalance + i * (impactAmount / 30)
+    }));
+    await json(route, {
+      period: payload.period || 'month',
+      referenceDate: new Date().toISOString().split('T')[0],
+      baseProjectedClosingBalance: baseBalance,
+      scenarioProjectedClosingBalance: baseBalance + impactAmount,
+      impactAmount,
+      monthlySavingsPotential: extraMonthlyIncome - extraMonthlyExpense,
+      basePoints,
+      scenarioPoints
+    });
+    return;
+  }
+
   if (method !== 'GET') {
     await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     return;
@@ -2160,7 +2284,8 @@ async function fulfillApi(route: Route, state: {
 
   if (path.match(/^\/api\/v1\/accounts\/[^/]+\/transactions$/)) {
     const accountId = path.split('/')[4];
-    await json(route, state.accountTransactions[accountId] ?? []);
+    const items = state.accountTransactions[accountId] ?? [];
+    await json(route, { items, totalCount: items.length, page: 1, pageSize: 50, totalPages: 1, hasNextPage: false });
     return;
   }
 
@@ -2324,6 +2449,37 @@ async function fulfillApi(route: Route, state: {
       totalOneTime: 1000,
       previousMonth: null,
       history: []
+    });
+    return;
+  }
+
+  if (path.match(/^\/api\/v1\/budget\/\d+\/\d+$/)) {
+    const parts = path.split('/');
+    const year = Number(parts[4]);
+    const month = Number(parts[5]);
+    const totalPlanned = state.budgetItems.reduce((s, b) => s + b.plannedAmount, 0);
+    const totalRealized = state.budgetItems.reduce((s, b) => s + b.realizedAmount, 0);
+    await json(route, { year, month, totalPlanned, totalRealized, totalVariance: totalPlanned - totalRealized, items: state.budgetItems });
+    return;
+  }
+
+  if (path.match(/^\/api\/v1\/reports\/monthly-summary\/\d+\/\d+$/)) {
+    const parts = path.split('/');
+    const year = Number(parts[5]);
+    const month = Number(parts[6]);
+    const expensesByCategory = [
+      { categoryName: 'Alimentação', amount: 1500, percentageOfTotal: 48.4 },
+      { categoryName: 'Transporte', amount: 800, percentageOfTotal: 25.8 },
+      { categoryName: 'Moradia', amount: 700, percentageOfTotal: 22.6 }
+    ];
+    await json(route, {
+      year, month,
+      totalIncome: 8000,
+      totalExpenses: 3100,
+      netBalance: 4900,
+      savingsRate: 61.3,
+      expensesByCategory,
+      topExpenses: expensesByCategory.slice(0, 3)
     });
     return;
   }

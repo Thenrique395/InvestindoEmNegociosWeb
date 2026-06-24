@@ -272,6 +272,10 @@ localmente (`http://127.0.0.1:4300` por padrão) com mocks/fixtures, conforme de
 - `authenticated-finance-modules.spec.ts`, `authenticated-admin-*.spec.ts`,
   `authenticated-profile-modules.spec.ts`, `authenticated-home-*.spec.ts` — módulos
   autenticados (financeiro, admin, perfil, home) com mocks.
+- `authenticated-cards-imports-billing-error-flows.spec.ts` — 8 cenários de erro com mocks:
+  cartões (create 409, edit 400, delete 409), OFX/CSV (import após preview, extração de
+  arquivo inválido) e billing (erro no cancelamento de renovação, erro no downgrade para
+  Basic, erro no retry de pagamento em atraso/PastDue).
 - `category-propagation.spec.ts` — propagação de categorias padrão/admin para usuários.
 - `commercial-checkout.spec.ts` — fluxo de checkout comercial (planos/billing) com mocks.
 - `error-flows.spec.ts` — cenários de erro genéricos (rede, validação etc.).

@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AuthService, AuthResponse } from '../auth.service';
+import { AuthService, AuthSessionResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 
@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     this.auth.login(this.email, this.password).subscribe({
-      next: (res: AuthResponse) => {
+      next: (res: AuthSessionResponse) => {
         this.uiFeedback.success(`Bem-vindo, ${res.name}.`);
         this.profile.getProfile().subscribe({
           next: (profile) => {

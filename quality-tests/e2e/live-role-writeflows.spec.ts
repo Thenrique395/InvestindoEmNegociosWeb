@@ -115,14 +115,9 @@ test.describe('live role write flows', () => {
     await investmentsPage.goto();
     await investmentsPage.createPosition(assetName);
 
-    const accessToken = await page.evaluate(() => window.localStorage.getItem('access_token'));
-    expect(accessToken).toBeTruthy();
-    const positionsResponse = await fetch(`${LIVE_API_BASE_URL}/investments/positions`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-    expect(positionsResponse.ok).toBeTruthy();
+    // access_token agora é cookie httpOnly — page.request reaproveita o cookie jar do browser.
+    const positionsResponse = await page.request.fetch(`${LIVE_API_BASE_URL}/investments/positions`);
+    expect(positionsResponse.ok()).toBeTruthy();
     const positions = await positionsResponse.json() as Array<{ asset?: string }>;
     expect(positions.some((position) => position.asset === assetName)).toBeTruthy();
   });

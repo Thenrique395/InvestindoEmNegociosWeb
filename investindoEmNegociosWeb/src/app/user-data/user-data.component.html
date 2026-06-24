@@ -44,32 +44,54 @@
       }
     </div>
 
-    <div class="card">
-      <h3>Importar dados</h3>
-      <p class="muted">Envie um arquivo JSON exportado anteriormente.</p>
+    @if (canImportData) {
+      <div class="card">
+        <h3>Importar dados</h3>
+        <p class="muted">Envie um arquivo JSON exportado anteriormente.</p>
 
-      <label class="file">
-        <input #fileInput type="file" accept="application/json,.json" (change)="onFileSelected($event)" />
-        <span>{{ selectedFile?.name || 'Selecionar arquivo JSON' }}</span>
-      </label>
+        <label class="file">
+          <input #fileInput type="file" accept="application/json,.json" (change)="onFileSelected($event)" />
+          <span>{{ selectedFile?.name || 'Selecionar arquivo JSON' }}</span>
+        </label>
 
-      <label class="check">
-        <input type="checkbox" [(ngModel)]="replaceExisting" />
-        <span>Substituir dados atuais</span>
-      </label>
+        <label class="check">
+          <input type="checkbox" [(ngModel)]="replaceExisting" />
+          <span>Substituir dados atuais</span>
+        </label>
 
-      <div class="actions">
-        <button type="button" class="btn btn--ghost" (click)="clearFile(fileInput)" [disabled]="importing || !selectedFile">Limpar</button>
-        <button type="button" class="btn btn--primary" [disabled]="importing || !selectedFile" (click)="requestImport()">
-          {{ importing ? 'Importando...' : 'Importar dados' }}
-        </button>
+        <div class="actions">
+          <button type="button" class="btn btn--ghost" (click)="clearFile(fileInput)" [disabled]="importing || !selectedFile">Limpar</button>
+          <button type="button" class="btn btn--primary" [disabled]="importing || !selectedFile" (click)="requestImport()">
+            {{ importing ? 'Importando...' : 'Importar dados' }}
+          </button>
+        </div>
+
+        <p class="danger">Atenção: ao marcar "Substituir dados atuais", os dados existentes da conta serão removidos antes da importação.</p>
+        @if (lastImportAt) {
+          <p class="meta">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+        }
       </div>
 
-      <p class="danger">Atenção: ao marcar “Substituir dados atuais”, os dados existentes da conta serão removidos antes da importação.</p>
-      @if (lastImportAt) {
-        <p class="meta">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      @if (confirmImportOpen) {
+        <app-confirm-dialog
+          title="Confirmar importação"
+          [message]="replaceExisting
+            ? 'Isso vai substituir os dados atuais pelo arquivo selecionado. Deseja continuar?'
+            : 'Isso vai adicionar dados do arquivo sem apagar os atuais. Deseja continuar?'"
+          [confirmLabel]="importing ? 'Importando...' : 'Confirmar'"
+          cancelLabel="Cancelar"
+          [variant]="replaceExisting ? 'danger' : 'warning'"
+          (cancelled)="cancelImportRequest()"
+          (confirmed)="importData(fileInput)"
+        ></app-confirm-dialog>
       }
-    </div>
+    } @else {
+      <div class="card card--locked">
+        <h3>Importar dados</h3>
+        <p class="muted">A importação de dados está disponível no plano Controle ou superior.</p>
+        <a routerLink="/planos" class="btn btn--primary btn--inline">Ver planos</a>
+      </div>
+    }
 
     <div class="card danger-card">
       <h3>Privacidade e exclusão</h3>
@@ -115,20 +137,6 @@
       }
     </div>
   </div>
-
-  @if (confirmImportOpen) {
-    <app-confirm-dialog
-      title="Confirmar importação"
-    [message]="replaceExisting
-      ? 'Isso vai substituir os dados atuais pelo arquivo selecionado. Deseja continuar?'
-      : 'Isso vai adicionar dados do arquivo sem apagar os atuais. Deseja continuar?'"
-      [confirmLabel]="importing ? 'Importando...' : 'Confirmar'"
-      cancelLabel="Cancelar"
-      [variant]="replaceExisting ? 'danger' : 'warning'"
-      (cancelled)="cancelImportRequest()"
-      (confirmed)="importData(fileInput)"
-    ></app-confirm-dialog>
-  }
 
   @if (confirmDeleteOpen) {
     <app-confirm-dialog

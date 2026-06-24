@@ -14,8 +14,6 @@ test.describe('commercial checkout', () => {
 
   test('finaliza o retorno do checkout pago com status real vindo do backend', async ({ page }) => {
     await page.addInitScript(() => {
-      localStorage.setItem('access_token', 'fake.jwt.token');
-      localStorage.setItem('refresh_token', 'refresh-token');
       localStorage.setItem('user_role', 'Basic');
       localStorage.setItem('access_expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
     });
@@ -112,10 +110,21 @@ test.describe('commercial checkout', () => {
 
     await page.goto('/checkout?plan=advanced&cycle=Yearly', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('button', { name: /^Continuar$/i }).first().click();
-    await page.getByRole('button', { name: /^Continuar$/i }).first().click();
-    await page.getByRole('button', { name: /^Continuar$/i }).first().click();
-    await page.getByRole('button', { name: /Ir para pagamento/i }).click();
+    // Passo 1: page carregou no passo 1, avança direto
+    await page.getByRole('button', { name: /^Continuar$/i }).first().waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: /^Continuar$/i }).first().click({ force: true });
+
+    // Passo 2: aguarda "Conta confirmada" (usuário logado via localStorage) antes de avançar
+    await page.getByRole('heading', { level: 2, name: /Conta confirmada/i }).first().waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: /^Continuar$/i }).first().click({ force: true });
+
+    // Passo 3: aguarda seção de pagamento antes de avançar
+    await page.getByRole('heading', { level: 2, name: /Pagamento com cartão/i }).first().waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: /^Continuar$/i }).first().click({ force: true });
+
+    // Passo 4: confirmação — clica em "Ir para pagamento"
+    await page.getByRole('button', { name: /Ir para pagamento/i }).waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: /Ir para pagamento/i }).click({ force: true });
 
     await expect(page).toHaveURL(/\/checkout\/sucesso/);
     await expect(page.getByRole('heading', { level: 1, name: /Patrimônio ativado com sucesso/i })).toBeVisible();

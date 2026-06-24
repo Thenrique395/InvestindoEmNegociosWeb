@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_BASE_URL } from './api.config';
-import { AuthResponse } from './auth.service';
+import { AuthSessionResponse } from './auth.service';
 
 export interface SubscriptionPlan {
   code: string;
@@ -39,7 +39,7 @@ export interface SubscriptionCatalogResponse {
 
 export interface SubscriptionChangeResponse {
   current: CurrentSubscription;
-  session: AuthResponse;
+  session: AuthSessionResponse;
   notes: string[];
 }
 

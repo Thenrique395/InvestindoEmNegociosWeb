@@ -9,6 +9,10 @@ import { UiFeedbackService } from './ui-feedback.service';
 let lastForbiddenFeedbackAt = 0;
 let lastServerErrorFeedbackAt = 0;
 
+const CSRF_COOKIE = 'XSRF-TOKEN';
+const CSRF_HEADER = 'X-XSRF-TOKEN';
+const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
 type ProblemDetailsLike = {
   title?: string;
   detail?: string;
@@ -50,6 +54,15 @@ function shouldThrottle(lastFeedbackAt: number, throttleMs: number): boolean {
   return Date.now() - lastFeedbackAt <= throttleMs;
 }
 
+function readCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.substring(name.length + 1)) : null;
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (!isPlatformBrowser(inject(PLATFORM_ID))) {
     return next(req);
@@ -57,7 +70,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   const feedback = inject(UiFeedbackService);
-  const token = auth.getAccessToken();
   const isAuthRequest =
     req.url.includes('/auth/login') ||
     req.url.includes('/auth/register') ||
@@ -65,13 +77,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     req.url.includes('/auth/forgot-password') ||
     req.url.includes('/auth/reset-password');
 
-  const withAuth = token && !isAuthRequest
-    ? req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-    : req;
+  // Cookie httpOnly de sessão é enviado automaticamente pelo browser via withCredentials —
+  // não há mais token para anexar manualmente no header Authorization.
+  const headers: Record<string, string> = {};
+  if (MUTATING_METHODS.has(req.method)) {
+    const csrfToken = readCookie(CSRF_COOKIE);
+    if (csrfToken) headers[CSRF_HEADER] = csrfToken;
+  }
+
+  const withAuth = req.clone({ withCredentials: true, setHeaders: headers });
 
   return next(withAuth).pipe(
     catchError((err: HttpErrorResponse) => {
@@ -95,8 +109,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      const refreshToken = auth.getRefreshToken();
-      if (!refreshToken) {
+      if (!auth.isAuthenticated()) {
         auth.clearSession();
         if (!router.url.startsWith('/login')) {
           router.navigateByUrl('/login');
@@ -104,13 +117,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      return auth.refresh(refreshToken).pipe(
-        switchMap((res) => {
-          const retry = req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${res.token}`
-            }
-          });
+      return auth.refresh().pipe(
+        switchMap(() => {
+          const retry = req.clone({ withCredentials: true, setHeaders: headers });
           return next(retry);
         }),
         catchError((refreshErr) => {

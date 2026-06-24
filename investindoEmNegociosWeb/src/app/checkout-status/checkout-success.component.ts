@@ -51,7 +51,7 @@ export class CheckoutSuccessComponent {
           this.status = status;
           this.plan = findMarketingPlan(status.planCode);
           this.cycle = status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly';
-          if (status.subscriptionActive && this.authService.getRefreshToken()) {
+          if (status.subscriptionActive && this.authService.isAuthenticated()) {
             this.authService.refresh().subscribe({ error: () => void 0 });
           }
           this.loading = false;

@@ -20,9 +20,9 @@ test.describe('authenticated admin categories', () => {
 
     await categoriesPage.goto();
     await page.getByPlaceholder('Nome da categoria').fill('Mercado');
-    await page.locator('.add-card select').nth(0).selectOption('default');
-    await page.locator('.add-card select').nth(1).selectOption('Expense');
-    await page.getByRole('button', { name: 'Adicionar' }).click();
+    await page.locator('.add-card__form select').nth(0).selectOption('default');
+    await page.locator('.add-card__form select').nth(1).selectOption('Expense');
+    await page.getByRole('button', { name: 'Adicionar', exact: true }).click();
     await categoriesPage.expectDuplicateDefaultWarning();
   });
 });

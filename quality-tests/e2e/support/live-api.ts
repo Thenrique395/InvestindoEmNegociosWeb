@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 export const LIVE_API_BASE_URL = 'http://35.174.50.187:5059/api/v1';
 
@@ -16,27 +16,20 @@ export async function liveEndpointAvailable(path: string): Promise<boolean> {
   }
 }
 
-async function accessToken(page: Page) {
-  const token = await page.evaluate(() => window.localStorage.getItem('access_token'));
-  expect(token).toBeTruthy();
-  return token as string;
-}
-
+// access_token/refresh_token agora são cookies httpOnly — page.request compartilha o
+// cookie jar do contexto do browser, então a sessão é enviada automaticamente sem
+// precisar extrair/anexar o token manualmente (que nem é mais legível via JS).
 export async function liveApi<T>(page: Page, path: string, options: ApiOptions = {}): Promise<T> {
-  const token = await accessToken(page);
-  const response = await fetch(`${LIVE_API_BASE_URL}${path}`, {
+  const response = await page.request.fetch(`${LIVE_API_BASE_URL}${path}`, {
     method: options.method ?? 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: options.body === undefined ? undefined : JSON.stringify(options.body)
+    headers: { 'Content-Type': 'application/json' },
+    data: options.body === undefined ? undefined : options.body
   });
-  if (!response.ok) {
+  if (!response.ok()) {
     const detail = await response.text().catch(() => '');
-    throw new Error(`Live API ${options.method ?? 'GET'} ${path} falhou com ${response.status}: ${detail}`);
+    throw new Error(`Live API ${options.method ?? 'GET'} ${path} falhou com ${response.status()}: ${detail}`);
   }
-  if (response.status === 204) {
+  if (response.status() === 204) {
     return undefined as T;
   }
   return response.json() as Promise<T>;

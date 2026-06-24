@@ -3,14 +3,14 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthService, AuthResponse } from './auth.service';
+import { AuthService, AuthSessionResponse } from './auth.service';
 import { authInterceptor } from './auth.interceptor';
 import { UiFeedbackService } from './ui-feedback.service';
+import { API_BASE_URL } from './api.config';
 
 class AuthServiceMock {
-  getAccessToken = jasmine.createSpy().and.returnValue('token-123');
-  getRefreshToken = jasmine.createSpy().and.returnValue(null);
-  refresh = jasmine.createSpy().and.callFake(() => of(buildAuthResponse()));
+  isAuthenticated = jasmine.createSpy().and.returnValue(true);
+  refresh = jasmine.createSpy().and.callFake(() => of(buildAuthSessionResponse()));
   clearSession = jasmine.createSpy();
 }
 
@@ -26,16 +26,22 @@ class UiFeedbackServiceMock {
   info = jasmine.createSpy();
 }
 
-function buildAuthResponse(): AuthResponse {
+function buildAuthSessionResponse(): AuthSessionResponse {
   return {
     userId: 'u1',
     name: 'Teste',
     email: 'teste@local',
     role: 'Basic',
-    token: 'token-novo',
-    refreshToken: 'refresh-novo',
     expiresAt: new Date(Date.now() + 3600_000).toISOString()
   };
+}
+
+function setCsrfCookie(value: string | null): void {
+  if (value) {
+    document.cookie = `XSRF-TOKEN=${value}; path=/`;
+  } else {
+    document.cookie = 'XSRF-TOKEN=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  }
 }
 
 describe('authInterceptor', () => {
@@ -47,6 +53,7 @@ describe('authInterceptor', () => {
   beforeEach(() => {
     auth = new AuthServiceMock();
     router = new RouterMock();
+    setCsrfCookie('csrf-abc');
 
     TestBed.configureTestingModule({
       providers: [
@@ -64,47 +71,50 @@ describe('authInterceptor', () => {
 
   afterEach(() => {
     httpMock.verify();
+    setCsrfCookie(null);
   });
 
-  it('deve anexar Authorization para requests protegidas', () => {
-    http.get('/api/v1/accounts').subscribe();
-    const req = httpMock.expectOne('/api/v1/accounts');
-    expect(req.request.headers.get('Authorization')).toBe('Bearer token-123');
+  it('deve enviar credenciais e anexar X-XSRF-TOKEN em requests mutáveis para a API', () => {
+    http.post(`${API_BASE_URL}/profile`, {}).subscribe();
+    const req = httpMock.expectOne(`${API_BASE_URL}/profile`);
+    expect(req.request.withCredentials).toBeTrue();
+    expect(req.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-abc');
     req.flush({});
   });
 
-  it('não deve anexar Authorization em rota de login', () => {
-    http.post('/api/v1/auth/login', { email: 'x', senha: 'y' }).subscribe();
-    const req = httpMock.expectOne('/api/v1/auth/login');
-    expect(req.request.headers.has('Authorization')).toBeFalse();
+  it('não deve anexar X-XSRF-TOKEN em requests GET', () => {
+    http.get(`${API_BASE_URL}/profile`).subscribe();
+    const req = httpMock.expectOne(`${API_BASE_URL}/profile`);
+    expect(req.request.withCredentials).toBeTrue();
+    expect(req.request.headers.has('X-XSRF-TOKEN')).toBeFalse();
     req.flush({});
   });
 
-  it('deve tentar refresh e repetir request após 401', () => {
-    auth.getRefreshToken.and.returnValue('refresh-123');
-    auth.refresh.and.returnValue(of(buildAuthResponse()));
+  it('deve tentar refresh e repetir request após 401 quando há sessão local', () => {
+    auth.isAuthenticated.and.returnValue(true);
+    auth.refresh.and.returnValue(of(buildAuthSessionResponse()));
 
-    http.get('/api/v1/profile').subscribe();
+    http.get(`${API_BASE_URL}/profile`).subscribe();
 
-    const first = httpMock.expectOne('/api/v1/profile');
+    const first = httpMock.expectOne(`${API_BASE_URL}/profile`);
     first.flush({ detail: 'unauthorized' }, { status: 401, statusText: 'Unauthorized' });
 
-    expect(auth.refresh).toHaveBeenCalledWith('refresh-123');
+    expect(auth.refresh).toHaveBeenCalled();
 
-    const retry = httpMock.expectOne('/api/v1/profile');
-    expect(retry.request.headers.get('Authorization')).toBe('Bearer token-novo');
+    const retry = httpMock.expectOne(`${API_BASE_URL}/profile`);
+    expect(retry.request.withCredentials).toBeTrue();
     retry.flush({ ok: true });
   });
 
-  it('deve limpar sessão e redirecionar quando 401 sem refresh token', () => {
+  it('deve limpar sessão e redirecionar quando 401 sem sessão local', () => {
     const errors: HttpErrorResponse[] = [];
-    auth.getRefreshToken.and.returnValue(null);
+    auth.isAuthenticated.and.returnValue(false);
 
-    http.get('/api/v1/profile').subscribe({
+    http.get(`${API_BASE_URL}/profile`).subscribe({
       error: (err) => errors.push(err)
     });
 
-    const req = httpMock.expectOne('/api/v1/profile');
+    const req = httpMock.expectOne(`${API_BASE_URL}/profile`);
     req.flush({ detail: 'unauthorized' }, { status: 401, statusText: 'Unauthorized' });
 
     expect(auth.clearSession).toHaveBeenCalled();
@@ -114,14 +124,14 @@ describe('authInterceptor', () => {
 
   it('deve limpar sessão e redirecionar quando refresh falha', () => {
     const errors: unknown[] = [];
-    auth.getRefreshToken.and.returnValue('refresh-123');
+    auth.isAuthenticated.and.returnValue(true);
     auth.refresh.and.returnValue(throwError(() => new Error('refresh-failed')));
 
-    http.get('/api/v1/profile').subscribe({
+    http.get(`${API_BASE_URL}/profile`).subscribe({
       error: (err) => errors.push(err)
     });
 
-    const req = httpMock.expectOne('/api/v1/profile');
+    const req = httpMock.expectOne(`${API_BASE_URL}/profile`);
     req.flush({ detail: 'unauthorized' }, { status: 401, statusText: 'Unauthorized' });
 
     expect(auth.clearSession).toHaveBeenCalled();

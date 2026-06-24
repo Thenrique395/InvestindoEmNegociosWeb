@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -183,7 +183,7 @@ export class InvestmentsComponent implements OnInit {
     { value: 'VENDA', label: 'Venda' }
   ];
 
-  constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService, private readonly destroyRef: DestroyRef) {}
+  constructor(private investments: InvestmentsService, private lookups: LookupsService, private uiFeedback: UiFeedbackService, private readonly destroyRef: DestroyRef, private readonly cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.restoreTab();
@@ -1396,6 +1396,7 @@ export class InvestmentsComponent implements OnInit {
     this.investments.listPositions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => {
         this.positions = list;
+        this.cdr.markForCheck();
       }
     });
   }

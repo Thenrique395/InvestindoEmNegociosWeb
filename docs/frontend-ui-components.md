@@ -307,4 +307,4 @@ this.form.setApiErrors(mapApiErrors(err, {
 - Aplicar `StatusBadgeComponent` nas telas restantes.
 - Aplicar `FilterBarComponent` em todas as listagens.
 - Criar tokens de design formais para spacing, radius, shadows e cores.
-- Criar Storybook ou manter a página `/design-lab/componentes` como catálogo visual.
+- Criar Storybook ou recriar uma página de catálogo visual (`design-lab` foi removido do roteamento; `src/app/design-lab/` está vazio).

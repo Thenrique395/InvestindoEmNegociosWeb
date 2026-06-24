@@ -7,7 +7,7 @@ import { ScheduleType } from '../types/money-types';
 import { InstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
 import { AuthService } from '../auth.service';
-import { ReceitasSummaryService, IncomeMonthSummary } from '../receitas-summary.service';
+import { ReceitasSummaryService, IncomeMonthSummary, IncomeSummaryResponse } from '../receitas-summary.service';
 import { formatLocaleDateFromIso, toIsoDateFromLocale } from '../utils/locale-utils';
 
 export interface StoredExpense {
@@ -395,8 +395,23 @@ export class ApiDataService {
     const current = this.dbSubject.value;
     const statusMap = new Map(current.incomes.map((income) => [income.id, income.status]));
 
+    const isBasic = this.authService.getRole() === 'Basic';
+    const summary$ = isBasic
+      ? this.receitasSummary.getList(month).pipe(
+          map((list): IncomeSummaryResponse => ({
+            month: list.month,
+            total: list.items.reduce((s, i) => s + i.amount, 0),
+            totalRecurring: 0,
+            totalOneTime: 0,
+            items: list.items,
+            previousMonth: null,
+            history: []
+          }))
+        )
+      : this.receitasSummary.getSummary(month);
+
     forkJoin({
-      summary: this.receitasSummary.getSummary(month),
+      summary: summary$,
       incomeInstallments: this.installments.list({ type: 'Income' })
     })
       .pipe(

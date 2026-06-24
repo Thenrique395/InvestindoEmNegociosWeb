@@ -24,7 +24,7 @@ Fonte real dos tokens atuais:
 
 Observação importante:
 
-- a direção `Command Premium` existe apenas como exploração no [systemDesigner.md](./systemDesigner.md) e no `Design Lab`
+- a direção `Command Premium` existe apenas como exploração em [systemDesigner.md](./systemDesigner.md); o antigo `Design Lab` (`src/app/design-lab/`) foi descontinuado e não tem mais rota navegável
 - ela não substitui os tokens oficiais enquanto não for validada explicitamente
 
 ## Princípios de UI

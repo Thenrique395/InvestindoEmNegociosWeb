@@ -16,6 +16,11 @@ export interface IncomeItemResponse {
   recurringStart?: string | null; // MM/YYYY
 }
 
+export interface IncomeListResponse {
+  month: string; // yyyy-MM
+  items: IncomeItemResponse[];
+}
+
 export interface IncomeSummaryResponse {
   month: string; // yyyy-MM
   total: number;
@@ -35,15 +40,21 @@ export interface IncomeMonthSummary {
 
 @Injectable({ providedIn: 'root' })
 export class ReceitasSummaryService {
-  private readonly baseUrl = `${API_BASE_URL}/incomes/summary`;
+  private readonly baseUrl = `${API_BASE_URL}/incomes`;
 
   constructor(private http: HttpClient) {}
+
+  getList(month?: string): Observable<IncomeListResponse> {
+    let params = new HttpParams();
+    if (month) params = params.set('month', month);
+    return this.http.get<IncomeListResponse>(this.baseUrl, { params });
+  }
 
   getSummary(month?: string): Observable<IncomeSummaryResponse> {
     let params = new HttpParams();
     if (month) {
       params = params.set('month', month);
     }
-    return this.http.get<IncomeSummaryResponse>(this.baseUrl, { params });
+    return this.http.get<IncomeSummaryResponse>(`${this.baseUrl}/summary`, { params });
   }
 }

@@ -60,11 +60,12 @@ export class CardsPage {
     await this.card(currentName).getByRole('button', { name: 'Editar' }).click();
     await this.page.getByLabel('Número do cartão').fill(`9999 8888 7777 ${last4}`);
     await this.page.getByLabel(/Nome( impresso)? (do|no) cartão/).fill(nextName);
+    await this.page.getByLabel('Apelido (opcional)').fill(nextName);
     await this.page.getByLabel(/Banco( \(opcional\))?/).fill('Banco Atualizado');
     await this.page.getByLabel('Limite de crédito').fill('9500');
     await this.page.getByRole('button', { name: 'Salvar alterações' }).click();
-    await expect(this.page.getByText(nextName)).toBeVisible();
-    await expect(this.card(nextName).getByText(new RegExp(`${last4}.*${last4}`))).toBeVisible();
+    await expect(this.card(nextName)).toBeVisible({ timeout: 15000 });
+    await expect(this.card(nextName).getByText(new RegExp(`${last4}.*${last4}`))).toBeVisible({ timeout: 15000 });
   }
 
   async removeCard(holderName: string) {

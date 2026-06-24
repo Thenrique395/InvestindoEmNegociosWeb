@@ -46,7 +46,7 @@ export class DashboardPage {
   }
 
   async closeRiskDetails() {
-    await this.page.getByRole('button', { name: 'Fechar', exact: true }).click();
+    await this.page.getByRole('button', { name: 'Fechar detalhes' }).click();
   }
 
   async switchToQuarterly() {

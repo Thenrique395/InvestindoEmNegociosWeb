@@ -138,7 +138,7 @@ Backend relacionado:
 - a base da API ainda tem fallback para endpoint remoto em `src/app/api.config.ts`; tratar mudanças de ambiente com cuidado
 - o frontend espelha parte do gating por role/feature para UX, mas a fonte final continua sendo o backend
 - mudanças em rotas protegidas precisam permanecer coerentes com a matriz de autorização da API
-- neste momento, rotas como `assistente`, `snapshots` e `emprestimos` merecem revisão para alinhar o frontend ao backend atual
+- neste momento, rotas como `assistente` e `snapshots` merecem revisão para alinhar o frontend ao backend atual; `emprestimos` já cobre pagamento de parcela por contrato com cronograma expansível
 
 ## Relação com a documentação central
 

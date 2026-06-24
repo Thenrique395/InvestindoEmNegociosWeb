@@ -134,7 +134,7 @@ export class CardsStore {
     });
   }
 
-  delete(id: string, onSuccess?: () => void): void {
+  delete(id: string, onSuccess?: () => void, onError?: () => void): void {
     this.patchCards({ error: null });
     this.cardsService.delete(id).subscribe({
       next: () => {
@@ -144,7 +144,10 @@ export class CardsStore {
         this.refresh();
         onSuccess?.();
       },
-      error: () => this.patchCards({ error: 'Falha ao remover cartão.' })
+      error: () => {
+        this.patchCards({ error: 'Falha ao remover cartão.' });
+        onError?.();
+      }
     });
   }
 

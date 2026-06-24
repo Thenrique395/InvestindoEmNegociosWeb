@@ -17,7 +17,7 @@ test.describe('authenticated error flows', () => {
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     await page.getByLabel('Conta origem').selectOption({ label: 'Conta principal' });
     await page.getByLabel('Conta destino').selectOption({ label: 'Reserva' });
-    await page.getByLabel('Valor').fill('99999');
+    await page.getByLabel('Valor', { exact: true }).fill('99999');
     await page.getByRole('button', { name: 'Transferir agora' }).click();
 
     await expect(page.getByText('Falha ao transferir entre contas.')).toBeVisible();

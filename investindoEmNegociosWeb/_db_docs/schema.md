@@ -23,7 +23,8 @@ O diagrama visual correspondente continua em `schema.svg`.
 Armazena os usuarios do sistema e dados de seguranca.
 - Chave primaria: `id`
 - Unicidade: `email`
-- Campos relevantes: `name`, `email`, `password_hash`, `role`, `is_active`, `last_login_at`, `failed_login_attempts`, `lockout_until`, `created_at`, `updated_at`.
+- Campos relevantes: `name`, `email`, `password_hash`, `role`, `is_active`, `last_login_at`, `failed_login_attempts`, `lockout_until`, `trial_used_at`, `is_anonymized`, `deleted_at`, `created_at`, `updated_at`.
+- `is_anonymized`/`deleted_at` suportam o fluxo de exclusão LGPD por anonimização (`User.Anonymize`): PII é zerada e o registro é mantido para auditoria, em vez de deletado fisicamente.
 
 ### user_profiles
 Preferencias e dados pessoais do usuario.

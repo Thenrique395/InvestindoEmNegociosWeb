@@ -203,6 +203,7 @@ export class ContasComponent implements OnInit {
 
   selectAccount(accountId: string): void {
     this.accountsStore.selectAccount(accountId);
+    this.selectedAccountId = accountId;
     this.loadTransactions();
   }
 
