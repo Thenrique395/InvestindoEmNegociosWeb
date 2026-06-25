@@ -68,6 +68,7 @@ export class CategoriesComponent implements OnInit {
     effect(() => {
       this.categorias = this.categoriesStore.categories();
       this.loading = this.categoriesStore.loading();
+      this.cdr.markForCheck();
     });
   }
 
