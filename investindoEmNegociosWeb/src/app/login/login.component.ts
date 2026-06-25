@@ -30,7 +30,10 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.route.snapshot.queryParamMap.get('created') === '1') {
-      this.uiFeedback.success('Conta criada. Faça login para continuar.');
+      // Adiado para fora do ciclo de change detection atual: chamar uiFeedback.success()
+      // de forma síncrona aqui muda um estado que o AppComponent (componente pai) já tinha
+      // checado neste mesmo ciclo, disparando NG0100 (ExpressionChangedAfterItHasBeenChecked).
+      setTimeout(() => this.uiFeedback.success('Conta criada. Faça login para continuar.'));
       this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { created: null },
