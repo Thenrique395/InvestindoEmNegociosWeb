@@ -86,6 +86,20 @@ export interface DebtSummaryResponse {
   nextItems: DebtSummaryItemResponse[];
 }
 
+export interface SubscriptionSummaryItemResponse {
+  planId: string;
+  title: string;
+  amount: number;
+  cardName?: string | null;
+}
+
+export interface SubscriptionsSummaryResponse {
+  referenceDate: string;
+  monthlyTotal: number;
+  count: number;
+  items: SubscriptionSummaryItemResponse[];
+}
+
 export interface WealthAssetBreakdownResponse {
   accountsBalance: number;
   investmentsBalance: number;

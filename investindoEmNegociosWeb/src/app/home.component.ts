@@ -24,7 +24,7 @@ import {
   rangeEndDate,
   resolveInsightShortGoal
 } from './utils/home-insight.utils';
-import { AccountsService, AccountResponse, CashflowProjectionResponse, DebtSummaryResponse, InsightEngineItemResponse, InsightEngineResponse, NetWorthHistoryResponse, NetWorthSummaryResponse, RealAvailableBalanceResponse, RecommendationEngineResponse, RiskBotAssessmentResponse } from './accounts.service';
+import { AccountsService, AccountResponse, CashflowProjectionResponse, DebtSummaryResponse, InsightEngineItemResponse, InsightEngineResponse, NetWorthHistoryResponse, NetWorthSummaryResponse, RealAvailableBalanceResponse, RecommendationEngineResponse, RiskBotAssessmentResponse, SubscriptionsSummaryResponse } from './accounts.service';
 import { AuthService } from './auth.service';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ProfileService } from './profile.service';
@@ -64,6 +64,7 @@ type InsightTodoItem = {
 export class HomeComponent implements OnInit {
   private subRealBalance?: Subscription;
   private subDebtSummary?: Subscription;
+  private subSubscriptionsSummary?: Subscription;
   private subNetWorth?: Subscription;
   private subNetWorthHistory?: Subscription;
   private subProjection?: Subscription;
@@ -89,6 +90,7 @@ export class HomeComponent implements OnInit {
   accountBalances: AccountResponse[] = [];
   realBalanceSummary: RealAvailableBalanceResponse | null = null;
   debtSummary: DebtSummaryResponse | null = null;
+  subscriptionsSummary: SubscriptionsSummaryResponse | null = null;
   netWorthSummary: NetWorthSummaryResponse | null = null;
   netWorthHistory: NetWorthHistoryResponse | null = null;
   cashflowProjection: CashflowProjectionResponse | null = null;
@@ -280,6 +282,7 @@ export class HomeComponent implements OnInit {
           this.accountsService.resolveDefaultAccountId(this.accountBalances);
           this.loadRealAvailableBalance();
           this.loadDebtSummary();
+          this.loadSubscriptionsSummary();
           this.loadNetWorthSummary();
           this.loadNetWorthHistory();
           this.loadProjection();
@@ -291,6 +294,7 @@ export class HomeComponent implements OnInit {
           this.accountBalances = [];
           this.realBalanceSummary = null;
           this.debtSummary = null;
+          this.subscriptionsSummary = null;
           this.netWorthSummary = null;
           this.netWorthHistory = null;
           this.cashflowProjection = null;
@@ -1167,6 +1171,7 @@ export class HomeComponent implements OnInit {
     this.atualizarSaldo();
     this.loadRealAvailableBalance();
     this.loadDebtSummary();
+    this.loadSubscriptionsSummary();
     this.loadNetWorthSummary();
     this.loadNetWorthHistory();
     this.loadProjection();
@@ -1217,6 +1222,26 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.debtSummary = null;
+        }
+      });
+  }
+
+  private loadSubscriptionsSummary(): void {
+    if (!this.isLogged) {
+      this.subscriptionsSummary = null;
+      return;
+    }
+
+    this.subSubscriptionsSummary?.unsubscribe();
+    this.subSubscriptionsSummary = this.accountsService
+      .getSubscriptionsSummary(this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (summary) => {
+          this.subscriptionsSummary = summary;
+        },
+        error: () => {
+          this.subscriptionsSummary = null;
         }
       });
   }

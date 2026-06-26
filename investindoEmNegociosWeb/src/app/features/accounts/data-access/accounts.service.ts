@@ -19,6 +19,7 @@ import {
   RealAvailableBalanceResponse,
   RecommendationEngineResponse,
   RiskBotAssessmentResponse,
+  SubscriptionsSummaryResponse,
 } from '../models/account.models';
 
 export type { PagedResult };
@@ -167,6 +168,12 @@ export class AccountsService {
     let params = new HttpParams();
     if (referenceDate) params = params.set('referenceDate', referenceDate);
     return this.http.get<DebtSummaryResponse>(`${this.baseUrl}/summary/debts`, { params });
+  }
+
+  getSubscriptionsSummary(referenceDate?: string): Observable<SubscriptionsSummaryResponse> {
+    let params = new HttpParams();
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<SubscriptionsSummaryResponse>(`${this.baseUrl}/summary/subscriptions`, { params });
   }
 
   getNetWorthSummary(referenceDate?: string): Observable<NetWorthSummaryResponse> {

@@ -501,6 +501,34 @@
       }
     </section>
   }
+  @if (hasAccess('Intermediate') && subscriptionsSummary && subscriptionsSummary.count) {
+    <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Assinaturas</p>
+          <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Recorrências categorizadas como Assinaturas.</p>
+        </div>
+        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
+          Total: {{ subscriptionsSummary.monthlyTotal | appCurrency }}/mês
+        </span>
+      </div>
+      <div class="grid gap-2">
+        @for (item of subscriptionsSummary.items; track trackByIndex($index, item)) {
+          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div class="min-w-0">
+                <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                @if (item.cardName) {
+                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">Cartão · {{ item.cardName }}</p>
+                }
+              </div>
+              <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.amount | appCurrency }}</strong>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
   @if (!isBasicProfile && !isLoadingDashboard) {
     <section
       class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]"
