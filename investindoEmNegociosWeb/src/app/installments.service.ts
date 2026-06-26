@@ -35,6 +35,7 @@ export interface InstallmentPayment {
   note?: string | null;
   isReversal: boolean;
   canReverse: boolean;
+  receiptUrl?: string | null;
 }
 
 export interface PaymentReversalPayload {
@@ -68,6 +69,12 @@ export class InstallmentsService {
 
   reversePayment(id: string, paymentId: string, payload: PaymentReversalPayload = {}) {
     return this.http.post(`${this.baseUrl}/${id}/payments/${paymentId}/reversals`, payload);
+  }
+
+  uploadReceipt(id: string, paymentId: string, file: File): Observable<{ receiptUrl: string }> {
+    const data = new FormData();
+    data.append('receipt', file);
+    return this.http.post<{ receiptUrl: string }>(`${this.baseUrl}/${id}/payments/${paymentId}/receipt`, data);
   }
 
   anticipate(id: string, payload: { dueDate: string; note?: string | null }) {

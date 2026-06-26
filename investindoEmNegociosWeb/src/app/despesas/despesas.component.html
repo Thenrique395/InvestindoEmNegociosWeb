@@ -353,10 +353,28 @@
                         <span>Estornando...</span>
                       }
                     </button>
+                    <button
+                      type="button"
+                      class="expenses-history-item__action"
+                      [disabled]="isAttachingReceipt(h.id)"
+                      (click)="prepararAnexoComprovante(h); comprovanteInput.click()">
+                      @if (!isAttachingReceipt(h.id)) {
+                        <span>Comprovante</span>
+                      }
+                      @if (isAttachingReceipt(h.id)) {
+                        <span>Enviando...</span>
+                      }
+                    </button>
                   </div>
                 </article>
               }
             </div>
+            <input
+              #comprovanteInput
+              type="file"
+              hidden
+              accept="image/*,application/pdf"
+              (change)="onComprovanteFileSelected($event)" />
           } @else {
             <p class="expenses-history-group__empty">Nenhuma parcela paga.</p>
           }

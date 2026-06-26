@@ -76,6 +76,7 @@ function createComponent() {
     categories as any,
     ui as any,
     accounts as any,
+    { listPayments: () => of([]), uploadReceipt: () => of({ receiptUrl: '' }) } as any,
     route as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
     { onDestroy: () => {} } as any

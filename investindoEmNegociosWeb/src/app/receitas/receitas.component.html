@@ -179,13 +179,21 @@
         [sortBy]="sortBy"
         [sortDir]="sortDir"
         [selectedIds]="selecionados"
+        [attachingReceiptIds]="attachingReceiptIds"
         (ordenar)="ordenarPor($event)"
         (editar)="editarPorId($event)"
         (remover)="remover($event)"
         (selecionar)="toggleSelecionar($event.id, $event.checked)"
         (selecionarTodos)="toggleSelecionarTodos($event)"
+        (comprovante)="prepararAnexoComprovante($event); comprovanteInput.click()"
       (emptyAction)="abrirModal()"></app-receitas-lista>
     </div>
+    <input
+      #comprovanteInput
+      type="file"
+      hidden
+      accept="image/*,application/pdf"
+      (change)="onComprovanteFileSelected($event)" />
 
     <app-receitas-form
       [mostrarForm]="mostrarForm"

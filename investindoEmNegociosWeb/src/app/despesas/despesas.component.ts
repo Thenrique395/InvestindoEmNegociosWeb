@@ -103,6 +103,8 @@ export class DespesasComponent implements OnInit {
   historicoTitulo = '';
   historicoItens: StoredExpense[] = [];
   reversingIds = new Set<string>();
+  attachingReceiptIds = new Set<string>();
+  private receiptUploadTargetId: string | null = null;
   mostrarImportFatura = false;
 
   novaDespesa: StoredExpense = this.criaDespesa();
@@ -464,6 +466,55 @@ export class DespesasComponent implements OnInit {
       },
       error: () => {
         this.reversingIds.delete(h.id);
+        this.setAlerta('Falha ao consultar pagamentos da parcela.', 3000, 'error');
+      }
+    });
+  }
+
+  isAttachingReceipt(installmentId: string): boolean {
+    return this.attachingReceiptIds.has(installmentId);
+  }
+
+  prepararAnexoComprovante(h: StoredExpense): void {
+    if (!h?.id || this.isAttachingReceipt(h.id)) return;
+    if (h.status !== 'PAID' && h.status !== 'PARTIALLY_PAID') {
+      this.setAlerta('Só é possível anexar comprovante a uma despesa já paga.', 2500, 'info');
+      return;
+    }
+    this.receiptUploadTargetId = h.id;
+  }
+
+  onComprovanteFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    const installmentId = this.receiptUploadTargetId;
+    input.value = '';
+    this.receiptUploadTargetId = null;
+    if (!file || !installmentId) return;
+
+    this.attachingReceiptIds.add(installmentId);
+    this.installments.listPayments(installmentId).subscribe({
+      next: (payments) => {
+        const target = [...(payments || [])]
+          .filter((p) => p.paidAmount > 0)
+          .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
+
+        if (!target) {
+          this.attachingReceiptIds.delete(installmentId);
+          this.setAlerta('Nenhum pagamento encontrado para anexar o comprovante.', 3000, 'info');
+          return;
+        }
+
+        this.installments
+          .uploadReceipt(installmentId, target.id, file)
+          .pipe(finalize(() => this.attachingReceiptIds.delete(installmentId)))
+          .subscribe({
+            next: () => this.setAlerta('Comprovante anexado com sucesso.', 3000, 'success'),
+            error: () => this.setAlerta('Falha ao anexar comprovante.', 3000, 'error')
+          });
+      },
+      error: () => {
+        this.attachingReceiptIds.delete(installmentId);
         this.setAlerta('Falha ao consultar pagamentos da parcela.', 3000, 'error');
       }
     });

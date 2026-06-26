@@ -15,6 +15,7 @@ import { hasAtLeastRole, UserRole } from '../roles';
 import { incomeStatusLabel } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
+import { InstallmentsService } from '../installments.service';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
@@ -61,6 +62,8 @@ export class ReceitasComponent implements OnInit {
   editReceivedId: string | null = null;
   editReceivedSource = '';
   selectedIds = new Set<string>();
+  attachingReceiptIds = new Set<string>();
+  private receiptUploadTargetId: string | null = null;
   loadingRecebido = false;
   loadingMes = true;
   contas: AccountResponse[] = [];
@@ -81,6 +84,7 @@ export class ReceitasComponent implements OnInit {
     private categoriesService: CategoriesService,
     private uiFeedback: UiFeedbackService,
     private accountsService: AccountsService,
+    private installments: InstallmentsService,
     private route: ActivatedRoute,
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef
@@ -483,6 +487,47 @@ export class ReceitasComponent implements OnInit {
     this.erroData = '';
     this.erroCategoria = '';
     this.valorSugestao = null;
+  }
+
+  prepararAnexoComprovante(installmentId: string): void {
+    if (!installmentId || this.attachingReceiptIds.has(installmentId)) return;
+    this.receiptUploadTargetId = installmentId;
+  }
+
+  onComprovanteFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    const installmentId = this.receiptUploadTargetId;
+    input.value = '';
+    this.receiptUploadTargetId = null;
+    if (!file || !installmentId) return;
+
+    this.attachingReceiptIds.add(installmentId);
+    this.installments.listPayments(installmentId).subscribe({
+      next: (payments) => {
+        const target = [...(payments || [])]
+          .filter((p) => p.paidAmount > 0)
+          .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
+
+        if (!target) {
+          this.attachingReceiptIds.delete(installmentId);
+          this.setAlerta('Nenhum recebimento encontrado para anexar o comprovante.', 3000, 'info');
+          return;
+        }
+
+        this.installments
+          .uploadReceipt(installmentId, target.id, file)
+          .pipe(finalize(() => this.attachingReceiptIds.delete(installmentId)))
+          .subscribe({
+            next: () => this.setAlerta('Comprovante anexado com sucesso.', 3000, 'success'),
+            error: () => this.setAlerta('Falha ao anexar comprovante.', 3000, 'error')
+          });
+      },
+      error: () => {
+        this.attachingReceiptIds.delete(installmentId);
+        this.setAlerta('Falha ao consultar recebimentos da parcela.', 3000, 'error');
+      }
+    });
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {

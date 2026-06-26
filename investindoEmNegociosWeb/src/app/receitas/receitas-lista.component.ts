@@ -22,8 +22,10 @@ export class ReceitasListaComponent {
   @Input() sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
   @Input() sortDir: 1 | -1 = 1;
   @Input() selectedIds: string[] = [];
+  @Input() attachingReceiptIds: Set<string> = new Set();
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<{ planId?: string; installmentId: string }>();
+  @Output() comprovante = new EventEmitter<string>();
   @Output() selecionar = new EventEmitter<{ id: string; checked: boolean }>();
   @Output() selecionarTodos = new EventEmitter<boolean>();
   @Output() ordenar = new EventEmitter<'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'>();
@@ -40,6 +42,19 @@ export class ReceitasListaComponent {
   onRemover(planId?: string, installmentId?: string): void {
     if (!installmentId) return;
     this.remover.emit({ planId, installmentId });
+  }
+
+  onComprovante(id?: string): void {
+    if (!id) return;
+    this.comprovante.emit(id);
+  }
+
+  isAttachingReceipt(id?: string): boolean {
+    return !!id && this.attachingReceiptIds.has(id);
+  }
+
+  canAttachReceipt(renda: StoredIncome): boolean {
+    return renda.status === 'PAID' || renda.status === 'PARTIALLY_PAID';
   }
 
   statusLabel(renda: StoredIncome): string {

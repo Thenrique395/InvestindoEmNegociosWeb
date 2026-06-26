@@ -167,6 +167,19 @@
                     <path d="M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                   </svg>
                 </button>
+                @if (canAttachReceipt(r)) {
+                  <button
+                    type="button"
+                    class="receitas-table__icon-action"
+                    [disabled]="isAttachingReceipt(r.id)"
+                    (click)="onComprovante(r.id)"
+                    aria-label="Anexar comprovante"
+                    [attr.data-tooltip]="'Comprovante'">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M8 12.5V7a4 4 0 0 1 8 0v8a3 3 0 0 1-6 0V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                }
               </div>
             </td>
           </tr>
