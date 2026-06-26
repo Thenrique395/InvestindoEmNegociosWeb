@@ -16,6 +16,7 @@ import { SectionCardComponent } from '../shared/section-card/section-card.compon
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AccountFormComponent } from '../features/accounts/components/account-form/account-form.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
 import { AccountTransferComponent, AccountTransferFormValue } from '../features/accounts/components/account-transfer/account-transfer.component';
 import { AccountImportComponent } from '../features/accounts/components/account-import/account-import.component';
@@ -305,7 +306,7 @@ export class ContasComponent implements OnInit {
         this.ofxRawText = result.rawText || '';
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao processar arquivo OFX.';
+        this.error = extractApiErrorMessage(err, 'Falha ao processar arquivo OFX.');
         this.clearOfxState();
       },
       complete: () => {
@@ -381,7 +382,7 @@ export class ContasComponent implements OnInit {
         this.csvRawText = result.rawText || '';
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao processar arquivo CSV.';
+        this.error = extractApiErrorMessage(err, 'Falha ao processar arquivo CSV.');
         this.clearCsvState();
       },
       complete: () => {

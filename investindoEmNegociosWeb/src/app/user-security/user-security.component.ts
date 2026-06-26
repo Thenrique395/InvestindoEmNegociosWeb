@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ProfileService, SecuritySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-user-security',
@@ -31,7 +32,7 @@ export class UserSecurityComponent {
         this.load();
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao revogar sessões.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao revogar sessões.'));
         this.revoking = false;
       },
       complete: () => {

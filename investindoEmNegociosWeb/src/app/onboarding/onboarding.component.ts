@@ -18,6 +18,7 @@ import { ReceitasFormComponent } from '../receitas/receitas-form.component';
 import { DespesasFormComponent } from '../despesas/despesas-form.component';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { parseLocaleDate, parseLocalizedNumber } from '../utils/locale-utils';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 import {
   accountTypeLabel,
   brToIso,
@@ -235,7 +236,7 @@ export class OnboardingComponent implements OnInit {
           this.announce('Sessão expirada. Faça login novamente.');
           this.router.navigateByUrl('/login');
         } else {
-          this.uiFeedback.error(err?.error?.detail || (err instanceof Error ? err.message : 'Erro ao salvar dados.'));
+          this.uiFeedback.error(extractApiErrorMessage(err, err instanceof Error ? err.message : 'Erro ao salvar dados.'));
           this.announce('Falha ao salvar os dados do perfil.');
         }
         this.loading = false;
@@ -302,7 +303,7 @@ export class OnboardingComponent implements OnInit {
       },
       error: (err) => {
         this.savingEntries = false;
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao concluir onboarding.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao concluir onboarding.'));
         this.announce('Falha ao concluir onboarding.');
       }
     });
@@ -337,7 +338,7 @@ export class OnboardingComponent implements OnInit {
       },
       error: (err) => {
         this.creatingAccount = false;
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao criar conta.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao criar conta.'));
         this.announce('Falha ao criar conta.');
       }
     });
@@ -559,7 +560,7 @@ export class OnboardingComponent implements OnInit {
       },
       error: (err) => {
         this.savingIncomeModal = false;
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar receita inicial.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cadastrar receita inicial.'));
       }
     });
   }
@@ -712,7 +713,7 @@ export class OnboardingComponent implements OnInit {
       },
       error: (err) => {
         this.savingExpenseModal = false;
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao cadastrar despesa inicial.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cadastrar despesa inicial.'));
       }
     });
   }

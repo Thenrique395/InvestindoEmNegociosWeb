@@ -6,6 +6,7 @@ import { AuthService } from '../auth.service';
 import { BillingService } from '../billing.service';
 import { SubscriptionsService, SubscriptionCatalogResponse, SubscriptionPlan } from '../subscriptions.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-subscriptions',
@@ -128,7 +129,7 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.uiFeedback.error(err?.error?.detail || 'Falha ao alterar plano.');
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao alterar plano.'));
           this.cdr.markForCheck();
         },
         complete: () => {
@@ -148,7 +149,7 @@ export class SubscriptionsComponent implements OnInit {
           window.location.href = response.url;
         },
         error: (err) => {
-          this.uiFeedback.error(err?.error?.detail || 'Não foi possível abrir o portal de cobrança.');
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível abrir o portal de cobrança.'));
           this.openingPortal = false;
           this.cdr.markForCheck();
         }
@@ -172,7 +173,7 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.uiFeedback.error(err?.error?.detail || 'Falha ao cancelar o plano.');
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cancelar o plano.'));
           this.cdr.markForCheck();
         },
         complete: () => {
@@ -200,7 +201,7 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.uiFeedback.error(err?.error?.detail || 'Não foi possível ativar o período de teste.');
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível ativar o período de teste.'));
           this.requestingTrial = false;
           this.cdr.markForCheck();
         }
@@ -225,7 +226,7 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.uiFeedback.error(err?.error?.detail || 'Não foi possível processar o reembolso.');
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível processar o reembolso.'));
           this.requestingRefund = false;
           this.cdr.markForCheck();
         }
@@ -244,7 +245,7 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.uiFeedback.error(err?.error?.detail || 'Não foi possível processar o pagamento.');
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível processar o pagamento.'));
           this.retrying = false;
           this.cdr.markForCheck();
         }

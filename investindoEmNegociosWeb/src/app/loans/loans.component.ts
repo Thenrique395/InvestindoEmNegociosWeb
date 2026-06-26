@@ -10,6 +10,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-loans',
@@ -73,7 +74,7 @@ export class LoansComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao carregar empréstimos.';
+        this.error = extractApiErrorMessage(err, 'Falha ao carregar empréstimos.');
         this.loading = false;
         this.cdr.markForCheck();
       }
@@ -85,7 +86,7 @@ export class LoansComponent implements OnInit {
     this.success = '';
     this.loansService.simulate(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => { this.simulation = result; this.cdr.markForCheck(); },
-      error: (err) => { this.error = err?.error?.detail || 'Falha ao simular empréstimo.'; this.cdr.markForCheck(); }
+      error: (err) => { this.error = extractApiErrorMessage(err, 'Falha ao simular empréstimo.'); this.cdr.markForCheck(); }
     });
   }
 
@@ -106,7 +107,7 @@ export class LoansComponent implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.error = err?.error?.detail || 'Falha ao atualizar contrato.';
+          this.error = extractApiErrorMessage(err, 'Falha ao atualizar contrato.');
           this.saving = false;
           this.cdr.markForCheck();
         }
@@ -123,7 +124,7 @@ export class LoansComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao criar empréstimo.';
+        this.error = extractApiErrorMessage(err, 'Falha ao criar empréstimo.');
         this.saving = false;
         this.cdr.markForCheck();
       }
@@ -167,7 +168,7 @@ export class LoansComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao excluir contrato.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao excluir contrato.'));
         this.deleting = null;
         this.cdr.markForCheck();
       }
@@ -195,7 +196,7 @@ export class LoansComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Falha ao pagar parcela.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao pagar parcela.'));
         this.payingInstallment = null;
         this.cdr.markForCheck();
       }

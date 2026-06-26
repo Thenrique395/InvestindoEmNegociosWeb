@@ -9,6 +9,7 @@ import { MARKETING_PLANS, findMarketingPlan, MarketingBillingCycle, MarketingPla
 import { SubscriptionsService } from '../subscriptions.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { cpfValidator, maskCpf } from '../utils/cpf.utils';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-checkout',
@@ -188,7 +189,7 @@ export class CheckoutComponent {
             queryParams: {
               plan: this.selectedPlan.code,
               cycle: this.selectedCycle,
-              message: err?.error?.detail || 'Não foi possível iniciar o checkout de cobrança.'
+              message: extractApiErrorMessage(err, 'Não foi possível iniciar o checkout de cobrança.')
             }
           });
         },
@@ -213,7 +214,7 @@ export class CheckoutComponent {
           queryParams: {
             plan: this.selectedPlan.code,
             cycle: this.selectedCycle,
-            message: err?.error?.detail || 'Não foi possível concluir a contratação neste momento.'
+            message: extractApiErrorMessage(err, 'Não foi possível concluir a contratação neste momento.')
           }
         });
       },

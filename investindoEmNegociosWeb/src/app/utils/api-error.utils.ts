@@ -51,6 +51,11 @@ export function getProblemTraceId(problem: ApiProblemDetails | null): string | u
 }
 
 export function extractApiErrorMessage(error: HttpErrorResponse, fallback: string): string {
+  // Erros 5xx (e falha de conexão, status 0) nunca devem expor texto vindo do backend — em
+  // produção o backend já redige detalhes de exceção não tratada, mas o frontend não deveria
+  // depender só disso (env mal configurado, endpoint novo sem esse cuidado, etc.).
+  if (error.status === 0 || error.status >= 500) return fallback;
+
   const payload = error.error as ApiProblemDetails | string | null | undefined;
 
   if (typeof payload === 'string' && payload.trim()) {

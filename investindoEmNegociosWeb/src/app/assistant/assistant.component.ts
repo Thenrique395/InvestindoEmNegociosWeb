@@ -7,6 +7,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-assistant',
@@ -42,7 +43,7 @@ export class AssistantComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao carregar contexto do assistente.';
+        this.error = extractApiErrorMessage(err, 'Falha ao carregar contexto do assistente.');
         this.loading = false;
         this.cdr.markForCheck();
       }
@@ -62,7 +63,7 @@ export class AssistantComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao conversar com o assistente.';
+        this.error = extractApiErrorMessage(err, 'Falha ao conversar com o assistente.');
         this.sending = false;
         this.cdr.markForCheck();
       }

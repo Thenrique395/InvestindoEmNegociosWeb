@@ -5,6 +5,7 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { UiFeedbackService } from './ui-feedback.service';
+import { extractApiErrorMessage } from './utils/api-error.utils';
 
 let lastForbiddenFeedbackAt = 0;
 let lastServerErrorFeedbackAt = 0;
@@ -12,43 +13,6 @@ let lastServerErrorFeedbackAt = 0;
 const CSRF_COOKIE = 'XSRF-TOKEN';
 const CSRF_HEADER = 'X-XSRF-TOKEN';
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
-
-type ProblemDetailsLike = {
-  title?: string;
-  detail?: string;
-  status?: number;
-  errors?: Record<string, string[] | string>;
-};
-
-function extractProblemDetailsMessage(err: HttpErrorResponse, fallback: string): string {
-  const payload = err.error as ProblemDetailsLike | string | null | undefined;
-
-  if (typeof payload === 'string' && payload.trim()) {
-    return payload;
-  }
-
-  if (!payload || typeof payload !== 'object') {
-    return fallback;
-  }
-
-  if (payload.detail?.trim()) {
-    return payload.detail;
-  }
-
-  const firstValidationMessage = Object.values(payload.errors ?? {})
-    .flatMap((value) => Array.isArray(value) ? value : [value])
-    .find((message) => typeof message === 'string' && message.trim());
-
-  if (firstValidationMessage) {
-    return firstValidationMessage;
-  }
-
-  if (payload.title?.trim()) {
-    return payload.title;
-  }
-
-  return fallback;
-}
 
 function shouldThrottle(lastFeedbackAt: number, throttleMs: number): boolean {
   return Date.now() - lastFeedbackAt <= throttleMs;
@@ -91,7 +55,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((err: HttpErrorResponse) => {
       if (err.status === 403 && !isAuthRequest) {
         if (!shouldThrottle(lastForbiddenFeedbackAt, 4000)) {
-          feedback.warning(extractProblemDetailsMessage(err, 'Seu perfil atual não tem acesso a esta funcionalidade.'));
+          feedback.warning(extractApiErrorMessage(err, 'Seu perfil atual não tem acesso a esta funcionalidade.'));
           lastForbiddenFeedbackAt = Date.now();
         }
         return throwError(() => err);
@@ -99,7 +63,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (err.status >= 500) {
         if (!shouldThrottle(lastServerErrorFeedbackAt, 5000)) {
-          feedback.error(extractProblemDetailsMessage(err, 'Ocorreu um erro inesperado. Tente novamente em alguns instantes.'));
+          feedback.error(extractApiErrorMessage(err, 'Ocorreu um erro inesperado. Tente novamente em alguns instantes.'));
           lastServerErrorFeedbackAt = Date.now();
         }
         return throwError(() => err);

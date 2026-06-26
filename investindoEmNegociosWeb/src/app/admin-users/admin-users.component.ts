@@ -6,6 +6,7 @@ import { UserRole } from '../roles';
 import { forkJoin, of } from 'rxjs';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 type AdminUserRow = AdminUserSummary & {
   pendingRole: UserRole;
@@ -117,7 +118,7 @@ export class AdminUsersComponent implements OnInit {
         this.uiFeedback.success('Alterações salvas com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Não foi possível salvar as alterações.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível salvar as alterações.'));
       },
       complete: () => {
         this.savingId = null;
@@ -151,7 +152,7 @@ export class AdminUsersComponent implements OnInit {
         this.featuresByUserId[user.id] = features;
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Não foi possível carregar as permissões por feature.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível carregar as permissões por feature.'));
       },
       complete: () => {
         this.featuresLoadingForUserId = null;
@@ -182,7 +183,7 @@ export class AdminUsersComponent implements OnInit {
         this.featuresByUserId[user.id] = features;
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Não foi possível atualizar o override da feature.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível atualizar o override da feature.'));
       },
       complete: () => {
         this.featureSavingKey = null;
@@ -260,7 +261,7 @@ export class AdminUsersComponent implements OnInit {
         this.uiFeedback.success('Usuário removido com sucesso.');
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Não foi possível excluir o usuário.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível excluir o usuário.'));
       },
       complete: () => {
         this.deletingId = null;
@@ -304,7 +305,7 @@ export class AdminUsersComponent implements OnInit {
         this.trialOpenForUserId = null;
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || 'Não foi possível conceder o trial.');
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível conceder o trial.'));
       },
       complete: () => {
         this.grantingTrial = false;

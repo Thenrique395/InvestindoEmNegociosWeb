@@ -4,6 +4,7 @@ import { InvoiceImportService, InvoiceReconciliationResponse } from '../invoice-
 import { FormsModule } from '@angular/forms';
 import { StoredCard } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 type InvoiceItem = {
   date?: string;
@@ -841,7 +842,7 @@ export class InvoiceImportComponent implements OnChanges {
         this.refreshReconciliation();
       },
       error: (err) => {
-        this.error = err?.error?.detail || err?.error?.title || 'Nao foi possivel ler o PDF.';
+        this.error = extractApiErrorMessage(err, 'Nao foi possivel ler o PDF.');
       },
       complete: () => {
         this.loading = false;
@@ -889,7 +890,7 @@ export class InvoiceImportComponent implements OnChanges {
           this.close.emit();
         },
         error: (err) => {
-          this.error = err?.error?.detail || err?.error?.title || 'Falha ao salvar a fatura.';
+          this.error = extractApiErrorMessage(err, 'Falha ao salvar a fatura.');
         },
         complete: () => {
           this.importing = false;

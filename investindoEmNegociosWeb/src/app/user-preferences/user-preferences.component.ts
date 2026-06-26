@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
 import { getInitialLocale, persistLocaleSettings, setLocaleSettings } from '../utils/locale-settings';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
@@ -120,7 +121,7 @@ export class UserPreferencesComponent implements OnInit {
       },
       error: (err) => {
         this.deletingAccount = false;
-        const message = err?.error?.detail || err?.error?.title || 'Não foi possível excluir a conta.';
+        const message = extractApiErrorMessage(err, 'Não foi possível excluir a conta.');
         this.uiFeedback.error(message);
       }
     });

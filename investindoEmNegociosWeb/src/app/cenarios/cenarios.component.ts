@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CenariosService, ScenarioSimulationResponse } from '../cenarios.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-cenarios',
@@ -39,7 +40,7 @@ export class CenariosComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (r) => { this.result = r; this.loading = false; this.cdr.markForCheck(); },
-        error: (err) => { this.error = err?.error?.detail || 'Falha ao simular cenário.'; this.loading = false; this.cdr.markForCheck(); }
+        error: (err) => { this.error = extractApiErrorMessage(err, 'Falha ao simular cenário.'); this.loading = false; this.cdr.markForCheck(); }
       });
   }
 

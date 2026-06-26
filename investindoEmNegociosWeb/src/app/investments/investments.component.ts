@@ -1202,7 +1202,7 @@ export class InvestmentsComponent implements OnInit {
         this.showMovimento = false;
         this.carregarPosicoes();
       },
-      error: (err) => this.uiFeedback.error(err?.error?.detail || 'Falha ao registrar movimento.')
+      error: (err) => this.uiFeedback.error(resolveApiErrorMessage(err, 'Falha ao registrar movimento.'))
     });
   }
 
@@ -1307,7 +1307,7 @@ export class InvestmentsComponent implements OnInit {
 
     this.investments.extractB3Report(file).subscribe({
       next: (preview) => (this.b3Preview = preview),
-      error: (err) => (this.b3Error = err?.error?.detail || 'Não foi possível ler o relatório da B3.'),
+      error: (err) => (this.b3Error = resolveApiErrorMessage(err, 'Não foi possível ler o relatório da B3.')),
       complete: () => {
         this.b3Loading = false;
         input.value = '';
@@ -1330,7 +1330,7 @@ export class InvestmentsComponent implements OnInit {
         this.b3Importing = false;
         this.closeB3ImportModal();
       },
-      error: (err) => (this.b3Error = err?.error?.detail || 'Falha ao importar dados da B3.'),
+      error: (err) => (this.b3Error = resolveApiErrorMessage(err, 'Falha ao importar dados da B3.')),
       complete: () => (this.b3Importing = false)
     });
   }

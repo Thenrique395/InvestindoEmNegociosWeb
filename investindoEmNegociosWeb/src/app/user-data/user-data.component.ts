@@ -8,6 +8,7 @@ import { AuthService } from '../auth.service';
 import { ProfileService, PrivacySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { Router } from '@angular/router';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-user-data',
@@ -76,7 +77,7 @@ export class UserDataComponent {
         this.uiFeedback.success('Exportação concluída.');
       },
       error: (err: HttpErrorResponse) => {
-        this.uiFeedback.error(this.resolveError(err, 'Falha ao exportar dados.'));
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao exportar dados.'));
         this.exporting = false;
       },
       complete: () => {
@@ -115,7 +116,7 @@ export class UserDataComponent {
         this.router.navigateByUrl('/');
       },
       error: (err: HttpErrorResponse) => {
-        this.uiFeedback.error(this.resolveError(err, 'Falha ao excluir conta.'));
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao excluir conta.'));
         this.deletingAccount = false;
       },
       complete: () => {
@@ -136,7 +137,7 @@ export class UserDataComponent {
         this.clearFile(input);
       },
       error: (err: HttpErrorResponse) => {
-        this.uiFeedback.error(this.resolveError(err, 'Falha ao importar dados.'));
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao importar dados.'));
         this.importing = false;
       },
       complete: () => {
@@ -151,12 +152,6 @@ export class UserDataComponent {
     if (utf8Match?.[1]) return decodeURIComponent(utf8Match[1]);
     const simpleMatch = /filename="?([^\";]+)"?/i.exec(contentDisposition);
     return simpleMatch?.[1] ?? null;
-  }
-
-  private resolveError(err: HttpErrorResponse, fallback: string): string {
-    const apiDetail = err?.error?.detail as string | undefined;
-    const apiTitle = err?.error?.title as string | undefined;
-    return apiDetail || apiTitle || fallback;
   }
 
   private loadPrivacySummary(): void {

@@ -5,6 +5,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-monthly-snapshots',
@@ -49,7 +50,7 @@ export class MonthlySnapshotsComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao carregar snapshots.';
+        this.error = extractApiErrorMessage(err, 'Falha ao carregar snapshots.');
         this.loading = false;
       }
     });
@@ -65,7 +66,7 @@ export class MonthlySnapshotsComponent implements OnInit {
         this.generating = false;
       },
       error: (err) => {
-        this.error = err?.error?.detail || 'Falha ao gerar snapshot.';
+        this.error = extractApiErrorMessage(err, 'Falha ao gerar snapshot.');
         this.generating = false;
       }
     });

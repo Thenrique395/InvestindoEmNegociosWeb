@@ -1,10 +1,13 @@
 export function resolveApiErrorMessage(err: unknown, fallback: string): string {
   const e = err as Record<string, unknown>;
   if (e?.['status'] === 0) return 'Falha de conexão com o servidor.';
+  const status = typeof e?.['status'] === 'number' ? (e['status'] as number) : undefined;
+  const statusSuffix = status ? ` (HTTP ${status})` : '';
+  // Erros 5xx nunca devem expor texto vindo do backend — mesma guarda de extractApiErrorMessage.
+  if (status !== undefined && status >= 500) return `${fallback}${statusSuffix}`;
   const apiError = e?.['error'] as Record<string, unknown> | undefined;
   const detail = apiError?.['detail'] || apiError?.['title'] || apiError?.['message'] || e?.['message'];
-  const status = e?.['status'] ? ` (HTTP ${e['status']})` : '';
-  return detail ? `${detail}${status}` : `${fallback}${status}`;
+  return detail ? `${detail}${statusSuffix}` : `${fallback}${statusSuffix}`;
 }
 
 export function mapApiErrors<T extends string>(

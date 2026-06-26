@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminRobotsService, RobotExecutionLog, RobotMonitorSummary, RobotStatus } from '../admin-robots.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 @Component({
   selector: 'app-admin-robots',
@@ -103,7 +104,7 @@ export class AdminRobotsComponent implements OnInit {
         this.load();
       },
       error: (err) => {
-        this.uiFeedback.error(err?.error?.detail || `Falha ao executar ${robotName}.`);
+        this.uiFeedback.error(extractApiErrorMessage(err, `Falha ao executar ${robotName}.`));
       },
       complete: () => {
         this.runningRobot = null;
