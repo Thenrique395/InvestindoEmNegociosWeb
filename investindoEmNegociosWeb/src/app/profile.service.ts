@@ -44,7 +44,6 @@ export interface PrivacySummary {
   selfServiceDeletionEnabled: boolean;
   deletionScope: string[];
   productionControls: string[];
-  scalabilityPhase: string;
   retentionPolicy: string;
 }
 

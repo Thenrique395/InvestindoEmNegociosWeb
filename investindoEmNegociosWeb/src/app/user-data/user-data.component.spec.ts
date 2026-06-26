@@ -21,7 +21,6 @@ describe('UserDataComponent', () => {
         selfServiceDeletionEnabled: true,
         deletionScope: ['perfil'],
         productionControls: ['jwt'],
-        scalabilityPhase: 'phase-1-runtime-hardened',
         retentionPolicy: 'ok'
       })),
       deleteOwnAccount: jasmine.createSpy().and.returnValue(of(void 0))
@@ -83,7 +82,6 @@ describe('UserDataComponent', () => {
         selfServiceDeletionEnabled: true,
         deletionScope: [],
         productionControls: [],
-        scalabilityPhase: 'phase-1-runtime-hardened',
         retentionPolicy: 'ok'
       })),
       deleteOwnAccount: jasmine.createSpy().and.returnValue(throwError(() => ({

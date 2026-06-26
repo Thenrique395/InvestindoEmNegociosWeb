@@ -83,7 +83,15 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isLogged && !this.isOnboardingRoute) this.ensureUserContext();
     this.appSession.startMonitoring(() => this.handleExpiredSession());
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
-      this.feedbackMessage = message;
+      // Adiado para fora do ciclo de change detection atual: qualquer componente que chame
+      // uiFeedback.success/error/info/warning() de forma síncrona no próprio ngOnInit (ex.:
+      // LoginComponent ao detectar ?created=1) dispararia esta emissão DURANTE o ciclo de CD
+      // do AppComponent (componente pai) já em andamento, mudando feedbackMessage depois dele
+      // já ter sido checado — NG0100 (ExpressionChangedAfterItHasBeenChecked). Corrigido aqui,
+      // na raiz, em vez de em cada chamador — protege qualquer uso futuro também.
+      setTimeout(() => {
+        this.feedbackMessage = message;
+      });
     });
     this.notificationsSub = this.notificationsFacade.state$.subscribe((state) => {
       this.notificationsOpen = state.open;
