@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormFieldComponent } from '../../../../shared/form-field/form-field.component';
 import { AccountRequest, AccountType } from '../../models/account.models';
+import { SUPPORTED_CURRENCIES } from '../../../../utils/locale-settings';
 
 type AccountFormField = 'name' | 'type' | 'initialBalance';
 
@@ -18,6 +19,7 @@ export class AccountFormComponent {
   @Input() editingId: string | null = null;
   @Input() saving = false;
   @Input() accountTypes: AccountType[] = [];
+  @Input() currencies: readonly string[] = SUPPORTED_CURRENCIES;
 
   @Output() save = new EventEmitter<void>();
   @Output() clear = new EventEmitter<void>();

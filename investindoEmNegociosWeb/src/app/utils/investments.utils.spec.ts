@@ -22,6 +22,7 @@ function buildPosition(overrides: Partial<InvestmentPosition>): InvestmentPositi
     openedAt: '2026-01-01',
     account: 'XP',
     movements: [],
+    currency: 'BRL',
     ...overrides
   };
 }
@@ -142,7 +143,8 @@ describe('investments.utils', () => {
         openedAt: '2026-01-15',
         account: 'XP',
         category: 'Dividendos',
-        note: 'Compra inicial'
+        note: 'Compra inicial',
+        currency: 'BRL'
       });
     });
 

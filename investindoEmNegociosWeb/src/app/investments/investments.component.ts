@@ -14,6 +14,7 @@ import {
 import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
 import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
+import { SUPPORTED_CURRENCIES } from '../utils/locale-settings';
 import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
@@ -22,6 +23,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import {
   AllocationInvestmentType,
   BenchmarkKey,
@@ -70,7 +72,7 @@ type RentabilidadeMonthPoint = {
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, StatusBadgeComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -142,6 +144,8 @@ export class InvestmentsComponent implements OnInit {
   csvImported = 0;
   csvPreviewRows: InvestmentPositionRequest[] = [];
 
+  readonly currencyOptions: readonly string[] = SUPPORTED_CURRENCIES;
+
   novaPosicao: Omit<InvestmentPosition, 'id' | 'movements'> = {
     type: 'RF',
     asset: '',
@@ -149,7 +153,8 @@ export class InvestmentsComponent implements OnInit {
     avgPrice: 0,
     openedAt: new Date().toISOString().slice(0, 10),
     account: '',
-    category: ''
+    category: '',
+    currency: 'BRL'
   };
 
   movimento: { type: MovementType; quantity: number; price: number; date: string; note?: string } = {
@@ -1209,7 +1214,7 @@ export class InvestmentsComponent implements OnInit {
   resetPosicao(): void {
     this.novaPosicao = {
       type: 'RF', asset: '', quantity: 0, avgPrice: 0,
-      openedAt: new Date().toISOString().slice(0, 10), account: '', category: ''
+      openedAt: new Date().toISOString().slice(0, 10), account: '', category: '', currency: 'BRL'
     };
     this.cadastroCustos = 0;
   }

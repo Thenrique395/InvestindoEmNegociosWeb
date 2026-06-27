@@ -153,7 +153,8 @@ export class ContasComponent implements OnInit {
       name: account.name,
       type: account.type,
       initialBalance: account.initialBalance,
-      isActive: account.isActive
+      isActive: account.isActive,
+      currency: account.currency
     };
   }
 
@@ -175,7 +176,8 @@ export class ContasComponent implements OnInit {
       name,
       type: this.form.type,
       initialBalance,
-      isActive: !!this.form.isActive
+      isActive: !!this.form.isActive,
+      currency: this.form.currency || 'BRL'
     };
 
     const done = () => {
@@ -440,7 +442,8 @@ export class ContasComponent implements OnInit {
       name: '',
       type: 'Checking',
       initialBalance: 0,
-      isActive: true
+      isActive: true,
+      currency: 'BRL'
     };
   }
 

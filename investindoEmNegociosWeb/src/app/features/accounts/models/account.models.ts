@@ -16,6 +16,7 @@ export interface AccountRequest {
   type: AccountType;
   initialBalance: number;
   isActive: boolean;
+  currency: string;
 }
 
 export interface AccountResponse {
@@ -27,6 +28,7 @@ export interface AccountResponse {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  currency: string;
 }
 
 export interface AccountBalanceResponse {
@@ -100,11 +102,19 @@ export interface SubscriptionsSummaryResponse {
   items: SubscriptionSummaryItemResponse[];
 }
 
+export interface OtherCurrencyBalanceResponse {
+  currency: string;
+  accountsBalance: number;
+  investmentsBalance: number;
+  totalAssets: number;
+}
+
 export interface WealthAssetBreakdownResponse {
   accountsBalance: number;
   investmentsBalance: number;
   tangibleAssetsBalance: number;
   totalAssets: number;
+  otherCurrencies?: OtherCurrencyBalanceResponse[] | null;
 }
 
 export interface WealthLiabilityBreakdownResponse {

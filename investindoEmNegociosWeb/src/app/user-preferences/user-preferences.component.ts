@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
-import { getInitialLocale, persistLocaleSettings, setLocaleSettings } from '../utils/locale-settings';
+import { getInitialLocale, persistLocaleSettings, setLocaleSettings, SUPPORTED_CURRENCIES } from '../utils/locale-settings';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AuthService } from '../auth.service';
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-preferences.component.scss']
 })
 export class UserPreferencesComponent implements OnInit {
-  moedas = ['BRL', 'USD', 'EUR'];
+  moedas: readonly string[] = SUPPORTED_CURRENCIES;
   moedaSelecionada = 'BRL';
   localizacoes: string[] = ['pt-BR'];
   novaLocalizacao = '';

@@ -105,7 +105,8 @@ export function parseCsvRows(text: string): InvestmentPositionRequest[] {
       openedAt: cols[openedI],
       account: cols[accountI],
       category: cols[categoryI] || '',
-      note: noteI >= 0 ? cols[noteI] || null : null
+      note: noteI >= 0 ? cols[noteI] || null : null,
+      currency: 'BRL'
     };
   });
 }

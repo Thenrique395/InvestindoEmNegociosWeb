@@ -105,7 +105,8 @@ export class OnboardingComponent implements OnInit {
     name: '',
     type: 'Checking',
     initialBalance: 0,
-    isActive: true
+    isActive: true,
+    currency: 'BRL'
   };
   accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
   expenseCategories: CategoryDto[] = [];
@@ -327,7 +328,8 @@ export class OnboardingComponent implements OnInit {
       name: this.accountForm.name.trim(),
       type: this.accountForm.type,
       initialBalance: Number(this.accountForm.initialBalance || 0),
-      isActive: true
+      isActive: true,
+      currency: 'BRL'
     }).subscribe({
       next: (account) => {
         this.creatingAccount = false;

@@ -20,6 +20,14 @@
       </select>
     </app-form-field>
 
+    <app-form-field label="Moeda">
+      <select [(ngModel)]="form.currency">
+        @for (c of currencies; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+    </app-form-field>
+
     <app-form-field label="Saldo inicial" [error]="balanceError">
       <input type="number" [(ngModel)]="form.initialBalance" (blur)="onTouch('initialBalance')" />
     </app-form-field>

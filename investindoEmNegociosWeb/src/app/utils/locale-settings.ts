@@ -3,6 +3,8 @@ export type LocaleSettings = {
   currency: string;
 };
 
+export const SUPPORTED_CURRENCIES = ['BRL', 'USD', 'EUR'] as const;
+
 const defaultSettings: LocaleSettings = {
   locale: 'pt-BR',
   currency: 'BRL'

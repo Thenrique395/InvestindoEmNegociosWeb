@@ -267,6 +267,9 @@
                         <img [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" />
                       }
                       <span>{{ p.asset }}</span>
+                      @if (p.currency !== 'BRL') {
+                        <app-status-badge tone="info" size="sm" [label]="p.currency"></app-status-badge>
+                      }
                     </div>
                   </td>
                   <td>{{ tipoPapel(p) }}</td>
@@ -276,13 +279,13 @@
                     </span>
                   </td>
                   <td>{{ p.quantity }}</td>
-                  <td>{{ p.avgPrice | appCurrency }}</td>
+                  <td>{{ p.avgPrice | appCurrency:p.currency }}</td>
                   <td>
                     @if (marketPrice(p) !== null) {
-                      <span>{{ marketPrice(p) | appCurrency }}</span>
+                      <span>{{ marketPrice(p) | appCurrency:p.currency }}</span>
                     } @else {
                       <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
-                        {{ p.avgPrice | appCurrency }}*
+                        {{ p.avgPrice | appCurrency:p.currency }}*
                       </span>
                     }
                   </td>
@@ -293,7 +296,7 @@
                       <span class="muted">-</span>
                     }
                   </td>
-                  <td>{{ valorAtualPosicao(p) | appCurrency }}</td>
+                  <td>{{ valorAtualPosicao(p) | appCurrency:p.currency }}</td>
                   <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
                   <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
                     {{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%
@@ -771,11 +774,19 @@
               <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
             </div>
             <div>
+              <label>Moeda</label>
+              <select [(ngModel)]="novaPosicao.currency" name="currency">
+                @for (c of currencyOptions; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+            </div>
+            <div>
               <label>Quantidade</label>
               <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
             </div>
             <div>
-              <label>Preço em R$</label>
+              <label>Preço{{ novaPosicao.currency === 'BRL' ? ' em R$' : '' }}</label>
               <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
             </div>
             <div>

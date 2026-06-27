@@ -418,10 +418,18 @@
             <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
               <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">{{ account.name }}</p>
               <p class="m-0 mt-1 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
-              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ account.currentBalance | appCurrency }}</strong>
+              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ account.currentBalance | appCurrency:account.currency }}</strong>
             </article>
           }
         </div>
+        @if (outrasMoedas.length) {
+          <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">
+            Outras moedas (não somadas ao patrimônio total):
+            @for (item of outrasMoedas; track item.currency; let last = $last) {
+              {{ item.currency }} {{ item.totalAssets | appCurrency:item.currency }}{{ last ? '' : ' · ' }}
+            }
+          </p>
+        }
       </section>
     }
     @if (hasAccess('Advanced') && patrimonioHistoryPoints.length) {

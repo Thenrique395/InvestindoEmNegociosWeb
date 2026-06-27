@@ -51,6 +51,7 @@ describe('InvestmentsComponent', () => {
       category: partial?.category ?? 'Ações',
       note: partial?.note,
       movements: partial?.movements ?? [],
+      currency: partial?.currency ?? 'BRL',
       marketPrice: partial?.marketPrice,
       marketName: partial?.marketName,
       marketLogoUrl: partial?.marketLogoUrl

@@ -5,11 +5,12 @@ import { AccountResponse, AccountType } from '../../models/account.models';
 import { EmptyStateComponent } from '../../../../empty-state/empty-state.component';
 import { UiStateComponent } from '../../../../ui-state/ui-state.component';
 import { AppCurrencyPipe } from '../../../../shared/app-currency.pipe';
+import { StatusBadgeComponent } from '../../../../shared/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-account-list',
   standalone: true,
-  imports: [CommonModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe],
+  imports: [CommonModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatusBadgeComponent],
   templateUrl: './account-list.component.html',
   styleUrl: './account-list.component.scss'
 })

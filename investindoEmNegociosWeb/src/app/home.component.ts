@@ -607,6 +607,10 @@ export class HomeComponent implements OnInit {
     return this.netWorthSummary?.liabilities.totalLiabilities ?? this.debtSummary?.totalDebt ?? this.totalDividaCartoes;
   }
 
+  get outrasMoedas() {
+    return this.netWorthSummary?.assets.otherCurrencies ?? [];
+  }
+
   get debtBuckets() {
     return this.debtSummary?.buckets || [];
   }

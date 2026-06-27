@@ -193,6 +193,7 @@ function createAccount(id: string, name: string): AccountResponse {
     currentBalance: 100,
     isActive: true,
     createdAt: '',
-    updatedAt: ''
+    updatedAt: '',
+    currency: 'BRL'
   };
 }

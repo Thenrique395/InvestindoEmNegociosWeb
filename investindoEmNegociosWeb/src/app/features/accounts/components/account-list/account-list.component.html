@@ -38,7 +38,12 @@
               </svg>
             </span>
             <div>
-              <h3>{{ account.name }}</h3>
+              <h3>
+                {{ account.name }}
+                @if (account.currency !== 'BRL') {
+                  <app-status-badge tone="info" size="sm" [label]="account.currency"></app-status-badge>
+                }
+              </h3>
               <p>{{ accountTypeLabel(account.type) }}</p>
             </div>
             <span class="account-card__status" [ngClass]="account.isActive ? 'account-card__status--active' : 'account-card__status--inactive'">
@@ -47,7 +52,7 @@
           </div>
           <div class="account-card__balance">
             <span>Saldo atual</span>
-            <strong>{{ account.currentBalance | appCurrency }}</strong>
+            <strong>{{ account.currentBalance | appCurrency:account.currency }}</strong>
           </div>
           <div class="account-card__actions">
             <button type="button" class="account-card__action account-card__action--primary" (click)="selectAccount.emit(account.id)">Extrato</button>
