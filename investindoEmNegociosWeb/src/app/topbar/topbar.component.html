@@ -133,6 +133,13 @@
                 <small>Sessões, acessos e proteção</small>
               </span>
             </button>
+            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/espacos" (click)="reloadIfSame('/espacos', $event)">
+              <span class="user-dropdown__icon" aria-hidden="true">E</span>
+              <span>
+                <strong>Espaços</strong>
+                <small>Separe contas e lançamentos por área</small>
+              </span>
+            </button>
             <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/dados" (click)="reloadIfSame('/dados', $event)">
               <span class="user-dropdown__icon" aria-hidden="true">D</span>
               <span>

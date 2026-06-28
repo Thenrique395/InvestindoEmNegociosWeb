@@ -200,6 +200,13 @@ export const routes: Routes = [
       import('./user-security/user-security.component').then((m) => m.UserSecurityComponent),
   },
   {
+    path: 'espacos',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Basic', preload: false },
+    loadComponent: () =>
+      import('./espacos/espacos.component').then((m) => m.EspacosComponent),
+  },
+  {
     path: 'dados',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },

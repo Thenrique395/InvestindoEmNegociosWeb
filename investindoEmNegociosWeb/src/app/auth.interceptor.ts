@@ -39,7 +39,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     req.url.includes('/auth/register') ||
     req.url.includes('/auth/refresh') ||
     req.url.includes('/auth/forgot-password') ||
-    req.url.includes('/auth/reset-password');
+    req.url.includes('/auth/reset-password') ||
+    (req.url.includes('/spaces/') && req.url.endsWith('/enter'));
 
   // Cookie httpOnly de sessão é enviado automaticamente pelo browser via withCredentials —
   // não há mais token para anexar manualmente no header Authorization.
