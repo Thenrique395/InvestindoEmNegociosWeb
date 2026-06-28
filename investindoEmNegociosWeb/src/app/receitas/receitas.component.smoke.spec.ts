@@ -1,5 +1,5 @@
 import { FormBuilder } from '@angular/forms';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 import { convertToParamMap } from '@angular/router';
 import { ReceitasComponent } from './receitas.component';
 import { StoredIncome } from '../data/api-data.service';
@@ -184,5 +184,108 @@ describe('ReceitasComponent smoke', () => {
     expect(ctx.component.totalRendas).toBe(7200);
     expect(ctx.component.totalRecorrentes).toBe(6000);
     expect(ctx.component.totalAvulsas).toBe(1200);
+  });
+});
+
+class InstallmentsServiceMock {
+  listPayments = jasmine.createSpy('listPayments').and.returnValue(of([]));
+  uploadReceipt = jasmine.createSpy('uploadReceipt').and.returnValue(of({ receiptUrl: 'http://x/receipt.pdf' }));
+}
+
+function buildPayment(overrides: Partial<{ id: string; paidAmount: number; paidAt: string }> = {}) {
+  return { id: 'pay-1', paidAmount: 100, paidAt: '2026-06-10T00:00:00Z', ...overrides };
+}
+
+function createComponentForReceiptTests() {
+  const db = new ApiDataServiceMock();
+  const auth = new AuthServiceMock();
+  const categories = new CategoriesServiceMock();
+  const ui = new UiFeedbackServiceMock();
+  const accounts = new AccountsServiceMock();
+  const installments = new InstallmentsServiceMock();
+  const route = new ActivatedRouteMock();
+
+  const component = new ReceitasComponent(
+    db as any,
+    auth as any,
+    categories as any,
+    ui as any,
+    accounts as any,
+    installments as any,
+    route as any,
+    { markForCheck: jasmine.createSpy('markForCheck') } as any,
+    { onDestroy: () => {} } as any
+  );
+
+  return { component, installments, ui };
+}
+
+describe('ReceitasComponent - anexo de comprovante', () => {
+  it('não prepara o anexo quando já há upload em andamento para a mesma parcela', () => {
+    const { component, installments } = createComponentForReceiptTests();
+    (component as any).attachingReceiptIds.add('inst-1');
+
+    component.prepararAnexoComprovante('inst-1');
+
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [new File(['x'], 'a.pdf')] });
+    component.onComprovanteFileSelected({ target: input } as unknown as Event);
+
+    expect(installments.listPayments).not.toHaveBeenCalled();
+  });
+
+  it('envia o comprovante do recebimento mais recente ao selecionar um arquivo', () => {
+    const { component, installments, ui } = createComponentForReceiptTests();
+    installments.listPayments.and.returnValue(of([
+      buildPayment({ id: 'pay-1', paidAmount: 100, paidAt: '2026-06-01T00:00:00Z' }),
+      buildPayment({ id: 'pay-2', paidAmount: 50, paidAt: '2026-06-10T00:00:00Z' })
+    ]));
+    component.prepararAnexoComprovante('inst-1');
+    const file = new File(['conteudo'], 'comprovante.pdf');
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [file] });
+
+    component.onComprovanteFileSelected({ target: input } as unknown as Event);
+
+    expect(installments.uploadReceipt).toHaveBeenCalledWith('inst-1', 'pay-2', file);
+    expect(ui.success).toHaveBeenCalled();
+  });
+
+  it('avisa quando não há recebimento elegível para anexar comprovante', () => {
+    const { component, installments, ui } = createComponentForReceiptTests();
+    installments.listPayments.and.returnValue(of([buildPayment({ paidAmount: 0 })]));
+    component.prepararAnexoComprovante('inst-1');
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [new File(['x'], 'a.pdf')] });
+
+    component.onComprovanteFileSelected({ target: input } as unknown as Event);
+
+    expect(installments.uploadReceipt).not.toHaveBeenCalled();
+    expect(ui.info).toHaveBeenCalled();
+  });
+
+  it('mostra erro quando o upload do comprovante falha', () => {
+    const { component, installments, ui } = createComponentForReceiptTests();
+    installments.listPayments.and.returnValue(of([buildPayment()]));
+    installments.uploadReceipt.and.returnValue(throwError(() => new Error('falhou')));
+    component.prepararAnexoComprovante('inst-1');
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [new File(['x'], 'a.pdf')] });
+
+    component.onComprovanteFileSelected({ target: input } as unknown as Event);
+
+    expect(ui.error).toHaveBeenCalled();
+  });
+
+  it('mostra erro quando falha ao consultar os recebimentos da parcela', () => {
+    const { component, installments, ui } = createComponentForReceiptTests();
+    installments.listPayments.and.returnValue(throwError(() => new Error('falhou')));
+    component.prepararAnexoComprovante('inst-1');
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [new File(['x'], 'a.pdf')] });
+
+    component.onComprovanteFileSelected({ target: input } as unknown as Event);
+
+    expect(ui.error).toHaveBeenCalled();
   });
 });

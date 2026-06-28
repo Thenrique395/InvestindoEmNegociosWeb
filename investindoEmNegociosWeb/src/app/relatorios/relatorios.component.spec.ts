@@ -1,0 +1,108 @@
+import { of, throwError } from 'rxjs';
+import { RelatoriosComponent } from './relatorios.component';
+import { MonthlySummaryReportResponse } from '../reports.service';
+
+class ReportsServiceMock {
+  getMonthlySummary = jasmine.createSpy('getMonthlySummary').and.returnValue(of(buildReport()));
+}
+
+function buildReport(overrides: Partial<MonthlySummaryReportResponse> = {}): MonthlySummaryReportResponse {
+  return {
+    year: 2026,
+    month: 6,
+    totalIncome: 5000,
+    totalExpenses: 3000,
+    netBalance: 2000,
+    savingsRate: 40,
+    expensesByCategory: [{ categoryName: 'Moradia', amount: 1500, percentageOfTotal: 50 }],
+    topExpenses: [],
+    ...overrides
+  };
+}
+
+function createComponent() {
+  const reportsService = new ReportsServiceMock();
+  const component = new RelatoriosComponent(
+    reportsService as any,
+    { markForCheck: jasmine.createSpy('markForCheck') } as any,
+    { onDestroy: () => {} } as any
+  );
+  return { component, reportsService };
+}
+
+describe('RelatoriosComponent', () => {
+  it('carrega o resumo do mês atual ao iniciar', () => {
+    const { component, reportsService } = createComponent();
+
+    component.ngOnInit();
+
+    expect(reportsService.getMonthlySummary).toHaveBeenCalledWith(component.year, component.month);
+    expect(component.report?.netBalance).toBe(2000);
+    expect(component.loading).toBeFalse();
+  });
+
+  it('limpa o loading quando a busca falha', () => {
+    const { component, reportsService } = createComponent();
+    reportsService.getMonthlySummary.and.returnValue(throwError(() => new Error('falhou')));
+
+    component.ngOnInit();
+
+    expect(component.loading).toBeFalse();
+    expect(component.report).toBeNull();
+  });
+
+  it('volta um mês (incluindo virada de ano) e recarrega o relatório', () => {
+    const { component, reportsService } = createComponent();
+    component.year = 2026;
+    component.month = 1;
+
+    component.prevMonth();
+
+    expect(component.month).toBe(12);
+    expect(component.year).toBe(2025);
+    expect(reportsService.getMonthlySummary).toHaveBeenCalledWith(2025, 12);
+  });
+
+  it('avança um mês (incluindo virada de ano) e recarrega o relatório', () => {
+    const { component } = createComponent();
+    component.year = 2026;
+    component.month = 12;
+
+    component.nextMonth();
+
+    expect(component.month).toBe(1);
+    expect(component.year).toBe(2027);
+  });
+
+  it('não exporta CSV nem PDF quando ainda não há relatório carregado', () => {
+    const { component } = createComponent();
+    const createSpy = spyOn(document, 'createElement').and.callThrough();
+
+    component.exportCsv();
+    component.exportPdf();
+
+    expect(createSpy).not.toHaveBeenCalledWith('a');
+  });
+
+  it('gera e dispara o download do CSV quando há relatório carregado', () => {
+    const { component } = createComponent();
+    component.ngOnInit();
+    const anchor = document.createElement('a');
+    spyOn(anchor, 'click');
+    spyOn(document, 'createElement').and.returnValue(anchor);
+    spyOn(URL, 'createObjectURL').and.returnValue('blob:fake');
+    spyOn(URL, 'revokeObjectURL');
+
+    component.exportCsv();
+
+    expect(anchor.click).toHaveBeenCalled();
+    expect(anchor.download).toBe('relatorio-2026-06.csv');
+  });
+
+  it('monta o nome do mês a partir do índice numérico', () => {
+    const { component } = createComponent();
+    component.month = 6;
+
+    expect(component.monthName).toBe('Junho');
+  });
+});
