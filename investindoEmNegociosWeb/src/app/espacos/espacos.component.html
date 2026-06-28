@@ -1,33 +1,25 @@
 <div class="grid gap-[var(--spacing-2)] p-[var(--spacing-2)]">
-  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-    <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Organização</p>
-    <h1 class="m-0 mt-1 text-[1.5rem] font-semibold text-[var(--text)]">Espaços</h1>
-    <p class="mt-2 text-[0.9375rem] text-[var(--text-muted)]">
-      Separe contas, cartões e lançamentos em áreas independentes — por exemplo, finanças pessoais e um negócio à parte.
-      Cada espaço pode ter sua própria senha. Trocar de espaço recarrega a tela mostrando só os dados daquele espaço.
-    </p>
-  </section>
+  <app-page-header
+    eyebrow="Organização"
+    title="Espaços"
+    description="Separe contas, cartões e lançamentos em áreas independentes — por exemplo, finanças pessoais e um negócio à parte. Cada espaço pode ter sua própria senha. Trocar de espaço recarrega a tela mostrando só os dados daquele espaço."
+  ></app-page-header>
 
-  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-    <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Novo espaço</p>
-    <div class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
-      <label class="grid gap-1 text-[0.8125rem] font-semibold text-[var(--text-muted)]">
-        Nome
+  <app-section-card title="Novo espaço" [hasHeaderActions]="false">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
+      <app-form-field label="Nome">
         <input type="text" [(ngModel)]="novoNome" placeholder="Ex.: Negócio" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
-      </label>
-      <label class="grid gap-1 text-[0.8125rem] font-semibold text-[var(--text-muted)]">
-        Senha <span class="font-normal text-[var(--text-muted)]">(opcional)</span>
+      </app-form-field>
+      <app-form-field label="Senha" hint="opcional">
         <input type="password" [(ngModel)]="novaSenha" placeholder="Deixe em branco para não proteger" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
-      </label>
+      </app-form-field>
     </div>
     <button type="button" class="btn-primary mt-3" [disabled]="saving" (click)="criar()">
       {{ saving ? 'Salvando...' : 'Criar espaço' }}
     </button>
-  </section>
+  </app-section-card>
 
-  <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-    <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Meus espaços</p>
-
+  <app-section-card title="Meus espaços" [hasHeaderActions]="false">
     @if (loading) {
       <p class="mt-3 text-[0.9375rem] text-[var(--text-muted)]">Carregando...</p>
     }
@@ -38,14 +30,12 @@
           <article class="rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
             @if (editingId === space.id) {
               <div class="grid gap-2">
-                <label class="grid gap-1 text-[0.8125rem] font-semibold text-[var(--text-muted)]">
-                  Nome
+                <app-form-field label="Nome">
                   <input type="text" [(ngModel)]="editNome" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-[var(--text)]" />
-                </label>
-                <label class="grid gap-1 text-[0.8125rem] font-semibold text-[var(--text-muted)]">
-                  Nova senha <span class="font-normal">(deixe em branco para manter / remover a atual)</span>
+                </app-form-field>
+                <app-form-field label="Nova senha" hint="deixe em branco para manter / remover a atual">
                   <input type="password" [(ngModel)]="editSenha" placeholder="Deixe em branco para não alterar" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-[var(--text)]" />
-                </label>
+                </app-form-field>
                 <div class="flex gap-2">
                   <button type="button" class="btn-primary sm" [disabled]="saving" (click)="salvarEdicao(space)">Salvar</button>
                   <button type="button" class="btn-ghost sm" (click)="cancelarEdicao()">Cancelar</button>
@@ -68,13 +58,9 @@
 
               @if (passwordPromptId === space.id) {
                 <div class="mt-3 grid gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2">
-                  <label class="grid gap-1 text-[0.8125rem] font-semibold text-[var(--text-muted)]">
-                    Senha do espaço "{{ passwordPromptNome }}"
+                  <app-form-field [label]="passwordPromptLabel" [error]="passwordPromptError">
                     <input type="password" [(ngModel)]="passwordPromptValue" (keyup.enter)="confirmarSenhaPrompt()" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
-                  </label>
-                  @if (passwordPromptError) {
-                    <p class="m-0 text-[0.8125rem] text-[var(--danger-text)]">{{ passwordPromptError }}</p>
-                  }
+                  </app-form-field>
                   <div class="flex gap-2">
                     <button type="button" class="btn-primary sm" [disabled]="enteringId === space.id" (click)="confirmarSenhaPrompt()">
                       {{ enteringId === space.id ? 'Entrando...' : 'Entrar' }}
@@ -100,5 +86,5 @@
         }
       </div>
     }
-  </section>
+  </app-section-card>
 </div>

@@ -307,4 +307,14 @@ this.form.setApiErrors(mapApiErrors(err, {
 - Aplicar `StatusBadgeComponent` nas telas restantes.
 - Aplicar `FilterBarComponent` em todas as listagens.
 - Criar tokens de design formais para spacing, radius, shadows e cores.
-- Criar Storybook ou recriar uma página de catálogo visual (`design-lab` foi removido do roteamento; `src/app/design-lab/` está vazio).
+- Criar Storybook ou recriar uma página de catálogo visual (`design-lab` foi removido do roteamento; a pasta vazia `src/app/design-lab/` foi removida em 2026-06-28).
+
+## Features recentes (revisão 2026-06-28)
+
+Cinco features inspiradas no concorrente Budgi foram entregues entre 2026-06-26 e 2026-06-28 (ver `ROADMAP.md` na pasta `docs/` central). A maioria não introduz componente reutilizável novo — reaproveita o que já existia:
+
+- **Insights de assinatura**: card novo na Home, sem componente novo (markup próprio da Home).
+- **Exportar PDF**: botão ao lado do "Exportar CSV" em `/relatorios`, sem componente novo (lógica client-side com `jspdf`).
+- **Anexo de comprovante**: botão "Comprovante" em despesas/receitas pagas, input de arquivo oculto — sem componente novo.
+- **Multi-moeda (Fase 1)**: `StatusBadgeComponent` (já documentado acima) reaproveitado para a tag de moeda (`USD`/`EUR`) ao lado de contas/investimentos não-BRL; `appCurrency` (pipe) ganhou um segundo argumento opcional de moeda.
+- **Spaces** (`/espacos`, `spaces.service.ts`): tela nova para criar/renomear/excluir/entrar em áreas. Na primeira versão foi escrita com markup solto (sem `PageHeader`/`SectionCard`/`FormField`) — **corrigido em 2026-06-28** para seguir o padrão (`EspacosComponent` agora usa os três).

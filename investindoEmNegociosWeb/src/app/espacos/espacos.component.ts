@@ -3,11 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { SpacesService, SpaceResponse } from '../spaces.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
 
 @Component({
   selector: 'app-espacos',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PageHeaderComponent, SectionCardComponent, FormFieldComponent],
   templateUrl: './espacos.component.html',
   styleUrl: './espacos.component.scss'
 })
@@ -145,6 +148,10 @@ export class EspacosComponent implements OnInit {
   confirmarSenhaPrompt(): void {
     if (!this.passwordPromptId) return;
     this.confirmarEntrada(this.passwordPromptId, this.passwordPromptValue);
+  }
+
+  get passwordPromptLabel(): string {
+    return `Senha do espaço "${this.passwordPromptNome}"`;
   }
 
   cancelarSenhaPrompt(): void {

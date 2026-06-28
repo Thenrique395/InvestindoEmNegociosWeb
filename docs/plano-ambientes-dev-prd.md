@@ -40,7 +40,7 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 - [x] Padronizar estrategia de branch: `main` entrega DEV; PRD e promovido manualmente pelo workflow de producao.
 - [x] Padronizar portas da API: DEV publica em `5059` e PRD publica em `5060`; a API continua ouvindo em `5059` dentro do container.
 - [x] Definir modelo oficial de deploy: por enquanto sera `compose` unico com variaveis por ambiente.
-- [ ] Remover fallback fixo do frontend para `http://35.174.50.187:5059/api/v1` e exigir `API_BASE_URL` correta por ambiente. Fallback ainda presente em `api.config.ts:7`, apontando para DEV (`5059`); PRD (`5060`) esta pausado desde 2026-06-15.
+- [ ] Remover fallback fixo do frontend para `http://35.174.50.187:5060/api/v1` e exigir `API_BASE_URL` correta por ambiente. Fallback ainda presente em `api.config.ts:7` — **atencao**: aponta para PRD (`5060`), que esta pausado desde 2026-06-15, nao para DEV (`5059`); se algum build novo rodar sem `API_BASE_URL` configurada, o frontend tentara falar com um backend pausado em vez de com DEV (revisado em 2026-06-28; valor real no codigo confirmado, doc anterior dizia `5059` por engano).
 - [x] Adicionar validacao pos-deploy do frontend para garantir que a tela abriu e chamou a API certa.
 
 ### Ainda pendente ou nao confirmado
