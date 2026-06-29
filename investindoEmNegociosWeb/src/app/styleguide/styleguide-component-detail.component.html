@@ -122,6 +122,19 @@
         <p>{{ 1234.56 | appCurrency }}</p>
         <p>{{ 1234.56 | appCurrency:'USD' }}</p>
       }
+      @case ('account-list') {
+        <app-account-list
+          [accounts]="demoAccounts"
+          [loading]="false"
+          [canManage]="true">
+        </app-account-list>
+      }
+      @case ('cartoes-listagem') {
+        <app-cartoes-listagem
+          [cards]="demoCards"
+          [brands]="demoCardBrands">
+        </app-cartoes-listagem>
+      }
       @case ('responsive-list') {
         <app-responsive-list
           [columns]="listColumns"

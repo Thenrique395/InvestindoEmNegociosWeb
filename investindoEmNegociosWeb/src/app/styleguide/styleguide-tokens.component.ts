@@ -67,10 +67,9 @@ export class StyleguideTokensComponent {
     { name: 'Extrabold (800)', variable: '--font-weight-extrabold' }
   ];
 
-  readonly buttonClasses = [
-    { className: 'btn-primary', label: 'Ação principal' },
-    { className: 'btn-ghost', label: 'Ação secundária' },
-    { className: 'btn-danger', label: 'Ação destrutiva' },
-    { className: 'btn-primary sm', label: 'Tamanho pequeno (.sm)' }
+  readonly buttonMatrix: { label: string; cls: string; clsSm: string }[] = [
+    { label: 'Primário', cls: 'btn-primary', clsSm: 'btn-primary sm' },
+    { label: 'Secundário / Ghost', cls: 'btn-ghost', clsSm: 'btn-ghost sm' },
+    { label: 'Destrutivo', cls: 'btn-danger', clsSm: 'btn-danger sm' }
   ];
 }

@@ -145,6 +145,20 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     description: 'Wrapper de label/hint/erro para inputs — padroniza validação visual e mensagens de campo.'
   },
   {
+    slug: 'account-list',
+    name: 'AccountList',
+    selector: 'app-account-list',
+    category: 'data',
+    description: 'Grade de cards de conta com saldo atual, tipo e ações. Componente de domínio — recebe AccountResponse[] do serviço de contas.'
+  },
+  {
+    slug: 'cartoes-listagem',
+    name: 'CartoesListagem',
+    selector: 'app-cartoes-listagem',
+    category: 'data',
+    description: 'Grade de cards de cartão de crédito com bandeira, banco, limite e ciclo de fatura. Recebe StoredCard[] e CardBrandLookup[].'
+  },
+  {
     slug: 'app-currency-pipe',
     name: 'AppCurrencyPipe',
     selector: 'appCurrency',

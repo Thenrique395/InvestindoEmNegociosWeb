@@ -22,6 +22,11 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
+import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
+import { AccountResponse } from '../features/accounts/models/account.models';
+import { CartoesListagemComponent } from '../cartoes/cartoes-listagem.component';
+import { StoredCard } from '../data/api-data.service';
+import { CardBrandLookup } from '../lookups.service';
 import { STYLEGUIDE_COMPONENTS, StyleguideEntry } from './styleguide-catalog';
 
 interface DemoListItem {
@@ -54,7 +59,9 @@ interface DemoListItem {
     EmptyStateComponent,
     AppCurrencyPipe,
     ResponsiveListComponent,
-    ResponsiveListCellDirective
+    ResponsiveListCellDirective,
+    AccountListComponent,
+    CartoesListagemComponent
   ],
   templateUrl: './styleguide-component-detail.component.html',
   styleUrls: ['./styleguide-content.scss', './styleguide-component-detail.component.scss']
@@ -67,6 +74,22 @@ export class StyleguideComponentDetailComponent implements OnInit {
   readonly formFieldHasError = signal(false);
   readonly periodHeroEvents = signal<string[]>([]);
   confirmResult: string | null = null;
+
+  readonly demoAccounts: AccountResponse[] = [
+    { id: '1', name: 'Conta Corrente', type: 'Checking', initialBalance: 5000, currentBalance: 4500, isActive: true, createdAt: '2026-01-01', updatedAt: '2026-06-01', currency: 'BRL' },
+    { id: '2', name: 'Poupança', type: 'Savings', initialBalance: 10000, currentBalance: 12000, isActive: true, createdAt: '2026-01-01', updatedAt: '2026-06-01', currency: 'BRL' },
+    { id: '3', name: 'Nubank', type: 'DigitalWallet', initialBalance: 0, currentBalance: 300, isActive: true, createdAt: '2026-01-01', updatedAt: '2026-06-01', currency: 'BRL' }
+  ];
+
+  readonly demoCards: StoredCard[] = [
+    { id: '1', bandeira: 'visa', numero: '4242', nome: 'VISA DEMO', banco: 'Nubank', limiteCredito: 5000, diaFechamento: 3, diaVencimento: 10 },
+    { id: '2', bandeira: 'mastercard', numero: '5353', nome: 'MASTER DEMO', banco: 'Itaú', limiteCredito: 8000, diaFechamento: 15, diaVencimento: 22 }
+  ];
+
+  readonly demoCardBrands: CardBrandLookup[] = [
+    { id: 1, code: 'visa', name: 'Visa' },
+    { id: 2, code: 'mastercard', name: 'Mastercard' }
+  ];
 
   readonly listColumns: ResponsiveListColumn[] = [
     { key: 'nome', label: 'Nome', sortable: true },
@@ -259,6 +282,23 @@ if (!confirmed) return;`,
   <input [(ngModel)]="name" />
 </app-form-field>`,
     'app-currency-pipe': `{{ 1234.56 | appCurrency }}
-{{ 1234.56 | appCurrency:'USD' }}`
+{{ 1234.56 | appCurrency:'USD' }}`,
+    'account-list': `<app-account-list
+  [accounts]="accounts"
+  [loading]="loading"
+  [canManage]="true"
+  (refresh)="recarregar()"
+  (create)="novaConta()"
+  (edit)="editarConta($event)"
+  (remove)="removerConta($event)"
+  (selectAccount)="selecionarConta($event)">
+</app-account-list>`,
+    'cartoes-listagem': `<app-cartoes-listagem
+  [cards]="cartoes"
+  [brands]="bandeiras"
+  (editar)="editarCartao($event)"
+  (remover)="removerCartao($event)"
+  (emptyAction)="novoCartao()">
+</app-cartoes-listagem>`
   };
 }

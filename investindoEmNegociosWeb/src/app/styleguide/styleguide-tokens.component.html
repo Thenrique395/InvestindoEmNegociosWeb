@@ -108,11 +108,91 @@
 
 <h2>Botões (classes utilitárias)</h2>
 <p>Classes globais definidas em <code>src/styles.scss</code> — usadas em toda a aplicação, fora do design system de componentes.</p>
-<div class="styleguide-demo">
-  @for (btn of buttonClasses; track btn.className) {
-    <div class="button-row">
-      <button type="button" [class]="btn.className">{{ btn.label }}</button>
-      <code>.{{ btn.className }}</code>
+<table class="btn-matrix">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Normal</th>
+      <th>Pequeno <code>.sm</code></th>
+      <th>Desabilitado</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (btn of buttonMatrix; track btn.cls) {
+      <tr>
+        <td><code>.{{ btn.cls }}</code></td>
+        <td><button type="button" [class]="btn.cls">{{ btn.label }}</button></td>
+        <td><button type="button" [class]="btn.clsSm">{{ btn.label }}</button></td>
+        <td><button type="button" [class]="btn.cls" disabled>{{ btn.label }}</button></td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<h2>Controles nativos</h2>
+<p>Inputs, selects e textarea estilizados — recebem estilos globais quando envoltos por <code>.form</code> ou com a classe <code>.filter-control</code>.</p>
+<div class="controls-demo form">
+  <div class="controls-demo__col">
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Texto</label>
+      <input type="text" placeholder="Placeholder..." />
     </div>
-  }
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Texto (desabilitado)</label>
+      <input type="text" value="Valor desabilitado" disabled />
+    </div>
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Data</label>
+      <input type="date" />
+    </div>
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Select</label>
+      <select>
+        <option value="">Selecione...</option>
+        <option>Opção 1</option>
+        <option>Opção 2</option>
+      </select>
+    </div>
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Select (desabilitado)</label>
+      <select disabled>
+        <option>Opção selecionada</option>
+      </select>
+    </div>
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Textarea</label>
+      <textarea placeholder="Texto longo..." rows="3"></textarea>
+    </div>
+  </div>
+  <div class="controls-demo__col">
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Com erro (classe manual)</label>
+      <input type="text" value="Valor inválido" class="controls-demo__input--error" />
+      <span class="controls-demo__error-msg">Informe um valor válido.</span>
+    </div>
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Checkbox</label>
+      <div class="controls-demo__check-row">
+        <input type="checkbox" id="ck1" checked /> <label for="ck1">Marcado</label>
+      </div>
+      <div class="controls-demo__check-row">
+        <input type="checkbox" id="ck2" /> <label for="ck2">Desmarcado</label>
+      </div>
+      <div class="controls-demo__check-row">
+        <input type="checkbox" id="ck3" disabled /> <label for="ck3">Desabilitado</label>
+      </div>
+    </div>
+    <div class="controls-demo__field">
+      <label class="controls-demo__label">Radio</label>
+      <div class="controls-demo__check-row">
+        <input type="radio" name="radio-demo" id="r1" checked /> <label for="r1">Opção A</label>
+      </div>
+      <div class="controls-demo__check-row">
+        <input type="radio" name="radio-demo" id="r2" /> <label for="r2">Opção B</label>
+      </div>
+      <div class="controls-demo__check-row">
+        <input type="radio" name="radio-demo" id="r3" disabled /> <label for="r3">Desabilitado</label>
+      </div>
+    </div>
+  </div>
 </div>
