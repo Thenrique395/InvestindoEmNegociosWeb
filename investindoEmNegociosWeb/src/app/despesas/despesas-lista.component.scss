@@ -1,118 +1,30 @@
-.expenses-table {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.expenses-table__scroll {
-  overflow-x: auto;
-}
-
-.expenses-table__table {
-  min-width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: var(--font-size-body-sm);
-}
-
-.expenses-table__head {
-  background: color-mix(in srgb, var(--surface-2) 70%, white);
-  color: var(--text);
-
-  tr {
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-.expenses-table__cell {
-  padding: 1rem 1.15rem;
-  font-weight: var(--font-weight-bold);
-  text-align: left;
-  white-space: nowrap;
-}
-
-.expenses-table__cell--checkbox {
-  width: 52px;
-}
-
-.expenses-table__cell--value,
-.expenses-table__cell--actions {
-  text-align: right;
-}
-
-.expenses-table__sort {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: var(--text);
-}
-
-.expenses-table__sort-dir {
-  font-size: var(--font-size-caption);
-  color: var(--text-muted);
-}
-
-.expenses-table__body {
-  tr + tr td {
-    border-top: 1px solid var(--border);
-  }
-}
-
-.expenses-table__row {
-  transition: background 160ms ease;
-}
-
-.expenses-table__row:hover {
-  background: color-mix(in srgb, var(--surface-2) 62%, white);
-}
-
-.expenses-table__item {
-  padding: 1rem 1.15rem;
-  vertical-align: middle;
-}
-
-.expenses-table__item--checkbox {
-  width: 52px;
-}
-
-.expenses-table__item--name {
+.despesas-lista__name {
   font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
-.expenses-table__item--muted {
+.despesas-lista__muted {
   color: var(--text-muted);
 }
 
-.expenses-table__item--value {
-  text-align: right;
-  font-weight: var(--font-weight-bold);
-}
-
-.expenses-table__item--actions {
-  text-align: right;
-}
-
-.expenses-table__amount {
+.despesas-lista__amount {
   color: var(--text);
 }
 
-.expenses-table__recurrence {
+.despesas-lista__recurrence {
   margin-inline-start: 0.35rem;
   color: var(--text-muted);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-semibold);
 }
 
-.expenses-table__actions {
+.despesas-lista__actions {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
 }
 
-.expenses-table__icon-action {
+.despesas-lista__icon-action {
   inline-size: 42px;
   block-size: 42px;
 
@@ -122,7 +34,7 @@
   }
 }
 
-.expenses-table__icon-action::after {
+.despesas-lista__icon-action::after {
   content: attr(data-tooltip);
   position: absolute;
   inset-inline-start: 50%;
@@ -144,18 +56,8 @@
   z-index: 8;
 }
 
-.expenses-table__icon-action:hover::after,
-.expenses-table__icon-action:focus-visible::after {
+.despesas-lista__icon-action:hover::after,
+.despesas-lista__icon-action:focus-visible::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-}
-
-.expenses-table__check {
-  inline-size: 16px;
-  block-size: 16px;
-  accent-color: var(--primary-text);
-}
-
-.expenses-table__empty {
-  padding: 1.6rem;
 }

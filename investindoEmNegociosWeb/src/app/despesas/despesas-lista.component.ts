@@ -1,14 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StoredExpense } from '../data/api-data.service';
-import { expenseStatusLabel } from '../utils/status';
-import { StatusBadgeComponent } from '../status-badge/status-badge.component';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { expenseStatusLabel, installmentStatusTone } from '../utils/status';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
+import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-despesas-lista',
   standalone: true,
-  imports: [StatusBadgeComponent, EmptyStateComponent, AppCurrencyPipe],
+  imports: [StatusBadgeComponent, ResponsiveListComponent, ResponsiveListCellDirective, AppCurrencyPipe],
   templateUrl: './despesas-lista.component.html',
   styleUrls: ['./despesas-lista.component.scss']
 })
@@ -32,8 +33,18 @@ export class DespesasListaComponent {
   @Output() selecionarTodos = new EventEmitter<boolean>();
   @Output() emptyAction = new EventEmitter<void>();
 
-  ordenarPor(campo: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status'): void {
-    this.ordenar.emit(campo);
+  readonly columns: ResponsiveListColumn[] = [
+    { key: 'nome', label: 'Nome', sortable: true },
+    { key: 'categoria', label: 'Categoria', sortable: true },
+    { key: 'pagamento', label: 'Pagamento', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
+    { key: 'vencimento', label: 'Vencimento', sortable: true },
+    { key: 'valor', label: 'Valor', sortable: true, align: 'end' },
+    { key: 'acoes', label: 'Ações', align: 'end' }
+  ];
+
+  ordenarPor(campo: string): void {
+    this.ordenar.emit(campo as 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status');
   }
 
   pagamentoLabel(d: StoredExpense): string {
@@ -48,24 +59,29 @@ export class DespesasListaComponent {
     return expenseStatusLabel(status);
   }
 
+  statusTone(status?: string) {
+    return installmentStatusTone(status);
+  }
+
   isSelecionavel(despesa: StoredExpense): boolean {
     return despesa.status !== 'PAID' && despesa.status !== 'CANCELED';
   }
 
-  get selectableCount(): number {
-    return this.despesas.filter((d) => this.isSelecionavel(d)).length;
+  get selectableIds(): string[] {
+    return this.despesas.filter((d) => this.isSelecionavel(d) && d.id).map((d) => d.id!);
   }
 
-  get selectedSelectableCount(): number {
-    return this.despesas.filter((d) => this.isSelecionavel(d) && this.isSelecionado(d.id)).length;
+  getId = (d: StoredExpense): string => d.id || '';
+
+  onSort(column: string): void {
+    this.ordenarPor(column);
   }
 
-  isSelecionado(id?: string): boolean {
-    if (!id) return false;
-    return this.selectedIds.includes(id);
-  }
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
+  onSelectionChange(event: { id: string; checked: boolean }): void {
+    this.selecionar.emit(event);
   }
 
+  onSelectAllChange(checked: boolean): void {
+    this.selecionarTodos.emit(checked);
+  }
 }

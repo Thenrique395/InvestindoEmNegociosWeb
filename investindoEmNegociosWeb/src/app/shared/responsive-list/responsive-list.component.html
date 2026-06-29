@@ -1,0 +1,84 @@
+<div class="responsive-list" [class.responsive-list--dimmed]="!items.length">
+  <div class="responsive-list__scroll">
+    <table class="responsive-list__table">
+      <thead class="responsive-list__head">
+        <tr>
+          @if (selectable) {
+            <th class="responsive-list__cell responsive-list__cell--checkbox">
+              <input
+                class="responsive-list__check"
+                type="checkbox"
+                [checked]="allSelected"
+                [indeterminate]="someSelected"
+                (change)="onSelectAllChange($any($event.target)?.checked ?? false)"
+                aria-label="Selecionar todas" />
+            </th>
+          }
+          @for (column of columns; track column.key) {
+            <th
+              class="responsive-list__cell"
+              [class.responsive-list__cell--value]="column.align === 'end'"
+              [class]="column.widthClass || ''">
+              @if (column.sortable) {
+                <button type="button" class="responsive-list__sort" (click)="sortByColumn(column.key)">
+                  {{ column.label }}
+                  @if (sortBy === column.key) {
+                    <span class="responsive-list__sort-dir">{{ sortDir === 1 ? '↑' : '↓' }}</span>
+                  }
+                </button>
+              } @else {
+                {{ column.label }}
+              }
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody class="responsive-list__body">
+        @if (loading) {
+          <tr>
+            <td class="responsive-list__empty" [attr.colspan]="columns.length + (selectable ? 1 : 0)">
+              <div class="responsive-list__loading">
+                <span class="responsive-list__spinner"></span>
+                {{ loadingLabel }}
+              </div>
+            </td>
+          </tr>
+        }
+        @if (!loading && !items.length) {
+          <tr>
+            <td class="responsive-list__empty" [attr.colspan]="columns.length + (selectable ? 1 : 0)">
+              <app-empty-state
+                [title]="emptyTitle"
+                [description]="emptyDescription"
+                [ctaLabel]="emptyCtaLabel"
+                [icon]="emptyIcon"
+                (action)="emptyAction.emit()"></app-empty-state>
+            </td>
+          </tr>
+        }
+        @if (!loading) {
+          @for (item of items; track trackByRow($index, item)) {
+            <tr class="responsive-list__row">
+              @if (selectable) {
+                <td class="responsive-list__item responsive-list__item--checkbox">
+                  <input
+                    class="responsive-list__check"
+                    type="checkbox"
+                    [checked]="isRowSelected(item)"
+                    [disabled]="!isRowSelectable(item)"
+                    (change)="onRowSelectionChange(item, $any($event.target)?.checked ?? false)"
+                    aria-label="Selecionar item" />
+                </td>
+              }
+              @for (column of columns; track column.key) {
+                <td class="responsive-list__item" [class.responsive-list__item--value]="column.align === 'end'">
+                  <ng-container *ngTemplateOutlet="cellTemplate(column.key); context: { $implicit: item }"></ng-container>
+                </td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

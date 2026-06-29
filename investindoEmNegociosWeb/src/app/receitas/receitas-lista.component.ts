@@ -1,14 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StoredIncome } from '../data/api-data.service';
-import { incomeStatusLabel } from '../utils/status';
-import { StatusBadgeComponent } from '../status-badge/status-badge.component';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { incomeStatusLabel, installmentStatusTone } from '../utils/status';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
+import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-receitas-lista',
   standalone: true,
-  imports: [StatusBadgeComponent, EmptyStateComponent, AppCurrencyPipe],
+  imports: [StatusBadgeComponent, ResponsiveListComponent, ResponsiveListCellDirective, AppCurrencyPipe],
   templateUrl: './receitas-lista.component.html',
   styleUrls: ['./receitas-lista.component.scss']
 })
@@ -31,8 +32,27 @@ export class ReceitasListaComponent {
   @Output() ordenar = new EventEmitter<'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'>();
   @Output() emptyAction = new EventEmitter<void>();
 
+  get columns(): ResponsiveListColumn[] {
+    const base: ResponsiveListColumn[] = [
+      { key: 'fonte', label: 'Fonte', sortable: true },
+      { key: 'categoria', label: 'Categoria', sortable: true },
+      { key: 'valor', label: 'Valor', sortable: true, align: 'end' },
+      { key: 'recebimento', label: 'Recebimento', sortable: true },
+      { key: 'tipo', label: 'Tipo', sortable: true }
+    ];
+    if (this.showStatus) {
+      base.push({ key: 'status', label: 'Status', sortable: true });
+    }
+    base.push({ key: 'acoes', label: 'Ações', align: 'end' });
+    return base;
+  }
+
   ordenarPor(campo: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'): void {
     this.ordenar.emit(campo);
+  }
+
+  onSort(column: string): void {
+    this.ordenarPor(column as 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status');
   }
 
   onEditar(id: string): void {
@@ -61,24 +81,25 @@ export class ReceitasListaComponent {
     return incomeStatusLabel(renda.status);
   }
 
+  statusTone(renda: StoredIncome) {
+    return installmentStatusTone(renda.status);
+  }
+
   isSelecionavel(renda: StoredIncome): boolean {
     return renda.status !== 'PAID' && renda.status !== 'CANCELED';
   }
 
-  get selectableCount(): number {
-    return this.rendas.filter((r) => this.isSelecionavel(r)).length;
+  get selectableIds(): string[] {
+    return this.rendas.filter((r) => this.isSelecionavel(r) && r.id).map((r) => r.id!);
   }
 
-  get selectedSelectableCount(): number {
-    return this.rendas.filter((r) => this.isSelecionavel(r) && this.isSelecionado(r.id)).length;
+  getId = (r: StoredIncome): string => r.id || '';
+
+  onSelectionChange(event: { id: string; checked: boolean }): void {
+    this.selecionar.emit(event);
   }
 
-  isSelecionado(id?: string): boolean {
-    if (!id) return false;
-    return this.selectedIds.includes(id);
+  onSelectAllChange(checked: boolean): void {
+    this.selecionarTodos.emit(checked);
   }
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
-  }
-
 }
