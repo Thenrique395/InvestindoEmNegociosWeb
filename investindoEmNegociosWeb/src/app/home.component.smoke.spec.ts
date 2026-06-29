@@ -13,6 +13,7 @@ function createComponent(): HomeComponent {
     { getRole: () => 'Basic' } as any,
     { getProfile: () => of(null) } as any,
     { list: () => of([]) } as any,
+    { health: () => of(null) } as any,
     { navigateByUrl: jasmine.createSpy() } as any,
     { onDestroy: () => {} } as any
   );
@@ -149,6 +150,7 @@ function createComponentForSubscriptionTests() {
     authService as any,
     { getProfile: () => of(null) } as any,
     { list: () => of([]) } as any,
+    { health: () => of(null) } as any,
     { navigateByUrl: jasmine.createSpy() } as any,
     { onDestroy: () => {} } as any
   );
@@ -184,5 +186,93 @@ describe('HomeComponent - insights de assinatura', () => {
     (component as any).loadSubscriptionsSummary();
 
     expect(component.subscriptionsSummary).toBeNull();
+  });
+});
+
+class FinancialAssistantServiceMock {
+  health = jasmine.createSpy('health').and.returnValue(of(null));
+}
+
+function createComponentForAiHealthTests() {
+  const accountsService = new AccountsServiceMock();
+  const authService = new AuthServiceMock();
+  const financialAssistantService = new FinancialAssistantServiceMock();
+  const component = new HomeComponent(
+    { expenses$: of([]), incomes$: of([]), cards$: of([]) } as any,
+    { list: () => of([]) } as any,
+    { debtTotal: () => of({ total: 0 }) } as any,
+    { getStatus: () => of({ step: 0, completed: true }), updateStatus: () => of({}) } as any,
+    accountsService as any,
+    authService as any,
+    { getProfile: () => of(null) } as any,
+    { list: () => of([]) } as any,
+    financialAssistantService as any,
+    { navigateByUrl: jasmine.createSpy() } as any,
+    { onDestroy: () => {} } as any
+  );
+  return { component, authService, financialAssistantService };
+}
+
+describe('HomeComponent - saúde financeira (IA)', () => {
+  it('não carrega a saúde financeira quando o usuário não está logado', () => {
+    const { component, authService, financialAssistantService } = createComponentForAiHealthTests();
+    authService.isAuthenticated.and.returnValue(false);
+
+    (component as any).loadAiHealth();
+
+    expect(financialAssistantService.health).not.toHaveBeenCalled();
+    expect(component.aiHealth).toBeNull();
+  });
+
+  it('não carrega a saúde financeira para perfil Basic', () => {
+    const { component, authService, financialAssistantService } = createComponentForAiHealthTests();
+    authService.getRole.and.returnValue('Basic');
+
+    (component as any).loadAiHealth();
+
+    expect(financialAssistantService.health).not.toHaveBeenCalled();
+    expect(component.aiHealth).toBeNull();
+  });
+
+  it('preenche a saúde financeira quando a busca tem sucesso para Intermediate+', () => {
+    const { component, authService, financialAssistantService } = createComponentForAiHealthTests();
+    authService.getRole.and.returnValue('Intermediate');
+    financialAssistantService.health.and.returnValue(of({
+      referenceDate: '2026-06-29',
+      overallStatus: 'warning',
+      overallSummary: 'Atenção pontual.',
+      areas: [{ area: 'cashflow', status: 'ok', explanation: 'ok' }],
+      generatedByAi: true
+    }));
+
+    (component as any).loadAiHealth();
+
+    expect(component.aiHealth?.overallStatus).toBe('warning');
+  });
+
+  it('zera a saúde financeira quando a busca falha', () => {
+    const { component, authService, financialAssistantService } = createComponentForAiHealthTests();
+    authService.getRole.and.returnValue('Intermediate');
+    financialAssistantService.health.and.returnValue(throwError(() => new Error('falhou')));
+
+    (component as any).loadAiHealth();
+
+    expect(component.aiHealth).toBeNull();
+  });
+
+  it('mapeia tom do badge a partir do status', () => {
+    const { component } = createComponentForAiHealthTests();
+
+    expect(component.aiHealthTone('critical')).toBe('danger');
+    expect(component.aiHealthTone('warning')).toBe('warning');
+    expect(component.aiHealthTone('ok')).toBe('success');
+  });
+
+  it('mapeia o rótulo de área esperado', () => {
+    const { component } = createComponentForAiHealthTests();
+
+    expect(component.aiHealthAreaLabel('cashflow')).toBe('Caixa');
+    expect(component.aiHealthAreaLabel('divida')).toBe('Dívida');
+    expect(component.aiHealthAreaLabel('patrimonio')).toBe('Patrimônio');
   });
 });

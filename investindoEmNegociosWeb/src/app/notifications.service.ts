@@ -15,7 +15,8 @@ export type NotificationKind =
   | 'GoalInactive'
   | 'Upcoming'
   | 'Overdue'
-  | 'CashflowInsight';
+  | 'CashflowInsight'
+  | 'AiHealthAlert';
 export type MoneyType = 'Income' | 'Expense';
 
 export interface CashflowInsightRecommendation {

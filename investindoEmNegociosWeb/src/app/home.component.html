@@ -537,6 +537,28 @@
       </div>
     </section>
   }
+  @if (hasAccess('Intermediate') && aiHealth) {
+    <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira (IA)</p>
+          <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">{{ aiHealth.overallSummary }}</p>
+        </div>
+        <app-status-badge [tone]="aiHealthTone(aiHealth.overallStatus)" [label]="aiHealth.overallStatus === 'critical' ? 'Crítico' : aiHealth.overallStatus === 'warning' ? 'Atenção' : 'Estável'"></app-status-badge>
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2">
+        @for (area of aiHealth.areas; track area.area) {
+          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+            <div class="flex items-center justify-between gap-2">
+              <strong class="text-[0.875rem] text-[var(--text)]">{{ aiHealthAreaLabel(area.area) }}</strong>
+              <app-status-badge [tone]="aiHealthTone(area.status)" [label]="area.status === 'critical' ? 'Crítico' : area.status === 'warning' ? 'Atenção' : 'Estável'"></app-status-badge>
+            </div>
+            <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">{{ area.explanation }}</p>
+          </article>
+        }
+      </div>
+    </section>
+  }
   @if (!isBasicProfile && !isLoadingDashboard) {
     <section
       class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]"

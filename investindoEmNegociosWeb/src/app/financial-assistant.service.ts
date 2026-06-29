@@ -25,6 +25,22 @@ export interface FinancialAssistantChatResponse {
   context: FinancialAssistantPromptContextResponse;
 }
 
+export type AiHealthStatus = 'critical' | 'warning' | 'ok';
+
+export interface AiHealthAreaVerdict {
+  area: 'cashflow' | 'divida' | 'patrimonio';
+  status: AiHealthStatus;
+  explanation: string;
+}
+
+export interface AiFinancialHealthResponse {
+  referenceDate: string;
+  overallStatus: AiHealthStatus;
+  overallSummary: string;
+  areas: AiHealthAreaVerdict[];
+  generatedByAi: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class FinancialAssistantService {
   private _conversation: FinancialAssistantChatResponse[] = [];
@@ -46,10 +62,16 @@ export class FinancialAssistantService {
   context(referenceDate?: string): Observable<FinancialAssistantPromptContextResponse> {
     let params = new HttpParams();
     if (referenceDate) params = params.set('referenceDate', referenceDate);
-    return this.http.get<FinancialAssistantPromptContextResponse>(`${API_BASE_URL}/financialassistant/context`, { params });
+    return this.http.get<FinancialAssistantPromptContextResponse>(`${API_BASE_URL}/financial-assistant/context`, { params });
   }
 
   chat(question: string, referenceDate?: string): Observable<FinancialAssistantChatResponse> {
-    return this.http.post<FinancialAssistantChatResponse>(`${API_BASE_URL}/financialassistant/chat`, { question, referenceDate });
+    return this.http.post<FinancialAssistantChatResponse>(`${API_BASE_URL}/financial-assistant/chat`, { question, referenceDate });
+  }
+
+  health(referenceDate?: string): Observable<AiFinancialHealthResponse> {
+    let params = new HttpParams();
+    if (referenceDate) params = params.set('referenceDate', referenceDate);
+    return this.http.get<AiFinancialHealthResponse>(`${API_BASE_URL}/financial-assistant/health`, { params });
   }
 }

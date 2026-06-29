@@ -31,6 +31,8 @@ import { ProfileService } from './profile.service';
 import { NotificationsService, NotificationItem } from './notifications.service';
 import { AppCurrencyPipe } from './shared/app-currency.pipe';
 import { StatCardComponent } from './shared/stat-card/stat-card.component';
+import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
+import { AiFinancialHealthResponse, AiHealthStatus, FinancialAssistantService } from './financial-assistant.service';
 
 type InsightDiagnostics = {
   healthScore: number;
@@ -57,7 +59,7 @@ type InsightTodoItem = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule, AppCurrencyPipe, StatCardComponent],
+  imports: [CommonModule, DecimalPipe, RouterModule, AppCurrencyPipe, StatCardComponent, StatusBadgeComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
@@ -65,6 +67,7 @@ export class HomeComponent implements OnInit {
   private subRealBalance?: Subscription;
   private subDebtSummary?: Subscription;
   private subSubscriptionsSummary?: Subscription;
+  private subAiHealth?: Subscription;
   private subNetWorth?: Subscription;
   private subNetWorthHistory?: Subscription;
   private subProjection?: Subscription;
@@ -91,6 +94,7 @@ export class HomeComponent implements OnInit {
   realBalanceSummary: RealAvailableBalanceResponse | null = null;
   debtSummary: DebtSummaryResponse | null = null;
   subscriptionsSummary: SubscriptionsSummaryResponse | null = null;
+  aiHealth: AiFinancialHealthResponse | null = null;
   netWorthSummary: NetWorthSummaryResponse | null = null;
   netWorthHistory: NetWorthHistoryResponse | null = null;
   cashflowProjection: CashflowProjectionResponse | null = null;
@@ -212,6 +216,7 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private profileService: ProfileService,
     private notificationsService: NotificationsService,
+    private financialAssistantService: FinancialAssistantService,
     private router: Router,
     private readonly destroyRef: DestroyRef
   ) {}
@@ -283,6 +288,7 @@ export class HomeComponent implements OnInit {
           this.loadRealAvailableBalance();
           this.loadDebtSummary();
           this.loadSubscriptionsSummary();
+          this.loadAiHealth();
           this.loadNetWorthSummary();
           this.loadNetWorthHistory();
           this.loadProjection();
@@ -295,6 +301,7 @@ export class HomeComponent implements OnInit {
           this.realBalanceSummary = null;
           this.debtSummary = null;
           this.subscriptionsSummary = null;
+          this.aiHealth = null;
           this.netWorthSummary = null;
           this.netWorthHistory = null;
           this.cashflowProjection = null;
@@ -1176,6 +1183,7 @@ export class HomeComponent implements OnInit {
     this.loadRealAvailableBalance();
     this.loadDebtSummary();
     this.loadSubscriptionsSummary();
+    this.loadAiHealth();
     this.loadNetWorthSummary();
     this.loadNetWorthHistory();
     this.loadProjection();
@@ -1248,6 +1256,39 @@ export class HomeComponent implements OnInit {
           this.subscriptionsSummary = null;
         }
       });
+  }
+
+  private loadAiHealth(): void {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
+      this.aiHealth = null;
+      return;
+    }
+
+    this.subAiHealth?.unsubscribe();
+    this.subAiHealth = this.financialAssistantService
+      .health(this.toIsoDate(this.dataAtual))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (health) => {
+          this.aiHealth = health;
+        },
+        error: () => {
+          this.aiHealth = null;
+        }
+      });
+  }
+
+  aiHealthAreaLabel(area: string): string {
+    switch (area) {
+      case 'cashflow': return 'Caixa';
+      case 'divida': return 'Dívida';
+      case 'patrimonio': return 'Patrimônio';
+      default: return area;
+    }
+  }
+
+  aiHealthTone(status: AiHealthStatus): 'success' | 'warning' | 'danger' {
+    return status === 'critical' ? 'danger' : status === 'warning' ? 'warning' : 'success';
   }
 
   private loadNetWorthSummary(): void {
