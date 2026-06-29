@@ -5,5 +5,10 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'despesas', renderMode: RenderMode.Prerender },
   { path: 'cartoes', renderMode: RenderMode.Prerender },
   { path: 'receitas', renderMode: RenderMode.Prerender },
+  // Ferramenta só de desenvolvimento (bloqueada em produção pelo devOnlyGuard) — nunca deve ser
+  // pré-renderizada como HTML estático no build de produção.
+  { path: 'styleguide', renderMode: RenderMode.Client },
+  { path: 'styleguide/tokens', renderMode: RenderMode.Client },
+  { path: 'styleguide/components/:slug', renderMode: RenderMode.Client },
   { path: '**', renderMode: RenderMode.Prerender }
 ];

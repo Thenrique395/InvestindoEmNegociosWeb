@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { roleGuard } from './role.guard';
 import { publicHomeGuard } from './public-home.guard';
+import { devOnlyGuard } from './dev-only.guard';
 import { APP_FEATURE_KEYS } from './features';
 
 export const routes: Routes = [
@@ -232,6 +233,30 @@ export const routes: Routes = [
     data: { feature: APP_FEATURE_KEYS.adminRobotsManage, preload: false },
     loadComponent: () =>
       import('./admin-robots/admin-robots.component').then((m) => m.AdminRobotsComponent),
+  },
+  {
+    path: 'styleguide',
+    canActivate: [devOnlyGuard],
+    loadComponent: () =>
+      import('./styleguide/styleguide-shell.component').then((m) => m.StyleguideShellComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./styleguide/styleguide-overview.component').then((m) => m.StyleguideOverviewComponent),
+      },
+      {
+        path: 'tokens',
+        loadComponent: () =>
+          import('./styleguide/styleguide-tokens.component').then((m) => m.StyleguideTokensComponent),
+      },
+      {
+        path: 'components/:slug',
+        loadComponent: () =>
+          import('./styleguide/styleguide-component-detail.component').then((m) => m.StyleguideComponentDetailComponent),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

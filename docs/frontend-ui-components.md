@@ -2,6 +2,11 @@
 
 Este documento define os componentes reutilizáveis do frontend, quando usar cada um e exemplos de implementação.
 
+> **Referência viva**: a rota `/styleguide` (dev-only, bloqueada em produção pelo `devOnlyGuard`)
+> mostra demos interativos de todos os componentes catalogados aqui, mais Design Tokens e classes
+> de botão — útil pra inspecionar/ajustar um componente isoladamente sem precisar navegar até a
+> tela real que o usa.
+
 ## Objetivos
 
 - Manter consistência visual entre telas.
@@ -117,6 +122,12 @@ Uso: exibir status padronizados.
 <app-status-badge tone="danger" label="Despesa"></app-status-badge>
 ```
 
+> **Achado corrigido (2026-06-29)**: existia um segundo `StatusBadgeComponent` (mesmo seletor
+> `app-status-badge`) em `src/app/status-badge/`, com API por `status`/heurística de texto em vez
+> de `tone` explícito — usado só por Despesas e Receitas. Migrado para este componente (o único
+> agora) e a pasta antiga removida. Use `installmentStatusTone()` (`utils/status.ts`) pra mapear
+> `InstallmentStatus` → `tone` em telas de parcelas/pagamentos.
+
 Tons disponíveis:
 
 - `success`
@@ -159,6 +170,119 @@ Quando usar:
 - Telas com busca.
 - Telas com filtros.
 - Listagens com ação principal.
+
+---
+
+### StatCardComponent
+
+Uso: card de métrica (eyebrow + valor em destaque + nota), com ícone e tooltip opcionais.
+
+```html
+<app-stat-card
+  tone="success"
+  eyebrow="Saldo disponível"
+  value="R$ 12.400,00"
+  note="Atualizado agora"
+  tooltipText="Saldo real considerando lançamentos confirmados.">
+</app-stat-card>
+```
+
+Tons disponíveis: `primary`, `success`, `warning`, `info`, `danger`.
+
+Quando usar:
+
+- Resumos numéricos no topo de uma tela (saldo, total do mês, score).
+
+---
+
+### ComparisonPillComponent
+
+Uso: pílula de comparação (ex.: "vs. mês anterior"), com cor condicionada à direção boa/ruim da variação.
+
+```html
+<app-comparison-pill label="vs. mês anterior" trend="up" polarity="higher-is-better">
+  +12%
+</app-comparison-pill>
+```
+
+`polarity="lower-is-better"` inverte a leitura (ex.: dívida caindo é bom mesmo com `trend="down"`).
+
+---
+
+### PeriodHeroComponent + PeriodTotalCardComponent + PeriodActionCardComponent
+
+Uso: hero de página com navegação de mês anterior/próximo e um card lateral (aside) — `PeriodTotalCardComponent` mostra um valor em destaque, `PeriodActionCardComponent` mostra uma ação recomendada em texto.
+
+```html
+<app-period-hero
+  eyebrow="Junho 2026"
+  title="Receitas do mês"
+  description="Acompanhe entradas e saídas do período."
+  (previousMonth)="mesAnterior()"
+  (nextMonth)="proximoMes()">
+  <div hero-aside>
+    <app-period-total-card eyebrow="Total do mês" value="R$ 5.200,00" description="Receitas confirmadas" />
+  </div>
+</app-period-hero>
+```
+
+Quando usar:
+
+- Topo de telas com navegação por mês (Despesas, Receitas, Relatórios).
+
+---
+
+### TooltipComponent
+
+Uso: botão "?" acessível que abre um painel de ajuda contextual ao clicar ou focar (usado, por exemplo, dentro do `StatCardComponent`).
+
+```html
+<app-tooltip label="Mais informações sobre o saldo" text="Saldo real considerando lançamentos confirmados." />
+```
+
+---
+
+### ResponsiveListComponent
+
+Uso: tabela genérica orientada a coluna — ordenação, seleção em lote (checkbox com estado
+indeterminado), loading e vazio (`EmptyStateComponent` embutido), com o conteúdo de cada célula
+projetado pelo consumidor via `<ng-template appResponsiveListCell="chave" let-item>`.
+
+```html
+<app-responsive-list
+  [columns]="columns"
+  [items]="despesas"
+  [getId]="getId"
+  [sortBy]="sortBy"
+  [sortDir]="sortDir"
+  [selectable]="true"
+  [selectedIds]="selectedIds"
+  [selectableIds]="selectableIds"
+  (sort)="onSort($event)"
+  (selectionChange)="onSelectionChange($event)"
+  (selectAllChange)="onSelectAllChange($event)">
+
+  <ng-template appResponsiveListCell="nome" let-item>{{ item.nome }}</ng-template>
+  <ng-template appResponsiveListCell="valor" let-item>{{ item.valor | appCurrency }}</ng-template>
+</app-responsive-list>
+```
+
+`columns: ResponsiveListColumn[]` define `key`/`label`/`sortable?`/`align?`/`widthClass?` — uma
+entrada por coluna, incluindo a de ações (sem `sortable`). `selectableIds` controla quais linhas
+podem ser marcadas (ex.: não deixar selecionar uma despesa já paga); `null` = todas selecionáveis.
+
+> **Origem (2026-06-29)**: generaliza o padrão de tabela que `DespesasListaComponent` e
+> `ReceitasListaComponent` tinham cada um implementado de forma quase idêntica (~95% do `.html`/`.scss`
+> duplicado, só com prefixos de classe diferentes). Preenche a pasta `src/app/shared/responsive-list/`,
+> que existia vazia desde antes — o usuário notou a ausência durante a revisão do `/styleguide` e
+> pediu a implementação real. `AccountListComponent`/`CartoesListagemComponent` (grid de cards, não
+> tabela) ficaram deliberadamente fora desta consolidação — formato visual diferente demais pra
+> caber na mesma API sem virar abstração forçada.
+
+Regras:
+
+- Toda tabela ordenável com seleção em lote nova deve usar `ResponsiveListComponent`, não recriar
+  a estrutura de `<table>`/checkbox/ordenação na mão.
 
 ---
 
@@ -217,6 +341,12 @@ Regras:
 
 Uso: feedback global de sucesso, erro, aviso e informação.
 
+> **Achado (revisão 2026-06-29)**: `ToastContainerComponent` não está montado em nenhum template
+> do projeto hoje — confirmado via busca em todo `src/app/**/*.html`. Quem de fato exibe os avisos
+> do `UiFeedbackService` é o bloco `feedbackMessage`/`global-alert` direto em `app.component.html`.
+> O componente continua aqui documentado (e com demo em `/styleguide`) porque existe no código,
+> mas religá-lo ou remover é uma decisão em aberto.
+
 ```ts
 this.uiFeedback.success('Salvo com sucesso.');
 this.uiFeedback.error('Não foi possível concluir.');
@@ -250,7 +380,34 @@ Regras:
 - Não usar parágrafos soltos para loading/empty em telas novas.
 - Usar componente padronizado.
 
+---
+
+### BillingAlertBannerComponent
+
+Uso: banner de alerta de cobrança (pagamento em atraso, acesso encerrado, renovação automática
+desativada nos próximos 7 dias) — montado uma vez no shell autenticado (`app.component.html`),
+não em telas individuais. Busca a assinatura atual via `SubscriptionsService` e só aparece pra
+papéis acima de `Basic`.
+
+```html
+<app-billing-alert-banner />
+```
+
+Diferente dos demais componentes deste documento, não é demonstrável isoladamente sem um usuário
+autenticado real — a página dele em `/styleguide` mostra só descrição e snippet.
+
 ## Helpers reutilizáveis
+
+### AppCurrencyPipe
+
+Uso: formatação monetária com suporte a moeda alternativa (multi-moeda) e máscara de privacidade
+financeira (`FinancialPrivacyService` — esconde o valor como `••••••` quando o modo privado está
+ativo).
+
+```html
+{{ valor | appCurrency }}
+{{ valorEmDolar | appCurrency:'USD' }}
+```
 
 ### FormState
 
@@ -306,8 +463,9 @@ this.form.setApiErrors(mapApiErrors(err, {
 - Aplicar `ModalComponent` em modais antigos.
 - Aplicar `StatusBadgeComponent` nas telas restantes.
 - Aplicar `FilterBarComponent` em todas as listagens.
-- Criar tokens de design formais para spacing, radius, shadows e cores.
-- Criar Storybook ou recriar uma página de catálogo visual (`design-lab` foi removido do roteamento; a pasta vazia `src/app/design-lab/` foi removida em 2026-06-28).
+- Criar tokens de design formais para spacing, radius, shadows e cores — **resolvido em 2026-06-29**: já existiam em `src/styles/design-tokens.scss`, agora catalogados em `/styleguide/tokens`.
+- Criar Storybook ou recriar uma página de catálogo visual — **resolvido em 2026-06-29**: rota `/styleguide` (dev-only), com demo vivo dos 18 componentes/pipe catalogados neste documento (`design-lab` tinha sido removido do roteamento por estar vazio; a pasta `src/app/design-lab/` foi removida em 2026-06-28).
+- `src/app/shared/responsive-list/` — **resolvido em 2026-06-29**: implementado `ResponsiveListComponent` de verdade (ver seção acima), `DespesasListaComponent`/`ReceitasListaComponent` migrados pra usá-lo.
 
 ## Features recentes (revisão 2026-06-28)
 

@@ -1,0 +1,25 @@
+<h1>Components Reference</h1>
+<p class="styleguide-overview__intro">
+  Catálogo dos blocos de UI reutilizáveis que já existem no projeto (pasta <code>src/app/shared/</code>
+  + <code>empty-state</code>/<code>ui-state</code> + <code>AppCurrencyPipe</code>). Esta rota só existe em
+  ambiente de desenvolvimento.
+</p>
+
+<table class="styleguide-table">
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Categoria</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of components; track item.slug) {
+      <tr>
+        <td><a [routerLink]="['/styleguide/components', item.slug]"><code>{{ item.name }}</code></a></td>
+        <td>{{ categoryLabels[item.category] }}</td>
+        <td>{{ item.description }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

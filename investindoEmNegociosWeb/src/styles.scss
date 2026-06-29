@@ -380,33 +380,46 @@ body [class*='goal-card__description'] {
   font-size: var(--font-size-caption);
 }
 
-:where(.btn-primary) {
+/* Sem `:where()` aqui de propósito: `:where()` zera a especificidade do seletor, e o reset do
+   Tailwind Preflight (`button { background-color: transparent; ... }`) usa um seletor de tag
+   simples (especificidade 0,0,1) — maior que `:where(.btn-primary)` (0,0,0), então o Preflight
+   vencia e deixava todo `<button class="btn-primary">` do app com fundo transparente. Bug real
+   encontrado em 2026-06-29 ao montar a página /styleguide (confirmado também fora dela, em
+   /checkout). As regras de layout acima (`:where(.btn, .btn-primary, ...)`) não precisam de
+   especificidade alta porque o Preflight não disputa min-height/padding/border-radius. */
+.btn-primary {
   background: var(--primary);
   color: var(--on-primary);
 }
 
-:where(.btn-primary):hover:not(:disabled, [aria-disabled='true']) {
+.btn-primary:hover:not(:disabled, [aria-disabled='true']) {
   background: color-mix(in srgb, var(--primary) 88%, black);
 }
 
-:where(.btn-ghost, .btn-cancel, .ghost, .btn--ghost) {
+.btn-ghost,
+.btn-cancel,
+.ghost,
+.btn--ghost {
   border-color: var(--control-border);
   background: var(--surface);
   color: var(--text-secondary);
 }
 
-:where(.btn-ghost, .btn-cancel, .ghost, .btn--ghost):hover:not(:disabled, [aria-disabled='true']) {
+.btn-ghost:hover:not(:disabled, [aria-disabled='true']),
+.btn-cancel:hover:not(:disabled, [aria-disabled='true']),
+.ghost:hover:not(:disabled, [aria-disabled='true']),
+.btn--ghost:hover:not(:disabled, [aria-disabled='true']) {
   border-color: var(--control-border-hover);
   background: var(--control-background-hover);
   color: var(--text);
 }
 
-:where(.btn-danger) {
+.btn-danger {
   background: var(--danger);
   color: var(--on-primary);
 }
 
-:where(.btn-danger):hover:not(:disabled, [aria-disabled='true']) {
+.btn-danger:hover:not(:disabled, [aria-disabled='true']) {
   background: color-mix(in srgb, var(--danger) 86%, black);
 }
 

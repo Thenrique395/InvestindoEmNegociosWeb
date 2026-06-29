@@ -1,0 +1,118 @@
+<h1>Design Tokens</h1>
+<p>
+  Valores reais de <code>src/styles.scss</code> e <code>src/styles/design-tokens.scss</code>.
+  As cores semânticas (<code>--color-*</code>) usadas pelos componentes em <code>src/app/shared/</code>
+  são aliases dessas variáveis, com fallback embutido (ex.: <code>--color-success: var(--success, #22c55e)</code>).
+</p>
+
+<h2>Superfícies e bordas</h2>
+<div class="tokens-grid">
+  @for (token of surfaceTokens; track token.variable) {
+    <div class="token-swatch">
+      <div class="token-swatch__box" [style.background]="'var(' + token.variable + ')'"></div>
+      <p class="token-swatch__name">{{ token.name }}</p>
+      <code>{{ token.variable }}</code>
+    </div>
+  }
+</div>
+
+<h2>Texto</h2>
+<div class="tokens-grid">
+  @for (token of textTokens; track token.variable) {
+    <div class="token-swatch">
+      <div class="token-swatch__box" [style.background]="'var(' + token.variable + ')'"></div>
+      <p class="token-swatch__name">{{ token.name }}</p>
+      <code>{{ token.variable }}</code>
+    </div>
+  }
+</div>
+
+<h2>Marca</h2>
+<div class="tokens-grid">
+  @for (token of brandTokens; track token.variable) {
+    <div class="token-swatch">
+      <div class="token-swatch__box" [style.background]="'var(' + token.variable + ')'"></div>
+      <p class="token-swatch__name">{{ token.name }}</p>
+      <code>{{ token.variable }}</code>
+    </div>
+  }
+</div>
+
+<h2>Cores semânticas</h2>
+<div class="tokens-grid">
+  @for (token of semanticTokens; track token.name) {
+    <div class="token-swatch">
+      <div class="token-swatch__box" [style.background]="'var(' + token.base + ')'"></div>
+      <p class="token-swatch__name">{{ token.name }}</p>
+      <code>{{ token.base }}</code> · <code>{{ token.text }}</code>
+    </div>
+  }
+</div>
+
+<h2>Spacing</h2>
+<div class="scale-row">
+  @for (variable of spacingTokens; track variable) {
+    <div class="scale-item">
+      <div class="scale-item__box" [style.width]="'var(' + variable + ')'" [style.height]="'var(' + variable + ')'"></div>
+      <code>{{ variable }}</code>
+    </div>
+  }
+</div>
+
+<h2>Radius</h2>
+<div class="scale-row">
+  @for (variable of radiusTokens; track variable) {
+    <div class="scale-item">
+      <div class="scale-item__box scale-item__box--radius" [style.borderRadius]="'var(' + variable + ')'"></div>
+      <code>{{ variable }}</code>
+    </div>
+  }
+</div>
+
+<h2>Sombras</h2>
+<div class="scale-row">
+  @for (variable of shadowTokens; track variable) {
+    <div class="scale-item">
+      <div class="scale-item__box scale-item__box--shadow" [style.boxShadow]="'var(' + variable + ')'"></div>
+      <code>{{ variable }}</code>
+    </div>
+  }
+</div>
+
+<h2>Tipografia</h2>
+<p>
+  Fonte única do projeto: <strong>Inter</strong> (variável, pacote <code>@fontsource-variable/inter</code>),
+  aplicada globalmente em <code>body</code> via <code>--font-sans</code>. Fallback:
+  <code>system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif</code>.
+</p>
+<p class="font-sample">Aa Bb Cc — Investindo em Negócios 0123456789</p>
+
+<h3>Pesos</h3>
+<div class="scale-row">
+  @for (weight of fontWeights; track weight.variable) {
+    <div class="scale-item">
+      <p class="font-weight-sample" [style.fontWeight]="'var(' + weight.variable + ')'">Aa</p>
+      <code>{{ weight.name }}</code>
+    </div>
+  }
+</div>
+
+<h2>Escala tipográfica</h2>
+<div class="type-scale">
+  @for (item of typeScale; track item.variable) {
+    <p [style.fontSize]="'var(' + item.variable + ')'" class="type-scale__sample">
+      {{ item.name }} <code>{{ item.variable }}</code>
+    </p>
+  }
+</div>
+
+<h2>Botões (classes utilitárias)</h2>
+<p>Classes globais definidas em <code>src/styles.scss</code> — usadas em toda a aplicação, fora do design system de componentes.</p>
+<div class="styleguide-demo">
+  @for (btn of buttonClasses; track btn.className) {
+    <div class="button-row">
+      <button type="button" [class]="btn.className">{{ btn.label }}</button>
+      <code>.{{ btn.className }}</code>
+    </div>
+  }
+</div>

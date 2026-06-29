@@ -9,7 +9,7 @@
       (loginRequested)="goToLogin()" />
   }
 
-  @if (isLogged && !isOnboardingRoute) {
+  @if (isLogged && !isOnboardingRoute && !isStyleguideRoute) {
     <div class="shell relative grid min-h-screen grid-cols-[300px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
       <app-sidebar
         [isLightTheme]="isLightTheme"
@@ -56,6 +56,10 @@
         <router-outlet />
       </div>
     </main>
+  }
+
+  @if (isStyleguideRoute) {
+    <router-outlet />
   }
 
   @if (showPublicExperience) {

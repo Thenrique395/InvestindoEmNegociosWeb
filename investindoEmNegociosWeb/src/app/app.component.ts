@@ -214,6 +214,10 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.appSession.isOnboardingRoute();
   }
 
+  get isStyleguideRoute(): boolean {
+    return this.appSession.isStyleguideRoute();
+  }
+
   isActiveRoute(path: string): boolean {
     return this.appSession.isActiveRoute(path);
   }

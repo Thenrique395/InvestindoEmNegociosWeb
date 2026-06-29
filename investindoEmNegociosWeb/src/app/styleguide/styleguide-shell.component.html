@@ -1,0 +1,30 @@
+<div class="styleguide">
+  <aside class="styleguide__sidebar">
+    <p class="styleguide__brand">Design System</p>
+
+    <p class="styleguide__group-title">Foundation</p>
+    <nav class="styleguide__nav">
+      <a routerLink="/styleguide/tokens" routerLinkActive="styleguide__link--active" class="styleguide__link">Design Tokens</a>
+    </nav>
+
+    @for (category of categories; track category) {
+      @if (itemsByCategory(category).length > 0) {
+        <p class="styleguide__group-title">{{ categoryLabels[category] }}</p>
+        <nav class="styleguide__nav">
+          @for (item of itemsByCategory(category); track item.slug) {
+            <a
+              [routerLink]="['/styleguide/components', item.slug]"
+              routerLinkActive="styleguide__link--active"
+              class="styleguide__link">
+              {{ item.name }}
+            </a>
+          }
+        </nav>
+      }
+    }
+  </aside>
+
+  <main class="styleguide__content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

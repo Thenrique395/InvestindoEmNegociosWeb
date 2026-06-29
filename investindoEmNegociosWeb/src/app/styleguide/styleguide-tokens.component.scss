@@ -1,0 +1,70 @@
+.tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--spacing-2);
+}
+
+.token-swatch__box {
+  height: 64px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.token-swatch__name {
+  margin: 0.4rem 0 0.1rem;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.scale-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-3);
+}
+
+.scale-item {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+}
+
+.scale-item__box {
+  background: var(--primary);
+}
+
+.scale-item__box--radius {
+  width: 56px;
+  height: 56px;
+}
+
+.scale-item__box--shadow {
+  width: 64px;
+  height: 48px;
+  background: var(--surface);
+}
+
+.font-sample {
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.font-weight-sample {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.type-scale {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.type-scale__sample {
+  margin: 0;
+}
+
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}

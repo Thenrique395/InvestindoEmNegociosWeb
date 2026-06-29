@@ -53,6 +53,10 @@ export class AppSessionFacadeService {
     return this.getCurrentPath().startsWith('/onboarding');
   }
 
+  isStyleguideRoute(): boolean {
+    return this.getCurrentPath().startsWith('/styleguide');
+  }
+
   isActiveRoute(path: string): boolean {
     return this.getCurrentPath().startsWith(path);
   }

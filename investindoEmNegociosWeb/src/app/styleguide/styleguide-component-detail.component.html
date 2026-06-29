@@ -1,0 +1,155 @@
+@if (entry) {
+  <h1>{{ entry.name }}</h1>
+  <p>{{ entry.description }}</p>
+
+  @if (slug === 'toast-container') {
+    <div class="styleguide-note">Este componente não está montado em nenhum template do projeto hoje — quem exibe os avisos é o bloco global em <code>app.component.html</code>. O demo abaixo monta uma instância só nesta página.</div>
+  }
+  @if (slug === 'billing-alert-banner') {
+    <div class="styleguide-note">Este componente busca a assinatura atual via API e depende de um usuário autenticado — não é demonstrável isoladamente. Veja a descrição e o snippet de uso abaixo.</div>
+  }
+
+  <h2>Demo</h2>
+  <div class="styleguide-demo">
+    @switch (slug) {
+      @case ('page-header') {
+        <app-page-header eyebrow="Financeiro" title="Contas" description="Gerencie suas contas e saldos">
+          <button page-actions class="btn-primary sm">Nova conta</button>
+        </app-page-header>
+      }
+      @case ('section-card') {
+        <app-section-card title="Extrato" description="Acompanhe movimentações do período">
+          <button card-actions class="btn-primary sm">Filtrar</button>
+          Conteúdo de exemplo da seção.
+        </app-section-card>
+      }
+      @case ('filter-bar') {
+        <app-filter-bar>
+          <div filter-left>
+            <input placeholder="Buscar..." class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+          </div>
+          <div filter-right>
+            <button class="btn-primary sm">Novo</button>
+          </div>
+        </app-filter-bar>
+      }
+      @case ('period-hero') {
+        <app-period-hero
+          eyebrow="Junho 2026"
+          title="Receitas do mês"
+          description="Acompanhe entradas e saídas do período."
+          (previousMonth)="onPeriodHeroNav('previous')"
+          (nextMonth)="onPeriodHeroNav('next')">
+          <div hero-aside>
+            <app-period-total-card eyebrow="Total do mês" value="R$ 5.200,00" description="Receitas confirmadas" />
+          </div>
+        </app-period-hero>
+        <p>Eventos emitidos: {{ periodHeroEvents().join(', ') || 'nenhum ainda' }}</p>
+      }
+      @case ('period-total-card') {
+        <app-period-total-card eyebrow="Total do mês" value="R$ 5.200,00" description="Receitas confirmadas" />
+      }
+      @case ('period-action-card') {
+        <app-period-action-card eyebrow="Próxima ação" title="Quitar despesas vencidas" description="2 despesas vencidas precisam de atenção." />
+      }
+      @case ('stat-card') {
+        <app-stat-card tone="success" eyebrow="Saldo disponível" value="R$ 12.400,00" note="Atualizado agora" tooltipText="Saldo real considerando lançamentos confirmados." />
+      }
+      @case ('comparison-pill') {
+        <app-comparison-pill label="vs. mês anterior" trend="up" polarity="higher-is-better">+12%</app-comparison-pill>
+      }
+      @case ('status-badge') {
+        <div class="styleguide-demo__row">
+          <app-status-badge tone="success" label="Ativa"></app-status-badge>
+          <app-status-badge tone="danger" label="Despesa"></app-status-badge>
+          <app-status-badge tone="warning" label="Duplicado"></app-status-badge>
+          <app-status-badge tone="info" label="Info"></app-status-badge>
+          <app-status-badge tone="muted" label="Inativo" [dot]="true"></app-status-badge>
+        </div>
+      }
+      @case ('ui-state') {
+        <app-ui-state type="loading" title="Carregando..."></app-ui-state>
+        <app-ui-state type="error" description="Não foi possível carregar os dados." retryLabel="Tentar novamente"></app-ui-state>
+      }
+      @case ('empty-state') {
+        <app-empty-state title="Nenhum registro encontrado" description="Crie um novo item para começar" ctaLabel="Novo item"></app-empty-state>
+      }
+      @case ('toast-container') {
+        <app-toast-container></app-toast-container>
+        <div class="styleguide-demo__row">
+          <button type="button" class="btn-primary sm" (click)="triggerToast('success')">Sucesso</button>
+          <button type="button" class="btn-ghost sm" (click)="triggerToast('info')">Info</button>
+          <button type="button" class="btn-ghost sm" (click)="triggerToast('warning')">Aviso</button>
+          <button type="button" class="btn-danger sm" (click)="triggerToast('error')">Erro</button>
+        </div>
+      }
+      @case ('billing-alert-banner') {
+        <p><em>Sem demo isolado — depende de dados reais de assinatura.</em></p>
+      }
+      @case ('tooltip') {
+        <app-tooltip label="Mais informações" text="Texto de ajuda contextual exibido ao clicar ou focar." />
+      }
+      @case ('modal') {
+        <div class="styleguide-demo__row">
+          <button type="button" class="btn-primary sm" (click)="modalOpen.set(true)">Abrir modal</button>
+        </div>
+        <app-modal [open]="modalOpen()" title="Novo item" subtitle="Preencha os dados" (close)="modalOpen.set(false)">
+          <div modal-body>Conteúdo de exemplo do modal.</div>
+          <div modal-footer>
+            <button type="button" class="btn-ghost sm" (click)="modalOpen.set(false)">Cancelar</button>
+            <button type="button" class="btn-primary sm" (click)="modalOpen.set(false)">Salvar</button>
+          </div>
+        </app-modal>
+      }
+      @case ('confirm-dialog') {
+        <app-confirm-dialog></app-confirm-dialog>
+        <div class="styleguide-demo__row">
+          <button type="button" class="btn-danger sm" (click)="openConfirm()">Remover item</button>
+          @if (confirmResult) {
+            <p>Resultado: {{ confirmResult }}</p>
+          }
+        </div>
+      }
+      @case ('form-field') {
+        <app-form-field label="Nome" [required]="true" [error]="formFieldHasError() ? 'Informe um nome válido.' : ''" [submitted]="formFieldHasError()">
+          <input type="text" placeholder="Digite um nome" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+        </app-form-field>
+        <div class="styleguide-demo__row">
+          <button type="button" class="btn-ghost sm" (click)="formFieldHasError.set(!formFieldHasError())">Alternar estado de erro</button>
+        </div>
+      }
+      @case ('app-currency-pipe') {
+        <p>{{ 1234.56 | appCurrency }}</p>
+        <p>{{ 1234.56 | appCurrency:'USD' }}</p>
+      }
+      @case ('responsive-list') {
+        <app-responsive-list
+          [columns]="listColumns"
+          [items]="listItems"
+          [getId]="listGetId"
+          [sortBy]="listSortBy"
+          [sortDir]="listSortDir"
+          [selectable]="true"
+          [selectedIds]="listSelectedIds"
+          (sort)="onListSort($event)"
+          (selectionChange)="onListSelectionChange($event)"
+          (selectAllChange)="onListSelectAllChange($event)">
+          <ng-template appResponsiveListCell="nome" let-item>{{ item.nome }}</ng-template>
+          <ng-template appResponsiveListCell="status" let-item>
+            <app-status-badge [tone]="item.status" [label]="item.status"></app-status-badge>
+          </ng-template>
+          <ng-template appResponsiveListCell="valor" let-item>{{ item.valor | appCurrency }}</ng-template>
+        </app-responsive-list>
+        <p>Selecionados: {{ listSelectedIds.length }}</p>
+      }
+    }
+  </div>
+
+  <h2>Uso</h2>
+  <pre class="styleguide-snippet">{{ usageSnippets[slug] }}</pre>
+
+  <a routerLink="/styleguide" class="styleguide-back">← Voltar para a visão geral</a>
+} @else {
+  <p>Componente "{{ slug }}" não encontrado no catálogo.</p>
+  <a routerLink="/styleguide" class="styleguide-back">← Voltar para a visão geral</a>
+}

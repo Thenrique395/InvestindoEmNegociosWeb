@@ -1,0 +1,13 @@
+.styleguide-back {
+  display: inline-block;
+  margin-top: var(--spacing-3);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.styleguide-demo__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2);
+}

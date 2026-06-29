@@ -1,0 +1,154 @@
+export type StyleguideCategory = 'layout' | 'forms' | 'feedback' | 'overlay' | 'data' | 'pipe';
+
+export interface StyleguideEntry {
+  slug: string;
+  name: string;
+  selector: string;
+  category: StyleguideCategory;
+  description: string;
+}
+
+export const STYLEGUIDE_CATEGORY_LABELS: Record<StyleguideCategory, string> = {
+  layout: 'Layout',
+  forms: 'Formulários',
+  feedback: 'Feedback',
+  overlay: 'Overlay',
+  data: 'Dados',
+  pipe: 'Pipe'
+};
+
+export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
+  {
+    slug: 'page-header',
+    name: 'PageHeader',
+    selector: 'app-page-header',
+    category: 'layout',
+    description: 'Cabeçalho padrão de página, com eyebrow, título, descrição e slots de ações/metadados.'
+  },
+  {
+    slug: 'section-card',
+    name: 'SectionCard',
+    selector: 'app-section-card',
+    category: 'layout',
+    description: 'Card de seção com título, descrição e slot de ações de cabeçalho — agrupa blocos de conteúdo.'
+  },
+  {
+    slug: 'filter-bar',
+    name: 'FilterBar',
+    selector: 'app-filter-bar',
+    category: 'layout',
+    description: 'Barra de filtros com slots à esquerda e à direita — busca, selects e ação principal de uma listagem.'
+  },
+  {
+    slug: 'period-hero',
+    name: 'PeriodHero',
+    selector: 'app-period-hero',
+    category: 'layout',
+    description: 'Hero de página com navegação de mês anterior/próximo e slot para um card lateral (aside).'
+  },
+  {
+    slug: 'period-total-card',
+    name: 'PeriodTotalCard',
+    selector: 'app-period-total-card',
+    category: 'data',
+    description: 'Card lateral de total do período (valor em destaque + descrição), usado ao lado do PeriodHero.'
+  },
+  {
+    slug: 'period-action-card',
+    name: 'PeriodActionCard',
+    selector: 'app-period-action-card',
+    category: 'data',
+    description: 'Variante do PeriodTotalCard focada em ação recomendada em vez de valor numérico.'
+  },
+  {
+    slug: 'stat-card',
+    name: 'StatCard',
+    selector: 'app-stat-card',
+    category: 'data',
+    description: 'Card de métrica com ícone, eyebrow, valor e nota — tons primary/success/warning/info/danger.'
+  },
+  {
+    slug: 'responsive-list',
+    name: 'ResponsiveList',
+    selector: 'app-responsive-list',
+    category: 'data',
+    description: 'Tabela genérica orientada a coluna, com ordenação, seleção em lote (checkbox) e células projetadas via <ng-template appResponsiveListCell>. Generaliza o padrão antes duplicado em DespesasLista/ReceitasLista.'
+  },
+  {
+    slug: 'comparison-pill',
+    name: 'ComparisonPill',
+    selector: 'app-comparison-pill',
+    category: 'data',
+    description: 'Pílula de comparação (ex.: "vs. mês anterior") com cor condicionada à direção boa/ruim da variação.'
+  },
+  {
+    slug: 'status-badge',
+    name: 'StatusBadge',
+    selector: 'app-status-badge',
+    category: 'feedback',
+    description: 'Badge de status com tons semânticos (success/danger/warning/info/muted/default) e ponto opcional.'
+  },
+  {
+    slug: 'ui-state',
+    name: 'UiState',
+    selector: 'app-ui-state',
+    category: 'feedback',
+    description: 'Bloco padrão de loading/erro/informação com ação de retry opcional.'
+  },
+  {
+    slug: 'empty-state',
+    name: 'EmptyState',
+    selector: 'app-empty-state',
+    category: 'feedback',
+    description: 'Estado vazio padrão (ícone, título, descrição e CTA opcional) para listagens sem dados.'
+  },
+  {
+    slug: 'toast-container',
+    name: 'ToastContainer',
+    selector: 'app-toast-container',
+    category: 'feedback',
+    description: 'Container de toasts conectado ao UiFeedbackService. Atualmente não está montado em nenhum template do projeto — quem mostra os avisos hoje é o bloco global em app.component.html.'
+  },
+  {
+    slug: 'billing-alert-banner',
+    name: 'BillingAlertBanner',
+    selector: 'app-billing-alert-banner',
+    category: 'feedback',
+    description: 'Banner de alerta de cobrança (pagamento em atraso, acesso encerrado, renovação próxima) — busca a assinatura atual via API, não é demonstrável isoladamente sem um usuário autenticado.'
+  },
+  {
+    slug: 'tooltip',
+    name: 'Tooltip',
+    selector: 'app-tooltip',
+    category: 'overlay',
+    description: 'Botão "?" acessível que abre um painel de ajuda contextual ao clicar/focar.'
+  },
+  {
+    slug: 'modal',
+    name: 'Modal',
+    selector: 'app-modal',
+    category: 'overlay',
+    description: 'Modal padrão com cabeçalho, corpo com scroll e rodapé de ações — tamanhos sm/md/lg/xl.'
+  },
+  {
+    slug: 'confirm-dialog',
+    name: 'ConfirmDialog',
+    selector: 'app-confirm-dialog',
+    category: 'overlay',
+    description: 'Diálogo de confirmação orientado a serviço (ConfirmDialogService.confirm) — substitui window.confirm.'
+  },
+  {
+    slug: 'form-field',
+    name: 'FormField',
+    selector: 'app-form-field',
+    category: 'forms',
+    description: 'Wrapper de label/hint/erro para inputs — padroniza validação visual e mensagens de campo.'
+  },
+  {
+    slug: 'app-currency-pipe',
+    name: 'AppCurrencyPipe',
+    selector: 'appCurrency',
+    category: 'pipe',
+    description: 'Pipe de formatação monetária com suporte a moeda alternativa e máscara de privacidade financeira.'
+  }
+];
