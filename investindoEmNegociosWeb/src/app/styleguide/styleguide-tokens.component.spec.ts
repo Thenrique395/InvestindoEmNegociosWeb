@@ -12,13 +12,13 @@ describe('StyleguideTokensComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('--primary');
   });
 
-  it('renderiza as 4 classes de botão', () => {
+  it('renderiza as 3 classes de botão em 3 estados (normal, sm, disabled)', () => {
     TestBed.configureTestingModule({ imports: [StyleguideTokensComponent] });
     const fixture = TestBed.createComponent(StyleguideTokensComponent);
 
     fixture.detectChanges();
 
     const buttons = fixture.nativeElement.querySelectorAll('button');
-    expect(buttons.length).toBe(4);
+    expect(buttons.length).toBe(9);
   });
 });

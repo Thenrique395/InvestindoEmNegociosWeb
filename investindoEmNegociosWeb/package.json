@@ -8,7 +8,7 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage --code-coverage-exclude=src/app/styleguide/**",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "quality:frontend": "npm run typecheck && npm run test:ci && npm run build:prod",
     "serve:ssr:investindoEmNegociosWeb": "node dist/investindo-em-negocios-web/server/server.mjs"

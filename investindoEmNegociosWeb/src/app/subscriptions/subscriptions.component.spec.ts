@@ -104,8 +104,10 @@ describe('SubscriptionsComponent', () => {
 
     const cdr = { markForCheck: jasmine.createSpy() } as any;
     const destroyRef = { onDestroy: jasmine.createSpy() } as any;
+    const component = new SubscriptionsComponent(subscriptionsService, authService, billingService, router, uiFeedback, cdr, destroyRef);
+    component.ngOnInit();
     return {
-      component: new SubscriptionsComponent(subscriptionsService, authService, billingService, router, uiFeedback, cdr, destroyRef),
+      component,
       subscriptionsService,
       authService,
       billingService,
