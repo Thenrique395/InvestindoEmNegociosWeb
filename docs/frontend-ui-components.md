@@ -112,6 +112,31 @@ Regras:
 
 ---
 
+### ToggleFieldComponent
+
+Uso: card de toggle (switch) com label e descrição, para opções booleanas em formulários
+(ex.: "Recorrente", "Notificar por e-mail"). Criado em 2026-06-29 ao migrar os modais de
+Despesas/Receitas/Cartões/Categorias/Investimentos/Metas para os componentes compartilhados —
+antes cada formulário tinha sua própria marcação de switch duplicada.
+
+```html
+<app-toggle-field
+  label="Recorrente"
+  description="Repete automaticamente todo mês."
+  [checked]="recorrente"
+  (checkedChange)="recorrente = $event">
+</app-toggle-field>
+```
+
+Inputs: `label`, `description`, `checked`, `disabled`. Output: `checkedChange`.
+
+Quando usar:
+
+- Qualquer opção booleana dentro de um formulário (`app-modal` ou tela cheia).
+- Não criar `<input type="checkbox">` solto com label manual para esse caso.
+
+---
+
 ### StatusBadgeComponent
 
 Uso: exibir status padronizados.
@@ -460,7 +485,7 @@ this.form.setApiErrors(mapApiErrors(err, {
 
 ## Pendências recomendadas
 
-- Aplicar `ModalComponent` em modais antigos.
+- Aplicar `ModalComponent` em modais antigos — **resolvido em 2026-06-30**: migrados os modais de Despesas, Receitas, Cartões, Categorias, Investimentos e Metas para `app-modal`/`app-form-field`/`app-toggle-field` (novo componente, ver seção acima), eliminando a marcação e o CSS de modal/campo/switch duplicados em cada tela.
 - Aplicar `StatusBadgeComponent` nas telas restantes.
 - Aplicar `FilterBarComponent` em todas as listagens.
 - Criar tokens de design formais para spacing, radius, shadows e cores — **resolvido em 2026-06-29**: já existiam em `src/styles/design-tokens.scss`, agora catalogados em `/styleguide/tokens`.
