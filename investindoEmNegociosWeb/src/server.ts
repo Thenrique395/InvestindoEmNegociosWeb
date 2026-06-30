@@ -13,8 +13,9 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
-const allowedHosts = process.env['ANGULAR_ALLOWED_HOSTS']?.split(',').map(h => h.trim()) ?? [];
-const angularApp = new AngularNodeAppEngine({ allowedHosts });
+// Desabilita a proteção SSRF de host no ambiente dev (HTTP sem domínio fixo).
+// Em produção com HTTPS e domínio real, substitua '*' pela lista de origens permitidas.
+const angularApp = new AngularNodeAppEngine({ allowedHosts: ['*'] });
 
 app.use(
   compression({
