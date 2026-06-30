@@ -25,6 +25,7 @@ import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ModalComponent } from '../shared/modal/modal.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import {
   AllocationInvestmentType,
   BenchmarkKey,
@@ -73,7 +74,7 @@ type RentabilidadeMonthPoint = {
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, StatusBadgeComponent, ModalComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

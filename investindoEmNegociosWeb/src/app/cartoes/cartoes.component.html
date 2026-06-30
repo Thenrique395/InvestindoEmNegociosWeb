@@ -81,30 +81,32 @@
           <h3 class="cards-statements__title">Como suas compras entram na fatura</h3>
           <p class="cards-statements__text">Escolha o cartão, o ano e o mês para ver fechamento, vencimento e total de cada fatura.</p>
         </div>
-        <div class="cards-statements__filters">
-          <label class="cards-filter">
-            <span class="cards-filter__label">Cartão</span>
-            <select [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
-              @for (c of cards; track trackByIndex($index, c)) {
-                <option [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
-              }
-            </select>
-          </label>
-          <label class="cards-filter">
-            <span class="cards-filter__label">Ano</span>
-            <input type="number" min="2000" max="2100" [(ngModel)]="statementYear" />
-          </label>
-          <label class="cards-filter">
-            <span class="cards-filter__label">Mês</span>
-            <select [(ngModel)]="statementMonth">
-              <option [ngValue]="null">Todos</option>
-              @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
-                <option [ngValue]="m">{{ statementMonthLabel(m) }}</option>
-              }
-            </select>
-          </label>
-          <button type="button" class="cards-statements__apply" (click)="loadStatementCycles()">Aplicar filtros</button>
-        </div>
+        <app-filter-bar>
+          <div filter-left class="cards-statements__filters">
+            <label class="cards-filter">
+              <span class="cards-filter__label">Cartão</span>
+              <select [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
+                @for (c of cards; track trackByIndex($index, c)) {
+                  <option [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
+                }
+              </select>
+            </label>
+            <label class="cards-filter">
+              <span class="cards-filter__label">Ano</span>
+              <input type="number" min="2000" max="2100" [(ngModel)]="statementYear" />
+            </label>
+            <label class="cards-filter">
+              <span class="cards-filter__label">Mês</span>
+              <select [(ngModel)]="statementMonth">
+                <option [ngValue]="null">Todos</option>
+                @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
+                  <option [ngValue]="m">{{ statementMonthLabel(m) }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          <button filter-right type="button" class="cards-statements__apply" (click)="loadStatementCycles()">Aplicar filtros</button>
+        </app-filter-bar>
       </div>
 
       @if (canViewCardStatements) {

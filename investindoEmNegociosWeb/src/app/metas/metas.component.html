@@ -53,35 +53,37 @@
       </app-period-action-card>
     </app-period-hero>
 
-    <div class="goals-filters">
-      <label class="goals-filter">
-        <span class="goals-filter__label">Ano</span>
-        <select [(ngModel)]="filtroAno" (change)="aplicarFiltros()">
-          <option [ngValue]="'ALL'">Todos</option>
-          @for (ano of anos; track trackByIndex($index, ano)) {
-            <option [ngValue]="ano">{{ ano }}</option>
-          }
-        </select>
-      </label>
-      <label class="goals-filter">
-        <span class="goals-filter__label">Status</span>
-        <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
-          <option [ngValue]="'ALL'">Todos</option>
-          @for (st of statusLista; track trackByIndex($index, st)) {
-            <option [ngValue]="st.id">{{ st.label }}</option>
-          }
-        </select>
-      </label>
-      <label class="goals-filter">
-        <span class="goals-filter__label">Tipo</span>
-        <select [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
-          <option [ngValue]="'ALL'">Todos</option>
-          @for (tipo of metaTipos; track trackByIndex($index, tipo)) {
-            <option [ngValue]="tipo.id">{{ tipo.label }}</option>
-          }
-        </select>
-      </label>
-    </div>
+    <app-filter-bar>
+      <div filter-left class="goals-filters">
+        <label class="goals-filter">
+          <span class="goals-filter__label">Ano</span>
+          <select [(ngModel)]="filtroAno" (change)="aplicarFiltros()">
+            <option [ngValue]="'ALL'">Todos</option>
+            @for (ano of anos; track trackByIndex($index, ano)) {
+              <option [ngValue]="ano">{{ ano }}</option>
+            }
+          </select>
+        </label>
+        <label class="goals-filter">
+          <span class="goals-filter__label">Status</span>
+          <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+            <option [ngValue]="'ALL'">Todos</option>
+            @for (st of statusLista; track trackByIndex($index, st)) {
+              <option [ngValue]="st.id">{{ st.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="goals-filter">
+          <span class="goals-filter__label">Tipo</span>
+          <select [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
+            <option [ngValue]="'ALL'">Todos</option>
+            @for (tipo of metaTipos; track trackByIndex($index, tipo)) {
+              <option [ngValue]="tipo.id">{{ tipo.label }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </app-filter-bar>
 
     @if (loading) {
       <div class="goals-state">

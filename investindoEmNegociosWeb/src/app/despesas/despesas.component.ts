@@ -25,6 +25,7 @@ import { StatusBadgeComponent } from '../shared/status-badge/status-badge.compon
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import {
   formatLocaleDate,
   formatMonthLabelFromKey,
@@ -50,6 +51,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     TooltipComponent,
     StatCardComponent,
     StatusBadgeComponent,
+    FilterBarComponent,
     ComparisonPillComponent,
     PeriodTotalCardComponent,
     PeriodHeroComponent,

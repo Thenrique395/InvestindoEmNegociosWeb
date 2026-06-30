@@ -21,6 +21,7 @@ import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -34,7 +35,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, StatCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, AppCurrencyPipe],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, StatCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, AppCurrencyPipe],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

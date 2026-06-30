@@ -13,13 +13,14 @@ import { FormState } from '../utils/form-state';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 
 type CategoryFormField = 'name' | 'scope' | 'type';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormFieldComponent, ModalComponent, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [CommonModule, FormsModule, FormFieldComponent, ModalComponent, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, FilterBarComponent],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

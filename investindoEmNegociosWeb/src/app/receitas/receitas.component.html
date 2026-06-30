@@ -145,28 +145,30 @@
       </div>
     }
 
-    <div class="receitas-filters">
-      <label class="receitas-filter receitas-filter--search">
-        <span class="receitas-filter__label">Busca por fonte</span>
-        <input type="text" [(ngModel)]="filtroTexto" placeholder="Ex.: Salário" />
-      </label>
-      <label class="receitas-filter">
-        <span class="receitas-filter__label">Tipo</span>
-        <select [(ngModel)]="filtroTipo">
-          <option value="all">Todos</option>
-          <option value="recurring">Recorrente</option>
-          <option value="oneTime">Avulsa</option>
-        </select>
-      </label>
-      <label class="receitas-filter">
-        <span class="receitas-filter__label">Status</span>
-        <select [(ngModel)]="filtroStatus">
-          <option value="all">Todos</option>
-          <option value="paid">Recebida</option>
-          <option value="pending">Pendente</option>
-        </select>
-      </label>
-    </div>
+    <app-filter-bar>
+      <div filter-left class="receitas-filters">
+        <label class="receitas-filter receitas-filter--search">
+          <span class="receitas-filter__label">Busca por fonte</span>
+          <input type="text" [(ngModel)]="filtroTexto" placeholder="Ex.: Salário" />
+        </label>
+        <label class="receitas-filter">
+          <span class="receitas-filter__label">Tipo</span>
+          <select [(ngModel)]="filtroTipo">
+            <option value="all">Todos</option>
+            <option value="recurring">Recorrente</option>
+            <option value="oneTime">Avulsa</option>
+          </select>
+        </label>
+        <label class="receitas-filter">
+          <span class="receitas-filter__label">Status</span>
+          <select [(ngModel)]="filtroStatus">
+            <option value="all">Todos</option>
+            <option value="paid">Recebida</option>
+            <option value="pending">Pendente</option>
+          </select>
+        </label>
+      </div>
+    </app-filter-bar>
 
     <div class="receitas-list-wrap">
       <app-receitas-lista

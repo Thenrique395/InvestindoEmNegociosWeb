@@ -213,26 +213,28 @@
         <h3>Meus Ativos</h3>
         <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
       </div>
-      <div class="table-filters">
-        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onFiltroMudou()" placeholder="Buscar por ativo, conta ou categoria" />
-        <select [(ngModel)]="filterType" (ngModelChange)="onFiltroMudou()">
-          <option value="ALL">Todos os tipos</option>
-          @for (t of tipos; track trackByIndex($index, t)) {
-            <option [value]="t.value">{{ t.label }}</option>
-          }
-        </select>
-        <select [(ngModel)]="filterAccount" (ngModelChange)="onFiltroMudou()">
-          <option value="ALL">Todas as contas</option>
-          @for (acc of contasDisponiveis; track trackByIndex($index, acc)) {
-            <option [value]="acc">{{ acc }}</option>
-          }
-        </select>
-        <select [(ngModel)]="filterStatus" (ngModelChange)="onFiltroMudou()">
-          <option value="ALL">Todos os status</option>
-          <option value="ACTIVE">Ativas</option>
-          <option value="ZEROED">Zeradas</option>
-        </select>
-      </div>
+      <app-filter-bar>
+        <div filter-left class="table-filters">
+          <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onFiltroMudou()" placeholder="Buscar por ativo, conta ou categoria" />
+          <select [(ngModel)]="filterType" (ngModelChange)="onFiltroMudou()">
+            <option value="ALL">Todos os tipos</option>
+            @for (t of tipos; track trackByIndex($index, t)) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </select>
+          <select [(ngModel)]="filterAccount" (ngModelChange)="onFiltroMudou()">
+            <option value="ALL">Todas as contas</option>
+            @for (acc of contasDisponiveis; track trackByIndex($index, acc)) {
+              <option [value]="acc">{{ acc }}</option>
+            }
+          </select>
+          <select [(ngModel)]="filterStatus" (ngModelChange)="onFiltroMudou()">
+            <option value="ALL">Todos os status</option>
+            <option value="ACTIVE">Ativas</option>
+            <option value="ZEROED">Zeradas</option>
+          </select>
+        </div>
+      </app-filter-bar>
       @if (!sortedPositions.length) {
         <app-empty-state
           icon="$"
@@ -330,22 +332,24 @@
           <div class="section-head__title">
             <h3>Consolidação de aportes</h3>
           </div>
-          <div class="chart-filters">
-            <select [(ngModel)]="consolidacaoGranularidade">
-              <option value="MONTHLY">Mensal</option>
-            </select>
-            <select [(ngModel)]="consolidacaoHorizonteAnos">
-              <option [ngValue]="1">1 ano</option>
-              <option [ngValue]="2">2 anos</option>
-              <option [ngValue]="3">3 anos</option>
-            </select>
-            <select [(ngModel)]="consolidacaoTipoFiltro">
-              <option value="ALL">Todos os tipos</option>
-              @for (t of tipos; track trackByIndex($index, t)) {
-                <option [value]="t.value">{{ t.label }}</option>
-              }
-            </select>
-          </div>
+          <app-filter-bar>
+            <div filter-left class="chart-filters">
+              <select [(ngModel)]="consolidacaoGranularidade">
+                <option value="MONTHLY">Mensal</option>
+              </select>
+              <select [(ngModel)]="consolidacaoHorizonteAnos">
+                <option [ngValue]="1">1 ano</option>
+                <option [ngValue]="2">2 anos</option>
+                <option [ngValue]="3">3 anos</option>
+              </select>
+              <select [(ngModel)]="consolidacaoTipoFiltro">
+                <option value="ALL">Todos os tipos</option>
+                @for (t of tipos; track trackByIndex($index, t)) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
+              </select>
+            </div>
+          </app-filter-bar>
         </div>
         <div class="consolidacao-chart">
           <div class="consolidacao-axis">

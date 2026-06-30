@@ -147,35 +147,37 @@
       </div>
     }
 
-    <div class="expenses-filters">
-      <label class="expenses-filter">
-        <span class="expenses-filter__label">Status</span>
-        <select [(ngModel)]="filtroStatus">
-          <option value="ALL">Todos</option>
-          <option value="OPEN">{{ statusLabel('OPEN') }}</option>
-          <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
-          <option value="PAID">{{ statusLabel('PAID') }}</option>
-          <option value="ANTICIPATED">{{ statusLabel('ANTICIPATED') }}</option>
-          <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
-        </select>
-      </label>
-      <label class="expenses-filter">
-        <span class="expenses-filter__label">Categoria</span>
-        <select [(ngModel)]="filtroCategoria">
-          <option value="ALL">Todas</option>
-          @if (!categorias.length) {
-            <option value="" disabled>Sem categorias cadastradas</option>
-          }
-          @for (c of categorias; track trackByIndex($index, c)) {
-            <option [value]="c.id">{{ c.name }}</option>
-          }
-        </select>
-      </label>
-      <label class="expenses-filter expenses-filter--search">
-        <span class="expenses-filter__label">Buscar</span>
-        <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
-      </label>
-    </div>
+    <app-filter-bar>
+      <div filter-left class="expenses-filters">
+        <label class="expenses-filter">
+          <span class="expenses-filter__label">Status</span>
+          <select [(ngModel)]="filtroStatus">
+            <option value="ALL">Todos</option>
+            <option value="OPEN">{{ statusLabel('OPEN') }}</option>
+            <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
+            <option value="PAID">{{ statusLabel('PAID') }}</option>
+            <option value="ANTICIPATED">{{ statusLabel('ANTICIPATED') }}</option>
+            <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
+          </select>
+        </label>
+        <label class="expenses-filter">
+          <span class="expenses-filter__label">Categoria</span>
+          <select [(ngModel)]="filtroCategoria">
+            <option value="ALL">Todas</option>
+            @if (!categorias.length) {
+              <option value="" disabled>Sem categorias cadastradas</option>
+            }
+            @for (c of categorias; track trackByIndex($index, c)) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="expenses-filter expenses-filter--search">
+          <span class="expenses-filter__label">Buscar</span>
+          <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
+        </label>
+      </div>
+    </app-filter-bar>
 
     <div class="expenses-list-wrap">
       <app-despesas-lista

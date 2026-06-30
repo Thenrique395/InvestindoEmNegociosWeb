@@ -84,21 +84,23 @@
       </app-period-action-card>
     </app-period-hero>
 
-    <div class="categories-filters">
-      <label class="categories-filter categories-filter--search">
-        <span class="categories-filter__label">Buscar categoria</span>
-        <input type="text" placeholder="Ex.: Moradia" [(ngModel)]="buscaNome" />
-      </label>
-      <label class="categories-filter">
-        <span class="categories-filter__label">Tipo</span>
-        <select [(ngModel)]="filtroTipo" (change)="carregar()">
-          <option value="">Todos</option>
-          @for (t of tipos; track trackByIndex($index, t)) {
-            <option [value]="t.id">{{ t.label }}</option>
-          }
-        </select>
-      </label>
-    </div>
+    <app-filter-bar>
+      <div filter-left class="categories-filters">
+        <label class="categories-filter categories-filter--search">
+          <span class="categories-filter__label">Buscar categoria</span>
+          <input type="text" placeholder="Ex.: Moradia" [(ngModel)]="buscaNome" />
+        </label>
+        <label class="categories-filter">
+          <span class="categories-filter__label">Tipo</span>
+          <select [(ngModel)]="filtroTipo" (change)="carregar()">
+            <option value="">Todos</option>
+            @for (t of tipos; track trackByIndex($index, t)) {
+              <option [value]="t.id">{{ t.label }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </app-filter-bar>
 
     <section class="categories-add-card">
       <div class="categories-add-card__header">
