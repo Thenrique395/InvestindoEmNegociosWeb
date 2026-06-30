@@ -145,6 +145,13 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     description: 'Wrapper de label/hint/erro para inputs — padroniza validação visual e mensagens de campo.'
   },
   {
+    slug: 'toggle-field',
+    name: 'ToggleField',
+    selector: 'app-toggle-field',
+    category: 'forms',
+    description: 'Card de toggle (switch) com label e descrição — usado para opções booleanas em formulários.'
+  },
+  {
     slug: 'account-list',
     name: 'AccountList',
     selector: 'app-account-list',

@@ -16,6 +16,7 @@ import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
 import { ToastContainerComponent } from '../shared/toast-container/toast-container.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
@@ -55,6 +56,7 @@ interface DemoListItem {
     ConfirmDialogComponent,
     ToastContainerComponent,
     FormFieldComponent,
+    ToggleFieldComponent,
     UiStateComponent,
     EmptyStateComponent,
     AppCurrencyPipe,
@@ -71,7 +73,9 @@ export class StyleguideComponentDetailComponent implements OnInit {
   entry: StyleguideEntry | undefined;
 
   readonly modalOpen = signal(false);
+  readonly modalSize = signal<'sm' | 'md' | 'lg' | 'xl'>('md');
   readonly formFieldHasError = signal(false);
+  readonly toggleFieldChecked = signal(true);
   readonly periodHeroEvents = signal<string[]>([]);
   confirmResult: string | null = null;
 
@@ -105,6 +109,18 @@ export class StyleguideComponentDetailComponent implements OnInit {
   listSortDir: 1 | -1 = 1;
   listSelectedIds: string[] = [];
   listGetId = (item: DemoListItem): string => item.id;
+  readonly listLoading = signal(false);
+  readonly listEmpty = signal(false);
+
+  private readonly listStatusLabels: Record<DemoListItem['status'], string> = {
+    success: 'Pago',
+    warning: 'Pendente',
+    danger: 'Atrasado'
+  };
+
+  listStatusLabel(status: DemoListItem['status']): string {
+    return this.listStatusLabels[status];
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -189,8 +205,12 @@ export class StyleguideComponentDetailComponent implements OnInit {
   eyebrow="Financeiro"
   title="Contas"
   description="Gerencie suas contas e saldos">
+  <span page-meta>3 contas ativas</span>
   <button page-actions class="btn-primary sm">Nova conta</button>
-</app-page-header>`,
+</app-page-header>
+
+<!-- Variante com borda/sombra (ex.: dentro de um card) -->
+<app-page-header [elevated]="true" size="sm" title="Resumo" />`,
     'section-card': `<app-section-card
   title="Extrato"
   description="Acompanhe movimentações do período">
@@ -258,6 +278,8 @@ this.uiFeedback.error('Não foi possível concluir.');`,
     tooltip: `<app-tooltip label="Mais informações" text="Texto de ajuda contextual." />`,
     modal: `<app-modal
   [open]="open"
+  size="md"
+  eyebrow="Exemplo"
   title="Novo item"
   subtitle="Preencha os dados"
   (close)="close()">
@@ -277,10 +299,22 @@ if (!confirmed) return;`,
     'form-field': `<app-form-field
   label="Nome"
   [required]="true"
+  hint="Como aparece nos relatórios"
   [error]="form.error('name')"
   [submitted]="form.submitted">
   <input [(ngModel)]="name" />
+</app-form-field>
+
+<!-- Campo confirmado, sem erro -->
+<app-form-field label="E-mail" description="Usado para receber notificações." tone="success">
+  <input [(ngModel)]="email" />
 </app-form-field>`,
+    'toggle-field': `<app-toggle-field
+  label="Recorrente"
+  description="Repete automaticamente todo mês."
+  [checked]="recorrente"
+  (checkedChange)="recorrente = $event">
+</app-toggle-field>`,
     'app-currency-pipe': `{{ 1234.56 | appCurrency }}
 {{ 1234.56 | appCurrency:'USD' }}`,
     'account-list': `<app-account-list

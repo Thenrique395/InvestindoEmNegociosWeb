@@ -14,13 +14,20 @@
     @switch (slug) {
       @case ('page-header') {
         <app-page-header eyebrow="Financeiro" title="Contas" description="Gerencie suas contas e saldos">
+          <span page-meta>3 contas ativas</span>
           <button page-actions class="btn-primary sm">Nova conta</button>
+        </app-page-header>
+        <app-page-header [elevated]="true" size="sm" eyebrow="Financeiro" title="Variante elevada" description="Com borda, sombra e padding (elevated=true)">
+          <button page-actions class="btn-ghost sm">Ação</button>
         </app-page-header>
       }
       @case ('section-card') {
         <app-section-card title="Extrato" description="Acompanhe movimentações do período">
           <button card-actions class="btn-primary sm">Filtrar</button>
           Conteúdo de exemplo da seção.
+        </app-section-card>
+        <app-section-card title="Variante muted" description="surface=&quot;muted&quot; padding=&quot;sm&quot;" surface="muted" padding="sm">
+          Fundo discreto, usado para blocos secundários dentro de uma página já cheia de cards.
         </app-section-card>
       }
       @case ('filter-bar') {
@@ -47,24 +54,69 @@
         <p>Eventos emitidos: {{ periodHeroEvents().join(', ') || 'nenhum ainda' }}</p>
       }
       @case ('period-total-card') {
-        <app-period-total-card eyebrow="Total do mês" value="R$ 5.200,00" description="Receitas confirmadas" />
+        <app-period-total-card eyebrow="Total do mês" value="R$ 5.200,00" description="Receitas confirmadas">
+          <button total-card-actions type="button" class="period-total-card__action period-total-card__action--primary">
+            <span class="period-total-card__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="period-total-card__action-copy">
+              <strong>Adicionar receita</strong>
+              <small>Registrar uma nova entrada manualmente.</small>
+            </span>
+          </button>
+        </app-period-total-card>
       }
       @case ('period-action-card') {
-        <app-period-action-card eyebrow="Próxima ação" title="Quitar despesas vencidas" description="2 despesas vencidas precisam de atenção." />
+        <app-period-action-card eyebrow="Próxima ação" title="Quitar despesas vencidas" description="2 despesas vencidas precisam de atenção.">
+          <button action-card-actions type="button" class="period-total-card__action period-total-card__action--ghost">
+            <span class="period-total-card__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="period-total-card__action-copy">
+              <strong>Ver despesas</strong>
+              <small>Abrir a lista filtrada por vencidas.</small>
+            </span>
+          </button>
+        </app-period-action-card>
       }
       @case ('stat-card') {
-        <app-stat-card tone="success" eyebrow="Saldo disponível" value="R$ 12.400,00" note="Atualizado agora" tooltipText="Saldo real considerando lançamentos confirmados." />
+        <div class="styleguide-demo__grid">
+          <app-stat-card tone="primary" eyebrow="Saldo disponível" value="R$ 12.400,00" note="Atualizado agora" tooltipText="Saldo real considerando lançamentos confirmados." />
+          <app-stat-card tone="success" eyebrow="Receitas do mês" value="R$ 8.200,00" note="+12% vs. mês anterior" />
+          <app-stat-card tone="warning" eyebrow="Despesas pendentes" value="R$ 1.350,00" note="3 contas a vencer" />
+          <app-stat-card tone="info" eyebrow="Investido" value="R$ 24.900,00" note="Carteira diversificada" />
+          <app-stat-card tone="danger" eyebrow="Despesas atrasadas" value="R$ 420,00" note="1 conta vencida" />
+        </div>
       }
       @case ('comparison-pill') {
-        <app-comparison-pill label="vs. mês anterior" trend="up" polarity="higher-is-better">+12%</app-comparison-pill>
+        <div class="styleguide-demo__row">
+          <app-comparison-pill label="Receitas vs. mês anterior" trend="up" polarity="higher-is-better">+12%</app-comparison-pill>
+          <app-comparison-pill label="Receitas vs. mês anterior" trend="down" polarity="higher-is-better">-8%</app-comparison-pill>
+        </div>
+        <div class="styleguide-demo__row">
+          <app-comparison-pill label="Despesas vs. mês anterior" trend="down" polarity="lower-is-better">-15%</app-comparison-pill>
+          <app-comparison-pill label="Despesas vs. mês anterior" trend="up" polarity="lower-is-better">+9%</app-comparison-pill>
+        </div>
+        <div class="styleguide-demo__row">
+          <app-comparison-pill label="Saldo vs. mês anterior" trend="flat" polarity="higher-is-better">estável</app-comparison-pill>
+        </div>
+        <p><em>Repare que a cor depende de <code>polarity</code>: "despesas" usa <code>lower-is-better</code>, então uma queda (-15%) aparece em verde.</em></p>
       }
       @case ('status-badge') {
         <div class="styleguide-demo__row">
-          <app-status-badge tone="success" label="Ativa"></app-status-badge>
-          <app-status-badge tone="danger" label="Despesa"></app-status-badge>
+          <app-status-badge tone="success" label="Ativa" [dot]="true"></app-status-badge>
+          <app-status-badge tone="danger" label="Despesa" [dot]="true"></app-status-badge>
           <app-status-badge tone="warning" label="Duplicado"></app-status-badge>
           <app-status-badge tone="info" label="Info"></app-status-badge>
           <app-status-badge tone="muted" label="Inativo" [dot]="true"></app-status-badge>
+        </div>
+        <div class="styleguide-demo__row">
+          <app-status-badge tone="success" label="Ativa" size="md"></app-status-badge>
+          <app-status-badge tone="danger" label="Despesa" size="md"></app-status-badge>
         </div>
       }
       @case ('ui-state') {
@@ -91,10 +143,14 @@
       }
       @case ('modal') {
         <div class="styleguide-demo__row">
+          <button type="button" class="btn-ghost sm" [class.btn-primary]="modalSize() === 'sm'" (click)="modalSize.set('sm')">sm</button>
+          <button type="button" class="btn-ghost sm" [class.btn-primary]="modalSize() === 'md'" (click)="modalSize.set('md')">md</button>
+          <button type="button" class="btn-ghost sm" [class.btn-primary]="modalSize() === 'lg'" (click)="modalSize.set('lg')">lg</button>
+          <button type="button" class="btn-ghost sm" [class.btn-primary]="modalSize() === 'xl'" (click)="modalSize.set('xl')">xl</button>
           <button type="button" class="btn-primary sm" (click)="modalOpen.set(true)">Abrir modal</button>
         </div>
-        <app-modal [open]="modalOpen()" title="Novo item" subtitle="Preencha os dados" (close)="modalOpen.set(false)">
-          <div modal-body>Conteúdo de exemplo do modal.</div>
+        <app-modal [open]="modalOpen()" [size]="modalSize()" eyebrow="Exemplo" title="Novo item" subtitle="Preencha os dados" (close)="modalOpen.set(false)">
+          <div modal-body>Conteúdo de exemplo do modal (tamanho: {{ modalSize() }}).</div>
           <div modal-footer>
             <button type="button" class="btn-ghost sm" (click)="modalOpen.set(false)">Cancelar</button>
             <button type="button" class="btn-primary sm" (click)="modalOpen.set(false)">Salvar</button>
@@ -111,12 +167,40 @@
         </div>
       }
       @case ('form-field') {
-        <app-form-field label="Nome" [required]="true" [error]="formFieldHasError() ? 'Informe um nome válido.' : ''" [submitted]="formFieldHasError()">
+        <app-form-field label="Nome" [required]="true" hint="Como aparece nos relatórios" [error]="formFieldHasError() ? 'Informe um nome válido.' : ''" [submitted]="formFieldHasError()">
           <input type="text" placeholder="Digite um nome" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
         </app-form-field>
         <div class="styleguide-demo__row">
           <button type="button" class="btn-ghost sm" (click)="formFieldHasError.set(!formFieldHasError())">Alternar estado de erro</button>
         </div>
+        <app-form-field label="E-mail" description="Usado para receber notificações de cobrança." tone="success">
+          <input type="email" placeholder="voce@exemplo.com" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+        </app-form-field>
+        <app-form-field label="Categoria">
+          <select class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]">
+            <option>Moradia</option>
+            <option>Transporte</option>
+            <option>Lazer</option>
+          </select>
+        </app-form-field>
+        <app-form-field label="Observações" hint="Opcional">
+          <textarea rows="3" placeholder="Notas internas..." class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]"></textarea>
+        </app-form-field>
+      }
+      @case ('toggle-field') {
+        <app-toggle-field
+          label="Recorrente"
+          description="Repete automaticamente todo mês."
+          [checked]="toggleFieldChecked()"
+          (checkedChange)="toggleFieldChecked.set($event)">
+        </app-toggle-field>
+        <app-toggle-field
+          label="Notificações por e-mail"
+          description="Indisponível neste plano."
+          [checked]="false"
+          [disabled]="true">
+        </app-toggle-field>
+        <p>Estado: {{ toggleFieldChecked() ? 'ativado' : 'desativado' }}</p>
       }
       @case ('app-currency-pipe') {
         <p>{{ 1234.56 | appCurrency }}</p>
@@ -136,12 +220,19 @@
         </app-cartoes-listagem>
       }
       @case ('responsive-list') {
+        <div class="styleguide-demo__row">
+          <button type="button" class="btn-ghost sm" (click)="listLoading.set(!listLoading())">Alternar loading</button>
+          <button type="button" class="btn-ghost sm" (click)="listEmpty.set(!listEmpty())">Alternar vazio</button>
+        </div>
         <app-responsive-list
           [columns]="listColumns"
-          [items]="listItems"
+          [items]="listEmpty() ? [] : listItems"
           [getId]="listGetId"
           [sortBy]="listSortBy"
           [sortDir]="listSortDir"
+          [loading]="listLoading()"
+          emptyTitle="Nenhum lançamento"
+          emptyDescription="Os itens cadastrados aparecerão aqui."
           [selectable]="true"
           [selectedIds]="listSelectedIds"
           (sort)="onListSort($event)"
@@ -149,7 +240,7 @@
           (selectAllChange)="onListSelectAllChange($event)">
           <ng-template appResponsiveListCell="nome" let-item>{{ item.nome }}</ng-template>
           <ng-template appResponsiveListCell="status" let-item>
-            <app-status-badge [tone]="item.status" [label]="item.status"></app-status-badge>
+            <app-status-badge [tone]="item.status" [label]="listStatusLabel(item.status)"></app-status-badge>
           </ng-template>
           <ng-template appResponsiveListCell="valor" let-item>{{ item.valor | appCurrency }}</ng-template>
         </app-responsive-list>

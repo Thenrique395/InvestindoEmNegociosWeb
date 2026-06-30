@@ -11,3 +11,9 @@
   align-items: center;
   gap: var(--spacing-2);
 }
+
+.styleguide-demo__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-2);
+}

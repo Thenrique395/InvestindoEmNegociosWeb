@@ -32,7 +32,8 @@ describe('StyleguideComponentDetailComponent', () => {
 
     expect(fixture.componentInstance.modalOpen()).toBeFalse();
 
-    const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+    const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
+    const button = buttons.find((btn) => btn.textContent?.trim() === 'Abrir modal')!;
     button.click();
     fixture.detectChanges();
 
