@@ -62,14 +62,14 @@
       </aside>
     </app-period-hero>
 
-    <div class="calendar-toolbar">
-      <div class="calendar-toolbar__group">
+    <app-filter-bar>
+      <div filter-left class="calendar-toolbar__group">
         <span class="calendar-toolbar__label">Mostrar</span>
         <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showExpenses" /> Despesas</label>
         <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showIncomes" /> Receitas</label>
         <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showCardDue" /> Cartões</label>
       </div>
-      <div class="calendar-toolbar__group">
+      <div filter-right class="calendar-toolbar__group">
         <label class="calendar-toolbar__field">
           <span class="calendar-toolbar__label">Categoria</span>
           <select [(ngModel)]="selectedCategory">
@@ -89,7 +89,7 @@
           </select>
         </label>
       </div>
-    </div>
+    </app-filter-bar>
 
     <div class="calendar-layout">
       <section class="calendar-grid-wrap">

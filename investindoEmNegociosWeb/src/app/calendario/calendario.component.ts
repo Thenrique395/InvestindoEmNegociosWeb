@@ -8,6 +8,7 @@ import { InstallmentStatus } from '../types/money-types';
 import { AccountsService } from '../accounts.service';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 
 type CalendarEventType = 'expense' | 'income' | 'card-due';
 
@@ -34,7 +35,7 @@ interface CalendarCell {
 @Component({
   selector: 'app-calendario',
   standalone: true,
-  imports: [NgClass, FormsModule, StatCardComponent, PeriodHeroComponent],
+  imports: [NgClass, FormsModule, StatCardComponent, PeriodHeroComponent, FilterBarComponent],
   templateUrl: './calendario.component.html',
   styleUrls: ['./calendario.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
