@@ -314,6 +314,12 @@
   background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
 
+.onboarding-panel--locked {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
 .onboarding-panel--accent {
   background: linear-gradient(
     180deg,
