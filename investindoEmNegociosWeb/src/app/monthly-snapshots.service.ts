@@ -26,10 +26,10 @@ export class MonthlySnapshotsService {
   constructor(private readonly http: HttpClient) {}
 
   list(): Observable<MonthlyFinancialSnapshotResponse[]> {
-    return this.http.get<MonthlyFinancialSnapshotResponse[]>(`${API_BASE_URL}/monthlysnapshots`);
+    return this.http.get<MonthlyFinancialSnapshotResponse[]>(`${API_BASE_URL}/monthly-snapshots`);
   }
 
   generate(year: number, month: number): Observable<MonthlyFinancialSnapshotResponse> {
-    return this.http.post<MonthlyFinancialSnapshotResponse>(`${API_BASE_URL}/monthlysnapshots/generate`, { year, month });
+    return this.http.post<MonthlyFinancialSnapshotResponse>(`${API_BASE_URL}/monthly-snapshots/generate`, { year, month });
   }
 }
