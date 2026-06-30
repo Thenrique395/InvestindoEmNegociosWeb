@@ -13,7 +13,8 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const allowedHosts = process.env['ANGULAR_ALLOWED_HOSTS']?.split(',').map(h => h.trim()) ?? [];
+const angularApp = new AngularNodeAppEngine({ allowedHosts });
 
 app.use(
   compression({
