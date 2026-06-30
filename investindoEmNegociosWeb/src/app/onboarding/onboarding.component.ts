@@ -45,11 +45,10 @@ export class OnboardingComponent implements OnInit {
   creatingAccount = false;
   savingEntries = false;
   liveMessage = '';
-  readonly totalSteps = 3;
+  readonly totalSteps = 4;
   readonly minBirthDate = '1900-01-01';
   readonly maxBirthDate = todayIso();
   step = 0;
-  profileSaved = false;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode | null = null;
   carryOverDay = 1;
@@ -228,9 +227,9 @@ export class OnboardingComponent implements OnInit {
     this.profile.upsert(payload).subscribe({
       next: () => {
         this.loading = false;
-        this.profileSaved = true;
-        this.uiFeedback.success('Dados do perfil salvos. Continue abaixo para criar a conta e os primeiros lançamentos.');
-        this.announce('Dados do perfil salvos com sucesso.');
+        this.uiFeedback.success('Dados do perfil salvos. Vamos para a conta e os primeiros lançamentos.');
+        this.announce('Dados e objetivo salvos com sucesso.');
+        this.nextStep();
       },
       error: (err) => {
         if (err?.status === 401) {
@@ -889,10 +888,6 @@ export class OnboardingComponent implements OnInit {
           this.carryOverDay = savedCarryOver;
         } else if (!this.canEditCarryOverDay) {
           this.carryOverDay = 1;
-        }
-
-        if (data.fullName) {
-          this.profileSaved = true;
         }
 
         this.hasDocument = !!data.document;
