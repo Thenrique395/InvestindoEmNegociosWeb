@@ -295,53 +295,54 @@
 
   </section>
 
-  @if (showAdminModal) {
-    <div class="modal">
-      <div class="modal__backdrop" (click)="closeAdminModal()"></div>
-      <div class="modal__card">
-        <h2>Editar categoria padrão</h2>
-        <label>
-          Nome
-          <input type="text" [(ngModel)]="adminName" />
-        </label>
-        <label>
-          Aplica em
-          <select [(ngModel)]="adminAppliesTo">
-            <option value="">Todos</option>
-            <option value="Income">Receitas</option>
-            <option value="Expense">Despesas</option>
-          </select>
-        </label>
-        <div class="modal__actions">
-          <button type="button" class="btn-cancel" (click)="closeAdminModal()">Cancelar</button>
-          <button type="button" class="btn-primary" (click)="saveAdmin()" [disabled]="adminSaving">
-            <span class="btn-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            {{ adminSaving ? 'Salvando...' : 'Salvar' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  }
+  <app-modal
+    [open]="showAdminModal"
+    eyebrow="Admin"
+    title="Editar categoria padrão"
+    size="sm"
+    (close)="closeAdminModal()">
 
-  @if (showDeleteModal) {
-    <div class="modal">
-      <div class="modal__backdrop" (click)="fecharDeleteModal()"></div>
-      <div class="modal__card">
-        <h2>Remover categoria</h2>
-        <p class="muted">Tem certeza que deseja remover a categoria abaixo?</p>
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text)]">
-          {{ deleteTarget?.name || 'Categoria' }}
-        </div>
-        <div class="modal__actions">
-          <button type="button" class="btn-cancel" (click)="fecharDeleteModal()">Cancelar</button>
-          <button type="button" class="btn-danger" (click)="confirmarRemocao()">Remover</button>
-        </div>
+    <div class="admin-form" modal-body>
+      <app-form-field label="Nome">
+        <input type="text" [(ngModel)]="adminName" />
+      </app-form-field>
+      <app-form-field label="Aplica em">
+        <select [(ngModel)]="adminAppliesTo">
+          <option value="">Todos</option>
+          <option value="Income">Receitas</option>
+          <option value="Expense">Despesas</option>
+        </select>
+      </app-form-field>
+    </div>
+
+    <div modal-footer>
+      <button type="button" class="btn-ghost sm" (click)="closeAdminModal()">Cancelar</button>
+      <button type="button" class="btn-primary sm" (click)="saveAdmin()" [disabled]="adminSaving">
+        {{ adminSaving ? 'Salvando...' : 'Salvar' }}
+      </button>
+    </div>
+
+  </app-modal>
+
+  <app-modal
+    [open]="showDeleteModal"
+    eyebrow="Atenção"
+    title="Remover categoria"
+    subtitle="Tem certeza que deseja remover a categoria abaixo?"
+    size="sm"
+    (close)="fecharDeleteModal()">
+
+    <div modal-body>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text)]">
+        {{ deleteTarget?.name || 'Categoria' }}
       </div>
     </div>
-  }
+
+    <div modal-footer>
+      <button type="button" class="btn-ghost sm" (click)="fecharDeleteModal()">Cancelar</button>
+      <button type="button" class="btn-danger sm" (click)="confirmarRemocao()">Remover</button>
+    </div>
+
+  </app-modal>
 
 </section>

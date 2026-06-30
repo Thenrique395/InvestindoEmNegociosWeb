@@ -196,51 +196,7 @@
   flex-wrap: wrap;
 }
 
-/* button styles now come from global tokens */
-
-.modal {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  z-index: 40;
-}
-
-.modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 15, 24, 0.6);
-}
-
-.modal__card {
-  position: relative;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  width: min(420px, 92vw);
+.admin-form {
   display: grid;
   gap: 1rem;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
-}
-
-.modal__card label {
-  display: grid;
-  gap: var(--spacing-1);
-  font-weight: var(--font-weight-semibold);
-}
-
-.modal__card input,
-.modal__card select {
-  padding: var(--spacing-1) var(--spacing-2);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background-color: var(--surface);
-  color: var(--text);
-}
-
-.modal__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
 }

@@ -11,6 +11,8 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { ModalComponent } from '../shared/modal/modal.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
 
 type MetaFiltroKind = 'ALL' | GoalKind;
 type GoalSection = {
@@ -23,7 +25,7 @@ type GoalSection = {
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, ModalComponent, FormFieldComponent],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })

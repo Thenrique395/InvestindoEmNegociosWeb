@@ -5,11 +5,14 @@ import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { RouterLink } from '@angular/router';
 import { CategoryDto } from '../categories.service';
+import { ModalComponent } from '../shared/modal/modal.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.component';
 
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [FormsModule, DigitOnlyDirective, RouterLink],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink, ModalComponent, FormFieldComponent, ToggleFieldComponent],
   templateUrl: './despesas-form.component.html',
   styleUrls: ['./despesas-form.component.scss']
 })

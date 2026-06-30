@@ -747,290 +747,279 @@
 
   </section>
 
-  @if (showCadastro) {
-    <div class="modal">
-      <div class="modal__backdrop" (click)="closeCadastroModal()"></div>
-      <div class="modal__card modal__card--launch">
-        <div class="launch-header">
-          <h3>Adicionar lançamento</h3>
-          <button class="modal__close" type="button" (click)="closeCadastroModal()">✕</button>
-        </div>
-        <div class="launch-type">
-          <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao('COMPRA')">Compra</button>
-          <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao('VENDA')">Venda</button>
-        </div>
-        @if (cadastroOperacao === 'COMPRA') {
-          <div class="form grid-form">
-            <div>
-              <label>Tipo de ativo</label>
-              <select [(ngModel)]="novaPosicao.type" name="type">
-                @for (t of tipos; track trackByIndex($index, t)) {
-                  <option [value]="t.value">{{ t.label }}</option>
-                }
-              </select>
-            </div>
-            <div>
-              <label>Ativo</label>
-              <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
-            </div>
-            <div>
-              <label>Moeda</label>
-              <select [(ngModel)]="novaPosicao.currency" name="currency">
-                @for (c of currencyOptions; track c) {
-                  <option [value]="c">{{ c }}</option>
-                }
-              </select>
-            </div>
-            <div>
-              <label>Quantidade</label>
-              <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
-            </div>
-            <div>
-              <label>Preço{{ novaPosicao.currency === 'BRL' ? ' em R$' : '' }}</label>
-              <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
-            </div>
-            <div>
-              <label>Outros custos <span class="muted">(opcional)</span></label>
-              <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="cadastroCustos" />
-            </div>
-            <div>
-              <label>Data da compra</label>
-              <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
-            </div>
-            <div>
-              <label>Conta/Corretora</label>
-              <input
-                type="text"
-                [(ngModel)]="novaPosicao.account"
-                name="account"
-                placeholder="Ex.: Nubank, XP"
-                list="brokerOptions" />
-              <datalist id="brokerOptions">
-                @for (inst of institutions; track trackByIndex($index, inst)) {
-                  <option [value]="inst.name"></option>
-                }
-              </datalist>
-            </div>
-            <div>
-              <label>Categoria (opcional)</label>
-              <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
-            </div>
+  <app-modal
+    [open]="showCadastro"
+    eyebrow="Investimentos"
+    title="Adicionar lançamento"
+    subtitle="Registre compra, venda ou movimento na sua carteira."
+    size="md"
+    (close)="closeCadastroModal()">
+
+    <div modal-body>
+      <div class="launch-type">
+        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao('COMPRA')">Compra</button>
+        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao('VENDA')">Venda</button>
+      </div>
+      @if (cadastroOperacao === 'COMPRA') {
+        <div class="form grid-form">
+          <div>
+            <label>Tipo de ativo</label>
+            <select [(ngModel)]="novaPosicao.type" name="type">
+              @for (t of tipos; track trackByIndex($index, t)) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
           </div>
-        }
-        @if (cadastroOperacao === 'VENDA') {
-          <div class="form grid-form">
-            <div>
-              <label>Ativo</label>
-              <select [(ngModel)]="vendaPositionId" name="vendaPositionId" (ngModelChange)="onVendaPositionChange()">
-                <option value="">Selecione</option>
-                @for (p of posicoesVendaveis; track trackById($index, p)) {
-                  <option [value]="p.id">
-                    {{ p.asset }} ({{ p.quantity | number:'1.0-4' }})
-                  </option>
-                }
-              </select>
-            </div>
-            <div>
-              <label>Quantidade</label>
-              <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
-            </div>
-            <div>
-              <label>Preço em R$</label>
-              <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
-            </div>
-            <div>
-              <label>Outros custos <span class="muted">(opcional)</span></label>
-              <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="vendaCustos" />
-            </div>
-            <div>
-              <label>Data da venda</label>
-              <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
-            </div>
-            <div>
-              <label>Observação (opcional)</label>
-              <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
-            </div>
+          <div>
+            <label>Ativo</label>
+            <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
           </div>
-        }
-        <div class="launch-total">
-          <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
-          <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | appCurrency }}</strong>
+          <div>
+            <label>Moeda</label>
+            <select [(ngModel)]="novaPosicao.currency" name="currency">
+              @for (c of currencyOptions; track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label>Quantidade</label>
+            <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
+          </div>
+          <div>
+            <label>Preço{{ novaPosicao.currency === 'BRL' ? ' em R$' : '' }}</label>
+            <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
+          </div>
+          <div>
+            <label>Outros custos <span class="muted">(opcional)</span></label>
+            <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="cadastroCustos" />
+          </div>
+          <div>
+            <label>Data da compra</label>
+            <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
+          </div>
+          <div>
+            <label>Conta/Corretora</label>
+            <input type="text" [(ngModel)]="novaPosicao.account" name="account" placeholder="Ex.: Nubank, XP" list="brokerOptions" />
+            <datalist id="brokerOptions">
+              @for (inst of institutions; track trackByIndex($index, inst)) {
+                <option [value]="inst.name"></option>
+              }
+            </datalist>
+          </div>
+          <div>
+            <label>Categoria (opcional)</label>
+            <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
+          </div>
         </div>
-        <div class="actions">
-          <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
-          <button class="btn-primary" type="button" (click)="cadastroOperacao === 'COMPRA' ? salvarPosicao() : salvarVenda()">
-            {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
-          </button>
+      }
+      @if (cadastroOperacao === 'VENDA') {
+        <div class="form grid-form">
+          <div>
+            <label>Ativo</label>
+            <select [(ngModel)]="vendaPositionId" name="vendaPositionId" (ngModelChange)="onVendaPositionChange()">
+              <option value="">Selecione</option>
+              @for (p of posicoesVendaveis; track trackById($index, p)) {
+                <option [value]="p.id">{{ p.asset }} ({{ p.quantity | number:'1.0-4' }})</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label>Quantidade</label>
+            <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
+          </div>
+          <div>
+            <label>Preço em R$</label>
+            <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
+          </div>
+          <div>
+            <label>Outros custos <span class="muted">(opcional)</span></label>
+            <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="vendaCustos" />
+          </div>
+          <div>
+            <label>Data da venda</label>
+            <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
+          </div>
+          <div>
+            <label>Observação (opcional)</label>
+            <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
+          </div>
         </div>
+      }
+      <div class="launch-total">
+        <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
+        <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | appCurrency }}</strong>
       </div>
     </div>
-  }
 
-  @if (showMovimento && posSelecionada) {
-    <div class="modal">
-      <div class="modal__backdrop" (click)="closeMovimentoModal()"></div>
-      <div class="modal__card">
-        <h3>Registrar compra/venda para {{ posSelecionada.asset }}</h3>
-        <div class="form inline">
-          <label>Operação</label>
-          <select [(ngModel)]="movimento.type" name="movType">
-            @for (tipo of movimentoTipos; track trackByIndex($index, tipo)) {
-              <option [value]="tipo.value">{{ tipo.label }}</option>
-            }
-          </select>
-          <label>Qtd.</label>
-          <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
-          <label>Preço unitário</label>
-          <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
-          <label>Outros custos</label>
-          <input type="number" min="0" step="any" [(ngModel)]="movimentoCustos" name="movCost" />
-          <label>Data</label>
-          <input type="date" [(ngModel)]="movimento.date" name="movDate" />
-          <label>Nota</label>
-          <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
-        </div>
-        <div class="launch-total">
-          <span>Valor total</span>
-          <strong>{{ movimentoValorTotal | appCurrency }}</strong>
-        </div>
-        <div class="actions">
-          <button class="btn-primary" type="button" (click)="salvarMovimento()">Salvar movimento</button>
-          <button class="btn-cancel sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
-        </div>
+    <div modal-footer>
+      <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
+      <button class="btn-primary sm" type="button" (click)="cadastroOperacao === 'COMPRA' ? salvarPosicao() : salvarVenda()">
+        {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
+      </button>
+    </div>
+
+  </app-modal>
+
+  <app-modal
+    [open]="showMovimento && !!posSelecionada"
+    eyebrow="Investimentos"
+    [title]="'Novo lançamento — ' + (posSelecionada?.asset ?? '')"
+    subtitle="Registre compra, venda ou movimento para esta posição."
+    size="sm"
+    (close)="closeMovimentoModal()">
+
+    <div modal-body>
+      <div class="form inline">
+        <label>Operação</label>
+        <select [(ngModel)]="movimento.type" name="movType">
+          @for (tipo of movimentoTipos; track trackByIndex($index, tipo)) {
+            <option [value]="tipo.value">{{ tipo.label }}</option>
+          }
+        </select>
+        <label>Qtd.</label>
+        <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
+        <label>Preço unitário</label>
+        <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
+        <label>Outros custos</label>
+        <input type="number" min="0" step="any" [(ngModel)]="movimentoCustos" name="movCost" />
+        <label>Data</label>
+        <input type="date" [(ngModel)]="movimento.date" name="movDate" />
+        <label>Nota</label>
+        <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+      </div>
+      <div class="launch-total">
+        <span>Valor total</span>
+        <strong>{{ movimentoValorTotal | appCurrency }}</strong>
       </div>
     </div>
-  }
 
-  @if (showB3Import) {
-    <div class="modal">
-      <div class="modal__backdrop" (click)="closeB3ImportModal()"></div>
-      <div class="modal__card modal__card--wide">
-        <h3>Importações e exportações</h3>
-        <section class="import-section">
-          <p class="label">Relatório consolidado da B3 (PDF)</p>
-          <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+    <div modal-footer>
+      <button class="btn-ghost sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
+      <button class="btn-primary sm" type="button" (click)="salvarMovimento()">Salvar movimento</button>
+    </div>
+
+  </app-modal>
+
+  <app-modal
+    [open]="showB3Import"
+    eyebrow="Importação"
+    title="Importações e exportações"
+    subtitle="Importe operações da B3 por PDF ou CSV para manter a carteira atualizada."
+    size="lg"
+    (close)="closeB3ImportModal()">
+
+    <div modal-body>
+      <section class="import-section">
+        <p class="label">Relatório consolidado da B3 (PDF)</p>
+        <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+        <div class="import-upload">
+          <label class="btn-primary sm import-upload__button">
+            <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
+            Escolher PDF
+          </label>
+          <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
+        </div>
+        @if (b3Loading) { <div class="muted">Lendo relatório...</div> }
+        @if (b3Error) { <div class="danger">{{ b3Error }}</div> }
+      </section>
+      <section class="import-section">
+        <p class="label">Planilha CSV</p>
+        <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
+        <div class="import-compact">
           <div class="import-upload">
             <label class="btn-primary sm import-upload__button">
-              <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
-              Escolher PDF
+              <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
+              Importar CSV
             </label>
-            <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
+            <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Exportar modelo</button>
           </div>
-          @if (b3Loading) {
-            <div class="muted">Lendo relatório...</div>
-          }
-          @if (b3Error) {
-            <div class="danger">{{ b3Error }}</div>
-          }
-        </section>
-        <section class="import-section">
-          <p class="label">Planilha CSV</p>
-          <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
-          <div class="import-compact">
-            <div class="import-upload">
-              <label class="btn-primary sm import-upload__button">
-                <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
-                Importar CSV
-              </label>
-              <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Exportar modelo</button>
-            </div>
-            <small class="muted">Importados nesta execução: {{ csvImported }}</small>
-          </div>
-          @if (csvError) {
-            <div class="danger">{{ csvError }}</div>
-          }
-          @if (csvPreviewRows.length) {
-            <details class="csv-preview">
-              <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Tipo</th>
-                      <th>Ativo</th>
-                      <th>Qtd</th>
-                      <th>Preço médio</th>
-                      <th>Conta</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (row of csvPreviewRows; track trackByIndex($index, row)) {
-                      <tr>
-                        <td>{{ row.type }}</td>
-                        <td>{{ row.asset }}</td>
-                        <td>{{ row.quantity }}</td>
-                        <td>{{ row.avgPrice | appCurrency }}</td>
-                        <td>{{ row.account }}</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </details>
-          }
-        </section>
-        @if (b3Preview) {
-          <div class="executive-grid">
-            <article class="card executive-card">
-              <p class="label">Mês de referência</p>
-              <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
-            </article>
-            <article class="card executive-card">
-              <p class="label">Total em posições</p>
-              <strong>{{ b3Preview.totals.positions | appCurrency }}</strong>
-            </article>
-            <article class="card executive-card">
-              <p class="label">Proventos</p>
-              <strong>{{ b3Preview.totals.incomes | appCurrency }}</strong>
-            </article>
-            <article class="card executive-card">
-              <p class="label">Negociações</p>
-              <strong>{{ b3Preview.trades.length }}</strong>
-            </article>
-          </div>
-          @if (b3Preview.positions.length) {
+          <small class="muted">Importados nesta execução: {{ csvImported }}</small>
+        </div>
+        @if (csvError) { <div class="danger">{{ csvError }}</div> }
+        @if (csvPreviewRows.length) {
+          <details class="csv-preview">
+            <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr>
-                    <th>Produto</th>
-                    <th>Instituição</th>
-                    <th>Qtd</th>
-                    <th>Fechamento</th>
-                    <th>Atualizado</th>
-                  </tr>
+                  <tr><th>Tipo</th><th>Ativo</th><th>Qtd</th><th>Preço médio</th><th>Conta</th></tr>
                 </thead>
                 <tbody>
-                  @for (p of b3Preview.positions; track trackByIndex($index, p)) {
+                  @for (row of csvPreviewRows; track trackByIndex($index, row)) {
                     <tr>
-                      <td>{{ p.product }}</td>
-                      <td>{{ p.institution }}</td>
-                      <td>{{ p.quantity }}</td>
-                      <td>{{ p.closingPrice | appCurrency }}</td>
-                      <td>{{ p.updatedValue | appCurrency }}</td>
+                      <td>{{ row.type }}</td>
+                      <td>{{ row.asset }}</td>
+                      <td>{{ row.quantity }}</td>
+                      <td>{{ row.avgPrice | appCurrency }}</td>
+                      <td>{{ row.account }}</td>
                     </tr>
                   }
                 </tbody>
               </table>
             </div>
-          }
-          <div class="import-actions">
-            <label class="filter">
-              <span>Estratégia</span>
-              <select [(ngModel)]="b3Strategy">
-                <option value="merge">Mesclar com dados atuais</option>
-                <option value="replace">Substituir mês importado</option>
-              </select>
-            </label>
-            <div class="actions">
-              <button class="btn-cancel sm" type="button" (click)="closeB3ImportModal()">Cancelar</button>
-              <button class="btn-primary sm" type="button" (click)="confirmarImportacaoB3()" [disabled]="b3Importing">
-                {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
-              </button>
-            </div>
+          </details>
+        }
+      </section>
+      @if (b3Preview) {
+        <div class="executive-grid">
+          <article class="card executive-card">
+            <p class="label">Mês de referência</p>
+            <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
+          </article>
+          <article class="card executive-card">
+            <p class="label">Total em posições</p>
+            <strong>{{ b3Preview.totals.positions | appCurrency }}</strong>
+          </article>
+          <article class="card executive-card">
+            <p class="label">Proventos</p>
+            <strong>{{ b3Preview.totals.incomes | appCurrency }}</strong>
+          </article>
+          <article class="card executive-card">
+            <p class="label">Negociações</p>
+            <strong>{{ b3Preview.trades.length }}</strong>
+          </article>
+        </div>
+        @if (b3Preview.positions.length) {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Produto</th><th>Instituição</th><th>Qtd</th><th>Fechamento</th><th>Atualizado</th></tr>
+              </thead>
+              <tbody>
+                @for (p of b3Preview.positions; track trackByIndex($index, p)) {
+                  <tr>
+                    <td>{{ p.product }}</td>
+                    <td>{{ p.institution }}</td>
+                    <td>{{ p.quantity }}</td>
+                    <td>{{ p.closingPrice | appCurrency }}</td>
+                    <td>{{ p.updatedValue | appCurrency }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
-      </div>
+        <div class="import-actions">
+          <label class="filter">
+            <span>Estratégia</span>
+            <select [(ngModel)]="b3Strategy">
+              <option value="merge">Mesclar com dados atuais</option>
+              <option value="replace">Substituir mês importado</option>
+            </select>
+          </label>
+        </div>
+      }
     </div>
-  }
+
+    <div modal-footer>
+      <button class="btn-ghost sm" type="button" (click)="closeB3ImportModal()">Cancelar</button>
+      @if (b3Preview) {
+        <button class="btn-primary sm" type="button" (click)="confirmarImportacaoB3()" [disabled]="b3Importing">
+          {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
+        </button>
+      }
+    </div>
+
+  </app-modal>
 </section>

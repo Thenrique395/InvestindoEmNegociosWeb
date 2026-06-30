@@ -5,11 +5,14 @@ import { StoredIncome } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { ModalComponent } from '../shared/modal/modal.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.component';
 
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, DigitOnlyDirective, RouterLink, AppCurrencyPipe],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink, AppCurrencyPipe, ModalComponent, FormFieldComponent, ToggleFieldComponent],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })

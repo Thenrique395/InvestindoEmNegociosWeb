@@ -1105,62 +1105,6 @@ th {
   padding: var(--spacing-1) 0;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  display: grid;
-  place-items: center;
-  padding: var(--spacing-2);
-}
-
-.modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 15, 24, 0.6);
-  backdrop-filter: blur(2px);
-}
-
-.modal__card {
-  position: relative;
-  width: min(980px, 96vw);
-  max-height: 90vh;
-  overflow: auto;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: var(--spacing-2);
-  display: grid;
-  gap: var(--spacing-2);
-}
-
-.modal__card--wide {
-  width: min(1100px, 96vw);
-}
-
-.modal__card--launch {
-  width: min(760px, 96vw);
-}
-
-.launch-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-1);
-  padding-bottom: var(--spacing-1);
-  border-bottom: 1px solid var(--border);
-}
-
-.modal__close {
-  border: 0;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: var(--font-size-title-sm);
-  line-height: var(--line-height-display);
-  padding: 0.2rem;
-}
-
 .launch-type {
   display: grid;
   grid-template-columns: 1fr 1fr;

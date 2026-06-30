@@ -160,32 +160,12 @@
 }
 
 /* Signup modal */
-.signup-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  display: grid;
-  place-items: center;
-}
-
-.signup-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: var(--overlay);
-  backdrop-filter: blur(4px);
-}
-
-.signup-modal__dialog {
-  position: relative;
-  z-index: 1;
-  width: min(1080px, 94vw);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+.signup-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
+  border-radius: var(--radius-lg);
+  margin: calc(-1 * var(--spacing-3)) calc(-1 * var(--spacing-4));
 }
 
 .signup-modal__left {

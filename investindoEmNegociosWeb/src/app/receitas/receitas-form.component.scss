@@ -1,227 +1,61 @@
-.income-form-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-}
-
-.income-form-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgb(15 23 42 / 0.62);
-  backdrop-filter: blur(10px);
-}
-
-.income-form-modal__dialog {
-  position: relative;
-  inline-size: min(860px, 100%);
-  max-block-size: min(92vh, 980px);
-  overflow-y: auto;
-  border-radius: var(--radius-2xl);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-lg);
-}
-
-.income-form-modal__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.65rem 1.65rem 1.25rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.income-form-modal__title-wrap {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.income-form-modal__eyebrow {
-  margin: 0;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.income-form-modal__title {
-  margin: 0;
-  font-size: clamp(1.7rem, 2vw, 2.1rem);
-  line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-title);
-  color: var(--text);
-}
-
-.income-form-modal__subtitle {
-  margin: 0;
-  max-inline-size: 52ch;
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-  color: var(--text-secondary);
-}
-
-.income-form-modal__close {
-  inline-size: 44px;
-  block-size: 44px;
-  flex: 0 0 auto;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 90%, white);
-  color: var(--text-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    background 160ms ease,
-    color 160ms ease;
-
-  svg {
-    inline-size: 20px;
-    block-size: 20px;
-  }
-}
-
-.income-form-modal__close:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--primary) 24%, transparent);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  color: var(--text);
-}
-
-.income-form-modal__form {
+.income-form {
   display: grid;
   gap: 1.3rem;
-  padding: 1.45rem 1.65rem 1.65rem;
 }
 
-.income-form-modal__section {
+.income-form__section {
   display: grid;
   gap: 1rem;
 }
 
-.income-form-modal__section-head {
+.income-form__section-head {
   display: grid;
   gap: 0.25rem;
 }
 
-.income-form-modal__section-title {
+.income-form__section-title {
   margin: 0;
   font-size: var(--font-size-body-lg);
   font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
-.income-form-modal__section-text {
+.income-form__section-text {
   margin: 0;
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
-.income-form-modal__grid {
+.income-form__grid {
   display: grid;
   gap: 1rem;
 }
 
-.income-form-modal__grid--main {
+.income-form__grid--main {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.income-field {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.income-field--full {
+.income-form__field--full {
   grid-column: 1 / -1;
 }
 
-.income-field__control {
+.income-form__control {
   min-height: 52px;
   border-radius: var(--radius-lg);
   padding: 0 1rem;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.income-form-modal__stack {
+.income-form__stack {
   display: grid;
   gap: 1rem;
 }
 
-.income-toggle-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--surface-2) 74%, white);
-  padding: 1rem;
-}
-
-.income-toggle-card__copy {
-  display: grid;
-  gap: 0.2rem;
-}
-
-.income-toggle-card__title {
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
-  color: var(--text);
-}
-
-.income-toggle-card__text {
-  font-size: var(--font-size-label);
-  line-height: var(--line-height-body);
-  color: var(--text-secondary);
-}
-
-.income-toggle-card__switch {
-  position: relative;
-  inline-size: 44px;
-  block-size: 24px;
-  flex: 0 0 auto;
-}
-
-.income-toggle-card__track {
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-3) 80%, white);
-  transition: border-color 160ms ease, background 160ms ease;
-}
-
-.income-toggle-card__thumb {
-  position: absolute;
-  inset-block-start: 3px;
-  inset-inline-start: 3px;
-  inline-size: 16px;
-  block-size: 16px;
-  border-radius: var(--radius-pill);
-  background: white;
-  box-shadow: var(--shadow-sm);
-  transition: transform 160ms ease;
-}
-
-.income-toggle-card__switch .peer:checked + .income-toggle-card__track {
-  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
-  background: var(--primary);
-}
-
-.income-toggle-card__switch .peer:checked ~ .income-toggle-card__thumb {
-  transform: translateX(20px);
-}
-
-.income-form-modal__warning {
+.income-form__warning {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -233,26 +67,29 @@
   padding: 0.95rem 1rem;
 }
 
-.income-form-modal__warning-copy {
+.income-form__warning-copy {
   display: grid;
   gap: 0.2rem;
 }
 
-.income-form-modal__warning-title {
+.income-form__warning-title,
+.income-form__warning-text {
   margin: 0;
+}
+
+.income-form__warning-title {
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
   color: var(--text);
 }
 
-.income-form-modal__warning-text {
-  margin: 0;
+.income-form__warning-text {
   font-size: var(--font-size-label);
   line-height: var(--line-height-body);
   color: var(--text-secondary);
 }
 
-.income-form-modal__warning-link {
+.income-form__warning-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -267,7 +104,7 @@
   text-decoration: none;
 }
 
-.income-form-modal__hint-card {
+.income-form__hint-card {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -279,12 +116,12 @@
   padding: 0.95rem 1rem;
 }
 
-.income-form-modal__hint-copy {
+.income-form__hint-copy {
   display: grid;
   gap: 0.2rem;
 }
 
-.income-form-modal__hint-title {
+.income-form__hint-title {
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-label);
@@ -292,14 +129,14 @@
   color: var(--text-muted);
 }
 
-.income-form-modal__hint-text {
+.income-form__hint-text {
   margin: 0;
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
-.income-form-modal__hint-action {
+.income-form__hint-action {
   min-height: 40px;
   border-radius: var(--radius-pill);
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
@@ -314,20 +151,20 @@
     background 160ms ease;
 }
 
-.income-form-modal__hint-action:hover {
+.income-form__hint-action:hover {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--primary) 24%, transparent);
   background: color-mix(in srgb, var(--surface) 96%, white);
 }
 
-.income-form-modal__summary {
+.income-form__summary {
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 76%, white);
   padding: 1rem;
 }
 
-.income-form-modal__summary-eyebrow {
+.income-form__summary-eyebrow {
   margin: 0;
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-bold);
@@ -336,17 +173,9 @@
   color: var(--text-muted);
 }
 
-.income-form-modal__summary-text {
+.income-form__summary-text {
   margin: 0.45rem 0 0;
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-body);
   color: var(--text);
-}
-
-.modal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding-top: 0.25rem;
 }

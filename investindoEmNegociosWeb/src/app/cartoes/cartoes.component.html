@@ -191,208 +191,188 @@
     </section>
   </section>
 
-  @if (mostrarModal) {
-    <div class="cards-modal">
-      <div class="cards-modal__backdrop" (click)="fecharModal()"></div>
-      <div class="cards-modal__dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="editandoId ? 'card-form-title-edit' : 'card-form-title-new'">
-        <header class="cards-modal__header">
-          <div class="cards-modal__title-wrap">
-            <p class="cards-modal__eyebrow">{{ editandoId ? 'Editar cartão' : 'Novo cartão' }}</p>
-            <h3 class="cards-modal__title" [id]="editandoId ? 'card-form-title-edit' : 'card-form-title-new'">
-              {{ editandoId ? 'Atualize os dados do cartão' : 'Adicionar cartão' }}
-            </h3>
-            <p class="cards-modal__subtitle">
-              {{ editandoId
-              ? 'Revise limite, ciclo e identificação para manter os lançamentos e faturas consistentes.'
-              : 'Cadastre o cartão, informe o limite e deixe fechamento e vencimento prontos para o acompanhamento.' }}
-            </p>
+  <app-modal
+    [open]="mostrarModal"
+    [eyebrow]="editandoId ? 'Editar cartão' : 'Novo cartão'"
+    [title]="editandoId ? 'Atualize os dados do cartão' : 'Adicionar cartão'"
+    [subtitle]="editandoId
+      ? 'Revise limite, ciclo e identificação para manter os lançamentos e faturas consistentes.'
+      : 'Cadastre o cartão, informe o limite e deixe fechamento e vencimento prontos para o acompanhamento.'"
+    size="lg"
+    (close)="fecharModal()">
+
+    <div class="cards-dialog-body" modal-body>
+      <form id="card-form" class="cards-form" (ngSubmit)="salvar()">
+        <section class="cards-form__section">
+          <div class="cards-form__section-head">
+            <h4 class="cards-form__section-title">Identidade do cartão</h4>
+            <p class="cards-form__section-text">Defina bandeira, número protegido, nome exibido e banco vinculado.</p>
           </div>
-          <button class="cards-modal__close" type="button" (click)="fecharModal()" aria-label="Fechar modal">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-        </header>
-        <div class="cards-modal__body">
-          <form class="cards-modal__form" (ngSubmit)="salvar()">
-            <section class="cards-modal__section">
-              <div class="cards-modal__section-head">
-                <h4 class="cards-modal__section-title">Identidade do cartão</h4>
-                <p class="cards-modal__section-text">Defina bandeira, número protegido, nome exibido e banco vinculado.</p>
-              </div>
-              <div class="cards-modal__grid cards-modal__grid--identity">
-                <label class="cards-field">
-                  <span class="cards-field__label">Bandeira</span>
-                  <select class="cards-field__control" [(ngModel)]="bandeira" name="bandeira">
-                    @for (b of brands; track trackByIndex($index, b)) {
-                      <option [ngValue]="b.id.toString()">{{ b.name }}</option>
-                    }
-                  </select>
-                </label>
-                <label class="cards-field cards-field--full">
-                  <span class="cards-field__label">Número do cartão</span>
-                  <div class="cards-field__control cards-field__control--inline">
-                    <input
-                      class="cards-field__input"
-                      [type]="mostrarNumero ? 'text' : 'password'"
-                      [(ngModel)]="numero"
-                      name="numero"
-                      maxlength="19"
-                      inputmode="numeric"
-                      pattern="[0-9 ]*"
-                      (input)="onNumeroInput($event)"
-                      placeholder="0000 0000 0000 0000"
-                      required />
-                    <button type="button" class="cards-field__ghost" (click)="toggleNumero()" [attr.aria-label]="mostrarNumero ? 'Ocultar número' : 'Mostrar número'">
-                      @if (!mostrarNumero) {
-                        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" fill="none" stroke="currentColor" stroke-width="1.7" />
-                          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7" />
-                        </svg>
-                      }
-                      @if (mostrarNumero) {
-                        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                          <path d="M3 3l18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-                          <path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                          <path d="M9.9 5.2A11.7 11.7 0 0 1 12 5c6.5 0 10 7 10 7a16.2 16.2 0 0 1-4.1 4.8M6.2 6.2C3.7 8 2 12 2 12s3.5 6 10 6c1.1 0 2.1-.1 3-.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                      }
-                    </button>
-                  </div>
-                </label>
-                <label class="cards-field">
-                  <span class="cards-field__label">Nome no cartão</span>
-                  <input class="cards-field__control" [(ngModel)]="nome" name="nome" placeholder="Ex.: JOAO P SANTOS" required />
-                </label>
-                <label class="cards-field">
-                  <span class="cards-field__label">Apelido (opcional)</span>
-                  <input class="cards-field__control" [(ngModel)]="apelido" name="apelido" placeholder="Ex.: Nubank pessoal" />
-                </label>
-                <label class="cards-field">
-                  <span class="cards-field__label">Banco</span>
-                  <input class="cards-field__control" [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
-                  <datalist id="bankOptions">
-                    @for (inst of institutions; track trackByIndex($index, inst)) {
-                      <option [value]="inst.name"></option>
-                    }
-                  </datalist>
-                </label>
-              </div>
-            </section>
-            <section class="cards-modal__section">
-              <div class="cards-modal__section-head">
-                <h4 class="cards-modal__section-title">Configuração financeira</h4>
-                <p class="cards-modal__section-text">Informe limite e defina os dias que organizam fechamento e vencimento da fatura.</p>
-              </div>
-              <div class="cards-modal__grid cards-modal__grid--financial">
-                <label class="cards-field">
-                  <span class="cards-field__label">Limite de crédito</span>
-                  <input
-                    class="cards-field__control"
-                    type="text"
-                    inputmode="decimal"
-                    [(ngModel)]="limiteCreditoInput"
-                    digitOnly
-                    (ngModelChange)="onLimiteChange($event)"
-                    name="limiteCredito"
-                    placeholder="R$ 0,00" />
-                </label>
-                <label class="cards-field">
-                  <span class="cards-field__label">Dia do fechamento</span>
-                  <input
-                    class="cards-field__control"
-                    type="text"
-                    inputmode="numeric"
-                    maxlength="2"
-                    [ngModel]="diaFechamento"
-                    (ngModelChange)="onDiaChange($event, 'fechamento')"
-                    (input)="onDiaInput($event, 'fechamento')"
-                    name="diaFechamento" />
-                </label>
-                <label class="cards-field">
-                  <span class="cards-field__label">Dia do vencimento</span>
-                  <input
-                    class="cards-field__control"
-                    type="text"
-                    inputmode="numeric"
-                    maxlength="2"
-                    [ngModel]="diaVencimento"
-                    (ngModelChange)="onDiaChange($event, 'vencimento')"
-                    (input)="onDiaInput($event, 'vencimento')"
-                    name="diaVencimento" />
-                </label>
-              </div>
-            </section>
-            <footer class="cards-modal__actions">
-              <button type="button" class="cards-modal__secondary" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
-              <button type="submit" class="cards-modal__primary" [disabled]="saving">
-                {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar cartão') }}
-              </button>
-            </footer>
-          </form>
-          <aside class="cards-preview">
-            <div class="cards-preview__card">
-              <div class="cards-preview__top">
-                <div class="cards-preview__chip"></div>
-                <div class="cards-preview__brand">
-                  @switch (bandeiraCode) {
-                    @case ('mastercard') {
-                      <div class="cards-preview__mastercard" aria-label="Mastercard">
-                        <span></span>
-                        <span></span>
-                      </div>
-                    }
-                    @case ('visa') {
-                      <span>VISA</span>
-                    }
-                    @case ('elo') {
-                      <span>ELO</span>
-                    }
-                    @case ('amex') {
-                      <span>AMEX</span>
-                    }
-                    @case ('hipercard') {
-                      <span>HIPER</span>
-                    }
-                    @default {
-                      <span>{{ (bandeiraNome || 'Bandeira') | uppercase }}</span>
-                    }
+          <div class="cards-form__grid cards-form__grid--identity">
+            <app-form-field label="Bandeira">
+              <select class="cards-form__control" [(ngModel)]="bandeira" name="bandeira">
+                @for (b of brands; track trackByIndex($index, b)) {
+                  <option [ngValue]="b.id.toString()">{{ b.name }}</option>
+                }
+              </select>
+            </app-form-field>
+            <app-form-field label="Número do cartão" class="cards-form__field--full">
+              <div class="cards-form__control--inline">
+                <input
+                  class="cards-form__input"
+                  [type]="mostrarNumero ? 'text' : 'password'"
+                  [(ngModel)]="numero"
+                  name="numero"
+                  maxlength="19"
+                  inputmode="numeric"
+                  pattern="[0-9 ]*"
+                  (input)="onNumeroInput($event)"
+                  placeholder="0000 0000 0000 0000"
+                  required />
+                <button type="button" class="cards-form__ghost" (click)="toggleNumero()" [attr.aria-label]="mostrarNumero ? 'Ocultar número' : 'Mostrar número'">
+                  @if (!mostrarNumero) {
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" fill="none" stroke="currentColor" stroke-width="1.7" />
+                      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7" />
+                    </svg>
                   }
-                </div>
+                  @if (mostrarNumero) {
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M3 3l18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                      <path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M9.9 5.2A11.7 11.7 0 0 1 12 5c6.5 0 10 7 10 7a16.2 16.2 0 0 1-4.1 4.8M6.2 6.2C3.7 8 2 12 2 12s3.5 6 10 6c1.1 0 2.1-.1 3-.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  }
+                </button>
               </div>
-              <div class="cards-preview__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</div>
-              <div class="cards-preview__footer">
-                <div>
-                  <span class="cards-preview__label">Nome</span>
-                  <strong>{{ nome || 'SEU CARTÃO' }}</strong>
-                </div>
-                <div class="cards-preview__tail">
-                  <span class="cards-preview__label">Final</span>
-                  <strong>•••• {{ finalCartao(numero) }}</strong>
-                </div>
-              </div>
+            </app-form-field>
+            <app-form-field label="Nome no cartão">
+              <input class="cards-form__control" [(ngModel)]="nome" name="nome" placeholder="Ex.: JOAO P SANTOS" required />
+            </app-form-field>
+            <app-form-field label="Apelido (opcional)">
+              <input class="cards-form__control" [(ngModel)]="apelido" name="apelido" placeholder="Ex.: Nubank pessoal" />
+            </app-form-field>
+            <app-form-field label="Banco">
+              <input class="cards-form__control" [(ngModel)]="banco" name="banco" placeholder="Ex.: Nubank" list="bankOptions" />
+              <datalist id="bankOptions">
+                @for (inst of institutions; track trackByIndex($index, inst)) {
+                  <option [value]="inst.name"></option>
+                }
+              </datalist>
+            </app-form-field>
+          </div>
+        </section>
+        <section class="cards-form__section">
+          <div class="cards-form__section-head">
+            <h4 class="cards-form__section-title">Configuração financeira</h4>
+            <p class="cards-form__section-text">Informe limite e defina os dias que organizam fechamento e vencimento da fatura.</p>
+          </div>
+          <div class="cards-form__grid cards-form__grid--financial">
+            <app-form-field label="Limite de crédito">
+              <input
+                class="cards-form__control"
+                type="text"
+                inputmode="decimal"
+                [(ngModel)]="limiteCreditoInput"
+                digitOnly
+                (ngModelChange)="onLimiteChange($event)"
+                name="limiteCredito"
+                placeholder="R$ 0,00" />
+            </app-form-field>
+            <app-form-field label="Dia do fechamento">
+              <input
+                class="cards-form__control"
+                type="text"
+                inputmode="numeric"
+                maxlength="2"
+                [ngModel]="diaFechamento"
+                (ngModelChange)="onDiaChange($event, 'fechamento')"
+                (input)="onDiaInput($event, 'fechamento')"
+                name="diaFechamento" />
+            </app-form-field>
+            <app-form-field label="Dia do vencimento">
+              <input
+                class="cards-form__control"
+                type="text"
+                inputmode="numeric"
+                maxlength="2"
+                [ngModel]="diaVencimento"
+                (ngModelChange)="onDiaChange($event, 'vencimento')"
+                (input)="onDiaInput($event, 'vencimento')"
+                name="diaVencimento" />
+            </app-form-field>
+          </div>
+        </section>
+      </form>
+      <aside class="cards-preview">
+        <div class="cards-preview__card">
+          <div class="cards-preview__top">
+            <div class="cards-preview__chip"></div>
+            <div class="cards-preview__brand">
+              @switch (bandeiraCode) {
+                @case ('mastercard') {
+                  <div class="cards-preview__mastercard" aria-label="Mastercard">
+                    <span></span>
+                    <span></span>
+                  </div>
+                }
+                @case ('visa') {
+                  <span>VISA</span>
+                }
+                @case ('elo') {
+                  <span>ELO</span>
+                }
+                @case ('amex') {
+                  <span>AMEX</span>
+                }
+                @case ('hipercard') {
+                  <span>HIPER</span>
+                }
+                @default {
+                  <span>{{ (bandeiraNome || 'Bandeira') | uppercase }}</span>
+                }
+              }
             </div>
-            <div class="cards-preview__meta">
-              <div class="cards-preview__meta-item">
-                <span>Apelido</span>
-                <strong>{{ apelido || nome || '—' }}</strong>
-              </div>
-              <div class="cards-preview__meta-item">
-                <span>Limite informado</span>
-                <strong>{{ limiteCreditoInput || 'R$ 0,00' }}</strong>
-              </div>
-              <div class="cards-preview__meta-item">
-                <span>Fechamento</span>
-                <strong>Dia {{ diaFechamento }}</strong>
-              </div>
-              <div class="cards-preview__meta-item">
-                <span>Vencimento</span>
-                <strong>Dia {{ diaVencimento }}</strong>
-              </div>
+          </div>
+          <div class="cards-preview__number">{{ mostrarNumero ? numeroFormatado : '•••• •••• •••• ••••' }}</div>
+          <div class="cards-preview__footer">
+            <div>
+              <span class="cards-preview__label">Nome</span>
+              <strong>{{ nome || 'SEU CARTÃO' }}</strong>
             </div>
-          </aside>
+            <div class="cards-preview__tail">
+              <span class="cards-preview__label">Final</span>
+              <strong>•••• {{ finalCartao(numero) }}</strong>
+            </div>
+          </div>
         </div>
-      </div>
+        <div class="cards-preview__meta">
+          <div class="cards-preview__meta-item">
+            <span>Apelido</span>
+            <strong>{{ apelido || nome || '—' }}</strong>
+          </div>
+          <div class="cards-preview__meta-item">
+            <span>Limite informado</span>
+            <strong>{{ limiteCreditoInput || 'R$ 0,00' }}</strong>
+          </div>
+          <div class="cards-preview__meta-item">
+            <span>Fechamento</span>
+            <strong>Dia {{ diaFechamento }}</strong>
+          </div>
+          <div class="cards-preview__meta-item">
+            <span>Vencimento</span>
+            <strong>Dia {{ diaVencimento }}</strong>
+          </div>
+        </div>
+      </aside>
     </div>
-  }
+
+    <div modal-footer>
+      <button type="button" class="btn-ghost sm" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
+      <button type="submit" form="card-form" class="btn-primary sm" [disabled]="saving">
+        {{ saving ? 'Salvando...' : (editandoId ? 'Salvar alterações' : 'Salvar cartão') }}
+      </button>
+    </div>
+
+  </app-modal>
 </div>

@@ -20,10 +20,13 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
         (click)="handleBackdropClick()"></div>
         <!-- modal card -->
         <section [class]="modalClass()">
-          @if (title() || subtitle() || showCloseButton()) {
+          @if (eyebrow() || title() || subtitle() || showCloseButton()) {
             <header
               class="flex items-start justify-between gap-4 border-b border-[var(--color-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]">
               <div class="min-w-0 space-y-1">
+                @if (eyebrow()) {
+                  <p class="m-0 text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{{ eyebrow() }}</p>
+                }
                 @if (title()) {
                   <h2
                     class="m-0 text-lg font-semibold text-[var(--color-text)]">
@@ -65,6 +68,7 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 })
 export class ModalComponent {
   readonly open = input<boolean>(false);
+  readonly eyebrow = input<string>('');
   readonly title = input<string>('');
   readonly subtitle = input<string>('');
   readonly size = input<ModalSize>('md');
