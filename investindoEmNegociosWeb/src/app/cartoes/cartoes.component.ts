@@ -21,6 +21,8 @@ import { PeriodTotalCardComponent } from '../shared/period-total-card/period-tot
 import { UiPermissionsService } from '../ui-permissions.service';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { installmentStatusTone, InstallmentStatusTone } from '../utils/status';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -41,6 +43,7 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     PeriodTotalCardComponent,
     ModalComponent,
     FormFieldComponent,
+    StatusBadgeComponent,
 ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss'],
@@ -482,6 +485,10 @@ export class CartoesComponent implements OnInit {
       default:
         return 'Pendente';
     }
+  }
+
+  cardExpenseStatusTone(expense: StoredExpense): InstallmentStatusTone {
+    return installmentStatusTone(expense.status);
   }
 
   trackByStatement(index: number, _item?: unknown): number {

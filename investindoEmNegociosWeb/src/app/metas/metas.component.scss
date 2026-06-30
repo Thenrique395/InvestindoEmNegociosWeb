@@ -219,38 +219,6 @@
   -webkit-line-clamp: 2;
 }
 
-.goal-card__status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  border-radius: var(--radius-pill);
-  padding: 0.32rem 0.75rem;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  white-space: nowrap;
-}
-
-.goal-card__status--ok {
-  background: color-mix(in srgb, var(--success) 12%, transparent);
-  color: var(--success-text);
-}
-
-.goal-card__status--warn {
-  background: color-mix(in srgb, var(--warning) 14%, transparent);
-  color: var(--warning-text);
-}
-
-.goal-card__status--danger {
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-  color: var(--danger-text);
-}
-
-.goal-card__status--neutral {
-  background: var(--surface-2);
-  color: var(--text-secondary);
-}
-
 .goal-card__description {
   min-height: 2.35rem;
   margin: 0;

@@ -6,7 +6,7 @@ import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/
 import { CardsService } from './cards.service';
 import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { Router, RouterModule } from '@angular/router';
-import { expenseStatusLabel, incomeStatusLabel } from './utils/status';
+import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone, InstallmentStatusTone } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 import {
@@ -114,6 +114,7 @@ export class HomeComponent implements OnInit {
     amount: number;
     type: 'income' | 'expense';
     status?: string;
+    statusTone?: InstallmentStatusTone;
     recurring?: boolean;
   }[] = [];
   metasResumo = {
@@ -1077,6 +1078,7 @@ export class HomeComponent implements OnInit {
       amount: e.valor || 0,
       type: 'expense' as const,
       status: expenseStatusLabel(e.status),
+      statusTone: installmentStatusTone(e.status),
       recurring: !!e.fixa,
       planId: e.planId
     }));
@@ -1087,6 +1089,7 @@ export class HomeComponent implements OnInit {
       amount: i.valor || 0,
       type: 'income' as const,
       status: incomeStatusLabel(i.status),
+      statusTone: installmentStatusTone(i.status),
       recurring: !!i.fixa,
       planId: i.planId
     }));
@@ -1289,6 +1292,19 @@ export class HomeComponent implements OnInit {
 
   aiHealthTone(status: AiHealthStatus): 'success' | 'warning' | 'danger' {
     return status === 'critical' ? 'danger' : status === 'warning' ? 'warning' : 'success';
+  }
+
+  metaStatusTone(status: GoalStatus): 'success' | 'warning' | 'danger' | 'muted' {
+    switch (status) {
+      case 'Completed':
+        return 'success';
+      case 'InProgress':
+        return 'warning';
+      case 'Canceled':
+        return 'danger';
+      default:
+        return 'muted';
+    }
   }
 
   private loadNetWorthSummary(): void {

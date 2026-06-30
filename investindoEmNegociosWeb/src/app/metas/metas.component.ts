@@ -13,6 +13,7 @@ import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 
 type MetaFiltroKind = 'ALL' | GoalKind;
 type GoalSection = {
@@ -25,7 +26,7 @@ type GoalSection = {
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, ModalComponent, FormFieldComponent],
+  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, ModalComponent, FormFieldComponent, StatusBadgeComponent],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss']
 })
@@ -84,17 +85,16 @@ export class MetasComponent implements OnInit {
     }
   }
 
-  statusClass(status?: GoalStatus): string {
-    if (!status) return 'neutral';
+  statusTone(status?: GoalStatus): 'success' | 'warning' | 'danger' | 'muted' {
     switch (status) {
       case 'Completed':
-        return 'ok';
+        return 'success';
       case 'InProgress':
-        return 'warn';
+        return 'warning';
       case 'Canceled':
         return 'danger';
       default:
-        return 'neutral';
+        return 'muted';
     }
   }
 

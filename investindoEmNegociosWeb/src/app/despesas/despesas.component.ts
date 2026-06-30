@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TitleCasePipe, DecimalPipe, NgClass } from '@angular/common';
+import { TitleCasePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -15,12 +15,13 @@ import { AuthService } from '../auth.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { LookupsService } from '../lookups.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
-import { expenseStatusLabel } from '../utils/status';
+import { expenseStatusLabel, installmentStatusTone, InstallmentStatusTone } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { UiPermissionsService } from '../ui-permissions.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
@@ -41,7 +42,6 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
   standalone: true,
   imports: [
     TitleCasePipe,
-    NgClass,
     DecimalPipe,
     FormsModule,
     DespesasListaComponent,
@@ -49,6 +49,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     InvoiceImportComponent,
     TooltipComponent,
     StatCardComponent,
+    StatusBadgeComponent,
     ComparisonPillComponent,
     PeriodTotalCardComponent,
     PeriodHeroComponent,
@@ -1057,6 +1058,10 @@ export class DespesasComponent implements OnInit {
 
   statusLabel(status?: InstallmentStatus): string {
     return expenseStatusLabel(status);
+  }
+
+  statusTone(status?: InstallmentStatus): InstallmentStatusTone {
+    return installmentStatusTone(status);
   }
 
   public parseValor(value: string | number): number {

@@ -88,23 +88,6 @@
   font-size: var(--font-size-label);
 }
 
-.account-card__status {
-  border-radius: var(--radius-pill);
-  padding: 0.3rem 0.55rem;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-}
-
-.account-card__status--active {
-  background: color-mix(in srgb, var(--success) 14%, transparent);
-  color: var(--success-text);
-}
-
-.account-card__status--inactive {
-  background: color-mix(in srgb, var(--text-muted) 14%, transparent);
-  color: var(--text-muted);
-}
-
 .account-card__balance {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);

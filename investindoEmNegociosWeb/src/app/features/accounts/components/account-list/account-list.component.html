@@ -46,9 +46,10 @@
               </h3>
               <p>{{ accountTypeLabel(account.type) }}</p>
             </div>
-            <span class="account-card__status" [ngClass]="account.isActive ? 'account-card__status--active' : 'account-card__status--inactive'">
-              {{ account.isActive ? 'Ativa' : 'Inativa' }}
-            </span>
+            <app-status-badge
+              [tone]="account.isActive ? 'success' : 'muted'"
+              [label]="account.isActive ? 'Ativa' : 'Inativa'">
+            </app-status-badge>
           </div>
           <div class="account-card__balance">
             <span>Saldo atual</span>

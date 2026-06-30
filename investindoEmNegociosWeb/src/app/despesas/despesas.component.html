@@ -330,7 +330,7 @@
                   <div class="expenses-history-item__main">
                     <div class="expenses-history-item__title-row">
                       <strong class="expenses-history-item__name">{{ h.nome }}</strong>
-                      <span class="expenses-history-item__status expenses-history-item__status--paid">{{ statusLabel('PAID') }}</span>
+                      <app-status-badge [tone]="statusTone('PAID')" [label]="statusLabel('PAID')"></app-status-badge>
                     </div>
                     <div class="expenses-history-item__meta">
                       @if (h.parcelasTotal) {
@@ -391,11 +391,7 @@
                   <div class="expenses-history-item__main">
                     <div class="expenses-history-item__title-row">
                       <strong class="expenses-history-item__name">{{ h.nome }}</strong>
-                      <span
-                        class="expenses-history-item__status"
-                        [ngClass]="h.status === 'ANTICIPATED' ? 'expenses-history-item__status--anticipated' : 'expenses-history-item__status--pending'">
-                        {{ statusLabel(h.status) }}
-                      </span>
+                      <app-status-badge [tone]="statusTone(h.status)" [label]="statusLabel(h.status)"></app-status-badge>
                     </div>
                     <div class="expenses-history-item__meta">
                       @if (h.parcelasTotal) {

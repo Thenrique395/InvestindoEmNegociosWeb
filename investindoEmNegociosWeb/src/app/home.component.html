@@ -872,11 +872,7 @@
                         <div class="min-w-0">
                           <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ meta.title }}</strong>
                           <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
-                            <span
-                              class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]"
-                              [ngClass]="meta.status === 'Completed' ? 'text-[var(--success-text)]' : meta.status === 'Canceled' ? 'text-[var(--danger-text)]' : 'text-[var(--text-secondary)]'">
-                              {{ meta.statusLabel }}
-                            </span>
+                            <app-status-badge [tone]="metaStatusTone(meta.status)" [label]="meta.statusLabel" size="sm"></app-status-badge>
                             @if (meta.targetDateLabel) {
                               <span class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]">
                                 Meta até {{ meta.targetDateLabel }}
@@ -1075,11 +1071,7 @@
                     <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
                       <span>{{ item.date }}</span>
                       <span class="opacity-70">•</span>
-                      <span
-                        class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] font-medium"
-                        [ngClass]="item.status === 'Pago' ? 'text-[var(--success-text)]' : item.status === 'Pendente' ? 'text-[var(--warning-text)]' : 'text-[var(--text-secondary)]'">
-                        {{ item.status }}
-                      </span>
+                      <app-status-badge [tone]="item.statusTone || 'muted'" [label]="item.status || ''" size="sm"></app-status-badge>
                       @if (item.recurring) {
                         <span class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--spacing-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
                       }

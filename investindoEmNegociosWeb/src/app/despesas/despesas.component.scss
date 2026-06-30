@@ -320,36 +320,6 @@
   color: var(--text-muted);
 }
 
-.expenses-history-item__status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  border-radius: var(--radius-pill);
-  padding: 0.3rem 0.7rem;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-display);
-}
-
-.expenses-history-item__status--paid {
-  border: 1px solid color-mix(in srgb, var(--success) 22%, transparent);
-  background: color-mix(in srgb, var(--success) 12%, white);
-  color: var(--success-text);
-}
-
-.expenses-history-item__status--pending {
-  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
-  background: color-mix(in srgb, var(--warning) 10%, white);
-  color: var(--warning-text);
-}
-
-.expenses-history-item__status--anticipated {
-  border: 1px solid color-mix(in srgb, var(--info) 24%, transparent);
-  background: color-mix(in srgb, var(--info) 10%, white);
-  color: var(--info-text);
-}
-
 .expenses-history-item__value-col {
   display: grid;
   justify-items: end;

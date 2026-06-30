@@ -180,7 +180,7 @@
                   <span>{{ expense.categoria || 'Sem categoria' }}</span>
                 </div>
                 <span class="cards-purchases__pill">Parcela {{ cardExpenseInstallmentLabel(expense) }}</span>
-                <span class="cards-purchases__pill cards-purchases__pill--status">{{ cardExpenseStatusLabel(expense) }}</span>
+                <app-status-badge [tone]="cardExpenseStatusTone(expense)" [label]="cardExpenseStatusLabel(expense)"></app-status-badge>
                 <strong class="cards-purchases__amount">{{ expense.valor | appCurrency }}</strong>
                 <span class="cards-purchases__date">Vence {{ expense.vencimento }}</span>
               </article>

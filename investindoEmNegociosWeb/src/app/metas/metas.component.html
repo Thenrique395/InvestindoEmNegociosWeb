@@ -127,9 +127,7 @@
                         <h4>{{ meta.title }}</h4>
                       </div>
                     </div>
-                    <span class="goal-card__status" [ngClass]="'goal-card__status--' + statusClass(meta.status)">
-                      {{ statusLabel(meta.status) }}
-                    </span>
+                    <app-status-badge [tone]="statusTone(meta.status)" [label]="statusLabel(meta.status)"></app-status-badge>
                   </header>
                   @if (descricaoMeta(meta)) {
                     <p class="goal-card__description">{{ descricaoMeta(meta) }}</p>

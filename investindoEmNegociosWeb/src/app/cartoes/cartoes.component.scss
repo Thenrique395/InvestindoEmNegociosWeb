@@ -346,12 +346,6 @@
   white-space: nowrap;
 }
 
-.cards-purchases__pill--status {
-  border-color: color-mix(in srgb, var(--warning) 22%, transparent);
-  background: rgba(254, 243, 199, 0.6);
-  color: var(--warning-text);
-}
-
 .cards-purchases__amount {
   color: var(--text);
   font-size: var(--font-size-body);
