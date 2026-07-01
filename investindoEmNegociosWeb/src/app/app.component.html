@@ -51,11 +51,35 @@
   }
 
   @if (isOnboardingRoute) {
-    <main class="onboarding-route-main">
-      <div class="route-view" [class.route-view--enter]="routeTransitionActive">
-        <router-outlet />
-      </div>
-    </main>
+    <div class="onboarding-route-shell">
+      <app-topbar
+        [brandSlogan]="brandSlogan"
+        [notificationsOpen]="notificationsOpen"
+        [notificationsLoading]="notificationsLoading"
+        [notificationsError]="notificationsError"
+        [notifications]="notifications"
+        [unreadCount]="unreadCount"
+        [userMenuOpen]="userMenuOpen"
+        [avatarUrl]="avatarUrl"
+        [userInitials]="userInitials"
+        [displayName]="displayName"
+        [currentRole]="currentRole"
+        [isLightTheme]="isLightTheme"
+        [financialValuesHidden]="financialValuesHidden"
+        (themeToggle)="toggleTheme()"
+        (financialValuesToggle)="toggleFinancialValues()"
+        (notificationsToggle)="toggleNotifications()"
+        (notificationsRefresh)="refreshNotifications()"
+        (notificationRead)="markNotificationRead($event.item, $event.event)"
+        (userMenuToggle)="toggleUserMenu()"
+        (routeReload)="reloadIfSame($event.path, $event.event)"
+        (logoutRequested)="logout()" />
+      <main class="onboarding-route-main">
+        <div class="route-view" [class.route-view--enter]="routeTransitionActive">
+          <router-outlet />
+        </div>
+      </main>
+    </div>
   }
 
   @if (isStyleguideRoute) {

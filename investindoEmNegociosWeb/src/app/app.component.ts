@@ -81,7 +81,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isLightTheme = theme === 'light';
     this.financialPrivacy.init();
     this.userPreferencesFacade.initFromStorage();
-    if (this.isLogged && !this.isOnboardingRoute) this.ensureUserContext();
+    if (this.isLogged) this.ensureUserContext();
     this.appSession.startMonitoring(() => this.handleExpiredSession());
     this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
       // Adiado para fora do ciclo de change detection atual: qualquer componente que chame
@@ -314,8 +314,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private handleAuthenticatedRoute(currentPath: string): void {
-    if (currentPath.startsWith('/onboarding')) return;
-
     this.ensureUserContext();
     if (!currentPath.startsWith('/receitas')) {
       this.apiDataService.refresh();

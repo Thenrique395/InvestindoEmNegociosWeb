@@ -11,9 +11,15 @@
   grid-template-columns: 224px minmax(0, 1fr);
 }
 
-.onboarding-route-main {
+.onboarding-route-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: var(--bg);
+}
+
+.onboarding-route-main {
+  flex: 1;
 }
 
 .page {
