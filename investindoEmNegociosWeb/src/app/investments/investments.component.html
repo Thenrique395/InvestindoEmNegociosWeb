@@ -166,32 +166,7 @@
             </select>
           </div>
         </div>
-        @if (carteiraDistribuicaoChart.length) {
-          <div class="donut-layout">
-            <div class="donut" [style.background]="carteiraDistribuicaoConicGradient" aria-hidden="true"></div>
-            <div class="distribution-list">
-              @for (item of carteiraDistribuicaoChart; track trackByIndex($index, item)) {
-                <div class="distribution-item">
-                  <div class="distribution-item__top">
-                    <div class="legend">
-                      <span class="legend__dot" [style.background]="item.color"></span>
-                      <strong>{{ item.label }}</strong>
-                    </div>
-                    <span>{{ item.percent | number:'1.1-1' }}%</span>
-                  </div>
-                  <small>{{ item.value | appCurrency }}</small>
-                  <span class="chart-hover-tip">
-                    {{ item.label }}<br />
-                    Participação: {{ item.percent | number:'1.1-1' }}%<br />
-                    Valor: {{ item.value | appCurrency }}
-                  </span>
-                </div>
-              }
-            </div>
-          </div>
-        } @else {
-          <div class="empty">Sem dados para a distribuição atual.</div>
-        }
+        <app-donut-chart [items]="carteiraDistribuicaoChart" emptyMessage="Sem dados para a distribuição atual." />
       </article>
     </section>
   }
@@ -458,33 +433,7 @@
             </div>
             <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
           </div>
-          @if (!distribuicaoPorTipoComCor.length) {
-            <div class="empty">Sem posições para exibir distribuição.</div>
-          }
-          @if (distribuicaoPorTipoComCor.length) {
-            <div class="donut-layout">
-              <div class="donut" [style.background]="distribuicaoConicGradient" aria-hidden="true"></div>
-              <div class="distribution-list">
-                @for (item of distribuicaoPorTipoComCor; track trackByIndex($index, item)) {
-                  <div class="distribution-item">
-                    <div class="distribution-item__top">
-                      <div class="legend">
-                        <span class="legend__dot" [style.background]="item.color"></span>
-                        <strong>{{ item.label }}</strong>
-                      </div>
-                      <span>{{ item.value | appCurrency }}</span>
-                    </div>
-                    <small>{{ item.percent | number:'1.0-1' }}%</small>
-                    <span class="chart-hover-tip">
-                      {{ item.label }}<br />
-                      Participação: {{ item.percent | number:'1.1-1' }}%<br />
-                      Valor: {{ item.value | appCurrency }}
-                    </span>
-                  </div>
-                }
-              </div>
-            </div>
-          }
+          <app-donut-chart [items]="distribuicaoPorTipoComCor" emptyMessage="Sem posições para exibir distribuição." />
         </article>
       }
     </section>

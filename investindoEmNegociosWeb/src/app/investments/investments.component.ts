@@ -26,6 +26,7 @@ import { PeriodActionCardComponent } from '../shared/period-action-card/period-a
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { DonutChartComponent } from '../shared/donut-chart/donut-chart.component';
 import {
   AllocationInvestmentType,
   BenchmarkKey,
@@ -74,7 +75,7 @@ type RentabilidadeMonthPoint = {
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent, DonutChartComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -437,16 +438,6 @@ export class InvestmentsComponent implements OnInit {
     return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
   }
 
-  get distribuicaoConicGradient(): string {
-    const parts: string[] = [];
-    let cursor = 0;
-    for (const item of this.distribuicaoPorTipoComCor) {
-      const next = cursor + item.percent;
-      parts.push(`${item.color} ${cursor}% ${next}%`);
-      cursor = next;
-    }
-    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(var(--color-border-strong) 0 100%)';
-  }
 
   get evolucaoMensalSeries(): ChartBucket[] {
     const now = new Date();
@@ -589,16 +580,6 @@ export class InvestmentsComponent implements OnInit {
     return base.filter((item) => item.key === this.carteiraTypeFilter);
   }
 
-  get carteiraDistribuicaoConicGradient(): string {
-    const parts: string[] = [];
-    let cursor = 0;
-    for (const item of this.carteiraDistribuicaoChart) {
-      const next = cursor + item.percent;
-      parts.push(`${item.color} ${cursor}% ${next}%`);
-      cursor = next;
-    }
-    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(var(--color-border-strong) 0 100%)';
-  }
 
   get evolucaoMaxValor(): number {
     return this.evolucaoMensalSeries.reduce((max, item) => Math.max(max, item.aporte, item.resgate, item.proventos), 0) || 1;

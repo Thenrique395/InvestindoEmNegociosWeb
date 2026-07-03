@@ -1,0 +1,118 @@
+:host {
+  display: block;
+}
+
+.donut-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, 260px) minmax(0, 1fr);
+  gap: var(--spacing-2);
+  align-items: start;
+}
+
+.donut {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  position: relative;
+  margin: 0 auto;
+}
+
+.donut::after {
+  content: '';
+  position: absolute;
+  inset: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.distribution-list {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: var(--spacing-2);
+}
+
+.distribution-item {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.7rem;
+  display: grid;
+  gap: 0.2rem;
+  background: var(--surface-2);
+}
+
+.chart-hover-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  min-width: 170px;
+  max-width: 220px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  font-size: var(--text-xs);
+  line-height: var(--line-height-control);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 4;
+}
+
+.distribution-item:hover .chart-hover-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.distribution-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-1);
+}
+
+.distribution-item__top strong {
+  color: var(--text);
+  font-size: var(--text-base);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 10px;
+}
+
+.distribution-item__top span,
+.distribution-item small {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.distribution-item small {
+  font-size: var(--font-size-label);
+}
+
+.empty {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--spacing-1) 0;
+}
+
+@media (max-width: 960px) {
+  .donut-layout {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+}

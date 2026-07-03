@@ -1200,7 +1200,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadRealAvailableBalance(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.realBalanceSummary = null;
       return;
     }
@@ -1222,7 +1222,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadDebtSummary(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.debtSummary = null;
       return;
     }
@@ -1243,7 +1243,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadSubscriptionsSummary(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.subscriptionsSummary = null;
       return;
     }
@@ -1309,7 +1309,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadNetWorthSummary(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.netWorthSummary = null;
       return;
     }
@@ -1329,7 +1329,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadNetWorthHistory(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.netWorthHistory = null;
       return;
     }
@@ -1371,7 +1371,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadRiskAssessment(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.riskAssessment = null;
       return;
     }
@@ -1393,7 +1393,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadInsights(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.insightEngine = null;
       this.engineInsightTips = [];
       return;
@@ -1418,7 +1418,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadRecommendations(): void {
-    if (!this.isLogged) {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
       this.recommendationEngine = null;
       return;
     }

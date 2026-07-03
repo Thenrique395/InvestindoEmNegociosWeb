@@ -1,0 +1,26 @@
+@if (items().length) {
+  <div class="donut-layout">
+    <div class="donut" [style.background]="conicGradient()" aria-hidden="true"></div>
+    <div class="distribution-list">
+      @for (item of items(); track item.label) {
+        <div class="distribution-item">
+          <div class="distribution-item__top">
+            <div class="legend">
+              <span class="legend__dot" [style.background]="item.color"></span>
+              <strong>{{ item.label }}</strong>
+            </div>
+            <span>{{ item.percent | number:'1.1-1' }}%</span>
+          </div>
+          <small>{{ item.value | appCurrency }}</small>
+          <span class="chart-hover-tip">
+            {{ item.label }}<br />
+            Participação: {{ item.percent | number:'1.1-1' }}%<br />
+            Valor: {{ item.value | appCurrency }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="empty">{{ emptyMessage() }}</div>
+}

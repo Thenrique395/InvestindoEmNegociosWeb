@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, NgZone, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -8,11 +8,20 @@ import { formatCurrencyValue } from '../utils/locale-utils';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut-chart.component';
+
+const CATEGORY_PALETTE = [
+  'var(--color-chart-series-1)',
+  'var(--color-chart-series-2)',
+  'var(--color-chart-series-3)',
+  'var(--color-chart-series-4)',
+  'var(--color-chart-series-5)'
+];
 
 @Component({
   selector: 'app-relatorios',
   standalone: true,
-  imports: [CommonModule, AppCurrencyPipe, UiStateComponent, EmptyStateComponent],
+  imports: [CommonModule, AppCurrencyPipe, UiStateComponent, EmptyStateComponent, DonutChartComponent],
   templateUrl: './relatorios.component.html',
   styleUrl: './relatorios.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,20 +38,31 @@ export class RelatoriosComponent implements OnInit {
   constructor(
     private readonly reportsService: ReportsService,
     private readonly cdr: ChangeDetectorRef,
-    private readonly destroyRef: DestroyRef
+    private readonly destroyRef: DestroyRef,
+    private readonly ngZone: NgZone
   ) {}
 
   ngOnInit(): void { this.load(); }
 
   get monthName(): string { return this.months[this.month - 1]; }
 
+  get expensesDonutItems(): DonutChartItem[] {
+    if (!this.report) return [];
+    return this.report.expensesByCategory.map((cat, index) => ({
+      label: cat.categoryName,
+      value: cat.amount,
+      percent: cat.percentageOfTotal,
+      color: CATEGORY_PALETTE[index % CATEGORY_PALETTE.length]
+    }));
+  }
+
   load(): void {
     this.loading = true;
     this.reportsService.getMonthlySummary(this.year, this.month)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (r) => { this.report = r; this.loading = false; this.cdr.markForCheck(); },
-        error: () => { this.loading = false; this.cdr.markForCheck(); }
+        next: (r) => this.ngZone.run(() => { this.report = r; this.loading = false; this.cdr.markForCheck(); }),
+        error: () => this.ngZone.run(() => { this.loading = false; this.cdr.markForCheck(); })
       });
   }
 

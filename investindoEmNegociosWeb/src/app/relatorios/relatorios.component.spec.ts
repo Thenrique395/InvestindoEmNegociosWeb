@@ -25,7 +25,8 @@ function createComponent() {
   const component = new RelatoriosComponent(
     reportsService as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
-    { onDestroy: () => {} } as any
+    { onDestroy: () => {} } as any,
+    { run: (fn: () => void) => fn() } as any
   );
   return { component, reportsService };
 }
@@ -96,7 +97,7 @@ describe('RelatoriosComponent', () => {
     component.exportCsv();
 
     expect(anchor.click).toHaveBeenCalled();
-    expect(anchor.download).toBe('relatorio-2026-06.csv');
+    expect(anchor.download).toBe(`relatorio-${component.year}-${String(component.month).padStart(2, '0')}.csv`);
   });
 
   it('monta o nome do mês a partir do índice numérico', () => {

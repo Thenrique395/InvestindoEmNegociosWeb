@@ -168,8 +168,18 @@ describe('HomeComponent - insights de assinatura', () => {
     expect(component.subscriptionsSummary).toBeNull();
   });
 
-  it('preenche o resumo de assinaturas quando a busca tem sucesso', () => {
+  it('não carrega o resumo de assinaturas para o perfil Basic (recurso é Intermediate+)', () => {
     const { component, accountsService } = createComponentForSubscriptionTests();
+
+    (component as any).loadSubscriptionsSummary();
+
+    expect(accountsService.getSubscriptionsSummary).not.toHaveBeenCalled();
+    expect(component.subscriptionsSummary).toBeNull();
+  });
+
+  it('preenche o resumo de assinaturas quando a busca tem sucesso', () => {
+    const { component, accountsService, authService } = createComponentForSubscriptionTests();
+    authService.getRole.and.returnValue('Intermediate');
     accountsService.getSubscriptionsSummary.and.returnValue(of(buildSubscriptionsSummary({ monthlyTotal: 89.7, count: 4 })));
 
     (component as any).loadSubscriptionsSummary();
@@ -179,7 +189,8 @@ describe('HomeComponent - insights de assinatura', () => {
   });
 
   it('zera o resumo de assinaturas quando a busca falha', () => {
-    const { component, accountsService } = createComponentForSubscriptionTests();
+    const { component, accountsService, authService } = createComponentForSubscriptionTests();
+    authService.getRole.and.returnValue('Intermediate');
     component.subscriptionsSummary = buildSubscriptionsSummary();
     accountsService.getSubscriptionsSummary.and.returnValue(throwError(() => new Error('falhou')));
 

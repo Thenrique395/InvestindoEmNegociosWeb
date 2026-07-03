@@ -29,6 +29,7 @@
         <app-empty-state icon="$" title="Sem despesas registradas" description="Não há despesas pagas neste período para exibir no relatório." />
       }
       @if (report.expensesByCategory.length) {
+        <app-donut-chart [items]="expensesDonutItems" emptyMessage="Sem despesas para exibir." />
         <div class="table-wrap">
           <table>
             <thead>
