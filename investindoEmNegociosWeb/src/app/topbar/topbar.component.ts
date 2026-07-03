@@ -35,7 +35,9 @@ export class TopbarComponent {
   @Input({ required: true }) isLightTheme = true;
   @Input({ required: true }) financialValuesHidden = false;
   @Input() currentRole: UserRole | null = null;
+  @Input() mobileMenuOpen = false;
 
+  @Output() menuToggle = new EventEmitter<void>();
   @Output() themeToggle = new EventEmitter<void>();
   @Output() financialValuesToggle = new EventEmitter<void>();
   @Output() notificationsToggle = new EventEmitter<void>();

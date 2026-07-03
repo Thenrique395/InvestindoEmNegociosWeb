@@ -387,3 +387,29 @@
   color: var(--text-muted);
   font-size: var(--font-size-body-sm);
 }
+
+@media (max-width: 960px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calendar-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .day-cell {
+    min-height: 68px;
+    padding: 0.4rem;
+  }
+
+  .weekdays span {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.65rem;
+  }
+}

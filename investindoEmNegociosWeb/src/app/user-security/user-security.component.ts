@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { ProfileService, SecuritySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
@@ -7,7 +8,7 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 @Component({
   selector: 'app-user-security',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmDialogComponent],
   templateUrl: './user-security.component.html',
   styleUrls: ['./user-security.component.scss']
 })
@@ -15,6 +16,7 @@ export class UserSecurityComponent {
   summary: SecuritySummary | null = null;
   loading = true;
   revoking = false;
+  confirmRevokeOpen = false;
 
   constructor(
     private readonly profileService: ProfileService,
@@ -24,6 +26,11 @@ export class UserSecurityComponent {
   }
 
   revokeSessions(): void {
+    this.confirmRevokeOpen = true;
+  }
+
+  performRevokeSessions(): void {
+    this.confirmRevokeOpen = false;
     if (this.revoking) return;
     this.revoking = true;
     this.profileService.revokeOwnSessions().subscribe({

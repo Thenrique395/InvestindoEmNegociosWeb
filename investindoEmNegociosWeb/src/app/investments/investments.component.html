@@ -351,44 +351,51 @@
             </div>
           </app-filter-bar>
         </div>
-        <div class="consolidacao-chart">
-          <div class="consolidacao-axis">
-            <span>{{ consolidacaoChartMax | appCurrency }}</span>
-            <span>{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
-            <span>R$ 0</span>
-            <span>-{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
-            <span>-{{ consolidacaoChartMax | appCurrency }}</span>
-          </div>
-          <div class="consolidacao-plot">
-            <div class="consolidacao-grid-lines">
-              @for (_ of [1,2,3,4,5]; track trackByIndex($index, _)) {
-                <span></span>
-              }
+        @if (!consolidacaoSeries.length) {
+          <div class="empty">Sem lançamentos de aportes no período.</div>
+        }
+        @if (consolidacaoSeries.length) {
+          <div class="consolidacao-chart">
+            <div class="consolidacao-axis">
+              <span>{{ consolidacaoChartMax | appCurrency }}</span>
+              <span>{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
+              <span>R$ 0</span>
+              <span>-{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
+              <span>-{{ consolidacaoChartMax | appCurrency }}</span>
             </div>
-            <div class="consolidacao-zero-line"></div>
-            <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + consolidacaoSeries.length + ', minmax(0, 1fr))'">
-              @for (item of consolidacaoSeries; track trackByIndex($index, item)) {
-                <div class="consolidacao-col">
-                  <div class="consolidacao-bars__stack">
-                    <span
-                      class="bar compra"
-                      [style.height.%]="(item.compras / consolidacaoChartMax) * 50"
-                    [attr.title]="'Compras: ' + (item.compras | appCurrency)"></span>
-                    <span
-                      class="bar venda"
-                      [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"
-                    [attr.title]="'Vendas: ' + (item.vendas | appCurrency)"></span>
+            <div class="consolidacao-plot">
+              <div class="consolidacao-grid-lines">
+                @for (_ of [1,2,3,4,5]; track trackByIndex($index, _)) {
+                  <span></span>
+                }
+              </div>
+              <div class="consolidacao-zero-line"></div>
+              <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + consolidacaoSeries.length + ', minmax(0, 1fr))'">
+                @for (item of consolidacaoSeries; track trackByIndex($index, item)) {
+                  <div class="consolidacao-col">
+                    <div class="consolidacao-bars__stack">
+                      <span
+                        class="bar compra"
+                        [style.height.%]="(item.compras / consolidacaoChartMax) * 50"></span>
+                      <span
+                        class="bar venda"
+                        [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"></span>
+                      <span class="chart-hover-tip">
+                        Compras: {{ item.compras | appCurrency }}<br />
+                        Vendas: {{ item.vendas | appCurrency }}
+                      </span>
+                    </div>
+                    <small>{{ item.label }}</small>
                   </div>
-                  <small>{{ item.label }}</small>
-                </div>
-              }
+                }
+              </div>
             </div>
           </div>
-        </div>
-        <div class="legend-row">
-          <span><i class="chip compra"></i> Compras</span>
-          <span><i class="chip venda"></i> Vendas</span>
-        </div>
+          <div class="legend-row">
+            <span><i class="chip compra"></i> Compras</span>
+            <span><i class="chip venda"></i> Vendas</span>
+          </div>
+        }
       </article>
       <article class="card chart-card">
         <div class="section-head">
@@ -468,6 +475,11 @@
                       <span>{{ item.value | appCurrency }}</span>
                     </div>
                     <small>{{ item.percent | number:'1.0-1' }}%</small>
+                    <span class="chart-hover-tip">
+                      {{ item.label }}<br />
+                      Participação: {{ item.percent | number:'1.1-1' }}%<br />
+                      Valor: {{ item.value | appCurrency }}
+                    </span>
                   </div>
                 }
               </div>
@@ -550,6 +562,19 @@
               <polyline class="line cdi" [attr.points]="rentabilidadeLinhaCdi"></polyline>
               <polyline class="line carteira" [attr.points]="rentabilidadeLinhaCarteira"></polyline>
             </svg>
+            @if (rentabilidadeSeries.length) {
+              <div class="rentabilidade-hover-points">
+                @for (point of rentabilidadeSeries; track trackByIndex($index, point); let i = $index) {
+                  <div class="rentabilidade-hover-point" [style.left.%]="(i / (rentabilidadeSeries.length - 1 || 1)) * 100">
+                    <span class="chart-hover-tip">
+                      {{ point.label }}<br />
+                      Carteira: {{ point.carteiraAc | number:'1.1-1' }}%<br />
+                      {{ indiceSelecionadoLabel }}: {{ point.benchmarkAc | number:'1.1-1' }}%
+                    </span>
+                  </div>
+                }
+              </div>
+            }
             <div class="rentabilidade-x-axis">
               @for (point of rentabilidadeSeries; track trackByIndex($index, point)) {
                 <small>{{ point.label }}</small>

@@ -25,11 +25,12 @@ import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
 import { UiPermissionsService } from '../ui-permissions.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, ConfirmDialogComponent],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
@@ -37,6 +38,7 @@ export class ContasComponent implements OnInit {
   loading = false;
   saving = false;
   error = '';
+  accountToRemove: AccountResponse | null = null;
 
   accounts: AccountResponse[] = [];
   selectedAccountId: string | null = null;
@@ -194,7 +196,17 @@ export class ContasComponent implements OnInit {
   }
 
   remove(account: AccountResponse): void {
-    if (!confirm(`Remover a conta "${account.name}"?`)) return;
+    this.accountToRemove = account;
+  }
+
+  cancelRemove(): void {
+    this.accountToRemove = null;
+  }
+
+  confirmRemove(): void {
+    const account = this.accountToRemove;
+    if (!account) return;
+    this.accountToRemove = null;
 
     this.accountsStore.delete(account.id, () => {
       if (this.selectedAccountId === account.id) {

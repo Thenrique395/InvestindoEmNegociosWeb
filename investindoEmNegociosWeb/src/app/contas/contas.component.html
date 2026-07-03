@@ -142,7 +142,7 @@
       }
       <!-- Desktop: tabela analítica -->
       @if (!loadingTransactions && transactions.length) {
-        <div class="overflow-x-auto">
+        <div class="contas-transactions-table overflow-x-auto">
           <table class="min-w-full text-sm">
             <thead>
               <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
@@ -172,6 +172,26 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Mobile: cards empilhados (mesma informação, sem scroll horizontal) -->
+        <div class="contas-transactions-cards">
+          @for (tx of transactions; track tx) {
+            <article class="contas-transaction-card">
+              <div class="contas-transaction-card__row">
+                <strong>{{ tx.description }}</strong>
+                <strong [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
+                  {{ tx.kind === 'Credit' ? '+' : '-' }}{{ tx.amount | appCurrency }}
+                </strong>
+              </div>
+              <div class="contas-transaction-card__row contas-transaction-card__row--meta">
+                <span>{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }} · {{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</span>
+                <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
+                  {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
+                </span>
+              </div>
+            </article>
+          }
+        </div>
         @if (transactionsTotalPages > 1) {
           <div class="flex items-center justify-between pt-3 text-sm text-[var(--text-muted)]">
             <span>{{ transactionsTotalCount }} movimentações · página {{ transactionsPage }} de {{ transactionsTotalPages }}</span>
@@ -197,4 +217,16 @@
     </app-section-card>
   }
   </section>
+
+  @if (accountToRemove) {
+    <app-confirm-dialog
+      title="Remover conta?"
+      [message]="'Remover a conta \'' + accountToRemove.name + '\'? Lançamentos associados deixam de referenciar essa conta.'"
+      confirmLabel="Remover conta"
+      cancelLabel="Cancelar"
+      variant="danger"
+      (confirmed)="confirmRemove()"
+      (cancelled)="cancelRemove()">
+    </app-confirm-dialog>
+  }
 </section>

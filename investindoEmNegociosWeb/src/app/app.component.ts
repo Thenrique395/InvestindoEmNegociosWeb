@@ -36,6 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showSignupModal = false;
   signupAlert = '';
   userMenuOpen = false;
+  mobileSidebarOpen = false;
   notificationsOpen = false;
   notifications: NotificationItem[] = [];
   unreadCount = 0;
@@ -173,12 +174,25 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.userMenuOpen && !target.closest('.user-menu')) {
       this.userMenuOpen = false;
     }
+
+    if (this.mobileSidebarOpen && !target.closest('.sidebar') && !target.closest('.menu-toggle')) {
+      this.mobileSidebarOpen = false;
+    }
   }
 
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     this.userMenuOpen = false;
+    this.mobileSidebarOpen = false;
     this.notificationsFacade.close();
+  }
+
+  toggleMobileSidebar(): void {
+    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarOpen = false;
   }
 
   @HostListener('window:focus')
@@ -326,6 +340,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private closeTransientUi(): void {
     this.userMenuOpen = false;
+    this.mobileSidebarOpen = false;
     this.notificationsFacade.close();
   }
 

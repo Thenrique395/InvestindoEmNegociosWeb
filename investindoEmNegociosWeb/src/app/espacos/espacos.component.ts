@@ -6,11 +6,12 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-espacos',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent, SectionCardComponent, FormFieldComponent],
+  imports: [FormsModule, PageHeaderComponent, SectionCardComponent, FormFieldComponent, ConfirmDialogComponent],
   templateUrl: './espacos.component.html',
   styleUrl: './espacos.component.scss'
 })
@@ -18,6 +19,7 @@ export class EspacosComponent implements OnInit {
   spaces: SpaceResponse[] = [];
   loading = false;
   saving = false;
+  spaceToDelete: SpaceResponse | null = null;
 
   novoNome = '';
   novaSenha = '';
@@ -115,9 +117,17 @@ export class EspacosComponent implements OnInit {
   }
 
   excluir(space: SpaceResponse): void {
-    if (!confirm(`Excluir o espaço "${space.name}"? Os dados desse espaço deixarão de aparecer, mas não serão apagados.`)) {
-      return;
-    }
+    this.spaceToDelete = space;
+  }
+
+  cancelarExclusao(): void {
+    this.spaceToDelete = null;
+  }
+
+  confirmarExclusao(): void {
+    const space = this.spaceToDelete;
+    if (!space) return;
+    this.spaceToDelete = null;
 
     this.deletingId = space.id;
     this.spacesService.delete(space.id).subscribe({

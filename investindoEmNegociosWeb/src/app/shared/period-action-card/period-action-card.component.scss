@@ -1,0 +1,47 @@
+@use '../period-card-actions.mixin' as actions;
+
+:host {
+  display: contents;
+}
+
+.app-period-action-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
+  box-shadow: var(--shadow-sm);
+  padding: 1.45rem 1.4rem 1.3rem;
+  display: grid;
+  gap: 0.95rem;
+}
+
+.app-period-action-card__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.app-period-action-card__title {
+  margin: 0;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
+  line-height: var(--line-height-tight);
+  color: var(--text);
+}
+
+.app-period-action-card__text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
+}
+
+.app-period-action-card__actions {
+  display: grid;
+  gap: 0.7rem;
+}
+
+@include actions.period-card-actions('.app-period-action-card__actions');

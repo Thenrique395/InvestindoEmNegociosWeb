@@ -117,23 +117,34 @@ describe('EspacosComponent', () => {
     expect(component.enteringId).toBeNull();
   });
 
+  it('abre a confirmação de exclusão sem excluir de imediato', () => {
+    const { component, spacesService } = createComponent();
+    const space = buildSpace({ id: 's2', name: 'Negócio', isDefault: false });
+
+    component.excluir(space);
+
+    expect(component.spaceToDelete).toEqual(space);
+    expect(spacesService.delete).not.toHaveBeenCalled();
+  });
+
   it('cancela a exclusão quando o usuário não confirma', () => {
     const { component, spacesService } = createComponent();
-    spyOn(window, 'confirm').and.returnValue(false);
-
     component.excluir(buildSpace({ id: 's2', name: 'Negócio', isDefault: false }));
 
-    expect(window.confirm).toHaveBeenCalled();
+    component.cancelarExclusao();
+
+    expect(component.spaceToDelete).toBeNull();
     expect(spacesService.delete).not.toHaveBeenCalled();
   });
 
   it('exclui o espaço após confirmação e recarrega a lista', () => {
     const { component, spacesService, uiFeedback } = createComponent();
-    spyOn(window, 'confirm').and.returnValue(true);
-
     component.excluir(buildSpace({ id: 's2', name: 'Negócio', isDefault: false }));
 
+    component.confirmarExclusao();
+
     expect(spacesService.delete).toHaveBeenCalledWith('s2');
+    expect(component.spaceToDelete).toBeNull();
     expect(uiFeedback.success).toHaveBeenCalled();
     expect(spacesService.list).toHaveBeenCalled();
   });

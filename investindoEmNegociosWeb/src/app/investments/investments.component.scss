@@ -343,6 +343,21 @@
   overflow: visible;
 }
 
+.rentabilidade-hover-points {
+  position: absolute;
+  inset: 0 0 1.35rem 0;
+  pointer-events: none;
+}
+
+.rentabilidade-hover-point {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  margin-left: -14px;
+  pointer-events: auto;
+}
+
 .rentabilidade-plot .line {
   fill: none;
   stroke-width: 2.5;
@@ -613,7 +628,9 @@
 }
 
 .patrimony-column:hover .chart-hover-tip,
-.distribution-item:hover .chart-hover-tip {
+.distribution-item:hover .chart-hover-tip,
+.consolidacao-bars__stack:hover .chart-hover-tip,
+.rentabilidade-hover-point:hover .chart-hover-tip {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -1218,4 +1235,56 @@ th {
 
 .section-collapsible[open] summary {
   margin-bottom: 0.65rem;
+}
+
+@media (max-width: 960px) {
+  .visual-grid,
+  .visual-grid--resume,
+  .rentabilidade-grid,
+  .proventos-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .visual-grid--resume .chart-card {
+    height: auto;
+  }
+
+  .donut-layout {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .executive-grid,
+  .executive-grid--three,
+  .summary__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .patrimony-chart,
+  .rentabilidade-chart,
+  .consolidacao-chart {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .patrimony-bars {
+    width: 28px;
+  }
+
+  .chart-filters {
+    flex-wrap: wrap;
+  }
+
+  .chart-filters select {
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 140px;
+  }
+
+  .patrimony-column:not(:nth-child(3n + 1)) .patrimony-x-label,
+  .consolidacao-col:not(:nth-child(3n + 1)) small,
+  .rentabilidade-x-axis small:not(:nth-child(3n + 1)) {
+    display: none;
+  }
 }

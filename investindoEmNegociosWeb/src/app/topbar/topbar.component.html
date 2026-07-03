@@ -1,4 +1,24 @@
 <header class="topbar flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)]">
+  <button
+    type="button"
+    class="menu-toggle grid place-items-center rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]"
+    aria-controls="app-sidebar"
+    [attr.aria-expanded]="mobileMenuOpen"
+    aria-label="Abrir menu de navegação"
+    (click)="menuToggle.emit()">
+    @if (!mobileMenuOpen) {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20">
+        <line x1="4" y1="7" x2="20" y2="7"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="17" x2="20" y2="17"></line>
+      </svg>
+    } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20">
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+        <line x1="6" y1="18" x2="18" y2="6"></line>
+      </svg>
+    }
+  </button>
   <div class="topbar__slogan text-[var(--text-sm)] font-medium text-[var(--text-muted)]">{{ brandSlogan }}</div>
   <div class="topbar__actions flex min-w-0 flex-1 items-center justify-end gap-[var(--spacing-2)]">
     <button

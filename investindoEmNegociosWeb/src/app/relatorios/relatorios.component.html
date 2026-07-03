@@ -1,13 +1,13 @@
 <section class="relatorios-page">
   <header class="page-header">
     <div class="page-header__nav">
-      <button type="button" class="btn-ghost btn--sm" (click)="prevMonth()">← Anterior</button>
+      <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
       <h1>Relatório · {{ monthName }} {{ year }}</h1>
-      <button type="button" class="btn-ghost btn--sm" (click)="nextMonth()">Próximo →</button>
+      <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
     </div>
     @if (report) {
-      <button type="button" class="btn-ghost btn--sm" (click)="exportCsv()">Exportar CSV</button>
-      <button type="button" class="btn-ghost btn--sm" (click)="exportPdf()">Exportar PDF</button>
+      <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
+      <button type="button" class="btn-ghost sm" (click)="exportPdf()">Exportar PDF</button>
     }
   </header>
 

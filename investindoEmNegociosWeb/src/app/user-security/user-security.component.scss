@@ -35,3 +35,64 @@
   padding: var(--spacing-2);
   background: var(--surface-2);
 }
+
+.privacy-strip {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.privacy-pill {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  padding: 0.85rem 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.privacy-pill strong {
+  font-size: var(--font-size-title-sm);
+}
+
+.privacy-pill span {
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2);
+  background: var(--surface-2);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: var(--font-size-title-sm);
+  color: var(--text);
+}
+
+.scope {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.scope div {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 0.65rem;
+}
+
+.scope--compact div {
+  border-left-color: color-mix(in srgb, var(--primary) 40%, transparent);
+}

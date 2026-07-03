@@ -575,3 +575,63 @@
     color: var(--text);
   }
 }
+
+@media (max-width: 960px) {
+  .cards-summary-grid,
+  .cards-statements__metrics,
+  .cards-form__grid--identity,
+  .cards-form__grid--financial {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cards-statements__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cards-dialog-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .cards-statements__header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cards-purchases__row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "icon main"
+      "pill badge"
+      "amount date";
+    row-gap: 0.5rem;
+  }
+
+  .cards-purchases__icon {
+    grid-area: icon;
+  }
+
+  .cards-purchases__main {
+    grid-area: main;
+  }
+
+  .cards-purchases__pill {
+    grid-area: pill;
+  }
+
+  .cards-purchases__row app-status-badge {
+    grid-area: badge;
+    justify-self: start;
+  }
+
+  .cards-purchases__amount {
+    grid-area: amount;
+  }
+
+  .cards-purchases__date {
+    grid-area: date;
+    justify-self: end;
+  }
+}

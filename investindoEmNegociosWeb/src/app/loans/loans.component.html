@@ -134,8 +134,8 @@
               </div>
               <div class="contract__actions">
                 <div class="pill">{{ contract.status }}</div>
-                <button type="button" class="btn-ghost btn--sm" (click)="edit(contract)" [disabled]="!!deleting">Editar</button>
-                <button type="button" class="btn-danger btn--sm" (click)="remove(contract)" [disabled]="deleting === contract.id || !!editingId">
+                <button type="button" class="btn-ghost sm" (click)="edit(contract)" [disabled]="!!deleting">Editar</button>
+                <button type="button" class="btn-danger sm" (click)="remove(contract)" [disabled]="deleting === contract.id || !!editingId">
                   {{ deleting === contract.id ? 'Excluindo...' : 'Excluir' }}
                 </button>
               </div>
@@ -146,7 +146,7 @@
               <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
             </div>
             <div class="contract__toggle">
-              <button type="button" class="btn-ghost btn--sm" (click)="toggleInstallments(contract.id)">
+              <button type="button" class="btn-ghost sm" (click)="toggleInstallments(contract.id)">
                 {{ expandedContractId === contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
               </button>
             </div>
@@ -164,7 +164,7 @@
                         <td><span class="pill" [class.pill--success]="inst.status === 'Paid'">{{ inst.status === 'Paid' ? 'Pago' : 'Em aberto' }}</span></td>
                         <td>
                           @if (inst.status === 'Open') {
-                            <button type="button" class="btn-primary btn--sm" (click)="payInstallment(contract, inst.id)" [disabled]="payingInstallment === inst.id">
+                            <button type="button" class="btn-primary sm" (click)="payInstallment(contract, inst.id)" [disabled]="payingInstallment === inst.id">
                               {{ payingInstallment === inst.id ? '...' : 'Pagar' }}
                             </button>
                           } @else {

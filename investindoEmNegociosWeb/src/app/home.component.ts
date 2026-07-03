@@ -32,6 +32,7 @@ import { NotificationsService, NotificationItem } from './notifications.service'
 import { AppCurrencyPipe } from './shared/app-currency.pipe';
 import { StatCardComponent } from './shared/stat-card/stat-card.component';
 import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
+import { TooltipComponent } from './shared/tooltip/tooltip.component';
 import { AiFinancialHealthResponse, AiHealthStatus, FinancialAssistantService } from './financial-assistant.service';
 
 type InsightDiagnostics = {
@@ -59,7 +60,7 @@ type InsightTodoItem = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule, AppCurrencyPipe, StatCardComponent, StatusBadgeComponent],
+  imports: [CommonModule, DecimalPipe, RouterModule, AppCurrencyPipe, StatCardComponent, StatusBadgeComponent, TooltipComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

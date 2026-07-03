@@ -170,6 +170,19 @@ td {
   font-weight: var(--font-weight-bold);
 }
 
+.pill--success {
+  background: var(--success-10);
+  color: var(--success-text);
+}
+
+.row--paid {
+  opacity: 0.7;
+}
+
+.text--sm {
+  font-size: var(--font-size-caption);
+}
+
 .compact {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

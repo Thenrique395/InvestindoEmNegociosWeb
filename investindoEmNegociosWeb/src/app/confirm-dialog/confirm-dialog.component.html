@@ -1,12 +1,12 @@
 <div class="modal">
   <div class="modal__backdrop" (click)="cancelled.emit()"></div>
-  <div class="modal__card">
-    <h2>{{ title }}</h2>
+  <div class="modal__card" role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId">
+    <h2 [id]="titleId">{{ title }}</h2>
     @if (message) {
       <p class="muted">{{ message }}</p>
     }
     <div class="modal__actions">
-      <button type="button" class="btn-cancel" (click)="cancelled.emit()">{{ cancelLabel }}</button>
+      <button type="button" class="btn-cancel" #cancelButton (click)="cancelled.emit()">{{ cancelLabel }}</button>
       <button type="button" [class]="confirmClass" (click)="confirmed.emit()">{{ confirmLabel }}</button>
     </div>
   </div>

@@ -34,11 +34,21 @@ describe('UserSecurityComponent', () => {
     expect(ctx.component.summary?.activeSessions).toBe(2);
   });
 
-  it('deve revogar sessões e recarregar o resumo', () => {
+  it('deve abrir a confirmação antes de revogar sessões', () => {
     const ctx = createComponent();
 
     ctx.component.revokeSessions();
 
+    expect(ctx.component.confirmRevokeOpen).toBeTrue();
+    expect(ctx.profileService.revokeOwnSessions).not.toHaveBeenCalled();
+  });
+
+  it('deve revogar sessões e recarregar o resumo após confirmação', () => {
+    const ctx = createComponent();
+
+    ctx.component.performRevokeSessions();
+
+    expect(ctx.component.confirmRevokeOpen).toBeFalse();
     expect(ctx.profileService.revokeOwnSessions).toHaveBeenCalled();
     expect(ctx.profileService.getSecuritySummary).toHaveBeenCalledTimes(2);
     expect(ctx.uiFeedback.success).toHaveBeenCalled();
@@ -60,7 +70,7 @@ describe('UserSecurityComponent', () => {
     const uiFeedback = { success: jasmine.createSpy(), error: jasmine.createSpy() };
     const ctx = createComponent({ profileService, uiFeedback });
 
-    ctx.component.revokeSessions();
+    ctx.component.performRevokeSessions();
 
     expect(uiFeedback.error).toHaveBeenCalledWith('Falha');
   });

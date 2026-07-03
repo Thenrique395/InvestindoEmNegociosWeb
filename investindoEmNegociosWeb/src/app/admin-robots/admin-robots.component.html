@@ -151,7 +151,7 @@
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
                     <button
-                      class="btn-warning sm"
+                      class="btn-ghost sm"
                       type="button"
                       (click)="runRobot(row.robotName)"
                       [disabled]="runningAll || !!runningRobot">
@@ -254,5 +254,17 @@
         </div>
       </div>
     </div>
+  }
+
+  @if (confirmRunAllOpen) {
+    <app-confirm-dialog
+      title="Executar todos os robôs?"
+      message="Isso dispara a execução manual de todos os robôs de automação agora, fora do agendamento normal. Pode gerar notificações e processar dados em produção."
+      confirmLabel="Executar todos"
+      cancelLabel="Cancelar"
+      variant="warning"
+      (confirmed)="performRunAll()"
+      (cancelled)="confirmRunAllOpen = false">
+    </app-confirm-dialog>
   }
 </section>

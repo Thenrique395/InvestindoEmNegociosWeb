@@ -1,5 +1,7 @@
 <aside
+  id="app-sidebar"
   class="sidebar grid min-h-screen content-start gap-[1rem] border-r border-[var(--border)] bg-[var(--sidebar)] p-[calc(var(--spacing-3)+4px)]"
+  [class.sidebar--mobile-open]="mobileOpen"
   >
   <div class="sidebar__brand flex items-center gap-3 border-b border-[var(--border)] px-[var(--spacing-1)] pb-[var(--spacing-2)]">
     <img

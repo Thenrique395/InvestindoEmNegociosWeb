@@ -54,9 +54,20 @@
             Use a revogação global para encerrar sessões ativas e exigir novo login com refresh token novo.
           </p>
         }
-        <button type="button" class="btn btn--danger" [disabled]="revoking" (click)="revokeSessions()">
+        <button type="button" class="btn-danger" [disabled]="revoking" (click)="revokeSessions()">
           {{ revoking ? 'Revogando...' : 'Revogar sessões ativas' }}
         </button>
+        @if (confirmRevokeOpen) {
+          <app-confirm-dialog
+            title="Revogar todas as sessões ativas?"
+            message="Todos os dispositivos conectados serão desconectados e vão precisar fazer login novamente, incluindo este."
+            confirmLabel="Revogar sessões"
+            cancelLabel="Cancelar"
+            variant="danger"
+            (confirmed)="performRevokeSessions()"
+            (cancelled)="confirmRevokeOpen = false">
+          </app-confirm-dialog>
+        }
       </div>
       <div class="card">
         <h3>Boas práticas</h3>

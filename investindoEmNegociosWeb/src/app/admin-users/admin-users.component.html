@@ -81,7 +81,7 @@
                 <td class="px-6 py-4">
                   <button
                     type="button"
-                    class="btn-secondary sm"
+                    class="btn-ghost sm"
                     (click)="toggleFeatures(user)"
                     [disabled]="savingId === user.id || deletingId === user.id || !!featuresLoadingForUserId">
                     {{ featuresOpenForUserId === user.id ? 'Fechar' : 'Gerenciar' }}
@@ -91,7 +91,7 @@
                   <div class="flex flex-wrap items-center justify-end gap-2">
                     <button
                       type="button"
-                      class="btn-warning sm"
+                      class="btn-ghost sm"
                       (click)="toggleStatus(user)"
                       [disabled]="savingId === user.id || deletingId === user.id">
                       <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
@@ -140,7 +140,7 @@
                     </button>
                     <button
                       type="button"
-                      class="btn-secondary sm"
+                      class="btn-ghost sm"
                       (click)="openTrial(user)"
                       [disabled]="savingId === user.id || deletingId === user.id || grantingTrial">
                       Trial
@@ -201,7 +201,7 @@
                         </button>
                         <button
                           type="button"
-                          class="btn-secondary sm"
+                          class="btn-ghost sm"
                           (click)="cancelTrial()"
                           [disabled]="grantingTrial">
                           Cancelar

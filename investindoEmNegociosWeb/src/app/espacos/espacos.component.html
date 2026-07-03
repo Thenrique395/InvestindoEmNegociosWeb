@@ -75,7 +75,7 @@
                   </button>
                   <button type="button" class="btn-ghost sm" (click)="iniciarEdicao(space)">Editar</button>
                   @if (!space.isDefault) {
-                    <button type="button" class="btn-ghost sm" [disabled]="deletingId === space.id" (click)="excluir(space)">
+                    <button type="button" class="btn-danger sm" [disabled]="deletingId === space.id" (click)="excluir(space)">
                       {{ deletingId === space.id ? 'Excluindo...' : 'Excluir' }}
                     </button>
                   }
@@ -87,4 +87,16 @@
       </div>
     }
   </app-section-card>
+
+  @if (spaceToDelete) {
+    <app-confirm-dialog
+      title="Excluir espaço?"
+      [message]="'Excluir o espaço \'' + spaceToDelete.name + '\'? Os dados desse espaço deixarão de aparecer, mas não serão apagados.'"
+      confirmLabel="Excluir espaço"
+      cancelLabel="Cancelar"
+      variant="danger"
+      (confirmed)="confirmarExclusao()"
+      (cancelled)="cancelarExclusao()">
+    </app-confirm-dialog>
+  }
 </div>

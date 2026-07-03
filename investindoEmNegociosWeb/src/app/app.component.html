@@ -10,13 +10,17 @@
   }
 
   @if (isLogged && !isOnboardingRoute && !isStyleguideRoute) {
-    <div class="shell relative grid min-h-screen grid-cols-[300px_minmax(0,1fr)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+    <div class="shell relative grid min-h-screen overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
       <app-sidebar
         [isLightTheme]="isLightTheme"
         [brandName]="brandName"
         [currentRole]="currentRole"
+        [mobileOpen]="mobileSidebarOpen"
         (routeReload)="reloadIfSame($event.path, $event.event)"
         (preferencesOpen)="goToPreferences($event)" />
+      @if (mobileSidebarOpen) {
+        <div class="shell__backdrop" (click)="closeMobileSidebar()"></div>
+      }
       <div class="content min-w-0 grid min-h-[calc(100vh-2rem)] gap-4 bg-transparent">
         <app-topbar
           [brandSlogan]="brandSlogan"
@@ -32,6 +36,8 @@
           [currentRole]="currentRole"
           [isLightTheme]="isLightTheme"
           [financialValuesHidden]="financialValuesHidden"
+          [mobileMenuOpen]="mobileSidebarOpen"
+          (menuToggle)="toggleMobileSidebar()"
           (themeToggle)="toggleTheme()"
           (financialValuesToggle)="toggleFinancialValues()"
           (notificationsToggle)="toggleNotifications()"

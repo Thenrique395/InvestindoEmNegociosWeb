@@ -1,12 +1,12 @@
 <section class="orcamento-page">
   <header class="page-header">
     <div class="page-header__nav">
-      <button type="button" class="btn-ghost btn--sm" (click)="prevMonth()">← Anterior</button>
+      <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
       <h1>Orçamento · {{ monthName }} {{ year }}</h1>
-      <button type="button" class="btn-ghost btn--sm" (click)="nextMonth()">Próximo →</button>
+      <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
     </div>
     @if (budget) {
-      <button type="button" class="btn-ghost btn--sm" (click)="exportCsv()">Exportar CSV</button>
+      <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
     }
   </header>
 
@@ -67,7 +67,7 @@
                     }
                   </td>
                   <td>
-                    <button type="button" class="btn-ghost btn--sm btn--danger" (click)="removeItem(item)" [disabled]="deletingId === item.id">
+                    <button type="button" class="btn-danger sm" (click)="removeItem(item)" [disabled]="deletingId === item.id">
                       {{ deletingId === item.id ? '...' : 'Remover' }}
                     </button>
                   </td>

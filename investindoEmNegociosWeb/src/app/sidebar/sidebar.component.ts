@@ -51,6 +51,7 @@ export class SidebarComponent {
   @Input({ required: true }) isLightTheme = false;
   @Input({ required: true }) brandName = '';
   @Input() currentRole: UserRole | null = null;
+  @Input() mobileOpen = false;
 
   @Output() routeReload = new EventEmitter<SidebarRouteReload>();
   @Output() preferencesOpen = new EventEmitter<Event | undefined>();

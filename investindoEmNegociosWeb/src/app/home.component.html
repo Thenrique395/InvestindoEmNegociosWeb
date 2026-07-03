@@ -1,4 +1,24 @@
 @if (isLogged) {
+  <ng-template #dashboardKpiSkeleton>
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+      </div>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+      </div>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
+      </div>
+      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
+        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
+      </div>
+    </div>
+  </ng-template>
   <section class="grid gap-4">
     @if (isBasicProfile) {
       @if (!isLoadingDashboard) {
@@ -213,24 +233,7 @@
           </section>
         </section>
       } @else {
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-          </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-          </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-          </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
-          </div>
-        </div>
+        <ng-container [ngTemplateOutlet]="dashboardKpiSkeleton" />
       }
     } @else {
       <header class="flex flex-wrap items-start justify-between gap-3">
@@ -271,135 +274,67 @@
         </div>
       </header>
       @if (!isLoadingDashboard) {
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3">
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-            <div class="mb-2 flex items-center gap-3">
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--color-primary-weak)] text-[var(--primary-text)]" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-                  <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldo Disponível Real</p>
-              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre saldo disponível real">
-                i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-                  SDR = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.
-                </span>
-                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-              </button>
-            </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ saldoDisponivelReal | appCurrency }}</h2>
-            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-sky-300/60 bg-sky-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-[var(--info-text)]">
-              <span class="inline-block h-2 w-2 rounded-full bg-sky-500"></span>
-              Em contas: {{ totalSaldoContas | appCurrency }}. Pendências: {{ pendenciasCaixa | appCurrency }}.
-            </p>
-            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Projetado com receitas pendentes: {{ saldoDisponivelProjetado | appCurrency }}</p>
-          </div>
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-            <div class="mb-2 flex items-center gap-3">
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(16,185,129,0.18)] text-[var(--success-text)]" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Patrimônio líquido</p>
-              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre patrimônio líquido">
-                i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[200px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-                  Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.
-                </span>
-                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-              </button>
-            </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ patrimonioLiquido | appCurrency }}</h2>
-            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-[var(--success-text)]">
-              <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-              Ativos: {{ patrimonioTotalAtivos | appCurrency }}. Passivos: {{ patrimonioPassivos | appCurrency }}.
-            </p>
-            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Investimentos consolidados: {{ patrimonioEmInvestimentos | appCurrency }} · Ativos reais: {{ patrimonioEmAtivosReais | appCurrency }}</p>
-          </div>
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-            <div class="mb-2 flex items-center gap-3">
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--color-success-weak)] text-[var(--success-text)]" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total Receitas</p>
-              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de receitas">
-                i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-                  Total de receitas do mês: apenas receitas com status recebido no período selecionado.
-                </span>
-                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-              </button>
-            </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalRendas | appCurrency }}</h2>
-            <p class="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-semibold text-[var(--warning-text)]">
-              <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-              Pendente a receber: {{ totalRendasPendentes | appCurrency }}.
-            </p>
-          </div>
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-            <div class="mb-2 flex items-center gap-3">
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--color-danger-weak)] text-[var(--danger-text)]" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Total de despesas</p>
-              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre total de despesas">
-                i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-                  Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.
-                </span>
-                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-              </button>
-            </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDespesas | appCurrency }}</h2>
-            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Somente despesas com vencimento neste mês.</p>
-          </div>
-          <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
-            <div class="mb-2 flex items-center gap-3">
-              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[rgba(100,116,139,0.2)] text-[var(--text-muted)]" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                  <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <p class="m-0 flex-1 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Dívida total nos cartões</p>
-              <button type="button" class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" aria-label="Mais informacoes sobre dívida nos cartoes">
-                i
-                <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[180px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-                  Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.
-                </span>
-                <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-              </button>
-            </div>
-            <h2 class="m-0 text-[clamp(1.35rem,1.8vw,1.85rem)] font-semibold text-[var(--text)]">{{ totalDividaCartoes | appCurrency }}</h2>
-            <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">Somatório de despesas vinculadas a cartões.</p>
-          </div>
+        <div class="basic-home-kpis">
+          <app-stat-card
+            tone="primary"
+            eyebrow="Saldo Disponível Real"
+            [value]="saldoDisponivelReal | appCurrency"
+            note="Em contas: {{ totalSaldoContas | appCurrency }} · Pendências: {{ pendenciasCaixa | appCurrency }} · Projetado: {{ saldoDisponivelProjetado | appCurrency }}"
+            tooltipLabel="Mais informações sobre saldo disponível real"
+            tooltipText="SDR = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.">
+            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+              <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </app-stat-card>
+          <app-stat-card
+            tone="info"
+            eyebrow="Patrimônio líquido"
+            [value]="patrimonioLiquido | appCurrency"
+            note="Ativos: {{ patrimonioTotalAtivos | appCurrency }} · Passivos: {{ patrimonioPassivos | appCurrency }} · Investimentos: {{ patrimonioEmInvestimentos | appCurrency }} · Ativos reais: {{ patrimonioEmAtivosReais | appCurrency }}"
+            tooltipLabel="Mais informações sobre patrimônio líquido"
+            tooltipText="Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.">
+            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </app-stat-card>
+          <app-stat-card
+            tone="success"
+            eyebrow="Total Receitas"
+            [value]="totalRendas | appCurrency"
+            note="Pendente a receber: {{ totalRendasPendentes | appCurrency }}"
+            tooltipLabel="Mais informações sobre total de receitas"
+            tooltipText="Total de receitas do mês: apenas receitas com status recebido no período selecionado.">
+            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </app-stat-card>
+          <app-stat-card
+            tone="danger"
+            eyebrow="Total de despesas"
+            [value]="totalDespesas | appCurrency"
+            note="Somente despesas com vencimento neste mês."
+            tooltipLabel="Mais informações sobre total de despesas"
+            tooltipText="Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.">
+            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </app-stat-card>
+          <app-stat-card
+            tone="warning"
+            eyebrow="Dívida total nos cartões"
+            [value]="totalDividaCartoes | appCurrency"
+            note="Somatório de despesas vinculadas a cartões."
+            tooltipLabel="Mais informações sobre dívida nos cartões"
+            tooltipText="Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.">
+            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </app-stat-card>
         </div>
       } @else {
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-          </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-          </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-          </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
-            <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
-          </div>
-        </div>
+        <ng-container [ngTemplateOutlet]="dashboardKpiSkeleton" />
       }
     }
     @if (hasAccess('Advanced') && accountBalances.length) {
@@ -563,11 +498,11 @@
     <section
       class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]"
     [ngClass]="insight.tone === 'warn'
-      ? 'border-amber-400/40 border-l-amber-400 bg-amber-500/10'
+      ? 'border-[color-mix(in_srgb,var(--warning)_35%,transparent)] border-l-[var(--warning)] bg-[color-mix(in_srgb,var(--warning)_10%,transparent)]'
       : insight.tone === 'danger'
-        ? 'border-rose-400/40 border-l-rose-400 bg-rose-500/10'
+        ? 'border-[color-mix(in_srgb,var(--danger)_35%,transparent)] border-l-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,transparent)]'
         : insight.tone === 'info'
-          ? 'border-sky-400/40 border-l-sky-400 bg-sky-500/10'
+          ? 'border-[color-mix(in_srgb,var(--info)_35%,transparent)] border-l-[var(--info)] bg-[color-mix(in_srgb,var(--info)_10%,transparent)]'
           : ''"
       >
       <div class="flex items-start gap-3">
@@ -812,16 +747,10 @@
       <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">Metas ativas</p>
-          <button
-            type="button"
-            class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-            aria-label="Como ler o resumo de metas">
-            i
-            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-              Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano.
-            </span>
-            <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-          </button>
+          <app-tooltip
+            label="Como ler o resumo de metas"
+            text="Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano."
+            size="sm" />
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
           <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
@@ -922,16 +851,10 @@
               <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Resultado do mês</p>
               <span class="text-[0.8125rem] text-[var(--text-muted)]">Saldo anterior + receitas recebidas - despesas</span>
             </div>
-            <button
-              type="button"
-              class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]"
-              aria-label="Como ler o gráfico de resultado do mês">
-              i
-              <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-[260px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-                Resultado considera somente receitas recebidas. Receitas pendentes aparecem separadas e não entram no saldo principal.
-              </span>
-              <span class="pointer-events-none absolute right-3 top-full z-10 mt-1 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-            </button>
+            <app-tooltip
+              label="Como ler o gráfico de resultado do mês"
+              text="Resultado considera somente receitas recebidas. Receitas pendentes aparecem separadas e não entram no saldo principal."
+              size="sm" />
           </div>
           <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
             <div class="grid gap-1">
@@ -1046,13 +969,10 @@
             <p class="m-0 text-[0.9375rem] font-semibold text-[var(--text)]">Movimentos recentes</p>
             <span class="text-[0.875rem] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
           </div>
-          <button class="group relative inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-2)] text-[var(--text-sm)] text-[var(--text-secondary)]" type="button" aria-label="Informações sobre movimentos recentes">
-            i
-            <span class="pointer-events-none absolute bottom-full right-0 mb-3 hidden min-w-[220px] rounded-[12px] border border-[var(--border-strong)] bg-[var(--surface)] p-2 text-left text-[0.8125rem] text-[var(--text)] shadow-[var(--shadow-lg)] group-hover:block">
-              Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido.
-            </span>
-            <span class="pointer-events-none absolute bottom-full right-2 mb-2 hidden h-2 w-2 rotate-45 border border-[var(--border-strong)] bg-[var(--surface)] group-hover:block"></span>
-          </button>
+          <app-tooltip
+            label="Informações sobre movimentos recentes"
+            text="Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido."
+            size="sm" />
         </div>
         @if (recentTransactions.length) {
           <div class="grid gap-2 min-h-0 overflow-y-auto pr-1">
@@ -1061,8 +981,15 @@
                 <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
                   <span
                     class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[0.875rem] font-semibold text-[var(--text)]"
-                    [ngClass]="item.type === 'income' ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]' : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'">
-                    {{ item.type === 'income' ? '↑' : '↓' }}
+                    [ngClass]="item.type === 'income' ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]' : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'"
+                    aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false">
+                      @if (item.type === 'income') {
+                        <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                      } @else {
+                        <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                      }
+                    </svg>
                   </span>
                   <div class="min-w-0">
                     <div class="flex items-center justify-between gap-2">

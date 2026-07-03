@@ -35,3 +35,13 @@
   gap: 0.6rem;
   flex-wrap: wrap;
 }
+
+.btn-warning {
+  background: var(--warning);
+  color: var(--on-primary);
+  border-color: transparent;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--warning) 86%, black);
+}

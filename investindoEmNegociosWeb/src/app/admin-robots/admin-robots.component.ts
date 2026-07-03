@@ -4,17 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { AdminRobotsService, RobotExecutionLog, RobotMonitorSummary, RobotStatus } from '../admin-robots.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-robots',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './admin-robots.component.html',
   styleUrls: ['./admin-robots.component.scss']
 })
 export class AdminRobotsComponent implements OnInit {
   loading = false;
   runningAll = false;
+  confirmRunAllOpen = false;
   runningRobot: string | null = null;
   robots: RobotStatus[] = [];
   recentRuns: RobotExecutionLog[] = [];
@@ -113,6 +115,11 @@ export class AdminRobotsComponent implements OnInit {
   }
 
   runAll(): void {
+    this.confirmRunAllOpen = true;
+  }
+
+  performRunAll(): void {
+    this.confirmRunAllOpen = false;
     if (this.runningAll || this.runningRobot) return;
     this.runningAll = true;
     this.adminRobots.runAll().subscribe({

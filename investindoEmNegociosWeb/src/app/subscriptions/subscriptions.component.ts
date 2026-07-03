@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { BillingService } from '../billing.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { SubscriptionsService, SubscriptionCatalogResponse, SubscriptionPlan } from '../subscriptions.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
@@ -11,7 +12,7 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ConfirmDialogComponent],
   templateUrl: './subscriptions.component.html',
   styleUrl: './subscriptions.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,6 +27,8 @@ export class SubscriptionsComponent implements OnInit {
   requestingTrial = false;
   requestingRefund = false;
   retrying = false;
+  confirmCancelOpen = false;
+  confirmRefundOpen = false;
 
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
@@ -157,6 +160,11 @@ export class SubscriptionsComponent implements OnInit {
   }
 
   cancel(): void {
+    this.confirmCancelOpen = true;
+  }
+
+  performCancel(): void {
+    this.confirmCancelOpen = false;
     if (this.cancelling) return;
     this.cancelling = true;
     this.subscriptionsService.cancel()
@@ -209,6 +217,11 @@ export class SubscriptionsComponent implements OnInit {
   }
 
   requestRefund(): void {
+    this.confirmRefundOpen = true;
+  }
+
+  performRefund(): void {
+    this.confirmRefundOpen = false;
     if (this.requestingRefund) return;
     this.requestingRefund = true;
     this.subscriptionsService.requestRefund()

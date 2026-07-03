@@ -156,6 +156,28 @@
         </button>
       </div>
     }
+    @if (confirmCancelOpen) {
+      <app-confirm-dialog
+        title="Cancelar renovação automática?"
+        message="Sua renovação automática será encerrada e o acesso volta para o plano Essencial ao final da vigência atual. Você continua com acesso premium até lá."
+        confirmLabel="Cancelar renovação"
+        cancelLabel="Manter assinatura"
+        variant="danger"
+        (confirmed)="performCancel()"
+        (cancelled)="confirmCancelOpen = false">
+      </app-confirm-dialog>
+    }
+    @if (confirmRefundOpen) {
+      <app-confirm-dialog
+        title="Cancelar com reembolso integral?"
+        message="Seu acesso premium é encerrado imediatamente e o reembolso integral é processado em até 5 dias úteis. Essa ação não pode ser desfeita."
+        confirmLabel="Cancelar com reembolso"
+        cancelLabel="Voltar"
+        variant="danger"
+        (confirmed)="performRefund()"
+        (cancelled)="confirmRefundOpen = false">
+      </app-confirm-dialog>
+    }
     @if (showTrialButton) {
       <div class="card">
         <h3>Experimentar grátis</h3>
