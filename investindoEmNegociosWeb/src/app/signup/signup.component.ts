@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Meta, Title } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, RegisterPayload } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { cpfValidator, maskCpf } from '../utils/cpf.utils';
+import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
 
 @Component({
   selector: 'app-signup',
@@ -13,7 +15,7 @@ import { cpfValidator, maskCpf } from '../utils/cpf.utils';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
 })
-export class SignupComponent {
+export class SignupComponent implements OnInit, OnDestroy {
   @Output() signedUp = new EventEmitter<void>();
 
   loading = false;
@@ -26,7 +28,9 @@ export class SignupComponent {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private title: Title,
+    private meta: Meta
   ) {
     this.form = this.fb.group(
       {
@@ -43,6 +47,23 @@ export class SignupComponent {
 
   get isRoutePage(): boolean {
     return this.router.url.split('?')[0].startsWith('/register');
+  }
+
+  ngOnInit(): void {
+    if (!this.isRoutePage) return;
+
+    this.title.setTitle('Criar conta grátis — Investindo em Negócios');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'Crie sua conta grátis e monte seu primeiro painel financeiro em minutos, sem cartão de crédito.'
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (!this.isRoutePage) return;
+
+    this.title.setTitle(DEFAULT_TITLE);
+    this.meta.updateTag({ name: 'description', content: DEFAULT_META_DESCRIPTION });
   }
 
   onSubmit(): void {

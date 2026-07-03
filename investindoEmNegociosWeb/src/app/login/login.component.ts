@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService, AuthSessionResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   email = '';
   password = '';
   loading = false;
@@ -25,10 +27,18 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private profile: ProfileService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private title: Title,
+    private meta: Meta
   ) {}
 
   ngOnInit(): void {
+    this.title.setTitle('Entrar — Investindo em Negócios');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'Acesse sua conta para continuar acompanhando receitas, despesas, cartões e metas em um só painel.'
+    });
+
     if (this.route.snapshot.queryParamMap.get('created') === '1') {
       this.uiFeedback.success('Conta criada. Faça login para continuar.');
       this.router.navigate([], {
@@ -38,6 +48,11 @@ export class LoginComponent implements OnInit {
         replaceUrl: true
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.title.setTitle(DEFAULT_TITLE);
+    this.meta.updateTag({ name: 'description', content: DEFAULT_META_DESCRIPTION });
   }
 
   togglePasswordVisibility(): void {

@@ -99,7 +99,7 @@
                 <strong class="plan-option__name">{{ plan.name }}</strong>
                 <p class="plan-option__desc">{{ plan.description }}</p>
                 <div class="plan-option__price">
-                  <b>{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
+                  <b class="tnum">{{ (selectedCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</b>
                   <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
                 </div>
               </button>
@@ -126,7 +126,7 @@
           <div class="step-summary__content">
             <p class="eyebrow">Plano</p>
             <strong>{{ selectedPlan.name }} · {{ selectedCycle === 'Yearly' ? 'cobrança anual' : 'cobrança mensal' }}</strong>
-            <span>{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} / {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+            <span class="tnum">{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} / {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
           </div>
           <button type="button" class="text-link step-summary__edit" (click)="goToStep(1)">Trocar</button>
         </div>
@@ -437,7 +437,7 @@
 
       <div class="summary-price-box">
         <div class="summary-price">
-          <strong>{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <strong class="tnum">{{ selectedPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
           <span>/ {{ selectedCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
         </div>
         <p class="summary-highlight">{{ selectedPlan.highlight }}</p>

@@ -1,6 +1,11 @@
 <section class="showcase">
   <section id="produto" class="hero">
     <div class="hero__content">
+      <div class="ledger-mark" aria-hidden="true">
+        <span class="ledger-mark__segment ledger-mark__segment--in"></span>
+        <span class="ledger-mark__segment ledger-mark__segment--goal"></span>
+        <span class="ledger-mark__segment ledger-mark__segment--out"></span>
+      </div>
       <p class="eyebrow">Investindo em Negócios</p>
       <h1>Saia da planilha e veja seu mês com clareza</h1>
       <p class="hero__lead">
@@ -12,7 +17,7 @@
           Criar conta grátis
           <span aria-hidden="true">→</span>
         </a>
-        <a routerLink="/planos" class="button button--secondary">Ver planos</a>
+        <a href="/#recursos" class="button button--secondary">Conhecer a plataforma</a>
       </div>
       <div class="hero__signals" aria-label="Por que começar agora">
         <span>Plano Essencial sem custo</span>
@@ -48,17 +53,17 @@
               <div class="preview-kpis">
                 <article class="preview-mini-card preview-mini-card--blue">
                   <span>Quanto sobra</span>
-                  <strong>R$ 8.380,00</strong>
+                  <strong class="tnum">R$ 8.380,00</strong>
                   <small>Disponível após saídas do período</small>
                 </article>
                 <article class="preview-mini-card preview-mini-card--green">
                   <span>Quanto entrou</span>
-                  <strong>R$ 11.000,00</strong>
+                  <strong class="tnum">R$ 11.000,00</strong>
                   <small>Receitas confirmadas no mês</small>
                 </article>
                 <article class="preview-mini-card preview-mini-card--red">
                   <span>Quanto saiu</span>
-                  <strong>R$ 2.620,00</strong>
+                  <strong class="tnum">R$ 2.620,00</strong>
                   <small>Despesas registradas no período</small>
                 </article>
               </div>
@@ -69,7 +74,7 @@
                 </article>
                 <article>
                   <span>Movimento recente</span>
-                  <strong>Salário · + R$ 11.000,00</strong>
+                  <strong class="tnum">Salário · + R$ 11.000,00</strong>
                 </article>
               </div>
             }
@@ -84,12 +89,12 @@
                 </article>
                 <article class="preview-invoice">
                   <span>Ciclo 06/2026</span>
-                  <strong>R$ 100,00 em aberto</strong>
+                  <strong class="tnum">R$ 100,00 em aberto</strong>
                   <small>Fecha 30/06 · vence 05/07</small>
                 </article>
                 <article class="preview-purchase">
                   <span>Compras do cartão</span>
-                  <strong>Mercado · 1/1 · R$ 100,00</strong>
+                  <strong class="tnum">Mercado · 1/1 · R$ 100,00</strong>
                   <small>05/07/2026</small>
                 </article>
               </div>
@@ -108,15 +113,15 @@
                 <div class="preview-goal__metrics">
                   <article>
                     <span>Valor da meta</span>
-                    <strong>R$ 50.000,00</strong>
+                    <strong class="tnum">R$ 50.000,00</strong>
                   </article>
                   <article>
                     <span>Acumulado</span>
-                    <strong>R$ 21.000,00</strong>
+                    <strong class="tnum">R$ 21.000,00</strong>
                   </article>
                   <article>
                     <span>Aporte previsto</span>
-                    <strong>R$ 3.000,00</strong>
+                    <strong class="tnum">R$ 3.000,00</strong>
                   </article>
                 </div>
               </div>
@@ -135,6 +140,48 @@
           }
         </div>
       </article>
+    </div>
+  </section>
+
+  <section id="dores" class="section section--shift">
+    <div class="section__intro">
+      <p class="eyebrow">Do improviso ao controle</p>
+      <h2>Você reconhece esse mês?</h2>
+    </div>
+
+    <div class="shift-grid">
+      <div class="shift-column shift-column--before">
+        <p class="shift-column__label">Do jeito antigo</p>
+        <ul>
+          @for (pair of painSolutionPairs; track pair.pain) {
+            <li>
+              <span class="shift-icon shift-icon--pain" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </span>
+              {{ pair.pain }}
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="shift-column shift-column--after">
+        <p class="shift-column__label">Com o painel</p>
+        <ul>
+          @for (pair of painSolutionPairs; track pair.solution) {
+            <li>
+              <span class="shift-icon shift-icon--solution" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              {{ pair.solution }}
+            </li>
+          }
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -190,9 +237,9 @@
 
   <section id="para-quem-e" class="section">
     <div class="section__intro">
-      <p class="eyebrow">Para quem é</p>
+      <p class="eyebrow">Benefícios por perfil</p>
       <h2>Feito para rotinas financeiras diferentes</h2>
-      <p>O painel se adapta ao que você precisa acompanhar agora — e cresce junto com sua rotina.</p>
+      <p>O painel se adapta ao que você precisa acompanhar agora — e cresce junto com sua rotina, sem trocar de ferramenta.</p>
     </div>
 
     <div class="personas-grid">
@@ -235,15 +282,15 @@
           <div class="feature-card__mock-kpis">
             <span class="feature-card__mock-kpi feature-card__mock-kpi--green">
               <em>Receitas</em>
-              <strong>R$ 11.000</strong>
+              <strong class="tnum">R$ 11.000</strong>
             </span>
             <span class="feature-card__mock-kpi feature-card__mock-kpi--red">
               <em>Despesas</em>
-              <strong>R$ 2.620</strong>
+              <strong class="tnum">R$ 2.620</strong>
             </span>
             <span class="feature-card__mock-kpi feature-card__mock-kpi--blue">
               <em>Saldo</em>
-              <strong>R$ 8.380</strong>
+              <strong class="tnum">R$ 8.380</strong>
             </span>
           </div>
           <div class="feature-card__mock-bars" aria-hidden="true">
@@ -407,7 +454,7 @@
           </div>
           <p class="price-card__label">{{ plan.name }}</p>
           <h3>{{ plan.salesHeadline }}</h3>
-          <strong class="price-card__price">
+          <strong class="price-card__price tnum">
             {{ plan.monthlyPrice | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}<span>/mês</span>
           </strong>
           <ul>
@@ -515,7 +562,7 @@
     </div>
     <div class="final-cta__actions">
       <a routerLink="/register" class="button button--primary button--lg">
-        Criar conta agora
+        Começar agora
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
           <line x1="5" y1="12" x2="19" y2="12"></line>
           <polyline points="12 5 19 12 12 19"></polyline>

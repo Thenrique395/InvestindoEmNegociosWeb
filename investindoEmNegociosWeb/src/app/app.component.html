@@ -1,5 +1,5 @@
-<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isLoginRoute">
-  @if (showPublicExperience && !isLoginRoute) {
+<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isStandaloneAuthRoute">
+  @if (showPublicExperience && !isStandaloneAuthRoute) {
     <app-public-header
       [brandName]="brandName"
       [isLightTheme]="isLightTheme"
@@ -94,7 +94,7 @@
     </main>
   }
 
-  @if (showPublicExperience && !isLoginRoute) {
+  @if (showPublicExperience && !isStandaloneAuthRoute) {
     <app-public-footer
       [brandName]="brandName"
       [brandSlogan]="brandSlogan"

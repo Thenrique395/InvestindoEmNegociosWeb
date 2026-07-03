@@ -11,13 +11,40 @@
         decoding="async" />
     </a>
   </div>
-  <nav class="menu">
+  <nav class="menu" [class.menu--open]="mobileMenuOpen()" id="public-menu">
     @for (item of navItems; track item.href) {
       <a [href]="item.href" (click)="handleNavClick(item, $event)">{{ item.label }}</a>
     }
+    <button class="menu__mobile-login" type="button" (click)="handleMobileLogin()">Entrar</button>
   </nav>
   <div class="header__actions">
-    <a class="signup-link" routerLink="/register">Criar conta grátis</a>
     <button class="login-link" type="button" (click)="loginRequested.emit()">Entrar</button>
+    <a class="signup-link" routerLink="/register">
+      Começar agora
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-controls="public-menu"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      aria-label="Abrir menu de navegação"
+      (click)="toggleMobileMenu()">
+      @if (!mobileMenuOpen()) {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20">
+          <line x1="4" y1="7" x2="20" y2="7"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="17" x2="20" y2="17"></line>
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20">
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+          <line x1="6" y1="18" x2="18" y2="6"></line>
+        </svg>
+      }
+    </button>
   </div>
 </header>

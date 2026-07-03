@@ -1,6 +1,35 @@
 .pricing-page {
   display: grid;
-  gap: 1.2rem;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.pricing-hero__mark {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin-bottom: 0.85rem;
+}
+
+.pricing-hero__mark span {
+  display: block;
+  width: 20px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+}
+
+.pricing-hero__mark span:nth-child(1) {
+  background: var(--success);
+}
+
+.pricing-hero__mark span:nth-child(2) {
+  background: var(--primary);
+}
+
+.pricing-hero__mark span:nth-child(3) {
+  background: var(--danger);
 }
 
 .pricing-hero,
@@ -417,6 +446,76 @@
   border-bottom: 0;
 }
 
+.comparison-cards {
+  display: none;
+}
+
+.comparison-plan-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  background: var(--surface);
+}
+
+.comparison-plan-card--featured {
+  border: 2px solid var(--primary);
+}
+
+.comparison-plan-card + .comparison-plan-card {
+  margin-top: 1rem;
+}
+
+.comparison-plan-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--font-size-title-sm);
+}
+
+.comparison-plan-card dl {
+  margin: 0;
+}
+
+.comparison-plan-card__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparison-plan-card__row:last-child {
+  border-bottom: 0;
+}
+
+.comparison-plan-card__row dt {
+  flex: 1 1 40%;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.comparison-plan-card__row dd {
+  flex: 1 1 55%;
+  min-width: 0;
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  text-align: right;
+}
+
+.comparison-plan-card__row:has(.comparison-icon) {
+  align-items: center;
+}
+
+.comparison-plan-card__row:has(.comparison-icon) dd {
+  flex: none;
+}
+
 .faq-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -463,4 +562,32 @@
 .btn--ghost {
   background: var(--surface-2);
   color: var(--text);
+}
+
+@media (max-width: 960px) {
+  .pricing-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pricing-grid,
+  .progression-grid,
+  .trust-grid,
+  .faq-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .comparison-head {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .comparison-table {
+    display: none;
+  }
+
+  .comparison-cards {
+    display: block;
+  }
 }

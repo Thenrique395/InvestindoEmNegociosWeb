@@ -45,9 +45,11 @@
 }
 
 .menu a {
-  color: var(--text);
+  position: relative;
+  color: var(--text-secondary);
   text-decoration: none;
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-normal);
   display: inline-flex;
   align-items: center;
@@ -57,9 +59,52 @@
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
+.menu a::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
 .menu a:hover,
 .menu a.active {
-  color: var(--primary);
+  color: var(--text);
+}
+
+.menu a:hover::after,
+.menu a.active::after {
+  transform: scaleX(1);
+}
+
+.menu__mobile-login {
+  display: none;
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.menu-toggle:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
 }
 
 .header__actions {
@@ -70,17 +115,18 @@
 }
 
 .login-link {
-  color: var(--text);
-  font-weight: var(--font-weight-bold);
+  color: var(--text-secondary);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 36px;
   padding: 0 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   cursor: pointer;
   font-family: inherit;
@@ -88,26 +134,101 @@
 
 .login-link:hover {
   color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-3);
+  border-color: var(--border);
+  background: var(--surface-2);
 }
 
 .signup-link {
   color: var(--on-primary);
   background: var(--primary);
-  border: 1px solid color-mix(in srgb, var(--primary) 60%, transparent);
-  font-weight: var(--font-weight-bold);
+  border: 1px solid transparent;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.4rem;
   height: 36px;
   padding: 0 14px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.signup-link svg {
+  transition: transform 0.18s ease;
 }
 
 .signup-link:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+  background: color-mix(in srgb, var(--primary) 90%, black);
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.signup-link:hover svg {
+  transform: translateX(2px);
+}
+
+@media (max-width: 720px) {
+  .menu {
+    position: absolute;
+    inset: 100% 0 auto 0;
+    z-index: 9;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    transition: max-height 0.22s ease;
+  }
+
+  .menu--open {
+    max-height: 420px;
+  }
+
+  .menu a {
+    height: 48px;
+    padding: 0 clamp(var(--spacing-3), 6vw, var(--spacing-6));
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+
+  .menu a::after {
+    display: none;
+  }
+
+  .menu a:hover,
+  .menu a.active {
+    background: var(--surface-2);
+  }
+
+  .menu__mobile-login {
+    display: block;
+    height: 48px;
+    padding: 0 clamp(var(--spacing-3), 6vw, var(--spacing-6));
+    border: 0;
+    border-top: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-semibold);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .login-link {
+    display: none;
+  }
+
+  .signup-link {
+    padding: 0 12px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
 }

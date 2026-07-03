@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
+import { Meta, Title } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,7 +14,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit, OnDestroy {
   email = '';
   loading = false;
   success = false;
@@ -20,8 +22,25 @@ export class ForgotPasswordComponent {
 
   constructor(
     private auth: AuthService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private title: Title,
+    private meta: Meta
   ) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('Recuperar senha — Investindo em Negócios');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'Solicite um link para redefinir a senha da sua conta Investindo em Negócios.'
+    });
+    this.meta.updateTag({ name: 'robots', content: 'noindex, nofollow' });
+  }
+
+  ngOnDestroy(): void {
+    this.title.setTitle(DEFAULT_TITLE);
+    this.meta.updateTag({ name: 'description', content: DEFAULT_META_DESCRIPTION });
+    this.meta.removeTag("name='robots'");
+  }
 
   onSubmit(): void {
     if (this.loading) return;

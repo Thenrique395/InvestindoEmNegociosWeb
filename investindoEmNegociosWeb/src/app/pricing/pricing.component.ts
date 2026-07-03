@@ -1,7 +1,9 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { MARKETING_PLANS, MarketingBillingCycle } from '../marketing-plans';
+import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
 
 @Component({
   selector: 'app-pricing',
@@ -10,7 +12,7 @@ import { MARKETING_PLANS, MarketingBillingCycle } from '../marketing-plans';
   templateUrl: './pricing.component.html',
   styleUrl: './pricing.component.scss'
 })
-export class PricingComponent {
+export class PricingComponent implements OnInit, OnDestroy {
   cycle: MarketingBillingCycle = 'Monthly';
   plans = MARKETING_PLANS;
   readonly planIconVariants: Record<string, string> = {
@@ -79,6 +81,32 @@ export class PricingComponent {
       answer: 'Controle. Ele resolve a dor mais comum de quem usa cartão, precisa prever vencimentos e quer saber o que sobra no fim do mês.'
     }
   ];
+
+  constructor(private readonly title: Title, private readonly meta: Meta) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('Planos — Investindo em Negócios');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'Compare os planos Essencial, Controle e Patrimônio e escolha o ideal para sua rotina financeira. Comece grátis, sem cartão de crédito.'
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.title.setTitle(DEFAULT_TITLE);
+    this.meta.updateTag({ name: 'description', content: DEFAULT_META_DESCRIPTION });
+  }
+
+  get comparisonByPlan(): { name: string; recommended?: boolean; rows: { label: string; value: string }[] }[] {
+    return this.plans.map((plan, planIndex) => ({
+      name: plan.name,
+      recommended: plan.recommended,
+      rows: this.comparisonRows.map((row) => ({
+        label: row.label,
+        value: row.values[planIndex]
+      }))
+    }));
+  }
 
   selectCycle(cycle: MarketingBillingCycle): void {
     this.cycle = cycle;

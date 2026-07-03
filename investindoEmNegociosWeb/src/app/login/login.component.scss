@@ -57,6 +57,31 @@
   filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.28));
 }
 
+.login-visual__mark {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin-top: 1.5rem;
+}
+
+.login-visual__mark span {
+  display: block;
+  width: 22px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+}
+
+.login-visual__mark span:nth-child(1) {
+  background: var(--success);
+}
+
+.login-visual__mark span:nth-child(2) {
+  background: var(--primary);
+}
+
+.login-visual__mark span:nth-child(3) {
+  background: var(--danger);
+}
+
 .login-visual__content {
   display: grid;
   gap: 1.1rem;

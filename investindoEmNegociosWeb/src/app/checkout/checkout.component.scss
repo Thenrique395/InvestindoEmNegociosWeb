@@ -1,6 +1,10 @@
 .checkout-page {
   display: grid;
-  gap: 1.1rem;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
 
 .checkout-header {

@@ -17,6 +17,11 @@ type PersonaCard = {
   modules: string[];
 };
 
+type PainSolutionPair = {
+  pain: string;
+  solution: string;
+};
+
 type TrustPoint = {
   icon: 'lock' | 'shield' | 'eye' | 'export';
   title: string;
@@ -49,6 +54,25 @@ export class ProductShowcaseComponent implements OnInit, OnDestroy {
       title: 'Cada aporte aproxima da meta',
       description: 'Defina o objetivo e acompanhe o progresso real, mês a mês, sem perder o fio.',
       kind: 'goals'
+    }
+  ];
+
+  protected readonly painSolutionPairs: PainSolutionPair[] = [
+    {
+      pain: 'A planilha trava, alguém esquece de atualizar e ninguém mais confia nela.',
+      solution: 'Lançamentos e saldo sempre atualizados, sem depender de ninguém mexer numa planilha.'
+    },
+    {
+      pain: 'A fatura do cartão chega maior do que você esperava — de novo.',
+      solution: 'Fatura, parcelas e vencimento organizados antes de fechar, sem susto no fim do mês.'
+    },
+    {
+      pain: 'Aquela meta que parecia perto sumiu no meio do caminho.',
+      solution: 'Progresso da meta visível mês a mês, com o que já entrou e o que ainda falta.'
+    },
+    {
+      pain: 'No fim do mês, ninguém sabe ao certo quanto realmente sobrou.',
+      solution: 'Um resumo direto de quanto entrou, saiu e sobrou, pronto assim que você abre o painel.'
     }
   ];
 

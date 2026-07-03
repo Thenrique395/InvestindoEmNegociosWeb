@@ -40,6 +40,32 @@
   line-height: var(--line-height-control);
 }
 
+.public-footer__mark {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-top: 0.85rem;
+}
+
+.public-footer__mark span {
+  display: block;
+  width: 14px;
+  height: 4px;
+  margin: 0;
+  border-radius: var(--radius-pill);
+}
+
+.public-footer__mark span:nth-child(1) {
+  background: var(--success);
+}
+
+.public-footer__mark span:nth-child(2) {
+  background: var(--primary);
+}
+
+.public-footer__mark span:nth-child(3) {
+  background: var(--danger);
+}
+
 .public-footer__column {
   display: grid;
   align-content: start;

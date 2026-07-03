@@ -1,6 +1,9 @@
 <section class="pricing-page">
   <section class="pricing-hero">
     <div class="pricing-hero__content">
+      <div class="pricing-hero__mark" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
       <p class="eyebrow">Planos</p>
       <h1>Comece com clareza, pague por previsibilidade, evolua para patrimônio</h1>
       <p class="lead">
@@ -130,11 +133,11 @@
         </div>
         <p class="plan-card__description">{{ plan.description }}</p>
         <div class="plan-price">
-          <strong>{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <strong class="tnum">{{ (cycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
           <span>/ {{ cycle === 'Yearly' ? 'ano' : 'mês' }}</span>
         </div>
         @if (cycle === 'Yearly' && plan.yearlyPrice > 0) {
-          <p class="plan-equivalent">
+          <p class="plan-equivalent tnum">
             equivalente a {{ yearlyEquivalent(plan) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês
           </p>
         }
@@ -211,6 +214,43 @@
             </div>
           }
         </div>
+      }
+    </div>
+
+    <div class="comparison-cards">
+      @for (plan of comparisonByPlan; track plan.name) {
+        <article class="comparison-plan-card" [class.comparison-plan-card--featured]="plan.recommended">
+          <div class="comparison-plan-card__head">
+            <strong>{{ plan.name }}</strong>
+            @if (plan.recommended) {
+              <span class="plan-badge">Mais escolhido</span>
+            }
+          </div>
+          <dl>
+            @for (row of plan.rows; track row.label) {
+              <div class="comparison-plan-card__row">
+                <dt>{{ row.label }}</dt>
+                <dd>
+                  @if (row.value === 'Sim') {
+                    <span class="comparison-icon comparison-icon--yes" aria-label="Sim">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </span>
+                  } @else if (row.value === 'Não') {
+                    <span class="comparison-icon comparison-icon--no" aria-label="Não">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </span>
+                  } @else {
+                    {{ row.value }}
+                  }
+                </dd>
+              </div>
+            }
+          </dl>
+        </article>
       }
     </div>
   </section>

@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Investindo em Negócios';
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
-  isLoginRoute = false;
+  isStandaloneAuthRoute = false;
   isLightTheme = false;
   showSignupModal = false;
   signupAlert = '';
@@ -302,7 +302,11 @@ export class AppComponent implements OnInit, OnDestroy {
   private handleNavigationEnd(event: NavigationEnd): void {
     this.restartRouteTransition();
     const currentPath = event.urlAfterRedirects.split('?')[0];
-    this.isLoginRoute = currentPath.startsWith('/login') || currentPath.startsWith('/register');
+    this.isStandaloneAuthRoute =
+      currentPath.startsWith('/login') ||
+      currentPath.startsWith('/register') ||
+      currentPath.startsWith('/forgot-password') ||
+      currentPath.startsWith('/reset-password');
     this.closeTransientUi();
 
     if (this.isLogged) {

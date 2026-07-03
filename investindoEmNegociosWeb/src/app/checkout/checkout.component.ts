@@ -1,7 +1,9 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
 import { AuthService, RegisterPayload } from '../auth.service';
 import { BillingService } from '../billing.service';
 import { CheckoutIntentService } from '../checkout-intent.service';
@@ -18,7 +20,7 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnDestroy {
   plans = MARKETING_PLANS;
   selectedPlan: MarketingPlan = findMarketingPlan(null);
   selectedCycle: MarketingBillingCycle = 'Monthly';
@@ -46,7 +48,9 @@ export class CheckoutComponent {
     private readonly checkoutIntent: CheckoutIntentService,
     private readonly subscriptionsService: SubscriptionsService,
     private readonly uiFeedback: UiFeedbackService,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private readonly title: Title,
+    private readonly meta: Meta
   ) {
     route.queryParamMap.subscribe((params) => {
       this.selectedPlan = findMarketingPlan(params.get('plan'));
@@ -65,6 +69,19 @@ export class CheckoutComponent {
       },
       { validators: this.passwordsMatchValidator }
     );
+
+    this.title.setTitle('Finalizar assinatura — Investindo em Negócios');
+    this.meta.updateTag({
+      name: 'description',
+      content: 'Finalize sua assinatura em poucos passos, em ambiente seguro processado pela Stripe.'
+    });
+    this.meta.updateTag({ name: 'robots', content: 'noindex, nofollow' });
+  }
+
+  ngOnDestroy(): void {
+    this.title.setTitle(DEFAULT_TITLE);
+    this.meta.updateTag({ name: 'description', content: DEFAULT_META_DESCRIPTION });
+    this.meta.removeTag("name='robots'");
   }
 
   get selectedPrice(): number {
