@@ -1116,22 +1116,11 @@ export class InvestmentsComponent implements OnInit {
       category: this.novaPosicao.category || ''
     };
     try {
-      const created = await firstValueFrom(this.investments.createPosition(payload));
-      await firstValueFrom(
-        this.investments.addMovement(created.id, {
-          type: 'COMPRA',
-          quantity: this.novaPosicao.quantity,
-          price: this.novaPosicao.avgPrice,
-          date: payload.openedAt,
-          note: custos > 0
-            ? `Cadastro inicial da posição (custos: ${this.currencyFormatter.format(custos)})`
-            : 'Cadastro inicial da posição'
-        })
-      );
+      await firstValueFrom(this.investments.createPosition(payload));
       this.resetPosicao();
       this.showCadastro = false;
       this.carregarPosicoes();
-      this.uiFeedback.success('Posição cadastrada com compra inicial registrada.');
+      this.uiFeedback.success('Posição cadastrada com sucesso.');
     } catch (err: unknown) {
       this.uiFeedback.error(resolveApiErrorMessage(err, 'Falha ao cadastrar posição.'));
     }
