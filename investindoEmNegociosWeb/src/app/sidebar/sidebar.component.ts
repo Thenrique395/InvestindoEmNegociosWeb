@@ -1,5 +1,4 @@
-import { NgClass } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { APP_FEATURE_KEYS, AppFeatureKey, hasFeatureForRole } from '../features';
 import { hasAtLeastRole, UserRole } from '../roles';
@@ -30,108 +29,97 @@ type SidebarIcon =
   | 'scenario'
   | 'report';
 
+type SidebarTone = 'danger' | 'success' | 'warning' | 'info';
+
 type SidebarNavItem = {
   label: string;
   path: string;
   icon: SidebarIcon;
   minRole?: UserRole;
   feature?: AppFeatureKey;
-  size: 'primary' | 'compact';
-  activeTone?: string;
+  tone?: SidebarTone;
 };
+
+type SidebarSection = {
+  id: string;
+  label?: string;
+  items: SidebarNavItem[];
+};
+
+const NAV_SECTIONS: SidebarSection[] = [
+  {
+    id: 'overview',
+    items: [
+      { label: 'Dashboard', path: '/dashboard', icon: 'dashboard', minRole: 'Basic' },
+      { label: 'Calendário', path: '/calendario', icon: 'calendar', minRole: 'Basic' }
+    ]
+  },
+  {
+    id: 'transactions',
+    label: 'Movimentações',
+    items: [
+      { label: 'Despesas', path: '/despesas', icon: 'expense', minRole: 'Basic', tone: 'danger' },
+      { label: 'Receitas', path: '/receitas', icon: 'income', minRole: 'Basic', tone: 'success' },
+      { label: 'Cartões', path: '/cartoes', icon: 'card', minRole: 'Basic' },
+      { label: 'Contas', path: '/contas', icon: 'account', minRole: 'Intermediate' },
+      { label: 'Categorias', path: '/categorias', icon: 'category', feature: APP_FEATURE_KEYS.categoriesRead }
+    ]
+  },
+  {
+    id: 'planning',
+    label: 'Planejamento',
+    items: [
+      { label: 'Metas', path: '/metas', icon: 'goal', minRole: 'Basic' },
+      { label: 'Orçamento', path: '/orcamento', icon: 'budget', feature: APP_FEATURE_KEYS.budgetAccess },
+      { label: 'Investimentos', path: '/investimentos', icon: 'investment', feature: APP_FEATURE_KEYS.investmentsAccess },
+      { label: 'Empréstimos', path: '/emprestimos', icon: 'loan', minRole: 'Intermediate', tone: 'warning' },
+      { label: 'Simulador', path: '/simulador', icon: 'scenario', feature: APP_FEATURE_KEYS.scenariosAccess }
+    ]
+  },
+  {
+    id: 'insights',
+    label: 'Análises',
+    items: [
+      { label: 'Relatórios', path: '/relatorios', icon: 'report', feature: APP_FEATURE_KEYS.reportsAccess },
+      { label: 'Histórico mensal', path: '/snapshots', icon: 'snapshot', minRole: 'Intermediate' },
+      { label: 'Assistente', path: '/assistente', icon: 'assistant', minRole: 'Intermediate', tone: 'info' },
+      { label: 'Calculadoras', path: '/calculadora', icon: 'calculator', minRole: 'Basic' }
+    ]
+  },
+  {
+    id: 'admin',
+    label: 'Administração',
+    items: [
+      { label: 'Usuários', path: '/admin/usuarios', icon: 'admin', feature: APP_FEATURE_KEYS.adminUsersManage },
+      { label: 'Parâmetros', path: '/admin/parametros', icon: 'parameters', feature: APP_FEATURE_KEYS.adminParametersManage },
+      { label: 'Robôs', path: '/admin/robots', icon: 'robot', feature: APP_FEATURE_KEYS.adminRobotsManage }
+    ]
+  }
+];
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [NgClass, RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
-  @Input({ required: true }) isLightTheme = false;
-  @Input({ required: true }) brandName = '';
-  @Input() currentRole: UserRole | null = null;
-  @Input() mobileOpen = false;
+  readonly isLightTheme = input.required<boolean>();
+  readonly brandName = input.required<string>();
+  readonly currentRole = input<UserRole | null>(null);
+  readonly mobileOpen = input(false);
 
-  @Output() routeReload = new EventEmitter<SidebarRouteReload>();
-  @Output() preferencesOpen = new EventEmitter<Event | undefined>();
+  readonly routeReload = output<SidebarRouteReload>();
+  readonly preferencesOpen = output<Event | undefined>();
 
-  readonly features = APP_FEATURE_KEYS;
-  readonly navItems: SidebarNavItem[] = [
-    { label: 'Dashboard', path: '/dashboard', icon: 'dashboard', minRole: 'Basic', size: 'primary' },
-    { label: 'Despesas', path: '/despesas', icon: 'expense', minRole: 'Basic', size: 'primary', activeTone: 'danger' },
-    { label: 'Receitas', path: '/receitas', icon: 'income', minRole: 'Basic', size: 'primary', activeTone: 'success' },
-    { label: 'Calendário', path: '/calendario', icon: 'calendar', minRole: 'Basic', size: 'primary' },
-    { label: 'Cartões', path: '/cartoes', icon: 'card', minRole: 'Basic', size: 'primary' },
-    { label: 'Contas', path: '/contas', icon: 'account', minRole: 'Intermediate', size: 'compact' },
-    { label: 'Categorias', path: '/categorias', icon: 'category', feature: this.features.categoriesRead, size: 'compact' },
-    { label: 'Investimentos', path: '/investimentos', icon: 'investment', feature: this.features.investmentsAccess, size: 'compact' },
-    { label: 'Metas', path: '/metas', icon: 'goal', minRole: 'Basic', size: 'primary' },
-    { label: 'Empréstimos', path: '/emprestimos', icon: 'loan', minRole: 'Intermediate', size: 'compact', activeTone: 'warning' },
-    { label: 'Snapshots', path: '/snapshots', icon: 'snapshot', minRole: 'Intermediate', size: 'compact' },
-    { label: 'Assistente', path: '/assistente', icon: 'assistant', minRole: 'Intermediate', size: 'compact', activeTone: 'info' },
-    { label: 'Orçamento', path: '/orcamento', icon: 'budget', feature: this.features.budgetAccess, size: 'compact' },
-    { label: 'Simulador', path: '/simulador', icon: 'scenario', feature: this.features.scenariosAccess, size: 'compact' },
-    { label: 'Relatórios', path: '/relatorios', icon: 'report', feature: this.features.reportsAccess, size: 'compact' },
-    { label: 'Calculadoras', path: '/calculadora', icon: 'calculator', minRole: 'Basic', size: 'compact' },
-    { label: 'Admin', path: '/admin/usuarios', icon: 'admin', feature: this.features.adminUsersManage, size: 'compact' },
-    { label: 'Parâmetros', path: '/admin/parametros', icon: 'parameters', feature: this.features.adminParametersManage, size: 'compact' },
-    { label: 'Robôs', path: '/admin/robots', icon: 'robot', feature: this.features.adminRobotsManage, size: 'compact' }
-  ];
-
-  private readonly primaryLinkClass =
-    'group flex min-h-[56px] items-center gap-3 rounded-[16px] border border-transparent px-[18px] py-[10px] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]';
-  private readonly compactLinkClass =
-    'group flex min-h-[48px] items-center gap-3 rounded-[14px] border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]';
-  private readonly activeLinkClass =
-    'border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] !text-[var(--primary-text)]';
-  private readonly primaryIconClass =
-    'nav-icon grid h-12 w-12 place-items-center rounded-[16px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition';
-  private readonly compactIconClass =
-    'nav-icon grid h-10 w-10 place-items-center rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-secondary)] transition';
-  private readonly activeIconByTone: Record<string, string> = {
-    primary: 'border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] !text-[var(--primary-text)]',
-    danger: 'border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] !text-[var(--danger-text)]',
-    success: 'border-[var(--color-success-soft)] bg-[var(--color-success-weak)] !text-[var(--success-text)]',
-    warning: 'border-[var(--color-warning-soft)] bg-[var(--color-warning-weak)] !text-[var(--warning-text)]',
-    info: 'border-[var(--color-info-soft)] bg-[var(--color-info-weak)] !text-[var(--info-text)]'
-  };
-
-  hasAccess(minRole: UserRole): boolean {
-    return hasAtLeastRole(this.currentRole, minRole);
-  }
-
-  hasFeature(featureKey: AppFeatureKey): boolean {
-    return hasFeatureForRole(this.currentRole, featureKey);
-  }
-
-  canShowItem(item: SidebarNavItem): boolean {
-    if (item.feature) {
-      return this.hasFeature(item.feature);
-    }
-
-    return item.minRole ? this.hasAccess(item.minRole) : true;
-  }
-
-  itemLinkClass(item: SidebarNavItem, isActive: boolean): string {
-    const baseClass = item.size === 'primary' ? this.primaryLinkClass : this.compactLinkClass;
-    return isActive ? `${baseClass} ${this.activeLinkClass}` : baseClass;
-  }
-
-  itemIconClass(item: SidebarNavItem, isActive: boolean): string {
-    const baseClass = item.size === 'primary' ? this.primaryIconClass : this.compactIconClass;
-    if (!isActive) {
-      return baseClass;
-    }
-
-    return `${baseClass} ${this.activeIconByTone[item.activeTone ?? 'primary']}`;
-  }
-
-  itemTextClass(item: SidebarNavItem): string {
-    return item.size === 'primary'
-      ? 'nav-text text-[var(--text-md)] font-semibold'
-      : 'nav-text text-[var(--text-sm)] font-semibold';
-  }
+  readonly visibleSections = computed(() => {
+    const role = this.currentRole();
+    return NAV_SECTIONS
+      .map(section => ({ ...section, items: section.items.filter(item => canShowItem(role, item)) }))
+      .filter(section => section.items.length > 0);
+  });
 
   reloadIfSame(path: string, event?: Event): void {
     this.routeReload.emit({ path, event });
@@ -140,4 +128,12 @@ export class SidebarComponent {
   goToPreferences(event?: Event): void {
     this.preferencesOpen.emit(event);
   }
+}
+
+function canShowItem(role: UserRole | null, item: SidebarNavItem): boolean {
+  if (item.feature) {
+    return hasFeatureForRole(role, item.feature);
+  }
+
+  return item.minRole ? hasAtLeastRole(role, item.minRole) : true;
 }

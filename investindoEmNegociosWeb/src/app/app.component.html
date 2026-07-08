@@ -10,7 +10,8 @@
   }
 
   @if (isLogged && !isOnboardingRoute && !isStyleguideRoute) {
-    <div class="shell relative grid min-h-screen overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+    <!-- overflow-clip (e não hidden): ancestral com overflow hidden desabilita o position: sticky da sidebar -->
+    <div class="shell relative grid min-h-screen overflow-clip border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
       <app-sidebar
         [isLightTheme]="isLightTheme"
         [brandName]="brandName"
