@@ -1,12 +1,12 @@
-<header class="topbar flex items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface)]">
+<header class="topbar">
   <button
     type="button"
-    class="menu-toggle grid place-items-center rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]"
+    class="menu-toggle"
     aria-controls="app-sidebar"
-    [attr.aria-expanded]="mobileMenuOpen"
+    [attr.aria-expanded]="mobileMenuOpen()"
     aria-label="Abrir menu de navegação"
     (click)="menuToggle.emit()">
-    @if (!mobileMenuOpen) {
+    @if (!mobileMenuOpen()) {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20">
         <line x1="4" y1="7" x2="20" y2="7"></line>
         <line x1="4" y1="12" x2="20" y2="12"></line>
@@ -19,160 +19,76 @@
       </svg>
     }
   </button>
-  <div class="topbar__slogan text-[var(--text-sm)] font-medium text-[var(--text-muted)]">{{ brandSlogan }}</div>
-  <div class="topbar__actions flex min-w-0 flex-1 items-center justify-end gap-[var(--spacing-2)]">
-    <button
-      class="privacy-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
-      type="button"
-      (click)="financialValuesToggle.emit()"
-      [attr.aria-pressed]="financialValuesHidden"
-      [attr.aria-label]="financialValuesHidden ? 'Exibir valores financeiros' : 'Ocultar valores financeiros'"
-      [attr.title]="financialValuesHidden ? 'Exibir valores financeiros' : 'Ocultar valores financeiros'">
-      @if (financialValuesHidden) {
-        <span aria-hidden="true">◌</span>
-      } @else {
-        <span aria-hidden="true">◉</span>
-      }
-    </button>
-    <button
-      class="theme-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
-      type="button"
-      (click)="themeToggle.emit()"
-      [attr.aria-label]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'"
-      [attr.title]="isLightTheme ? 'Ativar tema escuro' : 'Ativar tema claro'">
-      @if (isLightTheme) {
-        <span aria-hidden="true">☾</span>
-      } @else {
-        <span aria-hidden="true">☀</span>
-      }
-    </button>
-    <div class="notifications relative" [class.open]="notificationsOpen">
-      <button class="notif-trigger relative grid h-11 w-11 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]" type="button" (click)="notificationsToggle.emit()" aria-label="Notificações">
-        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M9.5 20a2.5 2.5 0 0 0 5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  <app-global-search class="topbar__search" />
+  <div class="topbar__actions">
+    @if (canUseAssistant()) {
+      <a
+        class="topbar__assistant"
+        routerLink="/assistente"
+        title="Abrir Assistente IA"
+        (click)="reloadIfSame('/assistente', $event)">
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M9 10.5h.01M12 10.5h.01M15 10.5h.01" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
         </svg>
-        @if (unreadCount) {
-          <span class="notif-badge absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full border border-[var(--surface)] bg-[var(--danger)] px-1 text-[0.75rem] font-semibold leading-none text-[var(--on-primary)] shadow-[0_4px_10px_rgba(0,0,0,0.2)]">{{ unreadCount }}</span>
-        }
-      </button>
-      @if (notificationsOpen) {
-        <div class="notif-dropdown absolute right-0 z-40 mt-2 grid w-[min(340px,80vw)] gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-md)]">
-          <div class="notif-header flex items-center justify-between font-bold text-[var(--text)]">
-            <span>Notificações</span>
-            <button type="button" class="notif-refresh rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-[var(--text-xs)] font-semibold text-[var(--text)]" (click)="notificationsRefresh.emit()">Atualizar</button>
-          </div>
-          <div class="notif-list grid max-h-[320px] gap-2 overflow-y-auto">
-            @if (notificationsLoading) {
-              <div class="notif-empty px-[var(--spacing-1)] text-[var(--text-sm)] text-[var(--text-muted)]">Carregando...</div>
-            }
-            @if (notificationsError) {
-              <div class="notif-empty error px-[var(--spacing-1)] text-[var(--text-sm)] !text-[var(--danger-text)]">{{ notificationsError }}</div>
-            }
-            @for (item of notifications; track trackNotification($index, item)) {
-              <button
-                type="button"
-                class="notif-item grid gap-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-left text-[var(--text)]"
-                [ngClass]="!item.readAt ? 'border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)]' : ''"
-                (click)="markNotificationRead(item, $event)"
-                >
-                <strong>{{ item.title }}</strong>
-                <span class="text-[var(--text-sm)] text-[var(--text-secondary)]">{{ item.message }}</span>
-              </button>
-            }
-            @if (!notifications.length) {
-              <div class="notif-empty px-[var(--spacing-1)] text-[var(--text-sm)] text-[var(--text-muted)]">
-                Sem notificações por enquanto.
-              </div>
-            }
-          </div>
-        </div>
+        <span class="topbar__assistant-label">Assistente IA</span>
+      </a>
+    }
+    <button
+      type="button"
+      class="topbar__icon-btn"
+      (click)="financialValuesToggle.emit()"
+      [attr.aria-pressed]="financialValuesHidden()"
+      [attr.aria-label]="financialValuesHidden() ? 'Exibir valores financeiros' : 'Ocultar valores financeiros'"
+      [attr.title]="financialValuesHidden() ? 'Exibir valores financeiros' : 'Ocultar valores financeiros'">
+      @if (financialValuesHidden()) {
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M3 3l18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          <path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.1 3.9M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7a9.9 9.9 0 0 0 4.4-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7" />
+        </svg>
       }
-    </div>
-    <div class="user-menu relative" [class.open]="userMenuOpen">
-      <button
-        class="user-trigger inline-flex min-w-0 max-w-[min(320px,72vw)] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-[12px] py-[8px] font-semibold text-[var(--text)] shadow-[0_6px_16px_rgba(15,23,42,0.08)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-3)]"
-        type="button"
-        aria-haspopup="menu"
-        aria-controls="user-menu-dropdown"
-        [attr.aria-expanded]="userMenuOpen"
-        (click)="userMenuToggle.emit()">
-        <span class="avatar grid h-9 w-9 place-items-center rounded-full border border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] font-bold tracking-[0.02em]" [class.has-image]="avatarUrl">
-          @if (avatarUrl) {
-            <img class="h-full w-full rounded-full object-cover" [src]="avatarUrl" [alt]="displayName + ' — foto de perfil'" />
-          }
-          @if (!avatarUrl) {
-            <span>{{ userInitials }}</span>
-          }
-        </span>
-        <span class="user-name min-w-0 max-w-[190px] truncate text-[var(--text-md)]">{{ displayName }}</span>
-        <span class="caret text-[var(--text-md)] opacity-70">▾</span>
-      </button>
-      @if (userMenuOpen) {
-        <div
-          id="user-menu-dropdown"
-          class="user-dropdown absolute right-0 z-30 mt-3 grid min-w-[320px] gap-3 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
-          role="menu"
-          aria-label="Menu do usuário"
-          >
-          <div class="user-dropdown__summary flex items-center gap-3 rounded-[16px] border border-[var(--border)] bg-[linear-gradient(135deg,rgba(37,99,235,0.10),rgba(255,255,255,0.92))] px-4 py-3">
-            <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[var(--color-primary-soft)] bg-[var(--color-primary-weak)] font-bold text-[var(--primary-text)]">
-              {{ userInitials }}
-            </div>
-            <div class="min-w-0">
-              <p class="m-0 truncate text-[var(--text-md)] font-bold text-[var(--text)]">{{ displayName }}</p>
-              <p class="m-0 text-[0.875rem] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Perfil {{ currentRole || 'Basic' }}</p>
-            </div>
-          </div>
-          <div class="user-dropdown__actions grid gap-1">
-            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/perfil" (click)="reloadIfSame('/perfil', $event)">
-              <span class="user-dropdown__icon" aria-hidden="true">U</span>
-              <span>
-                <strong>Perfil</strong>
-                <small>Nome, foto e dados pessoais</small>
-              </span>
-            </button>
-            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/assinatura" (click)="reloadIfSame('/assinatura', $event)">
-              <span class="user-dropdown__icon" aria-hidden="true">$</span>
-              <span>
-                <strong>Minha assinatura</strong>
-                <small>Plano, cobrança e acesso</small>
-              </span>
-            </button>
-            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/preferencias" (click)="reloadIfSame('/preferencias', $event)">
-              <span class="user-dropdown__icon" aria-hidden="true">P</span>
-              <span>
-                <strong>Preferências</strong>
-                <small>Moeda, idioma e alertas</small>
-              </span>
-            </button>
-            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/seguranca" (click)="reloadIfSame('/seguranca', $event)">
-              <span class="user-dropdown__icon" aria-hidden="true">S</span>
-              <span>
-                <strong>Segurança</strong>
-                <small>Sessões, acessos e proteção</small>
-              </span>
-            </button>
-            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/espacos" (click)="reloadIfSame('/espacos', $event)">
-              <span class="user-dropdown__icon" aria-hidden="true">E</span>
-              <span>
-                <strong>Espaços</strong>
-                <small>Separe contas e lançamentos por área</small>
-              </span>
-            </button>
-            <button type="button" class="user-dropdown__item" role="menuitem" routerLink="/dados" (click)="reloadIfSame('/dados', $event)">
-              <span class="user-dropdown__icon" aria-hidden="true">D</span>
-              <span>
-                <strong>Dados da conta</strong>
-                <small>Exportação, backup e exclusão</small>
-              </span>
-            </button>
-          </div>
-          <div class="section">
-            <button type="button" class="logout user-dropdown__logout" role="menuitem" (click)="logoutRequested.emit()">Sair da conta</button>
-          </div>
-        </div>
+    </button>
+    <button
+      type="button"
+      class="topbar__icon-btn"
+      (click)="themeToggle.emit()"
+      [attr.aria-label]="isLightTheme() ? 'Ativar tema escuro' : 'Ativar tema claro'"
+      [attr.title]="isLightTheme() ? 'Ativar tema escuro' : 'Ativar tema claro'">
+      @if (isLightTheme()) {
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7" />
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </svg>
       }
-    </div>
+    </button>
+    <app-notification-bell
+      [open]="notificationsOpen()"
+      [loading]="notificationsLoading()"
+      [error]="notificationsError()"
+      [items]="notifications()"
+      [unreadCount]="unreadCount()"
+      (toggleRequested)="notificationsToggle.emit()"
+      (refreshRequested)="notificationsRefresh.emit()"
+      (itemRead)="notificationRead.emit($event)" />
+    <span class="topbar__divider" aria-hidden="true"></span>
+    <app-user-menu
+      [open]="userMenuOpen()"
+      [avatarUrl]="avatarUrl()"
+      [initials]="userInitials()"
+      [displayName]="displayName()"
+      [role]="currentRole()"
+      (toggleRequested)="userMenuToggle.emit()"
+      (routeReload)="routeReload.emit($event)"
+      (logoutRequested)="logoutRequested.emit()" />
   </div>
 </header>

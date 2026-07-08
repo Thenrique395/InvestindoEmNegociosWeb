@@ -1,8 +1,10 @@
-import { NgClass } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NotificationItem } from '../notifications.service';
-import { UserRole } from '../roles';
+import { hasAtLeastRole, UserRole } from '../roles';
+import { GlobalSearchComponent } from './global-search/global-search.component';
+import { NotificationBellComponent } from './notification-bell/notification-bell.component';
+import { UserMenuComponent } from './user-menu/user-menu.component';
 
 export type TopbarRouteReload = {
   path: string;
@@ -17,45 +19,39 @@ export type TopbarNotificationRead = {
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [NgClass, RouterLink],
+  imports: [RouterLink, GlobalSearchComponent, NotificationBellComponent, UserMenuComponent],
   templateUrl: './topbar.component.html',
-  styleUrls: ['./topbar.component.scss']
+  styleUrls: ['./topbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TopbarComponent {
-  @Input({ required: true }) brandSlogan = '';
-  @Input({ required: true }) notificationsOpen = false;
-  @Input({ required: true }) notificationsLoading = false;
-  @Input({ required: true }) notificationsError = '';
-  @Input({ required: true }) notifications: NotificationItem[] = [];
-  @Input({ required: true }) unreadCount = 0;
-  @Input({ required: true }) userMenuOpen = false;
-  @Input({ required: true }) avatarUrl = '';
-  @Input({ required: true }) userInitials = 'U';
-  @Input({ required: true }) displayName = 'Usuário';
-  @Input({ required: true }) isLightTheme = true;
-  @Input({ required: true }) financialValuesHidden = false;
-  @Input() currentRole: UserRole | null = null;
-  @Input() mobileMenuOpen = false;
+  readonly notificationsOpen = input.required<boolean>();
+  readonly notificationsLoading = input.required<boolean>();
+  readonly notificationsError = input.required<string>();
+  readonly notifications = input.required<NotificationItem[]>();
+  readonly unreadCount = input.required<number>();
+  readonly userMenuOpen = input.required<boolean>();
+  readonly avatarUrl = input.required<string>();
+  readonly userInitials = input.required<string>();
+  readonly displayName = input.required<string>();
+  readonly isLightTheme = input.required<boolean>();
+  readonly financialValuesHidden = input.required<boolean>();
+  readonly currentRole = input<UserRole | null>(null);
+  readonly mobileMenuOpen = input(false);
 
-  @Output() menuToggle = new EventEmitter<void>();
-  @Output() themeToggle = new EventEmitter<void>();
-  @Output() financialValuesToggle = new EventEmitter<void>();
-  @Output() notificationsToggle = new EventEmitter<void>();
-  @Output() notificationsRefresh = new EventEmitter<void>();
-  @Output() notificationRead = new EventEmitter<TopbarNotificationRead>();
-  @Output() userMenuToggle = new EventEmitter<void>();
-  @Output() routeReload = new EventEmitter<TopbarRouteReload>();
-  @Output() logoutRequested = new EventEmitter<void>();
+  readonly menuToggle = output<void>();
+  readonly themeToggle = output<void>();
+  readonly financialValuesToggle = output<void>();
+  readonly notificationsToggle = output<void>();
+  readonly notificationsRefresh = output<void>();
+  readonly notificationRead = output<TopbarNotificationRead>();
+  readonly userMenuToggle = output<void>();
+  readonly routeReload = output<TopbarRouteReload>();
+  readonly logoutRequested = output<void>();
 
-  trackNotification(index: number, item: NotificationItem): string {
-    return item.id || `${item.title}-${item.createdAt}-${index}`;
-  }
+  readonly canUseAssistant = computed(() => hasAtLeastRole(this.currentRole(), 'Intermediate'));
 
   reloadIfSame(path: string, event?: Event): void {
     this.routeReload.emit({ path, event });
-  }
-
-  markNotificationRead(item: NotificationItem, event?: Event): void {
-    this.notificationRead.emit({ item, event });
   }
 }

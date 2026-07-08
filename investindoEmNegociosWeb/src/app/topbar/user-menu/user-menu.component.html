@@ -1,0 +1,107 @@
+<div class="user-menu" [class.open]="open()">
+  <button
+    type="button"
+    class="user-trigger"
+    aria-haspopup="menu"
+    aria-controls="user-menu-dropdown"
+    [attr.aria-expanded]="open()"
+    aria-label="Abrir menu do usuário"
+    (click)="toggleRequested.emit()">
+    <span class="user-trigger__avatar" [class.user-trigger__avatar--image]="avatarUrl()">
+      @if (avatarUrl()) {
+        <img [src]="avatarUrl()" [alt]="displayName() + ' — foto de perfil'" />
+      } @else {
+        <span aria-hidden="true">{{ initials() }}</span>
+      }
+    </span>
+    <span class="user-trigger__identity">
+      <span class="user-trigger__name">{{ displayName() }}</span>
+      <span class="user-trigger__role">{{ roleLabel() }}</span>
+    </span>
+    <svg class="user-trigger__caret" viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+  @if (open()) {
+    <div
+      #dropdown
+      id="user-menu-dropdown"
+      class="user-dropdown"
+      role="menu"
+      aria-label="Menu do usuário"
+      (keydown)="onMenuKeydown($event)">
+      <div class="user-dropdown__summary">
+        <span class="user-dropdown__avatar" [class.user-dropdown__avatar--image]="avatarUrl()">
+          @if (avatarUrl()) {
+            <img [src]="avatarUrl()" [alt]="displayName() + ' — foto de perfil'" />
+          } @else {
+            <span aria-hidden="true">{{ initials() }}</span>
+          }
+        </span>
+        <span class="user-dropdown__identity">
+          <span class="user-dropdown__name">{{ displayName() }}</span>
+          <span class="user-dropdown__role">{{ roleLabel() }}</span>
+        </span>
+      </div>
+      <div class="user-dropdown__actions">
+        @for (item of menuItems; track item.path) {
+          <button
+            type="button"
+            class="user-dropdown__item"
+            role="menuitem"
+            [routerLink]="item.path"
+            routerLinkActive="is-active"
+            (click)="reloadIfSame(item.path, $event)">
+            <span class="user-dropdown__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                @switch (item.icon) {
+                  @case ('profile') {
+                    <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zM4 21c0-3.9 3.6-6 8-6s8 2.1 8 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  }
+                  @case ('subscription') {
+                    <path d="M3 7h18a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  }
+                  @case ('preferences') {
+                    <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <circle cx="9" cy="7" r="2" fill="var(--surface)" stroke="currentColor" stroke-width="1.7" />
+                    <circle cx="15" cy="12" r="2" fill="var(--surface)" stroke="currentColor" stroke-width="1.7" />
+                    <circle cx="7" cy="17" r="2" fill="var(--surface)" stroke="currentColor" stroke-width="1.7" />
+                  }
+                  @case ('security') {
+                    <path d="M12 3l7 3v6c0 4.4-3 7.9-7 9-4-1.1-7-4.6-7-9V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  }
+                  @case ('spaces') {
+                    <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  }
+                  @case ('data') {
+                    <ellipse cx="12" cy="5" rx="7" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+                    <path d="M5 5v14c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    <path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  }
+                }
+              </svg>
+            </span>
+            <span class="user-dropdown__text">
+              <strong>{{ item.label }}</strong>
+              <small>{{ item.description }}</small>
+            </span>
+          </button>
+        }
+      </div>
+      <div class="user-dropdown__footer">
+        <button type="button" class="user-dropdown__item user-dropdown__item--danger" role="menuitem" (click)="logoutRequested.emit()">
+          <span class="user-dropdown__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="user-dropdown__text">
+            <strong>Sair da conta</strong>
+          </span>
+        </button>
+      </div>
+    </div>
+  }
+</div>

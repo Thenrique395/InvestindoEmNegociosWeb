@@ -1,0 +1,76 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.global-search {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  height: 40px;
+  padding: 0 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.global-search:hover {
+  border-color: var(--border-strong);
+}
+
+.global-search:focus-within {
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--control-focus-ring);
+}
+
+.global-search__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+}
+
+.global-search__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-control);
+}
+
+/* O anel de foco visível fica no contêiner via :focus-within */
+.global-search__input:focus,
+.global-search__input:focus-visible {
+  outline: none;
+}
+
+.global-search__input::placeholder {
+  color: var(--text-muted);
+}
+
+.global-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.global-search__kbd {
+  flex: none;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+@media (max-width: 820px) {
+  .global-search__kbd {
+    display: none;
+  }
+}

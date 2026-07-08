@@ -1,0 +1,52 @@
+<div class="notifications" [class.open]="open()">
+  <button
+    type="button"
+    class="notif-trigger"
+    aria-haspopup="true"
+    [attr.aria-expanded]="open()"
+    [attr.aria-label]="triggerLabel()"
+    [attr.title]="triggerLabel()"
+    (click)="toggleRequested.emit()">
+    <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9.5 20a2.5 2.5 0 0 0 5 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    @if (unreadCount()) {
+      <span class="notif-trigger__badge">{{ badgeLabel() }}</span>
+    }
+  </button>
+  @if (open()) {
+    <div class="notif-dropdown" role="region" aria-label="Notificações">
+      <div class="notif-dropdown__header">
+        <span class="notif-dropdown__title">Notificações</span>
+        <button type="button" class="notif-dropdown__refresh" (click)="refreshRequested.emit()">Atualizar</button>
+      </div>
+      <div class="notif-dropdown__list">
+        @if (loading()) {
+          <p class="notif-dropdown__empty">Carregando...</p>
+        }
+        @if (error()) {
+          <p class="notif-dropdown__empty notif-dropdown__empty--error">{{ error() }}</p>
+        }
+        @for (item of items(); track trackNotification($index, item)) {
+          <button
+            type="button"
+            class="notif-item"
+            [class.notif-item--unread]="!item.readAt"
+            (click)="markRead(item, $event)">
+            @if (!item.readAt) {
+              <span class="notif-item__dot" aria-hidden="true"></span>
+            }
+            <span class="notif-item__body">
+              <strong class="notif-item__title">{{ item.title }}</strong>
+              <span class="notif-item__message">{{ item.message }}</span>
+            </span>
+          </button>
+        }
+        @if (!items().length && !loading() && !error()) {
+          <p class="notif-dropdown__empty">Sem notificações por enquanto.</p>
+        }
+      </div>
+    </div>
+  }
+</div>
