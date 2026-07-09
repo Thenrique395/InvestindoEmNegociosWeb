@@ -559,126 +559,35 @@
           title="Receitas × Despesas por mês"
           subtitle="Últimos 6 meses: entradas recebidas, saídas por vencimento e resultado." />
         <div class="grid grid-cols-2 gap-3 max-[960px]:grid-cols-1">
-          <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-            <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Despesas por categoria</p>
-            @if (expenseCategorySlices.length) {
-              <div class="grid gap-3">
-                <div class="expense-donut-wrap">
-                  <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuição de despesas por categoria">
-                    <div class="expense-donut__center">
-                      <small>Total</small>
-                      <strong>{{ expenseCategoryTotal | appCurrency }}</strong>
-                    </div>
-                  </div>
-                </div>
-                <div class="divide-y divide-[var(--border)]">
-                  @for (item of expenseCategorySlices; track trackByIndex($index, item)) {
-                    <div class="flex items-center justify-between gap-2 py-1.5 text-[0.8125rem]">
-                      <span class="inline-flex min-w-0 items-center gap-2">
-                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background]="item.color"></span>
-                        <span class="truncate font-medium text-[var(--text)]">{{ item.label }}</span>
-                      </span>
-                      <span class="flex shrink-0 items-baseline gap-2">
-                        <span class="text-[0.75rem] text-[var(--text-muted)]">{{ item.total | appCurrency }}</span>
-                        <strong class="w-[38px] text-right font-semibold text-[var(--text)]">{{ item.percent | number:'1.0-0' }}%</strong>
-                      </span>
-                    </div>
-                  }
-                </div>
-              </div>
-            } @else {
-              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[0.8125rem] text-[var(--text-muted)]">Sem despesas.</div>
-            }
-          </div>
-          <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-            <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Receitas por categoria</p>
-            @if (incomeSourceSlices.length) {
-              <div class="grid gap-3">
-                <div class="expense-donut-wrap">
-                  <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuição de receitas por categoria">
-                    <div class="expense-donut__center">
-                      <small>Total</small>
-                      <strong>{{ incomeSourceTotal | appCurrency }}</strong>
-                    </div>
-                  </div>
-                </div>
-                <div class="divide-y divide-[var(--border)]">
-                  @for (item of incomeSourceSlices; track trackByIndex($index, item)) {
-                    <div class="flex items-center justify-between gap-2 py-1.5 text-[0.8125rem]">
-                      <span class="inline-flex min-w-0 items-center gap-2">
-                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background]="item.color"></span>
-                        <span class="truncate font-medium text-[var(--text)]">{{ item.label }}</span>
-                      </span>
-                      <span class="flex shrink-0 items-baseline gap-2">
-                        <span class="text-[0.75rem] text-[var(--text-muted)]">{{ item.total | appCurrency }}</span>
-                        <strong class="w-[38px] text-right font-semibold text-[var(--text)]">{{ item.percent | number:'1.0-0' }}%</strong>
-                      </span>
-                    </div>
-                  }
-                </div>
-              </div>
-            } @else {
-              <div class="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2 text-[0.8125rem] text-[var(--text-muted)]">Sem receitas por categoria.</div>
-            }
-          </div>
+          <app-category-breakdown-card
+            variant="expense"
+            title="Despesas por categoria"
+            subtitle="Veja onde seu dinheiro foi gasto no período."
+            [total]="expenseCategoryTotal"
+            [slices]="expenseCategorySlices"
+            [showInsights]="hasAccess('Intermediate')"
+            emptyText="Você ainda não possui despesas categorizadas neste período."
+            emptyCtaLabel="Cadastrar despesa"
+            emptyCtaLink="/despesas"
+            detailsRoute="/despesas"
+            detailsLabel="Ver detalhes" />
+          <app-category-breakdown-card
+            variant="income"
+            title="Receitas por categoria"
+            subtitle="Entenda de onde veio sua renda no período."
+            [total]="incomeSourceTotal"
+            [slices]="incomeSourceSlices"
+            [showInsights]="hasAccess('Intermediate')"
+            emptyText="Você ainda não possui receitas categorizadas neste período."
+            emptyCtaLabel="Cadastrar receita"
+            emptyCtaLink="/receitas"
+            detailsRoute="/receitas"
+            detailsLabel="Ver detalhes" />
         </div>
       </div>
-      <aside class="grid grid-rows-[auto_minmax(0,1fr)_auto] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="m-0 text-[0.9375rem] font-semibold text-[var(--text)]">Movimentos recentes</p>
-            <span class="text-[0.875rem] text-[var(--text-muted)]">Últimos lançamentos de receitas e despesas.</span>
-          </div>
-          <app-tooltip
-            label="Informações sobre movimentos recentes"
-            text="Movimentos recentes: lista os últimos lançamentos com data, status e valor para acompanhamento rápido."
-            size="sm" />
-        </div>
-        @if (recentTransactions.length) {
-          <div class="min-h-0 divide-y divide-[var(--border)] overflow-y-auto rounded-[12px] border border-[var(--border)] bg-[var(--surface)]">
-            @for (item of recentTransactions; track trackByIndex($index, item)) {
-              <a
-                class="group grid grid-cols-[auto_1fr_auto] items-center gap-2.5 px-3 py-2.5 no-underline transition-colors hover:bg-[var(--surface-2)]"
-                [routerLink]="item.type === 'income' ? '/receitas' : '/despesas'"
-                [attr.aria-label]="'Ver detalhes de ' + item.title">
-                <span
-                  class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full"
-                  [ngClass]="item.type === 'income' ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]' : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'"
-                  aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false">
-                    @if (item.type === 'income') {
-                      <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                    } @else {
-                      <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                    }
-                  </svg>
-                </span>
-                <div class="min-w-0">
-                  <strong class="block truncate text-[0.8125rem] font-semibold text-[var(--text)]">{{ item.title }}</strong>
-                  <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[0.75rem] text-[var(--text-muted)]">
-                    <span>{{ item.date }}</span>
-                    <app-status-badge [tone]="item.statusTone || 'muted'" [label]="item.status || ''" size="sm"></app-status-badge>
-                    @if (item.recurring) {
-                      <span class="rounded-full bg-[var(--surface-3)] px-1.5 py-[1px] text-[0.6875rem] text-[var(--text-secondary)]">Recorrente</span>
-                    }
-                  </div>
-                </div>
-                <span class="text-right text-[0.875rem] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                  {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
-                </span>
-              </a>
-            }
-          </div>
-        } @else {
-          <div class="grid content-center justify-items-center gap-1 rounded-[12px] border border-dashed border-[var(--border-strong)] bg-[var(--surface)] p-[var(--spacing-2)] text-center">
-            <p class="m-0 text-[0.875rem] font-semibold text-[var(--text)]">Nenhum movimento ainda</p>
-            <p class="m-0 text-[0.75rem] text-[var(--text-muted)]">Cadastre uma receita ou despesa para acompanhar por aqui.</p>
-            <a routerLink="/despesas" class="mt-1 inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text)] transition hover:bg-[var(--surface-3)]">Cadastrar despesa</a>
-          </div>
-        }
-        <div class="border-t border-[var(--border)] pt-3">
-          <app-upcoming-due-list [items]="upcomingDueItems" />
-        </div>
+      <aside class="dashboard-rail grid content-start gap-3 self-start">
+        <app-recent-movements-card [items]="recentTransactions" />
+        <app-upcoming-due-list [items]="upcomingDueItems" />
       </aside>
     </div>
   }

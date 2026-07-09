@@ -6,11 +6,10 @@ import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/
 import { CardsService } from './cards.service';
 import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { Router, RouterModule } from '@angular/router';
-import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone, InstallmentStatusTone } from './utils/status';
+import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 import {
-  buildConicGradient,
   calculateInsightHealthScore,
   dateKey,
   estimateRiskDayFromCurrentData,
@@ -35,7 +34,10 @@ import { TooltipComponent } from './shared/tooltip/tooltip.component';
 import { AiFinancialHealthResponse, AiHealthStatus, FinancialAssistantService } from './financial-assistant.service';
 import { MonthlyFlowChartComponent } from './dashboard/monthly-flow-chart.component';
 import { MonthResultCardComponent } from './dashboard/month-result-card.component';
+import { CategoryBreakdownCardComponent } from './dashboard/category-breakdown/category-breakdown-card.component';
+import { CategorySlice } from './dashboard/category-breakdown/category-breakdown.model';
 import { UpcomingDueListComponent, UpcomingDueItem } from './dashboard/upcoming-due-list.component';
+import { RecentMovementsCardComponent, RecentMovementItem } from './dashboard/recent-movements-card.component';
 import { InsightActionsComponent } from './dashboard/insight-actions.component';
 import { UpgradeCtaComponent } from './dashboard/upgrade-cta.component';
 import { FinancialOverviewComponent } from './dashboard/financial-overview/financial-overview.component';
@@ -76,7 +78,9 @@ type InsightTodoItem = {
     TooltipComponent,
     MonthlyFlowChartComponent,
     MonthResultCardComponent,
+    CategoryBreakdownCardComponent,
     UpcomingDueListComponent,
+    RecentMovementsCardComponent,
     InsightActionsComponent,
     UpgradeCtaComponent,
     FinancialOverviewComponent
@@ -121,22 +125,11 @@ export class HomeComponent implements OnInit {
   riskAssessment: RiskBotAssessmentResponse | null = null;
   insightEngine: InsightEngineResponse | null = null;
   recommendationEngine: RecommendationEngineResponse | null = null;
-  expenseCategorySlices: { label: string; total: number; percent: number; color: string }[] = [];
+  expenseCategorySlices: CategorySlice[] = [];
   expenseCategoryTotal = 0;
-  expenseCategoryChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
-  incomeSourceSlices: { label: string; total: number; percent: number; color: string }[] = [];
+  incomeSourceSlices: CategorySlice[] = [];
   incomeSourceTotal = 0;
-  incomeSourceChartBackground = 'conic-gradient(var(--surface-3) 0deg 360deg)';
-  recentTransactions: {
-    id: string;
-    title: string;
-    date: string;
-    amount: number;
-    type: 'income' | 'expense';
-    status?: string;
-    statusTone?: InstallmentStatusTone;
-    recurring?: boolean;
-  }[] = [];
+  recentTransactions: RecentMovementItem[] = [];
   monthlyFlowSeries: MonthlyFlowPoint[] = [];
   upcomingDueItems: UpcomingDueItem[] = [];
   receitasPeriodoAnterior: number | null = null;
@@ -869,23 +862,44 @@ export class HomeComponent implements OnInit {
       return [...head, { label: 'Outros', total: rest }];
     };
 
+    const toTotalsMap = (items: { label: string; total: number }[]): Map<string, number> =>
+      new Map(items.map((item) => [item.label, item.total]));
+
+    const prevRange = this.getPreviousPeriodRange();
+    const prevExpenses = this.expensesRaw.filter((d) => this.isDateInRange(d.vencimento, prevRange));
+    const prevIncomes = this.incomesRaw.filter((r) => this.isDateInRange(r.recebimento, prevRange));
+    const prevExpenseByLabel = toTotalsMap(groupByLabel(prevExpenses, (d) => d.categoria || 'Sem categoria'));
+    const prevIncomeByLabel = toTotalsMap(groupByLabel(prevIncomes, (r) => r.categoria || 'Sem categoria'));
+
     const expenseData = cap(groupByLabel(expenses, (d) => d.categoria || 'Sem categoria'));
     const incomeData = cap(groupByLabel(incomes, (r) => r.categoria || 'Sem categoria'));
 
     this.expenseCategoryTotal = expenseData.reduce((sum, item) => sum + item.total, 0);
-    this.expenseCategorySlices = expenseData.map((item, index) => ({
-      ...item,
-      percent: this.expenseCategoryTotal > 0 ? (item.total / this.expenseCategoryTotal) * 100 : 0,
-      color: this.expenseCategoryColors[index % this.expenseCategoryColors.length]
-    }));
-    this.expenseCategoryChartBackground = buildConicGradient(this.expenseCategorySlices);
+    this.expenseCategorySlices = expenseData.map((item, index) =>
+      this.toCategorySlice(item, index, this.expenseCategoryTotal, this.expenseCategoryColors, prevExpenseByLabel)
+    );
     this.incomeSourceTotal = incomeData.reduce((sum, item) => sum + item.total, 0);
-    this.incomeSourceSlices = incomeData.map((item, index) => ({
-      ...item,
-      percent: this.incomeSourceTotal > 0 ? (item.total / this.incomeSourceTotal) * 100 : 0,
-      color: this.incomeSourceColors[index % this.incomeSourceColors.length]
-    }));
-    this.incomeSourceChartBackground = buildConicGradient(this.incomeSourceSlices);
+    this.incomeSourceSlices = incomeData.map((item, index) =>
+      this.toCategorySlice(item, index, this.incomeSourceTotal, this.incomeSourceColors, prevIncomeByLabel)
+    );
+  }
+
+  private toCategorySlice(
+    item: { label: string; total: number },
+    index: number,
+    total: number,
+    palette: string[],
+    previousByLabel: Map<string, number>
+  ): CategorySlice {
+    // "Outros" agrega categorias diferentes entre períodos — não é comparável.
+    const previousTotal = item.label === 'Outros' ? null : previousByLabel.get(item.label) ?? null;
+    return {
+      label: item.label,
+      total: item.total,
+      percent: total > 0 ? (item.total / total) * 100 : 0,
+      color: palette[index % palette.length],
+      previousTotal
+    };
   }
 
   private updateMonthlyFlow(): void {

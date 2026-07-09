@@ -1,0 +1,291 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.cat-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  height: 100%;
+  padding: 1.1rem 1.15rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-elevation-sm);
+}
+
+.cat-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-1);
+}
+
+.cat-card__titles {
+  min-width: 0;
+}
+
+.cat-card__title {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.cat-card__subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-control);
+}
+
+.cat-card__details {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem 0.4rem 0.25rem 0.55rem;
+  border-radius: var(--radius-pill);
+  color: var(--primary-text);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background-color 160ms ease;
+}
+
+.cat-card__details:hover {
+  background: var(--color-primary-weak);
+}
+
+.cat-card__body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+}
+
+.cat-card__chart-wrap {
+  display: grid;
+  place-items: center;
+}
+
+.cat-card__chart {
+  position: relative;
+  width: 138px;
+  height: 138px;
+  border-radius: var(--radius-pill);
+}
+
+/* Máscara do furo do donut: usa a cor do card para "recortar" o centro. */
+.cat-card__chart-center {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: grid;
+  place-items: center;
+  gap: 0.05rem;
+  width: 96px;
+  height: 96px;
+  padding: 0.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.cat-card__chart-eyebrow {
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-label);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.cat-card__chart-value {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.cat-card__chart-count {
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  line-height: 1;
+}
+
+.cat-card__legend {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cat-card__legend-item {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.cat-card__legend-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cat-card__legend-name {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cat-card__legend-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+}
+
+.cat-card__legend-label {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cat-card__legend-values {
+  display: inline-flex;
+  flex: none;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.cat-card__legend-amount {
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.cat-card__legend-percent {
+  min-width: 34px;
+  color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  text-align: right;
+}
+
+.cat-card__legend-track {
+  height: 5px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.cat-card__legend-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 300ms ease;
+}
+
+.cat-card__insights {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.cat-card__insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-control);
+}
+
+.cat-card__insight svg {
+  flex: none;
+  margin-top: 0.05rem;
+  color: var(--primary-text);
+}
+
+.cat-card__insight--muted {
+  color: var(--text-muted);
+}
+
+.cat-card__insight--muted svg {
+  color: var(--text-muted);
+}
+
+.cat-card__empty {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.55rem;
+  min-height: 200px;
+  padding: var(--spacing-3) var(--spacing-2);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  text-align: center;
+}
+
+.cat-card__empty-icon {
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+
+.cat-card__empty-text {
+  max-width: 280px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-control);
+}
+
+.cat-card__empty-cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.15rem;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.cat-card__empty-cta:hover {
+  border-color: var(--primary);
+  background: var(--surface-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-card__legend-fill {
+    transition: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .cat-card__body {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  .cat-card__legend {
+    width: 100%;
+  }
+}

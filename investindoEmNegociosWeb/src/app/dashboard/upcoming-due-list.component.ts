@@ -54,17 +54,22 @@ export interface UpcomingDueItem {
   `,
   styles: `
     :host { display: block; }
-    .due-card { display: grid; gap: var(--spacing-1); }
+    .due-card {
+      display: grid; gap: var(--spacing-1);
+      padding: 1.1rem 1.15rem 1.05rem;
+      border: 1px solid var(--border); border-radius: var(--radius-xl);
+      background: var(--surface); box-shadow: var(--shadow-elevation-sm);
+    }
     .due-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-1); }
-    .due-card__title { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--text); }
-    .due-card__subtitle { margin: 2px 0 0; font-size: var(--text-xs); color: var(--text-muted); }
-    .due-card__link { font-size: var(--text-xs); font-weight: 600; color: var(--color-primary-text); text-decoration: none; white-space: nowrap; }
+    .due-card__title { margin: 0; font-size: var(--font-size-label); font-weight: 600; color: var(--text); }
+    .due-card__subtitle { margin: 2px 0 0; font-size: var(--font-size-caption); color: var(--text-muted); }
+    .due-card__link { font-size: var(--font-size-caption); font-weight: 600; color: var(--color-primary-text); text-decoration: none; white-space: nowrap; }
     .due-card__link:hover { text-decoration: underline; }
-    .due-card__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .due-card__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
     .due-card__item {
       display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-1);
       border: 1px solid var(--border); border-radius: var(--radius-md);
-      background: var(--surface); padding: 10px 12px; box-shadow: var(--shadow-sm);
+      background: var(--surface-2); padding: 10px 12px;
     }
     .due-card__item-main { display: grid; gap: 4px; min-width: 0; }
     .due-card__item-title { font-size: var(--text-sm); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

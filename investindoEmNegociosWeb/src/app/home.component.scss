@@ -1,41 +1,14 @@
-.expense-donut-wrap {
-  display: grid;
-  place-items: center;
+/* Rail lateral do dashboard: acompanha o scroll da coluna de gráficos (mais alta) no desktop. */
+.dashboard-rail {
+  position: sticky;
+  top: calc(var(--header-h) + var(--spacing-2));
 }
 
-.expense-donut {
-  position: relative;
-  width: 170px;
-  height: 170px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
+@media (max-width: 960px) {
+  .dashboard-rail {
+    position: static;
+  }
 }
-
-.expense-donut__center {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%);
-  width: 92px;
-  height: 92px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 0.35rem;
-}
-
-.expense-donut__center small {
-  font-size: var(--font-size-caption);
-  color: var(--text-muted);
-}
-
-.expense-donut__center strong {
-  font-size: var(--font-size-label);
-  color: var(--text);
-}
-
 
 .networth-chart {
   display: grid;
