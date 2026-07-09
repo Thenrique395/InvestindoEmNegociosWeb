@@ -27,6 +27,7 @@ import { PeriodTotalCardComponent } from '../shared/period-total-card/period-tot
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { BodyPortalDirective } from '../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import {
   formatLocaleDate,
@@ -55,6 +56,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     StatusBadgeComponent,
     FilterBarComponent,
     ConfirmSheetComponent,
+    BodyPortalDirective,
     BulkActionBarComponent,
     ComparisonPillComponent,
     PeriodTotalCardComponent,

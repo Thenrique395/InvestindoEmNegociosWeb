@@ -18,9 +18,9 @@
   gap: 1.3rem;
   padding: 1.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-elevation-sm);
 }
 
 .tx-list-wrap {

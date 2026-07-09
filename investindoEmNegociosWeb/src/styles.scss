@@ -245,7 +245,9 @@ select:not([multiple]) {
 :where(
   .receitas-table__icon-action,
   .expenses-table__icon-action,
-  .cards-list__action
+  .cards-list__action,
+  .receitas-lista__icon-action,
+  .despesas-lista__icon-action
 ) {
   position: relative;
   display: inline-flex;
@@ -262,12 +264,16 @@ select:not([multiple]) {
 :where(
   .receitas-table__icon-action,
   .expenses-table__icon-action,
-  .cards-list__action
+  .cards-list__action,
+  .receitas-lista__icon-action,
+  .despesas-lista__icon-action
 ):hover:not(:disabled),
 :where(
   .receitas-table__icon-action,
   .expenses-table__icon-action,
-  .cards-list__action
+  .cards-list__action,
+  .receitas-lista__icon-action,
+  .despesas-lista__icon-action
 ):focus-visible {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--primary) 26%, transparent);
@@ -278,12 +284,16 @@ select:not([multiple]) {
 :where(
   .receitas-table__icon-action--danger,
   .expenses-table__icon-action--danger,
-  .cards-list__action--danger
+  .cards-list__action--danger,
+  .receitas-lista__icon-action--danger,
+  .despesas-lista__icon-action--danger
 ):hover:not(:disabled),
 :where(
   .receitas-table__icon-action--danger,
   .expenses-table__icon-action--danger,
-  .cards-list__action--danger
+  .cards-list__action--danger,
+  .receitas-lista__icon-action--danger,
+  .despesas-lista__icon-action--danger
 ):focus-visible {
   border-color: color-mix(in srgb, var(--danger) 24%, transparent);
   background: color-mix(in srgb, var(--danger) 8%, transparent);

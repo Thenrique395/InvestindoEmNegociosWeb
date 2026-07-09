@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { BodyPortalDirective } from '../body-portal.directive';
 
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -6,10 +7,11 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 @Component({
   selector: 'app-modal',
   standalone: true,
-  imports: [],
+  imports: [BodyPortalDirective],
   template: `
     @if (open()) {
       <div
+        appBodyPortal
         class="fixed inset-0 z-[9999] flex items-center justify-center px-4 py-8"
         role="dialog"
         aria-modal="true"

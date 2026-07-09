@@ -6,9 +6,9 @@
 
 .app-period-total-card {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-elevation-sm);
   padding: 1.45rem 1.4rem 1.3rem;
   display: grid;
   gap: 0.95rem;

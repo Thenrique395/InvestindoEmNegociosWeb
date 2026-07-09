@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { BodyPortalDirective } from '../body-portal.directive';
 
 /**
  * Chrome compartilhado de diálogo de confirmação (overlay + card + cabeçalho +
@@ -8,10 +9,11 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 @Component({
   selector: 'app-confirm-sheet',
   standalone: true,
+  imports: [BodyPortalDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (open()) {
-      <div class="confirm-sheet" role="dialog" aria-modal="true" [attr.aria-label]="title() || eyebrow()">
+      <div appBodyPortal class="confirm-sheet" role="dialog" aria-modal="true" [attr.aria-label]="title() || eyebrow()">
         <div class="confirm-sheet__backdrop" (click)="dismiss.emit()"></div>
         <div class="confirm-sheet__dialog">
           <div class="confirm-sheet__head">
