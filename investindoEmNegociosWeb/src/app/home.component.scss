@@ -1,3 +1,30 @@
+/* Chrome padrão dos cards do dashboard, alinhado aos componentes extraídos
+   (month-result, category-breakdown, recent-movements). */
+.dash-card {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.1rem 1.15rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-elevation-sm);
+}
+
+.dash-card__title {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.dash-card__subtitle {
+  margin: 0.15rem 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-control);
+}
+
 /* Rail lateral do dashboard: acompanha o scroll da coluna de gráficos (mais alta) no desktop. */
 .dashboard-rail {
   position: sticky;
