@@ -1,4 +1,4 @@
-# Backlog — Shell do app (Sidebar + Topbar)
+# Backlog — Shell do app (Sidebar + Topbar) e Dashboard
 
 Registro do que ficou pendente, preparado apenas visualmente ou identificado como melhoria futura
 durante a refatoração premium da Sidebar e do Topbar (julho/2026). Atualizar este arquivo conforme
@@ -57,6 +57,27 @@ itens forem concluídos ou descartados.
       do usuário passa por inputs/outputs através de 2 níveis (app → topbar → filho). Aceitável
       hoje; se crescer, considerar um service com signals (padrão já usado em
       `notificationsFacade`).
+
+## Dashboard — Visão Geral Financeira (julho/2026)
+
+Componente `src/app/dashboard/financial-overview/` substituiu o antigo "Resumo financeiro".
+Regras puras (cards por plano, comparativos, compromissos, resumo) em `financial-overview.model.ts`,
+cobertas por spec. Pendências e próximos passos:
+
+- [ ] **Saúde financeira com score numérico (ex.: 82/100)** — hoje o card usa o status real da API
+      (`/financial-assistant/health`: Estável/Atenção/Crítico). O visual "82/100 · +6 pontos" pede um
+      score numérico calculado no backend; não foi inventado cálculo no frontend.
+- [ ] **Comparativo de patrimônio para Intermediate** — o delta usa `netWorthHistory`, que só é
+      carregado/exibido para Advanced hoje. Avaliar liberar a série (ou só o delta) para Intermediate.
+- [ ] **Compromissos além de despesas** — o card conta despesas em aberto (vencidas + 7 dias).
+      Evoluir para incluir faturas de cartão com fechamento próximo e parcelas de empréstimos.
+- [ ] **Módulo Família/CNPJ** — nenhum card foi adicionado porque não existe conta familiar no
+      produto. Quando o módulo existir, o grid do overview aceita novos cards via
+      `buildOverviewCards` sem mudança estrutural.
+- [ ] **Clique no card inteiro** — hoje só o link "Ver detalhes" navega; avaliar tornar o card todo
+      clicável (com área de toque generosa) mantendo acessibilidade.
+- [ ] **Animação de entrada dos cards** — stagger sutil no primeiro load (respeitando
+      `prefers-reduced-motion`).
 
 ## Nomenclatura pendente de validação com usuários
 

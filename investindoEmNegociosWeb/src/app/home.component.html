@@ -1,372 +1,25 @@
 @if (isLogged) {
-  <ng-template #dashboardKpiSkeleton>
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[0.9rem]">
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando resumo...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando receitas...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando despesas...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Aguarde um instante.</p>
-      </div>
-      <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Carregando cartões...</p>
-        <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Calculando dívidas.</p>
-      </div>
-    </div>
-  </ng-template>
   <section class="grid gap-4">
-    @if (isBasicProfile) {
-      @if (!isLoadingDashboard) {
-        <section class="basic-home-shell">
-          <div class="basic-home-hero">
-            <div class="basic-home-hero__copy">
-              <p class="basic-home-hero__eyebrow">Resumo do mês</p>
-              <h1 class="basic-home-hero__title">Seu mês com clareza</h1>
-              <p class="basic-home-hero__text">
-                Acompanhe o que entrou, o que saiu e o que ainda precisa da sua ação em {{ mesAtualLabel }}.
-              </p>
-              <div class="basic-home-periods">
-                <button
-                  type="button"
-                  class="basic-home-periods__button"
-                  [ngClass]="periodo === 'month' ? 'basic-home-periods__button--active' : ''"
-                  (click)="setPeriodo('month')"
-                  >
-                  Mensal
-                </button>
-                <button
-                  type="button"
-                  class="basic-home-periods__button"
-                  [ngClass]="periodo === 'quarter' ? 'basic-home-periods__button--active' : ''"
-                  (click)="setPeriodo('quarter')"
-                  >
-                  Trimestral
-                </button>
-                <button
-                  type="button"
-                  class="basic-home-periods__button"
-                  [ngClass]="periodo === 'year' ? 'basic-home-periods__button--active' : ''"
-                  (click)="setPeriodo('year')"
-                  >
-                  Anual
-                </button>
-              </div>
-            </div>
-            <article class="basic-home-guidance">
-              <div class="basic-home-guidance__head">
-                <div>
-                  <p class="basic-home-guidance__label">Próximo passo do mês</p>
-                  <h2 class="basic-home-guidance__title">{{ basicDashboardNextTitle }}</h2>
-                </div>
-                <span class="basic-home-guidance__chip">{{ mesAtualLabel }}</span>
-              </div>
-              <p class="basic-home-guidance__text">{{ basicDashboardNextMessage }}</p>
-              <a [routerLink]="basicDashboardNextActionLink" class="basic-home-guidance__cta">
-                {{ basicDashboardNextActionLabel }}
-              </a>
-            </article>
-          </div>
-          <div class="basic-home-kpis">
-            <app-stat-card
-              tone="primary"
-              eyebrow="Quanto sobra"
-              [value]="saldoDisponivelReal | appCurrency"
-              note="Disponível em contas: {{ totalSaldoContas | appCurrency }} · Pendências do mês: {{ pendenciasCaixa | appCurrency }}"
-              tooltipLabel="Mais informações sobre quanto sobra agora"
-              tooltipText="Saldo disponível real: o quanto já está livre para uso depois das saídas previstas do período.">
-              <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-                <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </app-stat-card>
-            <app-stat-card
-              tone="success"
-              eyebrow="Quanto entrou"
-              [value]="totalRendas | appCurrency"
-              note="Ainda a receber: {{ totalRendasPendentes | appCurrency }}"
-              tooltipLabel="Mais informações sobre entradas do mês"
-              tooltipText="Entradas do mês: considera só receitas já recebidas dentro do período selecionado.">
-              <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </app-stat-card>
-            <app-stat-card
-              tone="danger"
-              eyebrow="Quanto saiu"
-              [value]="totalDespesas | appCurrency"
-              note="Compras no cartão: {{ totalDividaCartoes | appCurrency }}"
-              tooltipLabel="Mais informações sobre saídas do mês"
-              tooltipText="Saídas do mês: soma de despesas com vencimento dentro do período selecionado.">
-              <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </app-stat-card>
-          </div>
-          <section class="basic-home-month">
-            <div class="basic-home-month__copy">
-              <p class="basic-home-month__eyebrow">Situação do mês</p>
-              <h2 class="basic-home-month__title">Entenda o que precisa da sua atenção agora</h2>
-              <p class="basic-home-month__text">
-                Use este resumo para decidir sua próxima ação e manter o dashboard útil durante o mês.
-              </p>
-            </div>
-            <div class="basic-home-month__grid">
-          <article class="basic-home-insight-card" [ngClass]="{
-            'basic-home-insight-card--danger': basicDashboardInsightTone === 'danger',
-            'basic-home-insight-card--warn': basicDashboardInsightTone === 'warn',
-            'basic-home-insight-card--ok': basicDashboardInsightTone === 'ok'
-          }">
-                <div class="basic-home-insight-card__head">
-                  <div>
-                    <p class="basic-home-insight-card__eyebrow">Insight principal</p>
-                    <h3 class="basic-home-insight-card__title">{{ basicDashboardInsightTitle }}</h3>
-                  </div>
-                  <div class="basic-home-insight-card__meta">
-                    <span class="basic-home-insight-card__badge">{{ basicDashboardInsightBadge }}</span>
-                    @if (basicDashboardHasInsightPagination) {
-                      <div class="basic-home-insight-card__nav">
-                        <button type="button" class="basic-home-insight-card__nav-button" (click)="previousBasicDashboardInsight()" aria-label="Insight anterior">
-                          ‹
-                        </button>
-                        <span class="basic-home-insight-card__nav-counter">{{ basicDashboardInsightPosition }} de {{ basicDashboardInsightCount }}</span>
-                        <button type="button" class="basic-home-insight-card__nav-button" (click)="nextBasicDashboardInsight()" aria-label="Próximo insight">
-                          ›
-                        </button>
-                      </div>
-                    }
-                  </div>
-                </div>
-                <p class="basic-home-insight-card__text">{{ basicDashboardInsightMessage }}</p>
-                @if (basicDashboardInsightExtraLabel) {
-                  <p class="basic-home-insight-card__support">
-                    {{ basicDashboardInsightExtraLabel }}
-                  </p>
-                }
-                <a [routerLink]="basicDashboardCurrentActionLink" [queryParams]="basicDashboardCurrentActionQueryParams" class="basic-home-insight-card__cta">
-                  {{ basicDashboardCurrentActionLabel }}
-                </a>
-              </article>
-              <article class="basic-home-summary-card">
-                <div class="basic-home-summary-card__head">
-                  <div>
-                    <p class="basic-home-summary-card__eyebrow">Resumo rápido</p>
-                    <h3 class="basic-home-summary-card__title">Como o mês está ficando</h3>
-                    <p class="basic-home-summary-card__period">{{ mesAtualLabel }}</p>
-                  </div>
-              <span class="basic-home-summary-card__status" [ngClass]="{
-                'basic-home-summary-card__status--ok': basicDashboardSummaryTone === 'ok',
-                'basic-home-summary-card__status--warn': basicDashboardSummaryTone === 'warn',
-                'basic-home-summary-card__status--danger': basicDashboardSummaryTone === 'danger'
-              }">
-                    {{ basicDashboardSummaryStatus }}
-                  </span>
-                </div>
-                <div class="basic-home-summary-card__rows">
-                  <div class="basic-home-summary-card__row basic-home-summary-card__row--income">
-                    <span>Entrou</span>
-                    <strong>{{ totalRendas | appCurrency }}</strong>
-                  </div>
-                  <div class="basic-home-summary-card__row basic-home-summary-card__row--expense">
-                    <span>Saiu</span>
-                    <strong>{{ totalDespesas | appCurrency }}</strong>
-                  </div>
-                  <div class="basic-home-summary-card__row basic-home-summary-card__row--available">
-                    <span>Sobra hoje</span>
-                    <strong>{{ saldoDisponivelReal | appCurrency }}</strong>
-                  </div>
-                  <div class="basic-home-summary-card__row basic-home-summary-card__row--pending">
-                    <span>Pendente a receber</span>
-                    <strong>{{ basicDashboardPendingReceivablesLabel }}</strong>
-                  </div>
-                </div>
-              </article>
-            </div>
-            <div class="basic-home-month__grid basic-home-month__grid--single">
-              <article class="basic-home-recent-card">
-                <div class="basic-home-recent-card__head">
-                  <div>
-                    <p class="basic-home-recent-card__eyebrow">Últimos movimentos</p>
-                    <h3 class="basic-home-recent-card__title">Movimentos recentes do período</h3>
-                  </div>
-                  <a routerLink="/calendario" class="basic-home-recent-card__link">Abrir calendário</a>
-                </div>
-                @if (basicDashboardRecentTransactions.length) {
-                  <div class="basic-home-recent-card__list">
-                    @for (item of basicDashboardRecentTransactions; track trackByIndex($index, item)) {
-                      <div class="basic-home-recent-card__item">
-                        <span class="basic-home-recent-card__icon" [ngClass]="item.type === 'income' ? 'basic-home-recent-card__icon--income' : 'basic-home-recent-card__icon--expense'" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                            @if (item.type === 'income') {
-                              <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                            }
-                            @if (item.type === 'expense') {
-                              <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                            }
-                          </svg>
-                        </span>
-                        <div class="basic-home-recent-card__item-main">
-                          <strong>{{ item.title }}</strong>
-                          <span>
-                            {{ item.type === 'income' ? 'Receita' : 'Despesa' }}
-                            @if (item.status) {
-                              • {{ item.status }}
-                            }
-                            • {{ item.date }}
-                          </span>
-                        </div>
-                        <strong [ngClass]="item.type === 'income' ? 'basic-home-recent-card__amount--income' : 'basic-home-recent-card__amount--expense'">
-                          {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
-                        </strong>
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <p class="basic-home-recent-card__empty">Sem movimentos recentes. Cadastre uma receita ou despesa para começar.</p>
-                }
-              </article>
-            </div>
-          </section>
-        </section>
-      } @else {
-        <ng-container [ngTemplateOutlet]="dashboardKpiSkeleton" />
-      }
-    } @else {
-      <header class="flex flex-wrap items-start justify-between gap-3">
-        <div class="max-w-[560px]">
-          <p class="text-[0.75rem] font-semibold uppercase tracking-[0.26em] text-[var(--text-muted)]">Resumo financeiro</p>
-          <h1 class="mt-1 text-[clamp(1.55rem,1.7vw,2rem)] font-semibold text-[var(--text)] leading-tight">
-            Visão geral de {{ mesAtualLabel }}
-          </h1>
-          <p class="mt-1 text-[0.875rem] text-[var(--text-muted)]">
-            Combine receitas, despesas e cartões para saber o quanto pode gastar.
-          </p>
-        </div>
-        <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] p-1 shadow-[var(--shadow-sm)]">
-          <button
-            type="button"
-            class="rounded-full border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.875rem] font-semibold transition"
-            [ngClass]="periodo === 'month' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-            (click)="setPeriodo('month')"
-            >
-            Mensal
-          </button>
-          <button
-            type="button"
-            class="rounded-full border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.875rem] font-semibold transition"
-            [ngClass]="periodo === 'quarter' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-            (click)="setPeriodo('quarter')"
-            >
-            Trimestral
-          </button>
-          <button
-            type="button"
-            class="rounded-full border border-transparent px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.875rem] font-semibold transition"
-            [ngClass]="periodo === 'year' ? 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text)]'"
-            (click)="setPeriodo('year')"
-            >
-            Anual
-          </button>
-        </div>
-      </header>
-      @if (!isLoadingDashboard) {
-        <div class="basic-home-kpis">
-          <app-stat-card
-            tone="primary"
-            eyebrow="Saldo Disponível Real"
-            [value]="saldoDisponivelReal | appCurrency"
-            note="Em contas: {{ totalSaldoContas | appCurrency }} · Pendências: {{ pendenciasCaixa | appCurrency }} · Projetado: {{ saldoDisponivelProjetado | appCurrency }}"
-            tooltipLabel="Mais informações sobre saldo disponível real"
-            tooltipText="SDR = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.">
-            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 4v16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-              <path d="M16 8.5c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.8 2.5 4 3 4 1.2 4 3-1.8 3-4 3-4-1.2-4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </app-stat-card>
-          <app-stat-card
-            tone="info"
-            eyebrow="Patrimônio líquido"
-            [value]="patrimonioLiquido | appCurrency"
-            note="Ativos: {{ patrimonioTotalAtivos | appCurrency }} · Passivos: {{ patrimonioPassivos | appCurrency }} · Investimentos: {{ patrimonioEmInvestimentos | appCurrency }} · Ativos reais: {{ patrimonioEmAtivosReais | appCurrency }}"
-            tooltipLabel="Mais informações sobre patrimônio líquido"
-            tooltipText="Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.">
-            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M5 18h14M7 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M17 7h3v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </app-stat-card>
-          <app-stat-card
-            tone="success"
-            eyebrow="Total Receitas"
-            [value]="totalRendas | appCurrency"
-            note="Pendente a receber: {{ totalRendasPendentes | appCurrency }}"
-            tooltipLabel="Mais informações sobre total de receitas"
-            tooltipText="Total de receitas do mês: apenas receitas com status recebido no período selecionado.">
-            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </app-stat-card>
-          <app-stat-card
-            tone="danger"
-            eyebrow="Total de despesas"
-            [value]="totalDespesas | appCurrency"
-            note="Somente despesas com vencimento neste mês."
-            tooltipLabel="Mais informações sobre total de despesas"
-            tooltipText="Total de despesas do mês: soma de gastos com vencimento no período, incluindo despesas fixas, variáveis e contas.">
-            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </app-stat-card>
-          <app-stat-card
-            tone="warning"
-            eyebrow="Dívida total nos cartões"
-            [value]="totalDividaCartoes | appCurrency"
-            note="Somatório de despesas vinculadas a cartões."
-            tooltipLabel="Mais informações sobre dívida nos cartões"
-            tooltipText="Dívida em cartões: soma das despesas vinculadas a cartões de crédito, incluindo parcelas futuras em aberto.">
-            <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M3 7h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </app-stat-card>
-        </div>
-      } @else {
-        <ng-container [ngTemplateOutlet]="dashboardKpiSkeleton" />
-      }
+    @if (loadErrorMessage) {
+      <div
+        role="alert"
+        class="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-300/60 bg-amber-500/10 px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.8125rem] text-[var(--warning-text)]">
+        <span>{{ loadErrorMessage }}</span>
+        <button
+          type="button"
+          class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text)]"
+          (click)="dismissLoadErrors()">
+          Dispensar
+        </button>
+      </div>
     }
-    @if (hasAccess('Advanced') && accountBalances.length) {
-      <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Saldos por conta</p>
-            <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Saldo atual consolidado: {{ totalSaldoContas | appCurrency }}</p>
-          </div>
-          @if (hasAccess('Intermediate')) {
-            <a routerLink="/contas" class="btn-ghost sm">Gerenciar contas</a>
-          }
-        </div>
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2">
-          @for (account of accountBalances; track trackByIndex($index, account)) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
-              <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">{{ account.name }}</p>
-              <p class="m-0 mt-1 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ account.type }}</p>
-              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ account.currentBalance | appCurrency:account.currency }}</strong>
-            </article>
-          }
-        </div>
-        @if (outrasMoedas.length) {
-          <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">
-            Outras moedas (não somadas ao patrimônio total):
-            @for (item of outrasMoedas; track item.currency; let last = $last) {
-              {{ item.currency }} {{ item.totalAssets | appCurrency:item.currency }}{{ last ? '' : ' · ' }}
-            }
-          </p>
-        }
-      </section>
-    }
+      <app-financial-overview
+        [data]="overviewData"
+        [role]="currentRole"
+        [periodo]="periodo"
+        [periodoLabel]="mesAtualLabel"
+        [loading]="isLoadingDashboard"
+        (periodoChange)="setPeriodo($event)" />
     @if (hasAccess('Advanced') && patrimonioHistoryPoints.length) {
       <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -374,21 +27,37 @@
             <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Evolução patrimonial</p>
             <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
           </div>
-          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
-            Atual: {{ patrimonioLiquido | appCurrency }}
-          </span>
+          <div class="flex flex-wrap items-center gap-2">
+            @if (patrimonioHistoryPoints.length > 1) {
+              <span
+                class="inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.75rem] font-semibold"
+                [ngClass]="patrimonioHistoryDelta >= 0
+                  ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]'
+                  : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'">
+                <svg viewBox="0 0 24 24" width="12" height="12" role="presentation" focusable="false" aria-hidden="true">
+                  @if (patrimonioHistoryDelta >= 0) {
+                    <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                  } @else {
+                    <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                  }
+                </svg>
+                {{ patrimonioHistoryDelta >= 0 ? '+' : '' }}{{ patrimonioHistoryDelta | appCurrency }} no período
+              </span>
+            }
+            <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-[3px] text-[0.75rem] text-[var(--text-muted)]">
+              Atual: <strong class="text-[var(--text)]">{{ patrimonioLiquido | appCurrency }}</strong>
+            </span>
+          </div>
         </div>
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(72px,1fr))] gap-2">
-          @for (point of patrimonioHistoryPoints; track trackByIndex($index, point)) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-2">
-              <div class="flex h-[92px] items-end justify-center">
-                <div class="w-full rounded-t-[10px] bg-[linear-gradient(180deg,rgba(16,185,129,0.28),rgba(16,185,129,0.9))]" [style.height.%]="(point.netWorth / patrimonioHistoryMax) * 100"></div>
+        <div class="networth-chart">
+          @for (point of patrimonioHistoryPoints; track trackByIndex($index, point); let last = $last) {
+            <div class="networth-chart__col" [class.networth-chart__col--current]="last">
+              <span class="networth-chart__value">{{ point.netWorth | appCurrency }}</span>
+              <div class="networth-chart__track" aria-hidden="true">
+                <div class="networth-chart__bar" [style.height.%]="patrimonioHistoryScale(point.netWorth)"></div>
               </div>
-              <div class="mt-2 text-center">
-                <strong class="block text-[0.8125rem] text-[var(--text)]">{{ point.label }}</strong>
-                <span class="block text-[0.75rem] text-[var(--text-muted)]">{{ point.netWorth | appCurrency }}</span>
-              </div>
-            </article>
+              <span class="networth-chart__label">{{ point.label }}</span>
+            </div>
           }
         </div>
         @if (patrimonioHistoryEstimated) {
@@ -411,21 +80,31 @@
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
           @for (bucket of debtBuckets; track trackByIndex($index, bucket)) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-              <p class="m-0 text-[0.75rem] uppercase tracking-[0.15em] text-[var(--text-muted)]">{{ bucket.label }}</p>
-              <strong class="mt-2 block text-[1rem] text-[var(--text)]">{{ bucket.totalAmount | appCurrency }}</strong>
-              <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">{{ bucket.itemsCount }} item(ns)</p>
+            <article class="debt-bucket" [attr.data-accent]="debtBucketAccent(bucket.label)">
+              <div class="debt-bucket__head">
+                <span class="debt-bucket__dot" aria-hidden="true"></span>
+                <p class="debt-bucket__label">{{ bucket.label }}</p>
+              </div>
+              <strong class="debt-bucket__amount">{{ bucket.totalAmount | appCurrency }}</strong>
+              <div class="debt-bucket__meter" aria-hidden="true">
+                <div class="debt-bucket__meter-fill" [style.width.%]="debtBucketPercent(bucket.totalAmount)"></div>
+              </div>
+              <p class="debt-bucket__meta">
+                {{ bucket.itemsCount }} {{ bucket.itemsCount === 1 ? 'item' : 'itens' }} ·
+                {{ debtBucketPercent(bucket.totalAmount) | number:'1.0-0' }}% do total
+              </p>
             </article>
           }
         </div>
         @if (debtNextItems.length) {
-          <div class="grid gap-2">
-            @for (item of debtNextItems; track trackByIndex($index, item)) {
-              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
-                <div class="flex flex-wrap items-start justify-between gap-2">
+          <div class="grid gap-1">
+            <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">Próximas obrigações</p>
+            <div class="divide-y divide-[var(--border)] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)]">
+              @for (item of debtNextItems; track trackByIndex($index, item)) {
+                <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
                   <div class="min-w-0">
-                    <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
-                    <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">
+                    <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                    <p class="m-0 mt-0.5 text-[0.75rem] text-[var(--text-muted)]">
                       {{ item.family === 'card' ? 'Cartão' : 'Obrigação' }}@if (item.relatedName) {
                       <span> · {{ item.relatedName }}</span>
                       }@if (item.statementReference) {
@@ -438,8 +117,8 @@
                   <span class="text-[0.75rem] text-[var(--text-muted)]">vence {{ item.dueDate | date:'dd/MM' }}</span>
                 </div>
               </div>
-            </article>
-          }
+            }
+          </div>
         </div>
       }
     </section>
@@ -494,7 +173,7 @@
       </div>
     </section>
   }
-  @if (!isBasicProfile && !isLoadingDashboard) {
+  @if (!isLoadingDashboard) {
     <section
       class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]"
     [ngClass]="insight.tone === 'warn'
@@ -540,7 +219,28 @@
       <button class="ghost sm" type="button" (click)="openInsightDetails()">Detalhes</button>
     </section>
   }
-  @if (!isBasicProfile && showInsightDetails) {
+  @if (!isLoadingDashboard && (insightObservations.length || insightTodoItems.length)) {
+    <section class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+      <div>
+        <p class="m-0 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Plano do mês</p>
+        <p class="m-0 text-[0.8125rem] text-[var(--text-muted)]">Pontos de atenção e próximos passos sugeridos a partir dos seus dados.</p>
+      </div>
+      <app-insight-actions [observations]="insightObservations" [actions]="insightTodoItems" />
+    </section>
+  }
+  @if (!isLoadingDashboard && isBasicProfile) {
+    <app-upgrade-cta
+      planLabel="Intermediate"
+      title="Desbloqueie análises que antecipam problemas de caixa"
+      [features]="['Projeção e análise de risco', 'Assinaturas recorrentes', 'Saúde financeira com IA', 'Mapa de dívidas']" />
+  }
+  @if (!isLoadingDashboard && !isBasicProfile && !hasAccess('Advanced')) {
+    <app-upgrade-cta
+      planLabel="Advanced"
+      title="Vá além: patrimônio consolidado e visão de longo prazo"
+      [features]="['Evolução patrimonial', 'Visão consolidada de ativos e passivos', 'Investimentos integrados ao patrimônio']" />
+  }
+  @if (showInsightDetails) {
     <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--spacing-3)] backdrop-blur-[2px]">
       <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 pb-[var(--spacing-3)]">
         <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
@@ -722,7 +422,7 @@
       </div>
     </div>
   }
-  @if (!isBasicProfile && metasResumo.total) {
+  @if (metasResumo.total) {
     <div class="grid gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -842,8 +542,8 @@
       </div>
     </div>
   }
-  @if (!isBasicProfile && !isLoadingDashboard) {
-    <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[980px]:grid-cols-1">
+  @if (!isLoadingDashboard) {
+    <div class="grid grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-3 max-[960px]:grid-cols-1">
       <div class="grid gap-3">
         <div class="grid gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
           <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
@@ -856,72 +556,77 @@
               text="Resultado considera somente receitas recebidas. Receitas pendentes aparecem separadas e não entram no saldo principal."
               size="sm" />
           </div>
-          <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[var(--shadow-sm)]">
-            <div class="grid gap-1">
-              <span class="text-[0.8125rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
-              <div class="flex items-center gap-2">
-                <span class="text-[1.25rem] font-semibold text-[var(--text)]">
+          <div class="rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
+            <div class="grid gap-2">
+              <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Saldo principal</span>
+              <div class="flex flex-wrap items-baseline gap-3">
+                <span class="text-[1.75rem] font-semibold leading-none tracking-[-0.02em] text-[var(--text)]">
                   {{ saldoPrincipal | appCurrency }}
                 </span>
-                <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.8125rem] text-[var(--text-muted)]">
-                  Saldo ant. {{ saldoAnterior | appCurrency }} • Recebidas {{ totalRendas | appCurrency }} • Despesas {{ totalDespesas | appCurrency }}
+                <span
+                  class="inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.75rem] font-semibold"
+                  [ngClass]="saldoDelta >= 0
+                    ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]'
+                    : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'">
+                  {{ saldoDelta >= 0 ? '+' : '' }}{{ saldoDelta | appCurrency }} no mês
                 </span>
               </div>
-              <span class="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-500/10 px-2 py-[2px] text-[0.75rem] font-semibold text-[var(--warning-text)]">
-                <span class="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-                Pendente a receber: {{ totalRendasPendentes | appCurrency }}
-              </span>
+              <div class="flex flex-wrap gap-x-5 gap-y-1 text-[0.8125rem]">
+                <span class="text-[var(--text-muted)]">Saldo anterior <strong class="ml-1 font-semibold text-[var(--text)]">{{ saldoAnterior | appCurrency }}</strong></span>
+                <span class="text-[var(--text-muted)]">Recebidas <strong class="ml-1 font-semibold text-[var(--success-text)]">{{ totalRendas | appCurrency }}</strong></span>
+                <span class="text-[var(--text-muted)]">Despesas <strong class="ml-1 font-semibold text-[var(--danger-text)]">{{ totalDespesas | appCurrency }}</strong></span>
+                @if (totalRendasPendentes > 0) {
+                  <span class="text-[var(--text-muted)]">A receber <strong class="ml-1 font-semibold text-[var(--warning-text)]">{{ totalRendasPendentes | appCurrency }}</strong></span>
+                }
+              </div>
             </div>
-            <div class="mt-3 grid gap-2">
-              <div class="flex h-[12px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-                <div
-                  class="h-full bg-[linear-gradient(90deg,var(--success),var(--color-success-soft))]"
-                [style.width.%]="saldoBasePercentual"></div>
-                <div
-                  class="h-full bg-[linear-gradient(90deg,var(--danger),var(--color-danger-soft))]"
-                [style.width.%]="saldoDespesasPercentual"></div>
+            <div class="mt-4 grid gap-2">
+              <div class="flex h-2 w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
+                <div class="h-full rounded-l-full bg-[var(--color-chart-income,var(--success))]" [style.width.%]="saldoBasePercentual"></div>
+                <div class="h-full bg-[var(--color-chart-expense,var(--danger))]" [style.width.%]="saldoDespesasPercentual"></div>
               </div>
-              <div class="flex flex-wrap items-center justify-between gap-2 text-[0.75rem] text-[var(--text-muted)]">
-                <span class="inline-flex items-center gap-2 rounded-full border border-[var(--color-success-soft)] bg-[var(--color-success-weak)] px-2 py-[2px]">
-                  <span class="inline-block h-2 w-2 rounded-full bg-[var(--color-success-weak)]"></span>
-                  Base disponível
-                  <strong class="text-[var(--text)]">
-                    {{ saldoBasePercentual | number:'1.0-0' }}%
-                  </strong>
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.75rem] text-[var(--text-muted)]">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="inline-block h-2 w-2 rounded-full bg-[var(--color-chart-income,var(--success))]"></span>
+                  Base disponível <strong class="text-[var(--text)]">{{ saldoBasePercentual | number:'1.0-0' }}%</strong>
                 </span>
-                <span class="inline-flex items-center gap-2 rounded-full border border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] px-2 py-[2px]">
-                  <span class="inline-block h-2 w-2 rounded-full bg-[var(--color-danger-weak)]"></span>
-                  Despesas
-                  <strong class="text-[var(--text)]">
-                    {{ saldoDespesasPercentual | number:'1.0-0' }}%
-                  </strong>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="inline-block h-2 w-2 rounded-full bg-[var(--color-chart-expense,var(--danger))]"></span>
+                  Despesas <strong class="text-[var(--text)]">{{ saldoDespesasPercentual | number:'1.0-0' }}%</strong>
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3 max-[980px]:grid-cols-1">
+        <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+          <app-monthly-flow-chart
+            [points]="monthlyFlowSeries"
+            title="Receitas × Despesas por mês"
+            subtitle="Últimos 6 meses: entradas recebidas, saídas por vencimento e resultado." />
+        </div>
+        <div class="grid grid-cols-2 gap-3 max-[960px]:grid-cols-1">
           <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
             <p class="m-0 text-[0.875rem] text-[var(--text-muted)]">Despesas por categoria</p>
             @if (expenseCategorySlices.length) {
               <div class="grid gap-3">
                 <div class="expense-donut-wrap">
-                  <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuicao de despesas por categoria">
+                  <div class="expense-donut" [style.background]="expenseCategoryChartBackground" role="img" aria-label="Distribuição de despesas por categoria">
                     <div class="expense-donut__center">
                       <small>Total</small>
                       <strong>{{ expenseCategoryTotal | appCurrency }}</strong>
                     </div>
                   </div>
                 </div>
-                <div class="grid gap-2">
-                  @for (item of expenseCategorySlices | slice:0:5; track trackByIndex($index, item)) {
-                    <div class="flex items-center justify-between text-[0.875rem]">
+                <div class="divide-y divide-[var(--border)]">
+                  @for (item of expenseCategorySlices; track trackByIndex($index, item)) {
+                    <div class="flex items-center justify-between gap-2 py-1.5 text-[0.8125rem]">
                       <span class="inline-flex min-w-0 items-center gap-2">
-                        <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
-                        <span class="truncate font-semibold">{{ item.label }}</span>
+                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background]="item.color"></span>
+                        <span class="truncate font-medium text-[var(--text)]">{{ item.label }}</span>
                       </span>
-                      <span class="font-semibold text-[var(--text)]">
-                        {{ item.percent | number:'1.0-0' }}%
+                      <span class="flex shrink-0 items-baseline gap-2">
+                        <span class="text-[0.75rem] text-[var(--text-muted)]">{{ item.total | appCurrency }}</span>
+                        <strong class="w-[38px] text-right font-semibold text-[var(--text)]">{{ item.percent | number:'1.0-0' }}%</strong>
                       </span>
                     </div>
                   }
@@ -936,22 +641,23 @@
             @if (incomeSourceSlices.length) {
               <div class="grid gap-3">
                 <div class="expense-donut-wrap">
-                  <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuicao de receitas por categoria">
+                  <div class="expense-donut" [style.background]="incomeSourceChartBackground" role="img" aria-label="Distribuição de receitas por categoria">
                     <div class="expense-donut__center">
                       <small>Total</small>
                       <strong>{{ incomeSourceTotal | appCurrency }}</strong>
                     </div>
                   </div>
                 </div>
-                <div class="grid gap-2">
-                  @for (item of incomeSourceSlices | slice:0:5; track trackByIndex($index, item)) {
-                    <div class="flex items-center justify-between text-[0.875rem]">
+                <div class="divide-y divide-[var(--border)]">
+                  @for (item of incomeSourceSlices; track trackByIndex($index, item)) {
+                    <div class="flex items-center justify-between gap-2 py-1.5 text-[0.8125rem]">
                       <span class="inline-flex min-w-0 items-center gap-2">
-                        <span class="h-2.5 w-2.5 rounded-full" [style.background]="item.color"></span>
-                        <span class="truncate font-semibold">{{ item.label }}</span>
+                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background]="item.color"></span>
+                        <span class="truncate font-medium text-[var(--text)]">{{ item.label }}</span>
                       </span>
-                      <span class="font-semibold text-[var(--text)]">
-                        {{ item.percent | number:'1.0-0' }}%
+                      <span class="flex shrink-0 items-baseline gap-2">
+                        <span class="text-[0.75rem] text-[var(--text-muted)]">{{ item.total | appCurrency }}</span>
+                        <strong class="w-[38px] text-right font-semibold text-[var(--text)]">{{ item.percent | number:'1.0-0' }}%</strong>
                       </span>
                     </div>
                   }
@@ -963,7 +669,7 @@
           </div>
         </div>
       </div>
-      <aside class="grid grid-rows-[auto_minmax(0,1fr)] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+      <aside class="grid grid-rows-[auto_minmax(0,1fr)_auto] content-start gap-3 self-stretch h-full min-h-[420px] rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <div class="flex items-center justify-between">
           <div>
             <p class="m-0 text-[0.9375rem] font-semibold text-[var(--text)]">Movimentos recentes</p>
@@ -975,52 +681,50 @@
             size="sm" />
         </div>
         @if (recentTransactions.length) {
-          <div class="grid gap-2 min-h-0 overflow-y-auto pr-1">
+          <div class="min-h-0 divide-y divide-[var(--border)] overflow-y-auto rounded-[12px] border border-[var(--border)] bg-[var(--surface)]">
             @for (item of recentTransactions; track trackByIndex($index, item)) {
-              <div class="grid grid-cols-[1fr_auto] items-center gap-2 rounded-[12px] bg-[var(--surface)] p-[var(--spacing-1)] shadow-[var(--shadow-sm)]">
-                <div class="grid grid-cols-[auto_1fr] items-center gap-2 min-w-0">
-                  <span
-                    class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full text-[0.875rem] font-semibold text-[var(--text)]"
-                    [ngClass]="item.type === 'income' ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]' : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'"
-                    aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false">
-                      @if (item.type === 'income') {
-                        <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                      } @else {
-                        <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                      }
-                    </svg>
-                  </span>
-                  <div class="min-w-0">
-                    <div class="flex items-center justify-between gap-2">
-                      <strong class="block truncate text-[0.875rem]">{{ item.title }}</strong>
-                    </div>
-                    <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
-                      <span>{{ item.date }}</span>
-                      <span class="opacity-70">•</span>
-                      <app-status-badge [tone]="item.statusTone || 'muted'" [label]="item.status || ''" size="sm"></app-status-badge>
-                      @if (item.recurring) {
-                        <span class="rounded-full border border-[var(--border)] bg-[var(--surface-3)] px-[var(--spacing-1)] py-[2px] text-[var(--text-xs)] text-[var(--text-secondary)]">Recorrente</span>
-                      }
-                    </div>
+              <a
+                class="group grid grid-cols-[auto_1fr_auto] items-center gap-2.5 px-3 py-2.5 no-underline transition-colors hover:bg-[var(--surface-2)]"
+                [routerLink]="item.type === 'income' ? '/receitas' : '/despesas'"
+                [attr.aria-label]="'Ver detalhes de ' + item.title">
+                <span
+                  class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full"
+                  [ngClass]="item.type === 'income' ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]' : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'"
+                  aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false">
+                    @if (item.type === 'income') {
+                      <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                    } @else {
+                      <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                    }
+                  </svg>
+                </span>
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.8125rem] font-semibold text-[var(--text)]">{{ item.title }}</strong>
+                  <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[0.75rem] text-[var(--text-muted)]">
+                    <span>{{ item.date }}</span>
+                    <app-status-badge [tone]="item.statusTone || 'muted'" [label]="item.status || ''" size="sm"></app-status-badge>
+                    @if (item.recurring) {
+                      <span class="rounded-full bg-[var(--surface-3)] px-1.5 py-[1px] text-[0.6875rem] text-[var(--text-secondary)]">Recorrente</span>
+                    }
                   </div>
                 </div>
-                <div class="flex flex-col items-end gap-2">
-                  <div class="flex items-center gap-2">
-                    <div class="text-[0.9375rem] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                      {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
-                    </div>
-                    <a class="inline-flex h-[24px] w-[24px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[0.875rem] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/despesas" aria-label="Ver detalhes do movimento">
-                      ↗
-                    </a>
-                  </div>
-                </div>
-              </div>
+                <span class="text-right text-[0.875rem] font-semibold tracking-[-0.01em]" [ngClass]="item.type === 'income' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
+                  {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
+                </span>
+              </a>
             }
           </div>
         } @else {
-          <p class="text-[0.8125rem] text-[var(--text-muted)]">Sem movimentos recentes. Cadastre uma receita ou despesa para aparecer aqui.</p>
+          <div class="grid content-center justify-items-center gap-1 rounded-[12px] border border-dashed border-[var(--border-strong)] bg-[var(--surface)] p-[var(--spacing-2)] text-center">
+            <p class="m-0 text-[0.875rem] font-semibold text-[var(--text)]">Nenhum movimento ainda</p>
+            <p class="m-0 text-[0.75rem] text-[var(--text-muted)]">Cadastre uma receita ou despesa para acompanhar por aqui.</p>
+            <a routerLink="/despesas" class="mt-1 inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text)] transition hover:bg-[var(--surface-3)]">Cadastrar despesa</a>
+          </div>
         }
+        <div class="border-t border-[var(--border)] pt-3">
+          <app-upcoming-due-list [items]="upcomingDueItems" />
+        </div>
       </aside>
     </div>
   }

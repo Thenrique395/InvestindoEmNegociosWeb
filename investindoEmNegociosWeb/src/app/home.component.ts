@@ -30,10 +30,16 @@ import { hasAtLeastRole, UserRole } from './roles';
 import { ProfileService } from './profile.service';
 import { NotificationsService, NotificationItem } from './notifications.service';
 import { AppCurrencyPipe } from './shared/app-currency.pipe';
-import { StatCardComponent } from './shared/stat-card/stat-card.component';
 import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
 import { TooltipComponent } from './shared/tooltip/tooltip.component';
 import { AiFinancialHealthResponse, AiHealthStatus, FinancialAssistantService } from './financial-assistant.service';
+import { MonthlyFlowChartComponent } from './dashboard/monthly-flow-chart.component';
+import { UpcomingDueListComponent, UpcomingDueItem } from './dashboard/upcoming-due-list.component';
+import { InsightActionsComponent } from './dashboard/insight-actions.component';
+import { UpgradeCtaComponent } from './dashboard/upgrade-cta.component';
+import { FinancialOverviewComponent } from './dashboard/financial-overview/financial-overview.component';
+import { FinancialOverviewInput } from './dashboard/financial-overview/financial-overview.model';
+import { MonthlyFlowPoint, buildMonthlyFlowSeries } from './utils/monthly-flow.utils';
 
 type InsightDiagnostics = {
   healthScore: number;
@@ -60,7 +66,19 @@ type InsightTodoItem = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule, AppCurrencyPipe, StatCardComponent, StatusBadgeComponent, TooltipComponent],
+  imports: [
+    CommonModule,
+    DecimalPipe,
+    RouterModule,
+    AppCurrencyPipe,
+    StatusBadgeComponent,
+    TooltipComponent,
+    MonthlyFlowChartComponent,
+    UpcomingDueListComponent,
+    InsightActionsComponent,
+    UpgradeCtaComponent,
+    FinancialOverviewComponent
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
@@ -80,7 +98,6 @@ export class HomeComponent implements OnInit {
   private incomesLoaded = false;
 
   dataAtual = new Date();
-  basicDashboardInsightIndex = 0;
   private expensesRaw: StoredExpense[] = [];
   private incomesRaw: StoredIncome[] = [];
   totalRendas = 0;
@@ -118,6 +135,13 @@ export class HomeComponent implements OnInit {
     statusTone?: InstallmentStatusTone;
     recurring?: boolean;
   }[] = [];
+  monthlyFlowSeries: MonthlyFlowPoint[] = [];
+  upcomingDueItems: UpcomingDueItem[] = [];
+  receitasPeriodoAnterior: number | null = null;
+  despesasPeriodoAnterior: number | null = null;
+  compromissosResumo = { emAtraso: 0, proximosSeteDias: 0, valorEmAberto: 0 };
+  loadErrorSections = new Set<string>();
+  loadErrorsDismissed = false;
   metasResumo = {
     total: 0,
     planned: 0,
@@ -267,6 +291,9 @@ export class HomeComponent implements OnInit {
       this.updateCategoryCharts();
       this.atualizarDividaCartoes();
       this.updateRecentTransactions();
+      this.updateMonthlyFlow();
+      this.updateUpcomingDueItems();
+      this.updateOverviewDerived();
       this.updateInsight();
     });
     this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
@@ -277,6 +304,8 @@ export class HomeComponent implements OnInit {
       this.atualizarSaldo();
       this.updateCategoryCharts();
       this.updateRecentTransactions();
+      this.updateMonthlyFlow();
+      this.updateOverviewDerived();
       this.updateInsight();
     });
     this.db.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
@@ -310,6 +339,7 @@ export class HomeComponent implements OnInit {
           this.riskAssessment = null;
           this.insightEngine = null;
           this.recommendationEngine = null;
+          this.registerLoadError('resumo de contas');
         }
       });
     }
@@ -367,7 +397,7 @@ export class HomeComponent implements OnInit {
       case 'info':
         return ['Cadastre receitas e despesas principais', 'Crie sua primeira meta anual'];
       default:
-        return ['Mantenha o ritmo atual', 'Reavalie suas metas no fim do mes'];
+        return ['Mantenha o ritmo atual', 'Reavalie suas metas no fim do mês'];
     }
   }
 
@@ -616,10 +646,6 @@ export class HomeComponent implements OnInit {
     return this.netWorthSummary?.liabilities.totalLiabilities ?? this.debtSummary?.totalDebt ?? this.totalDividaCartoes;
   }
 
-  get outrasMoedas() {
-    return this.netWorthSummary?.assets.otherCurrencies ?? [];
-  }
-
   get debtBuckets() {
     return this.debtSummary?.buckets || [];
   }
@@ -634,6 +660,42 @@ export class HomeComponent implements OnInit {
 
   get patrimonioHistoryMax(): number {
     return this.patrimonioHistoryPoints.reduce((max, item) => Math.max(max, item.netWorth), 0) || 1;
+  }
+
+  get patrimonioHistoryMin(): number {
+    const points = this.patrimonioHistoryPoints;
+    if (!points.length) return 0;
+    return points.reduce((min, item) => Math.min(min, item.netWorth), points[0].netWorth);
+  }
+
+  get patrimonioHistoryDelta(): number {
+    const points = this.patrimonioHistoryPoints;
+    if (points.length < 2) return 0;
+    return points[points.length - 1].netWorth - points[0].netWorth;
+  }
+
+  patrimonioHistoryScale(value: number): number {
+    const max = this.patrimonioHistoryMax;
+    const min = this.patrimonioHistoryMin;
+    if (max === min) return 100;
+    return 18 + ((value - min) / (max - min)) * 82;
+  }
+
+  debtBucketAccent(label: string): 'danger' | 'warning' | 'info' {
+    const normalized = (label || '').toLowerCase();
+    if (normalized.includes('atras')) return 'danger';
+    if (normalized.includes('cart')) return 'warning';
+    return 'info';
+  }
+
+  debtBucketPercent(amount: number): number {
+    const total = this.debtSummary?.totalDebt || 0;
+    if (total <= 0) return 0;
+    return Math.max(0, Math.min(100, (amount / total) * 100));
+  }
+
+  get saldoDelta(): number {
+    return this.saldoPrincipal - this.saldoAnterior;
   }
 
   get patrimonioHistoryEstimated(): boolean {
@@ -707,253 +769,6 @@ export class HomeComponent implements OnInit {
     return this.cards.length > 0;
   }
 
-  get basicDashboardNextTitle(): string {
-    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
-      return 'Comece pelos primeiros lançamentos';
-    }
-    if (!this.incomeEntriesCount) {
-      return 'Registre a primeira receita do período';
-    }
-    if (!this.expenseEntriesCount) {
-      return 'Registre a primeira despesa do período';
-    }
-    if (!this.hasCardEntries) {
-      return 'Opcional: revise seus cartões';
-    }
-    return 'Base do mês configurada';
-  }
-
-  get basicDashboardNextMessage(): string {
-    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
-      return 'Cadastre uma receita e uma despesa para começar com o dashboard refletindo sua rotina real.';
-    }
-    if (!this.incomeEntriesCount) {
-      return 'Sem receitas registradas ainda. Adicione uma entrada para acompanhar o que realmente entrou no caixa.';
-    }
-    if (!this.expenseEntriesCount) {
-      return 'Sem despesas registradas ainda. Lance a primeira saída para o saldo do mês ficar mais confiável.';
-    }
-    if (!this.hasCardEntries) {
-      return 'Você já consegue operar normalmente. Se usar cartão, pode cadastrar depois para acompanhar compras no crédito.';
-    }
-    return 'Receitas, despesas e cartões já estão compondo a leitura principal do seu mês.';
-  }
-
-  get basicDashboardNextActionLabel(): string {
-    if (!this.incomeEntriesCount) {
-      return 'Cadastrar receita';
-    }
-    if (!this.expenseEntriesCount) {
-      return 'Cadastrar despesa';
-    }
-    if (!this.hasCardEntries) {
-      return 'Revisar cartões';
-    }
-    return 'Revisar despesas';
-  }
-
-  get basicDashboardNextActionLink(): string {
-    if (!this.incomeEntriesCount) {
-      return '/receitas';
-    }
-    if (!this.expenseEntriesCount) {
-      return '/despesas';
-    }
-    if (!this.hasCardEntries) {
-      return '/cartoes';
-    }
-    return '/despesas';
-  }
-
-  get basicDashboardInsightTitle(): string {
-    if (this.basicDashboardActiveTodo) {
-      return this.resolveBasicDashboardInsightTodoTitle(this.basicDashboardActiveTodo);
-    }
-    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
-      return 'Faltam os primeiros lançamentos';
-    }
-    if (!this.incomeEntriesCount) {
-      return 'Registre a primeira receita';
-    }
-    if (!this.expenseEntriesCount) {
-      return 'Registre a primeira despesa';
-    }
-    if (this.saldoDisponivelReal < 0) {
-      return 'Seu saldo está negativo';
-    }
-    if (this.totalRendasPendentes > 0) {
-      return 'Existem receitas pendentes';
-    }
-    return 'Seu mês está no caminho certo';
-  }
-
-  get basicDashboardInsightMessage(): string {
-    if (this.basicDashboardActiveTodo) {
-      return this.basicDashboardActiveTodo.text;
-    }
-    if (!this.incomeEntriesCount && !this.expenseEntriesCount) {
-      return 'Sem receita e despesa registradas, o dashboard ainda não reflete sua rotina real.';
-    }
-    if (!this.incomeEntriesCount) {
-      return 'Sem entrada registrada, o valor que sobra no mês pode parecer menor do que realmente é.';
-    }
-    if (!this.expenseEntriesCount) {
-      return 'Sem a primeira saída, o saldo ainda não mostra o custo real do seu mês.';
-    }
-    if (this.saldoDisponivelReal < 0) {
-      return 'As saídas já superaram as entradas e o período pede ajuste imediato para evitar aperto no caixa.';
-    }
-    if (this.totalRendasPendentes > 0) {
-      return 'Confirme o que já entrou para o saldo do período ficar mais fiel à sua realidade.';
-    }
-    return 'Receitas e despesas principais já estão registradas e o saldo do período está mais confiável.';
-  }
-
-  get basicDashboardInsightTone(): 'danger' | 'warn' | 'ok' {
-    if (this.basicDashboardActiveTodo) {
-      return this.basicDashboardActiveTodo.severity === 'danger'
-        ? 'danger'
-        : this.basicDashboardActiveTodo.severity === 'warn'
-          ? 'warn'
-          : 'ok';
-    }
-    if (!this.incomeEntriesCount || !this.expenseEntriesCount || this.saldoDisponivelReal < 0) {
-      return 'danger';
-    }
-    if (this.totalRendasPendentes > 0 || !this.hasCardEntries) {
-      return 'warn';
-    }
-    return 'ok';
-  }
-
-  get basicDashboardInsightBadge(): string {
-    if (this.basicDashboardActiveTodo) {
-      if (this.basicDashboardActiveTodo.severity === 'danger') {
-        return 'Crítico';
-      }
-      if (this.basicDashboardActiveTodo.severity === 'warn') {
-        return 'Atenção';
-      }
-      return 'Revisar';
-    }
-    if (this.basicDashboardInsightTone === 'danger') {
-      return 'Ação necessária';
-    }
-    if (this.basicDashboardInsightTone === 'warn') {
-      return 'Atenção';
-    }
-    return 'Tudo certo';
-  }
-
-  get basicDashboardSummaryTone(): 'danger' | 'warn' | 'ok' {
-    if (this.saldoDisponivelReal < 0) {
-      return 'danger';
-    }
-    if (this.totalRendasPendentes > 0) {
-      return 'warn';
-    }
-    return 'ok';
-  }
-
-  get basicDashboardSummaryStatus(): string {
-    if (this.basicDashboardSummaryTone === 'danger') {
-      return 'Mês apertado';
-    }
-    if (this.basicDashboardSummaryTone === 'warn') {
-      return 'Atenção ao saldo';
-    }
-    return 'Mês confortável';
-  }
-
-  get basicDashboardPendingReceivablesLabel(): string {
-    if (this.totalRendasPendentes <= 0) {
-      return 'Sem pendências';
-    }
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(this.totalRendasPendentes);
-  }
-
-  get basicDashboardRecentTransactions(): typeof this.recentTransactions {
-    return this.recentTransactions.slice(0, 4);
-  }
-
-  get basicDashboardActiveTodo(): InsightTodoItem | null {
-    if (!this.insightTodoItems.length) return null;
-    return this.insightTodoItems[this.currentBasicDashboardInsightIndex] ?? this.insightTodoItems[0];
-  }
-
-  get basicDashboardInsightCount(): number {
-    return this.insightTodoItems.length || 1;
-  }
-
-  get basicDashboardInsightPosition(): number {
-    return this.insightTodoItems.length ? this.currentBasicDashboardInsightIndex + 1 : 1;
-  }
-
-  get basicDashboardHasInsightPagination(): boolean {
-    return this.insightTodoItems.length > 1;
-  }
-
-  get basicDashboardInsightExtraLabel(): string | null {
-    return null;
-  }
-
-  get basicDashboardCurrentActionLink(): string {
-    return this.basicDashboardActiveTodo?.route ?? this.basicDashboardNextActionLink;
-  }
-
-  get basicDashboardCurrentActionQueryParams(): Record<string, string> | null {
-    return this.basicDashboardActiveTodo?.queryParams ?? null;
-  }
-
-  get basicDashboardCurrentActionLabel(): string {
-    return this.basicDashboardActiveTodo?.actionLabel ?? this.basicDashboardNextActionLabel;
-  }
-
-  previousBasicDashboardInsight(): void {
-    if (!this.insightTodoItems.length) return;
-    this.basicDashboardInsightIndex =
-      (this.currentBasicDashboardInsightIndex - 1 + this.insightTodoItems.length) % this.insightTodoItems.length;
-  }
-
-  nextBasicDashboardInsight(): void {
-    if (!this.insightTodoItems.length) return;
-    this.basicDashboardInsightIndex =
-      (this.currentBasicDashboardInsightIndex + 1) % this.insightTodoItems.length;
-  }
-
-  private get currentBasicDashboardInsightIndex(): number {
-    if (!this.insightTodoItems.length) return 0;
-    return Math.max(0, Math.min(this.basicDashboardInsightIndex, this.insightTodoItems.length - 1));
-  }
-
-  private resolveBasicDashboardInsightTodoTitle(todo: InsightTodoItem): string {
-    const route = todo.route || '';
-    const focus = todo.queryParams?.['focus'] || '';
-    const text = todo.text.toLowerCase();
-
-    if (todo.id === 'pending-income' || route === '/receitas' || focus === 'pending' || text.includes('receita')) {
-      return 'Receitas pendentes';
-    }
-
-    if (todo.id === 'overdue-expenses' || focus === 'overdue' || text.includes('vencida')) {
-      return 'Despesas vencidas';
-    }
-
-    if (todo.id === 'due-soon-expenses' || focus === 'upcoming' || text.includes('próxima') || text.includes('proxima')) {
-      return 'Despesas próximas do vencimento';
-    }
-
-    if (route === '/cartoes' || text.includes('cartão') || text.includes('cartao')) {
-      return 'Cartões para revisar';
-    }
-
-    return 'Alerta do mês';
-  }
 
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
@@ -1069,6 +884,136 @@ export class HomeComponent implements OnInit {
       color: this.incomeSourceColors[index % this.incomeSourceColors.length]
     }));
     this.incomeSourceChartBackground = buildConicGradient(this.incomeSourceSlices);
+  }
+
+  private updateMonthlyFlow(): void {
+    this.monthlyFlowSeries = buildMonthlyFlowSeries(this.expensesRaw, this.incomesRaw, this.dataAtual, 6);
+  }
+
+  private updateUpcomingDueItems(): void {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const windowEnd = new Date(today);
+    windowEnd.setDate(windowEnd.getDate() + 14);
+
+    const items = this.expensesRaw
+      .filter((expense) => isExpenseOpen(expense.status))
+      .map((expense) => ({ expense, due: parseLocaleDate(expense.vencimento) }))
+      .filter((entry): entry is { expense: StoredExpense; due: Date } => !!entry.due && entry.due <= windowEnd)
+      .sort((a, b) => a.due.getTime() - b.due.getTime())
+      .slice(0, 5)
+      .map(({ expense, due }) => {
+        const overdue = due < today;
+        const daysUntil = Math.round((due.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+        return {
+          id: expense.id,
+          title: expense.nome || 'Despesa',
+          dueLabel: overdue ? `Venceu em ${expense.vencimento}` : `Vence em ${expense.vencimento}`,
+          amount: expense.valor || 0,
+          tone: overdue ? 'danger' : daysUntil <= 7 ? 'warning' : 'info',
+          statusLabel: overdue ? 'Em atraso' : daysUntil <= 1 ? 'Urgente' : 'A vencer'
+        } as UpcomingDueItem;
+      });
+
+    this.upcomingDueItems = items;
+  }
+
+  /**
+   * Deriva os dados da Visão Geral Financeira que dependem das listas cruas:
+   * totais do período anterior (comparativos) e compromissos em aberto.
+   * Comparativo fica `null` quando não há lançamentos no período anterior.
+   */
+  private updateOverviewDerived(): void {
+    const prevRange = this.getPreviousPeriodRange();
+    const hasPrevExpenses = this.expensesRaw.some((d) => this.isDateInRange(d.vencimento, prevRange));
+    const hasPrevIncomes = this.incomesRaw.some((r) => this.isDateInRange(r.recebimento, prevRange));
+    this.despesasPeriodoAnterior = hasPrevExpenses ? this.somarDespesasMes(this.expensesRaw, prevRange) : null;
+    this.receitasPeriodoAnterior = hasPrevIncomes ? this.somarRendasMes(this.incomesRaw, prevRange) : null;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const seteDias = new Date(today);
+    seteDias.setDate(seteDias.getDate() + 7);
+
+    let emAtraso = 0;
+    let proximosSeteDias = 0;
+    let valorEmAberto = 0;
+    for (const expense of this.expensesRaw) {
+      if (!isExpenseOpen(expense.status)) continue;
+      const due = parseLocaleDate(expense.vencimento);
+      if (!due || due > seteDias) continue;
+      if (due < today) {
+        emAtraso += 1;
+      } else {
+        proximosSeteDias += 1;
+      }
+      valorEmAberto += expense.valor || 0;
+    }
+    this.compromissosResumo = { emAtraso, proximosSeteDias, valorEmAberto };
+  }
+
+  private getPreviousPeriodRange(): { startKey: string; endKey: string } {
+    const monthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    if (this.periodo === 'year') {
+      const ano = this.dataAtual.getFullYear() - 1;
+      return { startKey: `${ano}-01`, endKey: `${ano}-12` };
+    }
+    if (this.periodo === 'quarter') {
+      const quarterStartMonth = Math.floor(this.dataAtual.getMonth() / 3) * 3;
+      const start = new Date(this.dataAtual.getFullYear(), quarterStartMonth - 3, 1);
+      const end = new Date(this.dataAtual.getFullYear(), quarterStartMonth - 1, 1);
+      return { startKey: monthKey(start), endKey: monthKey(end) };
+    }
+    const prev = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
+    return { startKey: monthKey(prev), endKey: monthKey(prev) };
+  }
+
+  get overviewData(): FinancialOverviewInput {
+    return {
+      saldoPeriodo: this.saldo,
+      saldoDisponivel: this.saldoDisponivelReal,
+      saldoEmContas: this.totalSaldoContas,
+      pendencias: this.pendenciasCaixa,
+      saldoProjetado: this.saldoDisponivelProjetado,
+      receitas: {
+        total: this.totalRendas,
+        pendentes: this.totalRendasPendentes,
+        anterior: this.receitasPeriodoAnterior
+      },
+      despesas: { total: this.totalDespesas, anterior: this.despesasPeriodoAnterior },
+      patrimonio: {
+        liquido: this.patrimonioLiquido,
+        ativos: this.patrimonioTotalAtivos,
+        passivos: this.patrimonioPassivos,
+        investimentos: this.patrimonioEmInvestimentos,
+        delta: this.patrimonioHistoryPoints.length > 1 ? this.patrimonioHistoryDelta : null
+      },
+      compromissos: {
+        ...this.compromissosResumo,
+        dividaCartoes: this.totalDividaCartoes,
+        temCartoes: this.hasCardEntries
+      },
+      saude: this.aiHealth ? { status: this.aiHealth.overallStatus, resumo: this.aiHealth.overallSummary } : null
+    };
+  }
+
+  get insightObservations(): string[] {
+    const observations = [...this.insightHighlights, ...this.insightChangesToday];
+    return observations.slice(0, 6);
+  }
+
+  registerLoadError(section: string): void {
+    this.loadErrorSections.add(section);
+  }
+
+  get loadErrorMessage(): string | null {
+    if (this.loadErrorsDismissed || this.loadErrorSections.size === 0) return null;
+    const sections = Array.from(this.loadErrorSections).join(', ');
+    return `Não foi possível carregar: ${sections}. Verifique sua conexão e recarregue a página.`;
+  }
+
+  dismissLoadErrors(): void {
+    this.loadErrorsDismissed = true;
   }
 
   private updateRecentTransactions(): void {
@@ -1196,6 +1141,7 @@ export class HomeComponent implements OnInit {
     this.loadRecommendations();
     this.updateCategoryCharts();
     this.updateRecentTransactions();
+    this.updateOverviewDerived();
     this.updateInsight();
   }
 
@@ -1216,6 +1162,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.realBalanceSummary = null;
+          this.registerLoadError('saldo disponível');
           this.updateInsight();
         }
       });
@@ -1238,6 +1185,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.debtSummary = null;
+          this.registerLoadError('dívidas');
         }
       });
   }
@@ -1258,6 +1206,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.subscriptionsSummary = null;
+          this.registerLoadError('assinaturas');
         }
       });
   }
@@ -1278,6 +1227,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.aiHealth = null;
+          this.registerLoadError('saúde financeira');
         }
       });
   }
@@ -1324,6 +1274,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.netWorthSummary = null;
+          this.registerLoadError('patrimônio');
         }
       });
   }
@@ -1344,6 +1295,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.netWorthHistory = null;
+          this.registerLoadError('evolução patrimonial');
         }
       });
   }
@@ -1365,6 +1317,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.cashflowProjection = null;
+          this.registerLoadError('projeção de caixa');
           this.updateInsight();
         }
       });
@@ -1387,6 +1340,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.riskAssessment = null;
+          this.registerLoadError('análise de risco');
           this.updateInsight();
         }
       });
@@ -1412,6 +1366,7 @@ export class HomeComponent implements OnInit {
         error: () => {
           this.insightEngine = null;
           this.engineInsightTips = [];
+          this.registerLoadError('insights');
           this.updateInsight();
         }
       });
@@ -1434,6 +1389,7 @@ export class HomeComponent implements OnInit {
         },
         error: () => {
           this.recommendationEngine = null;
+          this.registerLoadError('recomendações');
           this.updateInsight();
         }
       });
