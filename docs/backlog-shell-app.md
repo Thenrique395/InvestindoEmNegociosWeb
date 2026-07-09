@@ -22,10 +22,22 @@ itens forem concluídos ou descartados.
     navegação por teclado, estilo Linear/Raycast) — recomendado o segundo;
   - rota/estado de "resultados da busca" se necessário.
 
+## Decisão de produto — Mobile web (julho/2026)
+
+Haverá um **app nativo** no futuro. Ficou decidido com o usuário:
+
+- **Não investir em mobile web além do responsivo existente.** Nada de PWA, gestos de toque,
+  bottom navigation ou fluxos específicos de celular. As media queries atuais (sidebar drawer,
+  cards em 1 coluna, busca oculta em telas estreitas) são o piso e devem apenas ser mantidas —
+  elas também atendem janelas redimensionadas e split-screen no desktop.
+- **Exceção acordada:** uma passada de *priorização* no dashboard para acesso via browser mobile
+  (ver item na seção do Dashboard abaixo). Sem código novo de features — só ordem e carregamento.
+- Sessões futuras **não** devem "melhorar o mobile" por iniciativa própria.
+
 ## Melhorias de UX identificadas (não implementadas)
 
-- [ ] **Busca no mobile** — abaixo de 720px a busca some por completo. Quando a busca for
-      funcional, adicionar botão de lupa que abre a busca em overlay.
+- [ ] ~~**Busca no mobile**~~ — descartado pela decisão de mobile web acima; reavaliar somente
+      depois do app nativo.
 - [ ] **Sidebar colapsável no desktop** — modo "só ícones" (72px) com tooltip nos itens, padrão
       em SaaS premium. Exige persistir a preferência (localStorage ou preferências do usuário).
 - [ ] **Notificações mais ricas** — o `NotificationItem` já traz `kind` (vencimentos, metas,
@@ -76,6 +88,10 @@ cobertas por spec. Pendências e próximos passos:
       `buildOverviewCards` sem mudança estrutural.
 - [ ] **Clique no card inteiro** — hoje só o link "Ver detalhes" navega; avaliar tornar o card todo
       clicável (com área de toque generosa) mantendo acessibilidade.
+- [ ] **Priorização mobile do dashboard** (exceção acordada à decisão de mobile web) — quando
+      aberto em browser de celular: (1) reordenar cards via CSS `order` para Saldo e Compromissos
+      primeiro; (2) adiar seções pesadas (evolução patrimonial, mapa de dívidas, gráficos) com
+      `@defer (on viewport)`. Só CSS + defer, sem features novas nem layout paralelo.
 - [ ] **Animação de entrada dos cards** — stagger sutil no primeiro load (respeitando
       `prefers-reduced-motion`).
 
