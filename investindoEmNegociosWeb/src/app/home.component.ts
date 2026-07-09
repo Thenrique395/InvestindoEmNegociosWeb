@@ -34,6 +34,7 @@ import { StatusBadgeComponent } from './shared/status-badge/status-badge.compone
 import { TooltipComponent } from './shared/tooltip/tooltip.component';
 import { AiFinancialHealthResponse, AiHealthStatus, FinancialAssistantService } from './financial-assistant.service';
 import { MonthlyFlowChartComponent } from './dashboard/monthly-flow-chart.component';
+import { MonthResultCardComponent } from './dashboard/month-result-card.component';
 import { UpcomingDueListComponent, UpcomingDueItem } from './dashboard/upcoming-due-list.component';
 import { InsightActionsComponent } from './dashboard/insight-actions.component';
 import { UpgradeCtaComponent } from './dashboard/upgrade-cta.component';
@@ -74,6 +75,7 @@ type InsightTodoItem = {
     StatusBadgeComponent,
     TooltipComponent,
     MonthlyFlowChartComponent,
+    MonthResultCardComponent,
     UpcomingDueListComponent,
     InsightActionsComponent,
     UpgradeCtaComponent,

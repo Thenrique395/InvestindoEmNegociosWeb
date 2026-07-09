@@ -5,6 +5,11 @@
 .flow-card {
   display: grid;
   gap: var(--spacing-2);
+  padding: 1.1rem 1.15rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-elevation-sm);
 }
 
 .flow-card__head {
@@ -16,15 +21,17 @@
 
 .flow-card__title {
   margin: 0;
-  font-size: var(--text-sm);
-  font-weight: 600;
   color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
 }
 
 .flow-card__subtitle {
-  margin: 2px 0 0;
-  font-size: var(--text-xs);
+  margin: 0.2rem 0 0;
   color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-control);
 }
 
 .flow-chart {
@@ -39,87 +46,97 @@
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
 .flow-chart__bars {
   display: flex;
   align-items: flex-end;
-  gap: 5px;
-  height: 120px;
+  gap: 4px;
   width: 100%;
-  max-width: 60px;
-  border-bottom: 1px solid var(--border-strong);
+  max-width: 56px;
+  height: 130px;
   padding-bottom: 1px;
+  border-bottom: 1px solid var(--border);
 }
 
 .flow-chart__bar {
   flex: 1 1 0;
   min-width: 8px;
-  border-radius: 6px 6px 2px 2px;
-  transition: opacity 0.15s ease;
+  border-radius: var(--radius-sm) var(--radius-sm) 2px 2px;
+  transition: opacity 160ms ease;
 }
 
 .flow-chart__bar--income {
-  background: linear-gradient(180deg, var(--color-chart-income, var(--success)), var(--color-success-soft));
+  background: var(--color-chart-income, var(--success));
 }
 
 .flow-chart__bar--expense {
-  background: linear-gradient(180deg, var(--color-chart-expense, var(--danger)), var(--color-danger-soft));
+  background: var(--color-chart-expense, var(--danger));
+  opacity: 0.75;
 }
 
-.flow-chart__month:hover .flow-chart__bar {
+.flow-chart__month:hover .flow-chart__bar--income,
+.flow-chart__month:focus-within .flow-chart__bar--income {
   opacity: 0.85;
 }
 
+.flow-chart__month:hover .flow-chart__bar--expense,
+.flow-chart__month:focus-within .flow-chart__bar--expense {
+  opacity: 0.6;
+}
+
 .flow-chart__label {
-  font-size: var(--text-xs);
   color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-tight);
   text-transform: capitalize;
 }
 
 .flow-chart__balance {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
   max-width: 100%;
   overflow: hidden;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
-  padding: 1px 8px;
 }
 
 .flow-chart__balance--positive {
+  background: var(--color-success-weak);
   color: var(--success-text);
 }
 
 .flow-chart__balance--negative {
+  background: var(--color-danger-weak);
   color: var(--danger-text);
 }
 
 .flow-chart__tip {
   position: absolute;
-  left: 50%;
   bottom: calc(100% + 8px);
-  transform: translateX(-50%) translateY(4px);
+  left: 50%;
+  z-index: 4;
   min-width: 170px;
+  padding: 0.55rem 0.7rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--surface);
-  color: var(--text);
   box-shadow: var(--shadow-md);
-  padding: 0.45rem 0.55rem;
-  text-align: left;
-  font-size: var(--text-xs);
+  color: var(--text);
+  font-size: var(--font-size-caption);
   line-height: 1.5;
+  text-align: left;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  z-index: 4;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .flow-chart__month:hover .flow-chart__tip,
@@ -131,21 +148,22 @@
 .flow-chart__legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-2);
+  gap: 0.35rem var(--spacing-2);
 }
 
 .flow-chart__legend-item {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: var(--text-xs);
   color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-tight);
 }
 
 .flow-chart__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
 }
 
 .flow-chart__dot--income {
@@ -154,6 +172,7 @@
 
 .flow-chart__dot--expense {
   background: var(--color-chart-expense, var(--danger));
+  opacity: 0.75;
 }
 
 .flow-card__empty {
@@ -169,44 +188,47 @@
 
 .flow-card__empty-title {
   margin: 0;
-  font-size: var(--text-sm);
-  font-weight: 600;
   color: var(--text);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
 }
 
 .flow-card__empty-text {
-  margin: 0;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
   max-width: 320px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
 }
 
 .flow-card__empty-cta {
-  margin-top: 4px;
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
+  margin-top: 4px;
   padding: 6px 14px;
-  font-size: var(--text-xs);
-  font-weight: 600;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
   color: var(--text);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
-  transition: background-color 0.15s ease;
+  transition: background-color 160ms ease;
 }
 
 .flow-card__empty-cta:hover {
   background: var(--surface-3);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .flow-chart__bar,
+  .flow-chart__tip {
+    transition: none;
+  }
+}
+
 @media (max-width: 640px) {
   .flow-chart__bars {
-    height: 90px;
     max-width: 44px;
-  }
-
-  .flow-chart__balance {
-    font-size: 0.6875rem;
+    height: 100px;
   }
 }
