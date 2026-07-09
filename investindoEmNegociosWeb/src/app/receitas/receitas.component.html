@@ -1,7 +1,7 @@
-<div class="receitas-page">
+<div class="tx-page">
   @if (hasAccess('Basic')) {
-    <section class="receitas-summary-grid">
-      <app-stat-card
+    <section class="tx-summary-grid">
+      <app-transaction-summary-card
         tone="success"
         eyebrow="Recebidas"
         [value]="statusResumo.pagosValor | appCurrency"
@@ -12,9 +12,9 @@
           <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <span stat-note class="text-[var(--color-text-muted)] text-[length:var(--font-size-label)] font-semibold"> · {{ statusResumo.pagos }} lançamento(s)</span>
-      </app-stat-card>
+      </app-transaction-summary-card>
 
-      <app-stat-card
+      <app-transaction-summary-card
         tone="warning"
         eyebrow="Pendentes"
         [value]="statusResumo.pendentesValor | appCurrency"
@@ -26,9 +26,9 @@
           <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
         </svg>
         <span stat-note class="text-[var(--color-text-muted)] text-[length:var(--font-size-label)] font-semibold"> · {{ statusResumo.pendentes }} lançamento(s)</span>
-      </app-stat-card>
+      </app-transaction-summary-card>
 
-      <app-stat-card
+      <app-transaction-summary-card
         tone="info"
         eyebrow="Comparativo"
         [value]="previousComparison.isNew
@@ -56,11 +56,11 @@
           }
           · {{ previousComparison.monthLabel }}
         </span>
-      </app-stat-card>
+      </app-transaction-summary-card>
     </section>
   }
 
-  <section class="receitas-shell">
+  <section class="tx-shell">
     <app-period-hero
       eyebrow="Receitas do período"
       title="Receitas de {{ mesAtualLabel }}"
@@ -114,53 +114,30 @@
     </app-period-hero>
 
     @if (selecionados.length) {
-      <div class="receitas-bulk">
-        <div class="receitas-bulk__meta">
-          <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosRecebiveis.length }} recebível(is)</span>
-          @if (canChooseAccount) {
-            <label class="receitas-bulk__account">
-              <span>Conta de entrada</span>
-              <select [(ngModel)]="contaBaixaId">
-                @for (conta of contas; track trackByIndex($index, conta)) {
-                  <option [ngValue]="conta.id">
-                    {{ conta.name }}
-                  </option>
-                }
-              </select>
-            </label>
-          }
-        </div>
-        <button
-          type="button"
-          class="receitas-bulk__button"
-          [disabled]="loadingRecebido"
-          (click)="marcarRecebidasSelecionadas()">
-          @if (loadingRecebido) {
-            <span>Processando...</span>
-          }
-          @if (!loadingRecebido) {
-            <span>Marcar como recebida</span>
-          }
-        </button>
-      </div>
+      <app-bulk-action-bar
+        [summary]="selecionados.length + ' selecionada(s) · ' + selecionadosRecebiveis.length + ' recebível(is)'"
+        [accountLabel]="canChooseAccount ? 'Conta de entrada' : ''"
+        [accounts]="contas"
+        [(account)]="contaBaixaId"
+        [actions]="bulkActions" />
     }
 
     <app-filter-bar>
-      <div filter-left class="receitas-filters">
-        <label class="receitas-filter receitas-filter--search">
-          <span class="receitas-filter__label">Busca por fonte</span>
+      <div filter-left class="tx-filters">
+        <label class="tx-filter tx-filter--search">
+          <span class="tx-filter__label">Busca por fonte</span>
           <input type="text" [(ngModel)]="filtroTexto" placeholder="Ex.: Salário" />
         </label>
-        <label class="receitas-filter">
-          <span class="receitas-filter__label">Tipo</span>
+        <label class="tx-filter">
+          <span class="tx-filter__label">Tipo</span>
           <select [(ngModel)]="filtroTipo">
             <option value="all">Todos</option>
             <option value="recurring">Recorrente</option>
             <option value="oneTime">Avulsa</option>
           </select>
         </label>
-        <label class="receitas-filter">
-          <span class="receitas-filter__label">Status</span>
+        <label class="tx-filter">
+          <span class="tx-filter__label">Status</span>
           <select [(ngModel)]="filtroStatus">
             <option value="all">Todos</option>
             <option value="paid">Recebida</option>
@@ -170,7 +147,7 @@
       </div>
     </app-filter-bar>
 
-    <div class="receitas-list-wrap">
+    <div class="tx-list-wrap">
       <app-receitas-lista
         [rendas]="rendas"
         [loading]="loadingMes"
@@ -219,87 +196,43 @@
   </section>
 </div>
 
-@if (showEditReceivedModal) {
-  <div class="receitas-edit-received">
-    <div class="receitas-edit-received__backdrop" (click)="cancelarEdicaoRecebida()"></div>
-    <div class="receitas-edit-received__dialog">
-      <div class="receitas-edit-received__head">
-        <div class="receitas-edit-received__copy">
-          <p class="receitas-edit-received__eyebrow">Editar receita recebida</p>
-          <p class="receitas-edit-received__text">
-            Ao editar esta receita <strong>{{ editReceivedSource }}</strong>, o status voltará para
-            <strong>Pendente</strong> para que o ajuste seja feito.
-          </p>
-        </div>
-        <button
-          class="receitas-edit-received__close"
-          type="button"
-          (click)="cancelarEdicaoRecebida()"
-          aria-label="Fechar modal">
-          <svg viewBox="0 0 24 24" focusable="false" role="presentation" width="18" height="18">
-            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-        </button>
-      </div>
-      <div class="receitas-edit-received__actions">
-        <button type="button" class="receitas-edit-received__secondary" (click)="cancelarEdicaoRecebida()">
-          Não aceito
-        </button>
-        <button type="button" class="receitas-edit-received__primary" (click)="confirmarEdicaoRecebida()">
-          Aceitar e editar
-        </button>
-      </div>
-    </div>
-  </div>
-}
+<app-confirm-sheet
+  [open]="showEditReceivedModal"
+  eyebrow="Editar receita recebida"
+  (dismiss)="cancelarEdicaoRecebida()">
+  <p>
+    Ao editar esta receita <strong>{{ editReceivedSource }}</strong>, o status voltará para
+    <strong>Pendente</strong> para que o ajuste seja feito.
+  </p>
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost sm" (click)="cancelarEdicaoRecebida()">Não aceito</button>
+    <button type="button" class="btn-primary sm" (click)="confirmarEdicaoRecebida()">Aceitar e editar</button>
+  </ng-container>
+</app-confirm-sheet>
 
-@if (showDeleteModal) {
-  <div class="receitas-edit-received">
-    <div class="receitas-edit-received__backdrop" (click)="fecharModalExcluir()"></div>
-    <div class="receitas-edit-received__dialog">
-      <div class="receitas-edit-received__head">
-        <div class="receitas-edit-received__copy">
-          <p class="receitas-edit-received__eyebrow">Excluir receita</p>
-          <h3 class="receitas-edit-received__title">Confirmar remoção</h3>
-          @if (deleteIsRecurring) {
-            <p class="receitas-edit-received__text">
-              A receita <strong>{{ deleteFonte }}</strong> é recorrente. Deseja excluir apenas este mês ou encerrar a
-              recorrência?
-            </p>
-          } @else {
-            <p class="receitas-edit-received__text">
-              Tem certeza que deseja excluir a receita <strong>{{ deleteFonte }}</strong>? Essa ação não pode ser
-              desfeita.
-            </p>
-          }
-        </div>
-        <button
-          class="receitas-edit-received__close"
-          type="button"
-          (click)="fecharModalExcluir()"
-          aria-label="Fechar modal">
-          <svg viewBox="0 0 24 24" focusable="false" role="presentation" width="18" height="18">
-            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-        </button>
-      </div>
-      <div class="receitas-edit-received__actions">
-        @if (deleteIsRecurring) {
-          <button type="button" class="receitas-edit-received__secondary" (click)="confirmarExcluirSomenteEsta()">
-            Somente este mês
-          </button>
-          <button type="button" class="receitas-edit-received__danger" (click)="confirmarExcluirRecorrencia()">
-            Encerrar recorrência
-          </button>
-        } @else {
-          <button type="button" class="receitas-edit-received__secondary" (click)="fecharModalExcluir()">
-            Cancelar
-          </button>
-          <button type="button" class="receitas-edit-received__danger" (click)="confirmarExcluirSomenteEsta()">
-            Excluir receita
-          </button>
-        }
-      </div>
-    </div>
-  </div>
-}
+<app-confirm-sheet
+  [open]="showDeleteModal"
+  eyebrow="Excluir receita"
+  title="Confirmar remoção"
+  (dismiss)="fecharModalExcluir()">
+  @if (deleteIsRecurring) {
+    <p>
+      A receita <strong>{{ deleteFonte }}</strong> é recorrente. Deseja excluir apenas este mês ou encerrar a
+      recorrência?
+    </p>
+  } @else {
+    <p>
+      Tem certeza que deseja excluir a receita <strong>{{ deleteFonte }}</strong>? Essa ação não pode ser
+      desfeita.
+    </p>
+  }
+  <ng-container sheet-actions>
+    @if (deleteIsRecurring) {
+      <button type="button" class="btn-ghost sm" (click)="confirmarExcluirSomenteEsta()">Somente este mês</button>
+      <button type="button" class="btn-danger sm" (click)="confirmarExcluirRecorrencia()">Encerrar recorrência</button>
+    } @else {
+      <button type="button" class="btn-ghost sm" (click)="fecharModalExcluir()">Cancelar</button>
+      <button type="button" class="btn-danger sm" (click)="confirmarExcluirSomenteEsta()">Excluir receita</button>
+    }
+  </ng-container>
+</app-confirm-sheet>

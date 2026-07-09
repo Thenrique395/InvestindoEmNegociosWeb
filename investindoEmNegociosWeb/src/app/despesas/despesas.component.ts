@@ -20,12 +20,14 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { UiPermissionsService } from '../ui-permissions.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import {
   formatLocaleDate,
   formatMonthLabelFromKey,
@@ -49,9 +51,11 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     DespesasFormComponent,
     InvoiceImportComponent,
     TooltipComponent,
-    StatCardComponent,
+    TransactionSummaryCardComponent,
     StatusBadgeComponent,
     FilterBarComponent,
+    ConfirmSheetComponent,
+    BulkActionBarComponent,
     ComparisonPillComponent,
     PeriodTotalCardComponent,
     PeriodHeroComponent,
@@ -278,6 +282,29 @@ export class DespesasComponent implements OnInit {
   get selecionadosPagaveis(): StoredExpense[] {
     const selecionados = new Set(this.selecionados);
     return this.despesas.filter((d) => selecionados.has(d.id) && d.status !== 'PAID' && d.status !== 'CANCELED');
+  }
+
+  get bulkActions(): BulkAction[] {
+    const actions: BulkAction[] = [
+      {
+        label: 'Marcar como pago',
+        loadingLabel: 'Processando...',
+        loading: this.loadingPagar,
+        tone: 'primary',
+        run: () => this.pagarSelecionadas()
+      }
+    ];
+    if (this.canAnticipateExpenses) {
+      actions.push({
+        label: 'Solicitar antecipação',
+        loadingLabel: 'Antecipando...',
+        loading: this.loadingAntecipar,
+        tone: 'ghost',
+        run: () => this.anteciparSelecionadas()
+      });
+    }
+    actions.push({ label: 'Excluir', tone: 'danger', run: () => this.excluirSelecionadas() });
+    return actions;
   }
 
   get selecionadosAntecipaveis(): StoredExpense[] {

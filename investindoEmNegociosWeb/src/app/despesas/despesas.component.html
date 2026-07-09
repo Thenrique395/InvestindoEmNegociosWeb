@@ -1,6 +1,6 @@
-<div class="expenses-page">
-  <section class="expenses-summary-grid">
-    <app-stat-card
+<div class="tx-page">
+  <section class="tx-summary-grid">
+    <app-transaction-summary-card
       tone="warning"
       eyebrow="Pendentes"
       [value]="totalPendentes | appCurrency"
@@ -11,9 +11,9 @@
         <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
 
-    <app-stat-card
+    <app-transaction-summary-card
       tone="info"
       eyebrow="Antecipadas"
       [value]="totalAntecipadas | appCurrency"
@@ -23,9 +23,9 @@
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
 
-    <app-stat-card
+    <app-transaction-summary-card
       tone="success"
       eyebrow="Pagas"
       [value]="totalPagas | appCurrency"
@@ -35,10 +35,10 @@
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
   </section>
 
-  <section class="expenses-shell">
+  <section class="tx-shell">
     <app-period-hero
       eyebrow="Despesas do período"
       title="Despesas de {{ mesAtualLabel | titlecase }}"
@@ -94,63 +94,18 @@
     </app-period-hero>
 
     @if (selecionados.length) {
-      <div class="expenses-bulk">
-        <div class="expenses-bulk__meta">
-          <span>{{ selecionados.length }} selecionada(s) · {{ selecionadosPagaveis.length }} pagável(is)</span>
-          @if (canChooseAccount) {
-            <label class="expenses-bulk__account">
-              <span>Conta de baixa</span>
-              <select [(ngModel)]="contaBaixaId">
-                @for (conta of contas; track trackByIndex($index, conta)) {
-                  <option [ngValue]="conta.id">
-                    {{ conta.name }}
-                  </option>
-                }
-              </select>
-            </label>
-          }
-        </div>
-        <div class="expenses-bulk__actions">
-          <button
-            type="button"
-            class="expenses-bulk__button expenses-bulk__button--primary"
-            [disabled]="loadingPagar"
-            (click)="pagarSelecionadas()">
-            @if (loadingPagar) {
-              <span>Processando...</span>
-            }
-            @if (!loadingPagar) {
-              <span>Marcar como pago</span>
-            }
-          </button>
-          @if (canAnticipateExpenses) {
-            <button
-              type="button"
-              class="expenses-bulk__button expenses-bulk__button--ghost"
-              [disabled]="loadingAntecipar"
-              (click)="anteciparSelecionadas()">
-              @if (loadingAntecipar) {
-                <span>Antecipando...</span>
-              }
-              @if (!loadingAntecipar) {
-                <span>Solicitar antecipação</span>
-              }
-            </button>
-          }
-          <button
-            type="button"
-            class="expenses-bulk__button expenses-bulk__button--danger"
-            (click)="excluirSelecionadas()">
-            Excluir
-          </button>
-        </div>
-      </div>
+      <app-bulk-action-bar
+        [summary]="selecionados.length + ' selecionada(s) · ' + selecionadosPagaveis.length + ' pagável(is)'"
+        [accountLabel]="canChooseAccount ? 'Conta de baixa' : ''"
+        [accounts]="contas"
+        [(account)]="contaBaixaId"
+        [actions]="bulkActions" />
     }
 
     <app-filter-bar>
-      <div filter-left class="expenses-filters">
-        <label class="expenses-filter">
-          <span class="expenses-filter__label">Status</span>
+      <div filter-left class="tx-filters">
+        <label class="tx-filter">
+          <span class="tx-filter__label">Status</span>
           <select [(ngModel)]="filtroStatus">
             <option value="ALL">Todos</option>
             <option value="OPEN">{{ statusLabel('OPEN') }}</option>
@@ -160,8 +115,8 @@
             <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
           </select>
         </label>
-        <label class="expenses-filter">
-          <span class="expenses-filter__label">Categoria</span>
+        <label class="tx-filter">
+          <span class="tx-filter__label">Categoria</span>
           <select [(ngModel)]="filtroCategoria">
             <option value="ALL">Todas</option>
             @if (!categorias.length) {
@@ -172,14 +127,14 @@
             }
           </select>
         </label>
-        <label class="expenses-filter expenses-filter--search">
-          <span class="expenses-filter__label">Buscar</span>
+        <label class="tx-filter tx-filter--search">
+          <span class="tx-filter__label">Buscar</span>
           <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
         </label>
       </div>
     </app-filter-bar>
 
-    <div class="expenses-list-wrap">
+    <div class="tx-list-wrap">
       <app-despesas-lista
         [despesas]="despesasFiltradas"
         emptyTitle="Sem despesas no período"
@@ -239,71 +194,47 @@
     (imported)="onImportFaturaConcluida($event)"
   (close)="fecharImportFatura()"></app-invoice-import>
 
-  @if (confirmEdicao) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarEdicao()"></div>
-      <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-        <div class="flex items-start justify-between gap-4">
-          <div class="space-y-1">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Editar despesa</p>
-            <h3 class="text-xl font-semibold text-[var(--text)]">Aplicar alterações</h3>
-          </div>
-          <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarEdicao()">✕</button>
-        </div>
-        @if (confirmEdicao && !confirmEdicao.isRecorrente) {
-          <p class="mt-3 text-sm text-[var(--text-muted)]">
-            Esta despesa está parcelada. Deseja alterar apenas esta parcela ou todas as parcelas da série?
-          </p>
-        }
-        @if (confirmEdicao && confirmEdicao.isRecorrente) {
-          <p class="mt-3 text-sm text-[var(--text-muted)]">
-            Esta despesa é recorrente. Deseja alterar somente este lançamento ou toda a recorrência?
-          </p>
-        }
-        <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
-          <button type="button" class="btn-ghost sm" (click)="confirmarEdicao('single')">
-            {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Somente este mês' : 'Somente esta' }}
-          </button>
-          <button type="button" class="btn-primary sm" (click)="confirmarEdicao('all')">
-            {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Toda a recorrência' : 'Todas as parcelas' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  }
+  <app-confirm-sheet
+    [open]="!!confirmEdicao"
+    eyebrow="Editar despesa"
+    title="Aplicar alterações"
+    (dismiss)="cancelarEdicao()">
+    @if (confirmEdicao && !confirmEdicao.isRecorrente) {
+      <p>Esta despesa está parcelada. Deseja alterar apenas esta parcela ou todas as parcelas da série?</p>
+    }
+    @if (confirmEdicao && confirmEdicao.isRecorrente) {
+      <p>Esta despesa é recorrente. Deseja alterar somente este lançamento ou toda a recorrência?</p>
+    }
+    <ng-container sheet-actions>
+      <button type="button" class="btn-ghost sm" (click)="confirmarEdicao('single')">
+        {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Somente este mês' : 'Somente esta' }}
+      </button>
+      <button type="button" class="btn-primary sm" (click)="confirmarEdicao('all')">
+        {{ confirmEdicao && confirmEdicao.isRecorrente ? 'Toda a recorrência' : 'Todas as parcelas' }}
+      </button>
+    </ng-container>
+  </app-confirm-sheet>
 
-  @if (confirmRemocao) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancelarRemocao()"></div>
-      <div class="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
-        <div class="flex items-start justify-between gap-4">
-          <div class="space-y-1">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Excluir despesa</p>
-            <h3 class="text-xl font-semibold text-[var(--text)]">Confirmar remoção</h3>
-          </div>
-          <button class="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] text-[var(--text-muted)]" type="button" (click)="cancelarRemocao()">✕</button>
-        </div>
-        @if (confirmRemocao && !confirmRemocao.isRecurring) {
-          <p class="mt-3 text-sm text-[var(--text-muted)]">
-            Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?
-          </p>
-        }
-        @if (confirmRemocao && confirmRemocao.isRecurring) {
-          <p class="mt-3 text-sm text-[var(--text-muted)]">
-            Esta despesa é recorrente. Deseja excluir apenas este mês ou encerrar a recorrência?
-          </p>
-        }
-        <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
-          <button type="button" class="btn-ghost sm" (click)="confirmarRemocao(false)">
-            {{ confirmRemocao && confirmRemocao.isRecurring ? 'Somente este mês' : 'Somente esta' }}
-          </button>
-          <button type="button" class="btn-danger sm" (click)="confirmarRemocao(true)">
-            {{ confirmRemocao && confirmRemocao.isRecurring ? 'Encerrar recorrência' : 'Todas as parcelas' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  }
+  <app-confirm-sheet
+    [open]="!!confirmRemocao"
+    eyebrow="Excluir despesa"
+    title="Confirmar remoção"
+    (dismiss)="cancelarRemocao()">
+    @if (confirmRemocao && !confirmRemocao.isRecurring) {
+      <p>Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?</p>
+    }
+    @if (confirmRemocao && confirmRemocao.isRecurring) {
+      <p>Esta despesa é recorrente. Deseja excluir apenas este mês ou encerrar a recorrência?</p>
+    }
+    <ng-container sheet-actions>
+      <button type="button" class="btn-ghost sm" (click)="confirmarRemocao(false)">
+        {{ confirmRemocao && confirmRemocao.isRecurring ? 'Somente este mês' : 'Somente esta' }}
+      </button>
+      <button type="button" class="btn-danger sm" (click)="confirmarRemocao(true)">
+        {{ confirmRemocao && confirmRemocao.isRecurring ? 'Encerrar recorrência' : 'Todas as parcelas' }}
+      </button>
+    </ng-container>
+  </app-confirm-sheet>
 
   @if (historicoAberto) {
     <div class="expenses-history-drawer">

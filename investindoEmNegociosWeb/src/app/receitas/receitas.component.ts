@@ -17,11 +17,13 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { InstallmentsService } from '../installments.service';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -35,7 +37,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, StatCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, AppCurrencyPipe],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, BulkActionBarComponent, AppCurrencyPipe],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -146,6 +148,18 @@ export class ReceitasComponent implements OnInit {
   get selecionadosRecebiveis(): StoredIncome[] {
     const selecionados = new Set(this.selecionados);
     return this.rendas.filter((r) => selecionados.has(r.id) && r.status !== 'PAID' && r.status !== 'CANCELED');
+  }
+
+  get bulkActions(): BulkAction[] {
+    return [
+      {
+        label: 'Marcar como recebida',
+        loadingLabel: 'Processando...',
+        loading: this.loadingRecebido,
+        tone: 'primary',
+        run: () => this.marcarRecebidasSelecionadas()
+      }
+    ];
   }
 
   get rendas(): StoredIncome[] {
