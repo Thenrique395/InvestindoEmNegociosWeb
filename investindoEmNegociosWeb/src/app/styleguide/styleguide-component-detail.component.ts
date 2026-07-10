@@ -26,6 +26,7 @@ import { ResponsiveListCellDirective } from '../shared/responsive-list/responsiv
 import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
 import { AccountResponse } from '../features/accounts/models/account.models';
 import { CartoesListagemComponent } from '../cartoes/cartoes-listagem.component';
+import { buildCardMetrics, CardMetrics } from '../cartoes/card-metrics.model';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
 import { STYLEGUIDE_COMPONENTS, StyleguideEntry } from './styleguide-catalog';
@@ -89,6 +90,8 @@ export class StyleguideComponentDetailComponent implements OnInit {
     { id: '1', bandeira: 'visa', numero: '4242', nome: 'VISA DEMO', banco: 'Nubank', limiteCredito: 5000, diaFechamento: 3, diaVencimento: 10 },
     { id: '2', bandeira: 'mastercard', numero: '5353', nome: 'MASTER DEMO', banco: 'Itaú', limiteCredito: 8000, diaFechamento: 15, diaVencimento: 22 }
   ];
+
+  readonly demoCardMetrics: CardMetrics[] = this.demoCards.map((card) => buildCardMetrics(card, [], new Date()));
 
   readonly demoCardBrands: CardBrandLookup[] = [
     { id: 1, code: 'visa', name: 'Visa' },
@@ -328,7 +331,7 @@ if (!confirmed) return;`,
   (selectAccount)="selecionarConta($event)">
 </app-account-list>`,
     'cartoes-listagem': `<app-cartoes-listagem
-  [cards]="cartoes"
+  [metrics]="cardMetrics"
   [brands]="bandeiras"
   (editar)="editarCartao($event)"
   (remover)="removerCartao($event)"

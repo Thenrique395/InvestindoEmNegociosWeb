@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, effect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { UpperCasePipe, DatePipe } from '@angular/common';
+import { UpperCasePipe, DatePipe, DecimalPipe } from '@angular/common';
 import { ApiDataService, StoredCard, StoredExpense } from '../data/api-data.service';
 import { CartoesListagemComponent } from './cartoes-listagem.component';
 import { CardBrandLookup, InstitutionLookup } from '../lookups.service';
@@ -15,7 +15,7 @@ import { FormState } from '../utils/form-state';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { PeriodTotalCardComponent } from '../shared/period-total-card/period-total-card.component';
 import { UiPermissionsService } from '../ui-permissions.service';
@@ -24,6 +24,16 @@ import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { installmentStatusTone, InstallmentStatusTone } from '../utils/status';
+import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
+import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import {
+  buildCardMetrics,
+  overviewFromMetrics,
+  CardMetrics,
+  CardsOverview,
+  statementStatusFor,
+  StatementStatus
+} from './card-metrics.model';
 
 type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'dueDay';
 
@@ -34,18 +44,21 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     FormsModule,
     UpperCasePipe,
     DatePipe,
+    DecimalPipe,
     CartoesListagemComponent,
     DigitOnlyDirective,
     EmptyStateComponent,
     UiStateComponent,
     AppCurrencyPipe,
-    StatCardComponent,
+    TransactionSummaryCardComponent,
     PeriodHeroComponent,
     PeriodTotalCardComponent,
     ModalComponent,
     FormFieldComponent,
     StatusBadgeComponent,
     FilterBarComponent,
+    UsageBarComponent,
+    ConfirmSheetComponent,
 ],
   templateUrl: './cartoes.component.html',
   styleUrls: ['./cartoes.component.scss'],
@@ -115,6 +128,61 @@ export class CartoesComponent implements OnInit {
 
   get totalOpenStatements(): number {
     return this.statementCycles.reduce((sum, cycle) => sum + (cycle.totalOpen || 0), 0);
+  }
+
+  cartaoParaRemover: string | null = null;
+
+  private metricsCacheCards?: StoredCard[];
+  private metricsCacheExpenses?: StoredExpense[];
+  private metricsCacheValue: CardMetrics[] = [];
+
+  /** Calcula as métricas uma vez por combinação (cards, expenses); reusadas por lista e resumo. */
+  private computeCardMetrics(): CardMetrics[] {
+    if (this.metricsCacheCards === this.cards && this.metricsCacheExpenses === this.expenses) {
+      return this.metricsCacheValue;
+    }
+    this.metricsCacheValue = this.cards.map((card) => buildCardMetrics(card, this.expenses, new Date()));
+    this.metricsCacheCards = this.cards;
+    this.metricsCacheExpenses = this.expenses;
+    return this.metricsCacheValue;
+  }
+
+  get cardMetrics(): CardMetrics[] {
+    return this.computeCardMetrics();
+  }
+
+  get cardsOverview(): CardsOverview {
+    return overviewFromMetrics(this.computeCardMetrics());
+  }
+
+  statementStatus(cycle: CardStatementCycleDto): StatementStatus {
+    return statementStatusFor(cycle, new Date());
+  }
+
+  statementStatusLabel(status: StatementStatus): string {
+    switch (status) {
+      case 'paid':
+        return 'Paga';
+      case 'overdue':
+        return 'Atrasada';
+      case 'closed':
+        return 'Fechada';
+      default:
+        return 'Aberta';
+    }
+  }
+
+  statementStatusTone(status: StatementStatus): 'success' | 'danger' | 'warning' | 'info' {
+    switch (status) {
+      case 'paid':
+        return 'success';
+      case 'overdue':
+        return 'danger';
+      case 'closed':
+        return 'warning';
+      default:
+        return 'info';
+    }
   }
 
   get selectedCardExpenses(): StoredExpense[] {
@@ -309,11 +377,26 @@ export class CartoesComponent implements OnInit {
       this.uiFeedback.error('Não é possível remover este cartão; existem despesas vinculadas a ele.');
       return;
     }
+    this.cartaoParaRemover = id;
+  }
+
+  get cartaoParaRemoverNome(): string {
+    return this.cards.find((c) => c.id === this.cartaoParaRemover)?.nome || 'este cartão';
+  }
+
+  confirmarRemocao(): void {
+    const id = this.cartaoParaRemover;
+    this.cartaoParaRemover = null;
+    if (!id) return;
     this.cardsStore.delete(
       id,
       () => this.setAlerta('Cartão removido com sucesso.', 2500, 'success'),
       () => this.uiFeedback.error('Falha ao remover cartão.')
     );
+  }
+
+  cancelarRemocao(): void {
+    this.cartaoParaRemover = null;
   }
 
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {

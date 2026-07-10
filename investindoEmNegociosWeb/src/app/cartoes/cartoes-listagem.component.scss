@@ -10,7 +10,7 @@
 .cards-list__grid {
   display: grid;
   gap: 0.9rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 340px));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 380px));
   justify-content: start;
 }
 
@@ -20,9 +20,9 @@
   padding: 0.95rem;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), rgba(255, 255, 255, 0.98) 58%);
-  box-shadow: var(--shadow-sm);
-  max-width: 340px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), var(--surface) 58%);
+  box-shadow: var(--shadow-elevation-sm);
+  max-width: 100%;
 }
 
 .cards-list__top {
@@ -49,7 +49,7 @@
   padding: 0.45rem 0.65rem;
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--surface-2);
   color: var(--text);
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-bold);
@@ -67,7 +67,7 @@
   padding: 0.45rem 0.8rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 84%, white);
+  background: var(--surface-2);
   color: var(--text-secondary);
   font-size: 0.73rem;
   font-weight: var(--font-weight-bold);
@@ -128,13 +128,24 @@
   color: var(--text-muted);
 }
 
+.cards-list__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .cards-list__title {
   margin: 0;
+  min-width: 0;
+  overflow: hidden;
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-display);
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-title);
   color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cards-list__masked-inline {
@@ -162,24 +173,19 @@
   }
 }
 
-.cards-list__summary {
+.cards-list__usage {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cards-list__usage-head {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-.cards-list__summary-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.32rem;
-  min-height: 2.15rem;
-  padding: 0.52rem 0.72rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 82%, white);
-}
-
-.cards-list__summary-label {
+.cards-list__usage-label {
   font-size: 0.64rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-eyebrow);
@@ -187,17 +193,64 @@
   color: var(--text-muted);
 }
 
-.cards-list__summary-value {
+.cards-list__usage-percent {
   font-size: var(--font-size-label);
-  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+  color: var(--success-text);
+}
+
+.cards-list__usage-percent[data-tone='warning'] { color: var(--warning-text); }
+.cards-list__usage-percent[data-tone='critical'] { color: var(--danger-text); }
+
+.cards-list__usage-values {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+  font-size: var(--font-size-caption);
+  color: var(--text-muted);
+}
+
+.cards-list__usage-values strong {
   color: var(--text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cards-list__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+}
+
+.cards-list__meta-item {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.cards-list__meta-label {
+  font-size: 0.62rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cards-list__meta-value {
+  overflow: hidden;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cards-list__card--visa {
   background:
     radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 38%),
-    linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), rgba(255, 255, 255, 0.98) 60%);
+    linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), var(--surface) 60%);
 
   .cards-list__brand {
     border-color: color-mix(in srgb, var(--primary) 18%, transparent);
@@ -210,7 +263,7 @@
   background:
     radial-gradient(circle at top left, rgba(251, 191, 36, 0.16), transparent 34%),
     radial-gradient(circle at top right, rgba(244, 63, 94, 0.1), transparent 28%),
-    linear-gradient(135deg, rgba(148, 163, 184, 0.04), rgba(255, 255, 255, 0.98) 62%);
+    linear-gradient(135deg, rgba(148, 163, 184, 0.04), var(--surface) 62%);
 
   .cards-list__brand {
     min-inline-size: 5rem;
@@ -224,7 +277,7 @@
 .cards-list__card--elo {
   background:
     radial-gradient(circle at top left, color-mix(in srgb, var(--success) 12%, transparent), transparent 38%),
-    linear-gradient(135deg, rgba(2, 132, 199, 0.04), rgba(255, 255, 255, 0.98) 60%);
+    linear-gradient(135deg, rgba(2, 132, 199, 0.04), var(--surface) 60%);
 
   .cards-list__brand {
     border-color: rgba(15, 23, 42, 0.12);
@@ -236,7 +289,7 @@
 .cards-list__card--amex {
   background:
     radial-gradient(circle at top left, color-mix(in srgb, var(--info) 16%, transparent), transparent 36%),
-    linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(255, 255, 255, 0.98) 60%);
+    linear-gradient(135deg, rgba(6, 182, 212, 0.05), var(--surface) 60%);
 
   .cards-list__brand {
     border-color: rgba(8, 145, 178, 0.18);
@@ -247,7 +300,7 @@
 
 .cards-list__card--default {
   .cards-list__brand {
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--surface-2);
   }
 }
 
@@ -257,9 +310,9 @@
   justify-items: center;
   text-align: center;
   padding: 2rem;
-  border-radius: var(--radius-2xl);
-  border: 1px dashed color-mix(in srgb, var(--border-strong) 60%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 82%, white);
+  border-radius: var(--radius-xl);
+  border: 1px dashed var(--border-strong);
+  background: var(--surface-2);
 }
 
 .cards-list__empty-icon {
@@ -269,8 +322,8 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-xl);
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
-  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-primary-soft);
+  background: var(--color-primary-weak);
   color: var(--primary-text);
 
   svg {

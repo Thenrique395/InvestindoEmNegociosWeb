@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 
 
-type StatusBadgeTone = 'default' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
+export type StatusBadgeTone = 'default' | 'success' | 'danger' | 'warning' | 'info' | 'muted';
 type StatusBadgeSize = 'sm' | 'md';
 
 @Component({

@@ -1,18 +1,21 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, DecimalPipe } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { StatusBadgeComponent, StatusBadgeTone } from '../shared/status-badge/status-badge.component';
+import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
+import { CardMetrics, CardStatus } from './card-metrics.model';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgClass, AppCurrencyPipe],
+  imports: [NgClass, DecimalPipe, AppCurrencyPipe, StatusBadgeComponent, UsageBarComponent],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })
 export class CartoesListagemComponent {
-  @Input() cards: StoredCard[] = [];
+  @Input() metrics: CardMetrics[] = [];
   @Input() brands: CardBrandLookup[] = [];
   @Input() emptyTitle = 'Sem cartões cadastrados';
   @Input() emptyDescription = 'Adicione seu primeiro cartão para acompanhar limites e vencimentos.';
@@ -72,10 +75,38 @@ export class CartoesListagemComponent {
     return (code || '').toLowerCase() === 'mastercard';
   }
 
-  finalCartao(numero?: string): string {
-    if (!numero) return '••••';
-    const digits = numero.replace(/\D/g, '');
-    return digits.slice(-4).padStart(4, '•');
+  statusLabel(status: CardStatus): string {
+    switch (status) {
+      case 'overdue':
+        return 'Fatura atrasada';
+      case 'due-soon':
+        return 'Vence em breve';
+      case 'on-track':
+        return 'Em dia';
+      default:
+        return 'Sem fatura';
+    }
+  }
+
+  statusTone(status: CardStatus): StatusBadgeTone {
+    switch (status) {
+      case 'overdue':
+        return 'danger';
+      case 'due-soon':
+        return 'warning';
+      case 'on-track':
+        return 'success';
+      default:
+        return 'muted';
+    }
+  }
+
+  dueLabel(m: CardMetrics): string {
+    if (m.daysUntilDue === null) return 'Sem fatura em aberto';
+    if (m.overdueCount > 0) return 'Fatura vencida';
+    if (m.daysUntilDue === 0) return 'Vence hoje';
+    if (m.daysUntilDue === 1) return 'Vence amanhã';
+    return `Vence em ${m.daysUntilDue} dias`;
   }
 
   onEditar(card: StoredCard): void {
@@ -86,7 +117,7 @@ export class CartoesListagemComponent {
     this.remover.emit(id);
   }
 
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
+  trackByCard(_index: number, m: CardMetrics): string {
+    return m.card.id;
   }
 }

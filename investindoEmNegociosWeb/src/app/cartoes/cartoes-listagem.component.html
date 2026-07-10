@@ -1,13 +1,13 @@
 <div class="cards-list">
-  @if (cards.length) {
+  @if (metrics.length) {
     <div class="cards-list__grid">
-      @for (c of cards; track trackByIndex($index, c)) {
-        <article class="cards-list__card" [ngClass]="cardToneClass(c)">
+      @for (m of metrics; track trackByCard($index, m)) {
+        <article class="cards-list__card" [ngClass]="cardToneClass(m.card)">
           <div class="cards-list__top">
             <div class="cards-list__identity">
-              <div class="cards-list__brand" [ngClass]="'cards-list__brand--' + brandCode(c)" aria-hidden="true">
-                @if (!isMastercard(brandCode(c))) {
-                  {{ brandName(c) }}
+              <div class="cards-list__brand" [ngClass]="'cards-list__brand--' + brandCode(m.card)" aria-hidden="true">
+                @if (!isMastercard(brandCode(m.card))) {
+                  {{ brandName(m.card) }}
                 } @else {
                   <span class="cards-list__mastercard">
                     <span></span>
@@ -16,35 +16,59 @@
                   <span class="cards-list__mastercard-label">mastercard</span>
                 }
               </div>
-              <span class="cards-list__bank-tag">{{ c.banco || 'Banco não informado' }}</span>
+              <span class="cards-list__bank-tag">{{ m.card.banco || 'Banco não informado' }}</span>
             </div>
             <div class="cards-list__actions">
-              <button type="button" class="cards-list__action" (click)="onEditar(c)" aria-label="Editar cartão" title="Editar cartão">
+              <button type="button" class="cards-list__action" (click)="onEditar(m.card)" aria-label="Editar cartão" title="Editar cartão">
                 <svg viewBox="0 0 24 24" role="presentation" focusable="false">
                   <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                   <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
-              <button type="button" class="cards-list__action cards-list__action--danger" (click)="onRemover(c.id)" aria-label="Remover cartão" title="Remover cartão">
+              <button type="button" class="cards-list__action cards-list__action--danger" (click)="onRemover(m.card.id)" aria-label="Remover cartão" title="Remover cartão">
                 <svg viewBox="0 0 24 24" role="presentation" focusable="false">
                   <path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M8 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
             </div>
           </div>
+
           <div class="cards-list__copy">
-            <p class="cards-list__eyebrow">Cartão ativo</p>
-            <h3 class="cards-list__title">{{ c.nome }}</h3>
-            <p class="cards-list__masked-inline">{{ numeroProtegido(c.numero) }}</p>
-          </div>
-          <div class="cards-list__summary">
-            <div class="cards-list__summary-chip">
-              <span class="cards-list__summary-label">Limite</span>
-              <strong class="cards-list__summary-value">{{ c.limiteCredito | appCurrency }}</strong>
+            <div class="cards-list__title-row">
+              <h3 class="cards-list__title">{{ m.card.nome }}</h3>
+              <app-status-badge [tone]="statusTone(m.status)" [label]="statusLabel(m.status)" size="sm" />
             </div>
-            <div class="cards-list__summary-chip">
-              <span class="cards-list__summary-label">Ciclo</span>
-              <strong class="cards-list__summary-value">Fecha {{ c.diaFechamento }} · Vence {{ c.diaVencimento }}</strong>
+            <p class="cards-list__masked-inline">{{ numeroProtegido(m.card.numero) }}</p>
+          </div>
+
+          <div class="cards-list__usage">
+            <div class="cards-list__usage-head">
+              <span class="cards-list__usage-label">Limite utilizado</span>
+              <strong class="cards-list__usage-percent" [attr.data-tone]="m.usageTone">{{ m.usagePercent | number: '1.0-0' }}%</strong>
+            </div>
+            <app-usage-bar [percent]="m.usagePercent" [tone]="m.usageTone" [label]="'Limite utilizado: ' + (m.usagePercent | number: '1.0-0') + '%'" />
+            <div class="cards-list__usage-values">
+              <span>Usado <strong>{{ m.usedAmount | appCurrency }}</strong></span>
+              <span>Disponível <strong>{{ m.availableAmount | appCurrency }}</strong></span>
+            </div>
+          </div>
+
+          <div class="cards-list__meta">
+            <div class="cards-list__meta-item">
+              <span class="cards-list__meta-label">Fatura em aberto</span>
+              <strong class="cards-list__meta-value">{{ m.usedAmount | appCurrency }}</strong>
+            </div>
+            <div class="cards-list__meta-item">
+              <span class="cards-list__meta-label">Vencimento</span>
+              <strong class="cards-list__meta-value">{{ dueLabel(m) }}</strong>
+            </div>
+            <div class="cards-list__meta-item">
+              <span class="cards-list__meta-label">Melhor dia de compra</span>
+              <strong class="cards-list__meta-value">Dia {{ m.bestPurchaseDay }}</strong>
+            </div>
+            <div class="cards-list__meta-item">
+              <span class="cards-list__meta-label">Ciclo</span>
+              <strong class="cards-list__meta-value">Fecha {{ m.card.diaFechamento }} · Vence {{ m.card.diaVencimento }}</strong>
             </div>
           </div>
         </article>
@@ -65,5 +89,4 @@
       <button type="button" class="cards-list__empty-cta" (click)="emptyAction.emit()">{{ emptyCtaLabel }}</button>
     </section>
   }
-
 </div>

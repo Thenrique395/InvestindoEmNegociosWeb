@@ -1,3 +1,5 @@
+@use '../shared/transactions/transactions-layout';
+
 .cards-page {
   display: grid;
   gap: 1.5rem;
@@ -7,27 +9,11 @@
   text-rendering: optimizeLegibility;
 }
 
-.cards-summary-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.cards-shell {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
-  padding: 1.6rem;
-  display: grid;
-  gap: 1.35rem;
-}
-
 .cards-statements {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 97%, white);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-elevation-sm);
   padding: 1.5rem;
   display: grid;
   gap: 1.25rem;
@@ -73,30 +59,6 @@
   align-items: end;
 }
 
-.cards-filter {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.cards-filter__label {
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.cards-filter select,
-.cards-filter input {
-  min-height: 3.5rem;
-  padding: 0.9rem 1rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background-color: color-mix(in srgb, var(--surface-2) 78%, white);
-  font: inherit;
-  color: var(--text);
-}
-
 .cards-statements__apply {
   min-height: 3.5rem;
   padding: 0.9rem 1.2rem;
@@ -121,10 +83,10 @@
 
 .cards-statements__item {
   padding: 1.2rem 1.25rem;
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), rgba(255, 255, 255, 0.98) 60%);
-  box-shadow: var(--shadow-sm);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-elevation-sm);
   display: grid;
   gap: 1rem;
 }
@@ -150,6 +112,14 @@
   color: var(--text-secondary);
 }
 
+.cards-statements__item-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
 .cards-statements__item-badge {
   display: inline-flex;
   align-items: center;
@@ -157,7 +127,7 @@
   min-height: 2rem;
   padding: 0.35rem 0.8rem;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--surface-2) 75%, white);
+  background: var(--surface-2);
   color: var(--text-secondary);
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-bold);
@@ -212,11 +182,9 @@
 
 .cards-purchases {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background:
-    radial-gradient(circle at 0 0, color-mix(in srgb, var(--primary) 8%, transparent), transparent 34%),
-    color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-elevation-sm);
   padding: 1.2rem;
   display: grid;
   gap: 1rem;
@@ -283,10 +251,9 @@
   grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;
   align-items: center;
   gap: 0.85rem;
-  border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-  border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   padding: 0.9rem 1rem;
 }
 
