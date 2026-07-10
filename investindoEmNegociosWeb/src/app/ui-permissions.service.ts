@@ -1,6 +1,7 @@
 import { computed, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { APP_FEATURE_KEYS, AppFeatureKey, hasFeatureForRole } from './features';
+import { hasAtLeastRole } from './roles';
 
 @Injectable({ providedIn: 'root' })
 export class UiPermissionsService {
@@ -10,6 +11,14 @@ export class UiPermissionsService {
 
   can(featureKey: AppFeatureKey): boolean {
     return hasFeatureForRole(this.authService.getRole(), featureKey);
+  }
+
+  /**
+   * Visões avançadas do Calendário (Agenda, Timeline, filtros e comparações)
+   * ficam disponíveis a partir do plano Intermediário. Basic mantém Mês/Semana.
+   */
+  canUseAdvancedCalendarViews(): boolean {
+    return hasAtLeastRole(this.authService.getRole(), 'Intermediate');
   }
 
   canReadAccounts(): boolean {

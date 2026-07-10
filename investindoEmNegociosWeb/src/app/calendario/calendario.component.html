@@ -1,180 +1,180 @@
-<section class="calendar-page">
-  <section class="summary-grid">
-    <app-stat-card
-      tone="success"
-      eyebrow="Receitas do mês"
-      [value]="formatCurrency(monthIncomeTotal)"
-      [note]="'Entradas previstas para ' + monthTitle + '.'">
+<section class="cal-page">
+  <app-page-header
+    eyebrow="Agenda financeira"
+    title="Calendário Financeiro"
+    description="Visualize todos os seus compromissos financeiros em um único lugar."
+    [hasMeta]="false">
+    <div page-actions class="cal-header__actions">
+      <div class="cal-new">
+        <button type="button" class="btn-primary sm cal-new__trigger" (click)="toggleNewMenu()" [attr.aria-expanded]="showNewMenu">
+          <span aria-hidden="true">+</span> Novo evento financeiro
+        </button>
+        @if (showNewMenu) {
+          <button type="button" class="cal-new__backdrop" aria-label="Fechar menu" (click)="closeNewMenu()"></button>
+          <div class="cal-new__menu" role="menu">
+            <button type="button" role="menuitem" (click)="createFor('/receitas')"><i class="cal-new__dot" data-group="income"></i> Nova receita</button>
+            <button type="button" role="menuitem" (click)="createFor('/despesas')"><i class="cal-new__dot" data-group="expense"></i> Nova despesa</button>
+            <button type="button" role="menuitem" (click)="createFor('/cartoes')"><i class="cal-new__dot" data-group="card"></i> Novo cartão</button>
+            <button type="button" role="menuitem" (click)="createFor('/emprestimos')"><i class="cal-new__dot" data-group="loan"></i> Novo financiamento</button>
+            <button type="button" role="menuitem" (click)="createFor('/metas')"><i class="cal-new__dot" data-group="goal"></i> Nova meta</button>
+          </div>
+        }
+      </div>
+      <button type="button" class="btn-secondary sm" (click)="goToToday()">Hoje</button>
+    </div>
+  </app-page-header>
+
+  <section class="cal-summary" aria-label="Resumo do período">
+    <app-transaction-summary-card tone="success" eyebrow="Receitas previstas" [value]="periodSummary.incomeForecast | appCurrency"
+      [note]="'Entradas previstas em ' + monthTitle + '.'">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
 
-    <app-stat-card
-      tone="danger"
-      eyebrow="Despesas do mês"
-      [value]="formatCurrency(monthExpenseTotal)"
-      note="Saídas registradas para o período atual.">
+    <app-transaction-summary-card tone="danger" eyebrow="Despesas previstas" [value]="periodSummary.expenseForecast | appCurrency"
+      note="Contas e parcelas a pagar no período.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
 
-    <app-stat-card
-      tone="info"
-      eyebrow="Saldo previsto"
-      [value]="formatCurrency(monthProjectedBalance)"
-      note="Diferença entre o que entra e o que sai.">
+    <app-transaction-summary-card [tone]="periodSummary.projectedBalance >= 0 ? 'info' : 'warning'" eyebrow="Saldo previsto"
+      [value]="periodSummary.projectedBalance | appCurrency" note="Diferença entre o que entra e o que sai.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 16c1.5 2 3.5 3 6 3 3.5 0 6-2 6-6 0-3.2-2.3-5.5-5.7-5.5H6.5M6 16V9m0 7h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
 
-    <app-stat-card
-      tone="warning"
-      eyebrow="Pendências abertas"
-      [value]="monthOpenCount.toString()"
-      [note]="'Próximos 7 dias: ' + upcomingDueCount">
+    <app-transaction-summary-card tone="primary" eyebrow="Compromissos" [value]="periodSummary.commitments.toString()"
+      [note]="'Vencimentos no mês: ' + periodSummary.dueCount">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M7 3v3m10-3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-transaction-summary-card>
+
+    <app-transaction-summary-card tone="warning" eyebrow="Pendências" [value]="pending.length.toString()"
+      note="Compromissos atrasados a regularizar.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
   </section>
 
-  <section class="calendar-shell">
-    <app-period-hero
-      eyebrow="Calendário financeiro"
-      title="Calendário de {{ monthTitle }}"
-      description="Acompanhe vencimentos, receitas e compromissos do mês em uma visão diária e organizada."
-      (previousMonth)="previousMonth()"
-      (nextMonth)="nextMonth()">
-      <button hero-toolbar-end type="button" class="calendar-hero__nav-btn calendar-hero__nav-btn--primary" (click)="goToToday()">Hoje</button>
+  <div class="cal-controls">
+    <app-segmented-selector
+      [options]="viewOptions"
+      [value]="view"
+      ariaLabel="Escolher visualização"
+      (valueChange)="setView($event)" />
 
-      <aside hero-aside class="calendar-total-card">
-        <p class="calendar-total-card__eyebrow">Dia selecionado</p>
-        <strong class="calendar-total-card__value">{{ visibleEvents.length }}</strong>
-        <p class="calendar-total-card__text">{{ selectedDateLabel }}</p>
-        <div class="calendar-total-card__legend">
-          <span><i class="dot dot--income"></i>Receitas</span>
-          <span><i class="dot dot--expense"></i>Despesas</span>
-          <span><i class="dot dot--card"></i>Cartões</span>
-        </div>
-      </aside>
-    </app-period-hero>
+    <div class="cal-monthnav">
+      <button type="button" class="cal-monthnav__btn" (click)="previousMonth()" aria-label="Mês anterior">‹</button>
+      <span class="cal-monthnav__label">{{ monthTitle }}</span>
+      <button type="button" class="cal-monthnav__btn" (click)="nextMonth()" aria-label="Próximo mês">›</button>
+    </div>
+  </div>
 
-    <app-filter-bar>
-      <div filter-left class="calendar-toolbar__group">
-        <span class="calendar-toolbar__label">Mostrar</span>
-        <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showExpenses" /> Despesas</label>
-        <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showIncomes" /> Receitas</label>
-        <label class="calendar-toggle"><input type="checkbox" [(ngModel)]="showCardDue" /> Cartões</label>
-      </div>
-      <div filter-right class="calendar-toolbar__group">
-        <label class="calendar-toolbar__field">
-          <span class="calendar-toolbar__label">Categoria</span>
-          <select [(ngModel)]="selectedCategory">
+  <app-filter-bar>
+    <div filter-left class="cal-filters">
+      <app-segmented-selector
+        [options]="groupOptions"
+        [value]="groupFilter"
+        ariaLabel="Filtrar por tipo"
+        (valueChange)="setGroupFilter($event)" />
+
+      @if (canAdvanced) {
+        <label class="cal-select">
+          <span class="cal-select__label">Categoria</span>
+          <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()">
             <option value="all">Todas</option>
             @for (category of categoryOptions; track category) {
               <option [value]="category">{{ category }}</option>
             }
           </select>
         </label>
-        <label class="calendar-toolbar__field">
-          <span class="calendar-toolbar__label">Status</span>
-          <select [(ngModel)]="selectedStatus">
+        <label class="cal-select">
+          <span class="cal-select__label">Status</span>
+          <select [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
             <option value="all">Todos</option>
-            @for (status of statusOptions; track status) {
-              <option [value]="status">{{ statusLabel(status) }}</option>
-            }
+            <option value="forecast">Previsto</option>
+            <option value="paid">Pago</option>
+            <option value="received">Recebido</option>
+            <option value="overdue">Atrasado</option>
+            <option value="canceled">Cancelado</option>
           </select>
         </label>
-      </div>
-    </app-filter-bar>
+      }
+    </div>
 
-    <div class="calendar-layout">
-      <section class="calendar-grid-wrap">
-        <div class="calendar-grid-wrap__head">
-          <div>
-            <p class="eyebrow">Visão do mês</p>
-            <h2>{{ monthTitle }}</h2>
-          </div>
-          <p class="muted">Selecione um dia para ver receitas, despesas e vencimentos.</p>
+    <div filter-right class="cal-legend" aria-label="Legenda de categorias">
+      @for (item of legend; track item.kind) {
+        <span class="cal-legend__item" [title]="item.tooltip">
+          <i class="cal-legend__dot" [attr.data-group]="item.group"></i>{{ item.label }}
+        </span>
+      }
+    </div>
+  </app-filter-bar>
+
+  <div class="cal-layout">
+    <section class="cal-main">
+      @if (!viewHasEvents) {
+        <div class="cal-empty">
+          <app-empty-state
+            icon="🗓️"
+            title="Você ainda não possui compromissos financeiros neste período."
+            description="Cadastre receitas, despesas, cartões, financiamentos ou metas para vê-los aqui, organizados por data."
+            ctaLabel="Criar primeiro evento"
+            (action)="toggleNewMenu()" />
         </div>
-        <div class="weekdays">
-          @for (day of weekdays; track day) {
-            <span>{{ day }}</span>
-          }
-        </div>
+      } @else {
+        @switch (view) {
+          @case ('month') {
+            <app-financial-calendar
+              [events]="allEvents"
+              [monthRef]="currentMonth"
+              [selectedDate]="selectedDate"
+              [today]="today"
+              (daySelected)="selectDate($event)" />
 
-        <div class="calendar-grid">
-          @for (cell of monthCells; track trackCell($index, cell)) {
-            <button
-              type="button"
-              class="day-cell"
-            [ngClass]="{
-              'day-cell--outside': !cell.inMonth,
-              'day-cell--today': cell.isToday,
-              'day-cell--selected': cell.isSelected
-            }"
-              (click)="selectDate(cell.date)">
-              <span class="day-number">{{ cell.date.getDate() }}</span>
-              <div class="day-dots">
-                @if (hasTypeInDay(cell, 'expense')) {
-                  <span class="dot dot--expense"></span>
-                }
-                @if (hasTypeInDay(cell, 'income')) {
-                  <span class="dot dot--income"></span>
-                }
-                @if (hasTypeInDay(cell, 'card-due')) {
-                  <span class="dot dot--card"></span>
-                }
-              </div>
-            </button>
-          }
-        </div>
-      </section>
-
-      <aside class="day-panel">
-        <p class="eyebrow">Dia selecionado</p>
-        <h2>Compromissos do dia</h2>
-        <p class="muted">{{ selectedDateLabel }}</p>
-
-        @if (visibleEvents.length) {
-          <div class="day-events">
-            @for (event of visibleEvents; track trackEvent($index, event)) {
-              <article class="event-card">
-                <div class="event-card__top">
-                  <span [class]="badgeClass(event.type)">{{ eventTypeLabel(event.type) }}</span>
-                  @if (event.amount) {
-                    <strong>{{ formatCurrency(event.amount) }}</strong>
+            <section class="cal-day">
+              <header class="cal-day__head">
+                <div>
+                  <p class="cal-day__eyebrow">Dia selecionado</p>
+                  <h2 class="cal-day__title">{{ selectedDateLabel }}</h2>
+                </div>
+                <app-status-badge tone="info" [label]="dayEvents.length + ' compromisso(s)'" />
+              </header>
+              @if (dayEvents.length) {
+                <div class="cal-day__events">
+                  @for (event of dayEvents; track event.id) {
+                    <app-financial-event-card [event]="event" [pending]="pendingPaymentIds.has(event.id)" (markDone)="markDone($event)" />
                   }
                 </div>
-                <h3>{{ event.title }}</h3>
-                @if (event.meta) {
-                  <p class="muted">{{ event.meta }}</p>
-                }
-                @if (event.status) {
-                  <p class="muted">Status: {{ statusLabel(event.status) }}</p>
-                }
-                @if (canMarkAsPaid(event)) {
-                  <button
-                    type="button"
-                    class="event-action"
-                    [disabled]="isPaymentPending(event)"
-                    (click)="markAsPaid(event)">
-                    {{ isPaymentPending(event) ? 'Processando...' : 'Marcar como pago' }}
-                  </button>
-                }
-              </article>
-            }
-          </div>
-        } @else {
-          <div class="empty">
-            Nenhum compromisso para esse dia com os filtros atuais.
-          </div>
+              } @else {
+                <p class="cal-day__empty">Nenhum compromisso neste dia com os filtros atuais.</p>
+              }
+            </section>
+          }
+          @case ('week') {
+            <app-financial-agenda [groups]="weekGroups" [today]="today" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
+          }
+          @case ('agenda') {
+            <app-financial-agenda [groups]="agendaGroups" [today]="today" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
+          }
+          @case ('timeline') {
+            <app-financial-timeline [buckets]="timelineBuckets" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
+          }
         }
+      }
+    </section>
 
-      </aside>
-    </div>
-  </section>
+    <aside class="cal-aside">
+      <app-calendar-sidebar
+        [digest]="digest"
+        [upcoming]="upcoming"
+        [pending]="pending"
+        (eventSelected)="onEventSelected($event)" />
+    </aside>
+  </div>
 </section>

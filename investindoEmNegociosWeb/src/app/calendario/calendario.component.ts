@@ -1,89 +1,159 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiDataService, StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
-import { formatCurrencyValue, formatLocaleDate, formatMonthYearLabel, parseLocaleDate } from '../utils/locale-utils';
-import { InstallmentStatus } from '../types/money-types';
+import { LoansService, LoanContractResponse } from '../loans.service';
+import { GoalsService, Goal } from '../goals.service';
 import { AccountsService } from '../accounts.service';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
+import { UiPermissionsService } from '../ui-permissions.service';
+import { formatMonthYearLabel } from '../utils/locale-utils';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
+import { FinancialCalendarComponent } from './financial-calendar.component';
+import { FinancialAgendaComponent } from './financial-agenda.component';
+import { FinancialTimelineComponent } from './financial-timeline.component';
+import { FinancialEventCardComponent } from './financial-event-card.component';
+import { CalendarSidebarComponent } from './calendar-sidebar.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import {
+  buildCalendarEvents,
+  buildPeriodSummary,
+  buildTimeline,
+  CalendarEvent,
+  CalendarEventGroup,
+  CALENDAR_CATEGORIES,
+  DayGroup,
+  eventsForDay,
+  groupByDay,
+  isInMonth,
+  pendingEvents,
+  PeriodSummary,
+  startOfDay,
+  TimelineBucket,
+  TodayDigest,
+  todayDigest,
+  upcomingEvents
+} from './calendar-agenda.model';
 
-type CalendarEventType = 'expense' | 'income' | 'card-due';
-
-interface CalendarEvent {
-  id: string;
-  type: CalendarEventType;
-  title: string;
-  date: Date;
-  amount?: number;
-  status?: string;
-  meta?: string;
-  category?: string;
-  installmentId?: string;
-}
-
-interface CalendarCell {
-  date: Date;
-  inMonth: boolean;
-  isToday: boolean;
-  isSelected: boolean;
-  events: CalendarEvent[];
-}
+type CalendarView = 'month' | 'week' | 'agenda' | 'timeline';
+type GroupFilter = 'all' | CalendarEventGroup;
 
 @Component({
   selector: 'app-calendario',
   standalone: true,
-  imports: [NgClass, FormsModule, StatCardComponent, PeriodHeroComponent, FilterBarComponent],
+  imports: [
+    FormsModule,
+    PageHeaderComponent,
+    FilterBarComponent,
+    TransactionSummaryCardComponent,
+    StatusBadgeComponent,
+    EmptyStateComponent,
+    SegmentedSelectorComponent,
+    FinancialCalendarComponent,
+    FinancialAgendaComponent,
+    FinancialTimelineComponent,
+    FinancialEventCardComponent,
+    CalendarSidebarComponent,
+    AppCurrencyPipe
+  ],
   templateUrl: './calendario.component.html',
   styleUrls: ['./calendario.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CalendarioComponent implements OnInit {
-  currentMonth = new Date();
+  readonly today = new Date();
+  currentMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
   selectedDate = new Date();
+
+  view: CalendarView = 'month';
+  groupFilter: GroupFilter = 'all';
+  selectedCategory = 'all';
+  selectedStatus = 'all';
+  showNewMenu = false;
+
+  readonly legend = CALENDAR_CATEGORIES;
+  readonly canAdvanced: boolean;
 
   private expenses: StoredExpense[] = [];
   private incomes: StoredIncome[] = [];
   private cards: StoredCard[] = [];
-  private events: CalendarEvent[] = [];
+  private loans: LoanContractResponse[] = [];
+  private goals: Goal[] = [];
+  private defaultAccountId: string | null = null;
+  allEvents: CalendarEvent[] = [];
 
-  showExpenses = true;
-  showIncomes = true;
-  showCardDue = true;
-  selectedCategory = 'all';
-  selectedStatus = 'all';
+  // View models derivados (recalculados em recompute()).
+  filteredCount = 0;
+  dayEvents: CalendarEvent[] = [];
+  weekGroups: DayGroup[] = [];
+  agendaGroups: DayGroup[] = [];
+  timelineBuckets: TimelineBucket[] = [];
+  periodSummary: PeriodSummary = { incomeForecast: 0, expenseForecast: 0, projectedBalance: 0, commitments: 0, dueCount: 0 };
+  digest: TodayDigest = { expenses: 0, incomes: 0, cards: 0, loans: 0, goals: 0, total: 0 };
+  upcoming: CalendarEvent[] = [];
+  pending: CalendarEvent[] = [];
+  categoryOptions: string[] = [];
+  viewHasEvents = false;
+
   pendingPaymentIds = new Set<string>();
-  defaultAccountId: string | null = null;
-
-  weekdays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
 
   constructor(
-    private dataService: ApiDataService,
-    private accountsService: AccountsService,
+    private readonly dataService: ApiDataService,
+    private readonly loansService: LoansService,
+    private readonly goalsService: GoalsService,
+    private readonly accountsService: AccountsService,
+    private readonly permissions: UiPermissionsService,
+    private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef
-  ) {}
+  ) {
+    this.canAdvanced = this.permissions.canUseAdvancedCalendarViews();
+    if (this.canAdvanced && typeof window !== 'undefined' && window.innerWidth < 768) {
+      this.view = 'agenda';
+    }
+  }
 
   ngOnInit(): void {
     this.defaultAccountId = this.accountsService.getDefaultAccountId();
+
     this.dataService.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.expenses = items || [];
-      this.rebuildEvents();
-      this.cdr.markForCheck();
+      this.rebuild();
     });
-
     this.dataService.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.incomes = items || [];
-      this.rebuildEvents();
-      this.cdr.markForCheck();
+      this.rebuild();
     });
-
     this.dataService.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.cards = items || [];
-      this.rebuildEvents();
-      this.cdr.markForCheck();
+      this.rebuild();
+    });
+
+    // Financiamentos e metas têm datas reais; toleramos falha (ex.: sem acesso).
+    this.loansService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (items) => {
+        this.loans = items || [];
+        this.rebuild();
+      },
+      error: () => {
+        this.loans = [];
+        this.rebuild();
+      }
+    });
+    this.goalsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (items) => {
+        this.goals = items || [];
+        this.rebuild();
+      },
+      error: () => {
+        this.goals = [];
+        this.rebuild();
+      }
     });
   }
 
@@ -91,277 +161,178 @@ export class CalendarioComponent implements OnInit {
     return formatMonthYearLabel(this.currentMonth);
   }
 
-  get visibleEvents(): CalendarEvent[] {
-    return this.events
-      .filter((event) => this.isSameDate(event.date, this.selectedDate))
-      .filter((event) => this.matchesFilter(event))
-      .sort((a, b) => {
-        const typePriority: Record<CalendarEventType, number> = { expense: 1, 'card-due': 2, income: 3 };
-        return typePriority[a.type] - typePriority[b.type];
-      });
-  }
-
-  get categoryOptions(): string[] {
-    return Array.from(
-      new Set(
-        this.events
-          .map((event) => event.category)
-          .filter((value): value is string => Boolean(value && value.trim().length))
-      )
-    ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  }
-
-  get statusOptions(): string[] {
-    return ['OPEN', 'PARTIALLY_PAID', 'PAID', 'CANCELED', 'ANTICIPATED'];
-  }
-
-  get monthExpenseTotal(): number {
-    return this.events
-      .filter((event) => this.isInCurrentMonth(event.date))
-      .filter((event) => event.type === 'expense')
-      .reduce((sum, event) => sum + (event.amount || 0), 0);
-  }
-
-  get monthIncomeTotal(): number {
-    return this.events
-      .filter((event) => this.isInCurrentMonth(event.date))
-      .filter((event) => event.type === 'income')
-      .reduce((sum, event) => sum + (event.amount || 0), 0);
-  }
-
-  get monthProjectedBalance(): number {
-    return this.monthIncomeTotal - this.monthExpenseTotal;
-  }
-
-  get monthOpenCount(): number {
-    return this.events
-      .filter((event) => this.isInCurrentMonth(event.date))
-      .filter((event) => event.type !== 'card-due')
-      .filter((event) => (event.status || 'OPEN') === 'OPEN')
-      .length;
-  }
-
-  get upcomingDueCount(): number {
-    const now = new Date();
-    const threshold = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
-    return this.events
-      .filter((event) => this.isInCurrentMonth(event.date))
-      .filter((event) => event.date >= new Date(now.getFullYear(), now.getMonth(), now.getDate()))
-      .filter((event) => event.date <= threshold)
-      .filter((event) => event.type === 'card-due' || (event.status || 'OPEN') === 'OPEN')
-      .length;
-  }
-
   get selectedDateLabel(): string {
-    return formatLocaleDate(this.selectedDate);
+    return this.selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   }
 
-  get monthCells(): CalendarCell[] {
-    const year = this.currentMonth.getFullYear();
-    const month = this.currentMonth.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const startWeekday = (firstDay.getDay() + 6) % 7; // semana iniciando na segunda
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const totalSlots = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
+  get viewOptions(): SegmentOption[] {
+    return [
+      { value: 'month', label: 'Mês', icon: '▦' },
+      { value: 'week', label: 'Semana', icon: '▤' },
+      { value: 'agenda', label: 'Agenda', icon: '☰', hidden: !this.canAdvanced },
+      { value: 'timeline', label: 'Timeline', icon: '↳', hidden: !this.canAdvanced }
+    ];
+  }
 
-    const startDate = new Date(year, month, 1 - startWeekday);
-    const cells: CalendarCell[] = [];
-    const today = new Date();
+  get groupOptions(): SegmentOption[] {
+    return [
+      { value: 'all', label: 'Todos' },
+      { value: 'income', label: 'Receitas' },
+      { value: 'expense', label: 'Despesas' },
+      { value: 'card', label: 'Cartões' },
+      { value: 'loan', label: 'Parcelas' },
+      { value: 'goal', label: 'Metas' }
+    ];
+  }
 
-    for (let i = 0; i < totalSlots; i += 1) {
-      const cellDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
-      const cellEvents = this.events.filter((event) => this.isSameDate(event.date, cellDate));
-      cells.push({
-        date: cellDate,
-        inMonth: cellDate.getMonth() === month,
-        isToday: this.isSameDate(cellDate, today),
-        isSelected: this.isSameDate(cellDate, this.selectedDate),
-        events: cellEvents
-      });
-    }
+  setView(view: string): void {
+    this.view = view as CalendarView;
+    this.recompute();
+    this.cdr.markForCheck();
+  }
 
-    return cells;
+  setGroupFilter(value: string): void {
+    this.groupFilter = value as GroupFilter;
+    this.recompute();
+    this.cdr.markForCheck();
+  }
+
+  onFilterChange(): void {
+    this.recompute();
+    this.cdr.markForCheck();
   }
 
   previousMonth(): void {
     this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1, 1);
-    this.selectedDate = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), 1);
-    this.rebuildEvents();
+    this.selectedDate = new Date(this.currentMonth);
+    this.rebuild();
   }
 
   nextMonth(): void {
     this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
-    this.selectedDate = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), 1);
-    this.rebuildEvents();
+    this.selectedDate = new Date(this.currentMonth);
+    this.rebuild();
   }
 
   goToToday(): void {
-    const now = new Date();
-    this.currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    this.selectedDate = now;
-    this.rebuildEvents();
+    this.currentMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
+    this.selectedDate = new Date(this.today);
+    this.rebuild();
   }
 
   selectDate(date: Date): void {
-    const changedMonth =
-      date.getMonth() !== this.currentMonth.getMonth() ||
-      date.getFullYear() !== this.currentMonth.getFullYear();
-
+    const changedMonth = date.getMonth() !== this.currentMonth.getMonth() || date.getFullYear() !== this.currentMonth.getFullYear();
     this.selectedDate = new Date(date);
     if (changedMonth) {
       this.currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-      this.rebuildEvents();
+      this.rebuild();
+    } else {
+      this.recompute();
+      this.cdr.markForCheck();
     }
   }
 
-  formatCurrency(value?: number): string {
-    if (value == null) return '';
-    return formatCurrencyValue(value);
+  onEventSelected(event: CalendarEvent): void {
+    this.selectDate(event.date);
   }
 
-  eventTypeLabel(type: CalendarEventType): string {
-    if (type === 'expense') return 'Despesa';
-    if (type === 'income') return 'Receita';
-    return 'Vencimento cartão';
+  toggleNewMenu(): void {
+    this.showNewMenu = !this.showNewMenu;
   }
 
-  badgeClass(type: CalendarEventType): string {
-    if (type === 'expense') return 'badge badge--expense';
-    if (type === 'income') return 'badge badge--income';
-    return 'badge badge--card';
+  closeNewMenu(): void {
+    this.showNewMenu = false;
   }
 
-  statusLabel(status?: string): string {
-    const normalized = (status || '').toUpperCase() as InstallmentStatus;
-    if (normalized === 'PAID') return 'Pago';
-    if (normalized === 'PARTIALLY_PAID') return 'Parcialmente pago';
-    if (normalized === 'CANCELED') return 'Cancelado';
-    if (normalized === 'ANTICIPATED') return 'Antecipado';
-    return 'Em aberto';
+  createFor(route: string): void {
+    this.showNewMenu = false;
+    this.router.navigate([route]);
   }
 
-  canMarkAsPaid(event: CalendarEvent): boolean {
-    if (event.type === 'card-due') return false;
-    if (!event.installmentId) return false;
-    return (event.status || 'OPEN') !== 'PAID';
-  }
-
-  isPaymentPending(event: CalendarEvent): boolean {
-    if (!event.installmentId) return false;
-    return this.pendingPaymentIds.has(event.installmentId);
-  }
-
-  markAsPaid(event: CalendarEvent): void {
-    if (!this.canMarkAsPaid(event) || !event.installmentId) return;
+  markDone(event: CalendarEvent): void {
+    if (!event.actionable || !event.installmentId) return;
     const amount = event.amount || 0;
     if (amount <= 0) return;
 
-    this.pendingPaymentIds.add(event.installmentId);
-    const onComplete = () => {
-      this.pendingPaymentIds.delete(event.installmentId!);
-      this.rebuildEvents();
+    this.pendingPaymentIds.add(event.id);
+    this.cdr.markForCheck();
+    const finish = () => {
+      this.pendingPaymentIds.delete(event.id);
+      this.rebuild();
     };
 
-    if (event.type === 'expense') {
-      this.dataService.markExpensePaid(event.installmentId, amount, this.defaultAccountId).subscribe({
-        next: () => onComplete(),
-        error: () => onComplete()
-      });
-      return;
+    if (event.group === 'income') {
+      this.dataService.markIncomeReceived(event.installmentId, amount, this.defaultAccountId).subscribe({ next: finish, error: finish });
+    } else {
+      this.dataService.markExpensePaid(event.installmentId, amount, this.defaultAccountId).subscribe({ next: finish, error: finish });
     }
-
-    this.dataService.markIncomeReceived(event.installmentId, amount, this.defaultAccountId).subscribe({
-      next: () => onComplete(),
-      error: () => onComplete()
-    });
   }
 
-  hasTypeInDay(cell: CalendarCell, type: CalendarEventType): boolean {
-    return cell.events.some((event) => event.type === type);
-  }
-
-  trackCell(_: number, cell: CalendarCell): string {
-    return cell.date.toISOString().slice(0, 10);
-  }
-
-  trackEvent(_: number, event: CalendarEvent): string {
-    return event.id;
+  private rebuild(): void {
+    this.allEvents = buildCalendarEvents(
+      { expenses: this.expenses, incomes: this.incomes, cards: this.cards, loans: this.loans, goals: this.goals },
+      this.currentMonth,
+      this.today
+    );
+    this.categoryOptions = Array.from(
+      new Set(this.allEvents.map((event) => event.category).filter((value): value is string => !!value && value.trim().length > 0))
+    ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    this.recompute();
+    this.cdr.markForCheck();
   }
 
   private matchesFilter(event: CalendarEvent): boolean {
-    if (event.type === 'expense' && !this.showExpenses) return false;
-    if (event.type === 'income' && !this.showIncomes) return false;
-    if (event.type === 'card-due' && !this.showCardDue) return false;
-    if (this.selectedCategory !== 'all' && event.category !== this.selectedCategory) return false;
-    if (this.selectedStatus !== 'all' && (event.status || 'OPEN') !== this.selectedStatus) return false;
+    if (this.groupFilter !== 'all' && event.group !== this.groupFilter) return false;
+    if (this.canAdvanced) {
+      if (this.selectedCategory !== 'all' && event.category !== this.selectedCategory) return false;
+      if (this.selectedStatus !== 'all' && event.status !== this.selectedStatus) return false;
+    }
     return true;
   }
 
-  private rebuildEvents(): void {
-    const events: CalendarEvent[] = [];
+  /** Filtra e deriva todos os view models a partir de allEvents. */
+  private recompute(): void {
+    const filtered = this.allEvents.filter((event) => this.matchesFilter(event));
+    this.filteredCount = filtered.length;
 
-    for (const item of this.expenses) {
-      const date = parseLocaleDate(item.vencimento || '');
-      if (!date) continue;
-      events.push({
-        id: `expense-${item.id}`,
-        type: 'expense',
-        title: item.nome || 'Despesa',
-        date,
-        amount: item.valor || 0,
-        status: item.status || 'OPEN',
-        meta: item.categoria || undefined,
-        category: item.categoria || undefined,
-        installmentId: item.id
-      });
-    }
+    this.dayEvents = eventsForDay(filtered, this.selectedDate);
+    this.periodSummary = buildPeriodSummary(filtered, this.currentMonth);
+    this.digest = todayDigest(filtered, this.today);
+    this.upcoming = upcomingEvents(filtered, this.today, 7).slice(0, 6);
+    this.pending = pendingEvents(filtered, this.today).slice(0, 6);
 
-    for (const item of this.incomes) {
-      const date = parseLocaleDate(item.recebimento || '');
-      if (!date) continue;
-      events.push({
-        id: `income-${item.id}`,
-        type: 'income',
-        title: item.fonte || 'Receita',
-        date,
-        amount: item.valor || 0,
-        status: item.status || 'OPEN',
-        meta: item.categoria || undefined,
-        category: item.categoria || undefined,
-        installmentId: item.id
-      });
-    }
+    const weekStart = this.startOfWeek(this.selectedDate);
+    const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
+    const weekEvents = filtered.filter((event) => {
+      const day = startOfDay(event.date);
+      return day >= weekStart && day <= weekEnd;
+    });
+    this.weekGroups = groupByDay(weekEvents);
 
-    const month = this.currentMonth.getMonth();
-    const year = this.currentMonth.getFullYear();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    for (const card of this.cards) {
-      const dueDay = Math.max(1, Math.min(daysInMonth, card.diaVencimento || 1));
-      const date = new Date(year, month, dueDay);
-      events.push({
-        id: `card-due-${card.id}-${year}-${month + 1}`,
-        type: 'card-due',
-        title: `Vencimento cartão: ${card.nome}`,
-        date,
-        meta: card.banco || undefined
-      });
-    }
+    this.agendaGroups = groupByDay(filtered, this.today);
+    this.timelineBuckets = buildTimeline(filtered, this.today);
 
-    this.events = events;
+    this.viewHasEvents = this.computeViewHasEvents(filtered);
   }
 
-  private isSameDate(a: Date, b: Date): boolean {
-    return (
-      a.getFullYear() === b.getFullYear() &&
-      a.getMonth() === b.getMonth() &&
-      a.getDate() === b.getDate()
-    );
+  private computeViewHasEvents(filtered: CalendarEvent[]): boolean {
+    switch (this.view) {
+      case 'month':
+        return filtered.some((event) => isInMonth(event.date, this.currentMonth));
+      case 'week':
+        return this.weekGroups.length > 0;
+      case 'agenda':
+        return this.agendaGroups.length > 0;
+      case 'timeline':
+        return this.timelineBuckets.some((bucket) => bucket.events.length > 0);
+      default:
+        return filtered.length > 0;
+    }
   }
 
-  private isInCurrentMonth(date: Date): boolean {
-    return (
-      date.getMonth() === this.currentMonth.getMonth() &&
-      date.getFullYear() === this.currentMonth.getFullYear()
-    );
+  private startOfWeek(date: Date): Date {
+    const day = startOfDay(date);
+    const offset = (day.getDay() + 6) % 7; // segunda = 0
+    return new Date(day.getFullYear(), day.getMonth(), day.getDate() - offset);
   }
 }
