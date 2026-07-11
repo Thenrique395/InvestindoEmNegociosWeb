@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
 import { AdminCategoriesService, AdminCategory } from '../admin-categories.service';
@@ -7,28 +6,53 @@ import { AuthService } from '../auth.service';
 import { hasAtLeastRole } from '../roles';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { CategoriesStore } from '../categories.store';
+import { FormState } from '../utils/form-state';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { ModalComponent } from '../shared/modal/modal.component';
-import { FormState } from '../utils/form-state';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
-import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { CategoryListComponent } from './category-list.component';
+import {
+  buildCategoryViews,
+  buildOverview,
+  CategoriesFilters,
+  CategoriesOverview,
+  CategoryTab,
+  CategoryView,
+  filterCategories,
+  sortByName
+} from './categories-overview.model';
 
 type CategoryFormField = 'name' | 'scope' | 'type';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormFieldComponent, ModalComponent, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, FilterBarComponent],
+  imports: [
+    FormsModule,
+    FormFieldComponent,
+    ModalComponent,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    SegmentedSelectorComponent,
+    ConfirmDialogComponent,
+    EmptyStateComponent,
+    CategoryListComponent
+  ],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoriesComponent implements OnInit {
   categorias: CategoryDto[] = [];
-  filtroTipo: '' | CategoryType = '';
-  buscaNome = '';
+  categoryViews: CategoryView[] = [];
+  overview: CategoriesOverview = { total: 0, activeCount: 0, expenseCount: 0, incomeCount: 0, customCount: 0 };
+
+  filters: CategoriesFilters = { search: '', tab: 'all', origin: 'all', status: 'all' };
+
   nome = '';
   tipo: CategoryType = 'Expense';
   escopo: 'user' | 'default' = 'user';
@@ -39,17 +63,14 @@ export class CategoriesComponent implements OnInit {
 
   adminCategories: AdminCategory[] = [];
   adminLoading = false;
-  includeInactive = true;
   adminSaving = false;
   showAdminModal = false;
   adminEditing: AdminCategory | null = null;
   adminName = '';
   adminAppliesTo: '' | CategoryType = '';
-  showDeleteModal = false;
-  deleteTarget: CategoryDto | null = null;
-  activeView: 'user' | 'admin' = 'user';
+  deleteTarget: CategoryView | null = null;
 
-  tipos = [
+  readonly tipos = [
     { id: 'Expense' as CategoryType, label: 'Despesa' },
     { id: 'Income' as CategoryType, label: 'Receita' }
   ];
@@ -60,114 +81,82 @@ export class CategoriesComponent implements OnInit {
   );
 
   constructor(
-    private categoriesStore: CategoriesStore,
-    private categoriesService: CategoriesService,
-    private adminCategoriesService: AdminCategoriesService,
-    private authService: AuthService,
-    private uiFeedback: UiFeedbackService,
+    private readonly categoriesStore: CategoriesStore,
+    private readonly categoriesService: CategoriesService,
+    private readonly adminCategoriesService: AdminCategoriesService,
+    private readonly authService: AuthService,
+    private readonly uiFeedback: UiFeedbackService,
     private readonly cdr: ChangeDetectorRef
   ) {
     effect(() => {
       this.categorias = this.categoriesStore.categories();
       this.loading = this.categoriesStore.loading();
-      this.cdr.markForCheck();
+      this.buildViews();
     });
   }
 
   ngOnInit(): void {
     this.isAdmin = hasAtLeastRole(this.authService.getRole(), 'Admin');
-    this.carregar();
+    this.categoriesStore.load();
+    if (this.isAdmin) this.loadAdmin();
+  }
+
+  get tabOptions(): SegmentOption[] {
+    return [
+      { value: 'all', label: 'Todas' },
+      { value: 'Expense', label: 'Despesas' },
+      { value: 'Income', label: 'Receitas' }
+    ];
+  }
+
+  get filteredViews(): CategoryView[] {
+    return filterCategories(this.categoryViews, this.filters);
+  }
+
+  get busy(): boolean {
+    return (this.loading || this.adminLoading) && !this.categoryViews.length;
+  }
+
+  setTab(tab: string): void {
+    this.filters = { ...this.filters, tab: tab as CategoryTab };
+    this.cdr.markForCheck();
+  }
+
+  onFilterChange(): void {
+    this.cdr.markForCheck();
+  }
+
+  /** Fonte unificada: admin vê as categorias de sistema (com inativas) + as suas; usuário vê as próprias + padrão ativas. */
+  private buildViews(): void {
+    let source: CategoryDto[];
     if (this.isAdmin) {
-      this.loadAdmin();
-      this.activeView = 'user';
+      const system: CategoryDto[] = this.adminCategories.map((a) => ({
+        id: a.id,
+        name: a.name,
+        appliesTo: a.appliesTo === 'Income' || a.appliesTo === 'Expense' ? a.appliesTo : null,
+        isDefault: true,
+        isActive: a.isActive
+      }));
+      const personal = this.categorias.filter((c) => !c.isDefault);
+      source = [...system, ...personal];
+    } else {
+      source = this.categorias;
     }
-  }
-
-  get categoriasPadrao(): CategoryDto[] {
-    return this.categorias.filter((c) => c.isDefault);
-  }
-
-  get categoriasUsuario(): CategoryDto[] {
-    return this.categorias.filter((c) => !c.isDefault);
-  }
-
-  categoriasPorTipo(tipo: CategoryType): CategoryDto[] {
-    return this.categorias.filter((c) => c.appliesTo === tipo && this.matchSearch(c.name));
-  }
-
-  get categoriasVisiveis(): CategoryDto[] {
-    return this.categorias.filter((c) => this.matchSearch(c.name));
-  }
-
-  get adminCategoriesVisiveis(): AdminCategory[] {
-    return this.adminCategories.filter((c) => this.matchSearch(c.name));
-  }
-
-  get userMetrics(): { total: number; padrao: number; personalizadas: number } {
-    const list = this.categoriasVisiveis;
-    return {
-      total: list.length,
-      padrao: list.filter((c) => c.isDefault).length,
-      personalizadas: list.filter((c) => !c.isDefault).length
-    };
-  }
-
-  get adminMetrics(): { total: number; ativas: number; inativas: number } {
-    const list = this.adminCategoriesVisiveis;
-    return {
-      total: list.length,
-      ativas: list.filter((c) => c.isActive).length,
-      inativas: list.filter((c) => !c.isActive).length
-    };
-  }
-
-  iconForCategory(name: string, tipo: CategoryType): string {
-    const key = name.trim().toLowerCase();
-    const map: Record<string, string> = {
-      mercado: '🛒',
-      lazer: '🎯',
-      salario: '💰',
-      salário: '💰',
-      aluguel: '🏠',
-      transporte: '🚌',
-      saúde: '🩺',
-      educacao: '📚',
-      educação: '📚',
-      compras: '🛍️',
-      'compras online': '🛒',
-      investimentos: '📈'
-    };
-
-    if (map[key]) return map[key];
-    return tipo === 'Income' ? '💵' : '🧾';
-  }
-
-  iconForAdminCategory(category: AdminCategory): string {
-    const tipo = category.appliesTo === 'Income' || category.appliesTo === 'Expense' ? category.appliesTo : 'Expense';
-    return this.iconForCategory(category.name, tipo);
-  }
-
-  carregar(): void {
-    this.categoriesStore.load(this.filtroTipo || undefined);
+    this.categoryViews = sortByName(buildCategoryViews(source));
+    this.overview = buildOverview(this.categoryViews);
+    this.cdr.markForCheck();
   }
 
   loadAdmin(): void {
     this.adminLoading = true;
-    this.adminCategoriesService.list(this.includeInactive).subscribe({
-      next: (data) => { this.adminCategories = data; this.cdr.markForCheck(); },
-      error: () => {
-        this.uiFeedback.error('Não foi possível carregar as categorias padrão.');
-        this.adminLoading = false;
-        this.cdr.markForCheck();
-      },
+    this.adminCategoriesService.list(true).subscribe({
+      next: (data) => { this.adminCategories = data; this.buildViews(); },
+      error: () => { this.uiFeedback.error('Não foi possível carregar as categorias de sistema.'); this.adminLoading = false; this.cdr.markForCheck(); },
       complete: () => { this.adminLoading = false; this.cdr.markForCheck(); }
     });
   }
 
-  toggleIncludeInactive(): void {
-    this.includeInactive = !this.includeInactive;
-    this.loadAdmin();
-  }
+  // ---- Criar (usuário: pessoal / admin: pode escolher sistema) ---------------
 
   abrirModal(): void {
     this.showModal = true;
@@ -181,7 +170,6 @@ export class CategoriesComponent implements OnInit {
 
   adicionar(): void {
     this.categoryForm.submit();
-
     if (!this.categoryForm.isValid()) {
       this.uiFeedback.warning('Revise os campos destacados antes de salvar.');
       return;
@@ -189,94 +177,65 @@ export class CategoriesComponent implements OnInit {
 
     const nomeLimpo = this.nome.trim();
     const conflito = this.findConflict(nomeLimpo, this.tipo, this.escopo);
-    if (conflito === 'default') {
-      this.uiFeedback.info('Essa categoria já existe no padrão do sistema. Use a categoria padrão para evitar duplicidade.');
-      return;
-    }
-    if (conflito === 'user') {
-      this.uiFeedback.warning('Já existe uma categoria personalizada com esse nome e tipo.');
-      return;
-    }
-    if (conflito === 'admin') {
-      this.uiFeedback.warning('Já existe uma categoria padrão com esse nome e tipo.');
-      return;
-    }
+    if (conflito === 'default') { this.uiFeedback.info('Essa categoria já existe no sistema.'); return; }
+    if (conflito === 'user') { this.uiFeedback.warning('Você já tem uma categoria com esse nome e tipo.'); return; }
+    if (conflito === 'admin') { this.uiFeedback.warning('Já existe uma categoria de sistema com esse nome e tipo.'); return; }
 
     this.saving = true;
 
     if (this.isAdmin && this.escopo === 'default') {
-      this.adminCategoriesService
-        .create({ name: nomeLimpo, appliesTo: this.tipo })
-        .subscribe({
-          next: () => {
-            this.resetCategoryForm();
-            this.loadAdmin();
-            this.categoriesService.invalidateCache();
-            this.categoriesStore.refresh();
-            this.uiFeedback.success('Categoria padrão adicionada com sucesso.');
-            this.cdr.markForCheck();
-          },
-          error: () => {
-            this.uiFeedback.error('Erro ao adicionar categoria padrão.');
-            this.saving = false;
-            this.cdr.markForCheck();
-          },
-          complete: () => { this.saving = false; this.cdr.markForCheck(); }
-        });
+      this.adminCategoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).subscribe({
+        next: () => {
+          this.resetCategoryForm();
+          this.showModal = false;
+          this.loadAdmin();
+          this.categoriesService.invalidateCache();
+          this.categoriesStore.refresh();
+          this.uiFeedback.success('Categoria de sistema criada com sucesso.');
+        },
+        error: () => { this.uiFeedback.error('Erro ao criar categoria de sistema.'); this.saving = false; this.cdr.markForCheck(); },
+        complete: () => { this.saving = false; this.cdr.markForCheck(); }
+      });
       return;
     }
 
     this.categoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).subscribe({
-      next: (cat) => {
-        this.categorias = [...this.categorias, cat];
+      next: () => {
         this.categoriesStore.refresh();
         this.resetCategoryForm();
         this.showModal = false;
-        this.uiFeedback.success('Categoria adicionada com sucesso.');
-        this.cdr.markForCheck();
+        this.uiFeedback.success('Categoria criada com sucesso.');
       },
-      error: (err) => {
-        this.uiFeedback.error(err?.error ?? 'Erro ao adicionar categoria.');
-        this.saving = false;
-        this.cdr.markForCheck();
-      },
+      error: (err) => { this.uiFeedback.error(err?.error ?? 'Erro ao criar categoria.'); this.saving = false; this.cdr.markForCheck(); },
       complete: () => { this.saving = false; this.cdr.markForCheck(); }
     });
   }
 
-  remover(cat: CategoryDto): void {
-    if (cat.isDefault) return;
-    this.deleteTarget = cat;
-    this.showDeleteModal = true;
-  }
+  // ---- Editar / ativar-desativar (admin, categorias de sistema) --------------
 
-  fecharDeleteModal(): void {
-    this.showDeleteModal = false;
-    this.deleteTarget = null;
-  }
-
-  confirmarRemocao(): void {
-    if (!this.deleteTarget) return;
-    const cat = this.deleteTarget;
-    this.showDeleteModal = false;
-    this.deleteTarget = null;
-
-    this.categoriesService.delete(cat.id).subscribe({
-      next: () => {
-        this.categorias = this.categorias.filter((c) => c.id !== cat.id);
-        this.categoriesStore.refresh();
-        this.uiFeedback.success('Categoria removida com sucesso.');
-        this.cdr.markForCheck();
-      },
-      error: (err) => this.uiFeedback.error(err?.error ?? 'Não foi possível remover a categoria.')
-    });
-  }
-
-  openAdminEdit(category: AdminCategory): void {
-    this.adminEditing = category;
-    this.adminName = category.name;
-    this.adminAppliesTo = (category.appliesTo as CategoryType) || '';
+  onEditView(view: CategoryView): void {
+    if (!this.isAdmin || view.origin !== 'default') return;
+    const admin = this.adminCategories.find((c) => c.id === view.category.id);
+    if (!admin) return;
+    this.adminEditing = admin;
+    this.adminName = admin.name;
+    this.adminAppliesTo = (admin.appliesTo as CategoryType) || '';
     this.showAdminModal = true;
+  }
+
+  onToggleView(view: CategoryView): void {
+    if (!this.isAdmin || view.origin !== 'default' || this.adminSaving) return;
+    const admin = this.adminCategories.find((c) => c.id === view.category.id);
+    if (!admin) return;
+    const next = !admin.isActive;
+    admin.isActive = next;
+    this.adminSaving = true;
+    this.buildViews();
+    this.adminCategoriesService.updateStatus(admin.id, next).subscribe({
+      next: (updated) => { admin.isActive = updated.isActive; this.categoriesService.invalidateCache(); this.categoriesStore.refresh(); this.buildViews(); },
+      error: () => { admin.isActive = !next; this.uiFeedback.error('Não foi possível atualizar o status.'); this.buildViews(); },
+      complete: () => { this.adminSaving = false; this.cdr.markForCheck(); }
+    });
   }
 
   closeAdminModal(): void {
@@ -291,73 +250,50 @@ export class CategoriesComponent implements OnInit {
       return;
     }
     this.adminSaving = true;
-    const payload = {
-      name: this.adminName.trim(),
-      appliesTo: this.adminAppliesTo || null
-    };
-
-    this.adminCategoriesService.update(this.adminEditing.id, payload).subscribe({
+    this.adminCategoriesService.update(this.adminEditing.id, { name: this.adminName.trim(), appliesTo: this.adminAppliesTo || null }).subscribe({
       next: () => {
         this.showAdminModal = false;
         this.adminEditing = null;
         this.loadAdmin();
         this.categoriesService.invalidateCache();
         this.categoriesStore.refresh();
-        this.cdr.markForCheck();
       },
-      error: () => {
-        this.uiFeedback.error('Não foi possível salvar a categoria padrão.');
-        this.adminSaving = false;
-        this.cdr.markForCheck();
-      },
+      error: () => { this.uiFeedback.error('Não foi possível salvar a categoria de sistema.'); this.adminSaving = false; this.cdr.markForCheck(); },
       complete: () => { this.adminSaving = false; this.cdr.markForCheck(); }
     });
   }
 
-  toggleDefaultStatus(category: AdminCategory): void {
-    if (this.adminSaving) return;
-    const next = !category.isActive;
-    category.isActive = next;
-    this.adminSaving = true;
-    this.adminCategoriesService.updateStatus(category.id, next).subscribe({
-      next: (updated) => {
-        category.isActive = updated.isActive;
-        this.categoriesService.invalidateCache();
-        this.categoriesStore.refresh();
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        category.isActive = !next;
-        this.uiFeedback.error('Não foi possível atualizar o status.');
-        this.cdr.markForCheck();
-      },
-      complete: () => { this.adminSaving = false; this.cdr.markForCheck(); }
+  // ---- Excluir (categorias personalizadas) ----------------------------------
+
+  remover(view: CategoryView): void {
+    if (view.origin !== 'custom') return;
+    this.deleteTarget = view;
+  }
+
+  cancelarRemocao(): void {
+    this.deleteTarget = null;
+  }
+
+  confirmarRemocao(): void {
+    const view = this.deleteTarget;
+    if (!view) return;
+    this.deleteTarget = null;
+
+    this.categoriesService.delete(view.category.id).subscribe({
+      next: () => { this.categoriesStore.refresh(); this.uiFeedback.success('Categoria removida com sucesso.'); },
+      error: (err) => this.uiFeedback.error(err?.error ?? 'Não foi possível remover a categoria.')
     });
   }
 
-  setView(view: 'user' | 'admin'): void {
-    if (view === 'admin' && !this.isAdmin) return;
-    this.activeView = view;
-  }
+  // ---- Form helpers ---------------------------------------------------------
 
   private validateCategoryForm(): Partial<Record<CategoryFormField, string>> {
     const errors: Partial<Record<CategoryFormField, string>> = {};
     const nomeLimpo = this.nome.trim();
-
-    if (!nomeLimpo) {
-      errors.name = 'Informe o nome da categoria.';
-    } else if (nomeLimpo.length < 2) {
-      errors.name = 'O nome precisa ter pelo menos 2 caracteres.';
-    }
-
-    if (!this.tipo) {
-      errors.type = 'Selecione o tipo da categoria.';
-    }
-
-    if (this.isAdmin && !this.escopo) {
-      errors.scope = 'Selecione o escopo da categoria.';
-    }
-
+    if (!nomeLimpo) errors.name = 'Informe o nome da categoria.';
+    else if (nomeLimpo.length < 2) errors.name = 'O nome precisa ter pelo menos 2 caracteres.';
+    if (!this.tipo) errors.type = 'Selecione o tipo da categoria.';
+    if (this.isAdmin && !this.escopo) errors.scope = 'Selecione o escopo da categoria.';
     return errors;
   }
 
@@ -368,44 +304,23 @@ export class CategoriesComponent implements OnInit {
     this.categoryForm.reset();
   }
 
-  private matchSearch(name: string): boolean {
-    if (!this.buscaNome.trim()) return true;
-    return this.normalizeText(name).includes(this.normalizeText(this.buscaNome));
-  }
-
-  private findConflict(
-    name: string,
-    type: CategoryType,
-    scope: 'user' | 'default'
-  ): 'default' | 'user' | 'admin' | null {
+  private findConflict(name: string, type: CategoryType, scope: 'user' | 'default'): 'default' | 'user' | 'admin' | null {
     const normalizedName = this.normalizeText(name);
     const sameName = (value: string) => this.normalizeText(value) === normalizedName;
 
     if (scope === 'default') {
-      const existsInAdmin = this.adminCategories.some(
-        (c) => sameName(c.name) && (c.appliesTo === type || c.appliesTo === null || c.appliesTo === undefined)
-      );
+      const existsInAdmin = this.adminCategories.some((c) => sameName(c.name) && (c.appliesTo === type || c.appliesTo == null));
       return existsInAdmin ? 'admin' : null;
     }
 
     const duplicateDefault = this.categorias.some((c) => c.isDefault && c.appliesTo === type && sameName(c.name));
     if (duplicateDefault) return 'default';
-
     const duplicateUser = this.categorias.some((c) => !c.isDefault && c.appliesTo === type && sameName(c.name));
     if (duplicateUser) return 'user';
-
     return null;
   }
 
   private normalizeText(value: string): string {
-    return value
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim()
-      .toLowerCase();
-  }
-
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
+    return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').trim().toLowerCase();
   }
 }

@@ -1,313 +1,135 @@
-<section class="categories-page">
-  @if (!isAdmin || activeView === 'user') {
-    <section class="categories-summary-grid">
-      <app-stat-card
-        tone="primary"
-        eyebrow="Total visíveis"
-        value="{{ userMetrics.total }}"
-        note="Categorias disponíveis para classificar lançamentos.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M4 6a2 2 0 0 1 2-2h4v4a2 2 0 1 0 4 0V4h4a2 2 0 0 1 2 2v4h-4a2 2 0 1 0 0 4h4v4a2 2 0 0 1-2 2h-4v-4a2 2 0 1 0-4 0v4H6a2 2 0 0 1-2-2v-4h4a2 2 0 1 0 0-4H4V6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </app-stat-card>
-      <app-stat-card
-        tone="info"
-        eyebrow="Padrão"
-        value="{{ userMetrics.padrao }}"
-        note="Categorias do sistema já prontas para uso.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-          <path d="M12 8v8M8 10l4-2 4 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </app-stat-card>
-      <app-stat-card
-        tone="success"
-        eyebrow="Personalizadas"
-        value="{{ userMetrics.personalizadas }}"
-        note="Regras criadas para a sua organização financeira.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-        </svg>
-      </app-stat-card>
-    </section>
-  }
+<section class="cat-page">
+  <app-page-header
+    eyebrow="Central de categorias"
+    title="Categorias"
+    [description]="isAdmin
+      ? 'Gerencie as categorias do sistema e as suas próprias para organizar receitas e despesas.'
+      : 'Organize receitas e despesas para entender melhor sua vida financeira.'"
+    [hasMeta]="false">
+    <div page-actions class="cat-actions">
+      <button type="button" class="btn-primary sm" (click)="abrirModal()">
+        <span aria-hidden="true">+</span> Nova categoria
+      </button>
+    </div>
+  </app-page-header>
 
-  @if (isAdmin && activeView === 'admin') {
-    <section class="categories-summary-grid">
-      <app-stat-card
-        tone="primary"
-        eyebrow="Total visíveis"
-        value="{{ adminMetrics.total }}"
-        note="Categorias padrão exibidas no filtro atual.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M4 7h16M4 17h16M7 7v10M17 7v10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </app-stat-card>
-      <app-stat-card
-        tone="success"
-        eyebrow="Ativas"
-        value="{{ adminMetrics.ativas }}"
-        note="Disponíveis para todos os usuários.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </app-stat-card>
-      <app-stat-card
-        tone="warning"
-        eyebrow="Inativas"
-        value="{{ adminMetrics.inativas }}"
-        note="Mantidas no sistema, mas fora do uso comum.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </app-stat-card>
-    </section>
-  }
+  <!-- Cards de resumo -->
+  <section class="cat-summary" aria-label="Resumo de categorias">
+    <app-transaction-summary-card tone="primary" eyebrow="Total de categorias" [value]="overview.total.toString()" [note]="overview.activeCount + ' ativa(s)'">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M4 7h7v7H4zM13 4h7v7h-7zM13 14h7v6h-7zM4 16h7v4H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+      </svg>
+    </app-transaction-summary-card>
 
-  <section class="categories-shell">
-    <app-period-hero
-      eyebrow="Gerenciar categorias"
-      title="Organize receitas e despesas"
-      description="Categorias padrão são compartilhadas; crie as suas e use as do sistema quando quiser."
-      [showNavigation]="false">
-      <app-period-action-card
-        hero-aside
-        title="Criar uma categoria"
-        description="Use categorias para deixar relatórios, filtros e importações mais claros.">
-        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="abrirModal()">
-          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
-          <span class="period-total-card__action-copy">
-            <strong>Nova categoria</strong>
-            <small>Adicionar uma classificação personalizada.</small>
-          </span>
-        </button>
-      </app-period-action-card>
-    </app-period-hero>
+    <app-transaction-summary-card tone="danger" eyebrow="Categorias de despesas" [value]="overview.expenseCount.toString()" note="Classifique suas saídas.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-transaction-summary-card>
 
-    <app-filter-bar>
-      <div filter-left class="categories-filters">
-        <label class="categories-filter categories-filter--search">
-          <span class="categories-filter__label">Buscar categoria</span>
-          <input type="text" placeholder="Ex.: Moradia" [(ngModel)]="buscaNome" />
-        </label>
-        <label class="categories-filter">
-          <span class="categories-filter__label">Tipo</span>
-          <select [(ngModel)]="filtroTipo" (change)="carregar()">
-            <option value="">Todos</option>
-            @for (t of tipos; track trackByIndex($index, t)) {
-              <option [value]="t.id">{{ t.label }}</option>
-            }
-          </select>
-        </label>
-      </div>
-    </app-filter-bar>
+    <app-transaction-summary-card tone="success" eyebrow="Categorias de receitas" [value]="overview.incomeCount.toString()" note="Classifique suas entradas.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-transaction-summary-card>
 
-    <section class="categories-add-card">
-      <div class="categories-add-card__header">
-        <p class="categories-add-card__eyebrow">Cadastro rápido</p>
-        <h3>Adicionar nova categoria</h3>
-      </div>
-      <div class="add-card__form">
-        <app-form-field
-          label="Nome da categoria"
-          [error]="categoryForm.error('name')"
-          [submitted]="categoryForm.submitted"
-          [animate]="categoryForm.shouldAnimate('name')">
-          <input
-            type="text"
-            placeholder="Nome da categoria"
-            [(ngModel)]="nome"
-            (blur)="categoryForm.markTouched('name')" />
-        </app-form-field>
-
-        @if (isAdmin) {
-          <app-form-field
-            label="Escopo"
-            [error]="categoryForm.error('scope')"
-            [submitted]="categoryForm.submitted"
-            [animate]="categoryForm.shouldAnimate('scope')">
-            <select [(ngModel)]="escopo" (blur)="categoryForm.markTouched('scope')">
-              <option value="user">Personalizada (usuário)</option>
-              <option value="default">Padrão (sistema)</option>
-            </select>
-          </app-form-field>
-        }
-
-        <app-form-field
-          label="Tipo"
-          [error]="categoryForm.error('type')"
-          [submitted]="categoryForm.submitted"
-          [animate]="categoryForm.shouldAnimate('type')">
-          <select [(ngModel)]="tipo" (blur)="categoryForm.markTouched('type')">
-            @for (t of tipos; track trackByIndex($index, t)) {
-              <option [value]="t.id">{{ t.label }}</option>
-            }
-          </select>
-        </app-form-field>
-
-        <button class="btn-primary self-end" type="button" [disabled]="saving" (click)="adicionar()">
-          <span class="btn-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </span>
-          {{ saving ? 'Salvando...' : 'Adicionar' }}
-        </button>
-      </div>
-    </section>
-
-    @if (isAdmin) {
-      <div class="view-tabs">
-        <button
-          type="button"
-          class="view-tabs__item"
-          [class.active]="activeView === 'user'"
-          (click)="setView('user')">
-          Categorias
-        </button>
-        <button
-          type="button"
-          class="view-tabs__item"
-          [class.active]="activeView === 'admin'"
-          (click)="setView('admin')">
-          Categorias padrão (admin)
-        </button>
-      </div>
-    }
-
-  @if (!isAdmin || activeView === 'user') {
-    @if (!loading) {
-      <section class="card list-card">
-        <div class="section-title">Categorias</div>
-        <div class="space-y-2">
-          <div class="flex items-center gap-2 font-semibold text-[var(--success-text)]">
-            Categorias de Receita
-            <span class="text-sm font-semibold text-[var(--text-muted)]">({{ categoriasPorTipo('Income').length }})</span>
-          </div>
-          <div class="grid gap-3">
-            @for (c of categoriasPorTipo('Income'); track trackByIndex($index, c)) {
-              <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
-                <div class="grid h-9 w-9 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
-                  {{ iconForCategory(c.name, 'Income') }}
-                </div>
-                <div class="min-w-0">
-                  <div class="break-words font-semibold text-[var(--text)]">{{ c.name }}</div>
-                  <div class="text-sm text-[var(--text-muted)]">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
-                </div>
-                <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-[var(--success-text)]">Receita</span>
-                @if (!c.isDefault) {
-                  <button type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
-                }
-              </div>
-            }
-            @if (categoriasPorTipo('Income').length === 0) {
-              <div class="text-sm text-[var(--text-muted)]">Sem categorias de receita. Crie uma nova acima.</div>
-            }
-          </div>
-        </div>
-        <div class="space-y-2">
-          <div class="flex items-center gap-2 font-semibold text-[var(--danger-text)]">
-            Categorias de Despesa
-            <span class="text-sm font-semibold text-[var(--text-muted)]">({{ categoriasPorTipo('Expense').length }})</span>
-          </div>
-          <div class="grid gap-3">
-            @for (c of categoriasPorTipo('Expense'); track trackByIndex($index, c)) {
-              <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
-                <div class="grid h-9 w-9 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
-                  {{ iconForCategory(c.name, 'Expense') }}
-                </div>
-                <div class="min-w-0">
-                  <div class="break-words font-semibold text-[var(--text)]">{{ c.name }}</div>
-                  <div class="text-sm text-[var(--text-muted)]">{{ c.isDefault ? 'Categoria padrão' : 'Categoria personalizada' }}</div>
-                </div>
-                <span class="inline-flex items-center rounded-full border border-rose-200 bg-rose-100 px-2.5 py-1 text-xs font-semibold text-[var(--danger-text)]">Despesa</span>
-                @if (!c.isDefault) {
-                  <button type="button" class="btn-danger sm" (click)="remover(c)">Excluir</button>
-                }
-              </div>
-            }
-            @if (categoriasPorTipo('Expense').length === 0) {
-              <div class="text-sm text-[var(--text-muted)]">Sem categorias de despesa. Crie uma nova acima.</div>
-            }
-          </div>
-        </div>
-      </section>
-    } @else {
-      <div class="card">Carregando categorias...</div>
-    }
-  }
-
-  @if (isAdmin && activeView === 'admin') {
-    <section class="card admin-card">
-      <div class="admin-header">
-        <div>
-          <h3>Categorias padrão (admin)</h3>
-          <p class="muted">Ative, edite ou desative as categorias globais do sistema.</p>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" [checked]="includeInactive" (change)="toggleIncludeInactive()" />
-          <span>Exibir inativas</span>
-        </label>
-      </div>
-      @if (adminLoading) {
-        <div class="status">Carregando categorias padrão...</div>
-      }
-      @if (!adminLoading && adminCategoriesVisiveis.length) {
-        <div class="grid gap-3">
-          @for (c of adminCategoriesVisiveis; track trackByIndex($index, c)) {
-            <div class="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 grid-cols-[auto_1fr_auto] items-center">
-              <div class="grid h-10 w-10 place-items-center rounded-lg bg-[var(--surface-3)] text-lg" aria-hidden="true">
-                {{ iconForAdminCategory(c) }}
-              </div>
-              <div class="space-y-1">
-                <div class="font-semibold text-[var(--text)]">{{ c.name }}</div>
-                <div class="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
-                  <span>Aplica em</span>
-                  <span
-                    class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
-              [ngClass]="c.appliesTo === 'Income'
-                ? 'border-emerald-200 bg-emerald-100 text-[var(--success-text)]'
-                : c.appliesTo === 'Expense'
-                  ? 'border-rose-200 bg-rose-100 text-[var(--danger-text)]'
-                  : 'border-slate-200 bg-slate-100 text-slate-600'">
-                    {{ c.appliesTo || 'Todos' }}
-                  </span>
-                  <span
-                    class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
-                    [ngClass]="c.isActive ? 'border-emerald-200 bg-emerald-100 text-[var(--success-text)]' : 'border-slate-200 bg-slate-100 text-slate-600'">
-                    {{ c.isActive ? 'Ativa' : 'Inativa' }}
-                  </span>
-                </div>
-              </div>
-              <div class="flex flex-wrap items-center justify-start gap-2 justify-end">
-                <button type="button" class="btn-ghost sm" (click)="openAdminEdit(c)">Editar</button>
-                <button type="button" class="btn-ghost sm" (click)="toggleDefaultStatus(c)">
-                  {{ c.isActive ? 'Desativar' : 'Ativar' }}
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-      }
-      @if (!adminLoading && !adminCategoriesVisiveis.length) {
-        <div class="muted">Nenhuma categoria padrão encontrada para o filtro atual.</div>
-      }
-    </section>
-  }
-
+    <app-transaction-summary-card tone="info" [eyebrow]="isAdmin ? 'Minhas categorias' : 'Personalizadas'" [value]="overview.customCount.toString()" note="Criadas por você.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+    </app-transaction-summary-card>
   </section>
 
-  <app-modal
-    [open]="showAdminModal"
-    eyebrow="Admin"
-    title="Editar categoria padrão"
-    size="sm"
-    (close)="closeAdminModal()">
+  <!-- Abas de tipo -->
+  <div class="cat-controls">
+    <app-segmented-selector [options]="tabOptions" [value]="filters.tab" ariaLabel="Filtrar por tipo" (valueChange)="setTab($event)" />
+  </div>
 
-    <div class="admin-form" modal-body>
-      <app-form-field label="Nome">
-        <input type="text" [(ngModel)]="adminName" />
+  <!-- Filtros -->
+  <div class="cat-filterbar">
+    <div class="cat-filters">
+      <label class="cat-filter cat-filter--grow">
+        <span class="cat-filter__label">Buscar</span>
+        <input type="search" [(ngModel)]="filters.search" (ngModelChange)="onFilterChange()" placeholder="Nome da categoria" aria-label="Buscar categoria" />
+      </label>
+      <label class="cat-filter">
+        <span class="cat-filter__label">Origem</span>
+        <select [(ngModel)]="filters.origin" (ngModelChange)="onFilterChange()" aria-label="Filtrar por origem">
+          <option value="all">Todas</option>
+          <option value="default">Sistema</option>
+          <option value="custom">Minhas</option>
+        </select>
+      </label>
+      <label class="cat-filter">
+        <span class="cat-filter__label">Status</span>
+        <select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()" aria-label="Filtrar por status">
+          <option value="all">Todos</option>
+          <option value="active">Ativas</option>
+          <option value="inactive">Inativas</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- Lista -->
+  @if (busy) {
+    <div class="cat-hint">Carregando categorias...</div>
+  } @else if (!overview.total) {
+    <app-empty-state
+      icon="🗂️"
+      title="Você ainda não possui categorias cadastradas."
+      description="Crie categorias para organizar melhor suas receitas e despesas."
+      ctaLabel="Criar categoria"
+      (action)="abrirModal()">
+    </app-empty-state>
+  } @else {
+    <section class="cat-list-card">
+      <app-category-list
+        [views]="filteredViews"
+        [isAdmin]="isAdmin"
+        (edit)="onEditView($event)"
+        (toggleStatus)="onToggleView($event)"
+        (remove)="remover($event)">
+      </app-category-list>
+
+      @if (!filteredViews.length) {
+        <app-empty-state title="Nenhuma categoria encontrada" description="Ajuste a busca ou os filtros."></app-empty-state>
+      }
+    </section>
+  }
+
+  <!-- Modal criar categoria -->
+  <app-modal [open]="showModal" eyebrow="Cadastro" title="Nova categoria" size="sm" (close)="fecharModal()">
+    <div class="cat-form" modal-body>
+      <app-form-field label="Nome da categoria" [error]="categoryForm.error('name')" [submitted]="categoryForm.submitted" [animate]="categoryForm.shouldAnimate('name')">
+        <input type="text" placeholder="Ex.: Moradia" [(ngModel)]="nome" (blur)="categoryForm.markTouched('name')" />
       </app-form-field>
+      <app-form-field label="Tipo" [error]="categoryForm.error('type')" [submitted]="categoryForm.submitted" [animate]="categoryForm.shouldAnimate('type')">
+        <select [(ngModel)]="tipo" (blur)="categoryForm.markTouched('type')">
+          @for (t of tipos; track t.id) {
+            <option [value]="t.id">{{ t.label }}</option>
+          }
+        </select>
+      </app-form-field>
+      @if (isAdmin) {
+        <app-form-field label="Escopo" [error]="categoryForm.error('scope')" [submitted]="categoryForm.submitted" [animate]="categoryForm.shouldAnimate('scope')">
+          <select [(ngModel)]="escopo" (blur)="categoryForm.markTouched('scope')">
+            <option value="user">Minha (pessoal)</option>
+            <option value="default">Sistema (todos os usuários)</option>
+          </select>
+        </app-form-field>
+      }
+    </div>
+    <div modal-footer>
+      <button type="button" class="btn-ghost sm" (click)="fecharModal()">Cancelar</button>
+      <button type="button" class="btn-primary sm" (click)="adicionar()" [disabled]="saving">{{ saving ? 'Salvando...' : 'Criar categoria' }}</button>
+    </div>
+  </app-modal>
+
+  <!-- Modal editar categoria de sistema (admin) -->
+  <app-modal [open]="showAdminModal" eyebrow="Sistema" title="Editar categoria de sistema" size="sm" (close)="closeAdminModal()">
+    <div class="cat-form" modal-body>
+      <app-form-field label="Nome"><input type="text" [(ngModel)]="adminName" /></app-form-field>
       <app-form-field label="Aplica em">
         <select [(ngModel)]="adminAppliesTo">
           <option value="">Todos</option>
@@ -316,35 +138,22 @@
         </select>
       </app-form-field>
     </div>
-
     <div modal-footer>
       <button type="button" class="btn-ghost sm" (click)="closeAdminModal()">Cancelar</button>
-      <button type="button" class="btn-primary sm" (click)="saveAdmin()" [disabled]="adminSaving">
-        {{ adminSaving ? 'Salvando...' : 'Salvar' }}
-      </button>
+      <button type="button" class="btn-primary sm" (click)="saveAdmin()" [disabled]="adminSaving">{{ adminSaving ? 'Salvando...' : 'Salvar' }}</button>
     </div>
-
   </app-modal>
 
-  <app-modal
-    [open]="showDeleteModal"
-    eyebrow="Atenção"
-    title="Remover categoria"
-    subtitle="Tem certeza que deseja remover a categoria abaixo?"
-    size="sm"
-    (close)="fecharDeleteModal()">
-
-    <div modal-body>
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text)]">
-        {{ deleteTarget?.name || 'Categoria' }}
-      </div>
-    </div>
-
-    <div modal-footer>
-      <button type="button" class="btn-ghost sm" (click)="fecharDeleteModal()">Cancelar</button>
-      <button type="button" class="btn-danger sm" (click)="confirmarRemocao()">Remover</button>
-    </div>
-
-  </app-modal>
-
+  <!-- Confirmação de exclusão -->
+  @if (deleteTarget) {
+    <app-confirm-dialog
+      title="Remover categoria?"
+      [message]="'Remover a categoria \'' + deleteTarget.category.name + '\'? Lançamentos associados deixam de referenciar esta categoria.'"
+      confirmLabel="Remover categoria"
+      cancelLabel="Cancelar"
+      variant="danger"
+      (confirmed)="confirmarRemocao()"
+      (cancelled)="cancelarRemocao()">
+    </app-confirm-dialog>
+  }
 </section>
