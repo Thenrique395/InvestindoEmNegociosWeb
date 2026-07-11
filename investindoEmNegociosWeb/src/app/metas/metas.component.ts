@@ -1,584 +1,331 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GoalsService, Goal, GoalStatus, GoalKind, GoalContribution } from '../goals.service';
-import { maskDateDDMMYYYY, maskMoneyInput, parseDateDDMMYYYY } from '../utils/input-mask';
-import { formatLocaleDateFromIso, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
-import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, of } from 'rxjs';
+import {
+  Goal, GoalKind, GoalMode, GoalOccurrence, GoalProgress, GoalScopeDto, GoalsService, RecurrenceType
+} from '../goals.service';
+import { CategoriesStore } from '../categories.store';
+import { CategoryDto } from '../categories.service';
 import { UiFeedbackService } from '../ui-feedback.service';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
-import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
-import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
-import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
-
-type MetaFiltroKind = 'ALL' | GoalKind;
-type GoalSection = {
-  kind: GoalKind;
-  label: string;
-  subtitle: string;
-  metas: Goal[];
-};
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { GoalCardComponent } from './goal-card.component';
+import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, GoalView } from './goal-view.model';
 
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule, FormsModule, DigitOnlyDirective, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, ModalComponent, FormFieldComponent, StatusBadgeComponent, FilterBarComponent],
+  imports: [
+    FormsModule,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    SegmentedSelectorComponent,
+    ModalComponent,
+    FormFieldComponent,
+    ConfirmDialogComponent,
+    EmptyStateComponent,
+    AppCurrencyPipe,
+    GoalCardComponent
+  ],
   templateUrl: './metas.component.html',
-  styleUrls: ['./metas.component.scss']
+  styleUrls: ['./metas.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MetasComponent implements OnInit {
-  mostrarModal = false;
-  metaTipo: GoalKind = 'General';
-  metaNome = '';
-  metaValor = '';
-  metaAno = String(new Date().getFullYear());
-  metaDescricao = '';
-  metaMensal = '';
-  metaVencimento = '';
-  metas: Goal[] = [];
-  anos: number[] = [];
-  filtroAno: number | 'ALL' = 'ALL';
-  filtroStatus: GoalStatus | 'ALL' = 'ALL';
-  filtroTipo: MetaFiltroKind = 'ALL';
-  metaTipos = [
-    { id: 'Expense' as GoalKind, label: 'Despesas' },
-    { id: 'Income' as GoalKind, label: 'Receitas' },
-    { id: 'Investment' as GoalKind, label: 'Investimentos' },
-    { id: 'General' as GoalKind, label: 'Geral' }
-  ];
-  statusLista = [
-    { id: 'Planned' as GoalStatus, label: 'Planejada' },
-    { id: 'InProgress' as GoalStatus, label: 'Em andamento' },
-    { id: 'Completed' as GoalStatus, label: 'Concluída' },
-    { id: 'Canceled' as GoalStatus, label: 'Cancelada' }
-  ];
   loading = false;
+  goals: Goal[] = [];
+  private progressMap: Record<string, GoalProgress> = {};
+  views: GoalView[] = [];
+  filtered: GoalView[] = [];
+  summary: GoalsSummary = { total: 0, active: 0, achieved: 0, attention: 0, avgProgress: 0 };
+  tab: GoalTab = 'all';
+
+  categories: CategoryDto[] = [];
+
+  // Modal criar/editar
+  showForm = false;
   saving = false;
-  mostrarAporte = false;
-  aporteValor = '';
-  aporteData = new Date().toISOString().slice(0, 10);
-  aporteNota = '';
-  metaSelecionada?: Goal;
-  editando = false;
-  confirmModal = { show: false, goal: undefined as Goal | undefined, mode: 'cancel' as 'cancel' | 'reactivate' };
-  contribResumo: Record<string, { total: number; meses: number }> = {};
-  contribDetalhes: Record<string, GoalContribution[]> = {};
-  mostrarHistorico = false;
-  historicoMeta?: Goal;
+  editingId: string | null = null;
+  private editingGoalRef: Goal | null = null;
+  form = this.emptyForm();
 
-  statusLabel(status: GoalStatus): string {
-    switch (status) {
-      case 'Planned':
-        return 'Planejada';
-      case 'InProgress':
-        return 'Em andamento';
-      case 'Completed':
-        return 'Concluída';
-      case 'Canceled':
-        return 'Cancelada';
-      default:
-        return status;
-    }
-  }
+  // Aporte (investimento)
+  showContribute = false;
+  contributing = false;
+  contributeGoal?: Goal;
+  contributeAmount = '';
+  contributeDate = new Date().toISOString().slice(0, 10);
+  contributeNote = '';
 
-  statusTone(status?: GoalStatus): 'success' | 'warning' | 'danger' | 'muted' {
-    switch (status) {
-      case 'Completed':
-        return 'success';
-      case 'InProgress':
-        return 'warning';
-      case 'Canceled':
-        return 'danger';
-      default:
-        return 'muted';
-    }
-  }
+  // Detalhes
+  showDetails = false;
+  detailsGoal?: Goal;
+  detailsProgress?: GoalProgress | null;
+  detailsOccurrences: GoalOccurrence[] = [];
+
+  // Exclusão
+  deleteTarget: Goal | null = null;
+
+  readonly kindOptions: SegmentOption[] = [
+    { value: 'Expense', label: 'Despesa', icon: '📉' },
+    { value: 'Income', label: 'Receita', icon: '📈' },
+    { value: 'Investment', label: 'Investimento', icon: '🎯' }
+  ];
+
+  readonly recurrenceOptions: { value: RecurrenceType; label: string }[] = [
+    { value: 'None', label: 'Período único' },
+    { value: 'Monthly', label: 'Mensal' },
+    { value: 'Quarterly', label: 'Trimestral' },
+    { value: 'Semiannual', label: 'Semestral' },
+    { value: 'Annual', label: 'Anual' }
+  ];
 
   constructor(
-    private goalsService: GoalsService,
-    private uiFeedback: UiFeedbackService
+    private readonly goalsService: GoalsService,
+    private readonly categoriesStore: CategoriesStore,
+    private readonly uiFeedback: UiFeedbackService,
+    private readonly destroyRef: DestroyRef,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.prepararAnos();
-    this.carregarMetas();
+    this.categoriesStore.load();
+    this.categories = this.categoriesStore.categories();
+    this.loadGoals();
   }
 
-  get totalMetasAtivas(): number {
-    return this.metas.filter((meta) => meta.status !== 'Canceled').length;
+  get tabOptions(): SegmentOption[] {
+    return [
+      { value: 'all', label: 'Todas' },
+      { value: 'Expense', label: 'Despesas' },
+      { value: 'Income', label: 'Receitas' },
+      { value: 'Investment', label: 'Investimentos' },
+      { value: 'completed', label: 'Concluídas' },
+      { value: 'archived', label: 'Arquivadas' }
+    ];
   }
 
-  get totalMetaAmount(): number {
-    return this.metas.reduce((total, meta) => total + (meta.targetAmount || 0), 0);
+  get categoryOptions(): CategoryDto[] {
+    if (this.form.kind === 'Income') return this.categories.filter((c) => c.appliesTo === 'Income');
+    if (this.form.kind === 'Expense') return this.categories.filter((c) => c.appliesTo === 'Expense');
+    return [];
   }
 
-  get totalCurrentAmount(): number {
-    return this.metas.reduce((total, meta) => total + (meta.currentAmount || 0), 0);
+  get isInvestmentForm(): boolean {
+    return this.form.kind === 'Investment';
   }
 
-  get averageProgress(): number {
-    if (!this.metas.length) return 0;
-    const total = this.metas.reduce((sum, meta) => sum + this.progresso(meta), 0);
-    return Math.round(total / this.metas.length);
+  setTab(tab: string): void {
+    this.tab = tab as GoalTab;
+    this.filtered = filterGoals(this.views, this.tab);
+    this.cdr.markForCheck();
   }
 
-  get completedGoals(): number {
-    return this.metas.filter((meta) => meta.status === 'Completed').length;
+  loadGoals(): void {
+    this.loading = true;
+    this.goalsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (goals) => {
+        this.goals = goals || [];
+        if (!this.goals.length) { this.loading = false; this.rebuild(); return; }
+        forkJoin(this.goals.map((g) => this.goalsService.getProgress(g.id).pipe(catchError(() => of(null)))))
+          .subscribe((progresses) => {
+            this.progressMap = {};
+            this.goals.forEach((g, i) => { if (progresses[i]) this.progressMap[g.id] = progresses[i]!; });
+            this.loading = false;
+            this.rebuild();
+          });
+      },
+      error: () => { this.loading = false; this.uiFeedback.error('Não foi possível carregar as metas.'); this.cdr.markForCheck(); }
+    });
   }
 
-  get metaTipoLabel(): string {
-    return this.metaTipos.find((t) => t.id === this.metaTipo)?.label ?? 'Geral';
+  private rebuild(): void {
+    this.categories = this.categoriesStore.categories();
+    this.views = this.goals.map((g) => buildGoalView(g, this.progressMap[g.id]));
+    this.summary = buildGoalsSummary(this.views);
+    this.filtered = filterGoals(this.views, this.tab);
+    this.cdr.markForCheck();
   }
 
-  get labelValorMeta(): string {
-    switch (this.metaTipo) {
-      case 'Expense':    return 'Teto de gastos';
-      case 'Income':     return 'Meta de receita';
-      case 'Investment': return 'Valor a acumular';
-      default:           return 'Valor da meta';
-    }
-  }
+  // ---- Criar / editar -----------------------------------------------------
 
-  get labelMensal(): string {
-    switch (this.metaTipo) {
-      case 'Expense':    return 'Limite mensal (opcional)';
-      case 'Income':     return 'Receita mensal esperada';
-      case 'Investment': return 'Aporte mensal previsto';
-      default:           return 'Aporte mensal previsto';
-    }
-  }
-
-  get placeholderValorMeta(): string {
-    switch (this.metaTipo) {
-      case 'Expense':    return 'Ex.: 3.000,00 por mês';
-      case 'Income':     return 'Ex.: 15.000,00 no ano';
-      case 'Investment': return 'Ex.: 50.000,00';
-      default:           return 'Ex.: 12.000,00';
-    }
-  }
-
-  get metaPreviewNome(): string {
-    return this.metaNome.trim() || 'Nome da meta';
-  }
-
-  get metaPreviewValor(): string {
-    return this.metaValor ? `R$ ${this.metaValor}` : 'R$ 0,00';
-  }
-
-  get metaPreviewMensal(): string {
-    return this.metaMensal ? `R$ ${this.metaMensal}` : 'Não definido';
-  }
-
-  get metaPreviewPrazo(): string {
-    return this.metaVencimento || 'Sem prazo definido';
-  }
-
-  get metasPorSecao(): GoalSection[] {
-    const grouped = new Map<GoalKind, Goal[]>();
-    const order: GoalKind[] = ['Expense', 'Income', 'Investment', 'General'];
-    order.forEach((kind) => grouped.set(kind, []));
-
-    this.metas
-      .slice()
-      .sort((a, b) => this.compareMetas(a, b))
-      .forEach((meta) => grouped.get(meta.kind ?? 'General')?.push(meta));
-
-    const sectionMeta: Record<GoalKind, { label: string; subtitle: string }> = {
-      Expense:    { label: 'Metas de despesas',      subtitle: 'Controle de gastos e teto por período.' },
-      Income:     { label: 'Metas de receitas',      subtitle: 'Aumento de entradas e previsibilidade mensal.' },
-      Investment: { label: 'Metas de investimentos', subtitle: 'Acúmulo patrimonial e aportes recorrentes.' },
-      General:    { label: 'Metas gerais',           subtitle: 'Objetivos financeiros complementares.' }
+  private emptyForm() {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().slice(0, 10);
+    return {
+      kind: 'Expense' as GoalKind,
+      title: '',
+      targetAmount: '',
+      description: '',
+      startDate: start,
+      endDate: end,
+      recurrence: 'Monthly' as RecurrenceType,
+      warningThreshold: '80',
+      criticalThreshold: '100',
+      categoryId: '' as string
     };
-
-    return order
-      .map((kind) => ({
-        kind,
-        label: sectionMeta[kind].label,
-        subtitle: sectionMeta[kind].subtitle,
-        metas: grouped.get(kind) ?? []
-      }))
-      .filter((section) => section.metas.length > 0);
   }
 
-  prepararAnos(): void {
-    const atual = new Date().getFullYear();
-    this.anos = [];
-    for (let ano = atual - 2; ano <= atual + 3; ano++) {
-      this.anos.push(ano);
-    }
+  openCreate(): void {
+    this.editingId = null;
+    this.editingGoalRef = null;
+    this.form = this.emptyForm();
+    this.showForm = true;
   }
 
-  aplicarFiltros(): void {
-    this.carregarMetas();
+  openEdit(goal: Goal): void {
+    const base = this.emptyForm();
+    this.editingId = goal.id;
+    this.editingGoalRef = goal;
+    this.form = {
+      kind: goal.kind === 'General' ? 'Expense' : goal.kind,
+      title: goal.title,
+      targetAmount: String(goal.targetAmount ?? ''),
+      description: goal.description ?? '',
+      startDate: (goal.startDate ?? '').slice(0, 10) || base.startDate,
+      endDate: (goal.endDate ?? goal.targetDate ?? '').slice(0, 10) || base.endDate,
+      recurrence: goal.recurrence ?? 'None',
+      warningThreshold: goal.warningThreshold != null ? String(goal.warningThreshold) : '80',
+      criticalThreshold: goal.criticalThreshold != null ? String(goal.criticalThreshold) : '100',
+      categoryId: goal.scopes?.find((s) => s.scopeType === 'Category')?.refId ?? ''
+    };
+    this.showForm = true;
   }
 
-  abrirModal(): void {
-    this.editando = false;
-    this.resetarForm();
-    this.mostrarModal = true;
+  setFormKind(kind: string): void {
+    this.form.kind = kind as GoalKind;
+    this.form.categoryId = '';
   }
 
-  abrirModalEditar(meta: Goal): void {
-    this.editando = true;
-    this.metaSelecionada = meta;
-    this.metaTipo = meta.kind ?? 'General';
-    this.metaNome = meta.title;
-    this.metaValor = formatNumberValue(meta.targetAmount);
-    this.metaAno = String(meta.year);
-    this.metaDescricao = meta.description || '';
-    this.metaMensal = meta.expectedMonthly
-      ? formatNumberValue(meta.expectedMonthly)
-      : '';
-    this.metaVencimento = meta.targetDate ? this.formatarDataBR(meta.targetDate) : '';
-    this.mostrarModal = true;
-  }
-
-  fecharModal(): void {
+  closeForm(): void {
     if (this.saving) return;
-    this.mostrarModal = false;
-    this.resetarForm();
+    this.showForm = false;
   }
 
-  salvar(): void {
-    const valor = this.parseValor(this.metaValor);
-    const ano = Number(String(this.metaAno || '').replace(/\D/g, ''));
-    if (!this.metaNome.trim() || !valor || valor <= 0) {
-      this.uiFeedback.warning('Informe nome e valor maior que zero.');
-      return;
-    }
-    if (!ano) {
-      this.uiFeedback.warning('Informe um ano válido.');
-      return;
-    }
+  save(): void {
+    const title = this.form.title.trim();
+    const target = Number(this.form.targetAmount);
+    if (title.length < 2) { this.uiFeedback.warning('Informe um nome para a meta.'); return; }
+    if (!Number.isFinite(target) || target <= 0) { this.uiFeedback.warning('Informe um valor-alvo válido.'); return; }
+
+    const scopes: GoalScopeDto[] | null = this.form.categoryId
+      ? [{ scopeType: 'Category', refId: this.form.categoryId }]
+      : null;
+    const mode: GoalMode = this.form.kind === 'Expense' ? 'Limit' : this.form.kind === 'Income' ? 'Target' : 'RecurringContribution';
+    const year = this.form.startDate ? new Date(this.form.startDate).getFullYear() : new Date().getFullYear();
 
     const payload = {
-      title: this.metaNome.trim(),
-      targetAmount: valor,
-      currentAmount: this.metaSelecionada?.currentAmount ?? 0,
-      year: ano,
-      description: this.metaDescricao.trim() || null,
-      status: (this.metaSelecionada?.status as GoalStatus) ?? ('Planned' as GoalStatus),
-      expectedMonthly: this.parseValor(this.metaMensal),
-      targetDate: this.toTargetDate(),
-      kind: this.metaTipo
+      title,
+      targetAmount: target,
+      currentAmount: 0,
+      year,
+      description: this.form.description.trim() || null,
+      // 'InProgress' é válido no backend novo e no antigo (compat); o backend
+      // ignora o status na criação. Ao editar, preserva o status atual.
+      status: this.editingGoalRef?.status ?? 'InProgress',
+      expectedMonthly: 0,
+      targetDate: this.form.endDate || null,
+      kind: this.form.kind,
+      mode,
+      startDate: this.form.startDate || null,
+      endDate: this.form.endDate || null,
+      recurrence: this.form.recurrence,
+      warningThreshold: this.form.warningThreshold ? Number(this.form.warningThreshold) : null,
+      criticalThreshold: this.form.criticalThreshold ? Number(this.form.criticalThreshold) : null,
+      scopes
     };
 
     this.saving = true;
-    const save$ = this.editando && this.metaSelecionada
-      ? this.goalsService.update(this.metaSelecionada.id, payload)
-      : this.goalsService.create({ ...payload, currentAmount: 0 });
+    const op = this.editingId
+      ? this.goalsService.update(this.editingId, payload)
+      : this.goalsService.create(payload);
 
-    save$.subscribe({
+    op.subscribe({
       next: () => {
         this.saving = false;
-        this.fecharModal();
-        this.aplicarFiltros();
-        this.uiFeedback.success('Meta salva com sucesso.');
+        this.showForm = false;
+        this.uiFeedback.success(this.editingId ? 'Meta atualizada.' : 'Meta criada.');
+        this.loadGoals();
       },
-      error: (err) => {
-        this.saving = false;
-        this.uiFeedback.error(err?.error?.message ?? 'Falha ao salvar meta.');
-      }
+      error: (err) => { this.saving = false; this.uiFeedback.error(err?.error ?? 'Não foi possível salvar a meta.'); this.cdr.markForCheck(); }
     });
   }
 
-  formatarValor(): void {
-    this.metaValor = maskMoneyInput(this.metaValor);
-    this.atualizarAportePrevisto();
+  // ---- Aporte (investimento) ---------------------------------------------
+
+  openContribute(goal: Goal): void {
+    this.contributeGoal = goal;
+    this.contributeAmount = '';
+    this.contributeDate = new Date().toISOString().slice(0, 10);
+    this.contributeNote = '';
+    this.showContribute = true;
   }
 
-  formatarMensal(): void {
-    this.metaMensal = maskMoneyInput(this.metaMensal);
-  }
+  closeContribute(): void { if (!this.contributing) this.showContribute = false; }
 
-  formatarAno(): void {
-    const digits = String(this.metaAno || '').replace(/\D/g, '').slice(0, 4);
-    this.metaAno = digits;
-  }
-
-  formatarVencimento(): void {
-    this.metaVencimento = maskDateDDMMYYYY(this.metaVencimento);
-    this.atualizarAportePrevisto();
-  }
-
-  formatarAporte(): void {
-    this.aporteValor = maskMoneyInput(this.aporteValor);
-  }
-
-  private carregarContribuicoes(goalId: string): void {
-    this.goalsService.listContributions(goalId).subscribe({
-      next: (items) => {
-        const meses = new Set(items.map((i) => i.date.slice(0, 7)));
-        this.contribResumo[goalId] = { total: items.length, meses: meses.size };
-        this.contribDetalhes[goalId] = items;
-      }
+  saveContribution(): void {
+    const goal = this.contributeGoal;
+    const amount = Number(this.contributeAmount);
+    if (!goal || !Number.isFinite(amount) || amount <= 0) { this.uiFeedback.warning('Informe um valor de aporte válido.'); return; }
+    this.contributing = true;
+    this.goalsService.addContribution(goal.id, { amount, date: this.contributeDate, note: this.contributeNote.trim() || null }).subscribe({
+      next: () => { this.contributing = false; this.showContribute = false; this.uiFeedback.success('Aporte registrado.'); this.loadGoals(); },
+      error: () => { this.contributing = false; this.uiFeedback.error('Não foi possível registrar o aporte.'); this.cdr.markForCheck(); }
     });
   }
 
-  abrirModalAporte(meta: Goal): void {
-    this.metaSelecionada = meta;
-    this.carregarContribuicoes(meta.id);
-    this.aporteValor = '';
-    this.aporteData = new Date().toISOString().slice(0, 10);
-    this.aporteNota = '';
-    this.mostrarAporte = true;
-  }
+  // ---- Detalhes / histórico ----------------------------------------------
 
-  fecharAporte(): void {
-    if (this.saving) return;
-    this.mostrarAporte = false;
-    this.metaSelecionada = undefined;
-  }
-
-  salvarAporte(): void {
-    if (!this.metaSelecionada) return;
-    const valor = this.parseValor(this.aporteValor);
-    if (!valor || valor <= 0) {
-      this.uiFeedback.warning('Informe um valor de aporte válido.');
-      return;
-    }
-    const restante = this.metaSelecionada.targetAmount - this.metaSelecionada.currentAmount;
-    if (valor > restante) {
-      this.uiFeedback.warning('Valor do aporte excede o restante da meta.');
-      return;
-    }
-    this.saving = true;
-    this.goalsService
-      .addContribution(this.metaSelecionada.id, {
-        amount: valor,
-        date: this.aporteData,
-        note: this.aporteNota?.trim() || null
-      })
-      .subscribe({
-        next: () => {
-          this.saving = false;
-          const meta = this.metaSelecionada!;
-          const novoValor = meta.currentAmount + valor;
-          const novoStatus = novoValor >= meta.targetAmount ? ('Completed' as GoalStatus) : ('InProgress' as GoalStatus);
-          this.metas = this.metas.map((m) =>
-            m.id === meta.id ? { ...m, currentAmount: Math.min(novoValor, m.targetAmount), status: novoStatus } : m
-          );
-          this.fecharAporte();
-          this.aplicarFiltros();
-          this.uiFeedback.success('Aporte registrado com sucesso.');
-        },
-        error: () => {
-          this.saving = false;
-          this.uiFeedback.error('Falha ao registrar aporte.');
-        }
-      });
-  }
-
-  progresso(meta: Goal): number {
-    if (!meta.targetAmount) return 0;
-    return Math.min(100, Math.round((meta.currentAmount / meta.targetAmount) * 100));
-  }
-
-  goalRemaining(meta: Goal): number {
-    return Math.max((meta.targetAmount || 0) - (meta.currentAmount || 0), 0);
-  }
-
-  goalTone(meta: Goal): string {
-    if (meta.status === 'Completed') return 'success';
-    if (meta.status === 'Canceled') return 'danger';
-    if (meta.status === 'InProgress') return 'warning';
-    return 'primary';
-  }
-
-  cancelarMeta(meta: Goal): void {
-    this.confirmModal = { show: true, goal: meta, mode: 'cancel' };
-  }
-
-  reativarMeta(meta: Goal): void {
-    this.confirmModal = { show: true, goal: meta, mode: 'reactivate' };
-  }
-
-  confirmarAcao(): void {
-    if (!this.confirmModal.goal) {
-      this.confirmModal.show = false;
-      return;
-    }
-    const goal = this.confirmModal.goal;
-    const status =
-      this.confirmModal.mode === 'cancel'
-        ? ('Canceled' as GoalStatus)
-        : goal.currentAmount > 0
-        ? ('InProgress' as GoalStatus)
-        : ('Planned' as GoalStatus);
-
-    this.saving = true;
-    const payload = {
-      title: goal.title,
-      targetAmount: goal.targetAmount,
-      currentAmount: goal.currentAmount,
-      year: goal.year,
-      description: goal.description ?? null,
-      status,
-      expectedMonthly: goal.expectedMonthly,
-      targetDate: goal.targetDate ?? null,
-      kind: goal.kind ?? 'General' as GoalKind
-    };
-    this.goalsService.update(goal.id, payload).subscribe({
-      next: (updated) => {
-        this.metas = this.metas.map((m) => (m.id === updated.id ? updated : m));
-        this.saving = false;
-        const modo = this.confirmModal.mode;
-        this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
-        this.uiFeedback.success(modo === 'cancel' ? 'Meta cancelada.' : 'Meta reativada.');
-      },
-      error: () => {
-        this.saving = false;
-        this.uiFeedback.error('Falha ao atualizar o status da meta.');
-      }
+  openDetails(goal: Goal): void {
+    this.detailsGoal = goal;
+    this.detailsProgress = this.progressMap[goal.id] ?? null;
+    this.detailsOccurrences = [];
+    this.showDetails = true;
+    this.goalsService.getOccurrences(goal.id).pipe(catchError(() => of([] as GoalOccurrence[]))).subscribe((occ) => {
+      this.detailsOccurrences = occ;
+      this.cdr.markForCheck();
     });
   }
 
-  fecharConfirm(): void {
-    if (this.saving) return;
-    this.confirmModal = { show: false, goal: undefined, mode: 'cancel' };
+  closeDetails(): void { this.showDetails = false; }
+
+  get detailsView(): GoalView | null {
+    return this.detailsGoal ? buildGoalView(this.detailsGoal, this.detailsProgress) : null;
   }
 
-  isCanceled(meta: Goal): boolean {
-    return meta.status === 'Canceled';
-  }
+  // ---- Ciclo de vida ------------------------------------------------------
 
-  aporteTooltip(goalId: string): string {
-    const lista = this.contribDetalhes[goalId];
-    if (!lista?.length) return 'Nenhum aporte registrado';
-    const linhas = lista.slice(0, 4).map((c) => {
-      const data = new Date(c.date);
-      const dataStr = isNaN(data.getTime()) ? c.date : data.toLocaleDateString('pt-BR');
-      const valor = formatNumberValue(c.amount);
-      return `${dataStr}: R$ ${valor}${c.note ? ' - ' + c.note : ''}`;
-    });
-    const restante = lista.length > 4 ? `+${lista.length - 4} aporte(s)...` : '';
-    return [...linhas, restante].filter(Boolean).join('\n');
-  }
+  pause(goal: Goal) { this.lifecycle(this.goalsService.pause(goal.id), 'Meta pausada.'); }
+  resume(goal: Goal) { this.lifecycle(this.goalsService.resume(goal.id), 'Meta reativada.'); }
+  archive(goal: Goal) { this.lifecycle(this.goalsService.archive(goal.id), 'Meta arquivada.'); }
+  complete(goal: Goal) { this.lifecycle(this.goalsService.complete(goal.id), 'Meta concluída.'); }
 
-  abrirHistorico(meta: Goal): void {
-    this.historicoMeta = meta;
-    this.mostrarHistorico = true;
-    this.carregarContribuicoes(meta.id);
-  }
-
-  fecharHistorico(): void {
-    if (this.saving) return;
-    this.mostrarHistorico = false;
-    this.historicoMeta = undefined;
-  }
-
-  private carregarMetas(): void {
-    this.loading = true;
-    const ano = this.filtroAno === 'ALL' ? undefined : this.filtroAno;
-    const status = this.filtroStatus === 'ALL' ? undefined : this.filtroStatus;
-    this.goalsService.list(ano, status).subscribe({
-      next: (lista) => {
-        this.metas = lista
-          .filter((meta) => this.filtroTipo === 'ALL' || (meta.kind ?? 'General') === this.filtroTipo);
-        this.loading = false;
-        this.metas.forEach((m) => this.carregarContribuicoes(m.id));
-      },
-      error: () => {
-        this.loading = false;
-        this.uiFeedback.error('Não foi possível carregar as metas.');
-      }
+  private lifecycle(op: ReturnType<GoalsService['pause']>, success: string): void {
+    op.subscribe({
+      next: () => { this.uiFeedback.success(success); this.loadGoals(); },
+      error: () => this.uiFeedback.error('Ação indisponível no momento.')
     });
   }
 
-  private parseValor(raw: string): number {
-    return parseLocalizedNumber(raw);
+  // ---- Exclusão -----------------------------------------------------------
+
+  askRemove(goal: Goal): void { this.deleteTarget = goal; }
+  cancelRemove(): void { this.deleteTarget = null; }
+  confirmRemove(): void {
+    const goal = this.deleteTarget;
+    if (!goal) return;
+    this.deleteTarget = null;
+    this.goalsService.delete(goal.id).subscribe({
+      next: () => { this.uiFeedback.success('Meta excluída.'); this.loadGoals(); },
+      error: () => this.uiFeedback.error('Não foi possível excluir a meta.')
+    });
   }
-
-  private toTargetDate(): string | null {
-    if (!this.metaVencimento) return null;
-    const parsed = parseDateDDMMYYYY(this.metaVencimento);
-    if (!parsed) return null;
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, '0');
-    const day = String(parsed.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  private formatarDataBR(dateValue: string): string {
-    return formatLocaleDateFromIso(dateValue);
-  }
-
-  private atualizarAportePrevisto(): void {
-    const parsed = parseDateDDMMYYYY(this.metaVencimento);
-    const total = this.parseValor(this.metaValor);
-    if (!parsed || !total) return;
-    const current = this.metaSelecionada?.currentAmount ?? 0;
-    const restante = Math.max(total - current, 0);
-    const months = this.monthsUntil(parsed);
-    if (months <= 0) return;
-    const mensal = restante / months;
-    this.metaMensal = formatNumberValue(mensal);
-    this.metaAno = String(parsed.getFullYear());
-  }
-
-  private monthsUntil(target: Date): number {
-    const now = new Date();
-    const currentIndex = now.getFullYear() * 12 + now.getMonth();
-    const targetIndex = target.getFullYear() * 12 + target.getMonth();
-    const months = targetIndex - currentIndex + 1;
-    return months > 0 ? months : 0;
-  }
-
-  private resetarForm(): void {
-    this.metaTipo = 'General';
-    this.metaNome = '';
-    this.metaValor = '';
-    this.metaMensal = '';
-    this.metaVencimento = '';
-    this.metaAno = String(new Date().getFullYear());
-    this.metaDescricao = '';
-    this.metaSelecionada = undefined;
-    this.editando = false;
-  }
-
-  tipoMetaLabel(meta: Goal): string {
-    switch (meta.kind) {
-      case 'Expense':    return 'Controle de Despesas';
-      case 'Income':     return 'Meta de Receitas';
-      case 'Investment': return 'Meta de Investimentos';
-      default:           return 'Meta Geral';
-    }
-  }
-
-  descricaoMeta(meta: Goal): string | null {
-    return meta.description?.trim() || null;
-  }
-
-  private compareMetas(a: Goal, b: Goal): number {
-    const typeOrder: Record<GoalKind, number> = {
-      Expense: 0, Income: 1, Investment: 2, General: 3
-    };
-    const aType = a.kind ?? 'General';
-    const bType = b.kind ?? 'General';
-    const byType = typeOrder[aType] - typeOrder[bType];
-    if (byType !== 0) return byType;
-
-    const byProgress = this.progresso(b) - this.progresso(a);
-    if (byProgress !== 0) return byProgress;
-
-    return a.title.localeCompare(b.title, 'pt-BR');
-  }
-
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
-  }
-
-  trackByGoal(_: number, meta: Goal): string {
-    return meta.id;
-  }
-
-  trackBySection(_: number, section: GoalSection): string {
-    return section.kind;
-  }
-
 }

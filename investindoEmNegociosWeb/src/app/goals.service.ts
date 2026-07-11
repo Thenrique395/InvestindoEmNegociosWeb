@@ -4,8 +4,17 @@ import { Observable, map } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import { applyListQuery, ListQuery } from './api-query';
 
-export type GoalStatus = 'Planned' | 'InProgress' | 'Completed' | 'Canceled';
+export type GoalStatus = 'Planned' | 'InProgress' | 'Completed' | 'Canceled' | 'Draft' | 'Scheduled' | 'Active' | 'Paused' | 'Archived';
 export type GoalKind = 'General' | 'Expense' | 'Income' | 'Investment';
+export type GoalMode = 'Limit' | 'Target' | 'RecurringContribution' | 'PeriodContribution' | 'AccumulatedValue';
+export type RecurrenceType = 'None' | 'Weekly' | 'Monthly' | 'Quarterly' | 'Semiannual' | 'Annual' | 'Custom';
+export type GoalScopeType = 'Category' | 'Account' | 'Portfolio';
+export type CalculatedGoalState = 'OnTrack' | 'Attention' | 'Exceeded' | 'Overdue' | 'Achieved';
+
+export interface GoalScopeDto {
+  scopeType: GoalScopeType;
+  refId: string;
+}
 
 export interface Goal {
   id: string;
@@ -20,6 +29,15 @@ export interface Goal {
   updatedAt: string;
   expectedMonthly: number;
   targetDate?: string | null;
+  // Fase B — planejamento (opcionais: backend antigo não os retorna)
+  mode?: GoalMode;
+  startDate?: string | null;
+  endDate?: string | null;
+  recurrence?: RecurrenceType;
+  warningThreshold?: number | null;
+  criticalThreshold?: number | null;
+  archivedAt?: string | null;
+  scopes?: GoalScopeDto[] | null;
 }
 
 export interface CreateGoalRequest {
@@ -32,6 +50,41 @@ export interface CreateGoalRequest {
   expectedMonthly: number;
   targetDate?: string | null;
   kind: GoalKind;
+  mode?: GoalMode;
+  startDate?: string | null;
+  endDate?: string | null;
+  recurrence?: RecurrenceType;
+  warningThreshold?: number | null;
+  criticalThreshold?: number | null;
+  scopes?: GoalScopeDto[] | null;
+}
+
+export interface GoalProgress {
+  goalId: string;
+  kind: GoalKind;
+  mode: GoalMode;
+  target: number;
+  realized: number;
+  pending: number;
+  percent: number;
+  remaining: number;
+  forecast?: number | null;
+  daysRemaining?: number | null;
+  state: CalculatedGoalState;
+  start?: string | null;
+  end?: string | null;
+}
+
+export interface GoalOccurrence {
+  id: string;
+  sequence: number;
+  periodStart: string;
+  periodEnd: string;
+  targetAmount: number;
+  realized: number;
+  percent: number;
+  status: string;
+  isCurrent: boolean;
 }
 
 export interface GoalContribution {
@@ -80,6 +133,40 @@ export class GoalsService {
 
   update(id: string, payload: CreateGoalRequest): Observable<Goal> {
     return this.http.put<Goal>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  // ---- Fase B: progresso, ocorrências e ciclo de vida ---------------------
+
+  getProgress(id: string): Observable<GoalProgress> {
+    return this.http.get<GoalProgress>(`${this.baseUrl}/${id}/progress`);
+  }
+
+  getOccurrences(id: string): Observable<GoalOccurrence[]> {
+    return this.http.get<GoalOccurrence[]>(`${this.baseUrl}/${id}/occurrences`);
+  }
+
+  pause(id: string): Observable<Goal> {
+    return this.http.post<Goal>(`${this.baseUrl}/${id}/pause`, {});
+  }
+
+  resume(id: string): Observable<Goal> {
+    return this.http.post<Goal>(`${this.baseUrl}/${id}/resume`, {});
+  }
+
+  archive(id: string): Observable<Goal> {
+    return this.http.post<Goal>(`${this.baseUrl}/${id}/archive`, {});
+  }
+
+  complete(id: string): Observable<Goal> {
+    return this.http.post<Goal>(`${this.baseUrl}/${id}/complete`, {});
+  }
+
+  overrideCurrentOccurrence(id: string, targetAmount: number): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}/occurrences/current`, { targetAmount });
   }
 
   addContribution(goalId: string, payload: GoalContributionRequest): Observable<GoalContribution> {
