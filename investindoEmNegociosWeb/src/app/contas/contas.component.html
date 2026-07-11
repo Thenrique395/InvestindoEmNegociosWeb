@@ -1,67 +1,237 @@
 <section class="accounts-page">
-  <section class="accounts-summary-grid">
-    <app-stat-card
-      tone="primary"
-      eyebrow="Saldo consolidado"
-      [value]="totalBalance | appCurrency"
-      note="Soma atual das contas cadastradas.">
-      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-        <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-        <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-      </svg>
-    </app-stat-card>
-
-    <app-stat-card
-      tone="success"
-      eyebrow="Contas ativas"
-      [value]="activeAccountsCount.toString()"
-      [note]="accounts.length + ' conta(s) cadastrada(s) no total.'">
-      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-        <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </app-stat-card>
-
-    <app-stat-card
-      tone="info"
-      eyebrow="Extrato"
-      [value]="transactions.length.toString()"
-      [note]="selectedAccountLabel">
-      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-        <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </app-stat-card>
-  </section>
-
-  <section class="accounts-shell">
-    <app-period-hero
-      eyebrow="Contas e movimentações"
-      title="Controle saldos e transferências"
-      description="Cadastre contas, acompanhe saldo atual por movimentações e importe extratos quando precisar reconciliar o mês."
-      [showNavigation]="false">
-    @if (canManageAccounts) {
-      <app-period-action-card
-        hero-aside
-        [title]="editingId ? 'Finalizar edição' : 'Cadastrar conta'"
-        description="Mantenha as contas atualizadas para que o saldo real do dashboard fique consistente.">
-        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="startCreate()">
-          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
-          <span class="period-total-card__action-copy">
-            <strong>Nova conta</strong>
-            <small>Limpar o formulário e começar um novo cadastro.</small>
-          </span>
+  <app-page-header
+    eyebrow="Central de contas"
+    title="Contas"
+    description="Acompanhe seus saldos, movimentações e distribuição financeira em um único lugar."
+    [hasMeta]="false">
+    <div page-actions class="accounts-actions">
+      @if (canManageAccounts) {
+        <button type="button" class="btn-primary sm" (click)="focusCreate()">
+          <span aria-hidden="true">+</span> Nova conta
         </button>
-      </app-period-action-card>
-    }
-    </app-period-hero>
+      }
+      @if (canTransfer) {
+        <button type="button" class="btn-secondary sm" (click)="focusTransfer()">Nova transferência</button>
+      }
+      <button type="button" class="btn-ghost sm" (click)="refreshBalances()" aria-label="Atualizar saldos das contas">Atualizar saldos</button>
+    </div>
+  </app-page-header>
 
   @if (error) {
-    <p class="accounts-feedback accounts-feedback--error">
-      {{ error }}
-    </p>
+    <p class="accounts-feedback accounts-feedback--error" role="alert">{{ error }}</p>
   }
 
+  @if (loading && !hasAccounts) {
+    <app-ui-state type="loading" title="Carregando contas..."></app-ui-state>
+  }
+
+  @if (!loading && !hasAccounts) {
+    <app-empty-state
+      icon="🏦"
+      title="Você ainda não cadastrou nenhuma conta."
+      description="Cadastre uma conta para começar a acompanhar saldos, receitas, despesas e transferências."
+      [ctaLabel]="canManageAccounts ? 'Cadastrar conta' : ''"
+      (action)="focusCreate()">
+    </app-empty-state>
+
     @if (canManageAccounts) {
-      <div class="accounts-workspace">
+      <section id="accounts-workspace" class="accounts-workspace accounts-workspace--single">
+        <app-account-form
+          [form]="form"
+          [editingId]="editingId"
+          [saving]="saving"
+          [accountTypes]="accountTypes"
+          (save)="save()"
+          (clear)="startCreate()">
+        </app-account-form>
+      </section>
+    }
+  }
+
+  @if (hasAccounts) {
+    <!-- Cards de resumo -->
+    <section class="accounts-summary" aria-label="Resumo financeiro das contas">
+      <app-transaction-summary-card tone="primary" eyebrow="Saldo total" [value]="overview.totalBalance | appCurrency"
+        note="Soma das contas ativas.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+          <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </svg>
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
+        [note]="availableNote">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 7h16v10H4zM4 10h16M8 14h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
+        [note]="'Receitas reais ' + periodLabel + '.'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
+        [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card tone="primary" eyebrow="Contas ativas" [value]="overview.activeCount.toString()"
+        [note]="activeAccountsNote">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
+
+    <!-- Controles: período -->
+    <div class="accounts-controls">
+      <div class="accounts-controls__period">
+        <span class="accounts-controls__label" id="period-label">Período</span>
+        <app-segmented-selector
+          [options]="periodOptions"
+          [value]="period"
+          ariaLabel="Selecionar período"
+          (valueChange)="setPeriod($event)" />
+      </div>
+      @if (overview.hasNegative) {
+        <p class="accounts-controls__alert" role="status">⚠ Há conta com saldo negativo — verifique lançamentos ou faça um aporte.</p>
+      }
+    </div>
+
+    <!-- Filtros e ordenação (avançado) -->
+    @if (canAdvanced) {
+      <div class="accounts-filters">
+        <label class="accounts-filter accounts-filter--grow">
+          <span class="accounts-filter__label">Buscar</span>
+          <input type="search" [(ngModel)]="filters.search" placeholder="Nome da conta" aria-label="Buscar conta por nome" />
+        </label>
+        <label class="accounts-filter">
+          <span class="accounts-filter__label">Tipo</span>
+          <select [(ngModel)]="filters.type" aria-label="Filtrar por tipo de conta">
+            @for (opt of typeFilterOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="accounts-filter">
+          <span class="accounts-filter__label">Status</span>
+          <select [(ngModel)]="filters.status" aria-label="Filtrar por status">
+            <option value="all">Todos</option>
+            <option value="active">Ativas</option>
+            <option value="inactive">Inativas</option>
+          </select>
+        </label>
+        <label class="accounts-filter">
+          <span class="accounts-filter__label">Saldo</span>
+          <select [(ngModel)]="filters.balance" aria-label="Filtrar por saldo">
+            <option value="all">Todos</option>
+            <option value="positive">Positivo</option>
+            <option value="negative">Negativo</option>
+          </select>
+        </label>
+        <label class="accounts-filter">
+          <span class="accounts-filter__label">Ordenar</span>
+          <select [(ngModel)]="sort" aria-label="Ordenar contas">
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    }
+
+    <!-- Lista de contas + painel de disponibilidade -->
+    <div class="accounts-body" [class.accounts-body--with-aside]="showAside">
+      <div class="accounts-body__main">
+        <app-account-list
+          [accounts]="filteredAccounts"
+          [loading]="loading"
+          [canManage]="canManageAccounts"
+          [showHeader]="false"
+          [activityMap]="activityMap"
+          [primaryAccountId]="defaultAccountId"
+          [canTransfer]="canTransfer"
+          [canSetPrimary]="canManageAccounts"
+          (create)="focusCreate()"
+          (selectAccount)="selectAccount($event)"
+          (edit)="startEdit($event)"
+          (remove)="remove($event)"
+          (transfer)="focusTransfer()"
+          (setPrimary)="setPrimary($event)">
+        </app-account-list>
+
+        @if (canAdvanced && !filteredAccounts.length) {
+          <app-empty-state
+            title="Nenhuma conta encontrada"
+            description="Ajuste a busca ou os filtros para ver suas contas.">
+          </app-empty-state>
+        }
+      </div>
+
+      @if (showAside) {
+        <aside class="accounts-aside">
+          @if (realBalance) {
+            <section class="avail" aria-label="Disponibilidade">
+              <h3 class="avail__title">Disponibilidade</h3>
+              <dl class="avail__rows">
+                <div class="avail__row">
+                  <dt>Saldo em contas</dt>
+                  <dd>{{ realBalance.activeAccountsBalance | appCurrency }}</dd>
+                </div>
+                @if (reservedAmount > 0) {
+                  <div class="avail__row">
+                    <dt>− Comprometido</dt>
+                    <dd class="avail__neg">{{ reservedAmount | appCurrency }}</dd>
+                  </div>
+                }
+                <div class="avail__row avail__row--total">
+                  <dt>Disponível agora</dt>
+                  <dd [class.avail__neg]="availableBalance < 0">{{ availableBalance | appCurrency }}</dd>
+                </div>
+                @if (forecastAmount > 0) {
+                  <div class="avail__row">
+                    <dt>+ Previsto a receber</dt>
+                    <dd class="avail__pos">{{ forecastAmount | appCurrency }}</dd>
+                  </div>
+                  <div class="avail__row avail__row--muted">
+                    <dt>Projeção do período</dt>
+                    <dd>{{ projectedAvailable | appCurrency }}</dd>
+                  </div>
+                }
+              </dl>
+              @if (overdueAmount > 0) {
+                <p class="avail__alert" role="status">⚠ {{ overdueCount }} compromisso(s) vencido(s): {{ overdueAmount | appCurrency }}</p>
+              }
+            </section>
+          }
+
+          @if (showDistribution) {
+            <section class="avail avail--dist" aria-label="Distribuição de saldo">
+              <h3 class="avail__title">Distribuição de saldo</h3>
+              <app-donut-chart [items]="overview.distribution" />
+              <ul class="accounts-distribution__legend">
+                @for (item of overview.distribution; track item.label) {
+                  <li class="accounts-distribution__row">
+                    <span class="accounts-distribution__swatch" [style.background]="item.color" aria-hidden="true"></span>
+                    <span class="accounts-distribution__name">{{ item.label }}</span>
+                    <span class="accounts-distribution__pct">{{ item.percent | number:'1.0-1' }}%</span>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+        </aside>
+      }
+    </div>
+
+    <!-- Gerenciar: cadastro + transferência -->
+    @if (canManageAccounts) {
+      <section id="accounts-workspace" class="accounts-workspace" [class.accounts-workspace--single]="!canTransfer">
         <app-account-form
           [form]="form"
           [editingId]="editingId"
@@ -71,152 +241,88 @@
           (clear)="startCreate()">
         </app-account-form>
 
-        <app-account-transfer
-          [accounts]="accounts"
-          [value]="transferForm"
-          [transferring]="transferring"
-          (valueChange)="onTransferChange($event)"
-          (submitTransfer)="transfer()">
-        </app-account-transfer>
-      </div>
-    }
-
-    <section class="accounts-list-card">
-      <app-account-list
-        [accounts]="accounts"
-        [loading]="loading"
-        [canManage]="canManageAccounts"
-        (refresh)="loadAccounts()"
-        (create)="startCreate()"
-        (selectAccount)="selectAccount($event)"
-        (edit)="startEdit($event)"
-        (remove)="remove($event)">
-      </app-account-list>
-    </section>
-
-  @if (selectedAccount) {
-    <app-section-card
-      [title]="'Extrato: ' + selectedAccount.name"
-      description="Acompanhe movimentações, filtros e importações de extrato">
-      <div card-actions class="flex flex-wrap items-end gap-2">
-        <label class="grid gap-1 text-xs text-[var(--text-muted)]">
-          De
-          <input type="datetime-local" [(ngModel)]="fromInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
-        </label>
-        <label class="grid gap-1 text-xs text-[var(--text-muted)]">
-          Até
-          <input type="datetime-local" [(ngModel)]="toInput" class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 text-sm" />
-        </label>
-        <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
-      </div>
-      @if (canImportAccounts) {
-        <app-account-import
-          [ofxFileName]="ofxFileName"
-          [extractingOfx]="extractingOfx"
-          [importingOfx]="importingOfx"
-          [ofxExtract]="ofxExtract"
-          [duplicateCount]="duplicateCount()"
-          [categories]="categories"
-          [extractingCsv]="extractingCsv"
-          [importingCsv]="importingCsv"
-          [csvExtract]="csvExtract"
-          [csvSkipDuplicates]="csvSkipDuplicates"
-          (ofxSelected)="onOfxSelected($event)"
-          (csvSelected)="onCsvSelected($event)"
-          (clearOfx)="clearOfxState()"
-          (clearCsv)="clearCsvState()"
-          (importOfx)="importOfx()"
-          (importCsv)="importCsv()"
-          (csvSkipDuplicatesChange)="csvSkipDuplicates = $event"
-          (categoryChanged)="onImportCategoryChanged($event)">
-        </app-account-import>
-      }
-      @if (loadingTransactions) {
-        <app-ui-state type="loading" title="Carregando extrato..."></app-ui-state>
-      }
-      @if (!loadingTransactions && !transactions.length) {
-        <app-empty-state
-          title="Nenhuma movimentação"
-          description="Tente alterar o filtro ou importar um extrato.">
-        </app-empty-state>
-      }
-      <!-- Desktop: tabela analítica -->
-      @if (!loadingTransactions && transactions.length) {
-        <div class="contas-transactions-table overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead>
-              <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
-                <th class="py-2 pr-4">Data</th>
-                <th class="py-2 pr-4">Tipo</th>
-                <th class="py-2 pr-4">Descrição</th>
-                <th class="py-2 pr-4">Origem</th>
-                <th class="py-2 text-right">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (tx of transactions; track tx) {
-                <tr class="border-b border-[var(--border)]/60 text-[var(--text)]">
-                  <td class="py-2 pr-4">{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
-                  <td class="py-2 pr-4">
-                    <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                      {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
-                    </span>
-                  </td>
-                  <td class="py-2 pr-4">{{ tx.description }}</td>
-                  <td class="py-2 pr-4">{{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</td>
-                  <td class="py-2 text-right" [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                    {{ tx.kind === 'Credit' ? '+' : '-' }}{{ tx.amount | appCurrency }}
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Mobile: cards empilhados (mesma informação, sem scroll horizontal) -->
-        <div class="contas-transactions-cards">
-          @for (tx of transactions; track tx) {
-            <article class="contas-transaction-card">
-              <div class="contas-transaction-card__row">
-                <strong>{{ tx.description }}</strong>
-                <strong [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                  {{ tx.kind === 'Credit' ? '+' : '-' }}{{ tx.amount | appCurrency }}
-                </strong>
-              </div>
-              <div class="contas-transaction-card__row contas-transaction-card__row--meta">
-                <span>{{ tx.occurredAt | date:'dd/MM/yyyy HH:mm' }} · {{ sourceTypeLabel(tx.sourceType, tx.sourceLabel) }}</span>
-                <span [ngClass]="tx.kind === 'Credit' ? 'text-[var(--success-text)]' : 'text-[var(--danger-text)]'">
-                  {{ tx.kind === 'Credit' ? 'Crédito' : 'Débito' }}
-                </span>
-              </div>
-            </article>
-          }
-        </div>
-        @if (transactionsTotalPages > 1) {
-          <div class="flex items-center justify-between pt-3 text-sm text-[var(--text-muted)]">
-            <span>{{ transactionsTotalCount }} movimentações · página {{ transactionsPage }} de {{ transactionsTotalPages }}</span>
-            <div class="flex gap-2">
-              <button
-                type="button"
-                class="btn-ghost sm"
-                [disabled]="transactionsPage <= 1"
-                (click)="goToPage(transactionsPage - 1)">
-                ← Anterior
-              </button>
-              <button
-                type="button"
-                class="btn-ghost sm"
-                [disabled]="!transactionsHasNextPage"
-                (click)="goToPage(transactionsPage + 1)">
-                Próxima →
-              </button>
-            </div>
+        @if (canTransfer) {
+          <div id="accounts-transfer">
+            <app-account-transfer
+              [accounts]="accounts"
+              [value]="transferForm"
+              [transferring]="transferring"
+              (valueChange)="onTransferChange($event)"
+              (submitTransfer)="transfer()">
+            </app-account-transfer>
           </div>
         }
-      }
-    </app-section-card>
+      </section>
+    }
+
+    <!-- Extrato da conta selecionada -->
+    @if (selectedAccount) {
+      <app-section-card
+        id="accounts-statement"
+        [title]="'Extrato: ' + selectedAccount.name"
+        description="Movimentações, filtros e importação de extrato.">
+        <div card-actions class="accounts-statement__filters">
+          <label class="accounts-statement__field">
+            <span>De</span>
+            <input type="datetime-local" [(ngModel)]="fromInput" />
+          </label>
+          <label class="accounts-statement__field">
+            <span>Até</span>
+            <input type="datetime-local" [(ngModel)]="toInput" />
+          </label>
+          <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
+        </div>
+
+        @if (canImportAccounts) {
+          <app-account-import
+            [ofxFileName]="ofxFileName"
+            [extractingOfx]="extractingOfx"
+            [importingOfx]="importingOfx"
+            [ofxExtract]="ofxExtract"
+            [duplicateCount]="duplicateCount()"
+            [categories]="categories"
+            [extractingCsv]="extractingCsv"
+            [importingCsv]="importingCsv"
+            [csvExtract]="csvExtract"
+            [csvSkipDuplicates]="csvSkipDuplicates"
+            (ofxSelected)="onOfxSelected($event)"
+            (csvSelected)="onCsvSelected($event)"
+            (clearOfx)="clearOfxState()"
+            (clearCsv)="clearCsvState()"
+            (importOfx)="importOfx()"
+            (importCsv)="importCsv()"
+            (csvSkipDuplicatesChange)="csvSkipDuplicates = $event"
+            (categoryChanged)="onImportCategoryChanged($event)">
+          </app-account-import>
+        }
+
+        @if (loadingTransactions) {
+          <app-ui-state type="loading" title="Carregando extrato..."></app-ui-state>
+        }
+
+        @if (!loadingTransactions && !transactions.length) {
+          <app-empty-state
+            title="Esta conta ainda não possui movimentações."
+            description="As movimentações aparecem aqui conforme você registra receitas, despesas, transferências ou importa um extrato.">
+          </app-empty-state>
+        }
+
+        @if (!loadingTransactions && transactions.length) {
+          <app-account-movements-list [transactions]="transactions" [currency]="selectedAccount.currency" />
+
+          @if (transactionsTotalPages > 1) {
+            <div class="accounts-statement__pager">
+              <span>{{ transactionsTotalCount }} movimentações · página {{ transactionsPage }} de {{ transactionsTotalPages }}</span>
+              <div class="accounts-statement__pager-actions">
+                <button type="button" class="btn-ghost sm" [disabled]="transactionsPage <= 1" (click)="goToPage(transactionsPage - 1)">← Anterior</button>
+                <button type="button" class="btn-ghost sm" [disabled]="!transactionsHasNextPage" (click)="goToPage(transactionsPage + 1)">Próxima →</button>
+              </div>
+            </div>
+          }
+        }
+      </app-section-card>
+    }
   }
-  </section>
 
   @if (accountToRemove) {
     <app-confirm-dialog

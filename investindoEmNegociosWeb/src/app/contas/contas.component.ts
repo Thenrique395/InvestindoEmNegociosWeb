@@ -20,17 +20,45 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { AccountListComponent } from '../features/accounts/components/account-list/account-list.component';
 import { AccountTransferComponent, AccountTransferFormValue } from '../features/accounts/components/account-transfer/account-transfer.component';
 import { AccountImportComponent } from '../features/accounts/components/account-import/account-import.component';
+import { AccountMovementsListComponent } from '../features/accounts/components/account-movements/account-movements-list.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
+import { DonutChartComponent } from '../shared/donut-chart/donut-chart.component';
 import { UiPermissionsService } from '../ui-permissions.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import {
+  AccountPeriod,
+  AccountSort,
+  AccountsFilters,
+  AccountsOverview,
+  buildAccountsOverview,
+  filterAccounts,
+  sortAccounts
+} from './accounts-overview.model';
 
 @Component({
   selector: 'app-contas',
   standalone: true,
-  imports: [CommonModule, FormsModule, AccountFormComponent, AccountListComponent, AccountTransferComponent, AccountImportComponent, SectionCardComponent, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, ConfirmDialogComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AccountFormComponent,
+    AccountListComponent,
+    AccountTransferComponent,
+    AccountImportComponent,
+    AccountMovementsListComponent,
+    SectionCardComponent,
+    EmptyStateComponent,
+    UiStateComponent,
+    AppCurrencyPipe,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    SegmentedSelectorComponent,
+    DonutChartComponent,
+    ConfirmDialogComponent
+  ],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
@@ -77,11 +105,22 @@ export class ContasComponent implements OnInit {
 
   readonly accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
 
+  // Central de Contas — período, filtros e ordenação
+  period: AccountPeriod = 'month';
+  filters: AccountsFilters = { search: '', type: 'all', status: 'all', balance: 'all' };
+  sort: AccountSort = 'primary';
+  showManageWorkspace = false;
+  readonly canAdvanced: boolean;
+
+  private lastActivityKey = '';
+
   constructor(
     private readonly accountsStore: AccountsStore,
     private readonly categoriesService: CategoriesService,
     private readonly uiPermissions: UiPermissionsService
   ) {
+    this.canAdvanced = this.uiPermissions.canUseAdvancedAccountAnalysis();
+
     effect(() => {
       this.accounts = this.accountsStore.accounts();
       this.loading = this.accountsStore.loading();
@@ -106,23 +145,181 @@ export class ContasComponent implements OnInit {
       this.loadingTransactions = this.accountsStore.transactionsLoading();
       this.error = this.accountsStore.transactionsError() || this.error;
     });
+
+    // Recarrega a atividade por conta quando o conjunto de contas muda.
+    effect(
+      () => {
+        const key = this.accountsStore.accounts().map((account) => account.id).sort().join(',');
+        if (key && key !== this.lastActivityKey) {
+          this.lastActivityKey = key;
+          this.accountsStore.loadAccountsActivity(this.period);
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   ngOnInit(): void {
     this.loadAccounts();
     this.loadCategories();
+    this.accountsStore.loadRealBalance(this.period);
   }
+
+  // ---- Derivações (Central de Contas) ---------------------------------------
+
+  get activityMap() {
+    return this.accountsStore.accountsActivity();
+  }
+
+  get defaultAccountId(): string | null {
+    return this.accountsStore.defaultAccountId();
+  }
+
+  get realBalance() {
+    return this.accountsStore.realBalance();
+  }
+
+  get overview(): AccountsOverview {
+    return buildAccountsOverview(this.accounts, this.activityMap, this.defaultAccountId);
+  }
+
+  get filteredAccounts(): AccountResponse[] {
+    return sortAccounts(filterAccounts(this.accounts, this.filters), this.sort, this.activityMap, this.defaultAccountId);
+  }
+
+  get availableBalance(): number {
+    const real = this.realBalance;
+    return real ? real.realAvailableBalance : this.overview.totalBalance;
+  }
+
+  get reservedAmount(): number {
+    return this.realBalance?.pendingExpensesAmount ?? 0;
+  }
+
+  get availableNote(): string {
+    if (this.availableBalance < 0) return 'Compromissos em aberto superam o saldo — atenção.';
+    if (this.reservedAmount > 0) return 'Já descontando compromissos em aberto do período.';
+    return 'Sem compromissos em aberto no período.';
+  }
+
+  get availableTone(): 'info' | 'warning' {
+    return this.availableBalance < 0 ? 'warning' : 'info';
+  }
+
+  get forecastAmount(): number {
+    return this.realBalance?.pendingIncomesAmount ?? 0;
+  }
+
+  get overdueAmount(): number {
+    return this.realBalance?.overdueExpensesAmount ?? 0;
+  }
+
+  get overdueCount(): number {
+    return this.realBalance?.overdueExpensesCount ?? 0;
+  }
+
+  get projectedAvailable(): number {
+    return this.realBalance?.projectedAvailableBalance ?? this.availableBalance;
+  }
+
+  /** Mostra o painel lateral quando há dados de disponibilidade ou distribuição. */
+  get showAside(): boolean {
+    return !!this.realBalance || this.showDistribution;
+  }
+
+  get periodLabel(): string {
+    if (this.period === 'year') return 'no ano';
+    if (this.period === 'quarter') return 'no trimestre';
+    return 'no mês';
+  }
+
+  get showDistribution(): boolean {
+    return this.canAdvanced && this.overview.distribution.length > 1;
+  }
+
+  get hasAccounts(): boolean {
+    return this.accounts.length > 0;
+  }
+
+  get canTransfer(): boolean {
+    return this.canManageAccounts && this.accounts.filter((a) => a.isActive).length >= 2;
+  }
+
+  get activeAccountsNote(): string {
+    const primary = this.accounts.find((a) => a.id === this.defaultAccountId);
+    if (primary) return `Principal: ${primary.name}`;
+    return `${this.accounts.length} conta(s) cadastrada(s).`;
+  }
+
+  readonly periodOptions: SegmentOption[] = [
+    { value: 'month', label: 'Mês' },
+    { value: 'quarter', label: 'Trimestre' },
+    { value: 'year', label: 'Ano' }
+  ];
+
+  readonly typeFilterOptions: { value: AccountType | 'all'; label: string }[] = [
+    { value: 'all', label: 'Todos os tipos' },
+    { value: 'Checking', label: 'Conta corrente' },
+    { value: 'Savings', label: 'Poupança' },
+    { value: 'DigitalWallet', label: 'Carteira digital' },
+    { value: 'Cash', label: 'Dinheiro' },
+    { value: 'Other', label: 'Outro' }
+  ];
+
+  readonly sortOptions: { value: AccountSort; label: string }[] = [
+    { value: 'primary', label: 'Principal primeiro' },
+    { value: 'balance-desc', label: 'Maior saldo' },
+    { value: 'balance-asc', label: 'Menor saldo' },
+    { value: 'name', label: 'Nome' },
+    { value: 'recent', label: 'Movimentação recente' }
+  ];
+
+  setPeriod(period: string): void {
+    this.period = period as AccountPeriod;
+    this.accountsStore.loadRealBalance(this.period);
+    this.accountsStore.loadAccountsActivity(this.period);
+  }
+
+  setPrimary(account: AccountResponse): void {
+    this.accountsStore.setDefaultAccount(account.id);
+  }
+
+  refreshBalances(): void {
+    this.error = '';
+    this.accountsStore.refresh();
+    this.accountsStore.loadRealBalance(this.period);
+    this.lastActivityKey = '';
+    this.accountsStore.loadAccountsActivity(this.period);
+  }
+
+  focusCreate(): void {
+    this.showManageWorkspace = true;
+    this.startCreate();
+    queueMicrotask(() => this.scrollTo('accounts-workspace'));
+  }
+
+  focusTransfer(): void {
+    this.showManageWorkspace = true;
+    queueMicrotask(() => this.scrollTo('accounts-transfer'));
+  }
+
+  private scrollTo(id: string): void {
+    if (typeof document === 'undefined') return;
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---- Contas / formulário (comportamento preservado) -----------------------
 
   get selectedAccount(): AccountResponse | undefined {
     return this.accounts.find((account) => account.id === this.selectedAccountId);
   }
 
   get totalBalance(): number {
-    return this.accounts.reduce((total, account) => total + Number(account.currentBalance || 0), 0);
+    return this.overview.totalBalance;
   }
 
   get activeAccountsCount(): number {
-    return this.accounts.filter((account) => account.isActive).length;
+    return this.overview.activeCount;
   }
 
   get selectedAccountLabel(): string {
@@ -151,6 +348,7 @@ export class ContasComponent implements OnInit {
   startEdit(account: AccountResponse): void {
     this.error = '';
     this.editingId = account.id;
+    this.showManageWorkspace = true;
     this.form = {
       name: account.name,
       type: account.type,
@@ -158,6 +356,7 @@ export class ContasComponent implements OnInit {
       isActive: account.isActive,
       currency: account.currency
     };
+    queueMicrotask(() => this.scrollTo('accounts-workspace'));
   }
 
   save(): void {
@@ -220,6 +419,7 @@ export class ContasComponent implements OnInit {
     this.accountsStore.selectAccount(accountId);
     this.selectedAccountId = accountId;
     this.loadTransactions();
+    queueMicrotask(() => this.scrollTo('accounts-statement'));
   }
 
   loadTransactions(page = 1): void {

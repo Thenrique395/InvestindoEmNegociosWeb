@@ -4,96 +4,329 @@
 
 .accounts-page {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-.accounts-summary-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.accounts-shell {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
-  padding: 1.6rem;
-  display: grid;
-  gap: 1.3rem;
+.accounts-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .accounts-feedback {
   margin: 0;
-  border-radius: var(--radius-lg);
-  padding: 0.9rem 1rem;
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-semibold);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg, 12px);
+  font-size: var(--font-size-body-sm, 0.85rem);
 }
 
 .accounts-feedback--error {
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
-  color: var(--danger-text);
+  border: 1px solid var(--color-danger-soft);
+  background: var(--color-danger-weak);
+  color: var(--color-danger-text);
 }
 
-.accounts-workspace {
+// ---- Cards de resumo --------------------------------------------------------
+
+.accounts-summary {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
 }
 
-.accounts-list-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 97%, white);
-  box-shadow: var(--shadow-sm);
-  padding: 1.25rem;
+// ---- Controles --------------------------------------------------------------
+
+.accounts-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
 }
 
-table {
-  border-collapse: collapse;
+.accounts-controls__period {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-.contas-transactions-cards {
-  display: none;
+.accounts-controls__label {
+  font-size: var(--text-xs, 0.68rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
 }
 
-.contas-transaction-card {
+.accounts-controls__alert {
+  margin: 0;
+  font-size: var(--font-size-body-sm, 0.82rem);
+  color: var(--color-danger-text);
+  font-weight: 600;
+}
+
+// ---- Corpo: lista + painel lateral -----------------------------------------
+
+.accounts-body {
   display: grid;
-  gap: 0.35rem;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--border);
+  gap: 1.25rem;
+  align-items: start;
 }
 
-.contas-transaction-card:last-child {
-  border-bottom: 0;
+.accounts-body--with-aside {
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
 }
 
-.contas-transaction-card__row {
+.accounts-body__main {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.accounts-aside {
+  display: grid;
+  gap: 1rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.avail {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.05rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-elevation-sm);
+}
+
+.avail__title {
+  margin: 0;
+  font-size: var(--text-sm, 0.9rem);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.avail__rows {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.avail__row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
+  font-size: var(--font-size-body-sm, 0.85rem);
 }
 
-.contas-transaction-card__row--meta {
+.avail__row dt {
   color: var(--text-muted);
-  font-size: var(--font-size-caption);
 }
 
-@media (max-width: 960px) {
-  .accounts-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
+.avail__row dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.avail__row--total {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.avail__row--total dt {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.avail__row--total dd {
+  font-size: var(--font-size-body, 1rem);
+}
+
+.avail__row--muted dt,
+.avail__row--muted dd {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.avail__pos { color: var(--success-text, var(--success)) !important; }
+.avail__neg { color: var(--danger-text, var(--danger)) !important; }
+
+.avail__alert {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-md, 10px);
+  background: var(--color-danger-weak);
+  color: var(--color-danger-text);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+}
+
+.avail--dist {
+  justify-items: center;
+}
+
+.avail--dist .avail__title {
+  justify-self: start;
+}
+
+// ---- Distribuição (legenda) -------------------------------------------------
+
+.accounts-distribution__legend {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.accounts-distribution__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-size-body-sm, 0.82rem);
+}
+
+.accounts-distribution__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.accounts-distribution__name {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accounts-distribution__pct {
+  color: var(--text-muted);
+  min-width: 3rem;
+  text-align: right;
+}
+
+// ---- Filtros ----------------------------------------------------------------
+
+.accounts-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+}
+
+.accounts-filter {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 160px;
+}
+
+.accounts-filter--grow {
+  flex: 1 1 220px;
+}
+
+.accounts-filter__label {
+  font-size: var(--text-xs, 0.68rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.accounts-filter input,
+.accounts-filter select {
+  min-height: 42px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-body-sm, 0.85rem);
+}
+
+.accounts-filter input:focus-visible,
+.accounts-filter select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+// ---- Workspace (form + transferência) --------------------------------------
+
+.accounts-workspace {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.accounts-workspace--single {
+  grid-template-columns: minmax(0, 520px);
+}
+
+// ---- Extrato ----------------------------------------------------------------
+
+.accounts-statement__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.6rem;
+}
+
+.accounts-statement__field {
+  display: grid;
+  gap: 0.3rem;
+  font-size: var(--text-xs, 0.72rem);
+  color: var(--text-muted);
+}
+
+.accounts-statement__field input {
+  min-height: 38px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--font-size-body-sm, 0.85rem);
+}
+
+.accounts-statement__pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  font-size: var(--font-size-body-sm, 0.82rem);
+  color: var(--text-muted);
+}
+
+.accounts-statement__pager-actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+// ---- Responsividade ---------------------------------------------------------
+
+@media (max-width: 1080px) {
+  .accounts-body--with-aside {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts-aside {
+    position: static;
   }
 }
 
-@media (max-width: 640px) {
-  .contas-transactions-table {
-    display: none;
-  }
-
-  .contas-transactions-cards {
-    display: grid;
+@media (max-width: 720px) {
+  .accounts-actions {
+    width: 100%;
   }
 }

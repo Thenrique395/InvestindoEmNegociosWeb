@@ -15,14 +15,25 @@ class AccountsStoreMock {
   transactionsState = signal<any[]>([]);
   transactionsLoadingState = signal(false);
   transactionsErrorState = signal<string | null>(null);
+  realBalanceState = signal<any>(null);
+  activityState = signal<Record<string, any>>({});
+  defaultAccountIdState = signal<string | null>(null);
 
   accounts = this.accountsState.asReadonly();
   loading = this.loadingState.asReadonly();
   error = this.errorState.asReadonly();
   selectedAccountId = this.selectedAccountIdState.asReadonly();
   transactions = this.transactionsState.asReadonly();
+  transactionsTotalCount = signal(0).asReadonly();
+  transactionsPage = signal(1).asReadonly();
+  transactionsPageSize = signal(50).asReadonly();
+  transactionsTotalPages = signal(0).asReadonly();
+  transactionsHasNextPage = signal(false).asReadonly();
   transactionsLoading = this.transactionsLoadingState.asReadonly();
   transactionsError = this.transactionsErrorState.asReadonly();
+  realBalance = this.realBalanceState.asReadonly();
+  accountsActivity = this.activityState.asReadonly();
+  defaultAccountId = this.defaultAccountIdState.asReadonly();
 
   load = jasmine.createSpy('load').and.callFake(() => {
     const firstAccountId = this.accountsState()[0]?.id ?? null;
@@ -30,6 +41,10 @@ class AccountsStoreMock {
       this.selectedAccountIdState.set(firstAccountId);
     }
   });
+  refresh = jasmine.createSpy('refresh');
+  loadRealBalance = jasmine.createSpy('loadRealBalance');
+  loadAccountsActivity = jasmine.createSpy('loadAccountsActivity');
+  setDefaultAccount = jasmine.createSpy('setDefaultAccount');
   create = jasmine.createSpy('create');
   update = jasmine.createSpy('update');
   delete = jasmine.createSpy('delete');
@@ -54,6 +69,7 @@ class UiPermissionsServiceMock {
   canImportAccounts = jasmine.createSpy('canImportAccounts').and.returnValue(true);
   canViewCardStatements = jasmine.createSpy('canViewCardStatements').and.returnValue(true);
   canImportInvoices = jasmine.createSpy('canImportInvoices').and.returnValue(true);
+  canUseAdvancedAccountAnalysis = jasmine.createSpy('canUseAdvancedAccountAnalysis').and.returnValue(true);
 }
 
 describe('ContasComponent smoke', () => {

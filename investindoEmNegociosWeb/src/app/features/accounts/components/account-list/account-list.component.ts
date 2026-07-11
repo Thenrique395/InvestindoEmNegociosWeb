@@ -1,16 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { AccountResponse, AccountType } from '../../models/account.models';
 import { EmptyStateComponent } from '../../../../empty-state/empty-state.component';
 import { UiStateComponent } from '../../../../ui-state/ui-state.component';
-import { AppCurrencyPipe } from '../../../../shared/app-currency.pipe';
-import { StatusBadgeComponent } from '../../../../shared/status-badge/status-badge.component';
+import { AccountCardComponent } from '../account-card/account-card.component';
+import { AccountActivity, accountTypeLabel } from '../../../../contas/accounts-overview.model';
 
 @Component({
   selector: 'app-account-list',
   standalone: true,
-  imports: [CommonModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatusBadgeComponent],
+  imports: [EmptyStateComponent, UiStateComponent, AccountCardComponent],
   templateUrl: './account-list.component.html',
   styleUrl: './account-list.component.scss'
 })
@@ -19,24 +18,31 @@ export class AccountListComponent {
   @Input() loading = false;
   @Input() canManage = true;
 
+  /** Novos (opcionais) — retrocompatíveis com usos existentes (ex.: styleguide). */
+  @Input() showHeader = true;
+  @Input() activityMap: Record<string, AccountActivity> = {};
+  @Input() primaryAccountId: string | null = null;
+  @Input() canTransfer = false;
+  @Input() canSetPrimary = false;
+
   @Output() refresh = new EventEmitter<void>();
   @Output() create = new EventEmitter<void>();
   @Output() selectAccount = new EventEmitter<string>();
   @Output() edit = new EventEmitter<AccountResponse>();
   @Output() remove = new EventEmitter<AccountResponse>();
+  @Output() transfer = new EventEmitter<AccountResponse>();
+  @Output() setPrimary = new EventEmitter<AccountResponse>();
 
   get hasAccounts(): boolean {
     return this.accounts.length > 0;
   }
 
   accountTypeLabel(type: AccountType): string {
-    switch (type) {
-      case 'Checking': return 'Conta corrente';
-      case 'Savings': return 'Poupança';
-      case 'DigitalWallet': return 'Carteira digital';
-      case 'Cash': return 'Dinheiro';
-      default: return 'Outro';
-    }
+    return accountTypeLabel(type);
+  }
+
+  activityFor(accountId: string): AccountActivity | null {
+    return this.activityMap[accountId] ?? null;
   }
 
   trackByAccountId(_: number, account: AccountResponse): string {

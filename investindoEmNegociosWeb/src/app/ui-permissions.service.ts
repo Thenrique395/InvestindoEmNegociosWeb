@@ -21,6 +21,15 @@ export class UiPermissionsService {
     return hasAtLeastRole(this.authService.getRole(), 'Intermediate');
   }
 
+  /**
+   * Análises avançadas de Contas (distribuição de saldo, comparativos, filtros
+   * e ordenação completos) ficam disponíveis a partir do plano Intermediário.
+   * Basic mantém a visão simples de saldo e movimentações.
+   */
+  canUseAdvancedAccountAnalysis(): boolean {
+    return hasAtLeastRole(this.authService.getRole(), 'Intermediate');
+  }
+
   canReadAccounts(): boolean {
     return this.can(APP_FEATURE_KEYS.accountsRead);
   }

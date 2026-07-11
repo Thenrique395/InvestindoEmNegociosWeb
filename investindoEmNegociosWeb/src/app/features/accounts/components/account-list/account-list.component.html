@@ -1,11 +1,13 @@
 <section class="account-list">
-  <div class="account-list__head">
-    <div>
-      <p class="account-list__eyebrow">Carteira de contas</p>
-      <h2>Minhas contas</h2>
+  @if (showHeader) {
+    <div class="account-list__head">
+      <div>
+        <p class="account-list__eyebrow">Carteira de contas</p>
+        <h2>Minhas contas</h2>
+      </div>
+      <button type="button" class="account-list__refresh" (click)="refresh.emit()">Atualizar</button>
     </div>
-    <button type="button" class="account-list__refresh" (click)="refresh.emit()">Atualizar</button>
-  </div>
+  }
 
   @if (loading) {
     <app-ui-state type="loading" title="Carregando contas..."></app-ui-state>
@@ -30,39 +32,19 @@
   @if (!loading && hasAccounts) {
     <div class="account-list__grid">
       @for (account of accounts; track trackByAccountId($index, account)) {
-        <article class="account-card">
-          <div class="account-card__head">
-            <span class="account-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <div>
-              <h3>
-                {{ account.name }}
-                @if (account.currency !== 'BRL') {
-                  <app-status-badge tone="info" size="sm" [label]="account.currency"></app-status-badge>
-                }
-              </h3>
-              <p>{{ accountTypeLabel(account.type) }}</p>
-            </div>
-            <app-status-badge
-              [tone]="account.isActive ? 'success' : 'muted'"
-              [label]="account.isActive ? 'Ativa' : 'Inativa'">
-            </app-status-badge>
-          </div>
-          <div class="account-card__balance">
-            <span>Saldo atual</span>
-            <strong>{{ account.currentBalance | appCurrency:account.currency }}</strong>
-          </div>
-          <div class="account-card__actions">
-            <button type="button" class="account-card__action account-card__action--primary" (click)="selectAccount.emit(account.id)">Extrato</button>
-            @if (canManage) {
-              <button type="button" class="account-card__action" (click)="edit.emit(account)">Editar</button>
-              <button type="button" class="account-card__action account-card__action--danger" (click)="remove.emit(account)">Remover</button>
-            }
-          </div>
-        </article>
+        <app-account-card
+          [account]="account"
+          [activity]="activityFor(account.id)"
+          [isPrimary]="account.id === primaryAccountId"
+          [canManage]="canManage"
+          [canTransfer]="canTransfer"
+          [canSetPrimary]="canSetPrimary"
+          (viewStatement)="selectAccount.emit($event.id)"
+          (edit)="edit.emit($event)"
+          (remove)="remove.emit($event)"
+          (transfer)="transfer.emit($event)"
+          (setPrimary)="setPrimary.emit($event)">
+        </app-account-card>
       }
     </div>
   }
