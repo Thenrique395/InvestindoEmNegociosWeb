@@ -155,25 +155,8 @@
   color: var(--text);
 }
 
-.debt-bucket__meter {
-  height: 4px;
-  border-radius: 999px;
-  background: var(--surface-3);
-  overflow: hidden;
-}
-
-.debt-bucket__meter-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--info);
-}
-
-.debt-bucket[data-accent='warning'] .debt-bucket__meter-fill {
-  background: var(--warning);
-}
-
-.debt-bucket[data-accent='danger'] .debt-bucket__meter-fill {
-  background: var(--danger);
+.debt-bucket__bar {
+  display: block;
 }
 
 .debt-bucket__meta {

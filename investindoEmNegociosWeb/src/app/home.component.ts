@@ -43,6 +43,17 @@ import { UpgradeCtaComponent } from './dashboard/upgrade-cta.component';
 import { FinancialOverviewComponent } from './dashboard/financial-overview/financial-overview.component';
 import { FinancialOverviewInput } from './dashboard/financial-overview/financial-overview.model';
 import { MonthlyFlowPoint, buildMonthlyFlowSeries } from './utils/monthly-flow.utils';
+import { SectionCardComponent } from './shared/section-card/section-card.component';
+import { UsageBarComponent } from './shared/usage-bar/usage-bar.component';
+import { ComparisonPillComponent } from './shared/comparison-pill/comparison-pill.component';
+import {
+  DebtAccent,
+  debtAccentTone,
+  debtBucketAccent as debtBucketAccentFn,
+  debtBucketPercent as debtBucketPercentFn,
+  netWorthDelta,
+  netWorthScale
+} from './dashboard/dashboard-overview.model';
 
 type InsightDiagnostics = {
   healthScore: number;
@@ -83,7 +94,10 @@ type InsightTodoItem = {
     RecentMovementsCardComponent,
     InsightActionsComponent,
     UpgradeCtaComponent,
-    FinancialOverviewComponent
+    FinancialOverviewComponent,
+    SectionCardComponent,
+    UsageBarComponent,
+    ComparisonPillComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -653,40 +667,24 @@ export class HomeComponent implements OnInit {
     return this.netWorthHistory?.points || [];
   }
 
-  get patrimonioHistoryMax(): number {
-    return this.patrimonioHistoryPoints.reduce((max, item) => Math.max(max, item.netWorth), 0) || 1;
-  }
-
-  get patrimonioHistoryMin(): number {
-    const points = this.patrimonioHistoryPoints;
-    if (!points.length) return 0;
-    return points.reduce((min, item) => Math.min(min, item.netWorth), points[0].netWorth);
-  }
-
   get patrimonioHistoryDelta(): number {
-    const points = this.patrimonioHistoryPoints;
-    if (points.length < 2) return 0;
-    return points[points.length - 1].netWorth - points[0].netWorth;
+    return netWorthDelta(this.patrimonioHistoryPoints);
   }
 
   patrimonioHistoryScale(value: number): number {
-    const max = this.patrimonioHistoryMax;
-    const min = this.patrimonioHistoryMin;
-    if (max === min) return 100;
-    return 18 + ((value - min) / (max - min)) * 82;
+    return netWorthScale(value, this.patrimonioHistoryPoints);
   }
 
-  debtBucketAccent(label: string): 'danger' | 'warning' | 'info' {
-    const normalized = (label || '').toLowerCase();
-    if (normalized.includes('atras')) return 'danger';
-    if (normalized.includes('cart')) return 'warning';
-    return 'info';
+  debtBucketAccent(label: string): DebtAccent {
+    return debtBucketAccentFn(label);
+  }
+
+  debtBucketTone(label: string) {
+    return debtAccentTone(debtBucketAccentFn(label));
   }
 
   debtBucketPercent(amount: number): number {
-    const total = this.debtSummary?.totalDebt || 0;
-    if (total <= 0) return 0;
-    return Math.max(0, Math.min(100, (amount / total) * 100));
+    return debtBucketPercentFn(amount, this.debtSummary?.totalDebt || 0);
   }
 
   get saldoDelta(): number {

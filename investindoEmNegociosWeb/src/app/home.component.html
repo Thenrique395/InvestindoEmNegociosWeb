@@ -21,33 +21,18 @@
         [loading]="isLoadingDashboard"
         (periodoChange)="setPeriodo($event)" />
     @if (hasAccess('Advanced') && patrimonioHistoryPoints.length) {
-      <section class="dash-card">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p class="dash-card__title">Evolução patrimonial</p>
-            <p class="dash-card__subtitle">Patrimônio líquido mensal dos últimos {{ patrimonioHistoryPoints.length }} meses.</p>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            @if (patrimonioHistoryPoints.length > 1) {
-              <span
-                class="inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[0.75rem] font-semibold"
-                [ngClass]="patrimonioHistoryDelta >= 0
-                  ? 'bg-[var(--color-success-weak)] text-[var(--success-text)]'
-                  : 'bg-[var(--color-danger-weak)] text-[var(--danger-text)]'">
-                <svg viewBox="0 0 24 24" width="12" height="12" role="presentation" focusable="false" aria-hidden="true">
-                  @if (patrimonioHistoryDelta >= 0) {
-                    <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                  } @else {
-                    <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                  }
-                </svg>
-                {{ patrimonioHistoryDelta >= 0 ? '+' : '' }}{{ patrimonioHistoryDelta | appCurrency }} no período
-              </span>
-            }
-            <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-[3px] text-[0.75rem] text-[var(--text-muted)]">
-              Atual: <strong class="text-[var(--text)]">{{ patrimonioLiquido | appCurrency }}</strong>
-            </span>
-          </div>
+      <app-section-card
+        title="Evolução patrimonial"
+        [description]="'Patrimônio líquido mensal dos últimos ' + patrimonioHistoryPoints.length + ' meses.'">
+        <div card-actions class="flex flex-wrap items-center gap-2">
+          @if (patrimonioHistoryPoints.length > 1) {
+            <app-comparison-pill
+              label="no período"
+              [trend]="patrimonioHistoryDelta >= 0 ? 'up' : 'down'">
+              {{ patrimonioHistoryDelta >= 0 ? '+' : '' }}{{ patrimonioHistoryDelta | appCurrency }}
+            </app-comparison-pill>
+          }
+          <app-status-badge tone="muted" [label]="'Atual: ' + (patrimonioLiquido | appCurrency)"></app-status-badge>
         </div>
         <div class="networth-chart">
           @for (point of patrimonioHistoryPoints; track trackByIndex($index, point); let last = $last) {
@@ -61,22 +46,18 @@
           }
         </div>
         @if (patrimonioHistoryEstimated) {
-          <p class="dash-card__subtitle">
+          <p class="m-0 mt-3 text-sm text-[var(--text-muted)]">
             Série estimada a partir do histórico disponível de contas, pagamentos e movimentos de investimento.
           </p>
         }
-      </section>
+      </app-section-card>
     }
     @if (hasAccess('Intermediate') && debtSummary) {
-      <section class="dash-card">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p class="dash-card__title">Mapa de dívidas</p>
-            <p class="dash-card__subtitle">Composição oficial das obrigações em aberto.</p>
-          </div>
-          <span class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] text-[var(--text-muted)]">
-            Total: {{ debtSummary.totalDebt | appCurrency }}
-          </span>
+      <app-section-card
+        title="Mapa de dívidas"
+        description="Composição oficial das obrigações em aberto.">
+        <div card-actions>
+          <app-status-badge tone="muted" [label]="'Total: ' + (debtSummary.totalDebt | appCurrency)"></app-status-badge>
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
           @for (bucket of debtBuckets; track trackByIndex($index, bucket)) {
@@ -86,9 +67,11 @@
                 <p class="debt-bucket__label">{{ bucket.label }}</p>
               </div>
               <strong class="debt-bucket__amount">{{ bucket.totalAmount | appCurrency }}</strong>
-              <div class="debt-bucket__meter" aria-hidden="true">
-                <div class="debt-bucket__meter-fill" [style.width.%]="debtBucketPercent(bucket.totalAmount)"></div>
-              </div>
+              <app-usage-bar
+                class="debt-bucket__bar"
+                [percent]="debtBucketPercent(bucket.totalAmount)"
+                [tone]="debtBucketTone(bucket.label)"
+                [label]="bucket.label + ': ' + (debtBucketPercent(bucket.totalAmount) | number:'1.0-0') + '% do total'" />
               <p class="debt-bucket__meta">
                 {{ bucket.itemsCount }} {{ bucket.itemsCount === 1 ? 'item' : 'itens' }} ·
                 {{ debtBucketPercent(bucket.totalAmount) | number:'1.0-0' }}% do total
@@ -121,7 +104,7 @@
           </div>
         </div>
       }
-    </section>
+    </app-section-card>
   }
   @if (hasAccess('Intermediate') && subscriptionsSummary && subscriptionsSummary.count) {
     <section class="dash-card">
