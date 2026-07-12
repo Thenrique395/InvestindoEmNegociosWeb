@@ -2,15 +2,28 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MonthlyFinancialSnapshotResponse, MonthlySnapshotsService } from '../monthly-snapshots.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent, TransactionSummaryTone } from '../shared/transactions/transaction-summary-card.component';
+import { StatusBadgeComponent, StatusBadgeTone } from '../shared/status-badge/status-badge.component';
+import { UsageBarComponent, UsageBarTone } from '../shared/usage-bar/usage-bar.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { riskBadgeTone, riskLevel, riskUsageTone } from './snapshots-overview.model';
 
 @Component({
   selector: 'app-monthly-snapshots',
   standalone: true,
-  imports: [CommonModule, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [
+    CommonModule,
+    AppCurrencyPipe,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    StatusBadgeComponent,
+    UsageBarComponent,
+    UiStateComponent,
+    EmptyStateComponent
+  ],
   templateUrl: './monthly-snapshots.component.html',
   styleUrl: './monthly-snapshots.component.scss'
 })
@@ -42,8 +55,22 @@ export class MonthlySnapshotsComponent implements OnInit {
     return Number(this.latestSnapshot?.riskScore || 0);
   }
 
+  get latestRiskTone(): TransactionSummaryTone {
+    const level = riskLevel(this.latestSnapshot?.riskClassification, this.latestRiskScore);
+    return level === 'high' ? 'danger' : level === 'moderate' ? 'warning' : 'success';
+  }
+
+  riskBadgeTone(snapshot: MonthlyFinancialSnapshotResponse): StatusBadgeTone {
+    return riskBadgeTone(riskLevel(snapshot.riskClassification, snapshot.riskScore));
+  }
+
+  riskUsageTone(snapshot: MonthlyFinancialSnapshotResponse): UsageBarTone {
+    return riskUsageTone(riskLevel(snapshot.riskClassification, snapshot.riskScore));
+  }
+
   load(): void {
     this.loading = true;
+    this.error = '';
     this.snapshotsService.list().subscribe({
       next: (items) => {
         this.snapshots = items;

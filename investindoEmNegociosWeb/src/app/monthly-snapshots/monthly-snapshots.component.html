@@ -1,83 +1,107 @@
 <section class="snapshots-page">
-  <section class="snapshots-summary-grid">
-    <app-stat-card
-      tone="primary"
-      eyebrow="SDR atual"
-      [value]="latestRealBalance | appCurrency"
-      note="Saldo disponível real do snapshot mais recente.">
-      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-        <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </app-stat-card>
-    <app-stat-card
-      tone="info"
-      eyebrow="Projeção"
-      [value]="latestProjectedBalance | appCurrency"
-      note="Visão projetada do mês fechado mais recente.">
-      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-        <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </app-stat-card>
-    <app-stat-card
-      tone="warning"
-      eyebrow="Risco"
-      [value]="latestRiskScore + '/100'"
-      [note]="latestSnapshot?.riskClassification || 'Sem snapshot gerado'">
-      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-        <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </app-stat-card>
-  </section>
+  <app-page-header
+    eyebrow="Fechamento mensal"
+    title="Histórico mensal"
+    description="Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco.">
+    <div page-actions>
+      <button type="button" class="btn-primary" (click)="generateCurrentMonth()" [disabled]="generating">
+        {{ generating ? 'Gerando...' : 'Gerar snapshot do mês' }}
+      </button>
+    </div>
+  </app-page-header>
 
-  <section class="snapshots-shell">
-    <app-period-hero
-      eyebrow="Fechamento mensal"
-      title="Snapshots mensais"
-      description="Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco."
-      [showNavigation]="false">
-      <app-period-action-card
-        hero-aside
-        title="Gerar fechamento"
-        description="Atualize o retrato do mês para comparar risco, patrimônio e projeção.">
-        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="generateCurrentMonth()" [disabled]="generating">
-          <span class="period-total-card__action-icon" aria-hidden="true">+</span>
-          <span class="period-total-card__action-copy">
-            <strong>{{ generating ? 'Gerando...' : 'Gerar snapshot' }}</strong>
-            <small>Registrar o fechamento do mês atual.</small>
-          </span>
-        </button>
-      </app-period-action-card>
-    </app-period-hero>
+  @if (latestSnapshot) {
+    <section class="snapshots-summary-grid">
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="SDR atual"
+        [value]="latestRealBalance | appCurrency"
+        note="Saldo disponível real do snapshot mais recente.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Projeção"
+        [value]="latestProjectedBalance | appCurrency"
+        note="Visão projetada do mês fechado mais recente.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="latestRiskTone"
+        eyebrow="Risco"
+        [value]="latestRiskScore + '/100'"
+        [note]="latestSnapshot.riskClassification || 'Sem snapshot gerado'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
+  }
 
   @if (error) {
-    <div class="feedback error">{{ error }}</div>
+    <app-ui-state
+      type="error"
+      title="Não foi possível concluir a operação."
+      [description]="error"
+      retryLabel="Tentar novamente"
+      (retry)="load()" />
   }
-  <article class="card">
-    @if (loading) {
-      <p class="muted">Carregando...</p>
-    }
-    @if (!loading && !snapshots.length) {
-      <p class="muted">Nenhum snapshot gerado.</p>
-    }
-    @if (snapshots.length) {
-      <div class="snapshot-list">
-        @for (item of snapshots; track item) {
-          <section class="snapshot">
-            <div class="snapshot__head">
-              <h2>{{ item.snapshotLabel }}</h2>
-              <span class="pill">{{ item.riskClassification }} · {{ item.riskScore }}/100</span>
-            </div>
-            <div class="grid">
-              <div><span>SDR</span><strong>{{ item.realAvailableBalance | appCurrency }}</strong></div>
-              <div><span>Projeção</span><strong>{{ item.projectedBalance | appCurrency }}</strong></div>
-              <div><span>Dívida</span><strong>{{ item.totalDebt | appCurrency }}</strong></div>
-              <div><span>Patrimônio</span><strong>{{ item.netWorth | appCurrency }}</strong></div>
-            </div>
-            <p class="muted">{{ item.primaryInsight }}</p>
-          </section>
-        }
-      </div>
-    }
-  </article>
-  </section>
+
+  @if (loading) {
+    <app-ui-state type="loading" />
+  }
+
+  @if (!loading && !snapshots.length) {
+    <app-empty-state
+      icon="🗓️"
+      title="Nenhum snapshot gerado"
+      description="Gere o fechamento do mês atual para começar a comparar risco, patrimônio e projeção." />
+  }
+
+  @if (snapshots.length) {
+    <div class="snapshot-list">
+      @for (item of snapshots; track item.id) {
+        <article class="snapshot">
+          <div class="snapshot__head">
+            <h2>{{ item.snapshotLabel }}</h2>
+            <app-status-badge
+              [tone]="riskBadgeTone(item)"
+              [label]="item.riskClassification + ' · ' + item.riskScore + '/100'"
+              [dot]="true" />
+          </div>
+
+          <div class="snapshot__risk">
+            <span class="muted text--sm">Nível de risco</span>
+            <app-usage-bar
+              [percent]="item.riskScore"
+              [tone]="riskUsageTone(item)"
+              [label]="'Risco ' + item.riskScore + ' de 100'" />
+          </div>
+
+          <div class="grid">
+            <div><span>SDR</span><strong>{{ item.realAvailableBalance | appCurrency }}</strong></div>
+            <div><span>Projeção</span><strong>{{ item.projectedBalance | appCurrency }}</strong></div>
+            <div><span>Dívida</span><strong>{{ item.totalDebt | appCurrency }}</strong></div>
+            <div><span>Patrimônio</span><strong>{{ item.netWorth | appCurrency }}</strong></div>
+          </div>
+
+          @if (item.primaryInsight) {
+            <p class="snapshot__insight">{{ item.primaryInsight }}</p>
+          }
+
+          @if (item.recommendations.length) {
+            <ul class="snapshot__recs">
+              @for (rec of item.recommendations; track rec) {
+                <li>{{ rec }}</li>
+              }
+            </ul>
+          }
+        </article>
+      }
+    </div>
+  }
 </section>
