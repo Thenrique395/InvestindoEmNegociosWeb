@@ -1,25 +1,71 @@
 <section class="orcamento-page">
-  <header class="page-header">
-    <div class="page-header__nav">
-      <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
-      <h1>Orçamento · {{ monthName }} {{ year }}</h1>
-      <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
+  <app-page-header
+    eyebrow="Planejamento mensal"
+    [title]="'Orçamento · ' + monthName + ' ' + year"
+    description="Defina o quanto planeja gastar por categoria e acompanhe o realizado do mês.">
+    <div page-actions class="orcamento-actions">
+      <div class="orcamento-nav" role="group" aria-label="Navegar entre os meses">
+        <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
+        <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
+      </div>
+      @if (budget) {
+        <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
+      }
     </div>
-    @if (budget) {
-      <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
-    }
-  </header>
+  </app-page-header>
 
   @if (loading) {
     <app-ui-state type="loading" />
   }
 
-  @if (!loading && budget) {
-    <div class="budget-summary kpis">
-      <div><span>Planejado</span><strong>{{ budget.totalPlanned | appCurrency }}</strong></div>
-      <div><span>Realizado</span><strong>{{ budget.totalRealized | appCurrency }}</strong></div>
-      <div [class.negative]="budget.totalVariance < 0"><span>Variação</span><strong>{{ budget.totalVariance | appCurrency }}</strong></div>
-    </div>
+  @if (!loading && error) {
+    <app-ui-state
+      type="error"
+      title="Não foi possível concluir a operação."
+      [description]="error"
+      retryLabel="Tentar novamente"
+      (retry)="load()" />
+  }
+
+  @if (!loading && !error && budget) {
+    <section class="summary-grid">
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="Planejado"
+        [value]="overview.totalPlanned | appCurrency"
+        [note]="overview.itemsCount + ' categoria(s) no orçamento.'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Realizado"
+        [value]="overview.totalRealized | appCurrency"
+        note="Total já gasto nas categorias planejadas.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="overview.totalVariance < 0 ? 'danger' : 'success'"
+        eyebrow="Variação"
+        [value]="overview.totalVariance | appCurrency"
+        [note]="overview.totalVariance < 0 ? 'Gasto acima do planejado.' : 'Dentro do planejado.'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M3 12h4l3 8 4-16 3 8h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="overview.usagePercent > 100 ? 'danger' : overview.usagePercent > 80 ? 'warning' : 'success'"
+        eyebrow="Uso do orçamento"
+        [value]="overview.usagePercent + '%'"
+        [note]="overview.overBudgetCount ? (overview.overBudgetCount + ' categoria(s) estourada(s).') : 'Nenhuma categoria estourada.'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 3a9 9 0 1 0 9 9h-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
 
     <article class="card">
       <h2>Adicionar categoria</h2>
@@ -34,11 +80,11 @@
 
     <article class="card">
       <h2>Categorias</h2>
-      @if (!budget.items.length) {
+      @if (!itemViews.length) {
         <app-empty-state icon="$" title="Nenhuma categoria no orçamento" description="Adicione categorias e defina valores planejados para o mês." />
       }
-      @if (budget.items.length) {
-        <div class="table-wrap">
+      @if (itemViews.length) {
+        <div class="category-table">
           <table>
             <thead>
               <tr>
@@ -46,37 +92,100 @@
                 <th class="text-right">Planejado</th>
                 <th class="text-right">Realizado</th>
                 <th class="text-right">Variação</th>
-                <th class="text-right">% uso</th>
+                <th class="col-bar">Uso</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              @for (item of budget.items; track item.id) {
+              @for (view of itemViews; track view.item.id) {
                 <tr>
-                  <td>{{ item.categoryName }}</td>
-                  <td class="text-right">{{ item.plannedAmount | appCurrency }}</td>
-                  <td class="text-right">{{ item.realizedAmount | appCurrency }}</td>
-                  <td class="text-right" [class.negative]="item.variance < 0">{{ item.variance | appCurrency }}</td>
+                  <td>{{ view.item.categoryName }}</td>
                   <td class="text-right">
-                    @if (item.plannedAmount > 0) {
-                      <span [class.over-budget]="item.realizedAmount > item.plannedAmount">
-                        {{ (item.realizedAmount / item.plannedAmount * 100) | number:'1.0-0' }}%
-                      </span>
+                    @if (editingId === view.item.id) {
+                      <input
+                        class="edit-input"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        [(ngModel)]="editingAmount"
+                        (keyup.enter)="confirmEdit(view.item)"
+                        (keyup.escape)="cancelEdit()" />
                     } @else {
-                      —
+                      <button type="button" class="link-btn" (click)="startEdit(view.item)" [attr.aria-label]="'Editar valor planejado de ' + view.item.categoryName">
+                        {{ view.item.plannedAmount | appCurrency }}
+                      </button>
                     }
                   </td>
-                  <td>
-                    <button type="button" class="btn-danger sm" (click)="removeItem(item)" [disabled]="deletingId === item.id">
-                      {{ deletingId === item.id ? '...' : 'Remover' }}
-                    </button>
+                  <td class="text-right">{{ view.item.realizedAmount | appCurrency }}</td>
+                  <td class="text-right" [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</td>
+                  <td class="col-bar">
+                    <div class="usage-cell">
+                      <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
+                      <span class="usage-cell__pct" [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
+                    </div>
+                  </td>
+                  <td class="col-actions">
+                    @if (editingId === view.item.id) {
+                      <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
+                      <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
+                    } @else {
+                      <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId === view.item.id">
+                        {{ deletingId === view.item.id ? '...' : 'Remover' }}
+                      </button>
+                    }
                   </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
+
+        <ul class="category-cards">
+          @for (view of itemViews; track view.item.id) {
+            <li class="category-card">
+              <div class="category-card__head">
+                <span class="category-card__name">{{ view.item.categoryName }}</span>
+                <strong [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</strong>
+              </div>
+              <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
+              <div class="category-card__meta muted">
+                <span>{{ view.item.realizedAmount | appCurrency }} de {{ view.item.plannedAmount | appCurrency }}</span>
+                <span [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
+              </div>
+              <div class="category-card__actions">
+                @if (editingId === view.item.id) {
+                  <input
+                    class="edit-input"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    [(ngModel)]="editingAmount"
+                    (keyup.enter)="confirmEdit(view.item)" />
+                  <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
+                  <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
+                } @else {
+                  <button type="button" class="btn-ghost sm" (click)="startEdit(view.item)">Editar planejado</button>
+                  <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId === view.item.id">
+                    {{ deletingId === view.item.id ? '...' : 'Remover' }}
+                  </button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
       }
     </article>
   }
 </section>
+
+<app-confirm-sheet
+  [open]="!!pendingDelete"
+  eyebrow="Remover categoria"
+  [title]="pendingDelete ? ('Remover “' + pendingDelete.categoryName + '” do orçamento?') : ''"
+  (dismiss)="cancelRemove()">
+  <p>A categoria e seu valor planejado serão removidos deste mês. Os lançamentos realizados não são afetados.</p>
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost" (click)="cancelRemove()">Cancelar</button>
+    <button type="button" class="btn-danger" (click)="confirmRemove()">Remover</button>
+  </ng-container>
+</app-confirm-sheet>

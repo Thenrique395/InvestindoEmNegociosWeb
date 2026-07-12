@@ -7,11 +7,27 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
+import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOverview } from './budget-overview.model';
 
 @Component({
   selector: 'app-orcamento',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppCurrencyPipe, UiStateComponent, EmptyStateComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AppCurrencyPipe,
+    UiStateComponent,
+    EmptyStateComponent,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    UsageBarComponent,
+    ConfirmSheetComponent
+  ],
   templateUrl: './orcamento.component.html',
   styleUrl: './orcamento.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -21,6 +37,11 @@ export class OrcamentoComponent implements OnInit {
   loading = false;
   saving = false;
   deletingId: string | null = null;
+  error = '';
+
+  editingId: string | null = null;
+  editingAmount: number | null = null;
+  pendingDelete: BudgetItemResponse | null = null;
 
   year = new Date().getFullYear();
   month = new Date().getMonth() + 1;
@@ -41,11 +62,25 @@ export class OrcamentoComponent implements OnInit {
 
   get monthName(): string { return this.months[this.month - 1]; }
 
+  get overview(): BudgetOverview {
+    return buildBudgetOverview(this.budget);
+  }
+
+  get itemViews(): BudgetItemView[] {
+    return buildBudgetItemViews(this.budget);
+  }
+
   load(): void {
     this.loading = true;
+    this.error = '';
     this.budgetService.get(this.year, this.month).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (b) => { this.budget = b; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: (err) => {
+        this.budget = null;
+        this.error = extractApiErrorMessage(err, 'Não foi possível carregar o orçamento deste período.');
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -62,30 +97,79 @@ export class OrcamentoComponent implements OnInit {
         this.uiFeedback.success('Categoria adicionada ao orçamento.');
         this.cdr.markForCheck();
       },
-      error: () => { this.saving = false; this.cdr.markForCheck(); }
+      error: (err) => {
+        this.saving = false;
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao adicionar categoria.'));
+        this.cdr.markForCheck();
+      }
     });
   }
 
-  updateItem(item: BudgetItemResponse, newAmount: number): void {
-    this.budgetService.upsertItems(this.year, this.month, [{ categoryName: item.categoryName, plannedAmount: newAmount }])
+  startEdit(item: BudgetItemResponse): void {
+    this.editingId = item.id;
+    this.editingAmount = item.plannedAmount;
+    this.cdr.markForCheck();
+  }
+
+  cancelEdit(): void {
+    this.editingId = null;
+    this.editingAmount = null;
+    this.cdr.markForCheck();
+  }
+
+  confirmEdit(item: BudgetItemResponse): void {
+    const amount = this.editingAmount;
+    if (amount === null || amount < 0 || amount === item.plannedAmount) {
+      this.cancelEdit();
+      return;
+    }
+    this.budgetService.upsertItems(this.year, this.month, [{ categoryName: item.categoryName, plannedAmount: amount }])
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (b) => { this.budget = b; this.cdr.markForCheck(); },
-        error: () => {}
+        next: (b) => {
+          this.budget = b;
+          this.editingId = null;
+          this.editingAmount = null;
+          this.uiFeedback.success('Valor planejado atualizado.');
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao atualizar valor planejado.'));
+          this.cdr.markForCheck();
+        }
       });
   }
 
-  removeItem(item: BudgetItemResponse): void {
+  askRemove(item: BudgetItemResponse): void {
+    if (this.deletingId) return;
+    this.pendingDelete = item;
+    this.cdr.markForCheck();
+  }
+
+  cancelRemove(): void {
+    this.pendingDelete = null;
+    this.cdr.markForCheck();
+  }
+
+  confirmRemove(): void {
+    const item = this.pendingDelete;
+    if (!item || this.deletingId) return;
     this.deletingId = item.id;
+    this.pendingDelete = null;
     this.budgetService.deleteItem(item.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         if (this.budget) {
           this.budget = { ...this.budget, items: this.budget.items.filter(i => i.id !== item.id) };
         }
+        if (this.editingId === item.id) { this.editingId = null; this.editingAmount = null; }
         this.deletingId = null;
         this.uiFeedback.success('Item removido do orçamento.');
         this.cdr.markForCheck();
       },
-      error: () => { this.deletingId = null; this.cdr.markForCheck(); }
+      error: (err) => {
+        this.deletingId = null;
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao remover item.'));
+        this.cdr.markForCheck();
+      }
     });
   }
 
