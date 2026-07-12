@@ -1,8 +1,8 @@
 <section class="cenarios-page">
-  <header class="page-header">
-    <h1>Simulador de Cenários</h1>
-    <p class="muted">Projete o impacto de receita extra, despesas ou poupança no seu fluxo de caixa.</p>
-  </header>
+  <app-page-header
+    eyebrow="Planejamento"
+    title="Simulador de cenários"
+    description="Projete o impacto de receita extra, despesas ou poupança no seu fluxo de caixa." />
 
   <article class="card">
     <h2>Parâmetros</h2>
@@ -19,15 +19,14 @@
         Taxa de poupança (%)
         <input type="number" min="0" max="100" step="1" [(ngModel)]="params.savingsRatePercent" />
       </label>
-      <label>
-        Período
-        <select [(ngModel)]="params.period">
-          <option value="month">Este mês</option>
-          <option value="quarter">Próximos 3 meses</option>
-          <option value="semester">Próximos 6 meses</option>
-          <option value="year">Próximos 12 meses</option>
-        </select>
-      </label>
+      <div class="field">
+        <span class="field__label">Período</span>
+        <app-segmented-selector
+          ariaLabel="Período da projeção"
+          [options]="periodOptions"
+          [value]="params.period"
+          (valueChange)="setPeriod($event)" />
+      </div>
     </div>
     <div class="actions">
       <button type="button" class="btn-primary" (click)="simulate()" [disabled]="loading">
@@ -37,7 +36,12 @@
   </article>
 
   @if (error) {
-    <div class="feedback error">{{ error }}</div>
+    <app-ui-state
+      type="error"
+      title="Não foi possível concluir a operação."
+      [description]="error"
+      retryLabel="Tentar novamente"
+      (retry)="simulate()" />
   }
 
   @if (loading) {
@@ -45,28 +49,45 @@
   }
 
   @if (!loading && result) {
-    <div class="results-grid">
-      <article class="card result-card">
-        <h3>Saldo projetado (base)</h3>
-        <strong class="amount">{{ result.baseProjectedClosingBalance | appCurrency }}</strong>
-        <p class="muted">Sem alterações no comportamento atual.</p>
-      </article>
-      <article class="card result-card result-card--highlight">
-        <h3>Saldo projetado (cenário)</h3>
-        <strong class="amount">{{ result.scenarioProjectedClosingBalance | appCurrency }}</strong>
-        <p class="muted">Impacto: <strong>{{ impactSign }}{{ result.impactAmount | appCurrency }}</strong></p>
-      </article>
-      <article class="card result-card">
-        <h3>Potencial de poupança mensal</h3>
-        <strong class="amount">{{ result.monthlySavingsPotential | appCurrency }}</strong>
-        <p class="muted">Com os parâmetros informados.</p>
-      </article>
-    </div>
+    <section class="results-grid">
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Saldo projetado (base)"
+        [value]="result.baseProjectedClosingBalance | appCurrency"
+        note="Sem alterações no comportamento atual.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="scenarioTone"
+        eyebrow="Saldo projetado (cenário)"
+        [value]="result.scenarioProjectedClosingBalance | appCurrency">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span stat-note class="impact-note">
+          <app-comparison-pill label="Impacto" [trend]="impactTrend">
+            {{ impactSign }}{{ result.impactAmount | appCurrency }}
+          </app-comparison-pill>
+        </span>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="Potencial de poupança mensal"
+        [value]="result.monthlySavingsPotential | appCurrency"
+        note="Com os parâmetros informados.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 3v18M5 10a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
 
-    @if (result.scenarioPoints.length > 0) {
+    @if (pointViews.length) {
       <article class="card">
         <h2>Projeção diária</h2>
-        <div class="table-wrap">
+
+        <div class="projection-table">
           <table>
             <thead>
               <tr>
@@ -77,19 +98,36 @@
               </tr>
             </thead>
             <tbody>
-              @for (point of result.scenarioPoints.slice(0, 14); track point.date) {
+              @for (view of pointViews; track view.point.date) {
                 <tr>
-                  <td>{{ point.date | date:'dd/MM' }}</td>
-                  <td class="text-right">{{ point.baseClosingBalance | appCurrency }}</td>
-                  <td class="text-right">{{ point.scenarioClosingBalance | appCurrency }}</td>
-                  <td class="text-right" [class.positive]="point.scenarioClosingBalance >= point.baseClosingBalance" [class.negative]="point.scenarioClosingBalance < point.baseClosingBalance">
-                    {{ (point.scenarioClosingBalance - point.baseClosingBalance) | appCurrency }}
+                  <td>{{ view.point.date | date:'dd/MM' }}</td>
+                  <td class="text-right">{{ view.point.baseClosingBalance | appCurrency }}</td>
+                  <td class="text-right">{{ view.point.scenarioClosingBalance | appCurrency }}</td>
+                  <td class="text-right" [class.positive]="view.tone === 'positive'" [class.negative]="view.tone === 'negative'">
+                    {{ view.difference | appCurrency }}
                   </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
+
+        <ul class="projection-cards">
+          @for (view of pointViews; track view.point.date) {
+            <li class="projection-card">
+              <div class="projection-card__head">
+                <span class="projection-card__date">{{ view.point.date | date:'dd/MM' }}</span>
+                <strong [class.positive]="view.tone === 'positive'" [class.negative]="view.tone === 'negative'">
+                  {{ view.difference | appCurrency }}
+                </strong>
+              </div>
+              <div class="projection-card__meta muted">
+                <span>Base: {{ view.point.baseClosingBalance | appCurrency }}</span>
+                <span>Cenário: {{ view.point.scenarioClosingBalance | appCurrency }}</span>
+              </div>
+            </li>
+          }
+        </ul>
       </article>
     }
   }

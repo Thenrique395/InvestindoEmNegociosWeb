@@ -23,22 +23,15 @@
   letter-spacing: var(--letter-spacing-title);
 }
 
-.feedback {
-  padding: 0.9rem 1rem;
-  border-radius: var(--radius-lg);
-  font-weight: var(--font-weight-semibold);
-}
-
-.feedback.error {
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
-  color: var(--danger-text);
+.muted {
+  color: var(--text-muted);
 }
 
 .params-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: 1rem;
+  align-items: end;
 }
 
 label {
@@ -48,8 +41,17 @@ label {
   font-weight: var(--font-weight-semibold);
 }
 
-input,
-select {
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field__label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+input {
   border: 1px solid var(--border);
   background-color: var(--surface-2);
   border-radius: var(--radius-lg);
@@ -66,27 +68,18 @@ select {
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
-.result-card {
-  text-align: center;
-
-  .amount {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0.5rem 0;
-  }
-
-  &--highlight {
-    border: 2px solid var(--primary);
-  }
+.impact-note {
+  display: inline-flex;
+  margin-top: 0.35rem;
 }
 
-.table-wrap {
-  overflow: auto;
+/* Projeção diária — tabela (desktop) */
+.projection-table {
+  overflow-x: auto;
 }
 
 table {
@@ -101,6 +94,60 @@ td {
   text-align: left;
 }
 
+.text-right { text-align: right; }
+
+/* Projeção diária — cards (mobile) */
+.projection-cards {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.6rem;
+}
+
+.projection-card {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.projection-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.projection-card__date {
+  color: var(--text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.projection-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  font-size: var(--font-size-caption);
+}
+
 .positive { color: var(--success-text); }
 .negative { color: var(--danger-text); }
-.text-right { text-align: right; }
+
+@media (max-width: 860px) {
+  .results-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .projection-table {
+    display: none;
+  }
+
+  .projection-cards {
+    display: grid;
+  }
+}
