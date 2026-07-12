@@ -1,94 +1,59 @@
 <section class="investments">
   <section class="investments-shell">
-    <app-period-hero
+    <app-page-header
       eyebrow="Investimentos"
-      title="Carteira, evolução e decisões"
-      description="Acompanhe patrimônio, posições, rentabilidade e proventos com a mesma leitura operacional do restante do painel."
-      [showNavigation]="false">
-      <nav hero-toolbar-start class="tabs" aria-label="Abas de investimentos">
-        @for (tab of tabs; track trackByIndex($index, tab)) {
-          <button
-            type="button"
-            class="tab"
-            [class.active]="activeTab === tab.key"
-            (click)="setActiveTab(tab.key)">
-            {{ tab.label }}
-          </button>
-        }
-      </nav>
+      title="Carteira e evolução"
+      description="Acompanhe patrimônio, posições, rentabilidade e proventos — gestão e registro, sem recomendação de ativos."
+      [hasMeta]="false">
+      <div page-actions class="invest-actions">
+        <button type="button" class="btn-secondary sm" (click)="openB3ImportModal()">
+          <span aria-hidden="true">↓</span> Importar B3
+        </button>
+        <button type="button" class="btn-primary sm" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
+          <span aria-hidden="true">{{ showCadastro ? '×' : '+' }}</span> {{ showCadastro ? 'Fechar' : 'Novo lançamento' }}
+        </button>
+      </div>
+    </app-page-header>
 
-      <app-period-action-card
-        hero-aside
-        title="Atualizar a carteira"
-        description="Registre lançamentos ou importe operações para manter a posição atualizada.">
-        <button action-card-actions class="period-total-card__action period-total-card__action--ghost" type="button" (click)="openB3ImportModal()">
-          <span class="period-total-card__action-icon" aria-hidden="true">↓</span>
-          <span class="period-total-card__action-copy">
-            <strong>Importações</strong>
-            <small>Importar operações da B3.</small>
-          </span>
-        </button>
-        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="showCadastro ? closeCadastroModal() : openCadastroModal()">
-          <span class="period-total-card__action-icon" aria-hidden="true">{{ showCadastro ? '×' : '+' }}</span>
-          <span class="period-total-card__action-copy">
-            <strong>{{ showCadastro ? 'Fechar lançamento' : 'Novo lançamento' }}</strong>
-            <small>Registrar compra, venda ou provento.</small>
-          </span>
-        </button>
-      </app-period-action-card>
-    </app-period-hero>
+    <div class="invest-tabs">
+      <app-segmented-selector [options]="investmentTabOptions" [value]="activeTab" ariaLabel="Abas de investimentos" (valueChange)="setTab($event)" />
+    </div>
 
   @if (activeTab === 'RESUMO') {
     <section class="executive-grid">
-      <app-stat-card
-        tone="primary"
-        eyebrow="Patrimônio total"
-        value="{{ patrimonioAtual | appCurrency }}"
-        note="Valor investido: {{ aporteTotal | appCurrency }}"
-        tooltipText="Soma do valor atual de todas as posições ativas (quantidade x preço médio).">
+      <app-transaction-summary-card tone="primary" eyebrow="Patrimônio" [value]="overview.marketValue | appCurrency"
+        [note]="'Investido: ' + (overview.invested | appCurrency)"
+        tooltipText="Valor atual de mercado das posições (usa cotação quando disponível; senão, preço médio).">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
           <rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18" fill="none" stroke="currentColor" stroke-width="1.7"/>
         </svg>
-      </app-stat-card>
-      <app-stat-card
-        [tone]="crescimentoEstimado >= 0 ? 'success' : 'danger'"
-        eyebrow="Lucro total"
-        value="{{ crescimentoEstimado | appCurrency }}"
-        note="Aportes no mês: {{ aporteMes | appCurrency }}"
-        tooltipText="Diferença entre o patrimônio atual e o valor líquido aportado.">
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card [tone]="overview.growth >= 0 ? 'success' : 'danger'" eyebrow="Valorização"
+        [value]="overview.growth | appCurrency" [note]="'Rentabilidade: ' + (overview.profitPercent | number:'1.2-2') + '%'"
+        tooltipText="Diferença entre o valor de mercado e o total investido. Não inclui proventos.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M4 18h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-          <path d="m6 15 3-3 3 2 5-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M16 8h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 18h16M6 15l3-3 3 2 5-6M16 8h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </app-stat-card>
-      <app-stat-card
-        tone="success"
-        eyebrow="Proventos recebidos"
-        value="{{ proventosTotal | appCurrency }}"
-        note="{{ totalPosicoesAtivas }} posição(ões) ativa(s)"
-        tooltipText="Total acumulado de dividendos, JCP e rendimentos registrados na carteira.">
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card tone="info" eyebrow="Proventos recebidos" [value]="overview.proventos | appCurrency"
+        [note]="overview.activeCount + ' posição(ões) ativa(s)'"
+        tooltipText="Dividendos, JCP e rendimentos registrados — não entram como aporte nem valorização.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <ellipse cx="12" cy="6.5" rx="7" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <path d="M5 6.5v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <path d="M5 11.5v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M5 6.5v10c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-10" fill="none" stroke="currentColor" stroke-width="1.7"/>
         </svg>
-      </app-stat-card>
-      <app-stat-card
-        [tone]="rentabilidadeAcumuladaPercent >= 0 ? 'success' : 'danger'"
-        eyebrow="Rentabilidade"
-        value="{{ rentabilidadeAcumuladaPercent | number:'1.2-2' }}%"
-        note="Variação no mês: {{ rentabilidadeMensalPercent | number:'1.2-2' }}%"
-        tooltipText="Comparativo percentual do desempenho estimado no mês e no acumulado.">
+      </app-transaction-summary-card>
+
+      <app-transaction-summary-card [tone]="overview.resultMonth >= 0 ? 'success' : 'warning'" eyebrow="Aportes no mês"
+        [value]="overview.aporteMonth | appCurrency" [note]="'Resgates: ' + (overview.resgateMonth | appCurrency)"
+        tooltipText="Aportes e resgates registrados no mês corrente.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M4 19h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-          <rect x="6" y="12" width="3" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <rect x="11" y="9" width="3" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <rect x="16" y="6" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </app-stat-card>
+      </app-transaction-summary-card>
     </section>
   }
 
@@ -174,11 +139,11 @@
   @if (activeTab === 'ANALISE') {
     <article class="card action-card">
       <div>
-        <p class="label">O que fazer agora</p>
+        <p class="label">Panorama da carteira</p>
         <strong>{{ proximaAcao.titulo }}</strong>
         <small>{{ proximaAcao.descricao }}</small>
       </div>
-      <button class="btn-primary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
+      <button class="btn-secondary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
     </article>
   }
 
@@ -212,7 +177,7 @@
       </app-filter-bar>
       @if (!sortedPositions.length) {
         <app-empty-state
-          icon="$"
+          icon="📊"
           title="Nenhuma posição encontrada"
           description="Ajuste os filtros ou cadastre um ativo para começar a acompanhar sua carteira." />
       }
@@ -289,6 +254,40 @@
             </tbody>
           </table>
         </div>
+
+        <ul class="positions-cards">
+          @for (p of pagedPositions; track trackByIndex($index, p)) {
+            <li class="position-card">
+              <div class="position-card__head">
+                <div class="position-card__asset">
+                  @if (marketLogo(p)) { <img [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" /> }
+                  <div>
+                    <strong>{{ p.asset }}</strong>
+                    <span class="position-card__type">{{ tipoPapel(p) }}</span>
+                  </div>
+                </div>
+                <span class="status-pill" [class.zeroed]="p.quantity <= 0">{{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}</span>
+              </div>
+
+              <dl class="position-card__grid">
+                <div><dt>Quantidade</dt><dd>{{ p.quantity }}</dd></div>
+                <div><dt>Preço médio</dt><dd>{{ p.avgPrice | appCurrency:p.currency }}</dd></div>
+                <div><dt>Valor atual</dt><dd>{{ valorAtualPosicao(p) | appCurrency:p.currency }}</dd></div>
+                <div><dt>% carteira</dt><dd>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</dd></div>
+                <div>
+                  <dt>Rent. atual</dt>
+                  <dd [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">{{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%</dd>
+                </div>
+                <div>
+                  <dt>Resultado</dt>
+                  <dd [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">{{ resultadoPosicao(p) | appCurrency }}</dd>
+                </div>
+              </dl>
+
+              <button class="btn-ghost sm position-card__action" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
+            </li>
+          }
+        </ul>
       }
       @if (sortedPositions.length) {
         <div class="table-pagination">
@@ -715,7 +714,7 @@
                 <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
               </div>
               <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
-              <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? '• rebalancear' : '' }}</small>
+              <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? (item.atual > item.alvo ? '• acima do alvo' : '• abaixo do alvo') : '' }}</small>
             </div>
           }
         </div>

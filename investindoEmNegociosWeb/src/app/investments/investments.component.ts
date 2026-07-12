@@ -21,12 +21,14 @@ import { firstValueFrom } from 'rxjs';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { DonutChartComponent } from '../shared/donut-chart/donut-chart.component';
+import { buildInvestmentsOverview, InvestmentsOverview } from './investments-overview.model';
 import {
   AllocationInvestmentType,
   BenchmarkKey,
@@ -75,7 +77,7 @@ type RentabilidadeMonthPoint = {
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent, DonutChartComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PageHeaderComponent, TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent, DonutChartComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -202,6 +204,18 @@ export class InvestmentsComponent implements OnInit {
       next: (items) => (this.institutions = items || []),
       error: () => (this.institutions = [])
     });
+  }
+
+  get overview(): InvestmentsOverview {
+    return buildInvestmentsOverview(this.positions);
+  }
+
+  get investmentTabOptions(): SegmentOption[] {
+    return this.tabs.map((t) => ({ value: t.key, label: t.label }));
+  }
+
+  setTab(value: string): void {
+    this.setActiveTab(value as InvestmentsTab);
   }
 
   get patrimonioAtual(): number {
@@ -379,11 +393,12 @@ export class InvestmentsComponent implements OnInit {
     return this.alvoAlocacao.some((item) => item.alerta);
   }
 
+  // Observação factual da carteira — nunca recomendação de compra/venda de ativos.
   get proximaAcao(): { titulo: string; descricao: string; cta: string; targetId?: string; openForm?: boolean } {
     if (this.hasRebalanceAlert) {
       return {
-        titulo: 'Rebalancear carteira',
-        descricao: 'Existe classe com desvio maior que 7 p.p. do alvo. Vale revisar a alocação.',
+        titulo: 'Alocação fora do alvo definido',
+        descricao: 'Uma ou mais classes estão a mais de 7 p.p. do alvo que você configurou.',
         cta: 'Ver alocação',
         targetId: 'sec-alocacao'
       };
@@ -391,25 +406,25 @@ export class InvestmentsComponent implements OnInit {
 
     if (this.aporteMes <= 0) {
       return {
-        titulo: 'Registrar aporte do mês',
-        descricao: 'Ainda não há entrada no mês atual. Registrar aporte ajuda na disciplina do plano.',
-        cta: 'Nova posição',
+        titulo: 'Sem aportes neste mês',
+        descricao: 'Você ainda não registrou aportes no mês atual.',
+        cta: 'Registrar lançamento',
         openForm: true
       };
     }
 
     if (this.metaPatrimonio > 0 && this.progressoMeta < 100) {
       return {
-        titulo: 'Ajustar plano da meta',
-        descricao: `Faltam ${this.currencyFormatter.format(this.faltaMeta)} para atingir sua meta de patrimônio.`,
+        titulo: 'Progresso da meta de patrimônio',
+        descricao: `Faltam ${this.currencyFormatter.format(this.faltaMeta)} para a meta que você definiu.`,
         cta: 'Ver evolução',
         targetId: 'sec-evolucao'
       };
     }
 
     return {
-      titulo: 'Carteira em rotina estável',
-      descricao: 'Com os dados atuais, siga acompanhando rentabilidade e proventos.',
+      titulo: 'Alocação alinhada ao seu alvo',
+      descricao: 'Sua carteira está sem desvios relevantes em relação ao alvo definido.',
       cta: 'Ver evolução',
       targetId: 'sec-evolucao'
     };

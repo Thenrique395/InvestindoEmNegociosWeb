@@ -1206,3 +1206,34 @@ th {
     display: none;
   }
 }
+
+/* Fase 1 — header premium + abas padronizadas */
+.invest-actions { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; }
+.invest-tabs { display: flex; overflow-x: auto; margin-bottom: 0.25rem; }
+@media (max-width: 640px) {
+  .invest-actions, .invest-actions .btn-primary, .invest-actions .btn-secondary { width: 100%; }
+}
+
+/* Fase 2 — posições responsivas (tabela no desktop, cards no mobile) */
+.positions-cards { display: none; list-style: none; margin: 0; padding: 0; }
+.position-card {
+  display: grid; gap: 0.7rem; padding: 0.9rem;
+  border: 1px solid var(--border); border-radius: var(--radius-lg, 14px);
+  background: var(--surface); margin-bottom: 10px;
+}
+.position-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
+.position-card__asset { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.position-card__asset img { width: 28px; height: 28px; border-radius: 8px; object-fit: contain; background: var(--surface-2); }
+.position-card__asset strong { display: block; color: var(--text); }
+.position-card__type { font-size: var(--text-xs, 0.72rem); color: var(--text-muted); }
+.position-card__grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0.5rem 0.9rem; margin: 0; }
+.position-card__grid dt { font-size: var(--text-xs, 0.68rem); text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.position-card__grid dd { margin: 0; font-size: var(--text-sm, 0.85rem); font-weight: 600; color: var(--text); }
+.position-card__grid dd.success { color: var(--success-text, var(--success)); }
+.position-card__grid dd.danger { color: var(--danger-text, var(--danger)); }
+.position-card__action { width: 100%; }
+
+@media (max-width: 820px) {
+  #sec-posicoes .table-wrap { display: none; }
+  .positions-cards { display: block; }
+}

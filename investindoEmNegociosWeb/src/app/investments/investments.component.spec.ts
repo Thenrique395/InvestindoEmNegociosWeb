@@ -141,11 +141,12 @@ describe('InvestmentsComponent', () => {
     expect(investments.upsertAllocationTarget).toHaveBeenCalled();
   });
 
-  it('deve sugerir rebalanceamento quando houver desvio alto', () => {
+  it('informa (sem recomendar) quando a alocação está fora do alvo', () => {
     const { component } = createComponent();
     component.positions = [position({ type: 'ACOES', quantity: 10, avgPrice: 100 })];
 
-    expect(component.proximaAcao.titulo).toContain('Rebalancear');
+    expect(component.hasRebalanceAlert).toBeTrue();
+    expect(component.proximaAcao.titulo).toContain('fora do alvo');
   });
 
   it('deve sugerir novo aporte quando não houver movimento no mês', () => {
