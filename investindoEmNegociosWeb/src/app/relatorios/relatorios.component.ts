@@ -3,25 +3,30 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, NgZo
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ReportsService, MonthlySummaryReportResponse } from '../reports.service';
+import { ReportsService, CategoryExpenseResponse, MonthlySummaryReportResponse } from '../reports.service';
 import { formatCurrencyValue } from '../utils/locale-utils';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut-chart.component';
-
-const CATEGORY_PALETTE = [
-  'var(--color-chart-series-1)',
-  'var(--color-chart-series-2)',
-  'var(--color-chart-series-3)',
-  'var(--color-chart-series-4)',
-  'var(--color-chart-series-5)'
-];
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
+import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.model';
 
 @Component({
   selector: 'app-relatorios',
   standalone: true,
-  imports: [CommonModule, AppCurrencyPipe, UiStateComponent, EmptyStateComponent, DonutChartComponent],
+  imports: [
+    CommonModule,
+    AppCurrencyPipe,
+    UiStateComponent,
+    EmptyStateComponent,
+    DonutChartComponent,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    UsageBarComponent
+  ],
   templateUrl: './relatorios.component.html',
   styleUrl: './relatorios.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,6 +34,7 @@ const CATEGORY_PALETTE = [
 export class RelatoriosComponent implements OnInit {
   report: MonthlySummaryReportResponse | null = null;
   loading = false;
+  error = '';
 
   year = new Date().getFullYear();
   month = new Date().getMonth() + 1;
@@ -47,22 +53,26 @@ export class RelatoriosComponent implements OnInit {
   get monthName(): string { return this.months[this.month - 1]; }
 
   get expensesDonutItems(): DonutChartItem[] {
-    if (!this.report) return [];
-    return this.report.expensesByCategory.map((cat, index) => ({
-      label: cat.categoryName,
-      value: cat.amount,
-      percent: cat.percentageOfTotal,
-      color: CATEGORY_PALETTE[index % CATEGORY_PALETTE.length]
-    }));
+    return buildExpenseDonutItems(this.report?.expensesByCategory);
+  }
+
+  get topExpenses(): CategoryExpenseResponse[] {
+    return buildTopExpenses(this.report?.topExpenses);
   }
 
   load(): void {
     this.loading = true;
+    this.error = '';
     this.reportsService.getMonthlySummary(this.year, this.month)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (r) => this.ngZone.run(() => { this.report = r; this.loading = false; this.cdr.markForCheck(); }),
-        error: () => this.ngZone.run(() => { this.loading = false; this.cdr.markForCheck(); })
+        error: () => this.ngZone.run(() => {
+          this.report = null;
+          this.error = 'Não foi possível carregar o relatório deste período.';
+          this.loading = false;
+          this.cdr.markForCheck();
+        })
       });
   }
 

@@ -42,7 +42,7 @@ describe('RelatoriosComponent', () => {
     expect(component.loading).toBeFalse();
   });
 
-  it('limpa o loading quando a busca falha', () => {
+  it('limpa o loading e sinaliza erro quando a busca falha', () => {
     const { component, reportsService } = createComponent();
     reportsService.getMonthlySummary.and.returnValue(throwError(() => new Error('falhou')));
 
@@ -50,6 +50,34 @@ describe('RelatoriosComponent', () => {
 
     expect(component.loading).toBeFalse();
     expect(component.report).toBeNull();
+    expect(component.error).toContain('Não foi possível carregar');
+  });
+
+  it('deriva as maiores despesas do relatório (ordenadas e limitadas)', () => {
+    const { component, reportsService } = createComponent();
+    reportsService.getMonthlySummary.and.returnValue(of(buildReport({
+      topExpenses: [
+        { categoryName: 'Moradia', amount: 500, percentageOfTotal: 30 },
+        { categoryName: 'Mercado', amount: 900, percentageOfTotal: 50 }
+      ]
+    })));
+
+    component.ngOnInit();
+
+    expect(component.topExpenses.map((c) => c.categoryName)).toEqual(['Mercado', 'Moradia']);
+  });
+
+  it('limpa o erro ao recarregar com sucesso', () => {
+    const { component, reportsService } = createComponent();
+    reportsService.getMonthlySummary.and.returnValue(throwError(() => new Error('falhou')));
+    component.ngOnInit();
+    expect(component.error).not.toBe('');
+
+    reportsService.getMonthlySummary.and.returnValue(of(buildReport()));
+    component.load();
+
+    expect(component.error).toBe('');
+    expect(component.report?.netBalance).toBe(2000);
   });
 
   it('volta um mês (incluindo virada de ano) e recarrega o relatório', () => {

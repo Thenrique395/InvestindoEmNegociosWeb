@@ -1,27 +1,74 @@
 <section class="relatorios-page">
-  <header class="page-header">
-    <div class="page-header__nav">
-      <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
-      <h1>Relatório · {{ monthName }} {{ year }}</h1>
-      <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
+  <app-page-header
+    eyebrow="Relatório financeiro"
+    [title]="monthName + ' · ' + year"
+    description="Resumo do mês com receitas, despesas e distribuição por categoria — a partir dos seus lançamentos.">
+    <div page-actions class="relatorios-actions">
+      <div class="relatorios-nav" role="group" aria-label="Navegar entre os meses">
+        <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
+        <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
+      </div>
+      @if (report) {
+        <div class="relatorios-export">
+          <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
+          <button type="button" class="btn-ghost sm" (click)="exportPdf()">Exportar PDF</button>
+        </div>
+      }
     </div>
-    @if (report) {
-      <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
-      <button type="button" class="btn-ghost sm" (click)="exportPdf()">Exportar PDF</button>
-    }
-  </header>
+  </app-page-header>
 
   @if (loading) {
     <app-ui-state type="loading" />
   }
 
-  @if (!loading && report) {
-    <div class="summary-grid kpis">
-      <div><span>Receitas</span><strong class="positive">{{ report.totalIncome | appCurrency }}</strong></div>
-      <div><span>Despesas</span><strong class="negative">{{ report.totalExpenses | appCurrency }}</strong></div>
-      <div [class.negative]="report.netBalance < 0"><span>Saldo líquido</span><strong>{{ report.netBalance | appCurrency }}</strong></div>
-      <div><span>Taxa de poupança</span><strong>{{ report.savingsRate | number:'1.1-1' }}%</strong></div>
-    </div>
+  @if (!loading && error) {
+    <app-ui-state
+      type="error"
+      title="Não foi possível concluir a operação."
+      [description]="error"
+      retryLabel="Tentar novamente"
+      (retry)="load()" />
+  }
+
+  @if (!loading && !error && report) {
+    <section class="summary-grid">
+      <app-transaction-summary-card
+        tone="success"
+        eyebrow="Receitas"
+        [value]="report.totalIncome | appCurrency"
+        note="Total de entradas registradas no mês.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="danger"
+        eyebrow="Despesas"
+        [value]="report.totalExpenses | appCurrency"
+        note="Total de saídas pagas no mês.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="report.netBalance < 0 ? 'warning' : 'info'"
+        eyebrow="Saldo líquido"
+        [value]="report.netBalance | appCurrency"
+        [note]="report.netBalance < 0 ? 'Você gastou mais do que recebeu neste mês.' : 'Receitas menos despesas do mês.'">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="Taxa de poupança"
+        [value]="(report.savingsRate | number:'1.1-1') + '%'"
+        note="Parte das receitas que sobrou no mês.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 3v18M5 10a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
 
     <article class="card">
       <h2>Despesas por categoria</h2>
@@ -30,14 +77,15 @@
       }
       @if (report.expensesByCategory.length) {
         <app-donut-chart [items]="expensesDonutItems" emptyMessage="Sem despesas para exibir." />
-        <div class="table-wrap">
+
+        <div class="category-table">
           <table>
             <thead>
               <tr>
                 <th>Categoria</th>
                 <th class="text-right">Valor</th>
                 <th class="text-right">% do total</th>
-                <th>Barra</th>
+                <th class="col-bar">Participação</th>
               </tr>
             </thead>
             <tbody>
@@ -46,17 +94,50 @@
                   <td>{{ cat.categoryName }}</td>
                   <td class="text-right">{{ cat.amount | appCurrency }}</td>
                   <td class="text-right">{{ cat.percentageOfTotal | number:'1.1-1' }}%</td>
-                  <td>
-                    <div class="progress-bar">
-                      <div class="progress-bar__fill" [style.width.%]="cat.percentageOfTotal"></div>
-                    </div>
+                  <td class="col-bar">
+                    <app-usage-bar
+                      [percent]="cat.percentageOfTotal"
+                      tone="ok"
+                      [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
                   </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
+
+        <ul class="category-cards">
+          @for (cat of report.expensesByCategory; track cat.categoryName) {
+            <li class="category-card">
+              <div class="category-card__head">
+                <span class="category-card__name">{{ cat.categoryName }}</span>
+                <strong>{{ cat.amount | appCurrency }}</strong>
+              </div>
+              <app-usage-bar
+                [percent]="cat.percentageOfTotal"
+                tone="ok"
+                [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
+              <span class="category-card__percent muted">{{ cat.percentageOfTotal | number:'1.1-1' }}% do total</span>
+            </li>
+          }
+        </ul>
       }
     </article>
+
+    @if (topExpenses.length) {
+      <article class="card">
+        <h2>Maiores despesas</h2>
+        <ol class="top-expenses">
+          @for (cat of topExpenses; track cat.categoryName; let i = $index) {
+            <li class="top-expense">
+              <span class="top-expense__rank" aria-hidden="true">{{ i + 1 }}</span>
+              <span class="top-expense__name">{{ cat.categoryName }}</span>
+              <span class="top-expense__percent muted">{{ cat.percentageOfTotal | number:'1.1-1' }}%</span>
+              <strong class="top-expense__value">{{ cat.amount | appCurrency }}</strong>
+            </li>
+          }
+        </ol>
+      </article>
+    }
   }
 </section>

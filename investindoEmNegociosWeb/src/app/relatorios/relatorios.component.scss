@@ -5,30 +5,24 @@
   gap: 1.5rem;
 }
 
-.page-header {
+.relatorios-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
 }
 
-.page-header__nav {
+.relatorios-nav,
+.relatorios-export {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  h1 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin: 0;
-  }
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .summary-grid {
-  display: flex;
+  display: grid;
   gap: 1rem;
-  flex-wrap: wrap;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .card {
@@ -49,31 +43,13 @@
   letter-spacing: var(--letter-spacing-title);
 }
 
-.kpis > div {
-  padding: 0.85rem;
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  min-width: 10rem;
-}
-
-.kpis span {
-  display: block;
+.muted {
   color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-label);
-  margin-bottom: 0.25rem;
-  text-transform: uppercase;
 }
 
-.kpis strong {
-  color: var(--text);
-  font-size: var(--font-size-body-lg);
-}
-
-.table-wrap {
-  overflow: auto;
+/* Tabela de categorias (desktop) */
+.category-table {
+  overflow-x: auto;
 }
 
 table {
@@ -86,23 +62,116 @@ td {
   padding: 0.65rem 0.5rem;
   border-bottom: 1px solid var(--border);
   text-align: left;
+  vertical-align: middle;
 }
 
-.progress-bar {
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-  min-width: 6rem;
+.text-right { text-align: right; }
 
-  &__fill {
-    height: 100%;
-    background: var(--primary);
-    border-radius: 3px;
-    transition: width 0.3s ease;
+.col-bar {
+  width: 30%;
+  min-width: 8rem;
+}
+
+/* Cartões de categoria (mobile) */
+.category-cards {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.75rem;
+}
+
+.category-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.category-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.category-card__name {
+  color: var(--text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.category-card__percent {
+  font-size: var(--font-size-caption);
+}
+
+/* Maiores despesas */
+.top-expenses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.top-expense {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.top-expense__rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+}
+
+.top-expense__name {
+  min-width: 0;
+  color: var(--text);
+  font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-expense__percent {
+  font-size: var(--font-size-caption);
+}
+
+.top-expense__value {
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.positive { color: var(--success-text); }
-.negative { color: var(--danger-text); }
-.text-right { text-align: right; }
+@media (max-width: 640px) {
+  .summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .category-table {
+    display: none;
+  }
+
+  .category-cards {
+    display: grid;
+  }
+}
