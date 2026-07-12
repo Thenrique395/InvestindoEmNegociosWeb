@@ -3,20 +3,19 @@
   gap: 1.5rem;
 }
 
+.header-meta {
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: var(--font-weight-semibold);
+}
+
 .loans-summary-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.loans-shell {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
-  padding: 1.6rem;
-  display: grid;
-  gap: 1.3rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .card {
@@ -32,24 +31,6 @@
   color: var(--text-muted);
 }
 
-.feedback {
-  padding: 0.9rem 1rem;
-  border-radius: var(--radius-lg);
-  font-weight: var(--font-weight-semibold);
-}
-
-.feedback.error {
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
-  color: var(--danger-text);
-}
-
-.feedback.success {
-  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
-  background: color-mix(in srgb, var(--success) 10%, transparent);
-  color: var(--success-text);
-}
-
 .grid {
   display: grid;
   gap: 1rem;
@@ -59,6 +40,16 @@
 .form-card {
   display: grid;
   gap: 0.8rem;
+  align-content: start;
+}
+
+.form-card__head {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.form-card__head p {
+  margin: 0;
 }
 
 .form-card h2,
@@ -72,6 +63,16 @@
 label {
   display: grid;
   gap: 0.4rem;
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field__label {
   color: var(--text-secondary);
   font-weight: var(--font-weight-semibold);
 }
@@ -138,9 +139,19 @@ td {
   text-align: left;
 }
 
+.contracts-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
 .contract-list {
   display: grid;
   gap: 0.9rem;
+  margin-top: 0.9rem;
 }
 
 .contract {
@@ -148,13 +159,23 @@ td {
   border-radius: var(--radius-xl);
   padding: 1rem;
   background: var(--surface-2);
+  display: grid;
+  gap: 0.85rem;
 }
 
 .contract__head {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.contract__title {
+  min-width: 0;
+}
+
+.contract__title p {
+  margin: 0.2rem 0 0;
 }
 
 .contract h3 {
@@ -162,17 +183,32 @@ td {
   color: var(--text);
 }
 
-.pill {
-  padding: 0.4rem 0.7rem;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
-  color: var(--primary-text);
-  font-weight: var(--font-weight-bold);
+.contract__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.pill--success {
-  background: var(--success-10);
-  color: var(--success-text);
+.contract__progress {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.contract__progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.contract__progress-head strong {
+  color: var(--text);
+  font-size: var(--font-size-body);
+}
+
+.contract__next {
+  margin: 0.1rem 0 0;
 }
 
 .row--paid {
@@ -185,4 +221,33 @@ td {
 
 .compact {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .loans-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .loans-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contract__head {
+    flex-direction: column;
+  }
+
+  .contract__actions {
+    width: 100%;
+  }
+
+  .kpis,
+  .compact {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -1,74 +1,76 @@
 <section class="loans-page">
+  <app-page-header
+    eyebrow="Planejamento de passivos"
+    title="Empréstimos e amortização"
+    description="Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização dentro do contexto financeiro.">
+    @if (overview.nextDueDate) {
+      <span page-meta class="header-meta">
+        Próximo vencimento em {{ overview.nextDueDate | date:'dd/MM/yyyy' }} · {{ overview.nextDueAmount | appCurrency }}
+      </span>
+    }
+  </app-page-header>
+
   <section class="loans-summary-grid">
-    <app-stat-card
+    <app-transaction-summary-card
       tone="warning"
-      eyebrow="Saldo aberto"
-      [value]="totalOpenBalance | appCurrency"
+      eyebrow="Saldo devedor"
+      [value]="overview.totalOpenBalance | appCurrency"
       note="Valor ainda pendente nos contratos cadastrados.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
-    <app-stat-card
+    </app-transaction-summary-card>
+    <app-transaction-summary-card
       tone="primary"
-      eyebrow="Parcelas/mês"
-      [value]="totalMonthlyPayment | appCurrency"
-      note="Compromisso mensal estimado pelos contratos ativos.">
+      eyebrow="Parcela mensal"
+      [value]="overview.totalMonthly | appCurrency"
+      note="Compromisso mensal dos contratos ativos.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
-    <app-stat-card
+    </app-transaction-summary-card>
+    <app-transaction-summary-card
       tone="info"
       eyebrow="Parcelas abertas"
-      [value]="totalOpenInstallments.toString()"
-      [note]="contracts.length + ' contrato(s) acompanhado(s).'">
+      [value]="overview.totalOpenInstallments.toString()"
+      [note]="overview.contractsCount + ' contrato(s) acompanhado(s).'">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
+    <app-transaction-summary-card
+      tone="success"
+      eyebrow="Progresso geral"
+      [value]="overview.paidPercent + '%'"
+      note="Parcelas já quitadas no conjunto de contratos.">
+      <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+        <path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </app-transaction-summary-card>
   </section>
-
-  <section class="loans-shell">
-    <app-period-hero
-      eyebrow="Planejamento de passivos"
-      title="Empréstimos e amortização"
-      description="Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização dentro do contexto financeiro."
-      [showNavigation]="false">
-      <app-period-action-card
-        hero-aside
-        title="Simular antes de contratar"
-        description="Revise parcela, custo total e juros antes de salvar o contrato.">
-        <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="simulate()">
-          <span class="period-total-card__action-icon" aria-hidden="true">→</span>
-          <span class="period-total-card__action-copy">
-            <strong>Simular contrato</strong>
-            <small>Calcular parcelas com os dados preenchidos.</small>
-          </span>
-        </button>
-      </app-period-action-card>
-    </app-period-hero>
 
   @if (error) {
     <app-ui-state type="error" title="Não foi possível concluir a operação." [description]="error" retryLabel="Tentar novamente" (retry)="load()" />
   }
-  @if (success) {
-    <div class="feedback success">{{ success }}</div>
-  }
 
   <div class="grid">
     <article class="card form-card">
-      <h2>{{ editingId ? 'Editar contrato' : 'Novo contrato' }}</h2>
+      <div class="form-card__head">
+        <h2>{{ editingId ? 'Editar contrato' : 'Novo contrato' }}</h2>
+        <p class="muted text--sm">Preencha os dados e simule antes de salvar. Nada é registrado sem confirmação.</p>
+      </div>
       <label>Título<input [(ngModel)]="form.title" /></label>
       <label>Principal<input type="number" [(ngModel)]="form.principalAmount" /></label>
       <label>Juros ao ano (%)<input type="number" step="0.01" [(ngModel)]="form.annualInterestRate" /></label>
       <label>Prazo em meses<input type="number" [(ngModel)]="form.termMonths" /></label>
-      <label>Amortização
-        <select [(ngModel)]="form.amortizationType">
-          <option value="Price">PRICE</option>
-          <option value="Sac">SAC</option>
-        </select>
-      </label>
+      <div class="field">
+        <span class="field__label">Sistema de amortização</span>
+        <app-segmented-selector
+          ariaLabel="Sistema de amortização"
+          [options]="amortizationOptions"
+          [value]="form.amortizationType"
+          (valueChange)="setAmortization($event)" />
+      </div>
       <label>Data inicial<input type="date" [(ngModel)]="form.startDate" /></label>
       <label>Dia de pagamento<input type="number" min="1" max="28" [(ngModel)]="form.paymentDay" /></label>
       <div class="actions">
@@ -113,7 +115,17 @@
   </div>
 
   <article class="card">
-    <h2>Contratos cadastrados</h2>
+    <div class="contracts-head">
+      <h2>Contratos cadastrados</h2>
+      @if (contracts.length) {
+        <app-segmented-selector
+          ariaLabel="Filtrar contratos por situação"
+          [options]="statusFilterOptions"
+          [value]="statusFilter"
+          (valueChange)="setStatusFilter($event)" />
+      }
+    </div>
+
     @if (loading) {
       <app-ui-state type="loading" />
     }
@@ -123,48 +135,81 @@
         title="Nenhum empréstimo cadastrado"
         description="Simule e crie o primeiro contrato para acompanhar parcelas e saldo aberto." />
     }
-    @if (contracts.length) {
+    @if (!loading && contracts.length && !filteredViews.length) {
+      <app-empty-state
+        icon="⏳"
+        title="Nenhum contrato nesta situação"
+        description="Ajuste o filtro para ver os demais contratos." />
+    }
+    @if (filteredViews.length) {
       <div class="contract-list">
-        @for (contract of contracts; track contract.id) {
+        @for (view of filteredViews; track view.contract.id) {
           <section class="contract">
             <div class="contract__head">
-              <div>
-                <h3>{{ contract.title }}</h3>
-                <p class="muted">{{ contract.amortizationType }} · {{ contract.termMonths }} meses · saldo aberto {{ contract.openBalance | appCurrency }}</p>
+              <div class="contract__title">
+                <h3>{{ view.contract.title }}</h3>
+                <p class="muted text--sm">
+                  {{ view.contract.amortizationType === 'Sac' ? 'SAC' : 'PRICE' }} ·
+                  {{ view.contract.termMonths }} meses ·
+                  saldo aberto {{ view.contract.openBalance | appCurrency }}
+                </p>
               </div>
               <div class="contract__actions">
-                <div class="pill">{{ contract.status }}</div>
-                <button type="button" class="btn-ghost sm" (click)="edit(contract)" [disabled]="!!deleting">Editar</button>
-                <button type="button" class="btn-danger sm" (click)="remove(contract)" [disabled]="deleting === contract.id || !!editingId">
-                  {{ deleting === contract.id ? 'Excluindo...' : 'Excluir' }}
+                <app-status-badge [tone]="view.statusTone" [label]="view.statusLabel" [dot]="true" />
+                <button type="button" class="btn-ghost sm" (click)="edit(view.contract)" [disabled]="!!deleting">Editar</button>
+                <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting === view.contract.id || !!editingId">
+                  {{ deleting === view.contract.id ? 'Excluindo...' : 'Excluir' }}
                 </button>
               </div>
             </div>
+
+            <div class="contract__progress">
+              <div class="contract__progress-head">
+                <span class="muted text--sm">{{ view.paidCount }} de {{ view.totalCount }} parcelas quitadas</span>
+                <strong>{{ view.paidPercent }}%</strong>
+              </div>
+              <app-usage-bar
+                [percent]="view.paidPercent"
+                tone="ok"
+                [label]="view.paidPercent + '% das parcelas quitadas'" />
+              @if (view.nextInstallment) {
+                <p class="muted text--sm contract__next">
+                  Próxima parcela {{ view.nextInstallment.installmentNo }} em
+                  {{ view.nextInstallment.dueDate | date:'dd/MM/yyyy' }} ·
+                  {{ view.nextInstallment.totalAmount | appCurrency }}
+                </p>
+              }
+            </div>
+
             <div class="kpis compact">
-              <div><span>Parcela</span><strong>{{ contract.monthlyPayment | appCurrency }}</strong></div>
-              <div><span>Juros totais</span><strong>{{ contract.totalInterest | appCurrency }}</strong></div>
-              <div><span>Parcelas abertas</span><strong>{{ contract.openInstallments }}</strong></div>
+              <div><span>Parcela</span><strong>{{ view.contract.monthlyPayment | appCurrency }}</strong></div>
+              <div><span>Juros totais</span><strong>{{ view.contract.totalInterest | appCurrency }}</strong></div>
+              <div><span>Parcelas abertas</span><strong>{{ view.contract.openInstallments }}</strong></div>
             </div>
             <div class="contract__toggle">
-              <button type="button" class="btn-ghost sm" (click)="toggleInstallments(contract.id)">
-                {{ expandedContractId === contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
+              <button type="button" class="btn-ghost sm" (click)="toggleInstallments(view.contract.id)">
+                {{ expandedContractId === view.contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
               </button>
             </div>
-            @if (expandedContractId === contract.id) {
+            @if (expandedContractId === view.contract.id) {
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>#</th><th>Vencimento</th><th>Total</th><th>Saldo restante</th><th>Situação</th><th></th></tr></thead>
                   <tbody>
-                    @for (inst of contract.installments; track inst.id) {
+                    @for (inst of view.contract.installments; track inst.id) {
                       <tr [class.row--paid]="inst.status === 'Paid'">
                         <td>{{ inst.installmentNo }}</td>
                         <td>{{ inst.dueDate | date:'dd/MM/yyyy' }}</td>
                         <td>{{ inst.totalAmount | appCurrency }}</td>
                         <td>{{ inst.endingBalance | appCurrency }}</td>
-                        <td><span class="pill" [class.pill--success]="inst.status === 'Paid'">{{ inst.status === 'Paid' ? 'Pago' : 'Em aberto' }}</span></td>
+                        <td>
+                          <app-status-badge
+                            [tone]="inst.status === 'Paid' ? 'success' : 'muted'"
+                            [label]="inst.status === 'Paid' ? 'Pago' : 'Em aberto'" />
+                        </td>
                         <td>
                           @if (inst.status === 'Open') {
-                            <button type="button" class="btn-primary sm" (click)="payInstallment(contract, inst.id)" [disabled]="payingInstallment === inst.id">
+                            <button type="button" class="btn-primary sm" (click)="payInstallment(view.contract, inst.id)" [disabled]="payingInstallment === inst.id">
                               {{ payingInstallment === inst.id ? '...' : 'Pagar' }}
                             </button>
                           } @else {
@@ -182,5 +227,18 @@
       </div>
     }
   </article>
-  </section>
 </section>
+
+<app-confirm-sheet
+  [open]="!!pendingDelete"
+  eyebrow="Excluir contrato"
+  [title]="pendingDelete ? ('Excluir “' + pendingDelete.title + '”?') : ''"
+  (dismiss)="cancelRemove()">
+  <p>
+    Esta ação remove o contrato e todo o cronograma de parcelas. Não é possível desfazer.
+  </p>
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost" (click)="cancelRemove()">Cancelar</button>
+    <button type="button" class="btn-danger" (click)="confirmRemove()">Excluir contrato</button>
+  </ng-container>
+</app-confirm-sheet>

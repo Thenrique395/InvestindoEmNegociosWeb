@@ -107,4 +107,67 @@ describe('LoansComponent', () => {
     expect(ctx.component.error).toBe('Falha ao criar');
     expect(ctx.component.saving).toBeFalse();
   });
+
+  function contract(partial?: any) {
+    return {
+      id: 'c1', title: 'Empréstimo', principalAmount: 10000, annualInterestRate: 18,
+      termMonths: 24, amortizationType: 'Price', startDate: '2026-01-10', paymentDay: 10,
+      monthlyPayment: 500, totalCost: 12000, totalInterest: 2000, status: 'Active',
+      openBalance: 8000, openInstallments: 20, createdAt: '2026-01-01', installments: [],
+      ...partial
+    };
+  }
+
+  it('não exclui direto: askRemove apenas prepara a confirmação', () => {
+    const ctx = createComponent();
+    ctx.component.contracts = [contract()];
+
+    ctx.component.askRemove(ctx.component.contracts[0]);
+
+    expect(ctx.component.pendingDelete?.id).toBe('c1');
+    expect(ctx.loansService.delete).not.toHaveBeenCalled();
+  });
+
+  it('confirmRemove exclui o contrato pendente e limpa o estado', () => {
+    const loansService = {
+      list: jasmine.createSpy().and.returnValue(of([])),
+      simulate: jasmine.createSpy(),
+      create: jasmine.createSpy(),
+      update: jasmine.createSpy(),
+      delete: jasmine.createSpy().and.returnValue(of(void 0))
+    };
+    const ctx = createComponent({ loansService });
+    ctx.component.contracts = [contract()];
+    ctx.component.askRemove(ctx.component.contracts[0]);
+
+    ctx.component.confirmRemove();
+
+    expect(loansService.delete).toHaveBeenCalledWith('c1');
+    expect(ctx.component.contracts.length).toBe(0);
+    expect(ctx.component.pendingDelete).toBeNull();
+    expect(ctx.uiFeedback.success).toHaveBeenCalledWith(jasmine.stringContaining('excluído'));
+  });
+
+  it('cancelRemove descarta a confirmação sem excluir', () => {
+    const ctx = createComponent();
+    ctx.component.contracts = [contract()];
+    ctx.component.askRemove(ctx.component.contracts[0]);
+
+    ctx.component.cancelRemove();
+
+    expect(ctx.component.pendingDelete).toBeNull();
+    expect(ctx.loansService.delete).not.toHaveBeenCalled();
+  });
+
+  it('filteredViews respeita o filtro de situação', () => {
+    const ctx = createComponent();
+    ctx.component.contracts = [
+      contract({ id: 'a', status: 'Active', installments: [{ id: 'i1', installmentNo: 1, dueDate: '2026-03-10', beginningBalance: 0, principalAmount: 0, interestAmount: 0, totalAmount: 500, endingBalance: 0, status: 'Open' }] }),
+      contract({ id: 'b', status: 'Closed', installments: [{ id: 'i2', installmentNo: 1, dueDate: '2026-02-10', beginningBalance: 0, principalAmount: 0, interestAmount: 0, totalAmount: 500, endingBalance: 0, status: 'Paid' }] })
+    ];
+
+    ctx.component.setStatusFilter('closed');
+
+    expect(ctx.component.filteredViews.map((v) => v.contract.id)).toEqual(['b']);
+  });
 });

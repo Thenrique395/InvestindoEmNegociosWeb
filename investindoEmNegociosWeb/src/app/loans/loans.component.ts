@@ -2,20 +2,38 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { LoansService, LoanContractRequest, LoanContractResponse, LoanSimulationResponse } from '../loans.service';
+import { LoansService, LoanAmortizationType, LoanContractRequest, LoanContractResponse, LoanSimulationResponse } from '../loans.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
+import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { LoanContractView, LoansOverview, buildContractViews, buildLoansOverview } from './loans-overview.model';
+
+type LoanStatusFilter = 'all' | 'active' | 'closed';
 
 @Component({
   selector: 'app-loans',
   standalone: true,
-  imports: [CommonModule, FormsModule, EmptyStateComponent, UiStateComponent, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    EmptyStateComponent,
+    UiStateComponent,
+    AppCurrencyPipe,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    SegmentedSelectorComponent,
+    StatusBadgeComponent,
+    UsageBarComponent,
+    ConfirmSheetComponent
+  ],
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,18 +47,17 @@ export class LoansComponent implements OnInit {
   editingId: string | null = null;
   payingInstallment: string | null = null;
   expandedContractId: string | null = null;
+  statusFilter: LoanStatusFilter = 'all';
+  pendingDelete: LoanContractResponse | null = null;
   error = '';
   success = '';
 
-  form: LoanContractRequest = {
-    title: 'Empréstimo pessoal',
-    principalAmount: 10000,
-    annualInterestRate: 18,
-    termMonths: 24,
-    amortizationType: 'Price',
-    startDate: new Date().toISOString().slice(0, 10),
-    paymentDay: 10
-  };
+  readonly amortizationOptions: SegmentOption[] = [
+    { value: 'Price', label: 'PRICE' },
+    { value: 'Sac', label: 'SAC' }
+  ];
+
+  form: LoanContractRequest = this.defaultForm();
 
   constructor(
     private readonly loansService: LoansService,
@@ -53,16 +70,39 @@ export class LoansComponent implements OnInit {
     this.load();
   }
 
-  get totalOpenBalance(): number {
-    return this.contracts.reduce((total, contract) => total + Number(contract.openBalance || 0), 0);
+  get overview(): LoansOverview {
+    return buildLoansOverview(this.contracts);
   }
 
-  get totalMonthlyPayment(): number {
-    return this.contracts.reduce((total, contract) => total + Number(contract.monthlyPayment || 0), 0);
+  get contractViews(): LoanContractView[] {
+    return buildContractViews(this.contracts);
   }
 
-  get totalOpenInstallments(): number {
-    return this.contracts.reduce((total, contract) => total + Number(contract.openInstallments || 0), 0);
+  get filteredViews(): LoanContractView[] {
+    const views = this.contractViews;
+    if (this.statusFilter === 'active') return views.filter((v) => v.statusLabel === 'Ativo');
+    if (this.statusFilter === 'closed') return views.filter((v) => v.statusLabel === 'Quitado');
+    return views;
+  }
+
+  get statusFilterOptions(): SegmentOption[] {
+    const views = this.contractViews;
+    const active = views.filter((v) => v.statusLabel === 'Ativo').length;
+    const closed = views.filter((v) => v.statusLabel === 'Quitado').length;
+    return [
+      { value: 'all', label: `Todos (${views.length})` },
+      { value: 'active', label: `Ativos (${active})` },
+      { value: 'closed', label: `Quitados (${closed})` }
+    ];
+  }
+
+  setStatusFilter(value: string): void {
+    this.statusFilter = value as LoanStatusFilter;
+    this.cdr.markForCheck();
+  }
+
+  setAmortization(value: string): void {
+    this.form.amortizationType = value as LoanAmortizationType;
   }
 
   load(): void {
@@ -156,13 +196,27 @@ export class LoansComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  remove(contract: LoanContractResponse): void {
+  askRemove(contract: LoanContractResponse): void {
     if (this.deleting) return;
+    this.pendingDelete = contract;
+    this.cdr.markForCheck();
+  }
+
+  cancelRemove(): void {
+    this.pendingDelete = null;
+    this.cdr.markForCheck();
+  }
+
+  confirmRemove(): void {
+    const contract = this.pendingDelete;
+    if (!contract || this.deleting) return;
     this.deleting = contract.id;
+    this.pendingDelete = null;
     this.loansService.delete(contract.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.contracts = this.contracts.filter(c => c.id !== contract.id);
         if (this.editingId === contract.id) { this.editingId = null; this.resetForm(); }
+        if (this.expandedContractId === contract.id) { this.expandedContractId = null; }
         this.deleting = null;
         this.uiFeedback.success('Contrato excluído.');
         this.cdr.markForCheck();
@@ -204,7 +258,11 @@ export class LoansComponent implements OnInit {
   }
 
   private resetForm(): void {
-    this.form = {
+    this.form = this.defaultForm();
+  }
+
+  private defaultForm(): LoanContractRequest {
+    return {
       title: 'Empréstimo pessoal',
       principalAmount: 10000,
       annualInterestRate: 18,
