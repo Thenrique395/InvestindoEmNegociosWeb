@@ -4,11 +4,15 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { ProfileService, SecuritySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
 
 @Component({
   selector: 'app-user-security',
   standalone: true,
-  imports: [CommonModule, ConfirmDialogComponent],
+  imports: [CommonModule, ConfirmDialogComponent, PageHeaderComponent, SectionCardComponent, TransactionSummaryCardComponent, UiStateComponent],
   templateUrl: './user-security.component.html',
   styleUrls: ['./user-security.component.scss']
 })

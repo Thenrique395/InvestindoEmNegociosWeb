@@ -1,82 +1,94 @@
-<section class="panel">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">Segurança</p>
-      <h2>Sessões e login</h2>
-      <p class="muted">Gerencie sessões ativas, lockout de login e resposta rápida para acesso suspeito.</p>
-    </div>
-  </div>
+<section class="seguranca-page">
+  <app-page-header
+    eyebrow="Segurança"
+    title="Sessões e login"
+    description="Gerencie sessões ativas, lockout de login e resposta rápida para acesso suspeito." />
 
-  @if (summary; as security) {
-    <div class="privacy-strip">
-      <div class="privacy-pill">
-        <strong>{{ security.activeSessions }}</strong>
-        <span>Sessões ativas</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ security.failedLoginAttempts }}</strong>
-        <span>Tentativas inválidas</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ security.isLocked ? 'Sim' : 'Não' }}</strong>
-        <span>Conta bloqueada</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ security.lastLoginAt ? (security.lastLoginAt | date:'dd/MM HH:mm') : '—' }}</strong>
-        <span>Último login</span>
-      </div>
-    </div>
-  } @else {
-    @if (loading) {
-      <p class="muted">Carregando resumo de segurança.</p>
-    }
+  @if (!summary && loading) {
+    <app-ui-state type="loading" />
   }
 
   @if (summary; as security) {
-    <div class="grid">
-      <div class="card">
-        <h3>Controles ativos</h3>
+    <section class="seguranca-summary-grid">
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Sessões ativas"
+        [value]="security.activeSessions.toString()"
+        note="Dispositivos atualmente conectados.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 5h16v10H4zM8 19h8M12 15v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="security.failedLoginAttempts > 0 ? 'warning' : 'success'"
+        eyebrow="Tentativas inválidas"
+        [value]="security.failedLoginAttempts.toString()"
+        note="Logins malsucedidos recentes.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="security.isLocked ? 'danger' : 'success'"
+        eyebrow="Conta bloqueada"
+        [value]="security.isLocked ? 'Sim' : 'Não'"
+        note="Bloqueio automático por segurança.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M7 11V8a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.7" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="Último login"
+        [value]="(security.lastLoginAt | date:'dd/MM HH:mm') || '—'"
+        note="Data e hora do acesso mais recente.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+          <path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
+
+    <div class="seguranca-grid">
+      <app-section-card title="Controles ativos" [hasHeaderActions]="false">
         <div class="scope">
           @for (item of security.controls; track item) {
             <div>{{ item }}</div>
           }
         </div>
-      </div>
-      <div class="card">
-        <h3>Resposta rápida</h3>
+      </app-section-card>
+
+      <app-section-card title="Resposta rápida" [hasHeaderActions]="false">
         @if (security.lockoutUntil) {
-          <p class="muted">
-            Lockout até {{ security.lockoutUntil | date:'dd/MM/yyyy HH:mm' }}.
-          </p>
+          <p class="muted">Lockout até {{ security.lockoutUntil | date:'dd/MM/yyyy HH:mm' }}.</p>
+        } @else {
+          <p class="muted">Use a revogação global para encerrar sessões ativas e exigir novo login com refresh token novo.</p>
         }
-        @if (!security.lockoutUntil) {
-          <p class="muted">
-            Use a revogação global para encerrar sessões ativas e exigir novo login com refresh token novo.
-          </p>
-        }
-        <button type="button" class="btn-danger" [disabled]="revoking" (click)="revokeSessions()">
+        <button type="button" class="btn-danger response-action" [disabled]="revoking" (click)="revokeSessions()">
           {{ revoking ? 'Revogando...' : 'Revogar sessões ativas' }}
         </button>
-        @if (confirmRevokeOpen) {
-          <app-confirm-dialog
-            title="Revogar todas as sessões ativas?"
-            message="Todos os dispositivos conectados serão desconectados e vão precisar fazer login novamente, incluindo este."
-            confirmLabel="Revogar sessões"
-            cancelLabel="Cancelar"
-            variant="danger"
-            (confirmed)="performRevokeSessions()"
-            (cancelled)="confirmRevokeOpen = false">
-          </app-confirm-dialog>
-        }
-      </div>
-      <div class="card">
-        <h3>Boas práticas</h3>
+      </app-section-card>
+
+      <app-section-card title="Boas práticas" [hasHeaderActions]="false">
         <div class="scope scope--compact">
           @for (item of security.recommendations; track item) {
             <div>{{ item }}</div>
           }
         </div>
-      </div>
+      </app-section-card>
     </div>
   }
 </section>
+
+@if (confirmRevokeOpen) {
+  <app-confirm-dialog
+    title="Revogar todas as sessões ativas?"
+    message="Todos os dispositivos conectados serão desconectados e vão precisar fazer login novamente, incluindo este."
+    confirmLabel="Revogar sessões"
+    cancelLabel="Cancelar"
+    variant="danger"
+    (confirmed)="performRevokeSessions()"
+    (cancelled)="confirmRevokeOpen = false">
+  </app-confirm-dialog>
+}
