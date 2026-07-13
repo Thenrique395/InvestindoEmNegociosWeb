@@ -8,11 +8,27 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { SubscriptionsService, SubscriptionCatalogResponse, SubscriptionPlan } from '../subscriptions.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
 
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule, RouterLink, ConfirmDialogComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    ConfirmDialogComponent,
+    PageHeaderComponent,
+    SectionCardComponent,
+    TransactionSummaryCardComponent,
+    StatusBadgeComponent,
+    SegmentedSelectorComponent,
+    UiStateComponent
+  ],
   templateUrl: './subscriptions.component.html',
   styleUrl: './subscriptions.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -104,8 +120,17 @@ export class SubscriptionsComponent implements OnInit {
     return days <= 7;
   }
 
+  readonly cycleOptions: SegmentOption[] = [
+    { value: 'Monthly', label: 'Mensal' },
+    { value: 'Yearly', label: 'Anual' }
+  ];
+
   selectCycle(cycle: 'Monthly' | 'Yearly'): void {
     this.changingCycle = cycle;
+  }
+
+  setCycle(value: string): void {
+    this.changingCycle = value === 'Yearly' ? 'Yearly' : 'Monthly';
   }
 
   change(plan: SubscriptionPlan): void {

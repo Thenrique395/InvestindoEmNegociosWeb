@@ -1,18 +1,19 @@
-<section class="panel">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">Assinatura</p>
-      <h2>Minha assinatura</h2>
-      <p class="muted">Gerencie upgrade, downgrade, renovação e o escopo liberado pelo seu plano atual.</p>
+<section class="assinatura-page">
+  <app-page-header
+    eyebrow="Assinatura"
+    title="Minha assinatura"
+    description="Gerencie upgrade, downgrade, renovação e o escopo liberado pelo seu plano atual.">
+    <div page-actions>
+      <app-segmented-selector
+        ariaLabel="Ciclo de cobrança"
+        [options]="cycleOptions"
+        [value]="changingCycle"
+        (valueChange)="setCycle($event)" />
     </div>
-    <div class="billing-toggle">
-      <button type="button" class="btn btn--ghost" [class.is-active]="changingCycle === 'Monthly'" (click)="selectCycle('Monthly')">Mensal</button>
-      <button type="button" class="btn btn--ghost" [class.is-active]="changingCycle === 'Yearly'" (click)="selectCycle('Yearly')">Anual</button>
-    </div>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <p class="muted">Carregando catálogo de planos.</p>
+    <app-ui-state type="loading" />
   }
 
   @if (catalog; as vm) {
@@ -60,28 +61,43 @@
         </span>
       </div>
     }
-    <div class="privacy-strip">
-      <div class="privacy-pill">
-        <strong>{{ vm.current.planName }}</strong>
-        <span>{{ vm.current.isTrial ? 'Plano (trial)' : 'Plano atual' }}</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ vm.current.role }}</strong>
-        <span>Role efetiva</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ vm.current.autoRenew ? 'Ativa' : 'Cancelada' }}</strong>
-        <span>Renovação</span>
-      </div>
-      <div class="privacy-pill">
-        @if (isPastDue && gracePeriodEndsAtLabel) {
-          <strong>{{ gracePeriodEndsAtLabel }}</strong>
-          <span>Prazo para regularizar</span>
-        } @else {
-          <strong>{{ vm.current.renewsAt ? (vm.current.renewsAt | date:'dd/MM/yyyy') : '—' }}</strong>
-          <span>{{ vm.current.autoRenew ? 'Próxima virada' : 'Acesso ativo até' }}</span>
-        }
-      </div>
+    <div class="assinatura-summary-grid">
+      <app-transaction-summary-card
+        [tone]="vm.current.isTrial ? 'warning' : 'primary'"
+        [eyebrow]="vm.current.isTrial ? 'Plano (trial)' : 'Plano atual'"
+        [value]="vm.current.planName"
+        note="Plano que define os recursos liberados.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Role efetiva"
+        [value]="vm.current.role"
+        note="Nível de acesso aplicado à conta.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="vm.current.autoRenew ? 'success' : 'warning'"
+        eyebrow="Renovação"
+        [value]="vm.current.autoRenew ? 'Ativa' : 'Cancelada'"
+        note="Renovação automática do plano.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M20 12a8 8 0 0 1-13.7 5.7M4 12A8 8 0 0 1 17.7 6.3M20 6v5h-5M4 18v-5h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="isPastDue ? 'danger' : 'primary'"
+        [eyebrow]="(isPastDue && gracePeriodEndsAtLabel) ? 'Prazo para regularizar' : (vm.current.autoRenew ? 'Próxima virada' : 'Acesso ativo até')"
+        [value]="(isPastDue && gracePeriodEndsAtLabel) ? gracePeriodEndsAtLabel : ((vm.current.renewsAt | date:'dd/MM/yyyy') || '—')"
+        note="Data relevante do ciclo atual.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
     </div>
     <div class="plans-grid">
       @for (plan of vm.plans; track plan.code) {
@@ -92,7 +108,7 @@
               <p class="muted">{{ plan.description }}</p>
             </div>
             @if (plan.recommended) {
-              <span class="badge">Recomendado</span>
+              <app-status-badge tone="info" label="Recomendado" />
             }
           </div>
           <div class="price">
@@ -130,31 +146,28 @@
       }
     </div>
     @if (showPortalButton) {
-      <div class="card">
-        <h3>Gerenciar cobrança</h3>
+      <app-section-card title="Gerenciar cobrança" [hasHeaderActions]="false">
         <p class="muted">Atualize meio de pagamento, trate cobrança pendente e acompanhe a renovação pelo portal seguro do provedor.</p>
-        <button type="button" class="btn btn--ghost" [disabled]="openingPortal" (click)="openPortal()">
+        <button type="button" class="btn btn--ghost card-action" [disabled]="openingPortal" (click)="openPortal()">
           {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
         </button>
-      </div>
+      </app-section-card>
     }
     @if (showCancelButton) {
-      <div class="card">
-        <h3>Cancelar renovação</h3>
+      <app-section-card title="Cancelar renovação" [hasHeaderActions]="false">
         <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
-        <button type="button" class="btn btn--danger" [disabled]="cancelling" (click)="cancel()">
+        <button type="button" class="btn btn--danger card-action" [disabled]="cancelling" (click)="cancel()">
           {{ cancelling ? 'Cancelando...' : 'Cancelar renovação' }}
         </button>
-      </div>
+      </app-section-card>
     }
     @if (showRefundButton) {
-      <div class="card">
-        <h3>Direito de arrependimento</h3>
+      <app-section-card title="Direito de arrependimento" [hasHeaderActions]="false">
         <p class="muted">Dentro dos 7 dias após a contratação, você pode solicitar o cancelamento com reembolso integral (Lei 8.078/90, Art. 49). O acesso é encerrado imediatamente.</p>
-        <button type="button" class="btn btn--danger" [disabled]="requestingRefund" (click)="requestRefund()">
+        <button type="button" class="btn btn--danger card-action" [disabled]="requestingRefund" (click)="requestRefund()">
           {{ requestingRefund ? 'Processando...' : 'Cancelar com reembolso' }}
         </button>
-      </div>
+      </app-section-card>
     }
     @if (confirmCancelOpen) {
       <app-confirm-dialog
@@ -179,21 +192,19 @@
       </app-confirm-dialog>
     }
     @if (showTrialButton) {
-      <div class="card">
-        <h3>Experimentar grátis</h3>
+      <app-section-card title="Experimentar grátis" [hasHeaderActions]="false">
         <p class="muted">Ative 7 dias de acesso ao plano Advanced sem custo. Disponível uma vez por conta, sem compromisso de compra.</p>
-        <button type="button" class="btn btn--primary" [disabled]="requestingTrial" (click)="requestTrial()">
+        <button type="button" class="btn btn--primary card-action" [disabled]="requestingTrial" (click)="requestTrial()">
           {{ requestingTrial ? 'Ativando...' : 'Iniciar período de teste' }}
         </button>
-      </div>
+      </app-section-card>
     }
-    <div class="card">
-      <h3>Notas operacionais</h3>
+    <app-section-card title="Notas operacionais" [hasHeaderActions]="false">
       <div class="scope scope--compact">
         @for (note of vm.notes; track note) {
           <div>{{ note }}</div>
         }
       </div>
-    </div>
+    </app-section-card>
   }
 </section>
