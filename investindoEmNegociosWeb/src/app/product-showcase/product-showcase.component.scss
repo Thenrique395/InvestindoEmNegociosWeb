@@ -262,6 +262,7 @@
 .preview-kpis,
 .preview-row--split,
 .preview-card-strip,
+.preview-risk,
 .preview-goal__metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -419,6 +420,37 @@
 .preview-goal__metrics article {
   min-height: 84px;
   padding: 0.85rem;
+}
+
+.preview-risk {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.preview-risk__timeline {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+  min-height: 78px;
+  align-items: end;
+  border: 1px solid var(--landing-line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 0.75rem;
+}
+
+.preview-risk__timeline span {
+  display: grid;
+  min-height: var(--risk-level);
+  align-items: end;
+  border-radius: var(--radius-sm);
+  background: var(--warning-10);
+  color: var(--warning-text);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  padding: 0.45rem 0.35rem;
+  text-align: center;
 }
 
 .hero-preview-card__controls {
@@ -784,6 +816,63 @@
 .feature-card__mock-bars span:nth-child(6) {
   background: var(--success);
   opacity: 0.35;
+}
+
+.feature-card__mock--risk {
+  align-content: start;
+}
+
+.feature-card__risk-head,
+.feature-card__risk-grid article,
+.feature-card__risk-plan {
+  border: 1px solid var(--landing-line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.feature-card__risk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.feature-card__risk-head span,
+.feature-card__risk-grid span,
+.feature-card__risk-plan span {
+  color: var(--landing-muted);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  line-height: var(--line-height-tight);
+  text-transform: uppercase;
+}
+
+.feature-card__risk-head strong,
+.feature-card__risk-grid strong {
+  color: var(--warning-text);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.feature-card__risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.feature-card__risk-grid article,
+.feature-card__risk-plan {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem;
+}
+
+.feature-card__risk-plan p {
+  margin: 0;
+  color: var(--landing-text);
+  font-size: var(--font-size-body-sm);
 }
 
 .pricing-grid {

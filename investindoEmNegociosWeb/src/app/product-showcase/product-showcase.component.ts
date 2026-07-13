@@ -8,7 +8,7 @@ type HeroPreview = {
   eyebrow: string;
   title: string;
   description: string;
-  kind: 'dashboard' | 'cards' | 'goals';
+  kind: 'dashboard' | 'risk' | 'cards' | 'goals';
 };
 
 type PersonaCard = {
@@ -42,6 +42,12 @@ export class ProductShowcaseComponent implements OnInit, OnDestroy {
       title: 'Quanto sobra, sem precisar somar nada',
       description: 'Entradas, saídas e o que falta vencer aparecem prontos assim que você abre o painel.',
       kind: 'dashboard'
+    },
+    {
+      eyebrow: 'Painel de risco',
+      title: 'O aperto aparece antes de virar problema',
+      description: 'Score, dia de risco e despesas dos próximos dias ajudam a decidir o próximo passo.',
+      kind: 'risk'
     },
     {
       eyebrow: 'Cartões e faturas',

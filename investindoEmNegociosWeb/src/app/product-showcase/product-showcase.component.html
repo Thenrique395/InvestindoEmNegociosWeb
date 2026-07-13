@@ -7,10 +7,10 @@
         <span class="ledger-mark__segment ledger-mark__segment--out"></span>
       </div>
       <p class="eyebrow">Investindo em Negócios · Finanças pessoais sem susto</p>
-      <h1>Saia da planilha e veja seu mês com clareza</h1>
+      <h1>Antecipe o aperto antes do mês fechar</h1>
       <p class="hero__lead">
-        Lançamentos, cartões e metas em um só painel. Você sabe o que entrou, o que saiu e o que ainda
-        precisa de atenção antes do mês apertar.
+        Veja receitas, despesas, cartões e vencimentos no mesmo painel, com projeção de saldo, dia de risco
+        e próximos passos para agir antes do problema chegar.
       </p>
       <div class="hero__actions">
         <a routerLink="/register" class="button button--primary">
@@ -97,6 +97,33 @@
                   <strong class="tnum">Mercado · 1/1 · R$ 100,00</strong>
                   <small>05/07/2026</small>
                 </article>
+              </div>
+            }
+
+            @if (preview.kind === 'risk') {
+              <div class="preview-risk">
+                <article class="preview-mini-card preview-mini-card--red">
+                  <span>Saúde financeira</span>
+                  <strong class="tnum">68/100</strong>
+                  <small>Atenção em despesas próximas</small>
+                </article>
+                <article class="preview-mini-card preview-mini-card--blue">
+                  <span>Dia de risco</span>
+                  <strong>24/07</strong>
+                  <small>Menor saldo projetado no mês</small>
+                </article>
+                <article class="preview-mini-card preview-mini-card--green">
+                  <span>Próximos 5 dias</span>
+                  <strong class="tnum">R$ 1.280,00</strong>
+                  <small>Despesas com vencimento próximo</small>
+                </article>
+                <div class="preview-risk__timeline" aria-hidden="true">
+                  <span style="--risk-level: 34%">Seg</span>
+                  <span style="--risk-level: 52%">Ter</span>
+                  <span style="--risk-level: 78%">Qua</span>
+                  <span style="--risk-level: 45%">Qui</span>
+                  <span style="--risk-level: 62%">Sex</span>
+                </div>
               </div>
             }
 
@@ -328,6 +355,31 @@
         <p class="eyebrow">Metas</p>
         <h3>Progresso visível para não perder o objetivo</h3>
         <p>Defina prazo, acompanhe aportes e identifique desvios antes de comprometer o plano.</p>
+      </article>
+      <article class="feature-card feature-card--large">
+        <div class="feature-card__mock feature-card__mock--risk">
+          <div class="feature-card__risk-head">
+            <span>Score mensal</span>
+            <strong class="tnum">68/100</strong>
+          </div>
+          <div class="feature-card__risk-grid">
+            <article>
+              <span>Dia de risco</span>
+              <strong>24/07</strong>
+            </article>
+            <article>
+              <span>Fechamento</span>
+              <strong class="tnum">R$ 420</strong>
+            </article>
+          </div>
+          <div class="feature-card__risk-plan">
+            <span>Plano do mês</span>
+            <p>Revisar vencimentos, segurar compras variáveis e priorizar despesas dos próximos 5 dias.</p>
+          </div>
+        </div>
+        <p class="eyebrow">Antecipação</p>
+        <h3>Veja o dia de risco antes do saldo apertar</h3>
+        <p>Projeção de fechamento, menor saldo e plano do mês mostram onde agir antes do problema chegar.</p>
       </article>
       <article class="feature-card">
         <div class="feature-card__icon feature-card__icon--info" aria-hidden="true">
