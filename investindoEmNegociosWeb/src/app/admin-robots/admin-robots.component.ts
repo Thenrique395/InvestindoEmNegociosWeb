@@ -5,11 +5,26 @@ import { AdminRobotsService, RobotExecutionLog, RobotMonitorSummary, RobotStatus
 import { UiFeedbackService } from '../ui-feedback.service';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent, TransactionSummaryTone } from '../shared/transactions/transaction-summary-card.component';
+import { StatusBadgeComponent, StatusBadgeTone } from '../shared/status-badge/status-badge.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { runStatusLabel, runStatusTone, successRateTone } from './robots-monitor.model';
 
 @Component({
   selector: 'app-admin-robots',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ConfirmDialogComponent,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    StatusBadgeComponent,
+    UiStateComponent,
+    EmptyStateComponent
+  ],
   templateUrl: './admin-robots.component.html',
   styleUrls: ['./admin-robots.component.scss']
 })
@@ -149,6 +164,18 @@ export class AdminRobotsComponent implements OnInit {
   statusLabel(value: boolean | null): string {
     if (value === null) return 'Nunca executado';
     return value ? 'Sucesso' : 'Falha';
+  }
+
+  runLabel(success: boolean, wasSkipped: boolean): string {
+    return runStatusLabel(success, wasSkipped);
+  }
+
+  runTone(success: boolean, wasSkipped: boolean): StatusBadgeTone {
+    return runStatusTone(success, wasSkipped);
+  }
+
+  get successRateTone(): TransactionSummaryTone {
+    return successRateTone(this.summary24h.successRatePercent);
   }
 
   processedCountHint(count: number): string {

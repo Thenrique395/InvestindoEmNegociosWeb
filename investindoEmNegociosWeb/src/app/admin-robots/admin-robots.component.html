@@ -1,10 +1,9 @@
 <section class="admin-robots space-y-6 text-[var(--text)]">
-  <header class="flex flex-col gap-3 flex-row items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Monitor de Robôs</h1>
-      <p class="mt-1 text-sm text-[var(--text-muted)]">Acompanhe execução, falhas e rode manualmente quando necessário.</p>
-    </div>
-    <div class="flex items-center gap-2">
+  <app-page-header
+    eyebrow="Administração"
+    title="Monitor de Robôs"
+    description="Acompanhe execução, falhas e rode manualmente quando necessário.">
+    <div page-actions class="flex items-center gap-2">
       <button type="button" class="btn-primary sm" (click)="runAll()" [disabled]="loading || runningAll || !!runningRobot">
         {{ runningAll ? 'Executando...' : 'Executar todos' }}
       </button>
@@ -12,7 +11,7 @@
         {{ loading ? 'Atualizando...' : 'Atualizar' }}
       </button>
     </div>
-  </header>
+  </app-page-header>
 
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
     <strong class="text-[var(--text)]">Como ler:</strong>
@@ -20,28 +19,44 @@
   </div>
 
   @if (!loading) {
-    <div class="grid gap-3 grid-cols-2 grid-cols-4">
-      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Execuções (24h)</p>
-        <p class="mt-1 text-2xl font-semibold">{{ summary24h.totalRuns }}</p>
-        <p class="mt-1 text-xs text-[var(--text-muted)]">Sucesso: {{ summary24h.successRuns }} | Falha: {{ summary24h.failedRuns }}</p>
-      </article>
-      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Taxa de sucesso (24h)</p>
-        <p class="mt-1 text-2xl font-semibold">{{ summary24h.successRatePercent }}%</p>
-        <p class="mt-1 text-xs text-[var(--text-muted)]">Com base nas últimas 24 horas.</p>
-      </article>
-      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">Itens gerados (24h)</p>
-        <p class="mt-1 text-2xl font-semibold">{{ summary24h.itemsGenerated }}</p>
-        <p class="mt-1 text-xs text-[var(--text-muted)]">Novos lembretes/ações criados.</p>
-      </article>
-      <article class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
-        <p class="text-xs uppercase tracking-wide text-[var(--text-muted)]">E-mails (24h)</p>
-        <p class="mt-1 text-2xl font-semibold">{{ summary24h.emailsSent }}/{{ summary24h.emailsAttempted }}</p>
-        <p class="mt-1 text-xs text-[var(--text-muted)]">Falhas: {{ summary24h.emailsFailed }}</p>
-      </article>
-    </div>
+    <section class="robots-summary-grid">
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="Execuções (24h)"
+        [value]="summary24h.totalRuns.toString()"
+        [note]="'Sucesso: ' + summary24h.successRuns + ' | Falha: ' + summary24h.failedRuns">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="successRateTone"
+        eyebrow="Taxa de sucesso (24h)"
+        [value]="summary24h.successRatePercent + '%'"
+        note="Com base nas últimas 24 horas.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Itens gerados (24h)"
+        [value]="summary24h.itemsGenerated.toString()"
+        note="Novos lembretes/ações criados.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="E-mails (24h)"
+        [value]="summary24h.emailsSent + '/' + summary24h.emailsAttempted"
+        [note]="'Falhas: ' + summary24h.emailsFailed">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 6h16v12H4zM4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
   }
 
   <div class="filter-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
@@ -106,9 +121,7 @@
   </div>
 
   @if (loading) {
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
-      Carregando monitor...
-    </div>
+    <app-ui-state type="loading" />
   }
 
   @if (!loading && recentRuns.length) {
@@ -138,11 +151,7 @@
                 <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.startedAt | date: 'short' }}</td>
                 <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.finishedAt | date: 'short' }}</td>
                 <td class="px-4 py-3">
-                  <span
-                    class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
-                    [ngClass]="row.success ? 'border border-emerald-200 bg-emerald-100 text-[var(--success-text)]' : 'border border-rose-200 bg-rose-100 text-[var(--danger-text)]'">
-                    {{ row.wasSkipped ? 'Pulado' : (row.success ? 'Sucesso' : 'Falha') }}
-                  </span>
+                  <app-status-badge [tone]="runTone(row.success, row.wasSkipped)" [label]="runLabel(row.success, row.wasSkipped)" />
                 </td>
                 <td class="px-4 py-3">{{ row.metrics.itemsGenerated }}</td>
                 <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-muted)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
@@ -169,9 +178,10 @@
   }
 
   @if (!loading && !recentRuns.length) {
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]">
-      Sem execuções recentes para exibir.
-    </div>
+    <app-empty-state
+      icon="🤖"
+      title="Sem execuções recentes"
+      description="Nenhuma execução de robô no período filtrado." />
   }
 
   @if (selectedRun) {
@@ -186,15 +196,10 @@
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <span
-              class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
-            [ngClass]="selectedRun.wasSkipped
-              ? 'border-amber-200 bg-amber-100 text-[var(--warning-text)]'
-              : (selectedRun.success
-                  ? 'border-emerald-200 bg-emerald-100 text-[var(--success-text)]'
-                  : 'border-rose-200 bg-rose-100 text-[var(--danger-text)]')">
-              {{ selectedRun.wasSkipped ? 'Pulado' : (selectedRun.success ? 'Sucesso' : 'Falha') }}
-            </span>
+            <app-status-badge
+              size="md"
+              [tone]="runTone(selectedRun.success, selectedRun.wasSkipped)"
+              [label]="runLabel(selectedRun.success, selectedRun.wasSkipped)" />
             <button class="btn-ghost sm" type="button" (click)="closeRunDetails()">Fechar</button>
           </div>
         </div>
