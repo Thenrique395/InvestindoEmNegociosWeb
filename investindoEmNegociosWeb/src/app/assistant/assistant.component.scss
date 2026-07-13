@@ -9,44 +9,35 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.assistant-shell {
+.header-meta {
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
-  padding: 1.6rem;
-  display: grid;
-  gap: 1.3rem;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: var(--font-weight-semibold);
 }
 
-.feedback.error {
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
-  color: var(--danger-text);
-  font-weight: var(--font-weight-semibold);
-  padding: 0.9rem 1rem;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .assistant-composer,
 .conversation {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  padding: 1.25rem;
   display: grid;
   gap: 0.9rem;
 }
 
-label {
-  display: grid;
-  gap: 0.45rem;
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
-}
-
 textarea {
+  width: 100%;
   border: 1px solid var(--border);
   background: var(--surface-2);
   border-radius: var(--radius-lg);
@@ -79,10 +70,23 @@ textarea {
   color: var(--text-secondary);
   line-height: var(--line-height-body);
   margin: 0 0 0.45rem;
+  white-space: pre-wrap;
 }
 
 .bubble__d {
   color: var(--text-muted);
   margin: 0;
   font-size: var(--font-size-label);
+}
+
+@media (max-width: 900px) {
+  .assistant-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .assistant-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

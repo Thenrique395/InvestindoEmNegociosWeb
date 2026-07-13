@@ -4,15 +4,25 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FinancialAssistantPromptContextResponse, FinancialAssistantService } from '../financial-assistant.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent, TransactionSummaryTone } from '../shared/transactions/transaction-summary-card.component';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { assistantRiskTone } from './assistant-context.model';
 
 @Component({
   selector: 'app-assistant',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AppCurrencyPipe,
+    PageHeaderComponent,
+    TransactionSummaryCardComponent,
+    SectionCardComponent,
+    UiStateComponent
+  ],
   templateUrl: './assistant.component.html',
   styleUrl: './assistant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -28,6 +38,10 @@ export class AssistantComponent implements OnInit {
     return this.assistantService.conversation;
   }
 
+  get riskTone(): TransactionSummaryTone {
+    return assistantRiskTone(this.context?.risk?.score ?? 0);
+  }
+
   constructor(
     private readonly assistantService: FinancialAssistantService,
     private readonly cdr: ChangeDetectorRef,
@@ -35,7 +49,12 @@ export class AssistantComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  load(): void {
     this.loading = true;
+    this.error = '';
     this.assistantService.context().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (context) => {
         this.context = context;

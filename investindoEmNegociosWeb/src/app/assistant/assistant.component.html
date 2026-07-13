@@ -1,7 +1,16 @@
 <section class="assistant-page">
+  <app-page-header
+    eyebrow="Assistente financeiro"
+    title="Pergunte com contexto real"
+    description="Conversa guiada com base em SDR, projeção, dívida, patrimônio, risco e recomendações já calculadas.">
+    @if (context?.governanceSummary; as gov) {
+      <span page-meta class="header-meta">{{ gov }}</span>
+    }
+  </app-page-header>
+
   @if (context; as c) {
     <section class="assistant-summary-grid">
-      <app-stat-card
+      <app-transaction-summary-card
         tone="primary"
         eyebrow="SDR"
         [value]="c.realBalance.realAvailableBalance | appCurrency"
@@ -9,8 +18,8 @@
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-      </app-stat-card>
-      <app-stat-card
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
         tone="warning"
         eyebrow="Dívida"
         [value]="c.debts.totalDebt | appCurrency"
@@ -18,8 +27,8 @@
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-      </app-stat-card>
-      <app-stat-card
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
         tone="info"
         eyebrow="Patrimônio"
         [value]="c.netWorth.netWorth | appCurrency"
@@ -27,55 +36,66 @@
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-      </app-stat-card>
-      <app-stat-card
-        tone="danger"
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="riskTone"
         eyebrow="Risco"
         [value]="c.risk.score + '/100'"
         note="Pontuação usada para priorizar alertas.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-      </app-stat-card>
+      </app-transaction-summary-card>
     </section>
   }
 
-  <section class="assistant-shell">
-    <app-period-hero
-      eyebrow="Assistente financeiro"
-      title="Pergunte com contexto real"
-      description="Conversa guiada com base em SDR, projeção, dívida, patrimônio, risco e recomendações já calculadas."
-      [showNavigation]="false">
-      <app-period-action-card
-        hero-aside
-        title="Analisar o mês"
-        [description]="context?.governanceSummary || 'Carregando contexto financeiro para orientar as respostas.'">
-      </app-period-action-card>
-    </app-period-hero>
+  @if (loading) {
+    <app-ui-state type="loading" />
+  }
 
-    @if (error) {
-      <div class="feedback error">{{ error }}</div>
-    }
+  @if (error) {
+    <app-ui-state
+      type="error"
+      title="Não foi possível concluir a operação."
+      [description]="error"
+      retryLabel="Tentar novamente"
+      (retry)="load()" />
+  }
 
-    <article class="assistant-composer">
-      <label>Pergunta
-        <textarea [(ngModel)]="question" rows="4" placeholder="Ex.: Qual é meu maior risco financeiro neste mês?"></textarea>
-      </label>
+  <app-section-card
+    title="Sua pergunta"
+    description="A resposta considera automaticamente seu contexto financeiro atual."
+    [hasHeaderActions]="false">
+    <div class="assistant-composer">
+      <label class="sr-only" for="assistant-question">Pergunta</label>
+      <textarea
+        id="assistant-question"
+        [(ngModel)]="question"
+        rows="4"
+        placeholder="Ex.: Qual é meu maior risco financeiro neste mês?"></textarea>
       <div class="actions">
-        <button class="btn-primary" type="button" (click)="send()" [disabled]="sending || loading">{{ sending ? 'Respondendo...' : 'Perguntar' }}</button>
+        <button class="btn-primary" type="button" (click)="send()" [disabled]="sending || loading || !question.trim()">
+          {{ sending ? 'Respondendo...' : 'Perguntar' }}
+        </button>
       </div>
-    </article>
+    </div>
+  </app-section-card>
 
-    @if (conversation.length) {
-      <article class="conversation">
+  @if (conversation.length) {
+    <app-section-card
+      title="Conversa"
+      [hasHeaderActions]="false">
+      <div class="conversation">
         @for (item of conversation; track $index) {
           <section class="bubble">
             <p class="bubble__q">{{ item.question }}</p>
             <p class="bubble__a">{{ item.answer }}</p>
-            <p class="bubble__d">{{ item.disclaimer }}</p>
+            @if (item.disclaimer) {
+              <p class="bubble__d">{{ item.disclaimer }}</p>
+            }
           </section>
         }
-      </article>
-    }
-  </section>
+      </div>
+    </app-section-card>
+  }
 </section>
