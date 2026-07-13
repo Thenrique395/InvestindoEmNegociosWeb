@@ -100,8 +100,8 @@ export class ProductShowcaseComponent implements OnInit, OnDestroy {
     },
     {
       title: 'Quem quer crescer patrimônio',
-      description: 'Depois que o mês está sob controle, conecte investimentos e acompanhe a evolução do patrimônio.',
-      modules: ['Investimentos', 'Patrimônio', 'Projeções']
+      description: 'Use projeções para proteger o caixa do mês antes de avançar com metas, investimentos e patrimônio.',
+      modules: ['Projeções', 'Investimentos', 'Patrimônio']
     }
   ];
 
