@@ -6,6 +6,10 @@ import { UserRole } from '../roles';
 import { forkJoin, of } from 'rxjs';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 
 type AdminUserRow = AdminUserSummary & {
@@ -17,7 +21,7 @@ type AdminUserRow = AdminUserSummary & {
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, PageHeaderComponent, StatusBadgeComponent, UiStateComponent, EmptyStateComponent],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.scss']
 })

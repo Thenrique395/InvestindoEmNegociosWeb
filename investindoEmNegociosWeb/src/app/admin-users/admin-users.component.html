@@ -1,35 +1,34 @@
 <section class="admin-users space-y-6 text-[var(--text)]">
-  <header class="flex flex-col gap-3 flex-row items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Controle de acessos</h1>
-      <p class="mt-1 text-sm text-[var(--text-muted)]">Defina o nível de acesso de cada usuário.</p>
+  <app-page-header
+    eyebrow="Administração"
+    title="Controle de acessos"
+    description="Defina o nível de acesso de cada usuário.">
+    <div page-actions>
+      <button type="button" class="btn-primary sm" (click)="load()" [disabled]="loading">
+        <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+            <path
+              d="M20 12a8 8 0 0 1-13.66 5.66M4 12A8 8 0 0 1 17.66 6.34"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round" />
+            <path
+              d="M20 6v5h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </span>
+        Atualizar
+      </button>
     </div>
-    <button type="button" class="btn-primary sm" (click)="load()" [disabled]="loading">
-      <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
-          <path
-            d="M20 12a8 8 0 0 1-13.66 5.66M4 12A8 8 0 0 1 17.66 6.34"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round" />
-          <path
-            d="M20 6v5h-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-      </span>
-      Atualizar
-    </button>
-  </header>
+  </app-page-header>
 
   @if (loading) {
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
-      Carregando usuários...
-    </div>
+    <app-ui-state type="loading" />
   }
   @if (!loading && users.length) {
     <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
@@ -60,11 +59,10 @@
                   </div>
                 </td>
                 <td class="px-6 py-4">
-                  <span
-                    class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                    [ngClass]="user.isActive ? 'border border-emerald-200 bg-emerald-100 text-[var(--success-text)]' : 'border border-slate-200 bg-slate-100 text-slate-600'">
-                    {{ user.isActive ? 'Ativo' : 'Inativo' }}
-                  </span>
+                  <app-status-badge
+                    [tone]="user.isActive ? 'success' : 'muted'"
+                    [label]="user.isActive ? 'Ativo' : 'Inativo'"
+                    [dot]="true" />
                 </td>
                 <td class="px-6 py-4 text-[var(--text-muted)]">{{ user.createdAt | date: 'short' }}</td>
                 <td class="px-6 py-4">
@@ -256,9 +254,10 @@
   }
 
   @if (!loading && !users.length) {
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-center text-sm text-[var(--text-muted)]">
-      Nenhum usuário encontrado.
-    </div>
+    <app-empty-state
+      icon="👤"
+      title="Nenhum usuário encontrado"
+      description="Não há usuários para exibir no momento." />
   }
 
   @if (confirmOpen) {
