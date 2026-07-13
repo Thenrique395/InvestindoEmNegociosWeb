@@ -1,23 +1,17 @@
 <section class="admin-params space-y-6 text-[var(--text)]">
-  <header class="flex flex-col gap-3 flex-row items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Parâmetros do sistema</h1>
-      <p class="mt-1 text-sm text-[var(--text-muted)]">Controle bandeiras de cartão e formas de pagamento disponíveis.</p>
+  <app-page-header
+    eyebrow="Administração"
+    title="Parâmetros do sistema"
+    description="Controle bandeiras de cartão e formas de pagamento disponíveis.">
+    <div page-actions>
+      <button type="button" class="btn-ghost sm" (click)="loadAll()" [disabled]="loading" [attr.aria-busy]="loading">
+        {{ loading ? 'Atualizando...' : 'Atualizar' }}
+      </button>
     </div>
-    <button type="button" class="ghost sm" (click)="loadAll()" [disabled]="loading" [attr.aria-busy]="loading">
-      @if (!loading) {
-        <span>Atualizar</span>
-      }
-      @if (loading) {
-        <span>Atualizando...</span>
-      }
-    </button>
-  </header>
+  </app-page-header>
 
   @if (loading) {
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
-      Carregando parâmetros...
-    </div>
+    <app-ui-state type="loading" />
   }
   @if (!loading && scalabilityRuntime; as runtime) {
     <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
@@ -101,7 +95,7 @@
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <strong>{{ brand.name }}</strong>
                 <span class="text-[var(--text-muted)]">{{ brand.code }}</span>
-                <span class="text-[var(--text-muted)]">{{ brand.isActive ? 'Ativo' : 'Desativado' }}</span>
+                <app-status-badge [tone]="brand.isActive ? 'success' : 'muted'" [label]="brand.isActive ? 'Ativo' : 'Desativado'" />
                 @if (brandUpdatedLabel(brand)) {
                   <span class="text-[var(--text-muted)]">{{ brandUpdatedLabel(brand) }}</span>
                 }
@@ -168,7 +162,7 @@
             <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <strong>{{ method.name }}</strong>
-                <span class="text-[var(--text-muted)]">{{ method.isActive ? 'Ativo' : 'Desativado' }}</span>
+                <app-status-badge [tone]="method.isActive ? 'success' : 'muted'" [label]="method.isActive ? 'Ativo' : 'Desativado'" />
                 @if (methodUpdatedLabel(method)) {
                   <span class="text-[var(--text-muted)]">{{ methodUpdatedLabel(method) }}</span>
                 }
@@ -243,7 +237,7 @@
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <strong>{{ inst.name }}</strong>
                 <span class="text-[var(--text-muted)]">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
-                <span class="text-[var(--text-muted)]">{{ inst.isActive ? 'Ativo' : 'Desativado' }}</span>
+                <app-status-badge [tone]="inst.isActive ? 'success' : 'muted'" [label]="inst.isActive ? 'Ativo' : 'Desativado'" />
                 @if (institutionUpdatedLabel(inst)) {
                   <span class="text-[var(--text-muted)]">{{ institutionUpdatedLabel(inst) }}</span>
                 }

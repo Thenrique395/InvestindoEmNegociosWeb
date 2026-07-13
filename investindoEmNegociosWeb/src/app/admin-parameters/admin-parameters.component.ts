@@ -5,12 +5,15 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { AdminParametersService, CardBrandAdmin, InstitutionAdmin, NotificationSettings, PaymentMethodAdmin, RobotSettings, ScalabilityRuntime } from '../admin-parameters.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
 import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 
 @Component({
   selector: 'app-admin-parameters',
   standalone: true,
-  imports: [FormsModule, ConfirmDialogComponent],
+  imports: [FormsModule, ConfirmDialogComponent, PageHeaderComponent, StatusBadgeComponent, UiStateComponent],
   templateUrl: './admin-parameters.component.html',
   styleUrls: ['./admin-parameters.component.scss']
 })
