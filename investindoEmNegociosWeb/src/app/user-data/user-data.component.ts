@@ -7,13 +7,17 @@ import { DataPortabilityService } from '../data-portability.service';
 import { AuthService } from '../auth.service';
 import { ProfileService, PrivacySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
 
 @Component({
   selector: 'app-user-data',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, PageHeaderComponent, SectionCardComponent, TransactionSummaryCardComponent, UiStateComponent],
   templateUrl: './user-data.component.html',
   styleUrls: ['./user-data.component.scss']
 })

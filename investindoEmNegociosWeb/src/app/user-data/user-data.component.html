@@ -1,36 +1,46 @@
-<section class="panel">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">Dados</p>
-      <h2>Exportar / Importar</h2>
-      <p class="muted">Exporte todos os seus dados para JSON e importe quando precisar migrar conta.</p>
-    </div>
-  </div>
+<section class="dados-page">
+  <app-page-header
+    eyebrow="Dados"
+    title="Exportar / Importar"
+    description="Exporte todos os seus dados para JSON e importe quando precisar migrar conta." />
 
   @if (privacySummary; as privacy) {
-    <div class="privacy-strip">
-      <div class="privacy-pill">
-        <strong>{{ privacy.activeSessions }}</strong>
-        <span>Sessões ativas</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ privacy.pendingPasswordResetRequests }}</strong>
-        <span>Resets pendentes</span>
-      </div>
-      <div class="privacy-pill">
-        <strong>{{ privacy.auditEntries }}</strong>
-        <span>Eventos auditados</span>
-      </div>
-    </div>
-  } @else {
-    @if (privacyLoading) {
-      <p class="meta">Carregando centro de privacidade.</p>
-    }
+    <section class="dados-summary-grid">
+      <app-transaction-summary-card
+        tone="info"
+        eyebrow="Sessões ativas"
+        [value]="privacy.activeSessions.toString()"
+        note="Dispositivos atualmente conectados.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 5h16v10H4zM8 19h8M12 15v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        [tone]="privacy.pendingPasswordResetRequests > 0 ? 'warning' : 'success'"
+        eyebrow="Resets pendentes"
+        [value]="privacy.pendingPasswordResetRequests.toString()"
+        note="Pedidos de redefinição de senha em aberto.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M7 11V8a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.7" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        tone="primary"
+        eyebrow="Eventos auditados"
+        [value]="privacy.auditEntries.toString()"
+        note="Registros no histórico de auditoria.">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+    </section>
+  } @else if (privacyLoading) {
+    <app-ui-state type="loading" />
   }
 
   <div class="grid">
-    <div class="card">
-      <h3>Exportar dados</h3>
+    <app-section-card title="Exportar dados" [hasHeaderActions]="false">
       <p class="muted">Baixa um arquivo JSON com seu perfil, cartões, metas, planos, parcelas e investimentos.</p>
       <button type="button" class="btn btn--primary btn--inline" [disabled]="exporting" (click)="exportData()">
         {{ exporting ? 'Exportando...' : 'Exportar dados' }}
@@ -38,11 +48,10 @@
       @if (lastExportAt) {
         <p class="meta">Última exportação: {{ lastExportAt | date:'dd/MM/yyyy HH:mm' }}</p>
       }
-    </div>
+    </app-section-card>
 
     @if (canImportData) {
-      <div class="card">
-        <h3>Importar dados</h3>
+      <app-section-card title="Importar dados" [hasHeaderActions]="false">
         <p class="muted">Envie um arquivo JSON exportado anteriormente.</p>
 
         <label class="file">
@@ -66,7 +75,7 @@
         @if (lastImportAt) {
           <p class="meta">Última importação: {{ lastImportAt | date:'dd/MM/yyyy HH:mm' }}</p>
         }
-      </div>
+      </app-section-card>
 
       @if (confirmImportOpen) {
         <app-confirm-dialog
@@ -82,15 +91,13 @@
         ></app-confirm-dialog>
       }
     } @else {
-      <div class="card card--locked">
-        <h3>Importar dados</h3>
+      <app-section-card title="Importar dados" [hasHeaderActions]="false">
         <p class="muted">A importação de dados está disponível no plano Controle ou superior.</p>
         <a routerLink="/planos" class="btn btn--primary btn--inline">Ver planos</a>
-      </div>
+      </app-section-card>
     }
 
-    <div class="card danger-card">
-      <h3>Privacidade e exclusão</h3>
+    <app-section-card title="Privacidade e exclusão" [hasHeaderActions]="false" class="danger-card">
       @if (privacySummary; as privacy) {
         <p class="muted">{{ privacy.retentionPolicy }}</p>
       }
@@ -131,7 +138,7 @@
           </div>
         </div>
       }
-    </div>
+    </app-section-card>
   </div>
 
   @if (confirmDeleteOpen) {

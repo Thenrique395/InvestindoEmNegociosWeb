@@ -1,28 +1,20 @@
-.panel {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  background: var(--surface);
-  box-shadow: var(--shadow-md);
+.dados-page {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
   min-width: 0;
 }
 
-.panel__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.dados-summary-grid {
+  display: grid;
   gap: 1rem;
-  flex-wrap: wrap;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.eyebrow {
-  text-transform: none;
-  letter-spacing: var(--letter-spacing-label);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  margin: 0;
+@media (max-width: 760px) {
+  .dados-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .muted {
@@ -33,40 +25,7 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.privacy-strip {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-}
-
-.privacy-pill {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  padding: 0.85rem 1rem;
-  display: grid;
-  gap: 0.25rem;
-}
-
-.privacy-pill strong {
-  font-size: var(--text-lg);
-}
-
-.card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-2);
-  background: var(--surface-2);
-  display: grid;
-  gap: 0.75rem;
-}
-
-.card h3 {
-  margin: 0;
-  font-size: var(--text-lg);
-  color: var(--text);
+  align-items: start;
 }
 
 .btn {
