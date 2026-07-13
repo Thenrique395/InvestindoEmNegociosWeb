@@ -107,8 +107,8 @@ export class ProductShowcaseComponent implements OnInit, OnDestroy {
     },
     {
       icon: 'shield',
-      title: 'Você não entrega senha de banco',
-      description: 'Você controla o que cadastra e mantém suas credenciais bancárias fora da plataforma.'
+      title: 'Sem conectar sua conta bancária',
+      description: 'Você registra as informações no seu ritmo, sem compartilhar senha de banco com terceiros.'
     },
     {
       icon: 'eye',
