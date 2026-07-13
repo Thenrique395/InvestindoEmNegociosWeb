@@ -7,11 +7,14 @@ import { PageHeaderComponent } from '../shared/page-header/page-header.component
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
+import { UiStateComponent } from '../ui-state/ui-state.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 @Component({
   selector: 'app-espacos',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent, SectionCardComponent, FormFieldComponent, ConfirmDialogComponent],
+  imports: [FormsModule, PageHeaderComponent, SectionCardComponent, FormFieldComponent, ConfirmDialogComponent, StatusBadgeComponent, UiStateComponent, EmptyStateComponent],
   templateUrl: './espacos.component.html',
   styleUrl: './espacos.component.scss'
 })
