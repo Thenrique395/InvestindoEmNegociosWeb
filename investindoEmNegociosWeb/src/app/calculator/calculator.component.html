@@ -1,6 +1,17 @@
 <section class="calculator">
+  <app-page-header
+    eyebrow="Calculadoras"
+    [title]="selecionado?.title || 'Simuladores financeiros e trabalhistas'"
+    [description]="selecionado?.subtitle || 'Escolha um modelo, preencha os dados e veja resultados claros.'">
+    @if (selected) {
+      <div page-actions>
+        <button type="button" class="btn-ghost sm" (click)="backToCatalog()">← Voltar para catálogo</button>
+      </div>
+    }
+  </app-page-header>
+
   <section class="calculator-summary-grid">
-    <app-stat-card
+    <app-transaction-summary-card
       tone="primary"
       eyebrow="Modelos"
       [value]="calculators.length.toString()"
@@ -8,8 +19,8 @@
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 8h8M8 12h3M13 12h3M8 16h3M13 16h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
-    <app-stat-card
+    </app-transaction-summary-card>
+    <app-transaction-summary-card
       tone="success"
       eyebrow="Ativos"
       [value]="implementedCount.toString()"
@@ -17,8 +28,8 @@
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
-    <app-stat-card
+    </app-transaction-summary-card>
+    <app-transaction-summary-card
       tone="info"
       eyebrow="Em breve"
       [value]="pendingCount.toString()"
@@ -26,31 +37,8 @@
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 6v6l4 2M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
-    </app-stat-card>
+    </app-transaction-summary-card>
   </section>
-
-  <section class="calculator-shell">
-    <app-period-hero
-      eyebrow="Calculadoras"
-      title="{{ selecionado?.title || 'Simuladores financeiros e trabalhistas' }}"
-      description="{{ selecionado?.subtitle || 'Escolha um modelo, preencha os dados e veja resultados claros.' }}"
-      [showNavigation]="false">
-      <app-period-action-card
-        hero-aside
-        eyebrow="Catálogo"
-        [title]="selected ? 'Calculadora selecionada' : 'Escolha um simulador'"
-        [description]="selected ? 'Volte para alternar entre modelos financeiros e trabalhistas.' : 'Comece pelos simuladores ativos ou veja o que está mapeado para depois.'">
-        @if (selected) {
-          <button action-card-actions class="period-total-card__action period-total-card__action--primary" type="button" (click)="backToCatalog()">
-            <span class="period-total-card__action-icon" aria-hidden="true">←</span>
-            <span class="period-total-card__action-copy">
-              <strong>Voltar para catálogo</strong>
-              <small>Escolher outro modelo.</small>
-            </span>
-          </button>
-        }
-      </app-period-action-card>
-    </app-period-hero>
 
   @if (!selected) {
     <div class="calc__selector">
@@ -68,10 +56,9 @@
                 <small>{{ item.subtitle }}</small>
               </div>
               @if (item.implemented) {
-                <span class="chip">Ativo</span>
-              }
-              @if (!item.implemented) {
-                <span class="chip chip--muted">Em breve</span>
+                <app-status-badge class="selector__badge" tone="success" label="Ativo" />
+              } @else {
+                <app-status-badge class="selector__badge" tone="muted" label="Em breve" />
               }
             </button>
           }
@@ -93,10 +80,9 @@
                 <small>{{ item.subtitle }}</small>
               </div>
               @if (item.implemented) {
-                <span class="chip">Ativo</span>
-              }
-              @if (!item.implemented) {
-                <span class="chip chip--muted">Em breve</span>
+                <app-status-badge class="selector__badge" tone="success" label="Ativo" />
+              } @else {
+                <app-status-badge class="selector__badge" tone="muted" label="Em breve" />
               }
             </button>
           }
@@ -984,5 +970,4 @@
       </div>
     }
   }
-  </section>
 </section>

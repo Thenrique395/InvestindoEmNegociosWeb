@@ -4,9 +4,9 @@ import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
-import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
-import { PeriodActionCardComponent } from '../shared/period-action-card/period-action-card.component';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 
 type CalculatorType =
   | 'jurosCompostos'
@@ -57,7 +57,7 @@ interface CalcItem {
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, RouterLink, AppCurrencyPipe, StatCardComponent, PeriodHeroComponent, PeriodActionCardComponent],
+  imports: [FormsModule, DecimalPipe, RouterLink, AppCurrencyPipe, PageHeaderComponent, TransactionSummaryCardComponent, StatusBadgeComponent],
   templateUrl: './calculator.component.html',
   styleUrls: ['./calculator.component.scss']
 })
