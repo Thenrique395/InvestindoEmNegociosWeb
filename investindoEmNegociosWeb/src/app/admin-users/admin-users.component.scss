@@ -1,1 +1,53 @@
-/* Tailwind handles layout for this view. Keep file empty for overrides. */
+/* Tailwind cuida do layout geral; overrides pontuais aqui. */
+
+/* Barra de ações compacta (uma linha, sem quebra). */
+.user-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+}
+
+.user-actions .icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+/* Tooltip próprio: instantâneo e funciona mesmo com o botão desabilitado
+   (o hover é capturado pelo wrapper .act, não pelo botão). */
+.act {
+  position: relative;
+  display: inline-flex;
+}
+
+.act::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(2px);
+  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 20;
+}
+
+.act:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

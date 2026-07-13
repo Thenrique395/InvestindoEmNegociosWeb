@@ -86,14 +86,16 @@
                   </button>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="flex flex-wrap items-center justify-end gap-2">
+                  <div class="user-actions">
+                    <span class="act" [attr.data-tip]="user.pendingActive ? 'Bloquear' : 'Desbloquear'">
                     <button
                       type="button"
-                      class="btn-ghost sm"
+                      class="btn-ghost sm icon-btn"
                       (click)="toggleStatus(user)"
-                      [disabled]="savingId === user.id || deletingId === user.id">
+                      [disabled]="savingId === user.id || deletingId === user.id"
+                      [attr.aria-label]="user.pendingActive ? 'Bloquear usuário' : 'Desbloquear usuário'">
                       <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
-                        @if (user.isActive) {
+                        @if (user.pendingActive) {
                           <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
                             <path
                               d="M7 11V8a5 5 0 0 1 10 0v3"
@@ -103,8 +105,7 @@
                               stroke-linecap="round" />
                             <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2" />
                           </svg>
-                        }
-                        @if (!user.isActive) {
+                        } @else {
                           <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
                             <path
                               d="M17 11V8a5 5 0 0 0-9.9-1"
@@ -116,13 +117,16 @@
                           </svg>
                         }
                       </span>
-                      {{ user.pendingActive ? 'Bloquear' : 'Desbloquear' }}
                     </button>
+                    </span>
+                    <span class="act" [attr.data-tip]="user.dirty ? 'Salvar' : 'Sem alterações'">
                     <button
                       type="button"
-                      class="btn-primary sm"
+                      class="sm icon-btn"
+                      [ngClass]="user.dirty ? 'btn-primary' : 'btn-ghost'"
                       (click)="saveChanges(user)"
-                      [disabled]="!user.dirty || savingId === user.id || deletingId === user.id">
+                      [disabled]="!user.dirty || savingId === user.id || deletingId === user.id"
+                      aria-label="Salvar alterações">
                       <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
                         <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
                           <path
@@ -134,20 +138,30 @@
                             stroke-linejoin="round" />
                         </svg>
                       </span>
-                      Salvar
                     </button>
+                    </span>
+                    <span class="act" data-tip="Conceder trial">
                     <button
                       type="button"
-                      class="btn-ghost sm"
+                      class="btn-ghost sm icon-btn"
                       (click)="openTrial(user)"
-                      [disabled]="savingId === user.id || deletingId === user.id || grantingTrial">
-                      Trial
+                      [disabled]="savingId === user.id || deletingId === user.id || grantingTrial"
+                      aria-label="Conceder trial">
+                      <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
+                          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2" />
+                          <path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </span>
                     </button>
+                    </span>
+                    <span class="act" data-tip="Excluir">
                     <button
                       type="button"
-                      class="btn-danger sm"
+                      class="btn-danger sm icon-btn"
                       (click)="removeUser(user)"
-                      [disabled]="savingId === user.id || deletingId === user.id">
+                      [disabled]="savingId === user.id || deletingId === user.id"
+                      aria-label="Excluir usuário">
                       <span class="inline-flex h-4 w-4 items-center justify-center" aria-hidden="true">
                         <svg viewBox="0 0 24 24" focusable="false" class="h-4 w-4">
                           <path
@@ -159,8 +173,8 @@
                             stroke-linejoin="round" />
                         </svg>
                       </span>
-                      Excluir
                     </button>
+                    </span>
                   </div>
                 </td>
               </tr>
