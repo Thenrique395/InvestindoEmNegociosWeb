@@ -1,16 +1,10 @@
 <section class="preferences-page">
-  <section class="settings-shell">
-    <div class="settings-hero">
-      <div class="settings-hero__copy">
-        <p class="eyebrow">Configurações</p>
-        <h1>Preferências</h1>
-        <p>
-          Defina como valores, datas e lembretes aparecem em todas as telas.
-        </p>
-      </div>
-    </div>
+  <app-page-header
+    eyebrow="Configurações"
+    title="Preferências"
+    description="Defina como valores, datas e lembretes aparecem em todas as telas." />
 
-    <div class="settings-grid">
+  <div class="settings-grid">
       <section class="settings-card settings-card--main">
         <div class="settings-card__header">
           <div>
@@ -200,5 +194,4 @@
         <span>{{ loading ? 'Salvando...' : 'Salvar alterações' }}</span>
       </button>
     </footer>
-  </section>
 </section>

@@ -4,38 +4,9 @@
 
 .preferences-page {
   display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
   color: var(--text);
-}
-
-.settings-shell {
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background:
-    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 24%),
-    rgba(255, 255, 255, 0.94);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.07);
-}
-
-.settings-hero {
-  padding: clamp(1.35rem, 2.4vw, 2rem);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.settings-hero__copy h1 {
-  margin: 0;
-  color: var(--text);
-  font-size: clamp(2.4rem, 4.2vw, 3.7rem);
-  line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-display);
-}
-
-.settings-hero__copy p:not(.eyebrow) {
-  margin: 0.7rem 0 0;
-  max-width: 720px;
-  color: var(--text-secondary);
-  font-size: clamp(0.98rem, 1.2vw, 1.08rem);
-  line-height: var(--line-height-body);
 }
 
 .eyebrow {
@@ -58,7 +29,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
   gap: 1rem;
-  padding: clamp(1.1rem, 2.2vw, 1.6rem);
+}
+
+@media (max-width: 860px) {
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .settings-card {
@@ -360,11 +336,13 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
-  padding: 0.9rem clamp(1.1rem, 2.2vw, 1.6rem);
-  border-top: 1px solid rgba(226, 232, 240, 0.9);
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(239, 246, 255, 0.58));
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .settings-footer div {

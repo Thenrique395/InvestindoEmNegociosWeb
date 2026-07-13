@@ -7,11 +7,12 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 
 @Component({
   selector: 'app-user-preferences',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PageHeaderComponent],
   templateUrl: './user-preferences.component.html',
   styleUrls: ['./user-preferences.component.scss']
 })
