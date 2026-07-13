@@ -1,39 +1,8 @@
-.panel {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  background: var(--surface);
-  box-shadow: var(--shadow-md);
+.perfil-page {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
   min-width: 0;
-}
-
-.panel__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.eyebrow {
-  text-transform: none;
-  letter-spacing: var(--letter-spacing-label);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.muted {
-  color: var(--text-muted);
-}
-
-.placeholder {
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-2);
-  background: var(--surface-2);
 }
 
 .form {
@@ -124,6 +93,7 @@ select {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-2);
+  margin-top: 1.25rem;
 }
 
 .ghost {
@@ -133,4 +103,5 @@ select {
   box-shadow: none;
   padding: var(--spacing-2) var(--spacing-2);
   border-radius: var(--radius-sm);
+  width: fit-content;
 }

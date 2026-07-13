@@ -3,11 +3,13 @@ import { FormsModule } from '@angular/forms';
 
 import { ProfileService, UserProfile } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { SectionCardComponent } from '../shared/section-card/section-card.component';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PageHeaderComponent, SectionCardComponent],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })

@@ -1,120 +1,119 @@
-<section class="panel">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">Perfil</p>
-      <h2>Dados do usuário</h2>
-      <p class="muted">Edite nome, e-mail, avatar e outras informações pessoais.</p>
-    </div>
-  </div>
-  <div class="form">
-    <div class="avatar-block">
-      <div class="avatar-preview" [class.is-empty]="!avatarUrl">
-        @if (avatarUrl) {
-          <img [src]="avatarUrl" alt="Foto de perfil" />
-        }
-        @if (!avatarUrl) {
-          <span>Sem foto</span>
-        }
-      </div>
-      <div class="avatar-actions">
-        <label class="upload">
-          <input type="file" accept="image/*" (change)="onAvatarFileChange($event)" [disabled]="avatarUploading" />
-          <span>{{ avatarUploading ? 'Enviando...' : 'Enviar foto' }}</span>
-        </label>
-        <button type="button" class="ghost" (click)="limparAvatar()" [disabled]="!avatarUrl || avatarUploading">Remover</button>
-        <small class="hint">PNG/JPG até 2MB.</small>
-      </div>
-    </div>
-    <label>
-      Nome
-      <input type="text" [(ngModel)]="nome" placeholder="Seu nome" />
-    </label>
-    <label>
-      E-mail
-      <input type="email" [ngModel]="email" [readonly]="true" placeholder="email@exemplo.com" />
-    </label>
-    <label>
-      CPF
-      <input type="text" [ngModel]="documento" [readonly]="true" placeholder="CPF" />
-    </label>
-    <label>
-      Avatar (URL)
-      <input type="text" [(ngModel)]="avatarUrl" placeholder="https://..." />
-    </label>
-    <label>
-      Idioma / Locale
-      <select [(ngModel)]="idioma">
-        <option value="pt-BR">Português (Brasil)</option>
-        <option value="en-US">English (US)</option>
-      </select>
-    </label>
-    <label>
-      Telefone
-      <input type="tel" [(ngModel)]="telefone" placeholder="(xx) xxxxx-xxxx" />
-    </label>
-    <label>
-      Data de nascimento
-      <input type="date" [(ngModel)]="dataNascimento" />
-    </label>
-    <label>
-      Cidade
-      <input type="text" [(ngModel)]="cidade" placeholder="Sua cidade" />
-    </label>
-    <label>
-      Estado
-      <input type="text" [(ngModel)]="estado" placeholder="UF/Estado" />
-    </label>
-    <label>
-      País
-      <input type="text" [(ngModel)]="pais" placeholder="País" />
-    </label>
-    <label>
-      Modo de inteligência
-      <select [(ngModel)]="intelligenceMode">
-        <option value="B">Balanceado</option>
-        <option value="C">Conservador</option>
-      </select>
-    </label>
-    <label>
-      Dia de início da competência
-      <select [(ngModel)]="carryOverDay">
-        @for (day of carryOverDayOptions; track day) {
-          <option [ngValue]="day">Dia {{ day }}</option>
-        }
-      </select>
-    </label>
-  </div>
-  <div class="panel__actions">
-    <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPerfil()">
-      {{ loading ? 'Salvando...' : 'Salvar perfil' }}
-    </button>
-  </div>
-</section>
+<section class="perfil-page">
+  <app-page-header
+    eyebrow="Conta"
+    title="Perfil"
+    description="Gerencie seus dados pessoais e a senha de acesso." />
 
-<section class="panel">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">Segurança</p>
-      <h2>Alterar senha</h2>
-      <p class="muted">Troque sua senha atual por uma nova.</p>
+  <app-section-card
+    title="Dados do usuário"
+    description="Edite nome, e-mail, avatar e outras informações pessoais."
+    [hasHeaderActions]="false">
+    <div class="form">
+      <div class="avatar-block">
+        <div class="avatar-preview" [class.is-empty]="!avatarUrl">
+          @if (avatarUrl) {
+            <img [src]="avatarUrl" alt="Foto de perfil" />
+          }
+          @if (!avatarUrl) {
+            <span>Sem foto</span>
+          }
+        </div>
+        <div class="avatar-actions">
+          <label class="upload">
+            <input type="file" accept="image/*" (change)="onAvatarFileChange($event)" [disabled]="avatarUploading" />
+            <span>{{ avatarUploading ? 'Enviando...' : 'Enviar foto' }}</span>
+          </label>
+          <button type="button" class="ghost" (click)="limparAvatar()" [disabled]="!avatarUrl || avatarUploading">Remover</button>
+          <small class="hint">PNG/JPG até 2MB.</small>
+        </div>
+      </div>
+      <label>
+        Nome
+        <input type="text" [(ngModel)]="nome" placeholder="Seu nome" />
+      </label>
+      <label>
+        E-mail
+        <input type="email" [ngModel]="email" [readonly]="true" placeholder="email@exemplo.com" />
+      </label>
+      <label>
+        CPF
+        <input type="text" [ngModel]="documento" [readonly]="true" placeholder="CPF" />
+      </label>
+      <label>
+        Avatar (URL)
+        <input type="text" [(ngModel)]="avatarUrl" placeholder="https://..." />
+      </label>
+      <label>
+        Idioma / Locale
+        <select [(ngModel)]="idioma">
+          <option value="pt-BR">Português (Brasil)</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </label>
+      <label>
+        Telefone
+        <input type="tel" [(ngModel)]="telefone" placeholder="(xx) xxxxx-xxxx" />
+      </label>
+      <label>
+        Data de nascimento
+        <input type="date" [(ngModel)]="dataNascimento" />
+      </label>
+      <label>
+        Cidade
+        <input type="text" [(ngModel)]="cidade" placeholder="Sua cidade" />
+      </label>
+      <label>
+        Estado
+        <input type="text" [(ngModel)]="estado" placeholder="UF/Estado" />
+      </label>
+      <label>
+        País
+        <input type="text" [(ngModel)]="pais" placeholder="País" />
+      </label>
+      <label>
+        Modo de inteligência
+        <select [(ngModel)]="intelligenceMode">
+          <option value="B">Balanceado</option>
+          <option value="C">Conservador</option>
+        </select>
+      </label>
+      <label>
+        Dia de início da competência
+        <select [(ngModel)]="carryOverDay">
+          @for (day of carryOverDayOptions; track day) {
+            <option [ngValue]="day">Dia {{ day }}</option>
+          }
+        </select>
+      </label>
     </div>
-  </div>
-  <div class="form">
-    <label>
-      Senha atual
-      <input type="password" [(ngModel)]="senhaAtual" />
-    </label>
-    <label>
-      Nova senha
-      <input type="password" [(ngModel)]="novaSenha" />
-    </label>
-    <label>
-      Confirmar nova senha
-      <input type="password" [(ngModel)]="confirmaSenha" />
-    </label>
-  </div>
-  <div class="panel__actions">
-    <button type="button" class="btn-cancel sm" (click)="senhaAtual = novaSenha = confirmaSenha = ''">Cancelar</button>
-    <button type="button" class="btn-primary" (click)="alterarSenha()">Salvar nova senha</button>
-  </div>
+    <div class="panel__actions">
+      <button type="button" class="btn-primary" [disabled]="loading" (click)="salvarPerfil()">
+        {{ loading ? 'Salvando...' : 'Salvar perfil' }}
+      </button>
+    </div>
+  </app-section-card>
+
+  <app-section-card
+    title="Alterar senha"
+    description="Troque sua senha atual por uma nova."
+    [hasHeaderActions]="false">
+    <div class="form">
+      <label>
+        Senha atual
+        <input type="password" [(ngModel)]="senhaAtual" />
+      </label>
+      <label>
+        Nova senha
+        <input type="password" [(ngModel)]="novaSenha" />
+      </label>
+      <label>
+        Confirmar nova senha
+        <input type="password" [(ngModel)]="confirmaSenha" />
+      </label>
+    </div>
+    <div class="panel__actions">
+      <button type="button" class="btn-cancel sm" (click)="senhaAtual = novaSenha = confirmaSenha = ''">Cancelar</button>
+      <button type="button" class="btn-primary" (click)="alterarSenha()">Salvar nova senha</button>
+    </div>
+  </app-section-card>
 </section>
