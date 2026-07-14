@@ -13,6 +13,8 @@ function buildComponent(cardsStoreMock: any = {}) {
     load: jasmine.createSpy('load'),
     selectCard: jasmine.createSpy('selectCard'),
     loadStatements: jasmine.createSpy('loadStatements'),
+    create: jasmine.createSpy('create'),
+    update: jasmine.createSpy('update'),
     ...cardsStoreMock
   };
   const component = TestBed.runInInjectionContext(() => new CartoesComponent(
@@ -55,6 +57,38 @@ describe('CartoesComponent smoke', () => {
 
     expect(cardsStore.selectCard).toHaveBeenCalledWith('card-1');
     expect(cardsStore.loadStatements).toHaveBeenCalledWith('card-1', { year: 2026, month: 3 });
+  });
+
+  it('deriva cards() e cardMetrics do CardsStore (reativo — trava regressão do bug de exibição)', () => {
+    const cardDto = {
+      id: 'c1', brandId: 1, holderName: 'FULANO DE TAL', nickname: 'Meu Cartão',
+      last4: '1234', bank: 'Banco X', creditLimit: 5000, statementCloseDay: 10, dueDay: 18
+    };
+    const { component } = buildComponent({ cards: () => [cardDto] });
+
+    expect(component.cards().length).toBe(1);
+    expect(component.cards()[0].limiteCredito).toBe(5000);
+    expect(component.cards()[0].diaVencimento).toBe(18);
+    expect(component.cardMetrics.length).toBe(1);
+    expect(component.cardsOverview.activeCards).toBe(1);
+    expect(component.totalLimit).toBe(5000);
+  });
+
+  it('permite salvar edição mesmo com número mascarado (last4) — trava regressão do bug de edição', () => {
+    const cardDto = {
+      id: 'c1', brandId: 1, holderName: 'FULANO DE TAL', nickname: 'Meu Cartão',
+      last4: '9999', bank: 'Banco X', creditLimit: 5000, statementCloseDay: 10, dueDay: 18
+    };
+    const { component, cardsStore } = buildComponent({ cards: () => [cardDto] });
+
+    component.editar(component.cards()[0]); // em edição o campo número carrega só o last4 "9999"
+    component.limiteCredito = 8000; // usuário altera apenas o limite
+    component.salvar();
+
+    expect(cardsStore.update).toHaveBeenCalled();
+    const [id, payload] = cardsStore.update.calls.mostRecent().args;
+    expect(id).toBe('c1');
+    expect(payload.creditLimit).toBe(8000);
   });
 
   it('deve carregar dependências iniciais no init', () => {

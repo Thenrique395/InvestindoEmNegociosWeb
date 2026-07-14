@@ -106,7 +106,7 @@
             <label class="tx-filter">
               <span class="tx-filter__label">Cartão</span>
               <select [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
-                @for (c of cards; track trackByIndex($index, c)) {
+                @for (c of cards(); track trackByIndex($index, c)) {
                   <option [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
                 }
               </select>

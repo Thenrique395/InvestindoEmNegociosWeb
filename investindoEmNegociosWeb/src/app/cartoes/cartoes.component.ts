@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, effect } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, Signal, computed, effect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { UpperCasePipe, DatePipe, DecimalPipe } from '@angular/common';
@@ -76,7 +76,8 @@ export class CartoesComponent implements OnInit {
   diaVencimento = 1;
   saving = false;
   mostrarNumero = false;
-  cards: StoredCard[] = [];
+  /** Cartões derivados reativamente do CardsStore (signal) — o template lê cards() e o OnPush re-renderiza sozinho quando os dados chegam. */
+  readonly cards: Signal<StoredCard[]>;
   expenses: StoredExpense[] = [];
   institutions: InstitutionLookup[] = [];
   mostrarModal = false;
@@ -96,23 +97,23 @@ export class CartoesComponent implements OnInit {
   );
 
   get totalCards(): number {
-    return this.cards.length;
+    return this.cards().length;
   }
 
   get totalLimit(): number {
-    return this.cards.reduce((sum, card) => sum + (card.limiteCredito || 0), 0);
+    return this.cards().reduce((sum, card) => sum + (card.limiteCredito || 0), 0);
   }
 
   get nextClosingDay(): number | null {
-    if (!this.cards.length) return null;
-    return this.cards
+    if (!this.cards().length) return null;
+    return this.cards()
       .map((card) => Number(card.diaFechamento) || 31)
       .sort((a, b) => a - b)[0] ?? null;
   }
 
   get nextDueDay(): number | null {
-    if (!this.cards.length || this.nextClosingDay == null) return null;
-    const sameDayCard = this.cards.find((card) => Number(card.diaFechamento) === this.nextClosingDay);
+    if (!this.cards().length || this.nextClosingDay == null) return null;
+    const sameDayCard = this.cards().find((card) => Number(card.diaFechamento) === this.nextClosingDay);
     return sameDayCard ? Number(sameDayCard.diaVencimento) || null : null;
   }
 
@@ -138,11 +139,12 @@ export class CartoesComponent implements OnInit {
 
   /** Calcula as métricas uma vez por combinação (cards, expenses); reusadas por lista e resumo. */
   private computeCardMetrics(): CardMetrics[] {
-    if (this.metricsCacheCards === this.cards && this.metricsCacheExpenses === this.expenses) {
+    const cards = this.cards();
+    if (this.metricsCacheCards === cards && this.metricsCacheExpenses === this.expenses) {
       return this.metricsCacheValue;
     }
-    this.metricsCacheValue = this.cards.map((card) => buildCardMetrics(card, this.expenses, new Date()));
-    this.metricsCacheCards = this.cards;
+    this.metricsCacheValue = cards.map((card) => buildCardMetrics(card, this.expenses, new Date()));
+    this.metricsCacheCards = cards;
     this.metricsCacheExpenses = this.expenses;
     return this.metricsCacheValue;
   }
@@ -228,6 +230,8 @@ export class CartoesComponent implements OnInit {
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef
   ) {
+    this.cards = computed(() => this.cardsStore.cards().map((card) => this.mapCardDto(card)));
+
     effect(() => {
       const activeBrands = this.lookupsStore.cardBrands().filter((b) => b.isActive !== false);
       this.brands = activeBrands;
@@ -241,8 +245,7 @@ export class CartoesComponent implements OnInit {
     });
 
     effect(() => {
-      const mappedCards = this.cardsStore.cards().map((card) => this.mapCardDto(card));
-      this.cards = mappedCards;
+      const mappedCards = this.cards();
       const selectedId = this.cardsStore.selectedCardId();
       const nextStatementCardId = selectedId || mappedCards[0]?.id || null;
       const statementCardChanged = this.statementCardId !== nextStatementCardId;
@@ -381,7 +384,7 @@ export class CartoesComponent implements OnInit {
   }
 
   get cartaoParaRemoverNome(): string {
-    return this.cards.find((c) => c.id === this.cartaoParaRemover)?.nome || 'este cartão';
+    return this.cards().find((c) => c.id === this.cartaoParaRemover)?.nome || 'este cartão';
   }
 
   confirmarRemocao(): void {
@@ -446,9 +449,13 @@ export class CartoesComponent implements OnInit {
       errors.brand = 'Selecione a bandeira do cartão.';
     }
 
+    // Em edição, a API só devolve o last4 (o PAN completo nunca retorna por segurança),
+    // então o campo carrega apenas 4 dígitos. Não exigimos o número completo nesse caso,
+    // mas se o usuário digitar um número novo, ele é validado normalmente (13-19 dígitos).
+    const numeroInalteradoNaEdicao = !!this.editandoId && digits.length <= 4;
     if (!digits) {
       errors.number = 'Informe o número do cartão.';
-    } else if (digits.length < 13 || digits.length > 19) {
+    } else if (!numeroInalteradoNaEdicao && (digits.length < 13 || digits.length > 19)) {
       errors.number = 'O número do cartão deve ter entre 13 e 19 dígitos.';
     }
 
