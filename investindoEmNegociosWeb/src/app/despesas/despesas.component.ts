@@ -29,12 +29,11 @@ import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { BodyPortalDirective } from '../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
+import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
 import {
   formatLocaleDate,
-  formatMonthLabelFromKey,
   formatMonthYearLabel,
   formatNumberValue,
-  getActiveLocale,
   monthKeyFromLocaleDate,
   parseLocaleDate,
   parseLocalizedNumber
@@ -992,9 +991,7 @@ export class DespesasComponent implements OnInit {
   }
 
   public mesKey(): string {
-    const y = this.dataAtual.getFullYear();
-    const m = this.dataAtual.getMonth() + 1;
-    return `${y}-${String(m).padStart(2, '0')}`;
+    return monthKeyFromDate(this.dataAtual);
   }
 
   tituloBandeira(b: string): string {
@@ -1029,7 +1026,7 @@ export class DespesasComponent implements OnInit {
   }
 
   private mesKeyFromDate(date: Date): string {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    return monthKeyFromDate(date);
   }
 
   private previousMonthKey(): string {
@@ -1043,7 +1040,7 @@ export class DespesasComponent implements OnInit {
   }
 
   private formatMonthLabel(value: string): string {
-    return formatMonthLabelFromKey(value, 'long');
+    return monthLabelFromKey(value);
   }
 
   private mesKeyFromVencimento(vencimento: string): string | null {
@@ -1125,16 +1122,11 @@ export class DespesasComponent implements OnInit {
   }
 
   private collate(a: string | undefined, b: string | undefined): number {
-    return (a || '').localeCompare(b || '', getActiveLocale(), { sensitivity: 'base' });
+    return collateText(a, b);
   }
 
   private compareDate(a: string | undefined, b: string | undefined): number {
-    const da = this.parseData(a || '');
-    const db = this.parseData(b || '');
-    if (!da && !db) return 0;
-    if (!da) return -1;
-    if (!db) return 1;
-    return da.getTime() - db.getTime();
+    return compareLocaleDate(a, b);
   }
 
   private isDataValida(value: string): boolean {

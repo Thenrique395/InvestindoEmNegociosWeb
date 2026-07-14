@@ -24,6 +24,7 @@ import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
+import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
 import {
   formatLocaleDate,
   formatMonthYearLabel,
@@ -622,18 +623,11 @@ export class ReceitasComponent implements OnInit {
   }
 
   private compareDate(a: string, b: string): number {
-    const da = this.parseData(a);
-    const db = this.parseData(b);
-    if (!da && !db) return 0;
-    if (!da) return 1;
-    if (!db) return -1;
-    return da.getTime() - db.getTime();
+    return compareLocaleDate(a, b);
   }
 
   private collate(a?: string | null, b?: string | null): number {
-    const aa = (a || '').toString().toLowerCase();
-    const bb = (b || '').toString().toLowerCase();
-    return aa.localeCompare(bb, 'pt-BR');
+    return collateText(a, b);
   }
 
   private parseData(value: string): Date | null {
@@ -777,21 +771,15 @@ export class ReceitasComponent implements OnInit {
   }
 
   private mesKey(): string {
-    const y = this.dataAtual.getFullYear();
-    const m = this.dataAtual.getMonth() + 1;
-    return `${y}-${String(m).padStart(2, '0')}`;
+    return monthKeyFromDate(this.dataAtual);
   }
 
   private mesKeyFromDate(date: Date): string {
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    return `${y}-${String(m).padStart(2, '0')}`;
+    return monthKeyFromDate(date);
   }
 
   private formatMonthLabel(monthKey: string): string {
-    const [y, m] = monthKey.split('-').map((v) => Number(v));
-    if (!y || !m) return monthKey;
-    return formatMonthYearLabel(new Date(y, m - 1, 1));
+    return monthLabelFromKey(monthKey);
   }
 
   private mesKeyFromRecebimento(recebimento: string): string | null {
