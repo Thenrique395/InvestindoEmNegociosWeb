@@ -705,7 +705,7 @@
   min-height: 50px;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  background: #f1f5f9;
+  background: var(--color-surface-muted);
   padding: 0 1.05rem;
   color: var(--text);
   font-size: var(--font-size-body);
@@ -755,13 +755,13 @@
 
 .account-form__input--invalid {
   border-color: color-mix(in srgb, var(--danger) 72%, var(--border));
-  background: color-mix(in srgb, var(--danger) 6%, #f8fafc);
+  background: color-mix(in srgb, var(--danger) 6%, var(--color-bg));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .account-form__input-shell--invalid .account-form__input {
   border-color: color-mix(in srgb, var(--danger) 72%, var(--border));
-  background: color-mix(in srgb, var(--danger) 6%, #f8fafc);
+  background: color-mix(in srgb, var(--danger) 6%, var(--color-bg));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
