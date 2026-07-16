@@ -683,6 +683,7 @@
         </div>
         @if (showAlocacaoConfig) {
           <div class="allocation-config">
+            <p class="muted">Você define sua alocação-alvo. Este é um ponto de partida editável — ajuste ao seu perfil. <strong>Não é recomendação de investimento.</strong></p>
             <div class="allocation-config__inputs">
               @for (t of allocationTypes; track trackByIndex($index, t)) {
                 <label>

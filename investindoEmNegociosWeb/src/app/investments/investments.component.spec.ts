@@ -253,7 +253,7 @@ describe('InvestmentsComponent', () => {
     (component as any).carregarAlocacaoTarget();
     (component as any).carregarAlocacaoTarget();
 
-    expect(component.targetAllocation).toEqual({ RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 });
+    expect(component.targetAllocation).toEqual({ RF: 30, ACOES: 30, FUNDOS: 30, CRIPTO: 10 });
     expect(uiFeedback.warning).toHaveBeenCalledTimes(1);
   });
 

@@ -4,7 +4,9 @@ import { parseLocalizedNumber } from './locale-utils';
 export type BenchmarkKey = 'CDI' | 'IPCA' | 'IFIX' | 'IBOV' | 'SMLL' | 'IDIV' | 'IVVB11';
 export type AllocationInvestmentType = 'RF' | 'ACOES' | 'FUNDOS' | 'CRIPTO';
 
-export const DEFAULT_TARGET_ALLOCATION: Record<AllocationInvestmentType, number> = { RF: 40, ACOES: 35, FUNDOS: 20, CRIPTO: 5 };
+// Ponto de partida editável pelo usuário (fallback do default do backend) —
+// não é recomendação de investimento.
+export const DEFAULT_TARGET_ALLOCATION: Record<AllocationInvestmentType, number> = { RF: 30, ACOES: 30, FUNDOS: 30, CRIPTO: 10 };
 
 export function normalize(value: string): string {
   return (value || '')
