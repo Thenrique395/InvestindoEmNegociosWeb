@@ -83,8 +83,8 @@ export class ProductShowcaseComponent implements OnInit, OnDestroy {
       modules: ['Receitas', 'Despesas', 'Calendário']
     },
     {
-      title: 'Casal ou família',
-      description: 'Centralize contas, cartões e despesas do casal em um lugar só, com saldo real sempre à vista.',
+      title: 'Quem quer sair das planilhas',
+      description: 'Centralize contas, cartões e despesas em um lugar só, com saldo real sempre à vista — sem montar planilha.',
       modules: ['Contas', 'Cartões', 'Metas']
     },
     {
