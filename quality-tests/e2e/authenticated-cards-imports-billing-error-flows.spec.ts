@@ -69,6 +69,8 @@ test.describe('cartões — cenários de erro', () => {
 
     await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
     await page.locator('[title="Remover cartão"]').first().click();
+    // A exclusão pede confirmação (ConfirmSheet) antes de disparar o DELETE.
+    await page.locator('button.btn-danger').filter({ hasText: 'Remover cartão' }).click();
 
     await expect(page.getByText('Falha ao remover cartão.')).toBeVisible();
   });
