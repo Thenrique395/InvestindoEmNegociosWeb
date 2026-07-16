@@ -973,7 +973,7 @@
 .onboarding-btn--confirm {
   min-width: 320px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 90%, var(--primary-text)), #5a8dff);
-  color: #fff;
+  color: var(--color-text-inverse);
   border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent),

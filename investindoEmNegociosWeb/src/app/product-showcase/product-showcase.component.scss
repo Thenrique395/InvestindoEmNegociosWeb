@@ -710,7 +710,7 @@
 
 .feature-card--dark .feature-card__icon {
   background: rgba(255, 255, 255, 0.16);
-  color: #fff;
+  color: var(--color-text-inverse);
 }
 
 .feature-card__mock {

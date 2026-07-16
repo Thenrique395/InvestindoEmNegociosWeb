@@ -550,7 +550,7 @@
 .btn--primary {
   background: var(--primary);
   border-color: transparent;
-  color: #fff;
+  color: var(--color-text-inverse);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
 

@@ -373,7 +373,7 @@ textarea:focus {
   padding: 0.7rem 1rem;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--primary), #5b8cff);
-  color: #fff;
+  color: var(--color-text-inverse);
   text-align: left;
   box-shadow: 0 18px 34px color-mix(in srgb, var(--primary) 24%, transparent);
 }
@@ -395,7 +395,7 @@ textarea:focus {
 }
 
 .primary-action > span:last-child {
-  color: #fff;
+  color: var(--color-text-inverse);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-display);

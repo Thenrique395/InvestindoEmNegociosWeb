@@ -43,7 +43,7 @@
 
 .btn--primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--color-text-inverse);
   border-color: transparent;
 }
 
@@ -54,7 +54,7 @@
 
 .btn--danger {
   background: #b42318;
-  color: #fff;
+  color: var(--color-text-inverse);
   border-color: transparent;
 }
 
