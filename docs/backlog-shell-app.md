@@ -83,9 +83,10 @@ cobertas por spec. Pendências e próximos passos:
       carregado/exibido para Advanced hoje. Avaliar liberar a série (ou só o delta) para Intermediate.
 - [ ] **Compromissos além de despesas** — o card conta despesas em aberto (vencidas + 7 dias).
       Evoluir para incluir faturas de cartão com fechamento próximo e parcelas de empréstimos.
-- [ ] **Módulo Família/CNPJ** — nenhum card foi adicionado porque não existe conta familiar no
-      produto. Quando o módulo existir, o grid do overview aceita novos cards via
-      `buildOverviewCards` sem mudança estrutural.
+- [ ] **Módulo Família/CNPJ** — **adiado por decisão de produto** (lançamento inicial só pessoa
+      física/individual — ver `docs/DECISIONS/2026-07-16-lancamento-individual-adiar-familia-cnpj.md`).
+      Nenhum card foi adicionado porque não existe conta familiar no produto. Quando o módulo
+      existir, o grid do overview aceita novos cards via `buildOverviewCards` sem mudança estrutural.
 - [ ] **Clique no card inteiro** — hoje só o link "Ver detalhes" navega; avaliar tornar o card todo
       clicável (com área de toque generosa) mantendo acessibilidade.
 - [ ] **Priorização mobile do dashboard** (exceção acordada à decisão de mobile web) — quando

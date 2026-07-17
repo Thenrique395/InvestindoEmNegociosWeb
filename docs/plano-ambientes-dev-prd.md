@@ -1,5 +1,7 @@
 # Plano de Ambientes DEV e PRD
 
+> **Status atual (2026-07):** o ambiente **PRD está pausado** — foco em DEV enquanto os fluxos críticos são estabilizados. Ver `docs/DECISIONS/2026-06-15-pausar-ambiente-prd-focar-dev.md`. Este plano descreve a estratégia-alvo; ao reativar o PRD, revalidar os passos abaixo.
+
 Este documento define a ordem recomendada para separar os ambientes do projeto. A ordem correta e mais segura e:
 
 1. Banco de dados

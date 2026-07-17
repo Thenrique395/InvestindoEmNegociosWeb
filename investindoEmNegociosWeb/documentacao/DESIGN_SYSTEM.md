@@ -757,3 +757,32 @@ Este documento descreve os padrões, mas o que está implementado no código pre
 - quando um componente reutilizável mudar de padrão
 - quando o frontend consolidar novo padrão de layout ou navegação
 - quando o código base em `styles.scss` mudar de forma relevante
+
+## Convenções de frontend (change detection e testes)
+
+> Consolidado da auditoria (2026-07). Complementa os tokens/componentes acima com as convenções de implementação e teste. O **styleguide navegável** vive em `/styleguide` (catálogo `styleguide-catalog.ts`).
+
+### Change detection
+- Novo componente = `ChangeDetectionStrategy.OnPush` + estado via `signal()` / `computed()`; estado compartilhado via **signal store**.
+- **Evitar** os antipadrões que quebram a reatividade OnPush de forma sutil:
+  - ponte `service.x().subscribe(() => { ...; cdr.markForCheck(); })` — preferir signals;
+  - `effect()` que copia um signal para um campo comum lido no template.
+- Contexto: existe uma migração progressiva dos componentes `markForCheck`-based para signals (backlog A9). Bugs reais (cartões A19) e um artefato de teste (A22) ilustram por que o padrão importa.
+
+### Cores — sempre tokens
+- Nunca hex/rgba avulso em componente; usar os tokens oficiais (ver "Tokens oficiais"). Mapeamentos canônicos comuns:
+
+| Hex | Token |
+|---|---|
+| `#f8fafc` | `var(--color-bg)` |
+| `#f1f5f9` | `var(--color-surface-muted)` |
+| `#e2e8f0` | `var(--color-surface-raised)` |
+| `#64748b` | `var(--color-text-muted)` |
+| `#fff` (texto sobre cor) | `var(--color-text-inverse)` |
+
+Exceções aceitáveis: gradientes decorativos e sombras `rgba(...)` sem token exato.
+
+### Lógica pura e testes
+- Lógica testável por tela em arquivos `*.model.ts` + `.spec.ts`; utilitários de lançamentos compartilhados em `shared/transactions/transaction-helpers.ts`.
+- Unit (Karma/Jasmine) para lógica; E2E em `quality-tests/` (Playwright, harness mockado `setupAuthenticatedApp`).
+- **Atenção — ponto cego do Playwright headless:** telas OnPush de estado vazio dão falso "Carregando…" no headless contra a API real (agendamento de CD via rAF estrangulado). Não é bug de produção. Para E2E usar o **harness mockado**; em testes ad-hoc, `headless:false` ou ler o estado via `ng.getComponent(el).campo` em vez do DOM.
