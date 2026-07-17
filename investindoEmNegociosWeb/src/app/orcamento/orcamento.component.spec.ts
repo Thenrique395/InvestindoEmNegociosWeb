@@ -40,8 +40,8 @@ describe('OrcamentoComponent', () => {
     component.ngOnInit();
 
     expect(budgetService.get).toHaveBeenCalledWith(component.year, component.month);
-    expect(component.budget?.totalPlanned).toBe(1000);
-    expect(component.loading).toBeFalse();
+    expect(component.budget()?.totalPlanned).toBe(1000);
+    expect(component.loading()).toBeFalse();
   });
 
   it('sinaliza erro quando o carregamento falha', () => {
@@ -50,20 +50,20 @@ describe('OrcamentoComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.budget).toBeNull();
-    expect(component.error).toBe('boom');
-    expect(component.loading).toBeFalse();
+    expect(component.budget()).toBeNull();
+    expect(component.error()).toBe('boom');
+    expect(component.loading()).toBeFalse();
   });
 
   it('deriva overview com uso geral e estouros', () => {
     const { component } = createComponent();
-    component.budget = budget({
+    component.budget.set(budget({
       totalPlanned: 300, totalRealized: 200, totalVariance: 100,
       items: [
         item({ id: 'a', plannedAmount: 100, realizedAmount: 120 }),
         item({ id: 'b', plannedAmount: 200, realizedAmount: 80 })
       ]
-    });
+    }));
 
     expect(component.overview.usagePercent).toBe(67);
     expect(component.overview.overBudgetCount).toBe(1);
@@ -97,8 +97,8 @@ describe('OrcamentoComponent', () => {
 
   it('remove item apenas após confirmação', () => {
     const { component, budgetService } = createComponent();
-    component.budget = budget({ items: [item({ id: 'i1' }), item({ id: 'i2' })] });
-    const target = component.budget.items[0];
+    component.budget.set(budget({ items: [item({ id: 'i1' }), item({ id: 'i2' })] }));
+    const target = component.budget()!.items[0];
 
     component.askRemove(target);
     expect(component.pendingDelete?.id).toBe('i1');
@@ -107,14 +107,14 @@ describe('OrcamentoComponent', () => {
     component.confirmRemove();
 
     expect(budgetService.deleteItem).toHaveBeenCalledWith('i1');
-    expect(component.budget?.items.map((i) => i.id)).toEqual(['i2']);
+    expect(component.budget()?.items.map((i) => i.id)).toEqual(['i2']);
     expect(component.pendingDelete).toBeNull();
   });
 
   it('cancelRemove descarta sem excluir', () => {
     const { component, budgetService } = createComponent();
-    component.budget = budget();
-    component.askRemove(component.budget.items[0]);
+    component.budget.set(budget());
+    component.askRemove(component.budget()!.items[0]);
 
     component.cancelRemove();
 

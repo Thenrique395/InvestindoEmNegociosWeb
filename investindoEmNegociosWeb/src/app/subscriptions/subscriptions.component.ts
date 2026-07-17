@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -34,17 +34,19 @@ import { UiStateComponent } from '../ui-state/ui-state.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SubscriptionsComponent implements OnInit {
-  catalog: SubscriptionCatalogResponse | null = null;
-  loading = true;
-  changingPlanCode: string | null = null;
-  changingCycle: 'Monthly' | 'Yearly' = 'Monthly';
-  cancelling = false;
-  openingPortal = false;
-  requestingTrial = false;
-  requestingRefund = false;
-  retrying = false;
-  confirmCancelOpen = false;
-  confirmRefundOpen = false;
+  // Estado reativo por signal (A9): a resposta HTTP roda fora da zona (withFetch),
+  // então signals garantem a re-renderização OnPush sem depender de tick de zona.
+  readonly catalog = signal<SubscriptionCatalogResponse | null>(null);
+  readonly loading = signal(true);
+  readonly changingPlanCode = signal<string | null>(null);
+  readonly changingCycle = signal<'Monthly' | 'Yearly'>('Monthly');
+  readonly cancelling = signal(false);
+  readonly openingPortal = signal(false);
+  readonly requestingTrial = signal(false);
+  readonly requestingRefund = signal(false);
+  readonly retrying = signal(false);
+  readonly confirmCancelOpen = signal(false);
+  readonly confirmRefundOpen = signal(false);
 
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
@@ -61,7 +63,7 @@ export class SubscriptionsComponent implements OnInit {
   }
 
   get subscriptionStatus(): string {
-    return (this.catalog?.current.status || '').toLowerCase();
+    return (this.catalog()?.current.status || '').toLowerCase();
   }
 
   get isPastDue(): boolean {
@@ -74,37 +76,37 @@ export class SubscriptionsComponent implements OnInit {
 
   get isPastDueCritical(): boolean {
     if (!this.isPastDue) return false;
-    const renewsAt = this.catalog?.current.renewsAt;
+    const renewsAt = this.catalog()?.current.renewsAt;
     if (!renewsAt) return false;
     return (Date.now() - new Date(renewsAt).getTime()) / 86_400_000 >= 6;
   }
 
   get gracePeriodEndsAtLabel(): string | null {
     if (!this.isPastDue) return null;
-    const renewsAt = this.catalog?.current.renewsAt;
+    const renewsAt = this.catalog()?.current.renewsAt;
     if (!renewsAt) return null;
     const endsAt = new Date(new Date(renewsAt).getTime() + 7 * 86_400_000);
     return endsAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 
   get accessUntilLabel(): string | null {
-    const renewsAt = this.catalog?.current.renewsAt;
+    const renewsAt = this.catalog()?.current.renewsAt;
     if (!renewsAt) return null;
     return new Date(renewsAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 
   get showCancelButton(): boolean {
-    const c = this.catalog?.current;
+    const c = this.catalog()?.current;
     return !!c && c.autoRenew && this.subscriptionStatus === 'active' && c.planCode !== 'basic';
   }
 
   get showPortalButton(): boolean {
-    const c = this.catalog?.current;
+    const c = this.catalog()?.current;
     return !!c && c.planCode !== 'basic' && !c.isTrial;
   }
 
   get showTrialButton(): boolean {
-    const c = this.catalog?.current;
+    const c = this.catalog()?.current;
     return !!c && c.planCode === 'basic' && this.subscriptionStatus === 'active';
   }
 
@@ -113,7 +115,7 @@ export class SubscriptionsComponent implements OnInit {
   }
 
   get showRefundButton(): boolean {
-    const c = this.catalog?.current;
+    const c = this.catalog()?.current;
     if (!c || c.planCode === 'basic' || c.isTrial) return false;
     if (this.subscriptionStatus !== 'active') return false;
     const days = (Date.now() - new Date(c.startedAt).getTime()) / 86_400_000;
@@ -126,33 +128,33 @@ export class SubscriptionsComponent implements OnInit {
   ];
 
   selectCycle(cycle: 'Monthly' | 'Yearly'): void {
-    this.changingCycle = cycle;
+    this.changingCycle.set(cycle);
   }
 
   setCycle(value: string): void {
-    this.changingCycle = value === 'Yearly' ? 'Yearly' : 'Monthly';
+    this.changingCycle.set(value === 'Yearly' ? 'Yearly' : 'Monthly');
   }
 
   change(plan: SubscriptionPlan): void {
-    if (this.changingPlanCode) return;
+    if (this.changingPlanCode()) return;
     if (plan.code !== 'basic') {
       this.router.navigate(['/checkout'], {
-        queryParams: { plan: plan.code, cycle: this.changingCycle }
+        queryParams: { plan: plan.code, cycle: this.changingCycle() }
       });
       return;
     }
 
-    this.changingPlanCode = plan.code;
-    this.subscriptionsService.change(plan.code, this.changingCycle)
+    this.changingPlanCode.set(plan.code);
+    this.subscriptionsService.change(plan.code, this.changingCycle())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.authService.applySession(response.session);
-          this.catalog = {
+          this.catalog.set({
             current: response.current,
-            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            plans: this.catalog()?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
             notes: response.notes
-          };
+          });
           this.uiFeedback.success(`Plano alterado para ${response.current.planName}.`);
           this.cdr.markForCheck();
         },
@@ -161,15 +163,15 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         complete: () => {
-          this.changingPlanCode = null;
+          this.changingPlanCode.set(null);
           this.cdr.markForCheck();
         }
       });
   }
 
   openPortal(): void {
-    if (this.openingPortal) return;
-    this.openingPortal = true;
+    if (this.openingPortal()) return;
+    this.openingPortal.set(true);
     this.billingService.createPortalSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -178,30 +180,30 @@ export class SubscriptionsComponent implements OnInit {
         },
         error: (err) => {
           this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível abrir o portal de cobrança.'));
-          this.openingPortal = false;
+          this.openingPortal.set(false);
           this.cdr.markForCheck();
         }
       });
   }
 
   cancel(): void {
-    this.confirmCancelOpen = true;
+    this.confirmCancelOpen.set(true);
   }
 
   performCancel(): void {
-    this.confirmCancelOpen = false;
-    if (this.cancelling) return;
-    this.cancelling = true;
+    this.confirmCancelOpen.set(false);
+    if (this.cancelling()) return;
+    this.cancelling.set(true);
     this.subscriptionsService.cancel()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.authService.applySession(response.session);
-          this.catalog = {
+          this.catalog.set({
             current: response.current,
-            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
-            notes: this.catalog?.notes ?? []
-          };
+            plans: this.catalog()?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            notes: this.catalog()?.notes ?? []
+          });
           this.uiFeedback.success('Renovação automática cancelada. Seu acesso segue ativo até o fim do ciclo atual.');
           this.cdr.markForCheck();
         },
@@ -210,99 +212,99 @@ export class SubscriptionsComponent implements OnInit {
           this.cdr.markForCheck();
         },
         complete: () => {
-          this.cancelling = false;
+          this.cancelling.set(false);
           this.cdr.markForCheck();
         }
       });
   }
 
   requestTrial(): void {
-    if (this.requestingTrial) return;
-    this.requestingTrial = true;
+    if (this.requestingTrial()) return;
+    this.requestingTrial.set(true);
     this.subscriptionsService.requestTrial()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.authService.applySession(response.session);
-          this.catalog = {
+          this.catalog.set({
             current: response.current,
-            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            plans: this.catalog()?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
             notes: response.notes
-          };
+          });
           this.uiFeedback.success('Período de teste ativado! Aproveite 7 dias de acesso Advanced.');
-          this.requestingTrial = false;
+          this.requestingTrial.set(false);
           this.cdr.markForCheck();
         },
         error: (err) => {
           this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível ativar o período de teste.'));
-          this.requestingTrial = false;
+          this.requestingTrial.set(false);
           this.cdr.markForCheck();
         }
       });
   }
 
   requestRefund(): void {
-    this.confirmRefundOpen = true;
+    this.confirmRefundOpen.set(true);
   }
 
   performRefund(): void {
-    this.confirmRefundOpen = false;
-    if (this.requestingRefund) return;
-    this.requestingRefund = true;
+    this.confirmRefundOpen.set(false);
+    if (this.requestingRefund()) return;
+    this.requestingRefund.set(true);
     this.subscriptionsService.requestRefund()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.authService.applySession(response.session);
-          this.catalog = {
+          this.catalog.set({
             current: response.current,
-            plans: this.catalog?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
+            plans: this.catalog()?.plans.map((item) => ({ ...item, current: item.code === response.current.planCode })) ?? [],
             notes: response.notes
-          };
+          });
           this.uiFeedback.success('Reembolso solicitado. O estorno será processado em até 5 dias úteis.');
-          this.requestingRefund = false;
+          this.requestingRefund.set(false);
           this.cdr.markForCheck();
         },
         error: (err) => {
           this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível processar o reembolso.'));
-          this.requestingRefund = false;
+          this.requestingRefund.set(false);
           this.cdr.markForCheck();
         }
       });
   }
 
   retryPayment(): void {
-    if (this.retrying) return;
-    this.retrying = true;
+    if (this.retrying()) return;
+    this.retrying.set(true);
     this.subscriptionsService.retryPayment()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.uiFeedback.success('Pagamento enviado. Seu acesso será reativado assim que a confirmação chegar.');
-          this.retrying = false;
+          this.retrying.set(false);
           this.cdr.markForCheck();
         },
         error: (err) => {
           this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível processar o pagamento.'));
-          this.retrying = false;
+          this.retrying.set(false);
           this.cdr.markForCheck();
         }
       });
   }
 
   private load(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.subscriptionsService.getCatalog()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (catalog) => {
-          this.catalog = catalog;
-          this.loading = false;
+          this.catalog.set(catalog);
+          this.loading.set(false);
           this.cdr.markForCheck();
         },
         error: () => {
-          this.catalog = null;
-          this.loading = false;
+          this.catalog.set(null);
+          this.loading.set(false);
           this.cdr.markForCheck();
         }
       });

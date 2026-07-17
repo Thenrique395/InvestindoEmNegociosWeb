@@ -29,26 +29,26 @@
       </div>
     </div>
     <div class="actions">
-      <button type="button" class="btn-primary" (click)="simulate()" [disabled]="loading">
-        {{ loading ? 'Simulando...' : 'Simular cenário' }}
+      <button type="button" class="btn-primary" (click)="simulate()" [disabled]="loading()">
+        {{ loading() ? 'Simulando...' : 'Simular cenário' }}
       </button>
     </div>
   </article>
 
-  @if (error) {
+  @if (error()) {
     <app-ui-state
       type="error"
       title="Não foi possível concluir a operação."
-      [description]="error"
+      [description]="error()"
       retryLabel="Tentar novamente"
       (retry)="simulate()" />
   }
 
-  @if (loading) {
+  @if (loading()) {
     <app-ui-state type="loading" />
   }
 
-  @if (!loading && result) {
+  @if (!loading() && result(); as result) {
     <section class="results-grid">
       <app-transaction-summary-card
         tone="info"

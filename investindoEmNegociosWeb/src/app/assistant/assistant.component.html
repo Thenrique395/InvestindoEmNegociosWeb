@@ -3,12 +3,12 @@
     eyebrow="Assistente financeiro"
     title="Pergunte com contexto real"
     description="Conversa guiada com base em SDR, projeção, dívida, patrimônio, risco e recomendações já calculadas.">
-    @if (context?.governanceSummary; as gov) {
+    @if (context()?.governanceSummary; as gov) {
       <span page-meta class="header-meta">{{ gov }}</span>
     }
   </app-page-header>
 
-  @if (context; as c) {
+  @if (context(); as c) {
     <section class="assistant-summary-grid">
       <app-transaction-summary-card
         tone="primary"
@@ -49,15 +49,15 @@
     </section>
   }
 
-  @if (loading) {
+  @if (loading()) {
     <app-ui-state type="loading" />
   }
 
-  @if (error) {
+  @if (error()) {
     <app-ui-state
       type="error"
       title="Não foi possível concluir a operação."
-      [description]="error"
+      [description]="error()"
       retryLabel="Tentar novamente"
       (retry)="load()" />
   }
@@ -70,12 +70,13 @@
       <label class="sr-only" for="assistant-question">Pergunta</label>
       <textarea
         id="assistant-question"
-        [(ngModel)]="question"
+        [ngModel]="question()"
+        (ngModelChange)="question.set($event)"
         rows="4"
         placeholder="Ex.: Qual é meu maior risco financeiro neste mês?"></textarea>
       <div class="actions">
-        <button class="btn-primary" type="button" (click)="send()" [disabled]="sending || loading || !question.trim()">
-          {{ sending ? 'Respondendo...' : 'Perguntar' }}
+        <button class="btn-primary" type="button" (click)="send()" [disabled]="sending() || loading() || !question().trim()">
+          {{ sending() ? 'Respondendo...' : 'Perguntar' }}
         </button>
       </div>
     </div>

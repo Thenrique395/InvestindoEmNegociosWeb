@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BillingCheckoutStatusResponse, BillingService } from '../billing.service';
@@ -14,9 +14,10 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckoutPendingComponent {
-  plan: MarketingPlan = findMarketingPlan(null);
-  cycle: MarketingBillingCycle = 'Monthly';
-  status: BillingCheckoutStatusResponse | null = null;
+  // Estado por signal (A9): status/plan/cycle vêm de callback assíncrono (HTTP fora da zona).
+  readonly plan = signal<MarketingPlan>(findMarketingPlan(null));
+  readonly cycle = signal<MarketingBillingCycle>('Monthly');
+  readonly status = signal<BillingCheckoutStatusResponse | null>(null);
 
   constructor(route: ActivatedRoute, private readonly billingService: BillingService) {
     const cdr = inject(ChangeDetectorRef);
@@ -24,14 +25,14 @@ export class CheckoutPendingComponent {
 
     route.queryParamMap.pipe(takeUntilDestroyed(destroyRef)).subscribe((params) => {
       const checkoutId = params.get('checkout_id');
-      this.plan = findMarketingPlan(params.get('plan'));
-      this.cycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
+      this.plan.set(findMarketingPlan(params.get('plan')));
+      this.cycle.set(params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly');
       if (!checkoutId) return;
       this.billingService.getCheckoutStatus(checkoutId).subscribe({
         next: (status) => {
-          this.status = status;
-          this.plan = findMarketingPlan(status.planCode);
-          this.cycle = status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly';
+          this.status.set(status);
+          this.plan.set(findMarketingPlan(status.planCode));
+          this.cycle.set(status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly');
           cdr.markForCheck();
         },
         error: () => void 0

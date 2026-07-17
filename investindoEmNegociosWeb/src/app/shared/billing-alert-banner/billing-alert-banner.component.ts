@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
@@ -22,7 +22,8 @@ interface BillingAlert {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BillingAlertBannerComponent implements OnInit {
-  alert: BillingAlert | null = null;
+  // Estado por signal (A9): alert vem de callback assíncrono (HTTP fora da zona).
+  readonly alert = signal<BillingAlert | null>(null);
 
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
@@ -39,7 +40,7 @@ export class BillingAlertBannerComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (catalog) => {
-          this.alert = this.computeAlert(catalog.current);
+          this.alert.set(this.computeAlert(catalog.current));
           this.cdr.markForCheck();
         },
         error: () => void 0

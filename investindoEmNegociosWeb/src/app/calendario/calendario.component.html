@@ -25,35 +25,35 @@
   </app-page-header>
 
   <section class="cal-summary" aria-label="Resumo do período">
-    <app-transaction-summary-card tone="success" eyebrow="Receitas previstas" [value]="periodSummary.incomeForecast | appCurrency"
+    <app-transaction-summary-card tone="success" eyebrow="Receitas previstas" [value]="periodSummary().incomeForecast | appCurrency"
       [note]="'Entradas previstas em ' + monthTitle + '.'">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="danger" eyebrow="Despesas previstas" [value]="periodSummary.expenseForecast | appCurrency"
+    <app-transaction-summary-card tone="danger" eyebrow="Despesas previstas" [value]="periodSummary().expenseForecast | appCurrency"
       note="Contas e parcelas a pagar no período.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card [tone]="periodSummary.projectedBalance >= 0 ? 'info' : 'warning'" eyebrow="Saldo previsto"
-      [value]="periodSummary.projectedBalance | appCurrency" note="Diferença entre o que entra e o que sai.">
+    <app-transaction-summary-card [tone]="periodSummary().projectedBalance >= 0 ? 'info' : 'warning'" eyebrow="Saldo previsto"
+      [value]="periodSummary().projectedBalance | appCurrency" note="Diferença entre o que entra e o que sai.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 16c1.5 2 3.5 3 6 3 3.5 0 6-2 6-6 0-3.2-2.3-5.5-5.7-5.5H6.5M6 16V9m0 7h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="primary" eyebrow="Compromissos" [value]="periodSummary.commitments.toString()"
-      [note]="'Vencimentos no mês: ' + periodSummary.dueCount">
+    <app-transaction-summary-card tone="primary" eyebrow="Compromissos" [value]="periodSummary().commitments.toString()"
+      [note]="'Vencimentos no mês: ' + periodSummary().dueCount">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M7 3v3m10-3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="warning" eyebrow="Pendências" [value]="pending.length.toString()"
+    <app-transaction-summary-card tone="warning" eyebrow="Pendências" [value]="pending().length.toString()"
       note="Compromissos atrasados a regularizar.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -88,7 +88,7 @@
           <span class="cal-select__label">Categoria</span>
           <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()">
             <option value="all">Todas</option>
-            @for (category of categoryOptions; track category) {
+            @for (category of categoryOptions(); track category) {
               <option [value]="category">{{ category }}</option>
             }
           </select>
@@ -118,7 +118,7 @@
 
   <div class="cal-layout">
     <section class="cal-main">
-      @if (!viewHasEvents) {
+      @if (!viewHasEvents()) {
         <div class="cal-empty">
           <app-empty-state
             icon="🗓️"
@@ -131,7 +131,7 @@
         @switch (view) {
           @case ('month') {
             <app-financial-calendar
-              [events]="allEvents"
+              [events]="allEvents()"
               [monthRef]="currentMonth"
               [selectedDate]="selectedDate"
               [today]="today"
@@ -143,11 +143,11 @@
                   <p class="cal-day__eyebrow">Dia selecionado</p>
                   <h2 class="cal-day__title">{{ selectedDateLabel }}</h2>
                 </div>
-                <app-status-badge tone="info" [label]="dayEvents.length + ' compromisso(s)'" />
+                <app-status-badge tone="info" [label]="dayEvents().length + ' compromisso(s)'" />
               </header>
-              @if (dayEvents.length) {
+              @if (dayEvents().length) {
                 <div class="cal-day__events">
-                  @for (event of dayEvents; track event.id) {
+                  @for (event of dayEvents(); track event.id) {
                     <app-financial-event-card [event]="event" [pending]="pendingPaymentIds.has(event.id)" (markDone)="markDone($event)" />
                   }
                 </div>
@@ -157,13 +157,13 @@
             </section>
           }
           @case ('week') {
-            <app-financial-agenda [groups]="weekGroups" [today]="today" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
+            <app-financial-agenda [groups]="weekGroups()" [today]="today" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
           }
           @case ('agenda') {
-            <app-financial-agenda [groups]="agendaGroups" [today]="today" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
+            <app-financial-agenda [groups]="agendaGroups()" [today]="today" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
           }
           @case ('timeline') {
-            <app-financial-timeline [buckets]="timelineBuckets" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
+            <app-financial-timeline [buckets]="timelineBuckets()" [pendingIds]="pendingPaymentIds" (markDone)="markDone($event)" />
           }
         }
       }
@@ -171,9 +171,9 @@
 
     <aside class="cal-aside">
       <app-calendar-sidebar
-        [digest]="digest"
-        [upcoming]="upcoming"
-        [pending]="pending"
+        [digest]="digest()"
+        [upcoming]="upcoming()"
+        [pending]="pending()"
         (eventSelected)="onEventSelected($event)" />
     </aside>
   </div>

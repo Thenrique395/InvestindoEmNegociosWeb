@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -39,38 +39,40 @@ import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, G
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MetasComponent implements OnInit {
-  loading = false;
+  // Estado reativo por signal (A9): loadGoals/rebuild e os callbacks de salvar/aporte
+  // rodam fora da zona (withFetch), então signals dirigem a re-render OnPush.
+  readonly loading = signal(false);
   goals: Goal[] = [];
   private progressMap: Record<string, GoalProgress> = {};
-  views: GoalView[] = [];
-  filtered: GoalView[] = [];
-  summary: GoalsSummary = { total: 0, active: 0, achieved: 0, attention: 0, avgProgress: 0 };
-  tab: GoalTab = 'all';
+  readonly views = signal<GoalView[]>([]);
+  readonly tab = signal<GoalTab>('all');
+  readonly filtered = computed(() => filterGoals(this.views(), this.tab()));
+  readonly summary = computed<GoalsSummary>(() => buildGoalsSummary(this.views()));
 
-  categories: CategoryDto[] = [];
+  readonly categories = signal<CategoryDto[]>([]);
 
   // Modal criar/editar
-  showForm = false;
-  saving = false;
+  readonly showForm = signal(false);
+  readonly saving = signal(false);
   editingId: string | null = null;
   private editingGoalRef: Goal | null = null;
   form = this.emptyForm();
 
-  // Aporte (investimento)
-  showContribute = false;
-  contributing = false;
+  // Aporte (investimento) — campos ngModel (usuário digita, dentro da zona) ficam plain
+  readonly showContribute = signal(false);
+  readonly contributing = signal(false);
   contributeGoal?: Goal;
   contributeAmount = '';
   contributeDate = new Date().toISOString().slice(0, 10);
   contributeNote = '';
 
-  // Detalhes
+  // Detalhes (showDetails/detailsGoal são setados só em handlers síncronos)
   showDetails = false;
   detailsGoal?: Goal;
   detailsProgress?: GoalProgress | null;
-  detailsOccurrences: GoalOccurrence[] = [];
+  readonly detailsOccurrences = signal<GoalOccurrence[]>([]);
 
-  // Exclusão
+  // Exclusão (setado só em handlers síncronos)
   deleteTarget: Goal | null = null;
 
   readonly kindOptions: SegmentOption[] = [
@@ -97,7 +99,7 @@ export class MetasComponent implements OnInit {
 
   ngOnInit(): void {
     this.categoriesStore.load();
-    this.categories = this.categoriesStore.categories();
+    this.categories.set(this.categoriesStore.categories());
     this.loadGoals();
   }
 
@@ -113,8 +115,8 @@ export class MetasComponent implements OnInit {
   }
 
   get categoryOptions(): CategoryDto[] {
-    if (this.form.kind === 'Income') return this.categories.filter((c) => c.appliesTo === 'Income');
-    if (this.form.kind === 'Expense') return this.categories.filter((c) => c.appliesTo === 'Expense');
+    if (this.form.kind === 'Income') return this.categories().filter((c) => c.appliesTo === 'Income');
+    if (this.form.kind === 'Expense') return this.categories().filter((c) => c.appliesTo === 'Expense');
     return [];
   }
 
@@ -123,34 +125,30 @@ export class MetasComponent implements OnInit {
   }
 
   setTab(tab: string): void {
-    this.tab = tab as GoalTab;
-    this.filtered = filterGoals(this.views, this.tab);
-    this.cdr.markForCheck();
+    this.tab.set(tab as GoalTab);
   }
 
   loadGoals(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.goalsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (goals) => {
         this.goals = goals || [];
-        if (!this.goals.length) { this.loading = false; this.rebuild(); return; }
+        if (!this.goals.length) { this.loading.set(false); this.rebuild(); return; }
         forkJoin(this.goals.map((g) => this.goalsService.getProgress(g.id).pipe(catchError(() => of(null)))))
           .subscribe((progresses) => {
             this.progressMap = {};
             this.goals.forEach((g, i) => { if (progresses[i]) this.progressMap[g.id] = progresses[i]!; });
-            this.loading = false;
+            this.loading.set(false);
             this.rebuild();
           });
       },
-      error: () => { this.loading = false; this.uiFeedback.error('Não foi possível carregar as metas.'); this.cdr.markForCheck(); }
+      error: () => { this.loading.set(false); this.uiFeedback.error('Não foi possível carregar as metas.'); this.cdr.markForCheck(); }
     });
   }
 
   private rebuild(): void {
-    this.categories = this.categoriesStore.categories();
-    this.views = this.goals.map((g) => buildGoalView(g, this.progressMap[g.id]));
-    this.summary = buildGoalsSummary(this.views);
-    this.filtered = filterGoals(this.views, this.tab);
+    this.categories.set(this.categoriesStore.categories());
+    this.views.set(this.goals.map((g) => buildGoalView(g, this.progressMap[g.id])));
     this.cdr.markForCheck();
   }
 
@@ -178,7 +176,7 @@ export class MetasComponent implements OnInit {
     this.editingId = null;
     this.editingGoalRef = null;
     this.form = this.emptyForm();
-    this.showForm = true;
+    this.showForm.set(true);
   }
 
   openEdit(goal: Goal): void {
@@ -197,7 +195,7 @@ export class MetasComponent implements OnInit {
       criticalThreshold: goal.criticalThreshold != null ? String(goal.criticalThreshold) : '100',
       categoryId: goal.scopes?.find((s) => s.scopeType === 'Category')?.refId ?? ''
     };
-    this.showForm = true;
+    this.showForm.set(true);
   }
 
   setFormKind(kind: string): void {
@@ -206,8 +204,8 @@ export class MetasComponent implements OnInit {
   }
 
   closeForm(): void {
-    if (this.saving) return;
-    this.showForm = false;
+    if (this.saving()) return;
+    this.showForm.set(false);
   }
 
   save(): void {
@@ -243,19 +241,19 @@ export class MetasComponent implements OnInit {
       scopes
     };
 
-    this.saving = true;
+    this.saving.set(true);
     const op = this.editingId
       ? this.goalsService.update(this.editingId, payload)
       : this.goalsService.create(payload);
 
     op.subscribe({
       next: () => {
-        this.saving = false;
-        this.showForm = false;
+        this.saving.set(false);
+        this.showForm.set(false);
         this.uiFeedback.success(this.editingId ? 'Meta atualizada.' : 'Meta criada.');
         this.loadGoals();
       },
-      error: (err) => { this.saving = false; this.uiFeedback.error(err?.error ?? 'Não foi possível salvar a meta.'); this.cdr.markForCheck(); }
+      error: (err) => { this.saving.set(false); this.uiFeedback.error(err?.error ?? 'Não foi possível salvar a meta.'); this.cdr.markForCheck(); }
     });
   }
 
@@ -266,19 +264,19 @@ export class MetasComponent implements OnInit {
     this.contributeAmount = '';
     this.contributeDate = new Date().toISOString().slice(0, 10);
     this.contributeNote = '';
-    this.showContribute = true;
+    this.showContribute.set(true);
   }
 
-  closeContribute(): void { if (!this.contributing) this.showContribute = false; }
+  closeContribute(): void { if (!this.contributing()) this.showContribute.set(false); }
 
   saveContribution(): void {
     const goal = this.contributeGoal;
     const amount = Number(this.contributeAmount);
     if (!goal || !Number.isFinite(amount) || amount <= 0) { this.uiFeedback.warning('Informe um valor de aporte válido.'); return; }
-    this.contributing = true;
+    this.contributing.set(true);
     this.goalsService.addContribution(goal.id, { amount, date: this.contributeDate, note: this.contributeNote.trim() || null }).subscribe({
-      next: () => { this.contributing = false; this.showContribute = false; this.uiFeedback.success('Aporte registrado.'); this.loadGoals(); },
-      error: () => { this.contributing = false; this.uiFeedback.error('Não foi possível registrar o aporte.'); this.cdr.markForCheck(); }
+      next: () => { this.contributing.set(false); this.showContribute.set(false); this.uiFeedback.success('Aporte registrado.'); this.loadGoals(); },
+      error: () => { this.contributing.set(false); this.uiFeedback.error('Não foi possível registrar o aporte.'); this.cdr.markForCheck(); }
     });
   }
 
@@ -287,10 +285,10 @@ export class MetasComponent implements OnInit {
   openDetails(goal: Goal): void {
     this.detailsGoal = goal;
     this.detailsProgress = this.progressMap[goal.id] ?? null;
-    this.detailsOccurrences = [];
+    this.detailsOccurrences.set([]);
     this.showDetails = true;
     this.goalsService.getOccurrences(goal.id).pipe(catchError(() => of([] as GoalOccurrence[]))).subscribe((occ) => {
-      this.detailsOccurrences = occ;
+      this.detailsOccurrences.set(occ);
       this.cdr.markForCheck();
     });
   }

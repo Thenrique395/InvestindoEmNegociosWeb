@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FinancialAssistantPromptContextResponse, FinancialAssistantService } from '../financial-assistant.service';
@@ -28,18 +28,20 @@ import { assistantRiskTone } from './assistant-context.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssistantComponent implements OnInit {
-  context: FinancialAssistantPromptContextResponse | null = null;
-  question = '';
-  loading = false;
-  sending = false;
-  error = '';
+  // Estado por signal (A9): context/loading/sending/error e o campo question (resetado
+  // no callback assíncrono do chat) vêm de respostas HTTP fora da zona.
+  readonly context = signal<FinancialAssistantPromptContextResponse | null>(null);
+  readonly question = signal('');
+  readonly loading = signal(false);
+  readonly sending = signal(false);
+  readonly error = signal('');
 
   get conversation() {
     return this.assistantService.conversation;
   }
 
   get riskTone(): TransactionSummaryTone {
-    return assistantRiskTone(this.context?.risk?.score ?? 0);
+    return assistantRiskTone(this.context()?.risk?.score ?? 0);
   }
 
   constructor(
@@ -53,37 +55,38 @@ export class AssistantComponent implements OnInit {
   }
 
   load(): void {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.assistantService.context().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (context) => {
-        this.context = context;
-        this.loading = false;
+        this.context.set(context);
+        this.loading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = extractApiErrorMessage(err, 'Falha ao carregar contexto do assistente.');
-        this.loading = false;
+        this.error.set(extractApiErrorMessage(err, 'Falha ao carregar contexto do assistente.'));
+        this.loading.set(false);
         this.cdr.markForCheck();
       }
     });
   }
 
   send(): void {
-    if (!this.question.trim()) return;
-    this.sending = true;
-    this.error = '';
-    this.assistantService.chat(this.question).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const question = this.question().trim();
+    if (!question) return;
+    this.sending.set(true);
+    this.error.set('');
+    this.assistantService.chat(question).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.assistantService.addMessage(response);
-        this.context = response.context;
-        this.question = '';
-        this.sending = false;
+        this.context.set(response.context);
+        this.question.set('');
+        this.sending.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = extractApiErrorMessage(err, 'Falha ao conversar com o assistente.');
-        this.sending = false;
+        this.error.set(extractApiErrorMessage(err, 'Falha ao conversar com o assistente.'));
+        this.sending.set(false);
         this.cdr.markForCheck();
       }
     });

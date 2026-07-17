@@ -9,30 +9,30 @@
     </div>
   </app-page-header>
 
-  @if (views.length) {
+  @if (views().length) {
     <section class="metas-summary" aria-label="Resumo das metas">
-      <app-transaction-summary-card tone="primary" eyebrow="Metas ativas" [value]="summary.active.toString()" note="Em acompanhamento agora.">
+      <app-transaction-summary-card tone="primary" eyebrow="Metas ativas" [value]="summary().active.toString()" note="Em acompanhamento agora.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M12 3v4m0 10v4M3 12h4m10 0h4M6 6l2.5 2.5M18 18l-2.5-2.5M6 18l2.5-2.5M18 6l-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </app-transaction-summary-card>
-      <app-transaction-summary-card tone="success" eyebrow="Atingidas" [value]="summary.achieved.toString()" note="Objetivo alcançado.">
+      <app-transaction-summary-card tone="success" eyebrow="Atingidas" [value]="summary().achieved.toString()" note="Objetivo alcançado.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </app-transaction-summary-card>
-      <app-transaction-summary-card tone="warning" eyebrow="Precisam de atenção" [value]="summary.attention.toString()" note="Atrasadas, excedidas ou fora do ritmo.">
+      <app-transaction-summary-card tone="warning" eyebrow="Precisam de atenção" [value]="summary().attention.toString()" note="Atrasadas, excedidas ou fora do ritmo.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </app-transaction-summary-card>
-      <app-transaction-summary-card tone="info" eyebrow="Progresso médio" [value]="summary.avgProgress + '%'" note="Média das metas em andamento.">
+      <app-transaction-summary-card tone="info" eyebrow="Progresso médio" [value]="summary().avgProgress + '%'" note="Média das metas em andamento.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M4 18V9m5 9V5m5 13v-7m5 7V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       </app-transaction-summary-card>
     </section>
 
     <div class="metas-tabs">
-      <app-segmented-selector [options]="tabOptions" [value]="tab" ariaLabel="Filtrar metas" (valueChange)="setTab($event)" />
+      <app-segmented-selector [options]="tabOptions" [value]="tab()" ariaLabel="Filtrar metas" (valueChange)="setTab($event)" />
     </div>
   }
 
-  @if (loading && !views.length) {
+  @if (loading() && !views().length) {
     <div class="metas-hint">Carregando metas...</div>
-  } @else if (!views.length) {
+  } @else if (!views().length) {
     <app-empty-state
       icon="🎯"
       title="Você ainda não criou nenhuma meta."
@@ -40,11 +40,11 @@
       ctaLabel="Criar primeira meta"
       (action)="openCreate()">
     </app-empty-state>
-  } @else if (!filtered.length) {
+  } @else if (!filtered().length) {
     <app-empty-state title="Nenhuma meta neste filtro" description="Ajuste o filtro para ver suas metas."></app-empty-state>
   } @else {
     <div class="metas-grid">
-      @for (view of filtered; track view.goal.id) {
+      @for (view of filtered(); track view.goal.id) {
         <app-goal-card
           [view]="view"
           (details)="openDetails($event)"
@@ -61,7 +61,7 @@
   }
 
   <!-- Criar / editar meta -->
-  <app-modal [open]="showForm" eyebrow="Planejamento" [title]="editingId ? 'Editar meta' : 'Nova meta'" size="md" (close)="closeForm()">
+  <app-modal [open]="showForm()" eyebrow="Planejamento" [title]="editingId ? 'Editar meta' : 'Nova meta'" size="md" (close)="closeForm()">
     <div class="metas-form" modal-body>
       <div class="metas-form__kind">
         <span class="metas-form__label">Tipo de meta</span>
@@ -104,12 +104,12 @@
     </div>
     <div modal-footer>
       <button type="button" class="btn-ghost sm" (click)="closeForm()">Cancelar</button>
-      <button type="button" class="btn-primary sm" (click)="save()" [disabled]="saving">{{ saving ? 'Salvando...' : (editingId ? 'Salvar' : 'Criar meta') }}</button>
+      <button type="button" class="btn-primary sm" (click)="save()" [disabled]="saving()">{{ saving() ? 'Salvando...' : (editingId ? 'Salvar' : 'Criar meta') }}</button>
     </div>
   </app-modal>
 
   <!-- Aporte (investimento) -->
-  <app-modal [open]="showContribute" eyebrow="Investimento" title="Registrar aporte" size="sm" (close)="closeContribute()">
+  <app-modal [open]="showContribute()" eyebrow="Investimento" title="Registrar aporte" size="sm" (close)="closeContribute()">
     <div class="metas-form" modal-body>
       <app-form-field label="Valor do aporte (R$)"><input type="number" inputmode="decimal" [(ngModel)]="contributeAmount" placeholder="0,00" /></app-form-field>
       <app-form-field label="Data"><input type="date" [(ngModel)]="contributeDate" /></app-form-field>
@@ -117,7 +117,7 @@
     </div>
     <div modal-footer>
       <button type="button" class="btn-ghost sm" (click)="closeContribute()">Cancelar</button>
-      <button type="button" class="btn-primary sm" (click)="saveContribution()" [disabled]="contributing">{{ contributing ? 'Salvando...' : 'Registrar' }}</button>
+      <button type="button" class="btn-primary sm" (click)="saveContribution()" [disabled]="contributing()">{{ contributing() ? 'Salvando...' : 'Registrar' }}</button>
     </div>
   </app-modal>
 
@@ -135,9 +135,9 @@
       }
 
       <h4 class="metas-details__h">Evolução por período</h4>
-      @if (detailsOccurrences.length) {
+      @if (detailsOccurrences().length) {
         <ul class="metas-occ">
-          @for (o of detailsOccurrences; track o.id) {
+          @for (o of detailsOccurrences(); track o.id) {
             <li class="metas-occ__row" [class.metas-occ__row--current]="o.isCurrent">
               <span>{{ o.periodStart }} — {{ o.periodEnd }}</span>
               <span>{{ o.realized | appCurrency }} / {{ o.targetAmount | appCurrency }}</span>

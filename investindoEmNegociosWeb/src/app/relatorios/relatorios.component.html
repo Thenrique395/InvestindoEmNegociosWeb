@@ -8,7 +8,7 @@
         <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
         <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
       </div>
-      @if (report) {
+      @if (report()) {
         <div class="relatorios-export">
           <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
           <button type="button" class="btn-ghost sm" (click)="exportPdf()">Exportar PDF</button>
@@ -17,20 +17,20 @@
     </div>
   </app-page-header>
 
-  @if (loading) {
+  @if (loading()) {
     <app-ui-state type="loading" />
   }
 
-  @if (!loading && error) {
+  @if (!loading() && error()) {
     <app-ui-state
       type="error"
       title="Não foi possível concluir a operação."
-      [description]="error"
+      [description]="error()"
       retryLabel="Tentar novamente"
       (retry)="load()" />
   }
 
-  @if (!loading && !error && report) {
+  @if (!loading() && !error() && report(); as report) {
     <section class="summary-grid">
       <app-transaction-summary-card
         tone="success"

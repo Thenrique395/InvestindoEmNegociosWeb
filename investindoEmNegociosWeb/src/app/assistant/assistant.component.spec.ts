@@ -30,8 +30,8 @@ describe('AssistantComponent', () => {
     component.ngOnInit();
 
     expect(service.context).toHaveBeenCalled();
-    expect(component.context?.risk.score).toBe(20);
-    expect(component.loading).toBeFalse();
+    expect(component.context()?.risk.score).toBe(20);
+    expect(component.loading()).toBeFalse();
   });
 
   it('sinaliza erro quando o contexto falha', () => {
@@ -44,13 +44,13 @@ describe('AssistantComponent', () => {
 
     component.load();
 
-    expect(component.error).toBe('boom');
-    expect(component.loading).toBeFalse();
+    expect(component.error()).toBe('boom');
+    expect(component.loading()).toBeFalse();
   });
 
   it('não envia pergunta em branco', () => {
     const { component, service } = createComponent();
-    component.question = '   ';
+    component.question.set('   ');
 
     component.send();
 
@@ -59,23 +59,23 @@ describe('AssistantComponent', () => {
 
   it('envia a pergunta e atualiza o contexto da resposta', () => {
     const { component, service } = createComponent();
-    component.question = 'Qual meu risco?';
+    component.question.set('Qual meu risco?');
 
     component.send();
 
     expect(service.chat).toHaveBeenCalledWith('Qual meu risco?');
     expect(service.addMessage).toHaveBeenCalled();
-    expect(component.context?.risk.score).toBe(70);
-    expect(component.question).toBe('');
-    expect(component.sending).toBeFalse();
+    expect(component.context()?.risk.score).toBe(70);
+    expect(component.question()).toBe('');
+    expect(component.sending()).toBeFalse();
   });
 
   it('deriva o tom do risco a partir do contexto', () => {
     const { component } = createComponent();
-    component.context = contextObj(80);
+    component.context.set(contextObj(80));
     expect(component.riskTone).toBe('danger');
 
-    component.context = contextObj(10);
+    component.context.set(contextObj(10));
     expect(component.riskTone).toBe('success');
   });
 });

@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -15,10 +15,11 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckoutSuccessComponent {
-  plan: MarketingPlan = findMarketingPlan(null);
-  cycle: MarketingBillingCycle = 'Monthly';
-  status: BillingCheckoutStatusResponse | null = null;
-  loading = true;
+  // Estado por signal (A9): status/plan/cycle/loading vêm de callback assíncrono (HTTP fora da zona).
+  readonly plan = signal<MarketingPlan>(findMarketingPlan(null));
+  readonly cycle = signal<MarketingBillingCycle>('Monthly');
+  readonly status = signal<BillingCheckoutStatusResponse | null>(null);
+  readonly loading = signal(true);
 
   constructor(
     route: ActivatedRoute,
@@ -31,8 +32,8 @@ export class CheckoutSuccessComponent {
     route.queryParamMap.pipe(takeUntilDestroyed(destroyRef)).subscribe((params) => {
       const sessionId = params.get('session_id');
       const checkoutId = params.get('checkout_id');
-      this.plan = findMarketingPlan(params.get('plan'));
-      this.cycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
+      this.plan.set(findMarketingPlan(params.get('plan')));
+      this.cycle.set(params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly');
 
       const request$ = sessionId
         ? this.billingService.getCheckoutStatusBySession(sessionId)
@@ -41,24 +42,24 @@ export class CheckoutSuccessComponent {
           : null;
 
       if (!request$) {
-        this.loading = false;
+        this.loading.set(false);
         cdr.markForCheck();
         return;
       }
 
       request$.subscribe({
         next: (status) => {
-          this.status = status;
-          this.plan = findMarketingPlan(status.planCode);
-          this.cycle = status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly';
+          this.status.set(status);
+          this.plan.set(findMarketingPlan(status.planCode));
+          this.cycle.set(status.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly');
           if (status.subscriptionActive && this.authService.isAuthenticated()) {
             this.authService.refresh().subscribe({ error: () => void 0 });
           }
-          this.loading = false;
+          this.loading.set(false);
           cdr.markForCheck();
         },
         error: () => {
-          this.loading = false;
+          this.loading.set(false);
           cdr.markForCheck();
         }
       });

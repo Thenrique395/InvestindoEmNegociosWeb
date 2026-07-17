@@ -34,9 +34,9 @@ describe('CenariosComponent', () => {
     component.simulate();
 
     expect(service.simulate).toHaveBeenCalledWith(jasmine.objectContaining({ period: 'month', referenceDate: null }));
-    expect(component.result?.impactAmount).toBe(200);
-    expect(component.loading).toBeFalse();
-    expect(component.error).toBe('');
+    expect(component.result()?.impactAmount).toBe(200);
+    expect(component.loading()).toBeFalse();
+    expect(component.error()).toBe('');
   });
 
   it('sinaliza erro quando a simulação falha', () => {
@@ -46,18 +46,18 @@ describe('CenariosComponent', () => {
 
     component.simulate();
 
-    expect(component.error).toBe('boom');
-    expect(component.loading).toBeFalse();
+    expect(component.error()).toBe('boom');
+    expect(component.loading()).toBeFalse();
   });
 
   it('deriva sinal, tendência e tom do impacto', () => {
     const { component } = createComponent();
-    component.result = result({ impactAmount: 200 });
+    component.result.set(result({ impactAmount: 200 }));
     expect(component.impactSign).toBe('+');
     expect(component.impactTrend).toBe('up');
     expect(component.scenarioTone).toBe('success');
 
-    component.result = result({ impactAmount: -50 });
+    component.result.set(result({ impactAmount: -50 }));
     expect(component.impactSign).toBe('');
     expect(component.impactTrend).toBe('down');
     expect(component.scenarioTone).toBe('danger');
@@ -65,7 +65,7 @@ describe('CenariosComponent', () => {
 
   it('expõe os pontos de projeção derivados', () => {
     const { component } = createComponent();
-    component.result = result();
+    component.result.set(result());
 
     expect(component.pointViews.length).toBe(1);
     expect(component.pointViews[0].difference).toBe(100);

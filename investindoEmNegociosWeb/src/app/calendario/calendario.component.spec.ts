@@ -79,9 +79,9 @@ describe('CalendarioComponent', () => {
     fixture.detectChanges();
 
     // 15/03: Aluguel (despesa), Salario (receita), Vencimento Nubank (dia 15)
-    expect(component.dayEvents.length).toBe(3);
-    expect(component.dayEvents.some((e) => e.title.includes('Aluguel'))).toBeTrue();
-    expect(component.dayEvents.some((e) => e.group === 'card')).toBeTrue();
+    expect(component.dayEvents().length).toBe(3);
+    expect(component.dayEvents().some((e) => e.title.includes('Aluguel'))).toBeTrue();
+    expect(component.dayEvents().some((e) => e.group === 'card')).toBeTrue();
   });
 
   it('calcula o resumo do período (receitas, despesas e saldo)', () => {
@@ -89,9 +89,9 @@ describe('CalendarioComponent', () => {
     seed();
     fixture.detectChanges();
 
-    expect(component.periodSummary.incomeForecast).toBe(5000);
-    expect(component.periodSummary.expenseForecast).toBe(1320);
-    expect(component.periodSummary.projectedBalance).toBe(3680);
+    expect(component.periodSummary().incomeForecast).toBe(5000);
+    expect(component.periodSummary().expenseForecast).toBe(1320);
+    expect(component.periodSummary().projectedBalance).toBe(3680);
   });
 
   it('filtra por tipo (grupo)', () => {
@@ -100,8 +100,8 @@ describe('CalendarioComponent', () => {
     fixture.detectChanges();
 
     component.setGroupFilter('expense');
-    expect(component.dayEvents.every((e) => e.group === 'expense')).toBeTrue();
-    expect(component.dayEvents.length).toBe(1);
+    expect(component.dayEvents().every((e) => e.group === 'expense')).toBeTrue();
+    expect(component.dayEvents().length).toBe(1);
   });
 
   it('filtra por categoria e status quando avançado', () => {
@@ -114,8 +114,8 @@ describe('CalendarioComponent', () => {
     component.selectedStatus = 'overdue';
     component.onFilterChange();
 
-    expect(component.dayEvents.length).toBe(1);
-    expect(component.dayEvents[0].title).toContain('Aluguel');
+    expect(component.dayEvents().length).toBe(1);
+    expect(component.dayEvents()[0].title).toContain('Aluguel');
   });
 
   it('troca de visualização', () => {
@@ -125,7 +125,7 @@ describe('CalendarioComponent', () => {
 
     component.setView('timeline');
     expect(component.view).toBe('timeline');
-    expect(Array.isArray(component.timelineBuckets)).toBeTrue();
+    expect(Array.isArray(component.timelineBuckets())).toBeTrue();
   });
 
   it('navega entre meses e reposiciona a seleção', () => {
@@ -155,7 +155,7 @@ describe('CalendarioComponent', () => {
     seed();
     fixture.detectChanges();
 
-    const expenseEvent = component.dayEvents.find((e) => e.group === 'expense')!;
+    const expenseEvent = component.dayEvents().find((e) => e.group === 'expense')!;
     component.markDone(expenseEvent);
 
     expect(dataService.markExpensePaid).toHaveBeenCalledWith('e1', 1200, null);
@@ -166,7 +166,7 @@ describe('CalendarioComponent', () => {
     seed();
     fixture.detectChanges();
 
-    const incomeEvent = component.dayEvents.find((e) => e.group === 'income')!;
+    const incomeEvent = component.dayEvents().find((e) => e.group === 'income')!;
     component.markDone(incomeEvent);
 
     expect(dataService.markIncomeReceived).toHaveBeenCalledWith('i1', 5000, null);

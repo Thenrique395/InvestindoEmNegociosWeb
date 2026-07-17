@@ -15,25 +15,25 @@
 
   <!-- Cards de resumo -->
   <section class="cat-summary" aria-label="Resumo de categorias">
-    <app-transaction-summary-card tone="primary" eyebrow="Total de categorias" [value]="overview.total.toString()" [note]="overview.activeCount + ' ativa(s)'">
+    <app-transaction-summary-card tone="primary" eyebrow="Total de categorias" [value]="overview().total.toString()" [note]="overview().activeCount + ' ativa(s)'">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M4 7h7v7H4zM13 4h7v7h-7zM13 14h7v6h-7zM4 16h7v4H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="danger" eyebrow="Categorias de despesas" [value]="overview.expenseCount.toString()" note="Classifique suas saídas.">
+    <app-transaction-summary-card tone="danger" eyebrow="Categorias de despesas" [value]="overview().expenseCount.toString()" note="Classifique suas saídas.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="success" eyebrow="Categorias de receitas" [value]="overview.incomeCount.toString()" note="Classifique suas entradas.">
+    <app-transaction-summary-card tone="success" eyebrow="Categorias de receitas" [value]="overview().incomeCount.toString()" note="Classifique suas entradas.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="info" [eyebrow]="isAdmin ? 'Minhas categorias' : 'Personalizadas'" [value]="overview.customCount.toString()" note="Criadas por você.">
+    <app-transaction-summary-card tone="info" [eyebrow]="isAdmin ? 'Minhas categorias' : 'Personalizadas'" [value]="overview().customCount.toString()" note="Criadas por você.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       </svg>
@@ -74,7 +74,7 @@
   <!-- Lista -->
   @if (busy) {
     <div class="cat-hint">Carregando categorias...</div>
-  } @else if (!overview.total) {
+  } @else if (!overview().total) {
     <app-empty-state
       icon="🗂️"
       title="Você ainda não possui categorias cadastradas."
@@ -99,7 +99,7 @@
   }
 
   <!-- Modal criar categoria -->
-  <app-modal [open]="showModal" eyebrow="Cadastro" title="Nova categoria" size="sm" (close)="fecharModal()">
+  <app-modal [open]="showModal()" eyebrow="Cadastro" title="Nova categoria" size="sm" (close)="fecharModal()">
     <div class="cat-form" modal-body>
       <app-form-field label="Nome da categoria" [error]="categoryForm.error('name')" [submitted]="categoryForm.submitted" [animate]="categoryForm.shouldAnimate('name')">
         <input type="text" placeholder="Ex.: Moradia" [(ngModel)]="nome" (blur)="categoryForm.markTouched('name')" />
@@ -122,12 +122,12 @@
     </div>
     <div modal-footer>
       <button type="button" class="btn-ghost sm" (click)="fecharModal()">Cancelar</button>
-      <button type="button" class="btn-primary sm" (click)="adicionar()" [disabled]="saving">{{ saving ? 'Salvando...' : 'Criar categoria' }}</button>
+      <button type="button" class="btn-primary sm" (click)="adicionar()" [disabled]="saving()">{{ saving() ? 'Salvando...' : 'Criar categoria' }}</button>
     </div>
   </app-modal>
 
   <!-- Modal editar categoria de sistema (admin) -->
-  <app-modal [open]="showAdminModal" eyebrow="Sistema" title="Editar categoria de sistema" size="sm" (close)="closeAdminModal()">
+  <app-modal [open]="showAdminModal()" eyebrow="Sistema" title="Editar categoria de sistema" size="sm" (close)="closeAdminModal()">
     <div class="cat-form" modal-body>
       <app-form-field label="Nome"><input type="text" [(ngModel)]="adminName" /></app-form-field>
       <app-form-field label="Aplica em">
@@ -140,7 +140,7 @@
     </div>
     <div modal-footer>
       <button type="button" class="btn-ghost sm" (click)="closeAdminModal()">Cancelar</button>
-      <button type="button" class="btn-primary sm" (click)="saveAdmin()" [disabled]="adminSaving">{{ adminSaving ? 'Salvando...' : 'Salvar' }}</button>
+      <button type="button" class="btn-primary sm" (click)="saveAdmin()" [disabled]="adminSaving()">{{ adminSaving() ? 'Salvando...' : 'Salvar' }}</button>
     </div>
   </app-modal>
 

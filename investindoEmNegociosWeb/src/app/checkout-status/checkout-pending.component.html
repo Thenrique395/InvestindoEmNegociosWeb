@@ -1,7 +1,7 @@
 <section class="status-page status-page--pending">
   <div class="status-card">
     <p class="eyebrow">Contratação pendente</p>
-    <h1>Falta concluir a ativação do plano {{ plan.name }}</h1>
+    <h1>Falta concluir a ativação do plano {{ plan().name }}</h1>
     <p class="lead">
       Sua cobrança foi registrada e ainda depende de confirmação final do gateway ou de uma nova ação de pagamento.
     </p>
@@ -11,13 +11,13 @@
       <ul>
         <li>Entrar na sua conta</li>
         <li>Retomar o checkout ou atualizar o método de pagamento</li>
-        <li>Confirmar a contratação para o ciclo {{ cycle === 'Yearly' ? 'anual' : 'mensal' }}</li>
+        <li>Confirmar a contratação para o ciclo {{ cycle() === 'Yearly' ? 'anual' : 'mensal' }}</li>
       </ul>
     </div>
 
     <div class="status-actions">
-      <a class="btn btn--primary" [routerLink]="['/login']" [queryParams]="{ returnTo: '/checkout', plan: plan.code, cycle: cycle }">Entrar para concluir</a>
-      <a class="btn btn--ghost" [routerLink]="['/checkout']" [queryParams]="{ plan: plan.code, cycle: cycle }">Voltar ao checkout</a>
+      <a class="btn btn--primary" [routerLink]="['/login']" [queryParams]="{ returnTo: '/checkout', plan: plan().code, cycle: cycle() }">Entrar para concluir</a>
+      <a class="btn btn--ghost" [routerLink]="['/checkout']" [queryParams]="{ plan: plan().code, cycle: cycle() }">Voltar ao checkout</a>
     </div>
   </div>
 </section>

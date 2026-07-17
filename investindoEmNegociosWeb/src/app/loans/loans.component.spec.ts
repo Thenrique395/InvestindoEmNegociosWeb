@@ -59,8 +59,8 @@ describe('LoansComponent', () => {
     ctx.component.ngOnInit();
 
     expect(ctx.loansService.list).toHaveBeenCalled();
-    expect(ctx.component.contracts).toEqual([]);
-    expect(ctx.component.loading).toBeFalse();
+    expect(ctx.component.contracts()).toEqual([]);
+    expect(ctx.component.loading()).toBeFalse();
   });
 
   it('deve simular e preencher o cronograma', () => {
@@ -69,27 +69,27 @@ describe('LoansComponent', () => {
     ctx.component.simulate();
 
     expect(ctx.loansService.simulate).toHaveBeenCalledWith(ctx.component.form);
-    expect(ctx.component.simulation?.monthlyPayment).toBe(550);
-    expect(ctx.component.error).toBe('');
+    expect(ctx.component.simulation()?.monthlyPayment).toBe(550);
+    expect(ctx.component.error()).toBe('');
   });
 
   it('deve criar contrato e limpar a simulação anterior', () => {
     const ctx = createComponent();
-    ctx.component.simulation = {
+    ctx.component.simulation.set({
       monthlyPayment: 400,
       totalCost: 9600,
       totalInterest: 600,
       amortizationType: 'Price',
       installments: []
-    };
+    });
 
     ctx.component.create();
 
     expect(ctx.loansService.create).toHaveBeenCalledWith(ctx.component.form);
-    expect(ctx.component.contracts[0].id).toBe('c1');
-    expect(ctx.component.simulation).toBeNull();
+    expect(ctx.component.contracts()[0].id).toBe('c1');
+    expect(ctx.component.simulation()).toBeNull();
     expect(ctx.uiFeedback.success).toHaveBeenCalledWith(jasmine.stringContaining('Empréstimo criado'));
-    expect(ctx.component.saving).toBeFalse();
+    expect(ctx.component.saving()).toBeFalse();
   });
 
   it('deve exibir erro quando a criação falhar', () => {
@@ -104,8 +104,8 @@ describe('LoansComponent', () => {
 
     ctx.component.create();
 
-    expect(ctx.component.error).toBe('Falha ao criar');
-    expect(ctx.component.saving).toBeFalse();
+    expect(ctx.component.error()).toBe('Falha ao criar');
+    expect(ctx.component.saving()).toBeFalse();
   });
 
   function contract(partial?: any) {
@@ -120,9 +120,9 @@ describe('LoansComponent', () => {
 
   it('não exclui direto: askRemove apenas prepara a confirmação', () => {
     const ctx = createComponent();
-    ctx.component.contracts = [contract()];
+    ctx.component.contracts.set([contract()]);
 
-    ctx.component.askRemove(ctx.component.contracts[0]);
+    ctx.component.askRemove(ctx.component.contracts()[0]);
 
     expect(ctx.component.pendingDelete?.id).toBe('c1');
     expect(ctx.loansService.delete).not.toHaveBeenCalled();
@@ -137,21 +137,21 @@ describe('LoansComponent', () => {
       delete: jasmine.createSpy().and.returnValue(of(void 0))
     };
     const ctx = createComponent({ loansService });
-    ctx.component.contracts = [contract()];
-    ctx.component.askRemove(ctx.component.contracts[0]);
+    ctx.component.contracts.set([contract()]);
+    ctx.component.askRemove(ctx.component.contracts()[0]);
 
     ctx.component.confirmRemove();
 
     expect(loansService.delete).toHaveBeenCalledWith('c1');
-    expect(ctx.component.contracts.length).toBe(0);
+    expect(ctx.component.contracts().length).toBe(0);
     expect(ctx.component.pendingDelete).toBeNull();
     expect(ctx.uiFeedback.success).toHaveBeenCalledWith(jasmine.stringContaining('excluído'));
   });
 
   it('cancelRemove descarta a confirmação sem excluir', () => {
     const ctx = createComponent();
-    ctx.component.contracts = [contract()];
-    ctx.component.askRemove(ctx.component.contracts[0]);
+    ctx.component.contracts.set([contract()]);
+    ctx.component.askRemove(ctx.component.contracts()[0]);
 
     ctx.component.cancelRemove();
 
@@ -161,10 +161,10 @@ describe('LoansComponent', () => {
 
   it('filteredViews respeita o filtro de situação', () => {
     const ctx = createComponent();
-    ctx.component.contracts = [
+    ctx.component.contracts.set([
       contract({ id: 'a', status: 'Active', installments: [{ id: 'i1', installmentNo: 1, dueDate: '2026-03-10', beginningBalance: 0, principalAmount: 0, interestAmount: 0, totalAmount: 500, endingBalance: 0, status: 'Open' }] }),
       contract({ id: 'b', status: 'Closed', installments: [{ id: 'i2', installmentNo: 1, dueDate: '2026-02-10', beginningBalance: 0, principalAmount: 0, interestAmount: 0, totalAmount: 500, endingBalance: 0, status: 'Paid' }] })
-    ];
+    ]);
 
     ctx.component.setStatusFilter('closed');
 

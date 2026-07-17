@@ -8,26 +8,26 @@
         <button type="button" class="btn-ghost sm" (click)="prevMonth()">← Anterior</button>
         <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
       </div>
-      @if (budget) {
+      @if (budget()) {
         <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
       }
     </div>
   </app-page-header>
 
-  @if (loading) {
+  @if (loading()) {
     <app-ui-state type="loading" />
   }
 
-  @if (!loading && error) {
+  @if (!loading() && error()) {
     <app-ui-state
       type="error"
       title="Não foi possível concluir a operação."
-      [description]="error"
+      [description]="error()"
       retryLabel="Tentar novamente"
       (retry)="load()" />
   }
 
-  @if (!loading && !error && budget) {
+  @if (!loading() && !error() && budget(); as budget) {
     <section class="summary-grid">
       <app-transaction-summary-card
         tone="primary"
@@ -72,8 +72,8 @@
       <div class="inline-form">
         <input type="text" placeholder="Nome da categoria" [(ngModel)]="newCategory" />
         <input type="number" placeholder="Valor planejado" [(ngModel)]="newAmount" min="0" step="0.01" />
-        <button type="button" class="btn-primary" (click)="addItem()" [disabled]="saving || !newCategory || !newAmount">
-          {{ saving ? 'Salvando...' : 'Adicionar' }}
+        <button type="button" class="btn-primary" (click)="addItem()" [disabled]="saving() || !newCategory || !newAmount">
+          {{ saving() ? 'Salvando...' : 'Adicionar' }}
         </button>
       </div>
     </article>
@@ -129,8 +129,8 @@
                       <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
                       <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
                     } @else {
-                      <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId === view.item.id">
-                        {{ deletingId === view.item.id ? '...' : 'Remover' }}
+                      <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
+                        {{ deletingId() === view.item.id ? '...' : 'Remover' }}
                       </button>
                     }
                   </td>
@@ -165,8 +165,8 @@
                   <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
                 } @else {
                   <button type="button" class="btn-ghost sm" (click)="startEdit(view.item)">Editar planejado</button>
-                  <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId === view.item.id">
-                    {{ deletingId === view.item.id ? '...' : 'Remover' }}
+                  <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
+                    {{ deletingId() === view.item.id ? '...' : 'Remover' }}
                   </button>
                 }
               </div>

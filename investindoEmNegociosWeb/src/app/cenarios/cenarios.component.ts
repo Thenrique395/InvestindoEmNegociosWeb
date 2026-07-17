@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CenariosService, ScenarioSimulationResponse } from '../cenarios.service';
@@ -30,9 +30,10 @@ import { ScenarioPointView, buildScenarioPointViews, impactSign, impactTone } fr
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CenariosComponent {
-  result: ScenarioSimulationResponse | null = null;
-  loading = false;
-  error = '';
+  // Estado por signal (A9): result/loading/error vêm de callback assíncrono (HTTP fora da zona).
+  readonly result = signal<ScenarioSimulationResponse | null>(null);
+  readonly loading = signal(false);
+  readonly error = signal('');
 
   readonly periodOptions: SegmentOption[] = [
     { value: 'month', label: 'Este mês' },
@@ -59,33 +60,36 @@ export class CenariosComponent {
   }
 
   simulate(): void {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.cenariosService.simulate({ ...this.params, referenceDate: null })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (r) => { this.result = r; this.loading = false; this.cdr.markForCheck(); },
-        error: (err) => { this.error = extractApiErrorMessage(err, 'Falha ao simular cenário.'); this.loading = false; this.cdr.markForCheck(); }
+        next: (r) => { this.result.set(r); this.loading.set(false); this.cdr.markForCheck(); },
+        error: (err) => { this.error.set(extractApiErrorMessage(err, 'Falha ao simular cenário.')); this.loading.set(false); this.cdr.markForCheck(); }
       });
   }
 
   get impactSign(): string {
-    return this.result ? impactSign(this.result.impactAmount) : '';
+    const r = this.result();
+    return r ? impactSign(r.impactAmount) : '';
   }
 
   get impactTrend(): 'up' | 'down' | 'flat' {
-    if (!this.result) return 'flat';
-    const tone = impactTone(this.result.impactAmount);
+    const r = this.result();
+    if (!r) return 'flat';
+    const tone = impactTone(r.impactAmount);
     return tone === 'positive' ? 'up' : tone === 'negative' ? 'down' : 'flat';
   }
 
   get scenarioTone(): 'success' | 'danger' | 'info' {
-    if (!this.result) return 'info';
-    const tone = impactTone(this.result.impactAmount);
+    const r = this.result();
+    if (!r) return 'info';
+    const tone = impactTone(r.impactAmount);
     return tone === 'positive' ? 'success' : tone === 'negative' ? 'danger' : 'info';
   }
 
   get pointViews(): ScenarioPointView[] {
-    return buildScenarioPointViews(this.result?.scenarioPoints);
+    return buildScenarioPointViews(this.result()?.scenarioPoints);
   }
 }

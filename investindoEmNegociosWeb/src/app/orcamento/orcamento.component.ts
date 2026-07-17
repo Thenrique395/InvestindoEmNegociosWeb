@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { BudgetService, BudgetResponse, BudgetItemResponse } from '../budget.service';
@@ -33,11 +33,14 @@ import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOvervi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrcamentoComponent implements OnInit {
-  budget: BudgetResponse | null = null;
-  loading = false;
-  saving = false;
-  deletingId: string | null = null;
-  error = '';
+  // Estado de exibição assíncrono por signal (A9). Campos ngModel (newCategory/newAmount/
+  // editingAmount) e sync-only (editingId/pendingDelete) ficam plain: refletem via o CD
+  // disparado pelos signals co-setados no mesmo callback.
+  readonly budget = signal<BudgetResponse | null>(null);
+  readonly loading = signal(false);
+  readonly saving = signal(false);
+  readonly deletingId = signal<string | null>(null);
+  readonly error = signal('');
 
   editingId: string | null = null;
   editingAmount: number | null = null;
@@ -63,22 +66,22 @@ export class OrcamentoComponent implements OnInit {
   get monthName(): string { return this.months[this.month - 1]; }
 
   get overview(): BudgetOverview {
-    return buildBudgetOverview(this.budget);
+    return buildBudgetOverview(this.budget());
   }
 
   get itemViews(): BudgetItemView[] {
-    return buildBudgetItemViews(this.budget);
+    return buildBudgetItemViews(this.budget());
   }
 
   load(): void {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.budgetService.get(this.year, this.month).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (b) => { this.budget = b; this.loading = false; this.cdr.markForCheck(); },
+      next: (b) => { this.budget.set(b); this.loading.set(false); this.cdr.markForCheck(); },
       error: (err) => {
-        this.budget = null;
-        this.error = extractApiErrorMessage(err, 'Não foi possível carregar o orçamento deste período.');
-        this.loading = false;
+        this.budget.set(null);
+        this.error.set(extractApiErrorMessage(err, 'Não foi possível carregar o orçamento deste período.'));
+        this.loading.set(false);
         this.cdr.markForCheck();
       }
     });
@@ -86,19 +89,19 @@ export class OrcamentoComponent implements OnInit {
 
   addItem(): void {
     if (!this.newCategory.trim() || !this.newAmount) return;
-    this.saving = true;
+    this.saving.set(true);
     const items = [{ categoryName: this.newCategory.trim(), plannedAmount: this.newAmount }];
     this.budgetService.upsertItems(this.year, this.month, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (b) => {
-        this.budget = b;
+        this.budget.set(b);
         this.newCategory = '';
         this.newAmount = null;
-        this.saving = false;
+        this.saving.set(false);
         this.uiFeedback.success('Categoria adicionada ao orçamento.');
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.saving = false;
+        this.saving.set(false);
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao adicionar categoria.'));
         this.cdr.markForCheck();
       }
@@ -126,7 +129,7 @@ export class OrcamentoComponent implements OnInit {
     this.budgetService.upsertItems(this.year, this.month, [{ categoryName: item.categoryName, plannedAmount: amount }])
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (b) => {
-          this.budget = b;
+          this.budget.set(b);
           this.editingId = null;
           this.editingAmount = null;
           this.uiFeedback.success('Valor planejado atualizado.');
@@ -140,7 +143,7 @@ export class OrcamentoComponent implements OnInit {
   }
 
   askRemove(item: BudgetItemResponse): void {
-    if (this.deletingId) return;
+    if (this.deletingId()) return;
     this.pendingDelete = item;
     this.cdr.markForCheck();
   }
@@ -152,21 +155,22 @@ export class OrcamentoComponent implements OnInit {
 
   confirmRemove(): void {
     const item = this.pendingDelete;
-    if (!item || this.deletingId) return;
-    this.deletingId = item.id;
+    if (!item || this.deletingId()) return;
+    this.deletingId.set(item.id);
     this.pendingDelete = null;
     this.budgetService.deleteItem(item.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        if (this.budget) {
-          this.budget = { ...this.budget, items: this.budget.items.filter(i => i.id !== item.id) };
+        const current = this.budget();
+        if (current) {
+          this.budget.set({ ...current, items: current.items.filter(i => i.id !== item.id) });
         }
         if (this.editingId === item.id) { this.editingId = null; this.editingAmount = null; }
-        this.deletingId = null;
+        this.deletingId.set(null);
         this.uiFeedback.success('Item removido do orçamento.');
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.deletingId = null;
+        this.deletingId.set(null);
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao remover item.'));
         this.cdr.markForCheck();
       }
@@ -184,9 +188,10 @@ export class OrcamentoComponent implements OnInit {
   }
 
   exportCsv(): void {
-    if (!this.budget) return;
+    const budget = this.budget();
+    if (!budget) return;
     const rows = [['Categoria','Planejado','Realizado','Variação']];
-    for (const item of this.budget.items) {
+    for (const item of budget.items) {
       rows.push([item.categoryName, String(item.plannedAmount), String(item.realizedAmount), String(item.variance)]);
     }
     const csv = rows.map(r => r.join(';')).join('\n');

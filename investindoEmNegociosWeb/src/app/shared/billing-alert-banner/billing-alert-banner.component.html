@@ -1,4 +1,4 @@
-@if (alert) {
+@if (alert(); as alert) {
   <div class="billing-banner billing-banner--{{ alert.level }}" role="alert">
     <div class="billing-banner__body">
       <strong class="billing-banner__title">{{ alert.title }}</strong>

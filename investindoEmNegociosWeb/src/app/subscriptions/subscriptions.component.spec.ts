@@ -120,12 +120,12 @@ describe('SubscriptionsComponent', () => {
     const ctx = createComponent();
 
     expect(ctx.subscriptionsService.getCatalog).toHaveBeenCalled();
-    expect(ctx.component.catalog?.current.planCode).toBe('basic');
+    expect(ctx.component.catalog()?.current.planCode).toBe('basic');
   });
 
   it('deve redirecionar planos pagos para o checkout', () => {
     const ctx = createComponent();
-    const plan = ctx.component.catalog!.plans[1];
+    const plan = ctx.component.catalog()!.plans[1];
 
     ctx.component.change(plan);
 
@@ -134,7 +134,7 @@ describe('SubscriptionsComponent', () => {
     });
     expect(ctx.subscriptionsService.change).not.toHaveBeenCalled();
     expect(ctx.authService.applySession).not.toHaveBeenCalled();
-    expect(ctx.component.catalog?.current.planCode).toBe('basic');
+    expect(ctx.component.catalog()?.current.planCode).toBe('basic');
   });
 
   it('deve exibir erro quando a troca falhar', () => {
@@ -150,7 +150,7 @@ describe('SubscriptionsComponent', () => {
     const uiFeedback = { success: jasmine.createSpy(), error: jasmine.createSpy() };
     const ctx = createComponent({ subscriptionsService, uiFeedback });
 
-    ctx.component.change(ctx.component.catalog!.plans[0]);
+    ctx.component.change(ctx.component.catalog()!.plans[0]);
 
     expect(ctx.subscriptionsService.change).toHaveBeenCalledWith('basic', 'Monthly');
     expect(uiFeedback.error).toHaveBeenCalledWith('Falha ao alterar');

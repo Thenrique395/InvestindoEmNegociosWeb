@@ -7,16 +7,16 @@
       <app-segmented-selector
         ariaLabel="Ciclo de cobrança"
         [options]="cycleOptions"
-        [value]="changingCycle"
+        [value]="changingCycle()"
         (valueChange)="setCycle($event)" />
     </div>
   </app-page-header>
 
-  @if (loading) {
+  @if (loading()) {
     <app-ui-state type="loading" />
   }
 
-  @if (catalog; as vm) {
+  @if (catalog(); as vm) {
     @if (isPastDue) {
       <div class="subscription-alert" [class.subscription-alert--danger]="isPastDueCritical" [class.subscription-alert--warning]="!isPastDueCritical" role="alert">
         <strong>{{ isPastDueCritical ? 'Acesso premium em risco' : 'Pagamento em atraso' }}</strong>
@@ -30,12 +30,12 @@
             O acesso será encerrado em <strong>{{ gracePeriodEndsAtLabel }}</strong> caso não haja regularização.
           }
         </span>
-        <button type="button" class="btn btn--ghost btn--sm" [disabled]="openingPortal" (click)="openPortal()">
-          {{ openingPortal ? 'Abrindo portal...' : 'Atualizar forma de pagamento' }}
+        <button type="button" class="btn btn--ghost btn--sm" [disabled]="openingPortal()" (click)="openPortal()">
+          {{ openingPortal() ? 'Abrindo portal...' : 'Atualizar forma de pagamento' }}
         </button>
         @if (showRetryButton) {
-          <button type="button" class="btn btn--ghost btn--sm" [disabled]="retrying" (click)="retryPayment()">
-            {{ retrying ? 'Processando...' : 'Tentar novamente' }}
+          <button type="button" class="btn btn--ghost btn--sm" [disabled]="retrying()" (click)="retryPayment()">
+            {{ retrying() ? 'Processando...' : 'Tentar novamente' }}
           </button>
         }
       </div>
@@ -114,11 +114,11 @@
           <div class="price">
             <strong>
               {{
-              (changingCycle === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice)
+              (changingCycle() === 'Yearly' ? plan.yearlyPrice : plan.monthlyPrice)
               | currency:'BRL':'symbol':'1.2-2':'pt-BR'
               }}
             </strong>
-            <span>/ {{ changingCycle === 'Yearly' ? 'ano' : 'mês' }}</span>
+            <span>/ {{ changingCycle() === 'Yearly' ? 'ano' : 'mês' }}</span>
           </div>
           <div class="scope scope--compact">
             @for (feature of plan.features; track feature) {
@@ -138,9 +138,9 @@
             class="btn"
             [class.btn--primary]="!plan.current"
             [class.btn--ghost]="plan.current"
-            [disabled]="plan.current || changingPlanCode !== null"
+            [disabled]="plan.current || changingPlanCode() !== null"
             (click)="change(plan)">
-            {{ plan.current ? 'Plano atual' : (changingPlanCode === plan.code ? 'Aplicando...' : 'Trocar para este plano') }}
+            {{ plan.current ? 'Plano atual' : (changingPlanCode() === plan.code ? 'Aplicando...' : 'Trocar para este plano') }}
           </button>
         </article>
       }
@@ -148,28 +148,28 @@
     @if (showPortalButton) {
       <app-section-card title="Gerenciar cobrança" [hasHeaderActions]="false">
         <p class="muted">Atualize meio de pagamento, trate cobrança pendente e acompanhe a renovação pelo portal seguro do provedor.</p>
-        <button type="button" class="btn btn--ghost card-action" [disabled]="openingPortal" (click)="openPortal()">
-          {{ openingPortal ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
+        <button type="button" class="btn btn--ghost card-action" [disabled]="openingPortal()" (click)="openPortal()">
+          {{ openingPortal() ? 'Abrindo portal...' : 'Abrir portal de cobrança' }}
         </button>
       </app-section-card>
     }
     @if (showCancelButton) {
       <app-section-card title="Cancelar renovação" [hasHeaderActions]="false">
         <p class="muted">Ao cancelar, a renovação automática é encerrada e o acesso volta para Basic ao final da vigência atual.</p>
-        <button type="button" class="btn btn--danger card-action" [disabled]="cancelling" (click)="cancel()">
-          {{ cancelling ? 'Cancelando...' : 'Cancelar renovação' }}
+        <button type="button" class="btn btn--danger card-action" [disabled]="cancelling()" (click)="cancel()">
+          {{ cancelling() ? 'Cancelando...' : 'Cancelar renovação' }}
         </button>
       </app-section-card>
     }
     @if (showRefundButton) {
       <app-section-card title="Direito de arrependimento" [hasHeaderActions]="false">
         <p class="muted">Dentro dos 7 dias após a contratação, você pode solicitar o cancelamento com reembolso integral (Lei 8.078/90, Art. 49). O acesso é encerrado imediatamente.</p>
-        <button type="button" class="btn btn--danger card-action" [disabled]="requestingRefund" (click)="requestRefund()">
-          {{ requestingRefund ? 'Processando...' : 'Cancelar com reembolso' }}
+        <button type="button" class="btn btn--danger card-action" [disabled]="requestingRefund()" (click)="requestRefund()">
+          {{ requestingRefund() ? 'Processando...' : 'Cancelar com reembolso' }}
         </button>
       </app-section-card>
     }
-    @if (confirmCancelOpen) {
+    @if (confirmCancelOpen()) {
       <app-confirm-dialog
         title="Cancelar renovação automática?"
         message="Sua renovação automática será encerrada e o acesso volta para o plano Essencial ao final da vigência atual. Você continua com acesso premium até lá."
@@ -177,10 +177,10 @@
         cancelLabel="Manter assinatura"
         variant="danger"
         (confirmed)="performCancel()"
-        (cancelled)="confirmCancelOpen = false">
+        (cancelled)="confirmCancelOpen.set(false)">
       </app-confirm-dialog>
     }
-    @if (confirmRefundOpen) {
+    @if (confirmRefundOpen()) {
       <app-confirm-dialog
         title="Cancelar com reembolso integral?"
         message="Seu acesso premium é encerrado imediatamente e o reembolso integral é processado em até 5 dias úteis. Essa ação não pode ser desfeita."
@@ -188,14 +188,14 @@
         cancelLabel="Voltar"
         variant="danger"
         (confirmed)="performRefund()"
-        (cancelled)="confirmRefundOpen = false">
+        (cancelled)="confirmRefundOpen.set(false)">
       </app-confirm-dialog>
     }
     @if (showTrialButton) {
       <app-section-card title="Experimentar grátis" [hasHeaderActions]="false">
         <p class="muted">Ative 7 dias de acesso ao plano Advanced sem custo. Disponível uma vez por conta, sem compromisso de compra.</p>
-        <button type="button" class="btn btn--primary card-action" [disabled]="requestingTrial" (click)="requestTrial()">
-          {{ requestingTrial ? 'Ativando...' : 'Iniciar período de teste' }}
+        <button type="button" class="btn btn--primary card-action" [disabled]="requestingTrial()" (click)="requestTrial()">
+          {{ requestingTrial() ? 'Ativando...' : 'Iniciar período de teste' }}
         </button>
       </app-section-card>
     }

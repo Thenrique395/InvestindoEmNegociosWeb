@@ -49,8 +49,8 @@
     </app-transaction-summary-card>
   </section>
 
-  @if (error) {
-    <app-ui-state type="error" title="Não foi possível concluir a operação." [description]="error" retryLabel="Tentar novamente" (retry)="load()" />
+  @if (error()) {
+    <app-ui-state type="error" title="Não foi possível concluir a operação." [description]="error()" retryLabel="Tentar novamente" (retry)="load()" />
   }
 
   <div class="grid">
@@ -79,13 +79,13 @@
         } @else {
           <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
         }
-        <button class="btn-primary" type="button" (click)="create()" [disabled]="saving">
-          {{ saving ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
+        <button class="btn-primary" type="button" (click)="create()" [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
         </button>
       </div>
     </article>
 
-    @if (simulation; as s) {
+    @if (simulation(); as s) {
       <article class="card">
         <h2>Simulação</h2>
         <div class="kpis">
@@ -117,7 +117,7 @@
   <article class="card">
     <div class="contracts-head">
       <h2>Contratos cadastrados</h2>
-      @if (contracts.length) {
+      @if (contracts().length) {
         <app-segmented-selector
           ariaLabel="Filtrar contratos por situação"
           [options]="statusFilterOptions"
@@ -126,16 +126,16 @@
       }
     </div>
 
-    @if (loading) {
+    @if (loading()) {
       <app-ui-state type="loading" />
     }
-    @if (!loading && !contracts.length) {
+    @if (!loading() && !contracts().length) {
       <app-empty-state
         icon="$"
         title="Nenhum empréstimo cadastrado"
         description="Simule e crie o primeiro contrato para acompanhar parcelas e saldo aberto." />
     }
-    @if (!loading && contracts.length && !filteredViews.length) {
+    @if (!loading() && contracts().length && !filteredViews.length) {
       <app-empty-state
         icon="⏳"
         title="Nenhum contrato nesta situação"
@@ -156,9 +156,9 @@
               </div>
               <div class="contract__actions">
                 <app-status-badge [tone]="view.statusTone" [label]="view.statusLabel" [dot]="true" />
-                <button type="button" class="btn-ghost sm" (click)="edit(view.contract)" [disabled]="!!deleting">Editar</button>
-                <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting === view.contract.id || !!editingId">
-                  {{ deleting === view.contract.id ? 'Excluindo...' : 'Excluir' }}
+                <button type="button" class="btn-ghost sm" (click)="edit(view.contract)" [disabled]="!!deleting()">Editar</button>
+                <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting() === view.contract.id || !!editingId">
+                  {{ deleting() === view.contract.id ? 'Excluindo...' : 'Excluir' }}
                 </button>
               </div>
             </div>
@@ -209,8 +209,8 @@
                         </td>
                         <td>
                           @if (inst.status === 'Open') {
-                            <button type="button" class="btn-primary sm" (click)="payInstallment(view.contract, inst.id)" [disabled]="payingInstallment === inst.id">
-                              {{ payingInstallment === inst.id ? '...' : 'Pagar' }}
+                            <button type="button" class="btn-primary sm" (click)="payInstallment(view.contract, inst.id)" [disabled]="payingInstallment() === inst.id">
+                              {{ payingInstallment() === inst.id ? '...' : 'Pagar' }}
                             </button>
                           } @else {
                             <span class="muted text--sm">{{ inst.paidAt | date:'dd/MM/yy' }}</span>

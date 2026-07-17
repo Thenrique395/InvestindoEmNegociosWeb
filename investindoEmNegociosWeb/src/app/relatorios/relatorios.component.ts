@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, NgZone, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -32,9 +32,10 @@ import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.mod
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RelatoriosComponent implements OnInit {
-  report: MonthlySummaryReportResponse | null = null;
-  loading = false;
-  error = '';
+  // Estado por signal (A9): report/loading/error vêm de callback assíncrono (HTTP fora da zona).
+  readonly report = signal<MonthlySummaryReportResponse | null>(null);
+  readonly loading = signal(false);
+  readonly error = signal('');
 
   year = new Date().getFullYear();
   month = new Date().getMonth() + 1;
@@ -53,24 +54,24 @@ export class RelatoriosComponent implements OnInit {
   get monthName(): string { return this.months[this.month - 1]; }
 
   get expensesDonutItems(): DonutChartItem[] {
-    return buildExpenseDonutItems(this.report?.expensesByCategory);
+    return buildExpenseDonutItems(this.report()?.expensesByCategory);
   }
 
   get topExpenses(): CategoryExpenseResponse[] {
-    return buildTopExpenses(this.report?.topExpenses);
+    return buildTopExpenses(this.report()?.topExpenses);
   }
 
   load(): void {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.reportsService.getMonthlySummary(this.year, this.month)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (r) => this.ngZone.run(() => { this.report = r; this.loading = false; this.cdr.markForCheck(); }),
+        next: (r) => this.ngZone.run(() => { this.report.set(r); this.loading.set(false); this.cdr.markForCheck(); }),
         error: () => this.ngZone.run(() => {
-          this.report = null;
-          this.error = 'Não foi possível carregar o relatório deste período.';
-          this.loading = false;
+          this.report.set(null);
+          this.error.set('Não foi possível carregar o relatório deste período.');
+          this.loading.set(false);
           this.cdr.markForCheck();
         })
       });
@@ -87,18 +88,19 @@ export class RelatoriosComponent implements OnInit {
   }
 
   exportCsv(): void {
-    if (!this.report) return;
+    const report = this.report();
+    if (!report) return;
     const rows = [['Categoria','Valor (R$)','% do total']];
-    for (const cat of this.report.expensesByCategory) {
+    for (const cat of report.expensesByCategory) {
       rows.push([cat.categoryName, String(cat.amount), String(cat.percentageOfTotal)]);
     }
     const summaryRows = [
       [],
       ['Resumo'],
-      ['Receitas totais', String(this.report.totalIncome)],
-      ['Despesas totais', String(this.report.totalExpenses)],
-      ['Saldo líquido', String(this.report.netBalance)],
-      ['Taxa de poupança (%)', String(this.report.savingsRate)]
+      ['Receitas totais', String(report.totalIncome)],
+      ['Despesas totais', String(report.totalExpenses)],
+      ['Saldo líquido', String(report.netBalance)],
+      ['Taxa de poupança (%)', String(report.savingsRate)]
     ];
     const csv = [...rows, ...summaryRows].map(r => r.join(';')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -111,8 +113,8 @@ export class RelatoriosComponent implements OnInit {
   }
 
   exportPdf(): void {
-    if (!this.report) return;
-    const report = this.report;
+    const report = this.report();
+    if (!report) return;
     const doc = new jsPDF();
 
     doc.setFontSize(16);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -85,20 +85,21 @@ export class CalendarioComponent implements OnInit {
   private loans: LoanContractResponse[] = [];
   private goals: Goal[] = [];
   private defaultAccountId: string | null = null;
-  allEvents: CalendarEvent[] = [];
+  readonly allEvents = signal<CalendarEvent[]>([]);
 
-  // View models derivados (recalculados em recompute()).
-  filteredCount = 0;
-  dayEvents: CalendarEvent[] = [];
-  weekGroups: DayGroup[] = [];
-  agendaGroups: DayGroup[] = [];
-  timelineBuckets: TimelineBucket[] = [];
-  periodSummary: PeriodSummary = { incomeForecast: 0, expenseForecast: 0, projectedBalance: 0, commitments: 0, dueCount: 0 };
-  digest: TodayDigest = { expenses: 0, incomes: 0, cards: 0, loans: 0, goals: 0, total: 0 };
-  upcoming: CalendarEvent[] = [];
-  pending: CalendarEvent[] = [];
-  categoryOptions: string[] = [];
-  viewHasEvents = false;
+  // View models derivados por signal (A9): recompute()/rebuild() rodam a partir de
+  // subscribes assíncronos (dados/HTTP fora da zona), então signals dirigem a re-render.
+  readonly filteredCount = signal(0);
+  readonly dayEvents = signal<CalendarEvent[]>([]);
+  readonly weekGroups = signal<DayGroup[]>([]);
+  readonly agendaGroups = signal<DayGroup[]>([]);
+  readonly timelineBuckets = signal<TimelineBucket[]>([]);
+  readonly periodSummary = signal<PeriodSummary>({ incomeForecast: 0, expenseForecast: 0, projectedBalance: 0, commitments: 0, dueCount: 0 });
+  readonly digest = signal<TodayDigest>({ expenses: 0, incomes: 0, cards: 0, loans: 0, goals: 0, total: 0 });
+  readonly upcoming = signal<CalendarEvent[]>([]);
+  readonly pending = signal<CalendarEvent[]>([]);
+  readonly categoryOptions = signal<string[]>([]);
+  readonly viewHasEvents = signal(false);
 
   pendingPaymentIds = new Set<string>();
 
@@ -269,14 +270,15 @@ export class CalendarioComponent implements OnInit {
   }
 
   private rebuild(): void {
-    this.allEvents = buildCalendarEvents(
+    const allEvents = buildCalendarEvents(
       { expenses: this.expenses, incomes: this.incomes, cards: this.cards, loans: this.loans, goals: this.goals },
       this.currentMonth,
       this.today
     );
-    this.categoryOptions = Array.from(
-      new Set(this.allEvents.map((event) => event.category).filter((value): value is string => !!value && value.trim().length > 0))
-    ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    this.allEvents.set(allEvents);
+    this.categoryOptions.set(Array.from(
+      new Set(allEvents.map((event) => event.category).filter((value): value is string => !!value && value.trim().length > 0))
+    ).sort((a, b) => a.localeCompare(b, 'pt-BR')));
     this.recompute();
     this.cdr.markForCheck();
   }
@@ -292,14 +294,14 @@ export class CalendarioComponent implements OnInit {
 
   /** Filtra e deriva todos os view models a partir de allEvents. */
   private recompute(): void {
-    const filtered = this.allEvents.filter((event) => this.matchesFilter(event));
-    this.filteredCount = filtered.length;
+    const filtered = this.allEvents().filter((event) => this.matchesFilter(event));
+    this.filteredCount.set(filtered.length);
 
-    this.dayEvents = eventsForDay(filtered, this.selectedDate);
-    this.periodSummary = buildPeriodSummary(filtered, this.currentMonth);
-    this.digest = todayDigest(filtered, this.today);
-    this.upcoming = upcomingEvents(filtered, this.today, 7).slice(0, 6);
-    this.pending = pendingEvents(filtered, this.today).slice(0, 6);
+    this.dayEvents.set(eventsForDay(filtered, this.selectedDate));
+    this.periodSummary.set(buildPeriodSummary(filtered, this.currentMonth));
+    this.digest.set(todayDigest(filtered, this.today));
+    this.upcoming.set(upcomingEvents(filtered, this.today, 7).slice(0, 6));
+    this.pending.set(pendingEvents(filtered, this.today).slice(0, 6));
 
     const weekStart = this.startOfWeek(this.selectedDate);
     const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
@@ -307,24 +309,27 @@ export class CalendarioComponent implements OnInit {
       const day = startOfDay(event.date);
       return day >= weekStart && day <= weekEnd;
     });
-    this.weekGroups = groupByDay(weekEvents);
+    const weekGroups = groupByDay(weekEvents);
+    this.weekGroups.set(weekGroups);
 
-    this.agendaGroups = groupByDay(filtered, this.today);
-    this.timelineBuckets = buildTimeline(filtered, this.today);
+    const agendaGroups = groupByDay(filtered, this.today);
+    this.agendaGroups.set(agendaGroups);
+    const timelineBuckets = buildTimeline(filtered, this.today);
+    this.timelineBuckets.set(timelineBuckets);
 
-    this.viewHasEvents = this.computeViewHasEvents(filtered);
+    this.viewHasEvents.set(this.computeViewHasEvents(filtered, weekGroups, agendaGroups, timelineBuckets));
   }
 
-  private computeViewHasEvents(filtered: CalendarEvent[]): boolean {
+  private computeViewHasEvents(filtered: CalendarEvent[], weekGroups: DayGroup[], agendaGroups: DayGroup[], timelineBuckets: TimelineBucket[]): boolean {
     switch (this.view) {
       case 'month':
         return filtered.some((event) => isInMonth(event.date, this.currentMonth));
       case 'week':
-        return this.weekGroups.length > 0;
+        return weekGroups.length > 0;
       case 'agenda':
-        return this.agendaGroups.length > 0;
+        return agendaGroups.length > 0;
       case 'timeline':
-        return this.timelineBuckets.some((bucket) => bucket.events.length > 0);
+        return timelineBuckets.some((bucket) => bucket.events.length > 0);
       default:
         return filtered.length > 0;
     }

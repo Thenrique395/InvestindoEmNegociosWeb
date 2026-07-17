@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LoansService, LoanAmortizationType, LoanContractRequest, LoanContractResponse, LoanSimulationResponse } from '../loans.service';
@@ -39,18 +39,21 @@ type LoanStatusFilter = 'all' | 'active' | 'closed';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoansComponent implements OnInit {
-  contracts: LoanContractResponse[] = [];
-  simulation: LoanSimulationResponse | null = null;
-  loading = false;
-  saving = false;
-  deleting: string | null = null;
+  // Estado de exibição assíncrono por signal (A9). form (ngModel) e sync-only
+  // (editingId/expandedContractId/statusFilter/pendingDelete) ficam plain: refletem via
+  // o CD disparado pelos signals co-setados no mesmo callback.
+  readonly contracts = signal<LoanContractResponse[]>([]);
+  readonly simulation = signal<LoanSimulationResponse | null>(null);
+  readonly loading = signal(false);
+  readonly saving = signal(false);
+  readonly deleting = signal<string | null>(null);
+  readonly payingInstallment = signal<string | null>(null);
+  readonly error = signal('');
+  readonly success = signal('');
   editingId: string | null = null;
-  payingInstallment: string | null = null;
   expandedContractId: string | null = null;
   statusFilter: LoanStatusFilter = 'all';
   pendingDelete: LoanContractResponse | null = null;
-  error = '';
-  success = '';
 
   readonly amortizationOptions: SegmentOption[] = [
     { value: 'Price', label: 'PRICE' },
@@ -71,11 +74,11 @@ export class LoansComponent implements OnInit {
   }
 
   get overview(): LoansOverview {
-    return buildLoansOverview(this.contracts);
+    return buildLoansOverview(this.contracts());
   }
 
   get contractViews(): LoanContractView[] {
-    return buildContractViews(this.contracts);
+    return buildContractViews(this.contracts());
   }
 
   get filteredViews(): LoanContractView[] {
@@ -106,49 +109,49 @@ export class LoansComponent implements OnInit {
   }
 
   load(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.loansService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (items) => {
-        this.contracts = items;
-        this.loading = false;
+        this.contracts.set(items);
+        this.loading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = extractApiErrorMessage(err, 'Falha ao carregar empréstimos.');
-        this.loading = false;
+        this.error.set(extractApiErrorMessage(err, 'Falha ao carregar empréstimos.'));
+        this.loading.set(false);
         this.cdr.markForCheck();
       }
     });
   }
 
   simulate(): void {
-    this.error = '';
-    this.success = '';
+    this.error.set('');
+    this.success.set('');
     this.loansService.simulate(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (result) => { this.simulation = result; this.cdr.markForCheck(); },
-      error: (err) => { this.error = extractApiErrorMessage(err, 'Falha ao simular empréstimo.'); this.cdr.markForCheck(); }
+      next: (result) => { this.simulation.set(result); this.cdr.markForCheck(); },
+      error: (err) => { this.error.set(extractApiErrorMessage(err, 'Falha ao simular empréstimo.')); this.cdr.markForCheck(); }
     });
   }
 
   create(): void {
-    this.error = '';
-    this.success = '';
-    this.saving = true;
+    this.error.set('');
+    this.success.set('');
+    this.saving.set(true);
 
     if (this.editingId) {
       this.loansService.update(this.editingId, this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (updated) => {
-          this.contracts = this.contracts.map(c => c.id === updated.id ? updated : c);
-          this.simulation = null;
+          this.contracts.set(this.contracts().map(c => c.id === updated.id ? updated : c));
+          this.simulation.set(null);
           this.editingId = null;
           this.resetForm();
           this.uiFeedback.success('Contrato atualizado com cronograma recalculado.');
-          this.saving = false;
+          this.saving.set(false);
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.error = extractApiErrorMessage(err, 'Falha ao atualizar contrato.');
-          this.saving = false;
+          this.error.set(extractApiErrorMessage(err, 'Falha ao atualizar contrato.'));
+          this.saving.set(false);
           this.cdr.markForCheck();
         }
       });
@@ -157,15 +160,15 @@ export class LoansComponent implements OnInit {
 
     this.loansService.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (contract) => {
-        this.contracts = [contract, ...this.contracts];
-        this.simulation = null;
+        this.contracts.set([contract, ...this.contracts()]);
+        this.simulation.set(null);
         this.uiFeedback.success('Empréstimo criado com cronograma calculado.');
-        this.saving = false;
+        this.saving.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.error = extractApiErrorMessage(err, 'Falha ao criar empréstimo.');
-        this.saving = false;
+        this.error.set(extractApiErrorMessage(err, 'Falha ao criar empréstimo.'));
+        this.saving.set(false);
         this.cdr.markForCheck();
       }
     });
@@ -173,9 +176,9 @@ export class LoansComponent implements OnInit {
 
   edit(contract: LoanContractResponse): void {
     this.editingId = contract.id;
-    this.simulation = null;
-    this.error = '';
-    this.success = '';
+    this.simulation.set(null);
+    this.error.set('');
+    this.success.set('');
     this.form = {
       title: contract.title,
       principalAmount: contract.principalAmount,
@@ -190,14 +193,14 @@ export class LoansComponent implements OnInit {
 
   cancelEdit(): void {
     this.editingId = null;
-    this.simulation = null;
-    this.error = '';
+    this.simulation.set(null);
+    this.error.set('');
     this.resetForm();
     this.cdr.markForCheck();
   }
 
   askRemove(contract: LoanContractResponse): void {
-    if (this.deleting) return;
+    if (this.deleting()) return;
     this.pendingDelete = contract;
     this.cdr.markForCheck();
   }
@@ -209,21 +212,21 @@ export class LoansComponent implements OnInit {
 
   confirmRemove(): void {
     const contract = this.pendingDelete;
-    if (!contract || this.deleting) return;
-    this.deleting = contract.id;
+    if (!contract || this.deleting()) return;
+    this.deleting.set(contract.id);
     this.pendingDelete = null;
     this.loansService.delete(contract.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.contracts = this.contracts.filter(c => c.id !== contract.id);
+        this.contracts.set(this.contracts().filter(c => c.id !== contract.id));
         if (this.editingId === contract.id) { this.editingId = null; this.resetForm(); }
         if (this.expandedContractId === contract.id) { this.expandedContractId = null; }
-        this.deleting = null;
+        this.deleting.set(null);
         this.uiFeedback.success('Contrato excluído.');
         this.cdr.markForCheck();
       },
       error: (err) => {
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao excluir contrato.'));
-        this.deleting = null;
+        this.deleting.set(null);
         this.cdr.markForCheck();
       }
     });
@@ -235,23 +238,23 @@ export class LoansComponent implements OnInit {
   }
 
   payInstallment(contract: LoanContractResponse, installmentId: string): void {
-    if (this.payingInstallment) return;
-    this.payingInstallment = installmentId;
+    if (this.payingInstallment()) return;
+    this.payingInstallment.set(installmentId);
     this.loansService.payInstallment(contract.id, installmentId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
-        this.contracts = this.contracts.map(c => {
+        this.contracts.set(this.contracts().map(c => {
           if (c.id !== contract.id) return c;
           const installments = c.installments.map(i => i.id === updated.id ? updated : i);
           const openInstallments = installments.filter(i => i.status === 'Open');
           return { ...c, installments, openInstallments: openInstallments.length, openBalance: openInstallments.reduce((s, i) => s + i.totalAmount, 0) };
-        });
-        this.payingInstallment = null;
+        }));
+        this.payingInstallment.set(null);
         this.uiFeedback.success('Parcela registrada como paga.');
         this.cdr.markForCheck();
       },
       error: (err) => {
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao pagar parcela.'));
-        this.payingInstallment = null;
+        this.payingInstallment.set(null);
         this.cdr.markForCheck();
       }
     });

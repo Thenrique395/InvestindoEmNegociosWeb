@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BillingCheckoutStatusResponse, BillingService } from '../billing.service';
@@ -14,11 +14,13 @@ import { findMarketingPlan, MarketingBillingCycle, MarketingPlan } from '../mark
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckoutFailureComponent {
-  plan: MarketingPlan = findMarketingPlan(null);
-  cycle: MarketingBillingCycle = 'Monthly';
-  message = 'Não foi possível concluir a contratação neste momento.';
-  status: BillingCheckoutStatusResponse | null = null;
-  openingPortal = false;
+  // Estado por signal (A9): status/plan/cycle/message vêm de callbacks assíncronos
+  // (HTTP fora da zona), então signals dirigem a re-render OnPush.
+  readonly plan = signal<MarketingPlan>(findMarketingPlan(null));
+  readonly cycle = signal<MarketingBillingCycle>('Monthly');
+  readonly message = signal('Não foi possível concluir a contratação neste momento.');
+  readonly status = signal<BillingCheckoutStatusResponse | null>(null);
+  readonly openingPortal = signal(false);
 
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -30,16 +32,16 @@ export class CheckoutFailureComponent {
 
     route.queryParamMap.pipe(takeUntilDestroyed(destroyRef)).subscribe((params) => {
       const checkoutId = params.get('checkout_id');
-      this.plan = findMarketingPlan(params.get('plan'));
-      this.cycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
-      this.message = params.get('message') || this.message;
+      this.plan.set(findMarketingPlan(params.get('plan')));
+      this.cycle.set(params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly');
+      this.message.set(params.get('message') || this.message());
       if (!checkoutId) return;
       this.billingService.getCheckoutStatus(checkoutId).subscribe({
         next: (s) => {
-          this.status = s;
-          this.plan = findMarketingPlan(s.planCode);
-          this.cycle = s.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly';
-          this.message = s.failureReason || this.message;
+          this.status.set(s);
+          this.plan.set(findMarketingPlan(s.planCode));
+          this.cycle.set(s.billingCycle === 'Yearly' ? 'Yearly' : 'Monthly');
+          this.message.set(s.failureReason || this.message());
           this.cdr.markForCheck();
         },
         error: () => void 0
@@ -48,11 +50,11 @@ export class CheckoutFailureComponent {
   }
 
   openPortal(): void {
-    if (this.openingPortal) return;
-    this.openingPortal = true;
+    if (this.openingPortal()) return;
+    this.openingPortal.set(true);
     this.billingService.createPortalSession().subscribe({
       next: (response) => { window.location.href = response.url; },
-      error: () => { this.openingPortal = false; this.cdr.markForCheck(); }
+      error: () => { this.openingPortal.set(false); this.cdr.markForCheck(); }
     });
   }
 }
