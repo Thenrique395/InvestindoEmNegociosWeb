@@ -5,7 +5,7 @@ export class CategoriesPage {
 
   async goto() {
     await this.page.goto('/categorias', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Organize receitas e despesas' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 1, name: 'Categorias' })).toBeVisible();
   }
 
   async createCategory(name: string, type: 'Income' | 'Expense') {

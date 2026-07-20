@@ -9,17 +9,17 @@ export class InvestmentsPage {
   }
 
   async expectAccessControls() {
-    await expect(this.page.getByRole('button', { name: 'Importações' })).toBeVisible();
+    await expect(this.page.getByRole('button', { name: 'Importar B3' })).toBeVisible();
     await expect(this.page.getByRole('button', { name: 'Novo lançamento' })).toBeVisible();
   }
 
   async openAnalysisTab() {
-    await this.page.getByRole('button', { name: 'Análise' }).click();
+    await this.page.getByRole('radio', { name: 'Análise' }).click();
     await expect(this.page.getByRole('heading', { name: 'Alocação da carteira' })).toBeVisible();
   }
 
   async expectSummaryVisible() {
-    await expect(this.page.getByText('Patrimônio total')).toBeVisible();
+    await expect(this.page.getByText('Patrimônio', { exact: true })).toBeVisible();
   }
 
   async createPosition(assetName: string) {

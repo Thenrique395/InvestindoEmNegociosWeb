@@ -74,7 +74,7 @@ test.describe('live role profiles', () => {
 
     await page.goto('/calendario', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/calendario$/i, { timeout: 20000 });
-    await expect(page.getByText('Compromissos do dia')).toBeVisible();
+    await expect(page.getByText('Calendário financeiro')).toBeVisible();
 
     await page.goto('/admin/parametros', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/i, { timeout: 20000 });
@@ -91,12 +91,13 @@ test.describe('live role profiles', () => {
     await navigation.expectLinkVisible('Dashboard');
     await navigation.expectLinkVisible('Categorias');
     await navigation.expectLinkVisible('Investimentos');
-    await navigation.expectLinkVisible('Admin');
+    await navigation.expectLinkVisible('Usuários');
     await navigation.expectLinkVisible('Parâmetros');
     await navigation.expectLinkVisible('Robôs');
 
     await categoriesPage.goto();
-    await categoriesPage.openAdminDefaultCategories();
+    // Admin vê as categorias de sistema inline na lista unificada (card "Minhas categorias").
+    await expect(page.getByText('Minhas categorias')).toBeVisible();
 
     await adminRobotsPage.goto();
     await adminRobotsPage.expectRunAllAvailable();
@@ -113,6 +114,6 @@ test.describe('live role profiles', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Parâmetros do sistema' })).toBeVisible();
 
     await adminUsersPage.goto();
-    await adminUsersPage.expectUserVisible('codex.intermediate.live@example.com');
+    await adminUsersPage.expectUserVisible('thenrique395@gmail.com');
   });
 });
