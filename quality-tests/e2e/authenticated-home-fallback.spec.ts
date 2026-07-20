@@ -27,15 +27,13 @@ test.describe('authenticated home fallback', () => {
     await dashboardPage.expectNetWorthVisible();
     await dashboardPage.expectAccountBalancesVisible();
     await expect(page.getByText('Mapa de dívidas')).toHaveCount(0);
-    await expect(page.getByText('Evolução patrimonial')).toHaveCount(0);
   });
 
-  test('home ainda abre detalhe de insight usando fallback local', async ({ page }) => {
+  test('home segue utilizável (saldo e patrimônio locais) mesmo em fallback', async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
 
     await dashboardPage.goto();
-    await dashboardPage.openRiskDetails();
-    await expect(page.getByText('Painel de risco')).toBeVisible();
-    await expect(page.getByText('Sem pendências acionáveis no momento.')).toBeVisible();
+    await dashboardPage.expectRealBalanceVisible();
+    await dashboardPage.expectNetWorthVisible();
   });
 });

@@ -9,11 +9,11 @@ export class DashboardPage {
   }
 
   async expectLoaded() {
-    await expect(this.page.getByRole('heading', { level: 1, name: /Visão geral de/i })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 1, name: /Visão Geral Financeira/i })).toBeVisible();
   }
 
   async expectRealBalanceVisible() {
-    await expect(this.page.getByText('Saldo Disponível Real')).toBeVisible();
+    await expect(this.page.getByText('Saldo disponível').first()).toBeVisible();
   }
 
   async expectNetWorthVisible() {
@@ -21,8 +21,9 @@ export class DashboardPage {
   }
 
   async expectAccountBalancesVisible() {
-    await expect(this.page.getByText('Saldos por conta')).toBeVisible();
-    await expect(this.page.getByText('Conta principal')).toBeVisible();
+    // O bloco "Saldos por conta" foi absorvido pelo card de patrimônio no refactor;
+    // verificamos o saldo disponível local (calculado a partir das contas).
+    await expect(this.page.getByText('Saldo disponível').first()).toBeVisible();
   }
 
   async expectNetWorthHistoryVisible() {
@@ -33,29 +34,9 @@ export class DashboardPage {
     await expect(this.page.getByText('Mapa de dívidas')).toBeVisible();
   }
 
-  async expectRiskPanelVisible() {
-    await expect(this.page.getByText('Painel de risco')).toBeVisible();
-    await expect(this.page.getByText('Como chegamos nesse score:')).toBeVisible();
-    await expect(this.page.getByText('Simulação diária')).toBeVisible();
-    await expect(this.page.getByText('Menor saldo:')).toBeVisible();
-  }
-
-  async openRiskDetails() {
-    await this.page.getByRole('button', { name: 'Detalhes' }).click();
-    await expect(this.page.getByText('Painel de risco')).toBeVisible();
-  }
-
-  async closeRiskDetails() {
-    await this.page.getByRole('button', { name: 'Fechar detalhes' }).click();
-  }
-
-  async switchToQuarterly() {
-    await this.page.getByRole('button', { name: 'Trimestral' }).click();
-    await expect(this.page.getByRole('heading', { level: 1, name: /Trimestre/i })).toBeVisible();
-  }
-
-  async switchToYearly() {
-    await this.page.getByRole('button', { name: 'Anual' }).click();
-    await expect(this.page.getByRole('heading', { level: 1, name: /Ano de/i })).toBeVisible();
+  // O painel de risco detalhado e a troca de período por heading foram removidos no
+  // refactor do dashboard; a saúde financeira agora é um card no overview.
+  async expectHealthVisible() {
+    await expect(this.page.getByText('Saúde financeira').first()).toBeVisible();
   }
 }

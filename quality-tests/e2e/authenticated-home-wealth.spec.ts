@@ -18,14 +18,11 @@ test.describe('authenticated home wealth', () => {
     await dashboardPage.expectDebtMapVisible();
   });
 
-  test('dashboard abre painel de risco e mantém navegação por período', async ({ page }) => {
+  test('dashboard avançado exibe saúde financeira e mapa de dívidas', async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
 
     await dashboardPage.goto();
-    await dashboardPage.openRiskDetails();
-    await dashboardPage.expectRiskPanelVisible();
-    await dashboardPage.closeRiskDetails();
-    await dashboardPage.switchToQuarterly();
-    await dashboardPage.switchToYearly();
+    await dashboardPage.expectHealthVisible();
+    await dashboardPage.expectDebtMapVisible();
   });
 });

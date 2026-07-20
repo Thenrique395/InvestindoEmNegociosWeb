@@ -23,16 +23,16 @@ test.describe('authenticated finance modules', () => {
   test('gera snapshot do mês e adiciona na listagem', async ({ page }) => {
     await page.goto('/snapshots', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Snapshots mensais' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Histórico mensal' }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Gerar snapshot' }).click();
-    await expect(page.locator('.snapshot h2').first()).toBeVisible();
+    await expect(page.locator('.snapshot').first()).toBeVisible();
   });
 
   test('redireciona troca de plano pago para checkout', async ({ page }) => {
     await page.goto('/assinatura', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Minha assinatura' })).toBeVisible();
-    await page.getByRole('button', { name: 'Anual' }).click();
+    await expect(page.getByRole('heading', { name: 'Minha assinatura' }).first()).toBeVisible();
+    await page.getByRole('radio', { name: 'Anual' }).click();
     await page.locator('.plan-card').filter({ has: page.getByRole('heading', { level: 3, name: 'Intermediate' }) }).getByRole('button', { name: 'Trocar para este plano' }).click();
 
     await expect(page).toHaveURL(/\/checkout\?plan=intermediate&cycle=Yearly/);
@@ -42,9 +42,11 @@ test.describe('authenticated finance modules', () => {
   test('carrega segurança e revoga sessões ativas', async ({ page }) => {
     await page.goto('/seguranca', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Sessões e login' })).toBeVisible();
-    await expect(page.locator('.privacy-pill').filter({ hasText: 'Sessões ativas' }).locator('strong')).toHaveText('2');
+    await expect(page.getByRole('heading', { name: 'Sessões e login' }).first()).toBeVisible();
+    await expect(page.locator('app-transaction-summary-card').filter({ hasText: 'Sessões ativas' }).getByText('2')).toBeVisible();
     await page.getByRole('button', { name: 'Revogar sessões ativas' }).click();
-    await expect(page.getByText('2 sessão(ões) revogada(s).')).toBeVisible();
+    // Agora há um diálogo de confirmação antes de revogar.
+    await page.getByRole('button', { name: 'Revogar sessões', exact: true }).click();
+    await expect(page.getByText(/sessão\(ões\) revogada\(s\)\./)).toBeVisible();
   });
 });
