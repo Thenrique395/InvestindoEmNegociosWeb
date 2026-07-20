@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -45,8 +45,11 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 })
 export class ReceitasComponent implements OnInit {
   dataAtual = new Date();
-  rendasAll: StoredIncome[] = [];
-  summary: IncomeSummaryState | null = null;
+  // Estado assíncrono por signal (A9): rendasAll/summary/loadingMes vêm dos observables
+  // do ApiDataService (HTTP fora da zona); os demais signals vêm de subscribes assíncronos.
+  // Campos ngModel e sync-only ficam plain (refletem via o CD do signal co-setado).
+  readonly rendasAll = signal<StoredIncome[]>([]);
+  readonly summary = signal<IncomeSummaryState | null>(null);
   mostrarForm = false;
   novaRenda: StoredIncome = this.criaRenda();
   valorInput = '';
@@ -54,7 +57,7 @@ export class ReceitasComponent implements OnInit {
   erroData = '';
   erroCategoria = '';
   editandoId: string | null = null;
-  valorSugestao: number | null = null;
+  readonly valorSugestao = signal<number | null>(null);
   saving = false;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   showDeleteModal = false;
@@ -66,11 +69,11 @@ export class ReceitasComponent implements OnInit {
   editReceivedId: string | null = null;
   editReceivedSource = '';
   selectedIds = new Set<string>();
-  attachingReceiptIds = new Set<string>();
+  readonly attachingReceiptIds = signal<Set<string>>(new Set());
   private receiptUploadTargetId: string | null = null;
-  loadingRecebido = false;
-  loadingMes = true;
-  contas: AccountResponse[] = [];
+  readonly loadingRecebido = signal(false);
+  readonly loadingMes = signal(true);
+  readonly contas = signal<AccountResponse[]>([]);
   contaBaixaId: string | null = null;
   private contasCarregadas = false;
   private carregandoContas = false;
@@ -80,7 +83,7 @@ export class ReceitasComponent implements OnInit {
   focusMode: 'none' | 'pending' = 'none';
   sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
-  categorias: CategoryDto[] = [];
+  readonly categorias = signal<CategoryDto[]>([]);
 
   constructor(
     private db: ApiDataService,
@@ -106,20 +109,20 @@ export class ReceitasComponent implements OnInit {
       this.cdr.markForCheck();
     });
 
-    this.loadingMes = true;
+    this.loadingMes.set(true);
     this.db.refreshIncomes(this.mesKey());
     this.loadCategorias();
     this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
-      this.rendasAll = [...lista];
-      this.valorSugestao = this.getUltimoValorParaFonte(this.novaRenda.fonte);
+      this.rendasAll.set([...lista]);
+      this.valorSugestao.set(this.getUltimoValorParaFonte(this.novaRenda.fonte));
       this.cdr.markForCheck();
     });
     this.db.incomeSummary$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((summary) => {
-      this.summary = summary;
+      this.summary.set(summary);
       this.cdr.markForCheck();
     });
     this.db.incomesLoading$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((loading) => {
-      this.loadingMes = loading;
+      this.loadingMes.set(loading);
       this.cdr.markForCheck();
     });
   }
@@ -156,7 +159,7 @@ export class ReceitasComponent implements OnInit {
       {
         label: 'Marcar como recebida',
         loadingLabel: 'Processando...',
-        loading: this.loadingRecebido,
+        loading: this.loadingRecebido(),
         tone: 'primary',
         run: () => this.marcarRecebidasSelecionadas()
       }
@@ -165,7 +168,7 @@ export class ReceitasComponent implements OnInit {
 
   get rendas(): StoredIncome[] {
     const key = this.mesKey();
-    const filtradas = this.rendasAll
+    const filtradas = this.rendasAll()
       .filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key)
       .filter((r) => this.filtroTextoMatch(r))
       .filter((r) => this.filtroTipoMatch(r))
@@ -196,7 +199,7 @@ export class ReceitasComponent implements OnInit {
 
   get rendasMes(): StoredIncome[] {
     const key = this.mesKey();
-    const filtradas = this.rendasAll.filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key);
+    const filtradas = this.rendasAll().filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key);
     return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
   }
 
@@ -211,17 +214,20 @@ export class ReceitasComponent implements OnInit {
   }
 
   get totalRendas(): number {
-    if (this.summary) return this.summary.total;
+    const s = this.summary();
+    if (s) return s.total;
     return this.rendasMes.reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 
   get totalRecorrentes(): number {
-    if (this.summary) return this.summary.totalRecurring;
+    const s = this.summary();
+    if (s) return s.totalRecurring;
     return this.rendasMes.filter((r) => r.fixa).reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 
   get totalAvulsas(): number {
-    if (this.summary) return this.summary.totalOneTime;
+    const s = this.summary();
+    if (s) return s.totalOneTime;
     return this.rendasMes.filter((r) => !r.fixa).reduce((sum, r) => sum + (r.valor || 0), 0);
   }
 
@@ -259,9 +265,10 @@ export class ReceitasComponent implements OnInit {
 
   get previousComparison(): { month: string; monthLabel: string; delta: number; deltaAbs: number; percent: number; trend: 'up' | 'down' | 'flat'; isNew: boolean } {
     const prevDate = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
-    const summaryPrev = this.summary?.previousMonth;
+    const summary = this.summary();
+    const summaryPrev = summary?.previousMonth;
     const prevTotal = summaryPrev ? summaryPrev.total : 0;
-    const currentTotal = this.summary ? this.summary.total : this.totalRendas;
+    const currentTotal = summary ? summary.total : this.totalRendas;
     const delta = currentTotal - prevTotal;
     const isNew = prevTotal === 0 && currentTotal > 0;
     const percent = prevTotal > 0 ? (delta / prevTotal) * 100 : 0;
@@ -356,12 +363,12 @@ export class ReceitasComponent implements OnInit {
     this.novaRenda = { ...renda };
     this.valorInput = formatNumberValue(renda.valor);
     this.recebimentoInput = renda.recebimento;
-    this.valorSugestao = this.getUltimoValorParaFonte(renda.fonte);
+    this.valorSugestao.set(this.getUltimoValorParaFonte(renda.fonte));
     this.mostrarForm = true;
   }
 
   remover(payload: { planId?: string; installmentId: string }): void {
-    const renda = this.rendasAll.find((r) => r.id === payload.installmentId);
+    const renda = this.rendasAll().find((r) => r.id === payload.installmentId);
     if (!renda) return;
 
     this.deletePlanId = payload.planId || null;
@@ -372,7 +379,7 @@ export class ReceitasComponent implements OnInit {
   }
 
   editarPorId(id: string): void {
-    const renda = this.rendasAll.find((r) => r.id === id);
+    const renda = this.rendasAll().find((r) => r.id === id);
     if (renda) {
       if (renda.status === 'PAID') {
         this.editReceivedId = renda.id;
@@ -406,7 +413,7 @@ export class ReceitasComponent implements OnInit {
 
   confirmarEdicaoRecebida(): void {
     if (!this.editReceivedId) return;
-    const renda = this.rendasAll.find((r) => r.id === this.editReceivedId);
+    const renda = this.rendasAll().find((r) => r.id === this.editReceivedId);
     if (!renda) {
       this.cancelarEdicaoRecebida();
       return;
@@ -460,9 +467,9 @@ export class ReceitasComponent implements OnInit {
     }
     const accountId = this.canChooseAccount ? this.contaBaixaId : null;
     const pedidos = selecionadas.map((r) => this.db.markIncomeReceived(r.id, r.valor, accountId));
-    this.loadingRecebido = true;
+    this.loadingRecebido.set(true);
     forkJoin(pedidos)
-      .pipe(finalize(() => (this.loadingRecebido = false)))
+      .pipe(finalize(() => this.loadingRecebido.set(false)))
       .subscribe({
         next: () => {
           this.selectedIds.clear();
@@ -487,12 +494,13 @@ export class ReceitasComponent implements OnInit {
 
   onFonteChange(fonte: string): void {
     this.novaRenda.fonte = fonte;
-    this.valorSugestao = this.getUltimoValorParaFonte(fonte);
+    this.valorSugestao.set(this.getUltimoValorParaFonte(fonte));
   }
 
   aplicarSugestao(): void {
-    if (!this.valorSugestao) return;
-    this.valorInput = formatNumberValue(this.valorSugestao);
+    const sugestao = this.valorSugestao();
+    if (!sugestao) return;
+    this.valorInput = formatNumberValue(sugestao);
   }
 
   private resetarForm(): void {
@@ -502,12 +510,22 @@ export class ReceitasComponent implements OnInit {
     this.editandoId = null;
     this.erroData = '';
     this.erroCategoria = '';
-    this.valorSugestao = null;
+    this.valorSugestao.set(null);
   }
 
   prepararAnexoComprovante(installmentId: string): void {
-    if (!installmentId || this.attachingReceiptIds.has(installmentId)) return;
+    if (!installmentId || this.attachingReceiptIds().has(installmentId)) return;
     this.receiptUploadTargetId = installmentId;
+  }
+
+  private addAttaching(id: string): void {
+    this.attachingReceiptIds.set(new Set(this.attachingReceiptIds()).add(id));
+  }
+
+  private removeAttaching(id: string): void {
+    const next = new Set(this.attachingReceiptIds());
+    next.delete(id);
+    this.attachingReceiptIds.set(next);
   }
 
   onComprovanteFileSelected(event: Event): void {
@@ -518,7 +536,7 @@ export class ReceitasComponent implements OnInit {
     this.receiptUploadTargetId = null;
     if (!file || !installmentId) return;
 
-    this.attachingReceiptIds.add(installmentId);
+    this.addAttaching(installmentId);
     this.installments.listPayments(installmentId).subscribe({
       next: (payments) => {
         const target = [...(payments || [])]
@@ -526,21 +544,21 @@ export class ReceitasComponent implements OnInit {
           .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
 
         if (!target) {
-          this.attachingReceiptIds.delete(installmentId);
+          this.removeAttaching(installmentId);
           this.setAlerta('Nenhum recebimento encontrado para anexar o comprovante.', 3000, 'info');
           return;
         }
 
         this.installments
           .uploadReceipt(installmentId, target.id, file)
-          .pipe(finalize(() => this.attachingReceiptIds.delete(installmentId)))
+          .pipe(finalize(() => this.removeAttaching(installmentId)))
           .subscribe({
             next: () => this.setAlerta('Comprovante anexado com sucesso.', 3000, 'success'),
             error: () => this.setAlerta('Falha ao anexar comprovante.', 3000, 'error')
           });
       },
       error: () => {
-        this.attachingReceiptIds.delete(installmentId);
+        this.removeAttaching(installmentId);
         this.setAlerta('Falha ao consultar recebimentos da parcela.', 3000, 'error');
       }
     });
@@ -587,20 +605,20 @@ export class ReceitasComponent implements OnInit {
       next: (items) => {
         const filtradas = filtraReceitas(items || []);
         if (filtradas.length) {
-          this.categorias = filtradas;
+          this.categorias.set(filtradas);
           return;
         }
         this.categoriesService.list().subscribe({
           next: (all) => {
-            this.categorias = filtraReceitas(all || []);
+            this.categorias.set(filtraReceitas(all || []));
           },
           error: () => {
-            this.categorias = [];
+            this.categorias.set([]);
           }
         });
       },
       error: () => {
-        this.categorias = [];
+        this.categorias.set([]);
       }
     });
   }
@@ -637,7 +655,7 @@ export class ReceitasComponent implements OnInit {
   private getUltimoValorParaFonte(fonte: string): number | null {
     if (!fonte) return null;
     const needle = fonte.trim().toLowerCase();
-    const candidatas = this.rendasAll.filter((r) => (r.fonte || '').trim().toLowerCase() === needle);
+    const candidatas = this.rendasAll().filter((r) => (r.fonte || '').trim().toLowerCase() === needle);
     if (!candidatas.length) return null;
     const ordenadas = [...candidatas].sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
     return ordenadas[0].valor;
@@ -648,13 +666,14 @@ export class ReceitasComponent implements OnInit {
     this.carregandoContas = true;
     this.accountsService.list().subscribe({
       next: (items) => {
-        this.contas = (items || []).filter((c) => c.isActive);
-        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
+        const contas = (items || []).filter((c) => c.isActive);
+        this.contas.set(contas);
+        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(contas);
         this.contasCarregadas = true;
         this.carregandoContas = false;
       },
       error: () => {
-        this.contas = [];
+        this.contas.set([]);
         this.contaBaixaId = null;
         this.accountsService.setDefaultAccountId(null);
         this.carregandoContas = false;
@@ -664,13 +683,13 @@ export class ReceitasComponent implements OnInit {
 
   mesAnterior(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
-    this.loadingMes = true;
+    this.loadingMes.set(true);
     this.db.refreshIncomes(this.mesKey());
   }
 
   proximoMes(): void {
     this.dataAtual = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() + 1, 1);
-    this.loadingMes = true;
+    this.loadingMes.set(true);
     this.db.refreshIncomes(this.mesKey());
   }
 

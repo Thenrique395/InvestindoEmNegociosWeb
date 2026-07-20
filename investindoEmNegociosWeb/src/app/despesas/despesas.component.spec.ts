@@ -46,8 +46,8 @@ describe('DespesasComponent - competência de cartão no front', () => {
       diaFechamento: 10,
       diaVencimento: 15
     };
-    component.cartoes = [card];
-    component.cardBrandMap = { '1': 'VISA' };
+    component.cartoes.set([card]);
+    component.cardBrandMap.set({ '1': 'VISA' });
 
     const label = component.pagamentoLabel(
       baseExpense({
@@ -72,8 +72,8 @@ describe('DespesasComponent - competência de cartão no front', () => {
       diaFechamento: 10,
       diaVencimento: 15
     };
-    component.cartoes = [card];
-    component.cardBrandMap = { '1': 'VISA' };
+    component.cartoes.set([card]);
+    component.cardBrandMap.set({ '1': 'VISA' });
 
     const label = component.pagamentoLabel(
       baseExpense({

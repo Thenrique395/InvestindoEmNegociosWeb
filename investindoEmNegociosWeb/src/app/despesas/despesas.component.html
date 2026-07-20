@@ -97,7 +97,7 @@
       <app-bulk-action-bar
         [summary]="selecionados.length + ' selecionada(s) · ' + selecionadosPagaveis.length + ' pagável(is)'"
         [accountLabel]="canChooseAccount ? 'Conta de baixa' : ''"
-        [accounts]="contas"
+        [accounts]="contas()"
         [(account)]="contaBaixaId"
         [actions]="bulkActions" />
     }
@@ -119,10 +119,10 @@
           <span class="tx-filter__label">Categoria</span>
           <select [(ngModel)]="filtroCategoria">
             <option value="ALL">Todas</option>
-            @if (!categorias.length) {
+            @if (!categorias().length) {
               <option value="" disabled>Sem categorias cadastradas</option>
             }
-            @for (c of categorias; track trackByIndex($index, c)) {
+            @for (c of categorias(); track trackByIndex($index, c)) {
               <option [value]="c.id">{{ c.name }}</option>
             }
           </select>
@@ -158,8 +158,8 @@
 
   <app-despesas-form
     [mostrarForm]="mostrarForm"
-    [categorias]="categorias"
-    [cartoes]="cartoes"
+    [categorias]="categorias()"
+    [cartoes]="cartoes()"
     [novaDespesa]="novaDespesa"
     [valorInput]="valorInput"
     [valorParcelaLabel]="valorParcelaLabel"
@@ -172,7 +172,7 @@
     [saving]="saving"
     [cartaoSelecionadoId]="cartaoSelecionadoId"
     [cartaoSelecionadoLabel]="cartaoSelecionadoLabel"
-    [cardBrandMap]="cardBrandMap"
+    [cardBrandMap]="cardBrandMap()"
     [fixa]="fixa"
     [fixaMeses]="fixaMeses"
     [isEdit]="!!editando"
@@ -189,8 +189,8 @@
 
   <app-invoice-import
     [open]="mostrarImportFatura"
-    [cards]="cartoes"
-    [categories]="categorias"
+    [cards]="cartoes()"
+    [categories]="categorias()"
     (imported)="onImportFaturaConcluida($event)"
   (close)="fecharImportFatura()"></app-invoice-import>
 

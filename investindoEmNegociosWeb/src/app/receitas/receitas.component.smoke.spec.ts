@@ -223,7 +223,7 @@ function createComponentForReceiptTests() {
 describe('ReceitasComponent - anexo de comprovante', () => {
   it('não prepara o anexo quando já há upload em andamento para a mesma parcela', () => {
     const { component, installments } = createComponentForReceiptTests();
-    (component as any).attachingReceiptIds.add('inst-1');
+    component.attachingReceiptIds.set(new Set(['inst-1']));
 
     component.prepararAnexoComprovante('inst-1');
 

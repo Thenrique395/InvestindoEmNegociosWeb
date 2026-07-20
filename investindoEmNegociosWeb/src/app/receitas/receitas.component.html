@@ -117,7 +117,7 @@
       <app-bulk-action-bar
         [summary]="selecionados.length + ' selecionada(s) · ' + selecionadosRecebiveis.length + ' recebível(is)'"
         [accountLabel]="canChooseAccount ? 'Conta de entrada' : ''"
-        [accounts]="contas"
+        [accounts]="contas()"
         [(account)]="contaBaixaId"
         [actions]="bulkActions" />
     }
@@ -150,7 +150,7 @@
     <div class="tx-list-wrap">
       <app-receitas-lista
         [rendas]="rendas"
-        [loading]="loadingMes"
+        [loading]="loadingMes()"
         [showStatus]="hasAccess('Basic')"
         emptyTitle="Sem receitas no período"
         emptyDescription="Cadastre sua primeira receita para visualizar o comparativo."
@@ -158,7 +158,7 @@
         [sortBy]="sortBy"
         [sortDir]="sortDir"
         [selectedIds]="selecionados"
-        [attachingReceiptIds]="attachingReceiptIds"
+        [attachingReceiptIds]="attachingReceiptIds()"
         (ordenar)="ordenarPor($event)"
         (editar)="editarPorId($event)"
         (remover)="remover($event)"
@@ -177,12 +177,12 @@
     <app-receitas-form
       [mostrarForm]="mostrarForm"
       [novaRenda]="novaRenda"
-      [categorias]="categorias"
+      [categorias]="categorias()"
       [valorInput]="valorInput"
       [recebimentoInput]="recebimentoInput"
       [erroData]="erroData"
       [erroCategoria]="erroCategoria"
-      [valorSugestao]="valorSugestao"
+      [valorSugestao]="valorSugestao()"
       [editandoId]="editandoId"
       [resumoTexto]="resumoTexto"
       [saving]="saving"

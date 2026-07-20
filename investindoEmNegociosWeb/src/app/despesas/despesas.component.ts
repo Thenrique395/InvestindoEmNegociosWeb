@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TitleCasePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -75,14 +75,17 @@ export class DespesasComponent implements OnInit {
     '5': 'HIPERCARD'
   };
   dataAtual = new Date();
-  categorias: CategoryDto[] = [];
+  // Estado assíncrono por signal (A9): despesasPorMes/categorias/cartoes/contas/cardBrandMap
+  // vêm de observables/HTTP fora da zona. Campos ngModel e sync-only ficam plain (refletem
+  // via o CD do signal co-setado no mesmo callback).
+  readonly categorias = signal<CategoryDto[]>([]);
   private categoriaMap = new Map<string, string>();
   private expensesCache: StoredExpense[] = [];
-  cartoes: StoredCard[] = [];
-  cardBrandMap: Record<string, string> = {};
-  contas: AccountResponse[] = [];
+  readonly cartoes = signal<StoredCard[]>([]);
+  readonly cardBrandMap = signal<Record<string, string>>({});
+  readonly contas = signal<AccountResponse[]>([]);
   contaBaixaId: string | null = null;
-  despesasPorMes: Record<string, StoredExpense[]> = {};
+  readonly despesasPorMes = signal<Record<string, StoredExpense[]>>({});
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
   mostrarForm = false;
@@ -105,13 +108,13 @@ export class DespesasComponent implements OnInit {
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
   filtroCategoria: string = 'ALL';
   filtroNome: string = '';
-  loadingPagar = false;
-  loadingAntecipar = false;
+  readonly loadingPagar = signal(false);
+  readonly loadingAntecipar = signal(false);
   historicoAberto = false;
   historicoTitulo = '';
   historicoItens: StoredExpense[] = [];
-  reversingIds = new Set<string>();
-  attachingReceiptIds = new Set<string>();
+  readonly reversingIds = signal<Set<string>>(new Set());
+  readonly attachingReceiptIds = signal<Set<string>>(new Set());
   private receiptUploadTargetId: string | null = null;
   mostrarImportFatura = false;
 
@@ -159,7 +162,7 @@ export class DespesasComponent implements OnInit {
           const applies = (item.appliesTo || '').toString().toLowerCase();
           return applies === 'expense' || applies === 'despesa' || applies === 'despesas';
         });
-        this.categorias = filtradas;
+        this.categorias.set(filtradas);
         this.categoriaMap = new Map(filtradas.map((c) => [c.id, c.name]));
         const resolvedId = this.resolveCategoriaId(this.novaDespesa);
         if (resolvedId) {
@@ -170,7 +173,7 @@ export class DespesasComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => {
-        this.categorias = [];
+        this.categorias.set([]);
         this.categoriaMap = new Map();
         this.rebuildDespesas();
         this.cdr.markForCheck();
@@ -178,11 +181,11 @@ export class DespesasComponent implements OnInit {
     });
 
     this.db.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((cards) => {
-      this.cartoes = cards;
-      if (this.cartoes.length && !this.cartaoSelecionadoId) {
-        this.cartaoSelecionadoId = this.cartoes[0].id;
+      this.cartoes.set(cards);
+      if (cards.length && !this.cartaoSelecionadoId) {
+        this.cartaoSelecionadoId = cards[0].id;
       }
-      if (!this.cartoes.length) {
+      if (!cards.length) {
         this.cartaoSelecionadoId = null;
       }
       this.cdr.markForCheck();
@@ -190,12 +193,13 @@ export class DespesasComponent implements OnInit {
 
     this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (items) => {
-        this.contas = (items || []).filter((c) => c.isActive);
-        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(this.contas);
+        const contas = (items || []).filter((c) => c.isActive);
+        this.contas.set(contas);
+        this.contaBaixaId = this.accountsService.resolveDefaultAccountId(contas);
         this.cdr.markForCheck();
       },
       error: () => {
-        this.contas = [];
+        this.contas.set([]);
         this.contaBaixaId = null;
         this.accountsService.setDefaultAccountId(null);
         this.cdr.markForCheck();
@@ -210,11 +214,11 @@ export class DespesasComponent implements OnInit {
           const readable = (brand.name || brand.code || '').trim();
           if (readable) nextMap[idKey] = readable;
         }
-        this.cardBrandMap = nextMap;
+        this.cardBrandMap.set(nextMap);
         this.cdr.markForCheck();
       },
       error: () => {
-        this.cardBrandMap = {};
+        this.cardBrandMap.set({});
         this.cdr.markForCheck();
       }
     });
@@ -255,7 +259,7 @@ export class DespesasComponent implements OnInit {
   }
 
   get despesas(): StoredExpense[] {
-    return this.despesasPorMes[this.mesKey()] || [];
+    return this.despesasPorMes()[this.mesKey()] || [];
   }
 
   get totalPendentes(): number {
@@ -290,7 +294,7 @@ export class DespesasComponent implements OnInit {
       {
         label: 'Marcar como pago',
         loadingLabel: 'Processando...',
-        loading: this.loadingPagar,
+        loading: this.loadingPagar(),
         tone: 'primary',
         run: () => this.pagarSelecionadas()
       }
@@ -299,7 +303,7 @@ export class DespesasComponent implements OnInit {
       actions.push({
         label: 'Solicitar antecipação',
         loadingLabel: 'Antecipando...',
-        loading: this.loadingAntecipar,
+        loading: this.loadingAntecipar(),
         tone: 'ghost',
         run: () => this.anteciparSelecionadas()
       });
@@ -362,14 +366,14 @@ export class DespesasComponent implements OnInit {
   }
 
   get cartaoSelecionadoLabel(): string {
-    const card = this.cartoes.find((c) => c.id === this.cartaoSelecionadoId);
+    const card = this.cartoes().find((c) => c.id === this.cartaoSelecionadoId);
     if (!card) return 'Nenhum cartão selecionado';
     return this.formatarCartaoLabel(card);
   }
 
   cardLabel(id?: string): string {
     if (!id) return '';
-    const card = this.cartoes.find((c) => c.id === id);
+    const card = this.cartoes().find((c) => c.id === id);
     if (card) return this.formatarCartaoLabel(card);
     return id;
   }
@@ -389,7 +393,7 @@ export class DespesasComponent implements OnInit {
   }
 
   editarDespesaPorId(id: string): void {
-    const lista = this.despesasPorMes[this.mesKey()] || [];
+    const lista = this.despesasPorMes()[this.mesKey()] || [];
     const index = lista.findIndex((d) => d.id === id);
     if (index >= 0) {
       this.editarDespesa(this.mesKey(), index);
@@ -397,7 +401,7 @@ export class DespesasComponent implements OnInit {
   }
 
   openRemocaoPorId(id: string): void {
-    const lista = this.despesasPorMes[this.mesKey()] || [];
+    const lista = this.despesasPorMes()[this.mesKey()] || [];
     const item = lista.find((d) => d.id === id);
     if (!item) return;
     const index = lista.indexOf(item);
@@ -425,7 +429,7 @@ export class DespesasComponent implements OnInit {
   }
 
   abrirHistorico(id: string): void {
-    const todas = Object.values(this.despesasPorMes).flat();
+    const todas = Object.values(this.despesasPorMes()).flat();
     const alvo = todas.find((d) => d.id === id);
     if (!alvo) return;
     const chave = alvo.serieId || alvo.planId || alvo.id;
@@ -452,11 +456,31 @@ export class DespesasComponent implements OnInit {
     this.historicoAberto = false;
     this.historicoItens = [];
     this.historicoTitulo = '';
-    this.reversingIds.clear();
+    this.reversingIds.set(new Set());
   }
 
   isReversing(installmentId: string): boolean {
-    return this.reversingIds.has(installmentId);
+    return this.reversingIds().has(installmentId);
+  }
+
+  private addReversing(id: string): void {
+    this.reversingIds.set(new Set(this.reversingIds()).add(id));
+  }
+
+  private removeReversing(id: string): void {
+    const next = new Set(this.reversingIds());
+    next.delete(id);
+    this.reversingIds.set(next);
+  }
+
+  private addAttaching(id: string): void {
+    this.attachingReceiptIds.set(new Set(this.attachingReceiptIds()).add(id));
+  }
+
+  private removeAttaching(id: string): void {
+    const next = new Set(this.attachingReceiptIds());
+    next.delete(id);
+    this.attachingReceiptIds.set(next);
   }
 
   estornarDespesa(h: StoredExpense): void {
@@ -466,7 +490,7 @@ export class DespesasComponent implements OnInit {
       return;
     }
 
-    this.reversingIds.add(h.id);
+    this.addReversing(h.id);
     this.installments.listPayments(h.id).subscribe({
       next: (payments) => {
         const target = [...(payments || [])]
@@ -474,7 +498,7 @@ export class DespesasComponent implements OnInit {
           .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
 
         if (!target) {
-          this.reversingIds.delete(h.id);
+          this.removeReversing(h.id);
           this.setAlerta('Nenhum pagamento elegível para estorno nesta parcela.', 3000, 'info');
           return;
         }
@@ -484,7 +508,7 @@ export class DespesasComponent implements OnInit {
             reversedAt: new Date().toISOString(),
             note: 'Estorno solicitado pela UI de despesas'
           })
-          .pipe(finalize(() => this.reversingIds.delete(h.id)))
+          .pipe(finalize(() => this.removeReversing(h.id)))
           .subscribe({
             next: () => {
               this.db.refresh(true);
@@ -496,14 +520,14 @@ export class DespesasComponent implements OnInit {
           });
       },
       error: () => {
-        this.reversingIds.delete(h.id);
+        this.removeReversing(h.id);
         this.setAlerta('Falha ao consultar pagamentos da parcela.', 3000, 'error');
       }
     });
   }
 
   isAttachingReceipt(installmentId: string): boolean {
-    return this.attachingReceiptIds.has(installmentId);
+    return this.attachingReceiptIds().has(installmentId);
   }
 
   prepararAnexoComprovante(h: StoredExpense): void {
@@ -523,7 +547,7 @@ export class DespesasComponent implements OnInit {
     this.receiptUploadTargetId = null;
     if (!file || !installmentId) return;
 
-    this.attachingReceiptIds.add(installmentId);
+    this.addAttaching(installmentId);
     this.installments.listPayments(installmentId).subscribe({
       next: (payments) => {
         const target = [...(payments || [])]
@@ -531,21 +555,21 @@ export class DespesasComponent implements OnInit {
           .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
 
         if (!target) {
-          this.attachingReceiptIds.delete(installmentId);
+          this.removeAttaching(installmentId);
           this.setAlerta('Nenhum pagamento encontrado para anexar o comprovante.', 3000, 'info');
           return;
         }
 
         this.installments
           .uploadReceipt(installmentId, target.id, file)
-          .pipe(finalize(() => this.attachingReceiptIds.delete(installmentId)))
+          .pipe(finalize(() => this.removeAttaching(installmentId)))
           .subscribe({
             next: () => this.setAlerta('Comprovante anexado com sucesso.', 3000, 'success'),
             error: () => this.setAlerta('Falha ao anexar comprovante.', 3000, 'error')
           });
       },
       error: () => {
-        this.attachingReceiptIds.delete(installmentId);
+        this.removeAttaching(installmentId);
         this.setAlerta('Falha ao consultar pagamentos da parcela.', 3000, 'error');
       }
     });
@@ -556,7 +580,7 @@ export class DespesasComponent implements OnInit {
       this.setAlerta('Selecione uma conta ativa para registrar o pagamento.', 3000, 'error');
       return;
     }
-    const lista = this.despesasPorMes[this.mesKey()] || [];
+    const lista = this.despesasPorMes()[this.mesKey()] || [];
     const item = lista.find((d) => d.id === id);
     if (!item) return;
     const payload = {
@@ -566,13 +590,13 @@ export class DespesasComponent implements OnInit {
       note: null,
       accountId: this.canChooseAccount ? this.contaBaixaId : null
     };
-    this.loadingPagar = true;
+    this.loadingPagar.set(true);
     if (this.canChooseAccount) {
       this.accountsService.setDefaultAccountId(this.contaBaixaId);
     }
     this.installments
       .pay(id, payload)
-      .pipe(finalize(() => (this.loadingPagar = false)))
+      .pipe(finalize(() => this.loadingPagar.set(false)))
       .subscribe({
       next: () => {
         this.atualizarStatusLocal([id], 'PAID');
@@ -606,12 +630,12 @@ export class DespesasComponent implements OnInit {
       })
     );
 
-    this.loadingPagar = true;
+    this.loadingPagar.set(true);
     if (this.canChooseAccount) {
       this.accountsService.setDefaultAccountId(this.contaBaixaId);
     }
     forkJoin(pedidos)
-      .pipe(finalize(() => (this.loadingPagar = false)))
+      .pipe(finalize(() => this.loadingPagar.set(false)))
       .subscribe({
       next: () => {
         this.atualizarStatusLocal(pagaveis.map((p) => p.id), 'PAID');
@@ -681,9 +705,9 @@ export class DespesasComponent implements OnInit {
       this.installments.anticipate(item.id, { dueDate: novaDataIso })
     );
 
-    this.loadingAntecipar = true;
+    this.loadingAntecipar.set(true);
     forkJoin(pedidos)
-      .pipe(finalize(() => (this.loadingAntecipar = false)))
+      .pipe(finalize(() => this.loadingAntecipar.set(false)))
       .subscribe({
       next: () => {
         this.moverParaMesAtual(antecipaveis.map((a) => a.id), novaDataIso, 'ANTICIPATED');
@@ -699,9 +723,9 @@ export class DespesasComponent implements OnInit {
 
   private atualizarStatusLocal(ids: string[], status: StoredExpense['status']): void {
     const key = this.mesKey();
-    const lista = this.despesasPorMes[key] || [];
+    const lista = this.despesasPorMes()[key] || [];
     const atualizada = lista.map((d) => (ids.includes(d.id) ? { ...d, status } : d));
-    this.despesasPorMes = { ...this.despesasPorMes, [key]: atualizada };
+    this.despesasPorMes.set({ ...this.despesasPorMes(), [key]: atualizada });
   }
 
   private moverParaMesAtual(ids: string[], novaDataIso: string, status: StoredExpense['status']): void {
@@ -710,7 +734,7 @@ export class DespesasComponent implements OnInit {
     const novaData = formatLocaleDate(targetDate);
 
     const novoMapa: Record<string, StoredExpense[]> = {};
-    Object.entries(this.despesasPorMes).forEach(([key, lista]) => {
+    Object.entries(this.despesasPorMes()).forEach(([key, lista]) => {
       const filtrada = lista.filter((d) => !ids.includes(d.id));
       novoMapa[key] = filtrada;
     });
@@ -718,7 +742,7 @@ export class DespesasComponent implements OnInit {
     const atuais = novoMapa[targetKey] || [];
     const itensAtualizados = ids
       .map((id) => {
-        const encontrado = Object.values(this.despesasPorMes).flat().find((d) => d.id === id);
+        const encontrado = Object.values(this.despesasPorMes()).flat().find((d) => d.id === id);
         if (!encontrado) return null;
         return {
           ...encontrado,
@@ -729,7 +753,7 @@ export class DespesasComponent implements OnInit {
       .filter(Boolean) as StoredExpense[];
 
     novoMapa[targetKey] = [...atuais, ...itensAtualizados];
-    this.despesasPorMes = novoMapa;
+    this.despesasPorMes.set(novoMapa);
   }
 
   private hojeIso(): string {
@@ -824,8 +848,8 @@ export class DespesasComponent implements OnInit {
       this.fixa = false;
       this.fixaMeses = null;
       this.parcelar = this.parcelasCount > 1 ? true : this.parcelar;
-      if (!this.cartaoSelecionadoId && this.cartoes.length) {
-        this.cartaoSelecionadoId = this.cartoes[0].id;
+      if (!this.cartaoSelecionadoId && this.cartoes().length) {
+        this.cartaoSelecionadoId = this.cartoes()[0].id;
       }
       return;
     }
@@ -901,7 +925,7 @@ export class DespesasComponent implements OnInit {
   }
 
   editarDespesa(mesKey: string, index: number): void {
-    const item = this.despesasPorMes[mesKey]?.[index];
+    const item = this.despesasPorMes()[mesKey]?.[index];
     if (!item) return;
     const categoriaId = this.resolveCategoriaId(item);
     const categoriaNome = this.resolveCategoriaNome({ categoryId: categoriaId, categoria: item.categoria });
@@ -926,7 +950,7 @@ export class DespesasComponent implements OnInit {
     this.valorInput = formatNumberValue(item.valor);
     this.vencimentoInput = item.vencimento;
     this.formaPagamento = item.cartao ? 'cartao' : 'avista';
-    this.cartaoSelecionadoId = item.cartao || this.cartoes[0]?.id || null;
+    this.cartaoSelecionadoId = item.cartao || this.cartoes()[0]?.id || null;
     this.parcelar = !!item.parcelasTotal;
     this.parcelasCount = item.parcelasTotal || 1;
     this.fixa = !!item.fixa;
@@ -948,7 +972,7 @@ export class DespesasComponent implements OnInit {
   }
 
   removerDespesa(mesKey: string, index: number): void {
-    const lista = this.despesasPorMes[mesKey] || [];
+    const lista = this.despesasPorMes()[mesKey] || [];
     const item = lista[index];
     if (!item) return;
     this.db.removeExpense(item.id!);
@@ -1007,9 +1031,10 @@ export class DespesasComponent implements OnInit {
   private resolveBrandName(brandIdOrName?: string): string {
     const raw = (brandIdOrName || '').toString().trim();
     if (!raw) return 'Cartão';
+    const brandMap = this.cardBrandMap();
     return (
-      this.cardBrandMap[raw] ||
-      this.cardBrandMap[raw.toUpperCase()] ||
+      brandMap[raw] ||
+      brandMap[raw.toUpperCase()] ||
       this.brandFallbackMap[raw] ||
       raw.toUpperCase()
     );
@@ -1035,7 +1060,7 @@ export class DespesasComponent implements OnInit {
   }
 
   private totalMesByKey(key: string): number {
-    const lista = this.despesasPorMes[key] || [];
+    const lista = this.despesasPorMes()[key] || [];
     return lista.reduce((sum, d) => sum + d.valor, 0);
   }
 
@@ -1068,7 +1093,7 @@ export class DespesasComponent implements OnInit {
     this.parcelasCount = 1;
     this.formaPagamento = 'avista';
     this.editando = null;
-    this.cartaoSelecionadoId = this.cartoes[0]?.id || null;
+    this.cartaoSelecionadoId = this.cartoes()[0]?.id || null;
   }
 
   ordenarPor(campo: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status'): void {
@@ -1154,7 +1179,7 @@ export class DespesasComponent implements OnInit {
     if (expense.categoryId) return expense.categoryId;
     const nome = (expense.categoria || '').trim().toLowerCase();
     if (!nome) return null;
-    const match = this.categorias.find((c) => c.name.trim().toLowerCase() === nome);
+    const match = this.categorias().find((c) => c.name.trim().toLowerCase() === nome);
     return match?.id ?? null;
   }
 
@@ -1202,14 +1227,14 @@ export class DespesasComponent implements OnInit {
       categoria: this.resolveCategoriaNome(item)
     }));
 
-    this.despesasPorMes = lista.reduce((acc, item) => {
+    this.despesasPorMes.set(lista.reduce((acc, item) => {
       const isAntecipada = item.status === 'ANTICIPATED';
       const key = isAntecipada
         ? this.mesKeyFromDate(new Date()) || this.mesKey()
         : this.mesKeyFromVencimento(item.vencimento) || this.mesKey();
       acc[key] = acc[key] ? [...acc[key], item] : [item];
       return acc;
-    }, {} as Record<string, StoredExpense[]>);
+    }, {} as Record<string, StoredExpense[]>));
   }
   trackByIndex(index: number, _item?: unknown): number {
     return index;
