@@ -10,7 +10,7 @@ export class IncomesPage {
 
   async openCreateModal() {
     await this.page.getByRole('button', { name: 'Adicionar receita', exact: true }).click();
-    await expect(this.page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 2, name: 'Adicionar receita' })).toBeVisible();
   }
 
   createForm(): Locator {

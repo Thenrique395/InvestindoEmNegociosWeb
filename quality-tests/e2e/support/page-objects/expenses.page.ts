@@ -13,7 +13,7 @@ export class ExpensesPage {
 
   async openCreateModal() {
     await this.page.getByRole('button', { name: 'Adicionar despesa' }).first().click();
-    await expect(this.page.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 2, name: 'Adicionar lançamento' })).toBeVisible();
   }
 
   createForm(): Locator {

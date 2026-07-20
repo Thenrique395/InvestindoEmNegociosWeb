@@ -78,7 +78,7 @@ test.describe('orçamento mensal', () => {
     await page.getByRole('button', { name: 'Adicionar' }).click();
 
     await expect(page.getByText('Categoria adicionada ao orçamento.')).toBeVisible();
-    await expect(page.getByRole('cell', { name: 'Alimentação' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Alimentação' }).first()).toBeVisible();
   });
 
   test('remove uma categoria do orçamento', async ({ page }) => {
@@ -87,11 +87,13 @@ test.describe('orçamento mensal', () => {
     await page.getByPlaceholder('Nome da categoria').fill('Transporte');
     await page.getByPlaceholder('Valor planejado').fill('300');
     await page.getByRole('button', { name: 'Adicionar' }).click();
-    await expect(page.getByRole('cell', { name: 'Transporte' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Transporte' }).first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Remover' }).first().click();
+    // Remover agora exige confirmação num confirm-sheet.
+    await page.getByRole('dialog').getByRole('button', { name: 'Remover' }).click();
     await expect(page.getByText('Item removido do orçamento.')).toBeVisible();
-    await expect(page.getByRole('cell', { name: 'Transporte' })).not.toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Transporte' }).first()).not.toBeVisible();
   });
 
   test('navega para mês anterior e carrega novo orçamento', async ({ page }) => {
@@ -124,9 +126,9 @@ test.describe('simulador de cenários', () => {
     await page.getByLabel('Receita extra mensal').fill('1000');
     await page.getByRole('button', { name: 'Simular cenário' }).click();
 
-    await expect(page.getByRole('heading', { level: 3, name: 'Saldo projetado (base)' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 3, name: 'Saldo projetado (cenário)' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 3, name: 'Potencial de poupança mensal' })).toBeVisible();
+    await expect(page.getByText('Saldo projetado (base)')).toBeVisible();
+    await expect(page.getByText('Saldo projetado (cenário)')).toBeVisible();
+    await expect(page.getByText('Potencial de poupança mensal')).toBeVisible();
   });
 
   test('exibe tabela de projeção diária após simulação', async ({ page }) => {
@@ -143,10 +145,10 @@ test.describe('simulador de cenários', () => {
   test('simula com diferentes períodos usando o seletor', async ({ page }) => {
     await page.goto('/simulador', { waitUntil: 'domcontentloaded' });
 
-    await page.getByLabel('Período').selectOption('quarter');
+    await page.getByRole('radio', { name: '3 meses' }).click();
     await page.getByRole('button', { name: 'Simular cenário' }).click();
 
-    await expect(page.getByRole('heading', { level: 3, name: 'Saldo projetado (base)' })).toBeVisible();
+    await expect(page.getByText('Saldo projetado (base)')).toBeVisible();
   });
 });
 
@@ -159,11 +161,11 @@ test.describe('relatórios mensais', () => {
     await page.goto('/relatorios', { waitUntil: 'domcontentloaded' });
 
     const main = page.getByRole('main');
-    await expect(page.getByRole('heading', { level: 1, name: /Relatório/i })).toBeVisible();
-    await expect(main.getByText('Receitas', { exact: true })).toBeVisible();
-    await expect(main.getByText('Despesas', { exact: true })).toBeVisible();
-    await expect(main.getByText('Saldo líquido', { exact: true })).toBeVisible();
-    await expect(main.getByText('Taxa de poupança', { exact: true })).toBeVisible();
+    await expect(main.getByText('Relatório financeiro').first()).toBeVisible();
+    await expect(main.getByText('Receitas', { exact: true }).first()).toBeVisible();
+    await expect(main.getByText('Despesas', { exact: true }).first()).toBeVisible();
+    await expect(main.getByText('Saldo líquido', { exact: true }).first()).toBeVisible();
+    await expect(main.getByText('Taxa de poupança', { exact: true }).first()).toBeVisible();
   });
 
   test('exibe tabela de despesas por categoria', async ({ page }) => {

@@ -19,10 +19,11 @@ test.describe('authenticated admin categories', () => {
     const categoriesPage = new CategoriesPage(page);
 
     await categoriesPage.goto();
-    await page.getByPlaceholder('Nome da categoria').fill('Mercado');
-    await page.locator('.add-card__form select').nth(0).selectOption('default');
-    await page.locator('.add-card__form select').nth(1).selectOption('Expense');
-    await page.getByRole('button', { name: 'Adicionar', exact: true }).click();
+    await categoriesPage.openCreateModal();
+    await page.getByPlaceholder('Ex.: Moradia').fill('Mercado');
+    await page.getByRole('dialog').locator('select').nth(0).selectOption('Expense'); // Tipo
+    await page.getByRole('dialog').locator('select').nth(1).selectOption('default'); // Escopo
+    await page.getByRole('button', { name: 'Criar categoria' }).click();
     await categoriesPage.expectDuplicateDefaultWarning();
   });
 });

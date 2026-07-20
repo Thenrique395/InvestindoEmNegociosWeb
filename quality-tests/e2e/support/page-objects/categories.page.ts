@@ -8,15 +8,27 @@ export class CategoriesPage {
     await expect(this.page.getByRole('heading', { level: 1, name: 'Categorias' })).toBeVisible();
   }
 
+  // Criar categoria agora é via modal "Nova categoria" (nome + Tipo + Escopo p/ admin).
+  async openCreateModal() {
+    await this.page.getByRole('button', { name: /Nova categoria/ }).click();
+    await expect(this.page.getByPlaceholder('Ex.: Moradia')).toBeVisible();
+  }
+
+  private modalSelects() {
+    // app-modal usa body-portal (role="dialog"), então os selects não ficam sob <app-modal>.
+    return this.page.getByRole('dialog').locator('select');
+  }
+
   async createCategory(name: string, type: 'Income' | 'Expense') {
-    await this.page.getByPlaceholder('Nome da categoria').fill(name);
-    await this.page.locator('.add-card__form select').selectOption(type);
+    await this.openCreateModal();
+    await this.page.getByPlaceholder('Ex.: Moradia').fill(name);
+    await this.modalSelects().nth(0).selectOption(type);
     const createResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'POST' && response.url().includes('/categories')
     );
-    await this.page.getByRole('button', { name: 'Adicionar', exact: true }).click();
+    await this.page.getByRole('button', { name: 'Criar categoria' }).click();
     await expect.poll(async () => (await createResponse).ok()).toBeTruthy();
-    await expect(this.page.getByText(name)).toBeVisible({ timeout: 20000 });
+    await expect(this.page.getByText(name).first()).toBeVisible({ timeout: 20000 });
   }
 
   categoryCard(name: string) {
@@ -38,29 +50,26 @@ export class CategoriesPage {
     await expect(this.page.getByText(name)).toHaveCount(0, { timeout: 20000 });
   }
 
-  async openAdminDefaultCategories() {
-    await this.page.getByRole('button', { name: 'Categorias padrão (admin)' }).click();
-    await expect(this.page.getByRole('heading', { name: 'Categorias padrão (admin)' })).toBeVisible();
-  }
-
+  // Admin cria categoria de sistema escolhendo Escopo = "Sistema" no mesmo modal.
   async createDefaultCategory(name: string, type: 'Income' | 'Expense') {
-    await this.page.getByPlaceholder('Nome da categoria').fill(name);
-    await this.page.locator('.add-card__form select').nth(0).selectOption('default');
-    await this.page.locator('.add-card__form select').nth(1).selectOption(type);
+    await this.openCreateModal();
+    await this.page.getByPlaceholder('Ex.: Moradia').fill(name);
+    await this.modalSelects().nth(0).selectOption(type); // Tipo
+    await this.modalSelects().nth(1).selectOption('default'); // Escopo
     const createResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'POST' && response.url().includes('/admin/categories')
     );
-    await this.page.getByRole('button', { name: 'Adicionar', exact: true }).click();
+    await this.page.getByRole('button', { name: 'Criar categoria' }).click();
     await expect.poll(async () => (await createResponse).ok()).toBeTruthy();
   }
 
   async expectDefaultCategoryVisible(name: string) {
-    await this.openAdminDefaultCategories();
-    await expect(this.page.getByText(name, { exact: true })).toBeVisible();
+    // Admin vê as categorias de sistema inline na lista unificada.
+    await expect(this.page.getByText(name, { exact: true }).first()).toBeVisible({ timeout: 20000 });
   }
 
   async expectDuplicateDefaultWarning() {
-    await expect(this.page.getByText('Já existe uma categoria padrão com esse nome e tipo.')).toBeVisible();
+    await expect(this.page.getByText('Já existe uma categoria de sistema com esse nome e tipo.')).toBeVisible();
   }
 
   async editDefaultCategory(currentName: string, nextName: string) {
