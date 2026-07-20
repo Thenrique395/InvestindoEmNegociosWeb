@@ -73,6 +73,8 @@ export class CardsPage {
       response.request().method() === 'DELETE' && response.url().includes('/cards/')
     );
     await this.card(holderName).getByRole('button', { name: 'Remover' }).click();
+    // Remover cartão agora usa um confirm-sheet.
+    await this.page.getByRole('dialog').getByRole('button', { name: 'Remover cartão' }).click();
     await expect.poll(async () => (await deleteResponse).ok()).toBeTruthy();
     await expect(this.page.getByText(holderName)).toHaveCount(0, { timeout: 10000 });
   }

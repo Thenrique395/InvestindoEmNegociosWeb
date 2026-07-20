@@ -72,8 +72,9 @@ export class AccountsPage {
   }
 
   async removeAccount(name: string) {
-    this.page.once('dialog', (dialog) => dialog.accept());
     await this.accountCard(name).getByRole('button', { name: 'Remover' }).click();
+    // Remover conta agora usa um confirm-dialog (não confirm() nativo).
+    await this.page.getByRole('dialog').getByRole('button', { name: 'Remover conta' }).click();
     await this.expectAccountNotVisible(name);
   }
 

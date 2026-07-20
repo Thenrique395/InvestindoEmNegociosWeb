@@ -35,8 +35,10 @@ test.describe('empréstimos — edição e exclusão', () => {
     await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Excluir' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Excluir' }).first().click();
+    // Excluir contrato agora exige confirmação num confirm-sheet.
+    await page.getByRole('dialog').getByRole('button', { name: /Excluir/ }).click();
 
-    await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Excluir' })).not.toBeVisible();
+    await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Excluir' })).toHaveCount(0);
     await expect(page.getByText('Contrato excluído.')).toBeVisible();
   });
 
