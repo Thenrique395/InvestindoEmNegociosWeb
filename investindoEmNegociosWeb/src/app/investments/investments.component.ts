@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -86,27 +86,53 @@ export class InvestmentsComponent implements OnInit {
   private readonly tabStorageKey = 'investments.activeTab';
   private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  positions: InvestmentPosition[] = [];
-  institutions: InstitutionLookup[] = [];
+  // A9: estado assíncrono via signal, exposto por getter/setter para manter as leituras
+  // e escritas existentes intactas (o setter dirige o signal → re-render OnPush headless).
+  private readonly _positions = signal<InvestmentPosition[]>([]);
+  get positions(): InvestmentPosition[] { return this._positions(); }
+  set positions(v: InvestmentPosition[]) { this._positions.set(v); }
+  private readonly _institutions = signal<InstitutionLookup[]>([]);
+  get institutions(): InstitutionLookup[] { return this._institutions(); }
+  set institutions(v: InstitutionLookup[]) { this._institutions.set(v); }
   searchTerm = '';
   filterType: 'ALL' | InvestmentType = 'ALL';
   filterAccount = 'ALL';
   filterStatus: 'ALL' | 'ACTIVE' | 'ZEROED' = 'ALL';
   mode: FormMode = 'create';
   selectedId: string | null = null;
-  showCadastro = false;
-  showMovimento = false;
-  showB3Import = false;
+  private readonly _showCadastro = signal(false);
+  get showCadastro(): boolean { return this._showCadastro(); }
+  set showCadastro(v: boolean) { this._showCadastro.set(v); }
+  private readonly _showMovimento = signal(false);
+  get showMovimento(): boolean { return this._showMovimento(); }
+  set showMovimento(v: boolean) { this._showMovimento.set(v); }
+  private readonly _showB3Import = signal(false);
+  get showB3Import(): boolean { return this._showB3Import(); }
+  set showB3Import(v: boolean) { this._showB3Import.set(v); }
   posSelecionada?: InvestmentPosition | null;
   metaPatrimonioInput = '';
-  metaPatrimonio = 0;
-  metaSalvando = false;
-  b3Loading = false;
-  b3Importing = false;
-  b3Error = '';
-  b3FileName = '';
+  private readonly _metaPatrimonio = signal(0);
+  get metaPatrimonio(): number { return this._metaPatrimonio(); }
+  set metaPatrimonio(v: number) { this._metaPatrimonio.set(v); }
+  private readonly _metaSalvando = signal(false);
+  get metaSalvando(): boolean { return this._metaSalvando(); }
+  set metaSalvando(v: boolean) { this._metaSalvando.set(v); }
+  private readonly _b3Loading = signal(false);
+  get b3Loading(): boolean { return this._b3Loading(); }
+  set b3Loading(v: boolean) { this._b3Loading.set(v); }
+  private readonly _b3Importing = signal(false);
+  get b3Importing(): boolean { return this._b3Importing(); }
+  set b3Importing(v: boolean) { this._b3Importing.set(v); }
+  private readonly _b3Error = signal('');
+  get b3Error(): string { return this._b3Error(); }
+  set b3Error(v: string) { this._b3Error.set(v); }
+  private readonly _b3FileName = signal('');
+  get b3FileName(): string { return this._b3FileName(); }
+  set b3FileName(v: string) { this._b3FileName.set(v); }
   b3Strategy: B3ImportStrategy = 'merge';
-  b3Preview: B3ExtractResponse | null = null;
+  private readonly _b3Preview = signal<B3ExtractResponse | null>(null);
+  get b3Preview(): B3ExtractResponse | null { return this._b3Preview(); }
+  set b3Preview(v: B3ExtractResponse | null) { this._b3Preview.set(v); }
   sortBy: PositionSortKey = 'asset';
   sortDir: 'asc' | 'desc' = 'asc';
   currentPage = 1;
@@ -121,9 +147,13 @@ export class InvestmentsComponent implements OnInit {
   consolidacaoHorizonteAnos = 2;
   consolidacaoTipoFiltro: 'ALL' | InvestmentType = 'ALL';
   consolidacaoSearchTerm = '';
-  showAlocacaoConfig = false;
+  private readonly _showAlocacaoConfig = signal(false);
+  get showAlocacaoConfig(): boolean { return this._showAlocacaoConfig(); }
+  set showAlocacaoConfig(v: boolean) { this._showAlocacaoConfig.set(v); }
   private allocationLoadWarned = false;
-  targetAllocation: Record<AllocationInvestmentType, number> = { ...DEFAULT_TARGET_ALLOCATION };
+  private readonly _targetAllocation = signal<Record<AllocationInvestmentType, number>>({ ...DEFAULT_TARGET_ALLOCATION });
+  get targetAllocation(): Record<AllocationInvestmentType, number> { return this._targetAllocation(); }
+  set targetAllocation(v: Record<AllocationInvestmentType, number>) { this._targetAllocation.set(v); }
   cadastroOperacao: CadastroOperacao = 'COMPRA';
   activeTab: InvestmentsTab = 'RESUMO';
   tabs: Array<{ key: InvestmentsTab; label: string }> = [
@@ -144,10 +174,18 @@ export class InvestmentsComponent implements OnInit {
   ];
 
   // Prioridade 7: importação CSV
-  csvLoading = false;
-  csvError = '';
-  csvImported = 0;
-  csvPreviewRows: InvestmentPositionRequest[] = [];
+  private readonly _csvLoading = signal(false);
+  get csvLoading(): boolean { return this._csvLoading(); }
+  set csvLoading(v: boolean) { this._csvLoading.set(v); }
+  private readonly _csvError = signal('');
+  get csvError(): string { return this._csvError(); }
+  set csvError(v: string) { this._csvError.set(v); }
+  private readonly _csvImported = signal(0);
+  get csvImported(): number { return this._csvImported(); }
+  set csvImported(v: number) { this._csvImported.set(v); }
+  private readonly _csvPreviewRows = signal<InvestmentPositionRequest[]>([]);
+  get csvPreviewRows(): InvestmentPositionRequest[] { return this._csvPreviewRows(); }
+  set csvPreviewRows(v: InvestmentPositionRequest[]) { this._csvPreviewRows.set(v); }
 
   readonly currencyOptions: readonly string[] = SUPPORTED_CURRENCIES;
 
@@ -1006,7 +1044,7 @@ export class InvestmentsComponent implements OnInit {
 
   updateTargetAllocation(type: AllocationInvestmentType, value: number): void {
     const safe = Number.isFinite(value) ? value : 0;
-    this.targetAllocation[type] = Math.min(100, Math.max(0, safe));
+    this.targetAllocation = { ...this.targetAllocation, [type]: Math.min(100, Math.max(0, safe)) };
   }
 
   saveTargetAllocation(): void {
