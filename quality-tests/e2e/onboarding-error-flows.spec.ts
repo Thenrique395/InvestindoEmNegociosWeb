@@ -31,7 +31,7 @@ test.describe('onboarding error flows', () => {
       {
         path: '/api/v1/profile',
         method: 'PUT',
-        status: 500,
+        status: 400,
         body: { detail: 'Falha ao salvar perfil E2E.' }
       }
     ]);
@@ -50,7 +50,7 @@ test.describe('onboarding error flows', () => {
         path: '/api/v1/plans',
         method: 'POST',
         requestBodyIncludes: 'Salário E2E',
-        status: 500,
+        status: 400,
         body: { detail: 'Falha ao cadastrar receita E2E.' }
       }
     ]);
@@ -73,7 +73,7 @@ test.describe('onboarding error flows', () => {
         path: '/api/v1/plans',
         method: 'POST',
         requestBodyIncludes: 'Mercado E2E',
-        status: 500,
+        status: 400,
         body: { detail: 'Falha ao cadastrar despesa E2E.' }
       }
     ]);
@@ -97,7 +97,7 @@ test.describe('onboarding error flows', () => {
         path: '/api/v1/onboarding',
         method: 'PUT',
         requestBodyIncludes: '"completed":true',
-        status: 500,
+        status: 400,
         body: { detail: 'Falha ao concluir onboarding E2E.' }
       }
     ]);

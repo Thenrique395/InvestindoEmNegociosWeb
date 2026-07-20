@@ -34,7 +34,7 @@ export async function advanceToInitialEntriesStep(page: Page) {
 export async function saveInitialIncome(page: Page) {
   await page.getByRole('button', { name: 'Adicionar receita' }).click();
   const incomeDialog = page.getByRole('dialog', { name: 'Adicionar receita' });
-  await expect(incomeDialog.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
+  await expect(incomeDialog.getByRole('heading', { level: 2, name: 'Adicionar receita' })).toBeVisible();
   const incomeCategory = incomeDialog.getByRole('combobox', { name: 'Categoria' });
   await expect(incomeCategory).toContainText('Salário');
   await incomeDialog.getByRole('textbox', { name: 'Fonte' }).fill('Salário E2E');
@@ -48,7 +48,7 @@ export async function saveInitialIncome(page: Page) {
 export async function saveInitialExpense(page: Page) {
   await page.getByRole('button', { name: 'Adicionar despesa' }).click();
   const expenseDialog = page.getByRole('dialog', { name: 'Adicionar lançamento' });
-  await expect(expenseDialog.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
+  await expect(expenseDialog.getByRole('heading', { level: 2, name: 'Adicionar lançamento' })).toBeVisible();
   const expenseCategory = expenseDialog.getByRole('combobox', { name: 'Categoria' });
   await expect(expenseCategory).toContainText('Mercado');
   await expenseDialog.getByRole('textbox', { name: 'Nome da despesa' }).fill('Mercado E2E');
@@ -70,6 +70,6 @@ export async function completeOnboarding(page: Page) {
 
   await page.getByRole('button', { name: 'Concluir onboarding' }).click();
   await expect(page).toHaveURL(/\/dashboard$/, { timeout: 10000 });
-  await expect(page.getByRole('heading', { level: 1, name: 'Seu mês com clareza' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Visão Geral Financeira' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Dashboard', exact: true })).toBeVisible();
 }
