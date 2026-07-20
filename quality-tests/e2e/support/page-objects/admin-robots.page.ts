@@ -15,7 +15,9 @@ export class AdminRobotsPage {
 
   async runAll() {
     const response = this.page.waitForResponse((res) => res.request().method() === 'POST' && res.url().includes('/admin/robots/run-all'));
-    await this.page.getByRole('button', { name: 'Executar todos' }).click();
+    await this.page.getByRole('button', { name: 'Executar todos' }).first().click();
+    // Executar todos agora exige confirmação num diálogo.
+    await this.page.getByRole('dialog').getByRole('button', { name: 'Executar todos' }).click();
     await response;
   }
 

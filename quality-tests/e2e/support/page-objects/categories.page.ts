@@ -73,13 +73,13 @@ export class CategoriesPage {
   }
 
   async editDefaultCategory(currentName: string, nextName: string) {
-    await this.openAdminDefaultCategories();
-    const card = this.page.locator('section.admin-card div.rounded-xl').filter({ hasText: currentName }).first();
-    await card.getByRole('button', { name: 'Editar' }).click();
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Editar categoria padrão' })).toBeVisible();
-    await this.page.locator('.modal__card input[type="text"]').fill(nextName);
+    // Admin edita a categoria de sistema inline (botão "Editar" na lista) → modal.
+    await this.page.getByRole('button', { name: `Editar categoria de sistema ${currentName}` }).first().click();
+    await expect(this.page.getByRole('heading', { name: 'Editar categoria de sistema' })).toBeVisible();
+    const dialog = this.page.getByRole('dialog');
+    await dialog.getByRole('textbox').first().fill(nextName);
     const response = this.page.waitForResponse((resp) => resp.request().method() === 'PUT' && /\/api\/v1\/admin\/categories\/[^/]+$/.test(new URL(resp.url()).pathname));
-    await this.page.locator('.modal__card').getByRole('button', { name: 'Salvar' }).click();
+    await dialog.getByRole('button', { name: 'Salvar' }).click();
     await response;
   }
 }

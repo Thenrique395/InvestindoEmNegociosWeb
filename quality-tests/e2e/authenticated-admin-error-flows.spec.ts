@@ -45,6 +45,7 @@ test.describe('authenticated admin error flows', () => {
     const adminRobotsPage = new AdminRobotsPage(page);
     await adminRobotsPage.goto();
     await page.getByRole('button', { name: 'Executar todos' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Executar todos' }).click();
     await expect(page.getByText('Falha ao executar todos os robôs.')).toBeVisible();
   });
 
@@ -124,7 +125,7 @@ test.describe('authenticated admin error flows', () => {
           path: /\/api\/v1\/admin\/categories\/[^/]+$/,
           method: 'PUT',
           status: 400,
-          body: { detail: 'Não foi possível salvar a categoria padrão.' }
+          body: { detail: 'Não foi possível salvar a categoria de sistema.' }
         }
       ]
     });
@@ -132,11 +133,11 @@ test.describe('authenticated admin error flows', () => {
     const categoriesPage = new CategoriesPage(page);
     await categoriesPage.goto();
     await categoriesPage.editDefaultCategory('Mercado', 'Mercado alterado');
-    await expect(page.getByText('Não foi possível salvar a categoria padrão.')).toBeVisible();
+    // A UI usa uma mensagem fixa (não o detail da API) ao falhar a edição de sistema.
+    await expect(page.getByText('Não foi possível salvar a categoria de sistema.')).toBeVisible();
 
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await categoriesPage.openAdminDefaultCategories();
-    await expect(page.getByText('Mercado', { exact: true })).toBeVisible();
+    await expect(page.getByText('Mercado', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mercado alterado', { exact: true })).toHaveCount(0);
   });
 });

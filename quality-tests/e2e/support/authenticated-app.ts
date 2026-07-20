@@ -1647,7 +1647,7 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
-  if (method === 'POST' && path === '/api/v1/financialassistant/chat') {
+  if (method === 'POST' && path === '/api/v1/financial-assistant/chat') {
     const payload = JSON.parse(route.request().postData() || '{}');
     await json(route, {
       allowed: true,
@@ -2357,7 +2357,7 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
-  if (path === '/api/v1/financialassistant/context') {
+  if (path === '/api/v1/financial-assistant/context') {
     await json(route, state.assistantContext);
     return;
   }

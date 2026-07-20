@@ -24,7 +24,7 @@ test.describe('app shell', () => {
     await page.goto('/calculadora', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveURL(/\/calculadora$/);
-    await expect(page.getByRole('heading', { level: 2, name: /Simuladores financeiros e trabalhistas/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Simuladores financeiros e trabalhistas/i })).toBeVisible();
     await expect(page.getByText('Juros Compostos')).toBeVisible();
   });
 

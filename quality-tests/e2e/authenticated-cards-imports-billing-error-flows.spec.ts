@@ -192,6 +192,8 @@ test.describe('billing — cenários de erro', () => {
 
     await page.goto('/assinatura', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: /Cancelar renovação/i }).first().click();
+    // O cancelamento agora exige confirmação num diálogo.
+    await page.getByRole('dialog').getByRole('button', { name: /Cancelar renovação/i }).click();
 
     await expect(page.getByText('Falha ao cancelar o plano.')).toBeVisible();
   });

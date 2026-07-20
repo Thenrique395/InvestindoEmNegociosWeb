@@ -5,7 +5,7 @@ export class DataPage {
 
   async goto() {
     await this.page.goto('/dados', { waitUntil: 'domcontentloaded' });
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Exportar / Importar' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 1, name: 'Exportar / Importar' })).toBeVisible();
   }
 
   async expectPrivacySectionVisible() {
