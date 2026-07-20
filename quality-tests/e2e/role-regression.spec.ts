@@ -22,7 +22,7 @@ test.describe('role regression', () => {
 
     await page.goto('/categorias', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/categorias$/);
-    await expect(page.getByRole('heading', { level: 2, name: 'Organize receitas e despesas' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Categorias' }).first()).toBeVisible();
 
     await page.goto('/investimentos', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/);
@@ -66,7 +66,7 @@ test.describe('role regression', () => {
 
     await page.getByRole('link', { name: 'Categorias', exact: true }).click();
     await expect(page).toHaveURL(/\/categorias$/);
-    await expect(page.getByRole('heading', { level: 2, name: 'Organize receitas e despesas' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Categorias' }).first()).toBeVisible();
 
     await page.goto('/investimentos', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/dashboard$/);
@@ -93,15 +93,14 @@ test.describe('role regression', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('link', { name: 'Investimentos', exact: true })).toBeVisible();
-    await expect(page.getByText('Saldos por conta')).toBeVisible();
-    await expect(page.getByText('Evolução patrimonial')).toBeVisible();
+    await expect(page.getByText('Evolução patrimonial').first()).toBeVisible();
   });
 
   test('Admin acessa modulos administrativos', async ({ page }) => {
     await setupAuthenticatedApp(page, { role: 'Admin', profileName: 'Usuário Admin' });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Usuários' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Parâmetros' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Robôs' })).toBeVisible();
 

@@ -11,7 +11,8 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   workers: 1,
-  retries: process.env['CI'] ? 2 : 0,
+  // Local: 1 retry tolera blips de rede dos testes live remotos (ERR_NETWORK_CHANGED).
+  retries: process.env['CI'] ? 2 : 1,
   reporter: 'list',
   use: {
     baseURL: appBaseUrl,

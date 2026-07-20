@@ -9,7 +9,7 @@ test.describe('authenticated app shell', () => {
   test('abre dashboard com resumos financeiros oficiais', async ({ page }) => {
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { level: 1, name: /Visão geral de/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Visão Geral Financeira/i })).toBeVisible();
     await expect(page.getByText('Saldo Disponível Real')).toBeVisible();
     await expect(page.getByText('Patrimônio líquido', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mapa de dívidas')).toBeVisible();
