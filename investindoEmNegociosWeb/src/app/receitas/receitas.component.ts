@@ -3,8 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
 import { ReceitasFormComponent } from './receitas-form.component';
@@ -326,19 +327,16 @@ export class ReceitasComponent implements OnInit {
       : formatLocaleDate(this.dataAtual);
 
     this.saving = true;
-    let ok = false;
-    try {
-      if (this.editandoId) {
-        this.db.updateIncome(this.editandoId, {
+    const save$ = this.editandoId
+      ? this.db.updateIncome(this.editandoId, {
           planId: this.editandoId,
           fonte: this.novaRenda.fonte,
           categoryId: this.novaRenda.categoryId ?? null,
           valor,
           recebimento: recebimentoNormalizado,
           fixa: this.novaRenda.fixa
-        });
-      } else {
-        this.db.addIncome({
+        })
+      : this.db.addIncome({
           planId: '',
           fonte: this.novaRenda.fonte,
           categoryId: this.novaRenda.categoryId ?? null,
@@ -346,16 +344,16 @@ export class ReceitasComponent implements OnInit {
           recebimento: recebimentoNormalizado,
           fixa: this.novaRenda.fixa
         });
-      }
 
-      ok = true;
-    } finally {
-      this.saving = false;
-      if (ok) {
-        this.setAlerta('Receita salva com sucesso.', 2500, 'success');
-        this.fecharModal();
-      }
-    }
+    save$
+      .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setAlerta('Receita salva com sucesso.', 2500, 'success');
+          this.fecharModal();
+        },
+        error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível salvar a receita.'), 4000, 'error')
+      });
   }
 
   editar(renda: StoredIncome): void {
@@ -393,14 +391,24 @@ export class ReceitasComponent implements OnInit {
 
   confirmarExcluirSomenteEsta(): void {
     if (!this.deleteInstallmentId) return;
-    this.db.removeIncomeInstallment(this.deleteInstallmentId);
+    this.executarRemocaoReceita(this.db.removeIncomeInstallment(this.deleteInstallmentId));
     this.fecharModalExcluir();
   }
 
   confirmarExcluirRecorrencia(): void {
     if (!this.deletePlanId) return;
-    this.db.removeIncome(this.deletePlanId);
+    this.executarRemocaoReceita(this.db.removeIncome(this.deletePlanId));
     this.fecharModalExcluir();
+  }
+
+  /** Executa uma remoção de receita e dá feedback de sucesso/erro. */
+  private executarRemocaoReceita(op$: Observable<void>): void {
+    op$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.setAlerta('Receita excluída.', 2500, 'success'),
+        error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível excluir a receita.'), 4000, 'error')
+      });
   }
 
   fecharModalExcluir(): void {

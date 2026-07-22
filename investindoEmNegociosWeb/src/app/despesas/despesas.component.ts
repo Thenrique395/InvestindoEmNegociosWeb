@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnIn
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TitleCasePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
@@ -672,8 +673,24 @@ export class DespesasComponent implements OnInit {
       return;
     }
 
-    ids.forEach((id) => this.db.removeExpense(id));
     this.selectedIds.clear();
+    if (!ids.length) return;
+    forkJoin(ids.map((id) => this.db.removeExpense(id)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.setAlerta('Despesas excluídas.', 2500, 'success'),
+        error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível excluir uma ou mais despesas.'), 4000, 'error')
+      });
+  }
+
+  /** Executa uma remoção de despesa e dá feedback de sucesso/erro. */
+  private executarRemocaoDespesa(op$: Observable<void>): void {
+    op$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.setAlerta('Despesa excluída.', 2500, 'success'),
+        error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível excluir a despesa.'), 4000, 'error')
+      });
   }
 
   anteciparSelecionadas(): void {
@@ -802,31 +819,28 @@ export class DespesasComponent implements OnInit {
     const fixaMeses = this.fixa ? this.fixaMeses || null : null;
 
     this.saving = true;
-    let ok = false;
-    try {
-      // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
-      this.db.addExpense({
-        nome: this.novaDespesa.nome,
-        categoria: this.resolveCategoriaNome(this.novaDespesa),
-        categoryId: this.novaDespesa.categoryId ?? null,
-        valor: Number(valorParcela.toFixed(2)),
-        vencimento: formatLocaleDate(dataBase),
-        cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
-        parcelaNumero: parcelas > 1 ? 1 : undefined,
-        parcelasTotal: parcelas > 1 ? parcelas : undefined,
-        serieId: parcelas > 1 ? serieId : undefined,
-        fixa: this.fixa,
-        fixaMeses
+    // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
+    this.db.addExpense({
+      nome: this.novaDespesa.nome,
+      categoria: this.resolveCategoriaNome(this.novaDespesa),
+      categoryId: this.novaDespesa.categoryId ?? null,
+      valor: Number(valorParcela.toFixed(2)),
+      vencimento: formatLocaleDate(dataBase),
+      cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
+      parcelaNumero: parcelas > 1 ? 1 : undefined,
+      parcelasTotal: parcelas > 1 ? parcelas : undefined,
+      serieId: parcelas > 1 ? serieId : undefined,
+      fixa: this.fixa,
+      fixaMeses
+    })
+      .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setAlerta('Despesa salva com sucesso.', 2500, 'success');
+          this.fecharModal();
+        },
+        error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível salvar a despesa.'), 4000, 'error')
       });
-
-      ok = true;
-    } finally {
-      this.saving = false;
-      if (ok) {
-        this.setAlerta('Despesa salva com sucesso.', 2500, 'success');
-        this.fecharModal();
-      }
-    }
   }
 
   totalMes(): number {
@@ -975,7 +989,7 @@ export class DespesasComponent implements OnInit {
     const lista = this.despesasPorMes()[mesKey] || [];
     const item = lista[index];
     if (!item) return;
-    this.db.removeExpense(item.id!);
+    this.executarRemocaoDespesa(this.db.removeExpense(item.id!));
   }
 
   openRemocao(d: StoredExpense, mesKey: string, index: number): void {
@@ -1001,11 +1015,9 @@ export class DespesasComponent implements OnInit {
     if (!this.confirmRemocao) return;
     const { id, serieId } = this.confirmRemocao;
 
-    if (removerSerie && serieId) {
-      this.db.removeExpenseSeries(serieId);
-    } else {
-      this.db.removeExpense(id);
-    }
+    this.executarRemocaoDespesa(
+      removerSerie && serieId ? this.db.removeExpenseSeries(serieId) : this.db.removeExpense(id)
+    );
 
     this.confirmRemocao = null;
   }
@@ -1204,21 +1216,18 @@ export class DespesasComponent implements OnInit {
     };
 
     this.saving = true;
-    let ok = false;
-    try {
-      if (escopo === 'single') {
-        this.db.updateExpenseInstallment(this.editando.id, payload);
-      } else {
-        this.db.updateExpense(this.editando.id, payload);
-      }
-      ok = true;
-    } finally {
-      this.saving = false;
-      if (ok) {
-        this.setAlerta('Despesa atualizada com sucesso.', 2500, 'success');
-        this.fecharModal();
-      }
-    }
+    const update$ = escopo === 'single'
+      ? this.db.updateExpenseInstallment(this.editando.id, payload)
+      : this.db.updateExpense(this.editando.id, payload);
+    update$
+      .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setAlerta('Despesa atualizada com sucesso.', 2500, 'success');
+          this.fecharModal();
+        },
+        error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível atualizar a despesa.'), 4000, 'error')
+      });
   }
 
   private rebuildDespesas(): void {

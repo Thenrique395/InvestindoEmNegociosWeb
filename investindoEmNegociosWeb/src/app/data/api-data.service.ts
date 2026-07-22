@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, finalize, forkJoin, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, distinctUntilChanged, finalize, forkJoin, map, switchMap, tap, throwError } from 'rxjs';
 import { PlansService, Plan, CreatePlanPayload } from '../plans.service';
 import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
@@ -83,8 +83,12 @@ export class ApiDataService {
   private readonly db$ = this.dbSubject.asObservable();
   private readonly incomeSummarySubject = new BehaviorSubject<IncomeSummaryState | null>(null);
   private readonly incomesLoadingSubject = new BehaviorSubject<boolean>(false);
+  // Estado discreto de erro de carga (refresh de fundo). Não dispara toast; a UI
+  // pode exibir um aviso sutil e o dado permanece o último carregado com sucesso.
+  private readonly loadErrorSubject = new BehaviorSubject<boolean>(false);
   readonly incomeSummary$ = this.incomeSummarySubject.asObservable();
   readonly incomesLoading$ = this.incomesLoadingSubject.asObservable();
+  readonly loadError$ = this.loadErrorSubject.asObservable();
   private lastIncomeMonth?: string;
   private refreshInFlight = false;
   private refreshIncomesInFlight = false;
@@ -118,20 +122,17 @@ export class ApiDataService {
     this.refresh();
   }
 
-  addExpense(expense: Omit<StoredExpense, 'id'>): void {
+  addExpense(expense: Omit<StoredExpense, 'id'>): Observable<void> {
     const payload = this.toPlanPayloadFromExpense(expense);
-    this.plans.create(payload).subscribe({
-      next: () => this.refresh(),
-      error: () => {}
-    });
+    return this.plans.create(payload).pipe(tap(() => this.refresh()), map(() => void 0));
   }
 
-  updateExpense(_id: string, _data: Partial<StoredExpense>): void {
+  updateExpense(_id: string, _data: Partial<StoredExpense>): Observable<void> {
     const current = this.dbSubject.value;
     const existing = current.expenses.find((e) => e.id === _id);
     const planId = _data.planId || existing?.planId;
     if (!planId) {
-      return;
+      return throwError(() => new Error('Não foi possível localizar o lançamento para atualizar.'));
     }
 
     const merged: Omit<StoredExpense, 'id'> = {
@@ -146,13 +147,10 @@ export class ApiDataService {
     };
 
     const payload = this.toPlanPayloadFromExpense(merged);
-    this.plans.update(planId, payload).subscribe({
-      next: () => this.refresh(),
-      error: () => {}
-    });
+    return this.plans.update(planId, payload).pipe(tap(() => this.refresh()), map(() => void 0));
   }
 
-  updateExpenseInstallment(installmentId: string, data: Partial<StoredExpense>): void {
+  updateExpenseInstallment(installmentId: string, data: Partial<StoredExpense>): Observable<void> {
     const current = this.dbSubject.value;
     const existing = current.expenses.find((e) => e.id === installmentId);
     const merged: Omit<StoredExpense, 'id'> = {
@@ -169,31 +167,21 @@ export class ApiDataService {
     };
 
     const payload = this.toPlanPayloadFromExpense(merged);
-    this.installments
+    return this.installments
       .delete(installmentId)
-      .pipe(switchMap(() => this.plans.create(payload)))
-      .subscribe({
-        next: () => this.refresh(),
-        error: () => {}
-      });
+      .pipe(switchMap(() => this.plans.create(payload)), tap(() => this.refresh()), map(() => void 0));
   }
 
-  removeExpense(_id: string): void {
-    this.removeExpenseInstallment(_id);
+  removeExpense(_id: string): Observable<void> {
+    return this.removeExpenseInstallment(_id);
   }
 
-  removeExpenseSeries(planId: string): void {
-    this.plans.delete(planId).subscribe({
-      next: () => this.refresh(),
-      error: () => {}
-    });
+  removeExpenseSeries(planId: string): Observable<void> {
+    return this.plans.delete(planId).pipe(tap(() => this.refresh()), map(() => void 0));
   }
 
-  removeExpenseInstallment(installmentId: string): void {
-    this.installments.delete(installmentId).subscribe({
-      next: () => this.refresh(),
-      error: () => {}
-    });
+  removeExpenseInstallment(installmentId: string): Observable<void> {
+    return this.installments.delete(installmentId).pipe(tap(() => this.refresh()), map(() => void 0));
   }
 
   addCard(card: Omit<StoredCard, 'id'>) {
@@ -230,22 +218,16 @@ export class ApiDataService {
       );
   }
 
-  removeCard(id: string): void {
-    this.cardsApi.delete(id).subscribe({
-      next: () => this.refresh(),
-      error: () => {}
-    });
+  removeCard(id: string): Observable<void> {
+    return this.cardsApi.delete(id).pipe(tap(() => this.refresh()), map(() => void 0));
   }
 
-  addIncome(income: Omit<StoredIncome, 'id'>): void {
+  addIncome(income: Omit<StoredIncome, 'id'>): Observable<void> {
     const payload = this.toPlanPayloadFromIncome(income);
-    this.plans.create(payload).subscribe({
-      next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: () => {}
-    });
+    return this.plans.create(payload).pipe(tap(() => this.refreshIncomes(this.lastIncomeMonth)), map(() => void 0));
   }
 
-  updateIncome(planId: string, data: Partial<StoredIncome>): void {
+  updateIncome(planId: string, data: Partial<StoredIncome>): Observable<void> {
     const payload = this.toPlanPayloadFromIncome({
       planId,
       fonte: data.fonte || '',
@@ -255,24 +237,15 @@ export class ApiDataService {
       fixaInicio: data.fixaInicio
     });
 
-    this.plans.update(planId, payload).subscribe({
-      next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: () => {}
-    });
+    return this.plans.update(planId, payload).pipe(tap(() => this.refreshIncomes(this.lastIncomeMonth)), map(() => void 0));
   }
 
-  removeIncome(planId: string): void {
-    this.plans.delete(planId).subscribe({
-      next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: () => {}
-    });
+  removeIncome(planId: string): Observable<void> {
+    return this.plans.delete(planId).pipe(tap(() => this.refreshIncomes(this.lastIncomeMonth)), map(() => void 0));
   }
 
-  removeIncomeInstallment(installmentId: string): void {
-    this.installments.delete(installmentId).subscribe({
-      next: () => this.refreshIncomes(this.lastIncomeMonth),
-      error: () => {}
-    });
+  removeIncomeInstallment(installmentId: string): Observable<void> {
+    return this.installments.delete(installmentId).pipe(tap(() => this.refreshIncomes(this.lastIncomeMonth)), map(() => void 0));
   }
 
   markIncomeReceived(installmentId: string, amount: number, accountId?: string | null) {
@@ -358,8 +331,14 @@ export class ApiDataService {
         const expenses = this.mapExpenses(expensePlans, expenseInstallments, categoryMap);
         const mappedCards = this.mapCards(cards);
         this.dbSubject.next({ incomes, expenses, cards: mappedCards });
+        this.loadErrorSubject.next(false);
       },
-      error: () => {},
+      error: () => {
+        // Falha na carga de fundo: mantém o último dado bom e sinaliza estado de erro
+        // discreto (sem toast). Reseta o in-flight para não travar refreshes futuros.
+        this.loadErrorSubject.next(true);
+        this.refreshInFlight = false;
+      },
       complete: () => {
         this.refreshInFlight = false;
       }
@@ -471,8 +450,12 @@ export class ApiDataService {
           history: summary.history ?? []
         });
         this.enrichIncomeMetadataInBackground();
+        this.loadErrorSubject.next(false);
       },
-      error: () => {}
+      error: () => {
+        // Carga de receitas de fundo falhou: sinaliza erro discreto (sem toast).
+        this.loadErrorSubject.next(true);
+      }
     });
   }
 

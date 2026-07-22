@@ -15,10 +15,10 @@ class ApiDataServiceMock {
   readonly incomesLoading$ = this.incomesLoadingSubject.asObservable();
 
   refreshIncomes = jasmine.createSpy('refreshIncomes');
-  updateIncome = jasmine.createSpy('updateIncome');
-  addIncome = jasmine.createSpy('addIncome');
-  removeIncomeInstallment = jasmine.createSpy('removeIncomeInstallment');
-  removeIncome = jasmine.createSpy('removeIncome');
+  updateIncome = jasmine.createSpy('updateIncome').and.returnValue(of(undefined));
+  addIncome = jasmine.createSpy('addIncome').and.returnValue(of(undefined));
+  removeIncomeInstallment = jasmine.createSpy('removeIncomeInstallment').and.returnValue(of(undefined));
+  removeIncome = jasmine.createSpy('removeIncome').and.returnValue(of(undefined));
   setIncomeStatusLocal = jasmine.createSpy('setIncomeStatusLocal');
   markIncomeReceived = jasmine.createSpy('markIncomeReceived').and.returnValue(of(true));
 
