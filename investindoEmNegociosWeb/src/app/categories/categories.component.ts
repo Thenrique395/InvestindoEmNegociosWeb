@@ -110,7 +110,8 @@ export class CategoriesComponent implements OnInit {
 
   ngOnInit(): void {
     this.isAdmin = hasAtLeastRole(this.authService.getRole(), 'Admin');
-    this.categoriesStore.load();
+    // Tela de gestão inclui categorias inativas do usuário para permitir reativação.
+    this.categoriesStore.load(undefined, undefined, false, true);
     if (this.isAdmin) this.loadAdmin();
   }
 
@@ -221,6 +222,10 @@ export class CategoriesComponent implements OnInit {
   }
 
   onToggleView(view: CategoryView): void {
+    if (view.origin === 'custom') {
+      this.toggleCustomStatus(view);
+      return;
+    }
     if (!this.isAdmin || view.origin !== 'default' || this.adminSaving()) return;
     const admin = this.adminCategories().find((c) => c.id === view.category.id);
     if (!admin) return;
@@ -231,6 +236,21 @@ export class CategoriesComponent implements OnInit {
       next: (updated) => { this.setAdminActive(admin.id, updated.isActive); this.categoriesService.invalidateCache(); this.categoriesStore.refresh(); },
       error: () => { this.setAdminActive(admin.id, !next); this.uiFeedback.error('Não foi possível atualizar o status.'); },
       complete: () => { this.adminSaving.set(false); this.cdr.markForCheck(); }
+    });
+  }
+
+  /** Ativa/desativa uma categoria do próprio usuário (mantém histórico). */
+  private toggleCustomStatus(view: CategoryView): void {
+    if (this.saving()) return;
+    const next = !view.isActive;
+    this.saving.set(true);
+    this.categoriesService.setStatus(view.category.id, next).subscribe({
+      next: () => {
+        this.categoriesStore.refresh();
+        this.uiFeedback.success(next ? 'Categoria reativada.' : 'Categoria desativada.');
+      },
+      error: (err) => this.uiFeedback.error(err?.error ?? 'Não foi possível atualizar o status.'),
+      complete: () => { this.saving.set(false); this.cdr.markForCheck(); }
     });
   }
 
@@ -276,7 +296,14 @@ export class CategoriesComponent implements OnInit {
     this.deleteTarget = null;
 
     this.categoriesService.delete(view.category.id).subscribe({
-      next: () => { this.categoriesStore.refresh(); this.uiFeedback.success('Categoria removida com sucesso.'); },
+      next: (result) => {
+        this.categoriesStore.refresh();
+        if (result.action === 'deactivated') {
+          this.uiFeedback.info('Categoria arquivada porque possui lançamentos: sai da seleção, mas continua no histórico.');
+        } else {
+          this.uiFeedback.success('Categoria removida com sucesso.');
+        }
+      },
       error: (err) => this.uiFeedback.error(err?.error ?? 'Não foi possível remover a categoria.')
     });
   }

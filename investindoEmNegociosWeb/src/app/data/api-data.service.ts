@@ -323,8 +323,9 @@ export class ApiDataService {
       incomeInstallments: this.installments.list({ type: 'Income' }),
       expenseInstallments: this.installments.list({ type: 'Expense' }),
       cards: this.cardsApi.list(),
-      expenseCategories: this.categoriesApi.list('Expense'),
-      incomeCategories: this.categoriesApi.list('Income')
+      // includeInactive: resolve o nome de categorias arquivadas no histórico dos lançamentos.
+      expenseCategories: this.categoriesApi.list('Expense', undefined, true),
+      incomeCategories: this.categoriesApi.list('Income', undefined, true)
     }).subscribe({
       next: ({
         incomePlans,
@@ -510,7 +511,7 @@ export class ApiDataService {
 
     forkJoin({
       incomePlans: this.plans.list('Income'),
-      incomeCategories: this.categoriesApi.list('Income')
+      incomeCategories: this.categoriesApi.list('Income', undefined, true)
     }).subscribe({
       next: ({ incomePlans, incomeCategories }) => {
         this.incomePlansCache = new Map(incomePlans.map((p) => [p.id, p]));
