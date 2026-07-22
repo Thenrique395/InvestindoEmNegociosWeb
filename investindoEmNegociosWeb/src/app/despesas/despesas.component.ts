@@ -101,7 +101,7 @@ export class DespesasComponent implements OnInit {
   fixa = false;
   fixaMeses: number | null = null;
   cartaoSelecionadoId: string | null = null;
-  editando: { id: string; planId?: string; isParcela: boolean; isRecorrente: boolean } | null = null;
+  editando: { id: string; planId?: string; isParcela: boolean; isRecorrente: boolean; originalNome: string; originalCategoryId: string | null } | null = null;
   confirmEdicao: { isRecorrente: boolean } | null = null;
   confirmRemocao: { id: string; serieId?: string; totalParcelas?: number; isRecurring?: boolean } | null = null;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
@@ -947,7 +947,9 @@ export class DespesasComponent implements OnInit {
       id: item.id!,
       planId: item.planId,
       isParcela: !!item.parcelasTotal,
-      isRecorrente: !!item.fixa
+      isRecorrente: !!item.fixa,
+      originalNome: item.nome,
+      originalCategoryId: categoriaId ?? null
     };
     this.novaDespesa = {
       nome: item.nome,
@@ -1214,6 +1216,14 @@ export class DespesasComponent implements OnInit {
       vencimento: vencimentoNormalizado,
       cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined
     };
+
+    if (escopo === 'single') {
+      const nomeMudou = this.editando.originalNome !== payload.nome;
+      const categoriaMudou = (this.editando.originalCategoryId ?? null) !== (payload.categoryId ?? null);
+      if (nomeMudou || categoriaMudou) {
+        this.setAlerta('Nesta parcela, apenas valor e vencimento são alterados. Nome e categoria mudam ao editar toda a série.', 4500, 'info');
+      }
+    }
 
     this.saving = true;
     const update$ = escopo === 'single'

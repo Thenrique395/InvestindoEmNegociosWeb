@@ -59,6 +59,11 @@ export class InstallmentsService {
     return this.http.get<Installment[]>(this.baseUrl, { params });
   }
 
+  /** Edita valor e vencimento de uma única parcela in-place (preserva pagamentos). */
+  update(id: string, payload: { amount: number; dueDate: string }): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}`, payload);
+  }
+
   pay(id: string, payload: PaymentPayload) {
     return this.http.post(`${this.baseUrl}/${id}/payments`, payload);
   }

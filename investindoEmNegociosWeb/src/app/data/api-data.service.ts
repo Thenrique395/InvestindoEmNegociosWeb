@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, distinctUntilChanged, finalize, forkJoin, map, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, distinctUntilChanged, finalize, forkJoin, map, tap, throwError } from 'rxjs';
 import { PlansService, Plan, CreatePlanPayload } from '../plans.service';
 import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
@@ -151,25 +151,15 @@ export class ApiDataService {
   }
 
   updateExpenseInstallment(installmentId: string, data: Partial<StoredExpense>): Observable<void> {
-    const current = this.dbSubject.value;
-    const existing = current.expenses.find((e) => e.id === installmentId);
-    const merged: Omit<StoredExpense, 'id'> = {
-      ...(existing || {
-        nome: '',
-        categoria: '',
-        valor: 0,
-        vencimento: ''
-      }),
-      ...data,
-      fixa: false,
-      parcelasTotal: 1,
-      serieId: undefined
-    };
-
-    const payload = this.toPlanPayloadFromExpense(merged);
-    return this.installments
-      .delete(installmentId)
-      .pipe(switchMap(() => this.plans.create(payload)), tap(() => this.refresh()), map(() => void 0));
+    // Edita SOMENTE valor e vencimento da parcela in-place (preserva pagamentos/recibos).
+    // Nome/categoria são do plano e mudam via edição da série inteira.
+    const existing = this.dbSubject.value.expenses.find((e) => e.id === installmentId);
+    const amount = data.valor ?? existing?.valor ?? 0;
+    const dueDate = toIsoDateFromLocale(data.vencimento || existing?.vencimento || '');
+    if (!dueDate) {
+      return throwError(() => new Error('Data de vencimento inválida.'));
+    }
+    return this.installments.update(installmentId, { amount, dueDate }).pipe(tap(() => this.refresh()), map(() => void 0));
   }
 
   removeExpense(_id: string): Observable<void> {
