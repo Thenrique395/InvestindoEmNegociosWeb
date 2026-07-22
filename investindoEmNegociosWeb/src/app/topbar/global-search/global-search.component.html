@@ -1,4 +1,4 @@
-<form class="global-search" role="search" (submit)="$event.preventDefault()">
+<form class="global-search" role="search" (submit)="$event.preventDefault(); onSubmit()">
   <svg class="global-search__icon" viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
     <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.7" />
     <path d="M16.2 16.2L21 21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
@@ -10,6 +10,31 @@
     placeholder="Buscar transações, contas, cartões..."
     aria-label="Busca global"
     autocomplete="off"
+    [ngModel]="query()"
+    [ngModelOptions]="{ standalone: true }"
+    (ngModelChange)="onInput($event)"
+    (focus)="onInput(query())"
     (keydown.escape)="blurSearch()" />
   <kbd class="global-search__kbd" aria-hidden="true">{{ shortcutLabel }}</kbd>
+
+  @if (open()) {
+    <div class="global-search__backdrop" (click)="closePanel()"></div>
+    <div class="global-search__panel" role="listbox">
+      @if (hasResults()) {
+        @for (group of groups(); track group.title) {
+          <div class="gs-group">
+            <p class="gs-group__title">{{ group.title }}</p>
+            @for (item of group.items; track item.label + item.sublabel) {
+              <button type="button" class="gs-item" (click)="select(item)">
+                <span class="gs-item__label">{{ item.label }}</span>
+                <span class="gs-item__sub">{{ item.sublabel }}</span>
+              </button>
+            }
+          </div>
+        }
+      } @else {
+        <p class="gs-empty">Nenhum resultado para "{{ query() }}".</p>
+      }
+    </div>
+  }
 </form>

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { TitleCasePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
@@ -131,7 +132,8 @@ export class DespesasComponent implements OnInit {
     private uiFeedback: UiFeedbackService,
     private uiPermissions: UiPermissionsService,
     private readonly cdr: ChangeDetectorRef,
-    private readonly destroyRef: DestroyRef
+    private readonly destroyRef: DestroyRef,
+    private readonly route: ActivatedRoute
   ) {}
 
   get currentRole(): UserRole | null {
@@ -151,6 +153,15 @@ export class DespesasComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Busca global pode navegar com ?q= para pré-filtrar a lista por nome.
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const q = params.get('q');
+      if (q) {
+        this.filtroNome = q;
+        this.cdr.markForCheck();
+      }
+    });
+
     this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expensesCache = lista;
       this.rebuildDespesas();

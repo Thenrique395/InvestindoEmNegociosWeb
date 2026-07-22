@@ -1,4 +1,5 @@
 import { of, throwError } from 'rxjs';
+import { convertToParamMap } from '@angular/router';
 import { DespesasComponent } from './despesas.component';
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 
@@ -13,7 +14,8 @@ function createComponent(): DespesasComponent {
     {} as any,
     { canImportInvoices: () => true } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
-    { onDestroy: () => {} } as any
+    { onDestroy: () => {} } as any,
+    { queryParamMap: of(convertToParamMap({})) } as any
   );
 }
 
@@ -112,7 +114,8 @@ function createComponentForReceiptTests() {
     uiFeedback as any,
     { canImportInvoices: () => true } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
-    { onDestroy: () => {} } as any
+    { onDestroy: () => {} } as any,
+    { queryParamMap: of(convertToParamMap({})) } as any
   );
   return { component, installments, uiFeedback };
 }

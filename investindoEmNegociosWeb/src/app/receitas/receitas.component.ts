@@ -107,6 +107,9 @@ export class ReceitasComponent implements OnInit {
       } else {
         this.focusMode = 'none';
       }
+      // Busca global pode navegar com ?q= para pré-filtrar por texto.
+      const q = params.get('q');
+      if (q) this.filtroTexto = q;
       this.cdr.markForCheck();
     });
 
