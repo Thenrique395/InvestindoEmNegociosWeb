@@ -115,6 +115,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 30m
           envs: STACK_NAME,FRONTEND_IMAGE,FRONTEND_PORT,API_BASE_URL,GHCR_USER,GHCR_TOKEN,DEPLOY_PATH
           script: |
             set -euo pipefail
@@ -127,6 +128,12 @@ jobs:
             fi
             export FRONTEND_PORT
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            # Libera disco removendo imagens/cache não usados antes do pull. A imagem do
+            # frontend em execução continua (está em uso); preserva volumes. Evita disco
+            # cheio e pull travado no VPS.
+            docker image prune -af || true
+            docker builder prune -af || true
+            df -h / || true
             docker compose -p "$STACK_NAME" config >/dev/null
             docker compose -p "$STACK_NAME" pull
             docker compose -p "$STACK_NAME" up -d --no-build --force-recreate --remove-orphans
