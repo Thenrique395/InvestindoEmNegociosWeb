@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:contract": "node scripts/contract-enums.mjs",
     "test:e2e": "env -u FORCE_COLOR -u NO_COLOR playwright test",
     "test:e2e:headed": "env -u FORCE_COLOR -u NO_COLOR E2E_SLOWMO_MS=250 playwright test --headed --workers=1",
     "test:e2e:ui": "env -u FORCE_COLOR -u NO_COLOR playwright test --ui",
