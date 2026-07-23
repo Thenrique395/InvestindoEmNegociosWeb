@@ -47,6 +47,7 @@ import { CategoryView } from './categories-overview.model';
                     <button type="button" class="cl__action" (click)="edit.emit(view)" [attr.aria-label]="'Editar categoria de sistema ' + view.category.name">Editar</button>
                     <button type="button" class="cl__action" (click)="toggleStatus.emit(view)" [attr.aria-label]="(view.isActive ? 'Desativar' : 'Ativar') + ' categoria ' + view.category.name">{{ view.isActive ? 'Desativar' : 'Ativar' }}</button>
                   } @else if (view.origin === 'custom') {
+                    <button type="button" class="cl__action" (click)="toggleStatus.emit(view)" [attr.aria-label]="(view.isActive ? 'Desativar' : 'Ativar') + ' categoria ' + view.category.name">{{ view.isActive ? 'Desativar' : 'Ativar' }}</button>
                     <button type="button" class="cl__action cl__action--danger" (click)="remove.emit(view)" [attr.aria-label]="'Excluir categoria ' + view.category.name">Excluir</button>
                   } @else {
                     <span class="cl__readonly">—</span>
@@ -78,6 +79,7 @@ import { CategoryView } from './categories-overview.model';
                   <button type="button" class="cl__action" (click)="edit.emit(view)">Editar</button>
                   <button type="button" class="cl__action" (click)="toggleStatus.emit(view)">{{ view.isActive ? 'Desativar' : 'Ativar' }}</button>
                 } @else {
+                  <button type="button" class="cl__action" (click)="toggleStatus.emit(view)">{{ view.isActive ? 'Desativar' : 'Ativar' }}</button>
                   <button type="button" class="cl__action cl__action--danger" (click)="remove.emit(view)">Excluir</button>
                 }
               </div>
