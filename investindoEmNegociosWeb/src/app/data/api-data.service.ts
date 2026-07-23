@@ -4,7 +4,7 @@ import { PlansService, Plan, CreatePlanPayload } from '../plans.service';
 import { InstallmentsService, Installment } from '../installments.service';
 import { CardsService, CardDto } from '../cards.service';
 import { ScheduleType } from '../types/money-types';
-import { InstallmentStatus } from '../types/money-types';
+import { InstallmentStatus, toInstallmentStatus } from '../types/money-types';
 import { CategoriesService } from '../categories.service';
 import { AuthService } from '../auth.service';
 import { ReceitasSummaryService, IncomeMonthSummary, IncomeSummaryResponse } from '../receitas-summary.service';
@@ -402,7 +402,7 @@ export class ApiDataService {
         const installmentStatusMap = new Map(
           (incomeInstallments || []).map((inst) => [
             inst.id,
-            ((inst.status || '').toString().toUpperCase() as InstallmentStatus) || 'OPEN'
+            toInstallmentStatus(inst.status)
           ])
         );
         const previousById = new Map(currentState.incomes.map((income) => [income.id, income]));
@@ -531,7 +531,7 @@ export class ApiDataService {
       const categoryId = plan?.categoryId ?? null;
       const categoria = categoryMap?.get(categoryId || '') || 'Sem categoria';
       const rawStatus = inst.status || '';
-      const status = (rawStatus || '').toString().toUpperCase() as InstallmentStatus;
+      const status = toInstallmentStatus(rawStatus);
       return {
         id: inst.id,
         planId: inst.planId,
@@ -563,7 +563,7 @@ export class ApiDataService {
       const isSeries = (plan?.installmentsCount ?? 0) > 1;
       const isRecurring = plan?.schedule === 'Recurring';
       const rawStatus = inst.status || '';
-      const status = (rawStatus || '').toString().toUpperCase() as InstallmentStatus;
+      const status = toInstallmentStatus(rawStatus);
       return {
         id: inst.id,
         planId: plan?.id,
