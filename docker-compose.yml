@@ -6,5 +6,8 @@ services:
     environment:
       PORT: 4000
       API_BASE_URL: ${API_BASE_URL:-http://35.174.50.187:5055/api/v1}
+      # Grafana Faro (RUM) — URL do collector (pública/client-side). Injetada no
+      # navegador via /config.js. Vazio = Faro desligado.
+      FARO_URL: ${FARO_URL:-https://faro-collector-prod-sa-east-1.grafana.net/collect/10ef7accdcf16ded460931c5f2067971}
       ANGULAR_ALLOWED_HOSTS: ${ANGULAR_ALLOWED_HOSTS:-35.174.50.187:4201,35.174.50.187:4200,localhost:4200,localhost:4201}
     restart: unless-stopped

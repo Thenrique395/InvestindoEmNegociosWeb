@@ -80,9 +80,13 @@ if (localAssets) {
  */
 app.get('/config.js', (_req, res) => {
   const apiBaseUrl = process.env['API_BASE_URL'] ?? '';
+  const faroUrl = process.env['FARO_URL'] ?? '';
   res.type('application/javascript');
   res.setHeader('Cache-Control', 'no-store');
-  res.send(`window.__API_BASE_URL__=${JSON.stringify(apiBaseUrl)};`);
+  res.send(
+    `window.__API_BASE_URL__=${JSON.stringify(apiBaseUrl)};` +
+      `window.__FARO_URL__=${JSON.stringify(faroUrl)};`,
+  );
 });
 
 /**
