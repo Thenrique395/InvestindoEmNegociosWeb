@@ -73,6 +73,19 @@ if (localAssets) {
 }
 
 /**
+ * Expõe a configuração de runtime ao NAVEGADOR. O process.env só existe aqui no
+ * servidor (SSR); o index.html carrega /config.js e o api.config.ts lê
+ * window.__API_BASE_URL__. Assim o build é único e cada ambiente (dev/prod) usa a
+ * URL do seu próprio container, sem hardcode.
+ */
+app.get('/config.js', (_req, res) => {
+  const apiBaseUrl = process.env['API_BASE_URL'] ?? '';
+  res.type('application/javascript');
+  res.setHeader('Cache-Control', 'no-store');
+  res.send(`window.__API_BASE_URL__=${JSON.stringify(apiBaseUrl)};`);
+});
+
+/**
  * Handle all other requests by rendering the Angular application.
  */
 app.use('/**', (req, res, next) => {
