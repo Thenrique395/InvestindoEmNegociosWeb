@@ -847,6 +847,10 @@ export class DespesasComponent implements OnInit {
       .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          // saving vira false ANTES de fechar: o finalize (que zera saving) só roda depois
+          // do next, e fecharModal() sai cedo se saving ainda for true — por isso o modal
+          // não fechava. Ver cartoes.component (mesmo padrão correto).
+          this.saving = false;
           this.setAlerta('Despesa salva com sucesso.', 2500, 'success');
           this.fecharModal();
         },
@@ -1244,6 +1248,7 @@ export class DespesasComponent implements OnInit {
       .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.saving = false;
           this.setAlerta('Despesa atualizada com sucesso.', 2500, 'success');
           this.fecharModal();
         },

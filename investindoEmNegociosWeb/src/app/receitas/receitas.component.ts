@@ -352,6 +352,9 @@ export class ReceitasComponent implements OnInit {
       .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          // saving vira false ANTES de fechar (finalize roda depois do next; fecharModal()
+          // sai cedo se saving ainda for true). Mesmo padrão do cartoes.component.
+          this.saving = false;
           this.setAlerta('Receita salva com sucesso.', 2500, 'success');
           this.fecharModal();
         },

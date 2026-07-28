@@ -124,6 +124,44 @@ function buildPayment(overrides: Partial<{ id: string; paidAmount: number; paidA
   return { id: 'pay-1', paidAmount: 100, paidAt: '2026-06-10T00:00:00Z', ...overrides };
 }
 
+describe('DespesasComponent - fechar modal ao salvar', () => {
+  it('fecha o modal (mostrarForm=false) quando a despesa é salva com sucesso', () => {
+    // Regressão: o finalize (saving=false) roda depois do next; se fecharModal() for chamado
+    // com saving ainda true, o guard bloqueia e o modal não fecha. Com o fix (saving=false
+    // antes de fechar no next), o modal fecha.
+    const db = { addExpense: jasmine.createSpy('addExpense').and.returnValue(of({})) };
+    const uiFeedback = new UiFeedbackServiceMock();
+    const component = new DespesasComponent(
+      db as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      { getRole: () => null } as any,
+      uiFeedback as any,
+      { canImportInvoices: () => true } as any,
+      { markForCheck: jasmine.createSpy('markForCheck') } as any,
+      { onDestroy: () => {} } as any,
+      { queryParamMap: of(convertToParamMap({})) } as any
+    );
+
+    component.mostrarForm = true;
+    (component as any).editando = null;
+    (component as any).novaDespesa = { nome: 'Despesa teste', categoria: 'Categoria', categoryId: 'cat-1' };
+    // parseValor é público e sensível a locale — spy garante valor válido independente do ambiente.
+    spyOn(component, 'parseValor').and.returnValue(100);
+    component.valorInput = '100';
+    // Data com dia e mês <= 12: válida em qualquer locale (month-first ou day-first).
+    component.vencimentoInput = '05/08/2026';
+
+    component.adicionar();
+
+    expect(db.addExpense).toHaveBeenCalled();
+    expect(component.saving).toBeFalse();
+    expect(component.mostrarForm).toBeFalse();
+  });
+});
+
 describe('DespesasComponent - anexo de comprovante', () => {
   it('não abre o anexo quando a despesa ainda não foi paga', () => {
     const { component, uiFeedback } = createComponentForReceiptTests();
