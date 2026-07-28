@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FinancialPrivacyService } from '../../financial-privacy.service';
-import { TooltipComponent } from '../../shared/tooltip/tooltip.component';
 import { formatCurrencyValue } from '../../utils/locale-utils';
 import { buildConicGradient } from '../../utils/home-insight.utils';
 import {
@@ -16,7 +15,7 @@ import {
 @Component({
   selector: 'app-category-breakdown-card',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, TooltipComponent],
+  imports: [DecimalPipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './category-breakdown-card.component.html',
   styleUrl: './category-breakdown-card.component.scss'

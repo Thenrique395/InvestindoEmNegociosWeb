@@ -40,4 +40,9 @@ describe('ThemeService', () => {
     expect(service.init()).toBe('dark');
     expect(service.current()).toBe('dark');
   });
+
+  it('defaults to light when no theme is stored (ignores OS preference)', () => {
+    expect(service.init()).toBe('light');
+    expect(service.current()).toBe('light');
+  });
 });

@@ -261,7 +261,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme(): void {
-    this.isLightTheme = this.themeService.toggle() === 'light';
+    const theme = this.themeService.toggle();
+    this.isLightTheme = theme === 'light';
+    // Salva a escolha no servidor (persiste por usuário, entre dispositivos) quando logado.
+    if (this.appSession.isAuthenticated()) {
+      this.userPreferencesFacade.saveTheme(theme);
+    }
   }
 
   get financialValuesHidden(): boolean {

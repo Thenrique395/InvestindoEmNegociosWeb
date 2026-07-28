@@ -24,7 +24,6 @@ import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { installmentStatusTone, InstallmentStatusTone } from '../utils/status';
-import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import {
   buildCardMetrics,
@@ -57,7 +56,6 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     FormFieldComponent,
     StatusBadgeComponent,
     FilterBarComponent,
-    UsageBarComponent,
     ConfirmSheetComponent,
 ],
   templateUrl: './cartoes.component.html',

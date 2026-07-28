@@ -16,9 +16,11 @@ export class ThemeService {
   init(): AppTheme {
     if (!this.isBrowser) return this.activeTheme;
 
+    // Default do produto é CLARO (independente do tema do SO). A escolha do usuário — quando
+    // existir — vem do localStorage aqui (aplicação imediata) e, ao logar, do servidor
+    // (UserPreferencesFacadeService), que segue o usuário entre dispositivos.
     const storedTheme = this.readStoredTheme();
-    const preferredTheme = window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    return this.apply(storedTheme ?? preferredTheme, false);
+    return this.apply(storedTheme ?? 'light', false);
   }
 
   toggle(): AppTheme {

@@ -20,7 +20,6 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { StatCardComponent } from '../shared/stat-card/stat-card.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
@@ -77,7 +76,7 @@ type RentabilidadeMonthPoint = {
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, StatCardComponent, PageHeaderComponent, TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent, DonutChartComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, PageHeaderComponent, TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent, DonutChartComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

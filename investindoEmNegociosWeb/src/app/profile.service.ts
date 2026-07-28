@@ -26,6 +26,7 @@ export interface Preferences {
   currency: string;
   locales: string[];
   notifications?: NotificationPreferences;
+  theme?: 'light' | 'dark';
 }
 
 export interface NotificationPreferences {
@@ -113,6 +114,11 @@ export class ProfileService {
 
   updatePreferences(prefs: Preferences) {
     return this.http.put<Preferences>(this.prefsUrl, prefs);
+  }
+
+  // Persiste só o tema (endpoint leve pro toggle global).
+  updateTheme(theme: 'light' | 'dark') {
+    return this.http.put<{ theme: 'light' | 'dark' }>(`${this.prefsUrl}/theme`, { theme });
   }
 
   getPrivacySummary() {
