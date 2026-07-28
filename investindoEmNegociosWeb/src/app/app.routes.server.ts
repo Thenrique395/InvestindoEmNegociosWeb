@@ -10,5 +10,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'styleguide', renderMode: RenderMode.Client },
   { path: 'styleguide/tokens', renderMode: RenderMode.Client },
   { path: 'styleguide/components/:slug', renderMode: RenderMode.Client },
+  // Página de AÇÃO com token na query: não pode ser pré-renderizada estática (o prerender roda
+  // no build, sem token). Renderiza só no cliente para o componente montar e confirmar o e-mail.
+  { path: 'confirmar-email', renderMode: RenderMode.Client },
   { path: '**', renderMode: RenderMode.Prerender }
 ];
