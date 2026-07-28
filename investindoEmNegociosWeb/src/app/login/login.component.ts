@@ -50,6 +50,23 @@ export class LoginComponent implements OnInit, OnDestroy {
         replaceUrl: true
       });
     }
+
+    // Retorno da página de confirmação de e-mail (/confirmar-email redireciona pra cá).
+    const confirmed = this.route.snapshot.queryParamMap.get('confirmed') === '1';
+    const confirmError = this.route.snapshot.queryParamMap.get('confirmError') === '1';
+    if (confirmed) {
+      this.uiFeedback.success('E-mail validado com sucesso! Faça login para entrar.');
+    } else if (confirmError) {
+      this.uiFeedback.error('Link de confirmação inválido ou expirado. Faça login para reenviar o e-mail.');
+    }
+    if (confirmed || confirmError) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { confirmed: null, confirmError: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
+      });
+    }
   }
 
   ngOnDestroy(): void {

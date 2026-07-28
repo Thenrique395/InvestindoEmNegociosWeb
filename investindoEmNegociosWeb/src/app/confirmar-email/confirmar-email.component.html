@@ -1,22 +1,7 @@
 <section class="confirm-email">
   <div class="confirm-email__card">
     <div class="confirm-email__brand">Investindo em Negócios</div>
-
-    @if (state === 'loading') {
-      <h1 class="confirm-email__title">Confirmando seu e-mail…</h1>
-      <p class="confirm-email__text">Só um instante.</p>
-    } @else if (state === 'success') {
-      <div class="confirm-email__icon confirm-email__icon--ok" aria-hidden="true">✓</div>
-      <h1 class="confirm-email__title">E-mail confirmado!</h1>
-      <p class="confirm-email__text">Sua conta está ativa. Agora é só entrar.</p>
-      <a class="confirm-email__cta" routerLink="/login">Ir para o login</a>
-    } @else {
-      <div class="confirm-email__icon confirm-email__icon--err" aria-hidden="true">!</div>
-      <h1 class="confirm-email__title">Link inválido ou expirado</h1>
-      <p class="confirm-email__text">
-        Este link de confirmação não é mais válido. Faça login para receber um novo e-mail de confirmação.
-      </p>
-      <a class="confirm-email__cta" routerLink="/login">Ir para o login</a>
-    }
+    <h1 class="confirm-email__title">Confirmando seu e-mail…</h1>
+    <p class="confirm-email__text">Aguarde, você será redirecionado.</p>
   </div>
 </section>
