@@ -83,10 +83,10 @@ export class SignupComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.signedUp.emit();
         if (this.isRoutePage) {
-          this.router.navigate(['/login'], { queryParams: { created: '1' } });
+          this.router.navigate(['/login'], { queryParams: { created: '1', confirm: '1' } });
           return;
         }
-        this.uiFeedback.success('Conta criada com sucesso. Faça login para entrar.');
+        this.uiFeedback.success('Conta criada! Enviamos um e-mail de confirmação — confirme para poder entrar.');
       },
       error: (err: unknown) => {
         const code = err && typeof err === 'object' && 'code' in err ? (err as { code?: string }).code : undefined;

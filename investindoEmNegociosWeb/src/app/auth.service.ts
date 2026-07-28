@@ -19,6 +19,14 @@ export interface RegisterPayload {
   cpf: string;
 }
 
+// Cadastro não loga mais (double opt-in): a resposta traz só a info básica, sem sessão.
+export interface RegisteredUserResponse {
+  userId: string;
+  name: string;
+  email: string;
+  requiresEmailConfirmation: boolean;
+}
+
 export interface CheckAvailabilityResponse {
   emailExists: boolean;
   documentExists: boolean;
@@ -80,8 +88,22 @@ export class AuthService {
       document: (payload.cpf || '').replace(/\D/g, '')
     };
     return this.http
-      .post<AuthSessionResponse>(`${this.baseUrl}/register`, body)
+      .post<RegisteredUserResponse>(`${this.baseUrl}/register`, body)
       .pipe(catchError((err) => this.wrapError(err, 'Erro ao criar conta.')));
+  }
+
+  // Confirma o e-mail a partir do token do link enviado por e-mail.
+  confirmEmail(token: string) {
+    return this.http
+      .post<{ confirmed: boolean }>(`${this.baseUrl}/confirm-email`, { token })
+      .pipe(catchError((err) => this.wrapError(err, 'Não foi possível confirmar o e-mail.', false, false)));
+  }
+
+  // Reenvia o e-mail de confirmação (resposta é sempre silenciosa no backend).
+  resendConfirmation(email: string) {
+    return this.http
+      .post<void>(`${this.baseUrl}/resend-confirmation`, { email: email.trim().toLowerCase() })
+      .pipe(catchError((err) => this.wrapError(err, 'Se a conta existir e estiver pendente, reenviaremos o e-mail.', false, false)));
   }
 
   checkAvailability(email?: string, cpf?: string) {

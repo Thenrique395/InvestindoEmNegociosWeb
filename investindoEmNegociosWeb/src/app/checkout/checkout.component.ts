@@ -304,11 +304,11 @@ export class CheckoutComponent implements OnDestroy {
     };
 
     this.authService.register(payload).subscribe({
-      next: (res) => {
-        this.authService.applySession(res);
+      next: () => {
+        // Double opt-in: o cadastro não loga mais. O usuário precisa confirmar o e-mail antes de
+        // seguir (o fluxo de pagamento está adiado de qualquer forma).
         this.processing = false;
-        this.uiFeedback.success('Conta criada com sucesso.');
-        this.continueFromAccount();
+        this.uiFeedback.success('Conta criada! Enviamos um e-mail de confirmação — confirme para poder entrar.');
       },
       error: (err: unknown) => {
         this.processing = false;

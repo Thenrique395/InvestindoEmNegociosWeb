@@ -21,6 +21,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   password = '';
   loading = false;
   showPassword = false;
+  emailNotConfirmed = false;
+  resending = false;
 
   constructor(
     private auth: AuthService,
@@ -40,10 +42,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
 
     if (this.route.snapshot.queryParamMap.get('created') === '1') {
-      this.uiFeedback.success('Conta criada. Faça login para continuar.');
+      this.uiFeedback.success('Conta criada! Enviamos um e-mail de confirmação — confirme para poder entrar.');
       this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { created: null },
+        queryParams: { created: null, confirm: null },
         queryParamsHandling: 'merge',
         replaceUrl: true
       });
@@ -59,6 +61,21 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.showPassword = !this.showPassword;
   }
 
+  resendConfirmation(): void {
+    if (this.resending || !this.email) return;
+    this.resending = true;
+    this.auth.resendConfirmation(this.email).subscribe({
+      next: () => {
+        this.resending = false;
+        this.uiFeedback.success('Se a conta estiver pendente, reenviamos o e-mail de confirmação.');
+      },
+      error: () => {
+        this.resending = false;
+        this.uiFeedback.success('Se a conta estiver pendente, reenviamos o e-mail de confirmação.');
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.loading) return;
     if (!this.email || !this.email.includes('@')) {
@@ -71,6 +88,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
+    this.emailNotConfirmed = false;
 
     this.auth.login(this.email, this.password).subscribe({
       next: (res: AuthSessionResponse) => {
@@ -116,6 +134,10 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.uiFeedback.error('Conta bloqueada temporariamente. Tente novamente em alguns minutos.');
           } else if (err.status === 429) {
             this.uiFeedback.error('Muitas tentativas. Aguarde um pouco e tente novamente.');
+          } else if (err.status === 403 && err.error?.code === 'email_not_confirmed') {
+            // Double opt-in: credenciais ok, mas e-mail não confirmado. Oferece reenviar.
+            this.emailNotConfirmed = true;
+            this.uiFeedback.error('Confirme seu e-mail para entrar. Verifique sua caixa de entrada.');
           } else if (err.status === 401) {
             this.uiFeedback.error('E-mail ou senha incorretos.');
           } else {

@@ -83,6 +83,15 @@
             <span class="login-form__submit-icon" aria-hidden="true">→</span>
             <span>{{ loading ? 'Autenticando...' : 'Entrar no dashboard' }}</span>
           </button>
+
+          @if (emailNotConfirmed) {
+            <p class="login-form__confirm-hint">
+              Seu e-mail ainda não foi confirmado.
+              <button type="button" class="login-form__resend" [disabled]="resending" (click)="resendConfirmation()">
+                {{ resending ? 'Reenviando...' : 'Reenviar e-mail de confirmação' }}
+              </button>
+            </p>
+          }
         </form>
 
         <p class="login-main__register">
