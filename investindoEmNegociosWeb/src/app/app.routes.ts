@@ -72,12 +72,6 @@ export const routes: Routes = [
       import('./reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
   },
   {
-    path: 'confirmar-email',
-    data: { preload: false },
-    loadComponent: () =>
-      import('./confirmar-email/confirmar-email.component').then((m) => m.ConfirmarEmailComponent),
-  },
-  {
     path: 'onboarding',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Basic', preload: false },

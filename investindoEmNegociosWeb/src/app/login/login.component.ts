@@ -51,18 +51,18 @@ export class LoginComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Retorno da página de confirmação de e-mail (/confirmar-email redireciona pra cá).
-    const confirmed = this.route.snapshot.queryParamMap.get('confirmed') === '1';
-    const confirmError = this.route.snapshot.queryParamMap.get('confirmError') === '1';
-    if (confirmed) {
-      this.uiFeedback.success('E-mail validado com sucesso! Faça login para entrar.');
-    } else if (confirmError) {
-      this.uiFeedback.error('Link de confirmação inválido ou expirado. Faça login para reenviar o e-mail.');
-    }
-    if (confirmed || confirmError) {
+    // Double opt-in: o link do e-mail aponta direto pra cá com ?confirmToken=... —
+    // confirmamos aqui mesmo (a tela de login renderiza de forma confiável) e mostramos o resultado.
+    const confirmToken = this.route.snapshot.queryParamMap.get('confirmToken');
+    if (confirmToken) {
+      this.auth.confirmEmail(confirmToken).subscribe({
+        next: () => this.uiFeedback.success('E-mail validado com sucesso! Faça login para entrar.'),
+        error: () =>
+          this.uiFeedback.error('Link de confirmação inválido ou expirado. Faça login para reenviar o e-mail.')
+      });
       this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { confirmed: null, confirmError: null },
+        queryParams: { confirmToken: null },
         queryParamsHandling: 'merge',
         replaceUrl: true
       });
