@@ -42,12 +42,30 @@ function openInstallments(contract: LoanContractResponse): LoanInstallmentRespon
     .sort((a, b) => (parseIso(a.dueDate)?.getTime() ?? 0) - (parseIso(b.dueDate)?.getTime() ?? 0));
 }
 
+function resolveStatus(
+  contract: LoanContractResponse,
+  totalCount: number,
+  paidCount: number
+): { label: string; tone: StatusBadgeTone } {
+  const isClosed = contract.status === 'Closed' || (totalCount > 0 && paidCount === totalCount && contract.status !== 'Archived' && contract.status !== 'Cancelled');
+  switch (contract.status) {
+    case 'Archived':
+      return { label: 'Arquivado', tone: 'muted' };
+    case 'Cancelled':
+      return { label: 'Cancelado', tone: 'muted' };
+    case 'Overdue':
+      return { label: 'Atrasado', tone: 'danger' };
+    default:
+      return isClosed ? { label: 'Quitado', tone: 'success' } : { label: 'Ativo', tone: 'info' };
+  }
+}
+
 export function buildContractView(contract: LoanContractResponse): LoanContractView {
   const installments = contract.installments || [];
   const totalCount = installments.length;
   const paidCount = installments.filter((i) => i.status === 'Paid').length;
   const open = openInstallments(contract);
-  const isClosed = contract.status === 'Closed' || (totalCount > 0 && paidCount === totalCount);
+  const status = resolveStatus(contract, totalCount, paidCount);
 
   return {
     contract,
@@ -55,8 +73,8 @@ export function buildContractView(contract: LoanContractResponse): LoanContractV
     totalCount,
     paidPercent: totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0,
     nextInstallment: open[0] ?? null,
-    statusLabel: isClosed ? 'Quitado' : 'Ativo',
-    statusTone: isClosed ? 'success' : 'info'
+    statusLabel: status.label,
+    statusTone: status.tone
   };
 }
 

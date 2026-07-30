@@ -2,6 +2,7 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   { path: 'calculadora/:id', renderMode: RenderMode.Server },
+  { path: 'emprestimos/:id', renderMode: RenderMode.Server },
   { path: 'despesas', renderMode: RenderMode.Prerender },
   { path: 'cartoes', renderMode: RenderMode.Prerender },
   { path: 'receitas', renderMode: RenderMode.Prerender },

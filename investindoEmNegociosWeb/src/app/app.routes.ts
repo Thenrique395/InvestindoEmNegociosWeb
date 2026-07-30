@@ -143,6 +143,12 @@ export const routes: Routes = [
     loadComponent: () => import('./loans/loans.component').then((m) => m.LoansComponent),
   },
   {
+    path: 'emprestimos/:id',
+    canActivate: [authGuard, roleGuard],
+    data: { minRole: 'Intermediate', preload: false },
+    loadComponent: () => import('./loans/loan-detail/loan-detail.component').then((m) => m.LoanDetailComponent),
+  },
+  {
     path: 'snapshots',
     canActivate: [authGuard, roleGuard],
     data: { minRole: 'Intermediate', preload: false },

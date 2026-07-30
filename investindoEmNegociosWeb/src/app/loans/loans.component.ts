@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { LoansService, LoanAmortizationType, LoanContractRequest, LoanContractResponse, LoanSimulationResponse } from '../loans.service';
+import { RouterLink } from '@angular/router';
+import { LoansService, LoanAmortizationType, LoanContractRequest, LoanContractResponse, LoanInstallmentResponse, LoanPaymentRequest, LoanPaymentResult, LoanSimulationComparison, LoanSimulationResponse } from '../loans.service';
+import { AccountsService, AccountResponse } from '../accounts.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
@@ -16,7 +18,7 @@ import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.com
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { LoanContractView, LoansOverview, buildContractViews, buildLoansOverview } from './loans-overview.model';
 
-type LoanStatusFilter = 'all' | 'active' | 'closed';
+type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
 
 @Component({
   selector: 'app-loans',
@@ -24,6 +26,7 @@ type LoanStatusFilter = 'all' | 'active' | 'closed';
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     EmptyStateComponent,
     UiStateComponent,
     AppCurrencyPipe,
@@ -44,16 +47,26 @@ export class LoansComponent implements OnInit {
   // o CD disparado pelos signals co-setados no mesmo callback.
   readonly contracts = signal<LoanContractResponse[]>([]);
   readonly simulation = signal<LoanSimulationResponse | null>(null);
+  readonly comparison = signal<LoanSimulationComparison | null>(null);
+  readonly comparing = signal(false);
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly deleting = signal<string | null>(null);
-  readonly payingInstallment = signal<string | null>(null);
+  readonly archiving = signal<string | null>(null);
+  readonly paying = signal(false);
+  readonly accounts = signal<AccountResponse[]>([]);
   readonly error = signal('');
   readonly success = signal('');
   editingId: string | null = null;
   expandedContractId: string | null = null;
   statusFilter: LoanStatusFilter = 'all';
   pendingDelete: LoanContractResponse | null = null;
+  pendingArchive: LoanContractResponse | null = null;
+
+  // Sheet de pagamento integrado (conta/data/multa/desconto).
+  paySheet: { contract: LoanContractResponse; installment: LoanInstallmentResponse } | null = null;
+  payForm = { paidAt: this.today(), accountId: '', penaltyAmount: 0, discountAmount: 0 };
+  private payIdempotencyKey = '';
 
   readonly amortizationOptions: SegmentOption[] = [
     { value: 'Price', label: 'PRICE' },
@@ -64,6 +77,7 @@ export class LoansComponent implements OnInit {
 
   constructor(
     private readonly loansService: LoansService,
+    private readonly accountsService: AccountsService,
     private readonly uiFeedback: UiFeedbackService,
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef
@@ -71,6 +85,19 @@ export class LoansComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.loadAccounts();
+  }
+
+  private loadAccounts(): void {
+    this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (items) => { this.accounts.set(items); this.cdr.markForCheck(); },
+      // Contas são opcionais no pagamento; falha aqui não bloqueia o fluxo.
+      error: () => {}
+    });
+  }
+
+  private today(): string {
+    return new Date().toISOString().slice(0, 10);
   }
 
   get overview(): LoansOverview {
@@ -81,22 +108,31 @@ export class LoansComponent implements OnInit {
     return buildContractViews(this.contracts());
   }
 
+  private isActive = (v: LoanContractView) => v.statusLabel === 'Ativo' || v.statusLabel === 'Atrasado';
+  private isArchived = (v: LoanContractView) => v.statusLabel === 'Arquivado' || v.statusLabel === 'Cancelado';
+
   get filteredViews(): LoanContractView[] {
     const views = this.contractViews;
-    if (this.statusFilter === 'active') return views.filter((v) => v.statusLabel === 'Ativo');
-    if (this.statusFilter === 'closed') return views.filter((v) => v.statusLabel === 'Quitado');
-    return views;
+    switch (this.statusFilter) {
+      case 'active': return views.filter(this.isActive);
+      case 'closed': return views.filter((v) => v.statusLabel === 'Quitado');
+      case 'archived': return views.filter(this.isArchived);
+      default: return views.filter((v) => !this.isArchived(v));
+    }
   }
 
   get statusFilterOptions(): SegmentOption[] {
     const views = this.contractViews;
-    const active = views.filter((v) => v.statusLabel === 'Ativo').length;
+    const active = views.filter(this.isActive).length;
     const closed = views.filter((v) => v.statusLabel === 'Quitado').length;
-    return [
-      { value: 'all', label: `Todos (${views.length})` },
+    const archived = views.filter(this.isArchived).length;
+    const options: SegmentOption[] = [
+      { value: 'all', label: `Todos (${active + closed})` },
       { value: 'active', label: `Ativos (${active})` },
       { value: 'closed', label: `Quitados (${closed})` }
     ];
+    if (archived > 0) options.push({ value: 'archived', label: `Arquivados (${archived})` });
+    return options;
   }
 
   setStatusFilter(value: string): void {
@@ -127,10 +163,32 @@ export class LoansComponent implements OnInit {
   simulate(): void {
     this.error.set('');
     this.success.set('');
+    this.comparison.set(null);
     this.loansService.simulate(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => { this.simulation.set(result); this.cdr.markForCheck(); },
       error: (err) => { this.error.set(extractApiErrorMessage(err, 'Falha ao simular empréstimo.')); this.cdr.markForCheck(); }
     });
+  }
+
+  compare(): void {
+    this.error.set('');
+    this.success.set('');
+    this.simulation.set(null);
+    this.comparing.set(true);
+    this.loansService.compare(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (result) => { this.comparison.set(result); this.comparing.set(false); this.cdr.markForCheck(); },
+      error: (err) => { this.comparing.set(false); this.error.set(extractApiErrorMessage(err, 'Falha ao comparar sistemas.')); this.cdr.markForCheck(); }
+    });
+  }
+
+  /** Escolhe um sistema a partir da comparação: ajusta o formulário e mostra a simulação escolhida. */
+  chooseSystem(type: LoanAmortizationType): void {
+    const cmp = this.comparison();
+    if (!cmp) return;
+    this.form.amortizationType = type;
+    this.simulation.set(type === 'Sac' ? cmp.sac : cmp.price);
+    this.comparison.set(null);
+    this.cdr.markForCheck();
   }
 
   create(): void {
@@ -237,24 +295,103 @@ export class LoansComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  payInstallment(contract: LoanContractResponse, installmentId: string): void {
-    if (this.payingInstallment()) return;
-    this.payingInstallment.set(installmentId);
-    this.loansService.payInstallment(contract.id, installmentId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+  // ---- Pagamento integrado (sheet) --------------------------------------
+
+  openPaySheet(contract: LoanContractResponse, installment: LoanInstallmentResponse): void {
+    if (this.paying()) return;
+    this.paySheet = { contract, installment };
+    this.payForm = { paidAt: this.today(), accountId: '', penaltyAmount: 0, discountAmount: 0 };
+    this.payIdempotencyKey = this.newKey();
+    this.cdr.markForCheck();
+  }
+
+  cancelPaySheet(): void {
+    this.paySheet = null;
+    this.cdr.markForCheck();
+  }
+
+  get payTotal(): number {
+    if (!this.paySheet) return 0;
+    const penalty = Number(this.payForm.penaltyAmount) || 0;
+    const discount = Number(this.payForm.discountAmount) || 0;
+    return Math.max(this.paySheet.installment.totalAmount + penalty - discount, 0);
+  }
+
+  confirmPay(): void {
+    const sheet = this.paySheet;
+    if (!sheet || this.paying()) return;
+    this.paying.set(true);
+    const body: LoanPaymentRequest = {
+      paidAt: this.payForm.paidAt,
+      accountId: this.payForm.accountId || null,
+      penaltyAmount: Number(this.payForm.penaltyAmount) || 0,
+      discountAmount: Number(this.payForm.discountAmount) || 0
+    };
+    this.loansService.payInstallmentV2(sheet.contract.id, sheet.installment.id, body, this.payIdempotencyKey)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (res) => {
+          this.applyPaymentResult(res);
+          this.paySheet = null;
+          this.paying.set(false);
+          this.uiFeedback.success('Pagamento registrado.');
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.paying.set(false);
+          this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao registrar o pagamento.'));
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  // Backend é a fonte oficial: aplica a parcela atualizada + o resumo do contrato retornados.
+  private applyPaymentResult(res: LoanPaymentResult): void {
+    this.contracts.set(this.contracts().map(c => {
+      if (c.id !== res.contractId) return c;
+      const installments = c.installments.map(i => i.id === res.installment.id ? res.installment : i);
+      return {
+        ...c,
+        installments,
+        openBalance: res.contract.openBalance,
+        openInstallments: res.contract.openInstallments,
+        status: res.contract.status
+      };
+    }));
+  }
+
+  private newKey(): string {
+    const cryptoRef = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
+    return cryptoRef?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  // ---- Arquivamento (contrato com histórico não pode ser excluído) -------
+
+  askArchive(contract: LoanContractResponse): void {
+    if (this.archiving()) return;
+    this.pendingArchive = contract;
+    this.cdr.markForCheck();
+  }
+
+  cancelArchive(): void {
+    this.pendingArchive = null;
+    this.cdr.markForCheck();
+  }
+
+  confirmArchive(): void {
+    const contract = this.pendingArchive;
+    if (!contract || this.archiving()) return;
+    this.archiving.set(contract.id);
+    this.pendingArchive = null;
+    this.loansService.archive(contract.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
-        this.contracts.set(this.contracts().map(c => {
-          if (c.id !== contract.id) return c;
-          const installments = c.installments.map(i => i.id === updated.id ? updated : i);
-          const openInstallments = installments.filter(i => i.status === 'Open');
-          return { ...c, installments, openInstallments: openInstallments.length, openBalance: openInstallments.reduce((s, i) => s + i.totalAmount, 0) };
-        }));
-        this.payingInstallment.set(null);
-        this.uiFeedback.success('Parcela registrada como paga.');
+        this.contracts.set(this.contracts().map(c => c.id === updated.id ? updated : c));
+        this.archiving.set(null);
+        this.uiFeedback.success('Contrato arquivado.');
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao pagar parcela.'));
-        this.payingInstallment.set(null);
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao arquivar o contrato.'));
+        this.archiving.set(null);
         this.cdr.markForCheck();
       }
     });

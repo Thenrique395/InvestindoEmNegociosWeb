@@ -1,8 +1,8 @@
 <section class="loans-page">
   <app-page-header
     eyebrow="Planejamento de passivos"
-    title="Empréstimos e amortização"
-    description="Simule PRICE ou SAC, crie contratos e acompanhe o cronograma de amortização dentro do contexto financeiro.">
+    title="Empréstimos e financiamentos"
+    description="Acompanhe contratos, parcelas, juros, amortizações e a evolução do saldo devedor.">
     @if (overview.nextDueDate) {
       <span page-meta class="header-meta">
         Próximo vencimento em {{ overview.nextDueDate | date:'dd/MM/yyyy' }} · {{ overview.nextDueAmount | appCurrency }}
@@ -78,12 +78,36 @@
           <button class="btn-ghost" type="button" (click)="cancelEdit()">Cancelar</button>
         } @else {
           <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
+          <button class="btn-ghost" type="button" (click)="compare()" [disabled]="comparing()">
+            {{ comparing() ? 'Comparando...' : 'Comparar PRICE × SAC' }}
+          </button>
         }
         <button class="btn-primary" type="button" (click)="create()" [disabled]="saving()">
           {{ saving() ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
         </button>
       </div>
     </article>
+
+    @if (comparison(); as cmp) {
+      <article class="card compare-card">
+        <h2>PRICE × SAC</h2>
+        <p class="muted text--sm">Mesmos parâmetros, dois sistemas. Escolha para seguir com a criação.</p>
+        <div class="compare-grid">
+          @for (opt of [{ key: 'Price', label: 'PRICE', sim: cmp.price }, { key: 'Sac', label: 'SAC', sim: cmp.sac }]; track opt.key) {
+            <div class="compare-col">
+              <h3>{{ opt.label }}</h3>
+              <dl>
+                <div><dt>Parcela inicial</dt><dd>{{ opt.sim.installments[0].totalAmount | appCurrency }}</dd></div>
+                <div><dt>Parcela final</dt><dd>{{ opt.sim.installments[opt.sim.installments.length - 1].totalAmount | appCurrency }}</dd></div>
+                <div><dt>Custo total</dt><dd>{{ opt.sim.totalCost | appCurrency }}</dd></div>
+                <div><dt>Juros totais</dt><dd>{{ opt.sim.totalInterest | appCurrency }}</dd></div>
+              </dl>
+              <button type="button" class="btn-primary sm" (click)="chooseSystem($any(opt.key))">Escolher {{ opt.label }}</button>
+            </div>
+          }
+        </div>
+      </article>
+    }
 
     @if (simulation(); as s) {
       <article class="card">
@@ -157,9 +181,15 @@
               <div class="contract__actions">
                 <app-status-badge [tone]="view.statusTone" [label]="view.statusLabel" [dot]="true" />
                 <button type="button" class="btn-ghost sm" (click)="edit(view.contract)" [disabled]="!!deleting()">Editar</button>
-                <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting() === view.contract.id || !!editingId">
-                  {{ deleting() === view.contract.id ? 'Excluindo...' : 'Excluir' }}
-                </button>
+                @if (view.paidCount > 0) {
+                  <button type="button" class="btn-ghost sm" (click)="askArchive(view.contract)" [disabled]="archiving() === view.contract.id || !!editingId">
+                    {{ archiving() === view.contract.id ? 'Arquivando...' : 'Arquivar' }}
+                  </button>
+                } @else {
+                  <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting() === view.contract.id || !!editingId">
+                    {{ deleting() === view.contract.id ? 'Excluindo...' : 'Excluir' }}
+                  </button>
+                }
               </div>
             </div>
 
@@ -187,6 +217,7 @@
               <div><span>Parcelas abertas</span><strong>{{ view.contract.openInstallments }}</strong></div>
             </div>
             <div class="contract__toggle">
+              <a class="btn-ghost sm" [routerLink]="['/emprestimos', view.contract.id]">Ver detalhes</a>
               <button type="button" class="btn-ghost sm" (click)="toggleInstallments(view.contract.id)">
                 {{ expandedContractId === view.contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
               </button>
@@ -209,9 +240,7 @@
                         </td>
                         <td>
                           @if (inst.status === 'Open') {
-                            <button type="button" class="btn-primary sm" (click)="payInstallment(view.contract, inst.id)" [disabled]="payingInstallment() === inst.id">
-                              {{ payingInstallment() === inst.id ? '...' : 'Pagar' }}
-                            </button>
+                            <button type="button" class="btn-primary sm" (click)="openPaySheet(view.contract, inst)" [disabled]="paying()">Pagar</button>
                           } @else {
                             <span class="muted text--sm">{{ inst.paidAt | date:'dd/MM/yy' }}</span>
                           }
@@ -240,5 +269,57 @@
   <ng-container sheet-actions>
     <button type="button" class="btn-ghost" (click)="cancelRemove()">Cancelar</button>
     <button type="button" class="btn-danger" (click)="confirmRemove()">Excluir contrato</button>
+  </ng-container>
+</app-confirm-sheet>
+
+<app-confirm-sheet
+  [open]="!!pendingArchive"
+  eyebrow="Arquivar contrato"
+  [title]="pendingArchive ? ('Arquivar “' + pendingArchive.title + '”?') : ''"
+  (dismiss)="cancelArchive()">
+  <p>
+    Este contrato possui pagamentos e não pode ser excluído. Arquivar preserva todo o histórico
+    (parcelas, pagamentos e documentos) e tira o contrato dos acompanhamentos ativos.
+  </p>
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost" (click)="cancelArchive()">Cancelar</button>
+    <button type="button" class="btn-primary" (click)="confirmArchive()">Arquivar contrato</button>
+  </ng-container>
+</app-confirm-sheet>
+
+<app-confirm-sheet
+  [open]="!!paySheet"
+  eyebrow="Pagar parcela"
+  [title]="paySheet ? ('Parcela ' + paySheet.installment.installmentNo + ' — ' + (paySheet.installment.totalAmount | appCurrency)) : ''"
+  (dismiss)="cancelPaySheet()">
+  @if (paySheet) {
+    <div class="pay-form">
+      <label>Data do pagamento
+        <input type="date" [(ngModel)]="payForm.paidAt" />
+      </label>
+      <label>Conta de origem
+        <select [(ngModel)]="payForm.accountId">
+          <option value="">Sem conta (apenas registrar)</option>
+          @for (acc of accounts(); track acc.id) {
+            <option [value]="acc.id">{{ acc.name }} · {{ acc.currentBalance | appCurrency }}</option>
+          }
+        </select>
+      </label>
+      <div class="pay-form__row">
+        <label>Multa
+          <input type="number" min="0" step="0.01" [(ngModel)]="payForm.penaltyAmount" />
+        </label>
+        <label>Desconto
+          <input type="number" min="0" step="0.01" [(ngModel)]="payForm.discountAmount" />
+        </label>
+      </div>
+      <p class="pay-form__total">Total a pagar: <strong>{{ payTotal | appCurrency }}</strong></p>
+    </div>
+  }
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost" (click)="cancelPaySheet()">Cancelar</button>
+    <button type="button" class="btn-primary" (click)="confirmPay()" [disabled]="paying()">
+      {{ paying() ? 'Registrando...' : 'Confirmar pagamento' }}
+    </button>
   </ng-container>
 </app-confirm-sheet>

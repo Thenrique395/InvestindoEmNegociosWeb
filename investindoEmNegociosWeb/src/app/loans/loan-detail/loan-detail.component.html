@@ -1,0 +1,240 @@
+<section class="loan-detail">
+  <a class="loan-detail__back" routerLink="/emprestimos">← Voltar para empréstimos</a>
+
+  @if (loading()) {
+    <app-ui-state type="loading" />
+  }
+
+  @if (error()) {
+    <app-ui-state type="error" title="Não foi possível carregar o contrato." [description]="error()" retryLabel="Tentar novamente" (retry)="load()" />
+  }
+
+  @if (contract(); as c) {
+    @if (view; as v) {
+      <app-page-header eyebrow="Contrato" [title]="c.title"
+        [description]="(c.amortizationType === 'Sac' ? 'SAC' : 'PRICE') + ' · ' + c.termMonths + ' meses · ' + (c.annualInterestRate) + '% a.a.'">
+        <span page-meta>
+          <app-status-badge [tone]="v.statusTone" [label]="v.statusLabel" [dot]="true" />
+        </span>
+      </app-page-header>
+
+      <app-segmented-selector ariaLabel="Seções do contrato" [options]="tabs" [value]="activeTab" (valueChange)="setTab($event)" />
+
+      @if (activeTab === 'resumo') {
+        <section class="loans-summary-grid">
+          <app-transaction-summary-card tone="warning" eyebrow="Saldo devedor" [value]="c.openBalance | appCurrency" note="Valor ainda pendente." />
+          <app-transaction-summary-card tone="primary" eyebrow="Parcela" [value]="c.monthlyPayment | appCurrency" note="Compromisso mensal." />
+          <app-transaction-summary-card tone="info" eyebrow="Parcelas abertas" [value]="c.openInstallments.toString()"
+            [note]="v.paidCount + ' de ' + v.totalCount + ' quitadas.'" />
+          <app-transaction-summary-card tone="success" eyebrow="Progresso" [value]="v.paidPercent + '%'"
+            [note]="v.nextInstallment ? ('Próximo venc. ' + (v.nextInstallment.dueDate | date:'dd/MM/yyyy')) : 'Sem parcelas em aberto.'" />
+        </section>
+
+        <article class="card">
+          <h2>Detalhes do contrato</h2>
+          <dl class="detail-grid">
+            <div><dt>Sistema</dt><dd>{{ c.amortizationType === 'Sac' ? 'SAC' : 'PRICE' }}</dd></div>
+            <div><dt>Principal</dt><dd>{{ c.principalAmount | appCurrency }}</dd></div>
+            <div><dt>Taxa (a.a.)</dt><dd>{{ c.annualInterestRate }}%</dd></div>
+            <div><dt>Prazo</dt><dd>{{ c.termMonths }} meses</dd></div>
+            <div><dt>Custo total</dt><dd>{{ c.totalCost | appCurrency }}</dd></div>
+            <div><dt>Juros totais</dt><dd>{{ c.totalInterest | appCurrency }}</dd></div>
+            <div><dt>Início</dt><dd>{{ c.startDate | date:'dd/MM/yyyy' }}</dd></div>
+            <div><dt>Dia de pagamento</dt><dd>{{ c.paymentDay }}</dd></div>
+          </dl>
+        </article>
+
+        @if (c.openInstallments > 0 && c.status !== 'Closed' && c.status !== 'Archived' && c.status !== 'Cancelled') {
+          <div class="detail-actions">
+            <button type="button" class="btn-primary" (click)="openAmortSheet()">Registrar amortização</button>
+          </div>
+        }
+      }
+
+      @if (activeTab === 'parcelas') {
+        <article class="card">
+          @if (!c.installments.length) {
+            <app-empty-state icon="$" title="Sem parcelas" description="Este contrato ainda não possui cronograma." />
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th><th>Vencimento</th><th>Saldo inicial</th><th>Principal</th><th>Juros</th>
+                    <th>Total</th><th>Saldo final</th><th>Situação</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (inst of c.installments; track inst.id) {
+                    <tr [class.row--paid]="inst.status === 'Paid'">
+                      <td>{{ inst.installmentNo }}</td>
+                      <td>{{ inst.dueDate | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ inst.beginningBalance | appCurrency }}</td>
+                      <td>{{ inst.principalAmount | appCurrency }}</td>
+                      <td>{{ inst.interestAmount | appCurrency }}</td>
+                      <td>{{ inst.totalAmount | appCurrency }}</td>
+                      <td>{{ inst.endingBalance | appCurrency }}</td>
+                      <td>
+                        <app-status-badge [tone]="inst.status === 'Paid' ? 'success' : 'muted'"
+                          [label]="inst.status === 'Paid' ? 'Pago' : 'Em aberto'" />
+                      </td>
+                      <td class="cell-actions">
+                        @if (inst.status === 'Open') {
+                          <button type="button" class="btn-primary sm" (click)="openPaySheet(inst)" [disabled]="paying()">Pagar</button>
+                        } @else if (inst.status === 'Paid') {
+                          <button type="button" class="btn-ghost sm" (click)="togglePayments(inst)">
+                            {{ expandedInstallmentId === inst.id ? 'Ocultar' : 'Pagamentos' }}
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                    @if (expandedInstallmentId === inst.id) {
+                      <tr class="payments-row">
+                        <td colspan="9">
+                          @if (loadingPayments() === inst.id) {
+                            <p class="muted text--sm">Carregando pagamentos…</p>
+                          } @else if (!(paymentsByInstallment[inst.id]?.length)) {
+                            <p class="muted text--sm">Nenhum pagamento registrado para esta parcela.</p>
+                          } @else {
+                            <ul class="payment-history">
+                              @for (p of paymentsByInstallment[inst.id]; track p.id) {
+                                <li class="payment-history__item" [class.is-reversed]="p.isReversed">
+                                  <span>{{ p.paidAt | date:'dd/MM/yyyy' }} · {{ p.amount | appCurrency }}</span>
+                                  @if (p.isReversed) {
+                                    <app-status-badge tone="muted" label="Estornado" />
+                                  } @else {
+                                    <button type="button" class="btn-ghost sm" (click)="reversePayment(inst, p)" [disabled]="reversing() === p.id">
+                                      {{ reversing() === p.id ? 'Estornando…' : 'Estornar' }}
+                                    </button>
+                                  }
+                                </li>
+                              }
+                            </ul>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </article>
+      }
+
+      @if (activeTab === 'evolucao') {
+        <article class="card">
+          <h2>Evolução do saldo devedor</h2>
+          @if (balanceChart; as chart) {
+            <div class="balance-chart">
+              <svg viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Gráfico do saldo devedor ao longo das parcelas">
+                <polygon class="balance-chart__area" [attr.points]="chart.area" />
+                <polyline class="balance-chart__line" [attr.points]="chart.line" />
+              </svg>
+            </div>
+            <p class="muted text--sm">Saldo devedor projetado ao final de cada parcela (1 → {{ c.installments.length }}).</p>
+          } @else {
+            <app-empty-state icon="📉" title="Sem dados" description="O contrato ainda não possui cronograma para exibir a evolução." />
+          }
+        </article>
+      }
+
+      @if (activeTab === 'historico') {
+        <article class="card">
+          <h2>Histórico</h2>
+          @if (loadingTimeline()) {
+            <app-ui-state type="loading" />
+          } @else if (!(timeline()?.length)) {
+            <app-empty-state icon="🕔" title="Sem eventos" description="Nenhum evento registrado ainda." />
+          } @else {
+            <ul class="timeline">
+              @for (ev of timeline(); track $index) {
+                <li class="timeline__item" [attr.data-type]="ev.type">
+                  <span class="timeline__date">{{ ev.at | date:'dd/MM/yyyy' }}</span>
+                  <span class="timeline__title">{{ ev.title }}</span>
+                  @if (ev.amount != null) {
+                    <span class="timeline__amount">{{ ev.amount | appCurrency }}</span>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </article>
+      }
+    }
+  }
+</section>
+
+<app-confirm-sheet
+  [open]="!!paySheet"
+  eyebrow="Pagar parcela"
+  [title]="paySheet ? ('Parcela ' + paySheet.installment.installmentNo + ' — ' + (paySheet.installment.totalAmount | appCurrency)) : ''"
+  (dismiss)="cancelPaySheet()">
+  @if (paySheet) {
+    <div class="pay-form">
+      <label>Data do pagamento<input type="date" [(ngModel)]="payForm.paidAt" /></label>
+      <label>Conta de origem
+        <select [(ngModel)]="payForm.accountId">
+          <option value="">Sem conta (apenas registrar)</option>
+          @for (acc of accounts(); track acc.id) {
+            <option [value]="acc.id">{{ acc.name }} · {{ acc.currentBalance | appCurrency }}</option>
+          }
+        </select>
+      </label>
+      <div class="pay-form__row">
+        <label>Multa<input type="number" min="0" step="0.01" [(ngModel)]="payForm.penaltyAmount" /></label>
+        <label>Desconto<input type="number" min="0" step="0.01" [(ngModel)]="payForm.discountAmount" /></label>
+      </div>
+      <p class="pay-form__total">Total a pagar: <strong>{{ payTotal | appCurrency }}</strong></p>
+    </div>
+  }
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost" (click)="cancelPaySheet()">Cancelar</button>
+    <button type="button" class="btn-primary" (click)="confirmPay()" [disabled]="paying()">
+      {{ paying() ? 'Registrando...' : 'Confirmar pagamento' }}
+    </button>
+  </ng-container>
+</app-confirm-sheet>
+
+<app-confirm-sheet
+  [open]="amortSheetOpen"
+  eyebrow="Amortização extraordinária"
+  title="Registrar amortização"
+  (dismiss)="cancelAmortSheet()">
+  <div class="pay-form">
+    <label>Valor a amortizar
+      <input type="number" min="0" step="0.01" [(ngModel)]="amortForm.amount" />
+    </label>
+    <div class="field">
+      <span class="field__label">Estratégia</span>
+      <app-segmented-selector ariaLabel="Estratégia de amortização" [options]="amortStrategies" [value]="amortForm.strategy" (valueChange)="setAmortStrategy($event)" />
+    </div>
+    <label>Conta de origem
+      <select [(ngModel)]="amortForm.accountId">
+        <option value="">Sem conta (apenas registrar)</option>
+        @for (acc of accounts(); track acc.id) {
+          <option [value]="acc.id">{{ acc.name }} · {{ acc.currentBalance | appCurrency }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="btn-ghost sm" (click)="simulateAmort()">Simular efeito</button>
+
+    @if (amortPreview(); as p) {
+      <div class="amort-preview">
+        <div class="amort-preview__grid">
+          <div><span>Saldo devedor</span><strong>{{ p.previousBalance | appCurrency }} → {{ p.newBalance | appCurrency }}</strong></div>
+          <div><span>Prazo</span><strong>{{ p.previousTerm }} → {{ p.newTerm }} meses</strong></div>
+          <div><span>Parcela</span><strong>{{ p.previousPayment | appCurrency }} → {{ p.newPayment | appCurrency }}</strong></div>
+          <div><span>Economia de juros</span><strong class="amort-preview__savings">{{ p.estimatedSavings | appCurrency }}</strong></div>
+        </div>
+        <p class="amort-preview__disclaimer muted text--sm">{{ p.disclaimer }}</p>
+      </div>
+    }
+  </div>
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost" (click)="cancelAmortSheet()">Cancelar</button>
+    <button type="button" class="btn-primary" (click)="confirmAmort()" [disabled]="!amortPreview() || amortizing()">
+      {{ amortizing() ? 'Registrando...' : 'Confirmar amortização' }}
+    </button>
+  </ng-container>
+</app-confirm-sheet>
