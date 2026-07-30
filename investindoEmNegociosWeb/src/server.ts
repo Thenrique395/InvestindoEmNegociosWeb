@@ -44,11 +44,27 @@ app.get('/health', (_req, res) => {
  */
 app.use(
   express.static(browserDistFolder, {
-    maxAge: '1y',
+    // Sem maxAge global: o Cache-Control é definido por arquivo abaixo. Assets com hash no
+    // nome (imutáveis) podem ser cacheados por 1 ano; entrypoints (index.html, ngsw.json,
+    // ngsw-worker.js, .html, manifest) precisam de no-cache — senão o navegador/SW seguem
+    // servindo a versão antiga após um deploy (chunks somem → ChunkLoadError → tela branca).
     index: false,
     redirect: false,
-    setHeaders: (res, path) => {
-      if (/\.[0-9A-Z_-]{8,}\./i.test(path)) {
+    setHeaders: (res, filePath) => {
+      const file = filePath.toLowerCase();
+      const isEntrypoint =
+        file.endsWith('.html') ||
+        file.endsWith('ngsw.json') ||
+        file.endsWith('ngsw-worker.js') ||
+        file.endsWith('safety-worker.js') ||
+        file.endsWith('.webmanifest') ||
+        file.endsWith('manifest.json');
+      // Nomes com hash do Angular: name-HASH.ext ou name.HASH.ext (>= 8 chars).
+      const isHashed = /[.-][0-9a-z]{8,}\.[a-z0-9]+$/i.test(filePath);
+
+      if (isEntrypoint || !isHashed) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else {
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       }
     },
