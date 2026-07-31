@@ -8,6 +8,9 @@
         Próximo vencimento em {{ overview.nextDueDate | date:'dd/MM/yyyy' }} · {{ overview.nextDueAmount | appCurrency }}
       </span>
     }
+    <div page-actions class="loans-header-actions">
+      <button type="button" class="btn-primary" (click)="openForm()">Novo contrato</button>
+    </div>
   </app-page-header>
 
   <section class="loans-summary-grid">
@@ -49,98 +52,16 @@
     </app-transaction-summary-card>
   </section>
 
-  @if (error()) {
+  @if (error() && !showForm()) {
     <app-ui-state type="error" title="Não foi possível concluir a operação." [description]="error()" retryLabel="Tentar novamente" (retry)="load()" />
   }
 
-  <div class="grid">
-    <article class="card form-card">
-      <div class="form-card__head">
-        <h2>{{ editingId ? 'Editar contrato' : 'Novo contrato' }}</h2>
-        <p class="muted text--sm">Preencha os dados e simule antes de salvar. Nada é registrado sem confirmação.</p>
-      </div>
-      <label>Título<input [(ngModel)]="form.title" /></label>
-      <label>Principal<input type="number" [(ngModel)]="form.principalAmount" /></label>
-      <label>Juros ao ano (%)<input type="number" step="0.01" [(ngModel)]="form.annualInterestRate" /></label>
-      <label>Prazo em meses<input type="number" [(ngModel)]="form.termMonths" /></label>
-      <div class="field">
-        <span class="field__label">Sistema de amortização</span>
-        <app-segmented-selector
-          ariaLabel="Sistema de amortização"
-          [options]="amortizationOptions"
-          [value]="form.amortizationType"
-          (valueChange)="setAmortization($event)" />
-      </div>
-      <label>Data inicial<input type="date" [(ngModel)]="form.startDate" /></label>
-      <label>Dia de pagamento<input type="number" min="1" max="28" [(ngModel)]="form.paymentDay" /></label>
-      <div class="actions">
-        @if (editingId) {
-          <button class="btn-ghost" type="button" (click)="cancelEdit()">Cancelar</button>
-        } @else {
-          <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
-          <button class="btn-ghost" type="button" (click)="compare()" [disabled]="comparing()">
-            {{ comparing() ? 'Comparando...' : 'Comparar PRICE × SAC' }}
-          </button>
-        }
-        <button class="btn-primary" type="button" (click)="create()" [disabled]="saving()">
-          {{ saving() ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
-        </button>
-      </div>
-    </article>
-
-    @if (comparison(); as cmp) {
-      <article class="card compare-card">
-        <h2>PRICE × SAC</h2>
-        <p class="muted text--sm">Mesmos parâmetros, dois sistemas. Escolha para seguir com a criação.</p>
-        <div class="compare-grid">
-          @for (opt of [{ key: 'Price', label: 'PRICE', sim: cmp.price }, { key: 'Sac', label: 'SAC', sim: cmp.sac }]; track opt.key) {
-            <div class="compare-col">
-              <h3>{{ opt.label }}</h3>
-              <dl>
-                <div><dt>Parcela inicial</dt><dd>{{ opt.sim.installments[0].totalAmount | appCurrency }}</dd></div>
-                <div><dt>Parcela final</dt><dd>{{ opt.sim.installments[opt.sim.installments.length - 1].totalAmount | appCurrency }}</dd></div>
-                <div><dt>Custo total</dt><dd>{{ opt.sim.totalCost | appCurrency }}</dd></div>
-                <div><dt>Juros totais</dt><dd>{{ opt.sim.totalInterest | appCurrency }}</dd></div>
-              </dl>
-              <button type="button" class="btn-primary sm" (click)="chooseSystem($any(opt.key))">Escolher {{ opt.label }}</button>
-            </div>
-          }
-        </div>
-      </article>
-    }
-
-    @if (simulation(); as s) {
-      <article class="card">
-        <h2>Simulação</h2>
-        <div class="kpis">
-          <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | appCurrency }}</strong></div>
-          <div><span>Custo total</span><strong>{{ s.totalCost | appCurrency }}</strong></div>
-          <div><span>Juros totais</span><strong>{{ s.totalInterest | appCurrency }}</strong></div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
-            <tbody>
-              @for (item of s.installments.slice(0, 6); track item.id) {
-                <tr>
-                  <td>{{ item.installmentNo }}</td>
-                  <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ item.principalAmount | appCurrency }}</td>
-                  <td>{{ item.interestAmount | appCurrency }}</td>
-                  <td>{{ item.totalAmount | appCurrency }}</td>
-                  <td>{{ item.endingBalance | appCurrency }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </article>
-    }
-  </div>
-
-  <article class="card">
+  <article class="card contracts-card">
     <div class="contracts-head">
-      <h2>Contratos cadastrados</h2>
+      <div>
+        <h2>Contratos cadastrados</h2>
+        <p class="muted text--sm">Acompanhe cada contrato, pague parcelas e registre amortizações.</p>
+      </div>
       @if (contracts().length) {
         <app-segmented-selector
           ariaLabel="Filtrar contratos por situação"
@@ -157,7 +78,7 @@
       <app-empty-state
         icon="$"
         title="Nenhum empréstimo cadastrado"
-        description="Simule e crie o primeiro contrato para acompanhar parcelas e saldo aberto." />
+        description="Clique em “Novo contrato” para simular e criar o primeiro — e acompanhar parcelas e saldo devedor." />
     }
     @if (!loading() && contracts().length && !filteredViews.length) {
       <app-empty-state
@@ -178,19 +99,7 @@
                   saldo aberto {{ view.contract.openBalance | appCurrency }}
                 </p>
               </div>
-              <div class="contract__actions">
-                <app-status-badge [tone]="view.statusTone" [label]="view.statusLabel" [dot]="true" />
-                <button type="button" class="btn-ghost sm" (click)="edit(view.contract)" [disabled]="!!deleting()">Editar</button>
-                @if (view.paidCount > 0) {
-                  <button type="button" class="btn-ghost sm" (click)="askArchive(view.contract)" [disabled]="archiving() === view.contract.id || !!editingId">
-                    {{ archiving() === view.contract.id ? 'Arquivando...' : 'Arquivar' }}
-                  </button>
-                } @else {
-                  <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting() === view.contract.id || !!editingId">
-                    {{ deleting() === view.contract.id ? 'Excluindo...' : 'Excluir' }}
-                  </button>
-                }
-              </div>
+              <app-status-badge [tone]="view.statusTone" [label]="view.statusLabel" [dot]="true" />
             </div>
 
             <div class="contract__progress">
@@ -216,12 +125,25 @@
               <div><span>Juros totais</span><strong>{{ view.contract.totalInterest | appCurrency }}</strong></div>
               <div><span>Parcelas abertas</span><strong>{{ view.contract.openInstallments }}</strong></div>
             </div>
-            <div class="contract__toggle">
-              <a class="btn-ghost sm" [routerLink]="['/emprestimos', view.contract.id]">Ver detalhes</a>
+
+            <div class="contract__footer">
+              <a class="btn-primary sm" [routerLink]="['/emprestimos', view.contract.id]">Ver detalhes</a>
               <button type="button" class="btn-ghost sm" (click)="toggleInstallments(view.contract.id)">
                 {{ expandedContractId === view.contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
               </button>
+              <span class="contract__footer-spacer"></span>
+              <button type="button" class="btn-ghost sm" (click)="edit(view.contract)" [disabled]="!!deleting()">Editar</button>
+              @if (view.paidCount > 0) {
+                <button type="button" class="btn-ghost sm" (click)="askArchive(view.contract)" [disabled]="archiving() === view.contract.id">
+                  {{ archiving() === view.contract.id ? 'Arquivando...' : 'Arquivar' }}
+                </button>
+              } @else {
+                <button type="button" class="btn-danger sm" (click)="askRemove(view.contract)" [disabled]="deleting() === view.contract.id">
+                  {{ deleting() === view.contract.id ? 'Excluindo...' : 'Excluir' }}
+                </button>
+              }
             </div>
+
             @if (expandedContractId === view.contract.id) {
               <div class="table-wrap">
                 <table>
@@ -257,6 +179,123 @@
     }
   </article>
 </section>
+
+<!-- Modal: novo contrato / editar -->
+<app-modal
+  [open]="showForm()"
+  [eyebrow]="editingId ? 'Editar contrato' : 'Novo contrato'"
+  [title]="editingId ? 'Atualize o contrato' : 'Novo empréstimo ou financiamento'"
+  subtitle="Preencha os dados e simule antes de salvar. Nada é registrado sem confirmação."
+  size="lg"
+  (close)="closeForm()">
+
+  <form class="loan-form" modal-body (ngSubmit)="create()">
+    <section class="loan-form__section">
+      <div class="loan-form__section-head"><h4>Identificação</h4></div>
+      <div class="loan-form__grid">
+        <app-form-field label="Título" class="loan-form__field--full">
+          <input class="loan-form__control" type="text" name="title" [(ngModel)]="form.title"
+            placeholder="Ex: Empréstimo pessoal, financiamento do carro..." />
+        </app-form-field>
+      </div>
+    </section>
+
+    <section class="loan-form__section">
+      <div class="loan-form__section-head"><h4>Valores e condições</h4></div>
+      <div class="loan-form__grid">
+        <app-form-field label="Valor (R$)">
+          <input class="loan-form__control" type="number" min="0" name="principal" [(ngModel)]="form.principalAmount" />
+        </app-form-field>
+        <app-form-field label="Juros ao ano (%)">
+          <input class="loan-form__control" type="number" step="0.01" name="rate" [(ngModel)]="form.annualInterestRate" />
+        </app-form-field>
+        <app-form-field label="Prazo (meses)">
+          <input class="loan-form__control" type="number" min="1" name="term" [(ngModel)]="form.termMonths" />
+        </app-form-field>
+        <app-form-field label="Dia de pagamento" hint="1 a 28">
+          <input class="loan-form__control" type="number" min="1" max="28" name="paymentDay" [(ngModel)]="form.paymentDay" />
+        </app-form-field>
+        <app-form-field label="Data inicial">
+          <input class="loan-form__control" type="date" name="startDate" [(ngModel)]="form.startDate" />
+        </app-form-field>
+        <app-form-field label="Sistema de amortização" class="loan-form__field--full">
+          <app-segmented-selector
+            ariaLabel="Sistema de amortização"
+            [options]="amortizationOptions"
+            [value]="form.amortizationType"
+            (valueChange)="setAmortization($event)" />
+        </app-form-field>
+      </div>
+    </section>
+
+    @if (error()) {
+      <p class="loan-form__error" role="alert">{{ error() }}</p>
+    }
+
+    @if (comparison(); as cmp) {
+      <section class="loan-form__section">
+        <div class="loan-form__section-head">
+          <h4>PRICE × SAC</h4>
+          <p class="muted text--sm">Mesmos parâmetros, dois sistemas — escolha para seguir.</p>
+        </div>
+        <div class="compare-grid">
+          @for (opt of [{ key: 'Price', label: 'PRICE', sim: cmp.price }, { key: 'Sac', label: 'SAC', sim: cmp.sac }]; track opt.key) {
+            <div class="compare-col">
+              <h3>{{ opt.label }}</h3>
+              <dl>
+                <div><dt>Parcela inicial</dt><dd>{{ opt.sim.installments[0].totalAmount | appCurrency }}</dd></div>
+                <div><dt>Parcela final</dt><dd>{{ opt.sim.installments[opt.sim.installments.length - 1].totalAmount | appCurrency }}</dd></div>
+                <div><dt>Custo total</dt><dd>{{ opt.sim.totalCost | appCurrency }}</dd></div>
+                <div><dt>Juros totais</dt><dd>{{ opt.sim.totalInterest | appCurrency }}</dd></div>
+              </dl>
+              <button type="button" class="btn-primary sm" (click)="chooseSystem($any(opt.key))">Escolher {{ opt.label }}</button>
+            </div>
+          }
+        </div>
+      </section>
+    } @else if (simulation(); as s) {
+      <section class="loan-form__section">
+        <div class="loan-form__section-head"><h4>Simulação</h4></div>
+        <div class="kpis">
+          <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | appCurrency }}</strong></div>
+          <div><span>Custo total</span><strong>{{ s.totalCost | appCurrency }}</strong></div>
+          <div><span>Juros totais</span><strong>{{ s.totalInterest | appCurrency }}</strong></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
+            <tbody>
+              @for (item of s.installments.slice(0, 6); track item.id) {
+                <tr>
+                  <td>{{ item.installmentNo }}</td>
+                  <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ item.principalAmount | appCurrency }}</td>
+                  <td>{{ item.interestAmount | appCurrency }}</td>
+                  <td>{{ item.totalAmount | appCurrency }}</td>
+                  <td>{{ item.endingBalance | appCurrency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  </form>
+
+  <div class="loan-form__footer" modal-footer>
+    @if (!editingId) {
+      <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
+      <button class="btn-ghost" type="button" (click)="compare()" [disabled]="comparing()">
+        {{ comparing() ? 'Comparando...' : 'Comparar PRICE × SAC' }}
+      </button>
+    }
+    <span class="loan-form__footer-spacer"></span>
+    <button class="btn-ghost" type="button" (click)="closeForm()">Cancelar</button>
+    <button class="btn-primary" type="button" (click)="create()" [disabled]="saving()">
+      {{ saving() ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
+    </button>
+  </div>
+</app-modal>
 
 <app-confirm-sheet
   [open]="!!pendingDelete"

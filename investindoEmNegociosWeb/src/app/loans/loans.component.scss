@@ -276,3 +276,71 @@ td {
 @media (max-width: 640px) {
   .compare-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Header + lista */
+.loans-header-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.contracts-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--font-size-body-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+.contracts-head p { margin: 0.2rem 0 0; }
+
+.contract__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.contract__footer-spacer { flex: 1 1 auto; }
+
+/* Modal de novo contrato / edição */
+.loan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.loan-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.loan-form__section-head h4 {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--font-size-body);
+  letter-spacing: var(--letter-spacing-title);
+}
+.loan-form__section-head p { margin: 0.15rem 0 0; }
+.loan-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+.loan-form__field--full { grid-column: 1 / -1; }
+.loan-form__control { width: 100%; box-sizing: border-box; }
+.loan-form__error {
+  margin: 0;
+  color: var(--color-danger-text, #dc2626);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}
+.loan-form__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+.loan-form__footer-spacer { flex: 1 1 auto; }
+
+@media (max-width: 560px) {
+  .loan-form__grid { grid-template-columns: minmax(0, 1fr); }
+  .loan-form__footer-spacer,
+  .contract__footer-spacer { display: none; }
+}

@@ -15,6 +15,8 @@ import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-s
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { ModalComponent } from '../shared/modal/modal.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { LoanContractView, LoansOverview, buildContractViews, buildLoansOverview } from './loans-overview.model';
 
@@ -35,7 +37,9 @@ type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
     SegmentedSelectorComponent,
     StatusBadgeComponent,
     UsageBarComponent,
-    ConfirmSheetComponent
+    ConfirmSheetComponent,
+    ModalComponent,
+    FormFieldComponent
   ],
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.scss',
@@ -49,6 +53,7 @@ export class LoansComponent implements OnInit {
   readonly simulation = signal<LoanSimulationResponse | null>(null);
   readonly comparison = signal<LoanSimulationComparison | null>(null);
   readonly comparing = signal(false);
+  readonly showForm = signal(false);
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly deleting = signal<string | null>(null);
@@ -200,12 +205,9 @@ export class LoansComponent implements OnInit {
       this.loansService.update(this.editingId, this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (updated) => {
           this.contracts.set(this.contracts().map(c => c.id === updated.id ? updated : c));
-          this.simulation.set(null);
-          this.editingId = null;
-          this.resetForm();
           this.uiFeedback.success('Contrato atualizado com cronograma recalculado.');
           this.saving.set(false);
-          this.cdr.markForCheck();
+          this.closeForm();
         },
         error: (err) => {
           this.error.set(extractApiErrorMessage(err, 'Falha ao atualizar contrato.'));
@@ -219,10 +221,9 @@ export class LoansComponent implements OnInit {
     this.loansService.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (contract) => {
         this.contracts.set([contract, ...this.contracts()]);
-        this.simulation.set(null);
         this.uiFeedback.success('Empréstimo criado com cronograma calculado.');
         this.saving.set(false);
-        this.cdr.markForCheck();
+        this.closeForm();
       },
       error: (err) => {
         this.error.set(extractApiErrorMessage(err, 'Falha ao criar empréstimo.'));
@@ -235,6 +236,7 @@ export class LoansComponent implements OnInit {
   edit(contract: LoanContractResponse): void {
     this.editingId = contract.id;
     this.simulation.set(null);
+    this.comparison.set(null);
     this.error.set('');
     this.success.set('');
     this.form = {
@@ -246,15 +248,33 @@ export class LoansComponent implements OnInit {
       startDate: contract.startDate,
       paymentDay: contract.paymentDay
     };
+    this.showForm.set(true);
+    this.cdr.markForCheck();
+  }
+
+  /** Abre o modal para um novo contrato (formulário limpo). */
+  openForm(): void {
+    this.editingId = null;
+    this.resetForm();
+    this.simulation.set(null);
+    this.comparison.set(null);
+    this.error.set('');
+    this.showForm.set(true);
+    this.cdr.markForCheck();
+  }
+
+  closeForm(): void {
+    this.showForm.set(false);
+    this.editingId = null;
+    this.simulation.set(null);
+    this.comparison.set(null);
+    this.error.set('');
+    this.resetForm();
     this.cdr.markForCheck();
   }
 
   cancelEdit(): void {
-    this.editingId = null;
-    this.simulation.set(null);
-    this.error.set('');
-    this.resetForm();
-    this.cdr.markForCheck();
+    this.closeForm();
   }
 
   askRemove(contract: LoanContractResponse): void {
