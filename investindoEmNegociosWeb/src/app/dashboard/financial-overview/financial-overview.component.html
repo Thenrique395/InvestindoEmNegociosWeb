@@ -91,7 +91,11 @@
               </span>
             }
           </div>
-          <p class="overview-card__note">{{ card.note }}</p>
+          <p class="overview-card__note">
+            @for (linha of card.note.split(' · '); track $index) {
+              <span class="overview-card__note-line">{{ linha }}</span>
+            }
+          </p>
           @if (card.detailsRoute) {
             <a class="overview-card__link" [routerLink]="card.detailsRoute">
               {{ card.detailsLabel || 'Ver detalhes' }}
