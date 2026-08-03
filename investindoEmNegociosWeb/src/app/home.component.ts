@@ -8,7 +8,7 @@ import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { Router, RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone } from './utils/status';
 import { OnboardingService } from './onboarding.service';
-import { formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
+import { formatMonthLabel, formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 import {
   calculateInsightHealthScore,
   dateKey,
@@ -360,7 +360,9 @@ export class HomeComponent implements OnInit {
   get mesAtualLabel(): string {
     if (this.periodo === 'quarter') {
       const quarter = Math.floor(this.dataAtual.getMonth() / 3) + 1;
-      return `Trimestre ${quarter} de ${this.dataAtual.getFullYear()}`;
+      const year = this.dataAtual.getFullYear();
+      const primeiroMes = (quarter - 1) * 3;
+      return `${formatMonthLabel(year, primeiroMes)} a ${formatMonthLabel(year, primeiroMes + 2)} de ${year}`;
     }
     if (this.periodo === 'year') {
       return `Ano de ${this.dataAtual.getFullYear()}`;
