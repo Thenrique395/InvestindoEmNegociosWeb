@@ -1,11 +1,7 @@
 <section class="overview" aria-label="Visão geral financeira">
   <header class="overview__header">
     <div class="overview__heading">
-      <div class="overview__title-row">
-        <h1 class="overview__title">Visão Geral Financeira</h1>
-        <span class="overview__plan">Plano {{ planoLabel() }}</span>
-      </div>
-      <p class="overview__subtitle">{{ subtitle() }}</p>
+      <h1 class="overview__title">{{ heading() }}</h1>
     </div>
     <div class="overview__period" role="group" aria-label="Período da visão geral financeira">
       @for (option of periodoOptions; track option.value) {

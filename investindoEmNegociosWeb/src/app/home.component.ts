@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, debounceTime } from 'rxjs';
 import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/api-data.service';
 import { CardsService } from './cards.service';
 import { GoalsService, Goal, GoalStatus } from './goals.service';
@@ -116,6 +116,7 @@ export class HomeComponent implements OnInit {
   private latestRobotInsight: NotificationItem | null = null;
   private expensesLoaded = false;
   private incomesLoaded = false;
+  private readonly summaryRefresh$ = new Subject<void>();
 
   dataAtual = new Date();
   private expensesRaw: StoredExpense[] = [];
@@ -257,6 +258,9 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.summaryRefresh$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshSummaries());
     if (this.isLogged) {
       this.profileService.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (profile) => {
@@ -304,6 +308,7 @@ export class HomeComponent implements OnInit {
       this.updateUpcomingDueItems();
       this.updateOverviewDerived();
       this.updateInsight();
+      this.summaryRefresh$.next();
     });
     this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.incomesLoaded = true;
@@ -316,6 +321,7 @@ export class HomeComponent implements OnInit {
       this.updateMonthlyFlow();
       this.updateOverviewDerived();
       this.updateInsight();
+      this.summaryRefresh$.next();
     });
     this.db.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.cards = lista;
@@ -325,16 +331,7 @@ export class HomeComponent implements OnInit {
         next: (accounts) => {
           this.accountBalances = (accounts || []).filter((a) => a.isActive);
           this.accountsService.resolveDefaultAccountId(this.accountBalances);
-          this.loadRealAvailableBalance();
-          this.loadDebtSummary();
-          this.loadSubscriptionsSummary();
-          this.loadAiHealth();
-          this.loadNetWorthSummary();
-          this.loadNetWorthHistory();
-          this.loadProjection();
-          this.loadRiskAssessment();
-          this.loadInsights();
-          this.loadRecommendations();
+          this.refreshSummaries();
         },
         error: () => {
           this.accountBalances = [];
@@ -1143,6 +1140,15 @@ export class HomeComponent implements OnInit {
     this.totalRendas = this.somarRendasMes(this.incomesRaw);
     this.totalRendasPendentes = this.somarRendasPendentesMes(this.incomesRaw);
     this.atualizarSaldo();
+    this.refreshSummaries();
+    this.updateCategoryCharts();
+    this.updateRecentTransactions();
+    this.updateOverviewDerived();
+    this.updateInsight();
+  }
+
+  private refreshSummaries(): void {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) return;
     this.loadRealAvailableBalance();
     this.loadDebtSummary();
     this.loadSubscriptionsSummary();
@@ -1153,10 +1159,6 @@ export class HomeComponent implements OnInit {
     this.loadRiskAssessment();
     this.loadInsights();
     this.loadRecommendations();
-    this.updateCategoryCharts();
-    this.updateRecentTransactions();
-    this.updateOverviewDerived();
-    this.updateInsight();
   }
 
   private loadRealAvailableBalance(): void {

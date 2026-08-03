@@ -8,8 +8,7 @@ import {
   buildOverviewCards,
   buildOverviewSummary,
   FinancialOverviewInput,
-  OverviewPeriodo,
-  planoComercialLabel
+  OverviewPeriodo
 } from './financial-overview.model';
 
 const PERIODO_OPTIONS: { value: OverviewPeriodo; label: string }[] = [
@@ -40,11 +39,11 @@ export class FinancialOverviewComponent {
   readonly periodoOptions = PERIODO_OPTIONS;
   readonly skeletonSlots = [0, 1, 2, 3];
 
-  readonly planoLabel = computed(() => planoComercialLabel(this.role()));
-
-  readonly subtitle = computed(() => {
+  readonly heading = computed(() => {
     const label = this.periodoLabel();
-    return /^(Trimestre|Ano)/.test(label) ? `Resumo do ${label.charAt(0).toLowerCase()}${label.slice(1)}` : `Resumo de ${label}`;
+    return /^(Trimestre|Ano)/.test(label)
+      ? `Visão Geral Financeira do ${label.charAt(0).toLowerCase()}${label.slice(1)}`
+      : `Visão Geral Financeira de ${label}`;
   });
 
   readonly summary = computed(() => buildOverviewSummary(this.data(), this.role(), this.periodo()));

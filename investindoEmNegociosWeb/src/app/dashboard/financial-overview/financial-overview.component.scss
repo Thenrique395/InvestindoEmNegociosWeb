@@ -20,13 +20,6 @@
   max-width: 620px;
 }
 
-.overview__title-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
-}
-
 .overview__title {
   margin: 0;
   color: var(--text);
@@ -34,25 +27,6 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-title);
   line-height: var(--line-height-tight);
-}
-
-.overview__plan {
-  padding: 0.15rem 0.6rem;
-  border: 1px solid var(--color-primary-soft);
-  border-radius: var(--radius-pill);
-  background: var(--color-primary-weak);
-  color: var(--primary-text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
-  white-space: nowrap;
-}
-
-.overview__subtitle {
-  margin: 0.3rem 0 0;
-  color: var(--text-muted);
-  font-size: var(--font-size-label);
-  line-height: var(--line-height-control);
 }
 
 .overview__period {
