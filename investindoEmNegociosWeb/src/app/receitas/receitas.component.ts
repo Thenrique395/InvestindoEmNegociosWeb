@@ -332,8 +332,10 @@ export class ReceitasComponent implements OnInit {
     this.erroData = '';
 
     // Edição de receita recorrente: perguntar o escopo (somente este mês ou toda a
-    // recorrência) antes de persistir, espelhando o fluxo de despesas.
+    // recorrência) antes de persistir. Fecha o modal do formulário (z alto) para que a
+    // confirm-sheet de escopo (z menor, renderizada em portal) fique visível por cima.
     if (this.editandoId && this.editIsRecurring) {
+      this.mostrarForm = false;
       this.confirmEdicao = {};
       return;
     }
@@ -352,6 +354,8 @@ export class ReceitasComponent implements OnInit {
 
   cancelarEdicaoReceita(): void {
     this.confirmEdicao = null;
+    // Reabre o formulário para o usuário não perder a edição em andamento.
+    this.mostrarForm = true;
   }
 
   /**

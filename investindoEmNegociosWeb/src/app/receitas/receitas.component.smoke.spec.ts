@@ -317,6 +317,21 @@ describe('ReceitasComponent - edição por escopo (parcela x recorrência)', () 
     ctx.component.salvar();
 
     expect(ctx.component.confirmEdicao).not.toBeNull();
+    // fecha o modal do form para a confirm-sheet de escopo ficar visível por cima
+    expect(ctx.component.mostrarForm).toBe(false);
+    expect(ctx.db.updateIncome).not.toHaveBeenCalled();
+    expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
+  });
+
+  it('cancelar o modal de escopo reabre o formulário sem perder a edição', () => {
+    const ctx = editar(receitaRecorrente);
+    ctx.component.salvar();
+    expect(ctx.component.mostrarForm).toBe(false);
+
+    ctx.component.cancelarEdicaoReceita();
+
+    expect(ctx.component.confirmEdicao).toBeNull();
+    expect(ctx.component.mostrarForm).toBe(true);
     expect(ctx.db.updateIncome).not.toHaveBeenCalled();
     expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
   });
