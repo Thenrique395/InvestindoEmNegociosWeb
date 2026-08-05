@@ -58,6 +58,11 @@ export class ReceitasComponent implements OnInit {
   erroData = '';
   erroCategoria = '';
   editandoId: string | null = null;
+  editInstallmentId: string | null = null;
+  editIsRecurring = false;
+  editOriginalFonte = '';
+  editOriginalCategoryId: string | null = null;
+  confirmEdicao: Record<string, never> | null = null;
   readonly valorSugestao = signal<number | null>(null);
   saving = false;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
@@ -325,29 +330,71 @@ export class ReceitasComponent implements OnInit {
       return;
     }
     this.erroData = '';
+
+    // Edição de receita recorrente: perguntar o escopo (somente este mês ou toda a
+    // recorrência) antes de persistir, espelhando o fluxo de despesas.
+    if (this.editandoId && this.editIsRecurring) {
+      this.confirmEdicao = {};
+      return;
+    }
+
+    this.persistirReceita('all', valor);
+  }
+
+  /** Abre o modal de escopo já resolvido: aplica a edição na parcela ou na recorrência. */
+  confirmarEdicaoReceita(escopo: 'single' | 'all'): void {
+    if (this.saving) return;
+    const valor = this.parseValor(this.valorInput);
+    if (!this.novaRenda.fonte || !valor) return;
+    this.confirmEdicao = null;
+    this.persistirReceita(escopo, valor);
+  }
+
+  cancelarEdicaoReceita(): void {
+    this.confirmEdicao = null;
+  }
+
+  /**
+   * Persiste a receita. `escopo='single'` edita apenas a parcela do mês (valor/data),
+   * preservando os demais meses; `escopo='all'` cria/edita o plano inteiro.
+   */
+  private persistirReceita(escopo: 'single' | 'all', valor: number): void {
     const recebimentoNormalizado = this.recebimentoInput
       ? this.normalizaData(this.recebimentoInput)
       : formatLocaleDate(this.dataAtual);
 
-    this.saving = true;
-    const save$ = this.editandoId
-      ? this.db.updateIncome(this.editandoId, {
-          planId: this.editandoId,
-          fonte: this.novaRenda.fonte,
-          categoryId: this.novaRenda.categoryId ?? null,
-          valor,
-          recebimento: recebimentoNormalizado,
-          fixa: this.novaRenda.fixa
-        })
-      : this.db.addIncome({
-          planId: '',
-          fonte: this.novaRenda.fonte,
-          categoryId: this.novaRenda.categoryId ?? null,
-          valor,
-          recebimento: recebimentoNormalizado,
-          fixa: this.novaRenda.fixa
-        });
+    let save$: Observable<void>;
+    if (this.editandoId && escopo === 'single' && this.editInstallmentId) {
+      const fonteMudou = this.editOriginalFonte !== this.novaRenda.fonte;
+      const categoriaMudou = (this.editOriginalCategoryId ?? null) !== (this.novaRenda.categoryId ?? null);
+      if (fonteMudou || categoriaMudou) {
+        this.setAlerta('Neste mês, apenas o valor e a data de recebimento são alterados. Fonte e categoria mudam ao editar toda a recorrência.', 4500, 'info');
+      }
+      save$ = this.db.updateIncomeInstallment(this.editInstallmentId, {
+        valor,
+        recebimento: recebimentoNormalizado
+      });
+    } else if (this.editandoId) {
+      save$ = this.db.updateIncome(this.editandoId, {
+        planId: this.editandoId,
+        fonte: this.novaRenda.fonte,
+        categoryId: this.novaRenda.categoryId ?? null,
+        valor,
+        recebimento: recebimentoNormalizado,
+        fixa: this.novaRenda.fixa
+      });
+    } else {
+      save$ = this.db.addIncome({
+        planId: '',
+        fonte: this.novaRenda.fonte,
+        categoryId: this.novaRenda.categoryId ?? null,
+        valor,
+        recebimento: recebimentoNormalizado,
+        fixa: this.novaRenda.fixa
+      });
+    }
 
+    this.saving = true;
     save$
       .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -364,6 +411,10 @@ export class ReceitasComponent implements OnInit {
 
   editar(renda: StoredIncome): void {
     this.editandoId = renda.planId ?? null;
+    this.editInstallmentId = renda.id ?? null;
+    this.editIsRecurring = renda.schedule === 'Recurring' || !!renda.fixa;
+    this.editOriginalFonte = renda.fonte;
+    this.editOriginalCategoryId = renda.categoryId ?? null;
     this.novaRenda = { ...renda };
     this.valorInput = formatNumberValue(renda.valor);
     this.recebimentoInput = renda.recebimento;
@@ -522,6 +573,11 @@ export class ReceitasComponent implements OnInit {
     this.valorInput = '';
     this.recebimentoInput = '';
     this.editandoId = null;
+    this.editInstallmentId = null;
+    this.editIsRecurring = false;
+    this.editOriginalFonte = '';
+    this.editOriginalCategoryId = null;
+    this.confirmEdicao = null;
     this.erroData = '';
     this.erroCategoria = '';
     this.valorSugestao.set(null);

@@ -197,6 +197,18 @@
 </div>
 
 <app-confirm-sheet
+  [open]="!!confirmEdicao"
+  eyebrow="Editar receita"
+  title="Aplicar alterações"
+  (dismiss)="cancelarEdicaoReceita()">
+  <p>Esta receita é recorrente. Deseja alterar somente este mês ou toda a recorrência?</p>
+  <ng-container sheet-actions>
+    <button type="button" class="btn-ghost sm" (click)="confirmarEdicaoReceita('single')">Somente este mês</button>
+    <button type="button" class="btn-primary sm" (click)="confirmarEdicaoReceita('all')">Toda a recorrência</button>
+  </ng-container>
+</app-confirm-sheet>
+
+<app-confirm-sheet
   [open]="showEditReceivedModal"
   eyebrow="Editar receita recebida"
   (dismiss)="cancelarEdicaoRecebida()">

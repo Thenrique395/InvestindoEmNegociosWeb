@@ -16,6 +16,7 @@ class ApiDataServiceMock {
 
   refreshIncomes = jasmine.createSpy('refreshIncomes');
   updateIncome = jasmine.createSpy('updateIncome').and.returnValue(of(undefined));
+  updateIncomeInstallment = jasmine.createSpy('updateIncomeInstallment').and.returnValue(of(undefined));
   addIncome = jasmine.createSpy('addIncome').and.returnValue(of(undefined));
   removeIncomeInstallment = jasmine.createSpy('removeIncomeInstallment').and.returnValue(of(undefined));
   removeIncome = jasmine.createSpy('removeIncome').and.returnValue(of(undefined));
@@ -287,5 +288,71 @@ describe('ReceitasComponent - anexo de comprovante', () => {
     component.onComprovanteFileSelected({ target: input } as unknown as Event);
 
     expect(ui.error).toHaveBeenCalled();
+  });
+});
+
+describe('ReceitasComponent - edição por escopo (parcela x recorrência)', () => {
+  const receitaRecorrente: StoredIncome = {
+    id: 'inst-ago',
+    planId: 'plan-1',
+    fonte: 'Salário',
+    categoria: 'Trabalho',
+    categoryId: 'cat-1',
+    valor: 1000,
+    recebimento: '05/08/2026',
+    schedule: 'Recurring',
+    fixa: true,
+    status: 'OPEN'
+  };
+
+  function editar(income: StoredIncome) {
+    const ctx = createComponent();
+    ctx.component.editar(income);
+    ctx.component.valorInput = '1.500,00';
+    return ctx;
+  }
+
+  it('ao salvar uma receita recorrente, abre o modal de escopo em vez de persistir direto', () => {
+    const ctx = editar(receitaRecorrente);
+    ctx.component.salvar();
+
+    expect(ctx.component.confirmEdicao).not.toBeNull();
+    expect(ctx.db.updateIncome).not.toHaveBeenCalled();
+    expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
+  });
+
+  it('escopo "somente este mês" edita apenas a parcela (updateIncomeInstallment)', () => {
+    const ctx = editar(receitaRecorrente);
+    ctx.component.salvar();
+    ctx.component.confirmarEdicaoReceita('single');
+
+    expect(ctx.db.updateIncomeInstallment).toHaveBeenCalled();
+    const [installmentId, payload] = ctx.db.updateIncomeInstallment.calls.mostRecent().args;
+    expect(installmentId).toBe('inst-ago');
+    expect(payload.valor).toBe(1500);
+    expect(ctx.db.updateIncome).not.toHaveBeenCalled();
+    expect(ctx.component.confirmEdicao).toBeNull();
+  });
+
+  it('escopo "toda a recorrência" edita o plano inteiro (updateIncome)', () => {
+    const ctx = editar(receitaRecorrente);
+    ctx.component.salvar();
+    ctx.component.confirmarEdicaoReceita('all');
+
+    expect(ctx.db.updateIncome).toHaveBeenCalled();
+    const [planId, payload] = ctx.db.updateIncome.calls.mostRecent().args;
+    expect(planId).toBe('plan-1');
+    expect(payload.valor).toBe(1500);
+    expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
+  });
+
+  it('receita avulsa (não recorrente) salva direto, sem modal de escopo', () => {
+    const avulsa: StoredIncome = { ...receitaRecorrente, id: 'inst-x', schedule: 'OneTime', fixa: false };
+    const ctx = editar(avulsa);
+    ctx.component.salvar();
+
+    expect(ctx.component.confirmEdicao).toBeNull();
+    expect(ctx.db.updateIncome).toHaveBeenCalled();
+    expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
   });
 });

@@ -238,6 +238,19 @@ export class ApiDataService {
     return this.installments.delete(installmentId).pipe(tap(() => this.refreshIncomes(this.lastIncomeMonth)), map(() => void 0));
   }
 
+  updateIncomeInstallment(installmentId: string, data: Partial<StoredIncome>): Observable<void> {
+    // Edita SOMENTE valor e data de recebimento da parcela in-place (preserva os
+    // recebimentos já registrados nos demais meses da recorrência). Fonte/categoria
+    // são do plano e mudam ao editar a recorrência inteira.
+    const existing = this.dbSubject.value.incomes.find((i) => i.id === installmentId);
+    const amount = data.valor ?? existing?.valor ?? 0;
+    const dueDate = toIsoDateFromLocale(data.recebimento || existing?.recebimento || '');
+    if (!dueDate) {
+      return throwError(() => new Error('Data de recebimento inválida.'));
+    }
+    return this.installments.update(installmentId, { amount, dueDate }).pipe(tap(() => this.refreshIncomes(this.lastIncomeMonth)), map(() => void 0));
+  }
+
   markIncomeReceived(installmentId: string, amount: number, accountId?: string | null) {
     return this.installments.pay(installmentId, {
       paidAmount: amount,
