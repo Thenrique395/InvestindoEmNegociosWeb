@@ -17,6 +17,8 @@ import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
+import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { LoanContractView, LoansOverview, buildContractViews, buildLoansOverview } from './loans-overview.model';
 
@@ -39,7 +41,9 @@ type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
     UsageBarComponent,
     ConfirmSheetComponent,
     ModalComponent,
-    FormFieldComponent
+    FormFieldComponent,
+    ResponsiveListComponent,
+    ResponsiveListCellDirective
   ],
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.scss',
@@ -76,6 +80,22 @@ export class LoansComponent implements OnInit {
   readonly amortizationOptions: SegmentOption[] = [
     { value: 'Price', label: 'PRICE' },
     { value: 'Sac', label: 'SAC' }
+  ];
+  readonly installmentColumns: ResponsiveListColumn[] = [
+    { key: 'number', label: '#' },
+    { key: 'dueDate', label: 'Vencimento' },
+    { key: 'total', label: 'Total', align: 'end' },
+    { key: 'balance', label: 'Saldo restante', align: 'end' },
+    { key: 'status', label: 'Situação' },
+    { key: 'actions', label: 'Ações', align: 'end' }
+  ];
+  readonly simulationColumns: ResponsiveListColumn[] = [
+    { key: 'number', label: '#' },
+    { key: 'dueDate', label: 'Vencimento' },
+    { key: 'principal', label: 'Principal', align: 'end' },
+    { key: 'interest', label: 'Juros', align: 'end' },
+    { key: 'total', label: 'Total', align: 'end' },
+    { key: 'balance', label: 'Saldo', align: 'end' }
   ];
 
   form: LoanContractRequest = this.defaultForm();
@@ -125,6 +145,8 @@ export class LoansComponent implements OnInit {
       default: return views.filter((v) => !this.isArchived(v));
     }
   }
+
+  readonly trackInstallment = (installment: LoanInstallmentResponse): string => installment.id;
 
   get statusFilterOptions(): SegmentOption[] {
     const views = this.contractViews;

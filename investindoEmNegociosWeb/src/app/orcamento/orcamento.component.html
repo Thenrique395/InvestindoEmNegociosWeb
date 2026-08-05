@@ -80,100 +80,62 @@
 
     <article class="card">
       <h2>Categorias</h2>
-      @if (!itemViews.length) {
-        <app-empty-state icon="$" title="Nenhuma categoria no orçamento" description="Adicione categorias e defina valores planejados para o mês." />
-      }
-      @if (itemViews.length) {
-        <div class="category-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Categoria</th>
-                <th class="text-right">Planejado</th>
-                <th class="text-right">Realizado</th>
-                <th class="text-right">Variação</th>
-                <th class="col-bar">Uso</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (view of itemViews; track view.item.id) {
-                <tr>
-                  <td>{{ view.item.categoryName }}</td>
-                  <td class="text-right">
-                    @if (editingId === view.item.id) {
-                      <input
-                        class="edit-input"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        [(ngModel)]="editingAmount"
-                        (keyup.enter)="confirmEdit(view.item)"
-                        (keyup.escape)="cancelEdit()" />
-                    } @else {
-                      <button type="button" class="link-btn" (click)="startEdit(view.item)" [attr.aria-label]="'Editar valor planejado de ' + view.item.categoryName">
-                        {{ view.item.plannedAmount | appCurrency }}
-                      </button>
-                    }
-                  </td>
-                  <td class="text-right">{{ view.item.realizedAmount | appCurrency }}</td>
-                  <td class="text-right" [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</td>
-                  <td class="col-bar">
-                    <div class="usage-cell">
-                      <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
-                      <span class="usage-cell__pct" [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
-                    </div>
-                  </td>
-                  <td class="col-actions">
-                    @if (editingId === view.item.id) {
-                      <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
-                      <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
-                    } @else {
-                      <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
-                        {{ deletingId() === view.item.id ? '...' : 'Remover' }}
-                      </button>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+      <app-responsive-list
+        [columns]="categoryColumns"
+        [items]="itemViews"
+        [getId]="trackBudgetItem"
+        emptyIcon="$"
+        emptyTitle="Nenhuma categoria no orçamento"
+        emptyDescription="Adicione categorias e defina valores planejados para o mês.">
+        <ng-template appResponsiveListCell="category" let-view>
+          <span class="category-name">{{ view.item.categoryName }}</span>
+        </ng-template>
 
-        <ul class="category-cards">
-          @for (view of itemViews; track view.item.id) {
-            <li class="category-card">
-              <div class="category-card__head">
-                <span class="category-card__name">{{ view.item.categoryName }}</span>
-                <strong [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</strong>
-              </div>
-              <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
-              <div class="category-card__meta muted">
-                <span>{{ view.item.realizedAmount | appCurrency }} de {{ view.item.plannedAmount | appCurrency }}</span>
-                <span [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
-              </div>
-              <div class="category-card__actions">
-                @if (editingId === view.item.id) {
-                  <input
-                    class="edit-input"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    [(ngModel)]="editingAmount"
-                    (keyup.enter)="confirmEdit(view.item)" />
-                  <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
-                  <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
-                } @else {
-                  <button type="button" class="btn-ghost sm" (click)="startEdit(view.item)">Editar planejado</button>
-                  <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
-                    {{ deletingId() === view.item.id ? '...' : 'Remover' }}
-                  </button>
-                }
-              </div>
-            </li>
+        <ng-template appResponsiveListCell="planned" let-view>
+          @if (editingId === view.item.id) {
+            <input
+              class="edit-input"
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="editingAmount"
+              (keyup.enter)="confirmEdit(view.item)"
+              (keyup.escape)="cancelEdit()" />
+          } @else {
+            <button type="button" class="link-btn" (click)="startEdit(view.item)" [attr.aria-label]="'Editar valor planejado de ' + view.item.categoryName">
+              {{ view.item.plannedAmount | appCurrency }}
+            </button>
           }
-        </ul>
-      }
+        </ng-template>
+
+        <ng-template appResponsiveListCell="realized" let-view>
+          {{ view.item.realizedAmount | appCurrency }}
+        </ng-template>
+
+        <ng-template appResponsiveListCell="variance" let-view>
+          <span [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</span>
+        </ng-template>
+
+        <ng-template appResponsiveListCell="usage" let-view>
+          <div class="usage-cell">
+            <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
+            <span class="usage-cell__pct" [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
+          </div>
+        </ng-template>
+
+        <ng-template appResponsiveListCell="actions" let-view>
+          <div class="list-actions">
+            @if (editingId === view.item.id) {
+              <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
+              <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
+            } @else {
+              <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
+                {{ deletingId() === view.item.id ? '...' : 'Remover' }}
+              </button>
+            }
+          </div>
+        </ng-template>
+      </app-responsive-list>
     </article>
   }
 </section>

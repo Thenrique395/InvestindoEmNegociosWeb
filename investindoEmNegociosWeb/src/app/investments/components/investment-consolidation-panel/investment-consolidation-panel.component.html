@@ -1,0 +1,119 @@
+<section class="consolidacao">
+  <article class="card chart-card">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Consolidação de aportes</h3>
+      </div>
+      <app-filter-bar>
+        <div filter-left class="chart-filters">
+          <select aria-label="Granularidade da consolidação">
+            <option value="MONTHLY">Mensal</option>
+          </select>
+          <select [ngModel]="horizonYears" (ngModelChange)="horizonYearsChange.emit($event)" aria-label="Horizonte">
+            <option [ngValue]="1">1 ano</option>
+            <option [ngValue]="2">2 anos</option>
+            <option [ngValue]="3">3 anos</option>
+          </select>
+          <select [ngModel]="typeFilter" (ngModelChange)="typeFilterChange.emit($event)" aria-label="Tipo de investimento">
+            <option value="ALL">Todos os tipos</option>
+            @for (t of tipos; track trackByIndex($index)) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </select>
+        </div>
+      </app-filter-bar>
+    </div>
+    @if (!series.length) {
+      <div class="empty">Sem lançamentos de aportes no período.</div>
+    }
+    @if (series.length) {
+      <div class="consolidacao-chart">
+        <div class="consolidacao-axis">
+          <span>{{ chartMax | appCurrency }}</span>
+          <span>{{ (chartMax / 2) | appCurrency }}</span>
+          <span>R$ 0</span>
+          <span>-{{ (chartMax / 2) | appCurrency }}</span>
+          <span>-{{ chartMax | appCurrency }}</span>
+        </div>
+        <div class="consolidacao-plot">
+          <div class="consolidacao-grid-lines">
+            @for (_ of gridLines; track trackByIndex($index)) {
+              <span></span>
+            }
+          </div>
+          <div class="consolidacao-zero-line"></div>
+          <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + series.length + ', minmax(0, 1fr))'">
+            @for (item of series; track trackByIndex($index)) {
+              <div class="consolidacao-col">
+                <div class="consolidacao-bars__stack">
+                  <span
+                    class="bar compra"
+                    [style.height.%]="(item.compras / chartMax) * 50"></span>
+                  <span
+                    class="bar venda"
+                    [style.height.%]="(item.vendas / chartMax) * 50"></span>
+                  <span class="chart-hover-tip">
+                    Compras: {{ item.compras | appCurrency }}<br />
+                    Vendas: {{ item.vendas | appCurrency }}
+                  </span>
+                </div>
+                <small>{{ item.label }}</small>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span><i class="chip compra"></i> Compras</span>
+        <span><i class="chip venda"></i> Vendas</span>
+      </div>
+    }
+  </article>
+
+  <article class="card chart-card">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Lançamentos consolidados</h3>
+      </div>
+      <input
+        type="text"
+        [ngModel]="searchTerm"
+        (ngModelChange)="searchTermChange.emit($event)"
+        placeholder="Buscar ativos" />
+    </div>
+    <app-responsive-list
+      [items]="rows"
+      [columns]="columns"
+      emptyIcon="📈"
+      emptyTitle="Sem lançamentos para os filtros atuais."
+      emptyMessage="Ajuste os filtros ou registre compras e vendas para visualizar a consolidação.">
+      <ng-template appResponsiveListCell="asset" let-row>
+        <strong>{{ row.asset }}</strong>
+      </ng-template>
+      <ng-template appResponsiveListCell="investmentType" let-row>
+        {{ investmentTypeLabel(row.investmentType) }}
+      </ng-template>
+      <ng-template appResponsiveListCell="ordem" let-row>
+        <span [class.success]="row.ordem === 'Compra'" [class.danger]="row.ordem === 'Venda'">{{ row.ordem }}</span>
+      </ng-template>
+      <ng-template appResponsiveListCell="quantity" let-row>
+        {{ row.quantity | number:'1.0-4' }}
+      </ng-template>
+      <ng-template appResponsiveListCell="unitPrice" let-row>
+        {{ row.unitPrice | appCurrency }}
+      </ng-template>
+      <ng-template appResponsiveListCell="total" let-row>
+        {{ row.total | appCurrency }}
+      </ng-template>
+      <ng-template appResponsiveListCell="quantityAfter" let-row>
+        {{ row.quantityAfter | number:'1.0-4' }}
+      </ng-template>
+      <ng-template appResponsiveListCell="date" let-row>
+        {{ row.date | date:'dd/MM/yyyy' }}
+      </ng-template>
+      <ng-template appResponsiveListCell="source" let-row>
+        <span class="status-pill" [class.zeroed]="row.source === 'Manual'">{{ row.source }}</span>
+      </ng-template>
+    </app-responsive-list>
+  </article>
+</section>

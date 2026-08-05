@@ -18,15 +18,19 @@ import { SUPPORTED_CURRENCIES } from '../utils/locale-settings';
 import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
-import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ModalComponent } from '../shared/modal/modal.component';
-import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { DonutChartComponent } from '../shared/donut-chart/donut-chart.component';
+import { InvestmentAssetsListComponent, InvestmentPositionSortKey } from './components/investment-assets-list/investment-assets-list.component';
+import {
+  ConsolidationBucket,
+  ConsolidationMovementRow,
+  InvestmentConsolidationPanelComponent
+} from './components/investment-consolidation-panel/investment-consolidation-panel.component';
+import { InvestmentDividendsPanelComponent } from './components/investment-dividends-panel/investment-dividends-panel.component';
 import { buildInvestmentsOverview, InvestmentsOverview } from './investments-overview.model';
 import {
   AllocationInvestmentType,
@@ -48,21 +52,10 @@ type CadastroOperacao = 'COMPRA' | 'VENDA';
 type InvestmentsTab = 'RESUMO' | 'CONSOLIDACAO' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
 type PatrimonioBucket = { key: string; label: string; aplicado: number; ganho: number; total: number };
-type PositionSortKey = 'asset' | 'paperType' | 'status' | 'quantity' | 'avgPrice' | 'currentValue' | 'portfolioPercent' | 'currentReturn' | 'estimatedResult';
+type PositionSortKey = InvestmentPositionSortKey;
 type ProventoMonthBucket = { key: string; label: string; total: number };
-type ConsolidacaoBucket = { key: string; label: string; compras: number; vendas: number };
-type ConsolidacaoMovimentoRow = {
-  id: string;
-  asset: string;
-  investmentType: InvestmentType;
-  ordem: 'Compra' | 'Venda';
-  quantity: number;
-  unitPrice: number;
-  total: number;
-  quantityAfter: number;
-  date: string;
-  source: 'B3' | 'Manual';
-};
+type ConsolidacaoBucket = ConsolidationBucket;
+type ConsolidacaoMovimentoRow = ConsolidationMovementRow;
 type RentabilidadeMonthPoint = {
   key: string;
   year: number;
@@ -76,7 +69,7 @@ type RentabilidadeMonthPoint = {
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, EmptyStateComponent, AppCurrencyPipe, PageHeaderComponent, TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent, ModalComponent, FilterBarComponent, DonutChartComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, AppCurrencyPipe, PageHeaderComponent, TransactionSummaryCardComponent, SegmentedSelectorComponent, ModalComponent, DonutChartComponent, InvestmentAssetsListComponent, InvestmentConsolidationPanelComponent, InvestmentDividendsPanelComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -142,7 +135,6 @@ export class InvestmentsComponent implements OnInit {
   rentabilidadePeriodo: 'SINCE_START' | 'LAST_12M' = 'SINCE_START';
   rentabilidadeTipoFiltro: 'ALL' | InvestmentType = 'ALL';
   rentabilidadeBenchmark: BenchmarkKey = 'CDI';
-  consolidacaoGranularidade: 'MONTHLY' = 'MONTHLY';
   consolidacaoHorizonteAnos = 2;
   consolidacaoTipoFiltro: 'ALL' | InvestmentType = 'ALL';
   consolidacaoSearchTerm = '';
@@ -706,22 +698,6 @@ export class InvestmentsComponent implements OnInit {
     return this.proventosPorAtivo12Meses.length;
   }
 
-  get proventosPorAtivo(): { asset: string; total: number }[] {
-    const totals = new Map<string, number>();
-    for (const pos of this.positions) {
-      for (const mov of pos.movements || []) {
-        if (!['DIVIDENDO', 'JCP', 'RENDIMENTO'].includes(mov.type)) continue;
-        const value = (mov.quantity || 0) * (mov.price || 0);
-        totals.set(pos.asset, (totals.get(pos.asset) || 0) + value);
-      }
-    }
-    return Array.from(totals.entries()).map(([asset, total]) => ({ asset, total })).sort((a, b) => b.total - a.total).slice(0, 6);
-  }
-
-  get proventosTotal(): number {
-    return this.proventosPorAtivo.reduce((sum, item) => sum + item.total, 0);
-  }
-
   get aporteTotal(): number {
     return this.positions.reduce((sum, pos) => sum + positionNetContributed(pos), 0);
   }
@@ -1014,10 +990,6 @@ export class InvestmentsComponent implements OnInit {
     }
 
     return rows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }
-
-  investimentoTipoLabel(type: InvestmentType): string {
-    return this.tipos.find((t) => t.value === type)?.label || type;
   }
 
   get mesesComparativo(): number {

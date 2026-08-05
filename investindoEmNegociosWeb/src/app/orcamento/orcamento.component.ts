@@ -6,11 +6,12 @@ import { BudgetService, BudgetResponse, BudgetItemResponse } from '../budget.ser
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
+import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOverview } from './budget-overview.model';
 
@@ -22,11 +23,12 @@ import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOvervi
     FormsModule,
     AppCurrencyPipe,
     UiStateComponent,
-    EmptyStateComponent,
     PageHeaderComponent,
     TransactionSummaryCardComponent,
     UsageBarComponent,
-    ConfirmSheetComponent
+    ConfirmSheetComponent,
+    ResponsiveListComponent,
+    ResponsiveListCellDirective
   ],
   templateUrl: './orcamento.component.html',
   styleUrl: './orcamento.component.scss',
@@ -53,6 +55,14 @@ export class OrcamentoComponent implements OnInit {
   newAmount: number | null = null;
 
   readonly months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  readonly categoryColumns: ResponsiveListColumn[] = [
+    { key: 'category', label: 'Categoria' },
+    { key: 'planned', label: 'Planejado', align: 'end' },
+    { key: 'realized', label: 'Realizado', align: 'end' },
+    { key: 'variance', label: 'Variação', align: 'end' },
+    { key: 'usage', label: 'Uso', widthClass: 'orcamento-usage-column' },
+    { key: 'actions', label: 'Ações', align: 'end' }
+  ];
 
   constructor(
     private readonly budgetService: BudgetService,
@@ -72,6 +82,8 @@ export class OrcamentoComponent implements OnInit {
   get itemViews(): BudgetItemView[] {
     return buildBudgetItemViews(this.budget());
   }
+
+  readonly trackBudgetItem = (view: BudgetItemView): string => view.item.id;
 
   load(): void {
     this.loading.set(true);

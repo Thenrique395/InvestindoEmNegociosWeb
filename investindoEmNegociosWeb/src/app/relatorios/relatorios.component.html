@@ -72,56 +72,35 @@
 
     <article class="card">
       <h2>Despesas por categoria</h2>
-      @if (!report.expensesByCategory.length) {
-        <app-empty-state icon="$" title="Sem despesas registradas" description="Não há despesas pagas neste período para exibir no relatório." />
-      }
       @if (report.expensesByCategory.length) {
         <app-donut-chart [items]="expensesDonutItems" emptyMessage="Sem despesas para exibir." />
-
-        <div class="category-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Categoria</th>
-                <th class="text-right">Valor</th>
-                <th class="text-right">% do total</th>
-                <th class="col-bar">Participação</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (cat of report.expensesByCategory; track cat.categoryName) {
-                <tr>
-                  <td>{{ cat.categoryName }}</td>
-                  <td class="text-right">{{ cat.amount | appCurrency }}</td>
-                  <td class="text-right">{{ cat.percentageOfTotal | number:'1.1-1' }}%</td>
-                  <td class="col-bar">
-                    <app-usage-bar
-                      [percent]="cat.percentageOfTotal"
-                      tone="ok"
-                      [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <ul class="category-cards">
-          @for (cat of report.expensesByCategory; track cat.categoryName) {
-            <li class="category-card">
-              <div class="category-card__head">
-                <span class="category-card__name">{{ cat.categoryName }}</span>
-                <strong>{{ cat.amount | appCurrency }}</strong>
-              </div>
-              <app-usage-bar
-                [percent]="cat.percentageOfTotal"
-                tone="ok"
-                [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
-              <span class="category-card__percent muted">{{ cat.percentageOfTotal | number:'1.1-1' }}% do total</span>
-            </li>
-          }
-        </ul>
       }
+      <app-responsive-list
+        [columns]="expenseCategoryColumns"
+        [items]="report.expensesByCategory"
+        [getId]="trackCategory"
+        emptyIcon="$"
+        emptyTitle="Sem despesas registradas"
+        emptyDescription="Não há despesas pagas neste período para exibir no relatório.">
+        <ng-template appResponsiveListCell="category" let-cat>
+          <span class="category-name">{{ cat.categoryName }}</span>
+        </ng-template>
+
+        <ng-template appResponsiveListCell="amount" let-cat>
+          {{ cat.amount | appCurrency }}
+        </ng-template>
+
+        <ng-template appResponsiveListCell="percent" let-cat>
+          {{ cat.percentageOfTotal | number:'1.1-1' }}%
+        </ng-template>
+
+        <ng-template appResponsiveListCell="share" let-cat>
+          <app-usage-bar
+            [percent]="cat.percentageOfTotal"
+            tone="ok"
+            [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
+        </ng-template>
+      </app-responsive-list>
     </article>
 
     @if (topExpenses.length) {

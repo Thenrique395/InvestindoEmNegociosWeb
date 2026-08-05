@@ -30,11 +30,26 @@
   dd { margin: 0; font-weight: 600; }
 }
 
-.cell-actions { white-space: nowrap; }
+.installment-number {
+  color: var(--text);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
 
-.row--paid { opacity: 0.72; }
+.installment-actions {
+  display: flex;
+  justify-content: flex-end;
+}
 
-.payments-row td { background: var(--color-surface-muted, rgba(148, 163, 184, 0.08)); }
+.payment-history-panel {
+  min-width: 15rem;
+  margin-top: 0.65rem;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  text-align: left;
+}
 
 .payment-history {
   list-style: none;

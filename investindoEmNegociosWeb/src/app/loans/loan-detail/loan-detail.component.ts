@@ -18,6 +18,8 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
 import { ConfirmSheetComponent } from '../../shared/confirm-sheet/confirm-sheet.component';
 import { UiStateComponent } from '../../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../../empty-state/empty-state.component';
+import { ResponsiveListComponent, ResponsiveListColumn } from '../../shared/responsive-list/responsive-list.component';
+import { ResponsiveListCellDirective } from '../../shared/responsive-list/responsive-list-cell.directive';
 import { extractApiErrorMessage } from '../../utils/api-error.utils';
 import { LoanContractView, buildContractView } from '../loans-overview.model';
 
@@ -29,7 +31,8 @@ type LoanDetailTab = 'resumo' | 'parcelas' | 'evolucao' | 'historico';
   imports: [
     CommonModule, FormsModule, RouterModule, AppCurrencyPipe, PageHeaderComponent,
     TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent,
-    ConfirmSheetComponent, UiStateComponent, EmptyStateComponent
+    ConfirmSheetComponent, UiStateComponent, EmptyStateComponent,
+    ResponsiveListComponent, ResponsiveListCellDirective
   ],
   templateUrl: './loan-detail.component.html',
   styleUrl: './loan-detail.component.scss',
@@ -50,6 +53,17 @@ export class LoanDetailComponent implements OnInit {
     { value: 'parcelas', label: 'Parcelas' },
     { value: 'evolucao', label: 'Evolução' },
     { value: 'historico', label: 'Histórico' }
+  ];
+  readonly installmentColumns: ResponsiveListColumn[] = [
+    { key: 'number', label: '#' },
+    { key: 'dueDate', label: 'Vencimento' },
+    { key: 'beginningBalance', label: 'Saldo inicial', align: 'end' },
+    { key: 'principal', label: 'Principal', align: 'end' },
+    { key: 'interest', label: 'Juros', align: 'end' },
+    { key: 'total', label: 'Total', align: 'end' },
+    { key: 'endingBalance', label: 'Saldo final', align: 'end' },
+    { key: 'status', label: 'Situação' },
+    { key: 'actions', label: 'Ações', align: 'end' }
   ];
 
   readonly timeline = signal<LoanTimelineEvent[] | null>(null);
@@ -100,6 +114,8 @@ export class LoanDetailComponent implements OnInit {
     const c = this.contract();
     return c ? buildContractView(c) : null;
   }
+
+  readonly trackInstallment = (installment: LoanInstallmentResponse): string => installment.id;
 
   load(): void {
     if (!this.contractId) return;

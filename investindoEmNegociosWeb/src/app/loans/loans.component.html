@@ -145,33 +145,38 @@
             </div>
 
             @if (expandedContractId === view.contract.id) {
-              <div class="table-wrap">
-                <table>
-                  <thead><tr><th>#</th><th>Vencimento</th><th>Total</th><th>Saldo restante</th><th>Situação</th><th></th></tr></thead>
-                  <tbody>
-                    @for (inst of view.contract.installments; track inst.id) {
-                      <tr [class.row--paid]="inst.status === 'Paid'">
-                        <td>{{ inst.installmentNo }}</td>
-                        <td>{{ inst.dueDate | date:'dd/MM/yyyy' }}</td>
-                        <td>{{ inst.totalAmount | appCurrency }}</td>
-                        <td>{{ inst.endingBalance | appCurrency }}</td>
-                        <td>
-                          <app-status-badge
-                            [tone]="inst.status === 'Paid' ? 'success' : 'muted'"
-                            [label]="inst.status === 'Paid' ? 'Pago' : 'Em aberto'" />
-                        </td>
-                        <td>
-                          @if (inst.status === 'Open') {
-                            <button type="button" class="btn-primary sm" (click)="openPaySheet(view.contract, inst)" [disabled]="paying()">Pagar</button>
-                          } @else {
-                            <span class="muted text--sm">{{ inst.paidAt | date:'dd/MM/yy' }}</span>
-                          }
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
+              <app-responsive-list
+                [columns]="installmentColumns"
+                [items]="view.contract.installments"
+                [getId]="trackInstallment"
+                emptyIcon="$"
+                emptyTitle="Sem parcelas"
+                emptyDescription="Este contrato ainda não possui cronograma.">
+                <ng-template appResponsiveListCell="number" let-inst>
+                  <span class="installment-number">{{ inst.installmentNo }}</span>
+                </ng-template>
+                <ng-template appResponsiveListCell="dueDate" let-inst>
+                  {{ inst.dueDate | date:'dd/MM/yyyy' }}
+                </ng-template>
+                <ng-template appResponsiveListCell="total" let-inst>
+                  {{ inst.totalAmount | appCurrency }}
+                </ng-template>
+                <ng-template appResponsiveListCell="balance" let-inst>
+                  {{ inst.endingBalance | appCurrency }}
+                </ng-template>
+                <ng-template appResponsiveListCell="status" let-inst>
+                  <app-status-badge
+                    [tone]="inst.status === 'Paid' ? 'success' : 'muted'"
+                    [label]="inst.status === 'Paid' ? 'Pago' : 'Em aberto'" />
+                </ng-template>
+                <ng-template appResponsiveListCell="actions" let-inst>
+                  @if (inst.status === 'Open') {
+                    <button type="button" class="btn-primary sm" (click)="openPaySheet(view.contract, inst)" [disabled]="paying()">Pagar</button>
+                  } @else {
+                    <span class="muted text--sm">{{ inst.paidAt | date:'dd/MM/yy' }}</span>
+                  }
+                </ng-template>
+              </app-responsive-list>
             }
           </section>
         }
@@ -261,23 +266,32 @@
           <div><span>Custo total</span><strong>{{ s.totalCost | appCurrency }}</strong></div>
           <div><span>Juros totais</span><strong>{{ s.totalInterest | appCurrency }}</strong></div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>Vencimento</th><th>Principal</th><th>Juros</th><th>Total</th><th>Saldo</th></tr></thead>
-            <tbody>
-              @for (item of s.installments.slice(0, 6); track item.id) {
-                <tr>
-                  <td>{{ item.installmentNo }}</td>
-                  <td>{{ item.dueDate | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ item.principalAmount | appCurrency }}</td>
-                  <td>{{ item.interestAmount | appCurrency }}</td>
-                  <td>{{ item.totalAmount | appCurrency }}</td>
-                  <td>{{ item.endingBalance | appCurrency }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <app-responsive-list
+          [columns]="simulationColumns"
+          [items]="s.installments.slice(0, 6)"
+          [getId]="trackInstallment"
+          emptyIcon="$"
+          emptyTitle="Sem parcelas simuladas"
+          emptyDescription="Ajuste os dados do contrato e simule novamente.">
+          <ng-template appResponsiveListCell="number" let-item>
+            <span class="installment-number">{{ item.installmentNo }}</span>
+          </ng-template>
+          <ng-template appResponsiveListCell="dueDate" let-item>
+            {{ item.dueDate | date:'dd/MM/yyyy' }}
+          </ng-template>
+          <ng-template appResponsiveListCell="principal" let-item>
+            {{ item.principalAmount | appCurrency }}
+          </ng-template>
+          <ng-template appResponsiveListCell="interest" let-item>
+            {{ item.interestAmount | appCurrency }}
+          </ng-template>
+          <ng-template appResponsiveListCell="total" let-item>
+            {{ item.totalAmount | appCurrency }}
+          </ng-template>
+          <ng-template appResponsiveListCell="balance" let-item>
+            {{ item.endingBalance | appCurrency }}
+          </ng-template>
+        </app-responsive-list>
       </section>
     }
   </form>

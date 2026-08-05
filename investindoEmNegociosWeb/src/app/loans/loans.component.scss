@@ -122,23 +122,6 @@ select {
   font-size: var(--font-size-body-lg);
 }
 
-.table-wrap {
-  overflow: auto;
-  margin-top: 0.9rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 0.65rem 0.5rem;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-
 .contracts-head {
   display: flex;
   flex-wrap: wrap;
@@ -211,12 +194,14 @@ td {
   margin: 0.1rem 0 0;
 }
 
-.row--paid {
-  opacity: 0.7;
-}
-
 .text--sm {
   font-size: var(--font-size-caption);
+}
+
+.installment-number {
+  color: var(--text);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
 }
 
 .compact {

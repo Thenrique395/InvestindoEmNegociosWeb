@@ -47,63 +47,14 @@
   color: var(--text-muted);
 }
 
-/* Tabela de categorias (desktop) */
-.category-table {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 0.65rem 0.5rem;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  vertical-align: middle;
-}
-
-.text-right { text-align: right; }
-
-.col-bar {
-  width: 30%;
-  min-width: 8rem;
-}
-
-/* Cartões de categoria (mobile) */
-.category-cards {
-  display: none;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 0.75rem;
-}
-
-.category-card {
-  display: grid;
-  gap: 0.5rem;
-  padding: 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-}
-
-.category-card__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.category-card__name {
+.category-name {
   color: var(--text);
   font-weight: var(--font-weight-semibold);
 }
 
-.category-card__percent {
-  font-size: var(--font-size-caption);
+:host ::ng-deep .relatorios-share-column {
+  width: 32%;
+  min-width: 11rem;
 }
 
 /* Maiores despesas */
@@ -165,13 +116,5 @@ td {
 @media (max-width: 640px) {
   .summary-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .category-table {
-    display: none;
-  }
-
-  .category-cards {
-    display: grid;
   }
 }

@@ -18,7 +18,7 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
         [attr.aria-label]="title()">
         <!-- backdrop -->
         <div
-          class="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] backdrop-blur-sm"
+          class="absolute inset-0 backdrop-blur-sm"
         (click)="handleBackdropClick()"></div>
         <!-- modal card -->
         <section [class]="modalClass()">

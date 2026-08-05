@@ -148,274 +148,38 @@
   }
 
   @if (activeTab === 'RESUMO') {
-    <div class="card" id="sec-posicoes">
-      <div class="section-head">
-        <h3>Meus Ativos</h3>
-        <span class="muted">{{ sortedPositions.length }} item(ns) · {{ totalPosicoesZeradas }} zerada(s)</span>
-      </div>
-      <app-filter-bar>
-        <div filter-left class="table-filters">
-          <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onFiltroMudou()" placeholder="Buscar por ativo, conta ou categoria" />
-          <select [(ngModel)]="filterType" (ngModelChange)="onFiltroMudou()">
-            <option value="ALL">Todos os tipos</option>
-            @for (t of tipos; track trackByIndex($index, t)) {
-              <option [value]="t.value">{{ t.label }}</option>
-            }
-          </select>
-          <select [(ngModel)]="filterAccount" (ngModelChange)="onFiltroMudou()">
-            <option value="ALL">Todas as contas</option>
-            @for (acc of contasDisponiveis; track trackByIndex($index, acc)) {
-              <option [value]="acc">{{ acc }}</option>
-            }
-          </select>
-          <select [(ngModel)]="filterStatus" (ngModelChange)="onFiltroMudou()">
-            <option value="ALL">Todos os status</option>
-            <option value="ACTIVE">Ativas</option>
-            <option value="ZEROED">Zeradas</option>
-          </select>
-        </div>
-      </app-filter-bar>
-      @if (!sortedPositions.length) {
-        <app-empty-state
-          icon="📊"
-          title="Nenhuma posição encontrada"
-          description="Ajuste os filtros ou cadastre um ativo para começar a acompanhar sua carteira." />
-      }
-      @if (sortedPositions.length) {
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('asset')" title="Código do ativo na carteira (ticker B3).">Ativo <span>{{ sortIcon('asset') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('paperType')" title="Classificação do ativo: ON/PN/PNA/PNB/UNT ou Cotas">Classe <span>{{ sortIcon('paperType') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('status')" title="Ativa: quantidade maior que zero. Zerada: quantidade igual a zero.">Status <span>{{ sortIcon('status') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('quantity')" title="Quantidade atual do ativo em carteira.">Quantidade <span>{{ sortIcon('quantity') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('avgPrice')" title="Preço médio por unidade da posição (custo médio).">Preço médio <span>{{ sortIcon('avgPrice') }}</span></button></th>
-                <th title="Preço atual de mercado por unidade, quando disponível na fonte de cotação.">Preço mercado</th>
-                <th title="Variação percentual entre preço de mercado e preço médio: (preço mercado - preço médio) / preço médio.">Variação</th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('currentValue')" title="Valor atual da posição: quantidade × preço de mercado (ou preço médio no fallback).">Valor atual <span>{{ sortIcon('currentValue') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('portfolioPercent')" title="Participação desta posição no patrimônio total da carteira">% carteira <span>{{ sortIcon('portfolioPercent') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('currentReturn')" title="Rentabilidade atual da posição: (resultado / base da posição) × 100.">Rent. atual <span>{{ sortIcon('currentReturn') }}</span></button></th>
-                <th><button class="sort-btn" type="button" (click)="ordenarPor('estimatedResult')" title="Resultado financeiro da posição: valor atual - base da posição (quantidade × preço médio).">Resultado <span>{{ sortIcon('estimatedResult') }}</span></button></th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (p of pagedPositions; track trackByIndex($index, p)) {
-                <tr>
-                  <td>
-                    <div class="asset-cell">
-                      @if (marketLogo(p)) {
-                        <img [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" />
-                      }
-                      <span>{{ p.asset }}</span>
-                      @if (p.currency !== 'BRL') {
-                        <app-status-badge tone="info" size="sm" [label]="p.currency"></app-status-badge>
-                      }
-                    </div>
-                  </td>
-                  <td>{{ tipoPapel(p) }}</td>
-                  <td>
-                    <span class="status-pill" [class.zeroed]="p.quantity <= 0">
-                      {{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}
-                    </span>
-                  </td>
-                  <td>{{ p.quantity }}</td>
-                  <td>{{ p.avgPrice | appCurrency:p.currency }}</td>
-                  <td>
-                    @if (marketPrice(p) !== null) {
-                      <span>{{ marketPrice(p) | appCurrency:p.currency }}</span>
-                    } @else {
-                      <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
-                        {{ p.avgPrice | appCurrency:p.currency }}*
-                      </span>
-                    }
-                  </td>
-                  <td [class.success]="(variacaoPrecoPercent(p) || 0) >= 0" [class.danger]="(variacaoPrecoPercent(p) || 0) < 0">
-                    @if (variacaoPrecoPercent(p) !== null) {
-                      <span>{{ variacaoPrecoPercent(p) | number:'1.2-2' }}%</span>
-                    } @else {
-                      <span class="muted">-</span>
-                    }
-                  </td>
-                  <td>{{ valorAtualPosicao(p) | appCurrency:p.currency }}</td>
-                  <td>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</td>
-                  <td [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">
-                    {{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%
-                  </td>
-                  <td [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">
-                    {{ resultadoPosicao(p) | appCurrency }}
-                  </td>
-                  <td>
-                    <button class="btn-ghost sm" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <ul class="positions-cards">
-          @for (p of pagedPositions; track trackByIndex($index, p)) {
-            <li class="position-card">
-              <div class="position-card__head">
-                <div class="position-card__asset">
-                  @if (marketLogo(p)) { <img [src]="marketLogo(p)!" [alt]="marketLabel(p) || p.asset" loading="lazy" /> }
-                  <div>
-                    <strong>{{ p.asset }}</strong>
-                    <span class="position-card__type">{{ tipoPapel(p) }}</span>
-                  </div>
-                </div>
-                <span class="status-pill" [class.zeroed]="p.quantity <= 0">{{ p.quantity > 0 ? 'Ativa' : 'Zerada' }}</span>
-              </div>
-
-              <dl class="position-card__grid">
-                <div><dt>Quantidade</dt><dd>{{ p.quantity }}</dd></div>
-                <div><dt>Preço médio</dt><dd>{{ p.avgPrice | appCurrency:p.currency }}</dd></div>
-                <div><dt>Valor atual</dt><dd>{{ valorAtualPosicao(p) | appCurrency:p.currency }}</dd></div>
-                <div><dt>% carteira</dt><dd>{{ percentualNaCarteira(p) | number:'1.1-1' }}%</dd></div>
-                <div>
-                  <dt>Rent. atual</dt>
-                  <dd [class.success]="rentabilidadeAtualPercent(p) >= 0" [class.danger]="rentabilidadeAtualPercent(p) < 0">{{ rentabilidadeAtualPercent(p) | number:'1.1-1' }}%</dd>
-                </div>
-                <div>
-                  <dt>Resultado</dt>
-                  <dd [class.success]="resultadoPosicao(p) >= 0" [class.danger]="resultadoPosicao(p) < 0">{{ resultadoPosicao(p) | appCurrency }}</dd>
-                </div>
-              </dl>
-
-              <button class="btn-ghost sm position-card__action" type="button" (click)="abrirMovimento(p)">Novo lançamento</button>
-            </li>
-          }
-        </ul>
-      }
-      @if (sortedPositions.length) {
-        <div class="table-pagination">
-          <button class="btn-ghost sm" type="button" (click)="mudarPagina(-1)" [disabled]="currentPage <= 1">Anterior</button>
-          <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }}</small>
-          <button class="btn-ghost sm" type="button" (click)="mudarPagina(1)" [disabled]="currentPage >= totalPages">Próxima</button>
-        </div>
-      }
-    </div>
+    <app-investment-assets-list
+      [positions]="sortedPositions"
+      [pagedPositions]="pagedPositions"
+      [totalZeroed]="totalPosicoesZeradas"
+      [totalPages]="totalPages"
+      [currentPage]="currentPage"
+      [pageLabel]="pageLabel"
+      [portfolioValue]="patrimonioAtual"
+      [tipos]="tipos"
+      [accounts]="contasDisponiveis"
+      [(searchTerm)]="searchTerm"
+      [(filterType)]="filterType"
+      [(filterAccount)]="filterAccount"
+      [(filterStatus)]="filterStatus"
+      [sortBy]="sortBy"
+      [sortDir]="sortDir"
+      (filtersChanged)="onFiltroMudou()"
+      (sort)="ordenarPor($event)"
+      (pageChange)="mudarPagina($event)"
+      (movement)="abrirMovimento($event)" />
   }
 
   @if (activeTab === 'CONSOLIDACAO') {
-    <section class="consolidacao">
-      <article class="card chart-card">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Consolidação de aportes</h3>
-          </div>
-          <app-filter-bar>
-            <div filter-left class="chart-filters">
-              <select [(ngModel)]="consolidacaoGranularidade">
-                <option value="MONTHLY">Mensal</option>
-              </select>
-              <select [(ngModel)]="consolidacaoHorizonteAnos">
-                <option [ngValue]="1">1 ano</option>
-                <option [ngValue]="2">2 anos</option>
-                <option [ngValue]="3">3 anos</option>
-              </select>
-              <select [(ngModel)]="consolidacaoTipoFiltro">
-                <option value="ALL">Todos os tipos</option>
-                @for (t of tipos; track trackByIndex($index, t)) {
-                  <option [value]="t.value">{{ t.label }}</option>
-                }
-              </select>
-            </div>
-          </app-filter-bar>
-        </div>
-        @if (!consolidacaoSeries.length) {
-          <div class="empty">Sem lançamentos de aportes no período.</div>
-        }
-        @if (consolidacaoSeries.length) {
-          <div class="consolidacao-chart">
-            <div class="consolidacao-axis">
-              <span>{{ consolidacaoChartMax | appCurrency }}</span>
-              <span>{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
-              <span>R$ 0</span>
-              <span>-{{ (consolidacaoChartMax / 2) | appCurrency }}</span>
-              <span>-{{ consolidacaoChartMax | appCurrency }}</span>
-            </div>
-            <div class="consolidacao-plot">
-              <div class="consolidacao-grid-lines">
-                @for (_ of [1,2,3,4,5]; track trackByIndex($index, _)) {
-                  <span></span>
-                }
-              </div>
-              <div class="consolidacao-zero-line"></div>
-              <div class="consolidacao-bars" [style.gridTemplateColumns]="'repeat(' + consolidacaoSeries.length + ', minmax(0, 1fr))'">
-                @for (item of consolidacaoSeries; track trackByIndex($index, item)) {
-                  <div class="consolidacao-col">
-                    <div class="consolidacao-bars__stack">
-                      <span
-                        class="bar compra"
-                        [style.height.%]="(item.compras / consolidacaoChartMax) * 50"></span>
-                      <span
-                        class="bar venda"
-                        [style.height.%]="(item.vendas / consolidacaoChartMax) * 50"></span>
-                      <span class="chart-hover-tip">
-                        Compras: {{ item.compras | appCurrency }}<br />
-                        Vendas: {{ item.vendas | appCurrency }}
-                      </span>
-                    </div>
-                    <small>{{ item.label }}</small>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-          <div class="legend-row">
-            <span><i class="chip compra"></i> Compras</span>
-            <span><i class="chip venda"></i> Vendas</span>
-          </div>
-        }
-      </article>
-      <article class="card chart-card">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Lançamentos consolidados</h3>
-          </div>
-          <input type="text" [(ngModel)]="consolidacaoSearchTerm" placeholder="Buscar ativos" />
-        </div>
-        @if (consolidacaoRows.length) {
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ativo</th>
-                  <th>Tipo de investimento</th>
-                  <th>Tipo de ordem</th>
-                  <th>Quantidade</th>
-                  <th>Preço unitário</th>
-                  <th>Total</th>
-                  <th>Quantidade total</th>
-                  <th>Data do lançamento</th>
-                  <th>Fonte</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of consolidacaoRows; track trackById($index, row)) {
-                  <tr>
-                    <td><strong>{{ row.asset }}</strong></td>
-                    <td>{{ investimentoTipoLabel(row.investmentType) }}</td>
-                    <td [class.success]="row.ordem === 'Compra'" [class.danger]="row.ordem === 'Venda'">{{ row.ordem }}</td>
-                    <td>{{ row.quantity | number:'1.0-4' }}</td>
-                    <td>{{ row.unitPrice | appCurrency }}</td>
-                    <td>{{ row.total | appCurrency }}</td>
-                    <td>{{ row.quantityAfter | number:'1.0-4' }}</td>
-                    <td>{{ row.date | date:'dd/MM/yyyy' }}</td>
-                    <td><span class="status-pill" [class.zeroed]="row.source === 'Manual'">{{ row.source }}</span></td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        } @else {
-          <div class="empty">Sem lançamentos para os filtros atuais.</div>
-        }
-      </article>
-    </section>
+    <app-investment-consolidation-panel
+      [series]="consolidacaoSeries"
+      [chartMax]="consolidacaoChartMax"
+      [rows]="consolidacaoRows"
+      [horizonYears]="consolidacaoHorizonteAnos"
+      [(typeFilter)]="consolidacaoTipoFiltro"
+      [(searchTerm)]="consolidacaoSearchTerm"
+      [tipos]="tipos"
+      (horizonYearsChange)="consolidacaoHorizonteAnos = $event" />
   }
 
   @if (activeTab === 'ANALISE') {
@@ -539,84 +303,13 @@
   }
 
   @if (activeTab === 'PROVENTOS') {
-    <section class="proventos-grid">
-      <article class="card chart-card">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Resumo de proventos</h3>
-          </div>
-        </div>
-        <div class="proventos-summary">
-          <div class="proventos-summary__row">
-            <small>Média mensal (12 meses)</small>
-            <strong>{{ proventosMedia12Meses | appCurrency }}</strong>
-          </div>
-          <div class="proventos-summary__row">
-            <small>Total em 12 meses</small>
-            <strong>{{ proventosTotal12Meses | appCurrency }}</strong>
-          </div>
-          <div class="proventos-summary__row">
-            <small>Ativos pagadores</small>
-            <strong>{{ proventosAtivosPagadores }}</strong>
-          </div>
-        </div>
-      </article>
-      <article class="card chart-card">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Evolução mensal de proventos</h3>
-            <button type="button" class="hint" aria-label="Explicação do gráfico evolução de proventos">
-              i
-              <span class="hint__panel">Total recebido por mês em dividendos, JCP e rendimentos nos últimos 12 meses.</span>
-            </button>
-          </div>
-          <span class="muted">Últimos 12 meses</span>
-        </div>
-        <div class="proventos-evolution">
-          @for (item of proventosMensaisSeries; track trackByIndex($index, item)) {
-            <div class="proventos-evolution__column">
-              <div class="proventos-evolution__bars">
-                <span
-                  class="bar provento"
-                  [style.height.%]="(item.total / proventosMensaisMax) * 100"
-                [attr.title]="item.label + ': ' + (item.total | appCurrency)"></span>
-              </div>
-              <small>{{ item.label }}</small>
-            </div>
-          }
-        </div>
-      </article>
-    </section>
-  }
-
-  @if (activeTab === 'PROVENTOS') {
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Ativos que pagam proventos</h3>
-        </div>
-        <span class="muted">Total: {{ proventosTotal12Meses | appCurrency }}</span>
-      </div>
-      @if (!proventosPorAtivo12Meses.length) {
-        <div class="empty">Sem proventos registrados no período.</div>
-      }
-      @if (proventosPorAtivo12Meses.length) {
-        <div class="income-list">
-          @for (item of proventosPorAtivo12Meses; track trackByIndex($index, item)) {
-            <div class="income-item">
-              <div class="income-item__top">
-                <strong>{{ item.asset }}</strong>
-                <span>{{ item.total | appCurrency }}</span>
-              </div>
-              <div class="progress-bar slim">
-                <span [style.width.%]="(item.total / proventosTotal12Meses) * 100"></span>
-              </div>
-              <small>{{ item.percent | number:'1.1-1' }}% do total</small>
-            </div>
-          }
-        </div>
-      }
-    </article>
+    <app-investment-dividends-panel
+      [monthlySeries]="proventosMensaisSeries"
+      [monthlyMax]="proventosMensaisMax"
+      [total12Months]="proventosTotal12Meses"
+      [monthlyAverage]="proventosMedia12Meses"
+      [payingAssets]="proventosAtivosPagadores"
+      [assets]="proventosPorAtivo12Meses" />
   }
 
   @if (activeTab === 'RENTABILIDADE') {

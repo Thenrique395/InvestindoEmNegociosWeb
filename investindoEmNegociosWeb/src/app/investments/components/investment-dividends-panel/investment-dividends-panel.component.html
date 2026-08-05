@@ -1,0 +1,77 @@
+<section class="proventos-grid">
+  <article class="card chart-card">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Resumo de proventos</h3>
+      </div>
+    </div>
+    <div class="proventos-summary">
+      <div class="proventos-summary__row">
+        <small>Média mensal (12 meses)</small>
+        <strong>{{ monthlyAverage | appCurrency }}</strong>
+      </div>
+      <div class="proventos-summary__row">
+        <small>Total em 12 meses</small>
+        <strong>{{ total12Months | appCurrency }}</strong>
+      </div>
+      <div class="proventos-summary__row">
+        <small>Ativos pagadores</small>
+        <strong>{{ payingAssets }}</strong>
+      </div>
+    </div>
+  </article>
+
+  <article class="card chart-card">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Evolução mensal de proventos</h3>
+        <button type="button" class="hint" aria-label="Explicação do gráfico evolução de proventos">
+          i
+          <span class="hint__panel">Total recebido por mês em dividendos, JCP e rendimentos nos últimos 12 meses.</span>
+        </button>
+      </div>
+      <span class="muted">Últimos 12 meses</span>
+    </div>
+    <div class="proventos-evolution">
+      @for (item of monthlySeries; track trackByIndex($index)) {
+        <div class="proventos-evolution__column">
+          <div class="proventos-evolution__bars">
+            <span
+              class="bar provento"
+              [style.height.%]="(item.total / monthlyMax) * 100"
+              [attr.title]="item.label + ': ' + (item.total | appCurrency)"></span>
+          </div>
+          <small>{{ item.label }}</small>
+        </div>
+      }
+    </div>
+  </article>
+</section>
+
+<article class="card chart-card">
+  <div class="section-head">
+    <div class="section-head__title">
+      <h3>Ativos que pagam proventos</h3>
+    </div>
+    <span class="muted">Total: {{ total12Months | appCurrency }}</span>
+  </div>
+  @if (!assets.length) {
+    <div class="empty">Sem proventos registrados no período.</div>
+  }
+  @if (assets.length) {
+    <div class="income-list">
+      @for (item of assets; track trackByIndex($index)) {
+        <div class="income-item">
+          <div class="income-item__top">
+            <strong>{{ item.asset }}</strong>
+            <span>{{ item.total | appCurrency }}</span>
+          </div>
+          <div class="progress-bar slim">
+            <span [style.width.%]="(item.total / total12Months) * 100"></span>
+          </div>
+          <small>{{ item.percent | number:'1.1-1' }}% do total</small>
+        </div>
+      }
+    </div>
+  }
+</article>

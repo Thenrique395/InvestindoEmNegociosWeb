@@ -7,11 +7,12 @@ import { ReportsService, CategoryExpenseResponse, MonthlySummaryReportResponse }
 import { formatCurrencyValue } from '../utils/locale-utils';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
-import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut-chart.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
+import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
+import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.model';
 
 @Component({
@@ -21,11 +22,12 @@ import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.mod
     CommonModule,
     AppCurrencyPipe,
     UiStateComponent,
-    EmptyStateComponent,
     DonutChartComponent,
     PageHeaderComponent,
     TransactionSummaryCardComponent,
-    UsageBarComponent
+    UsageBarComponent,
+    ResponsiveListComponent,
+    ResponsiveListCellDirective
   ],
   templateUrl: './relatorios.component.html',
   styleUrl: './relatorios.component.scss',
@@ -41,6 +43,12 @@ export class RelatoriosComponent implements OnInit {
   month = new Date().getMonth() + 1;
 
   readonly months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  readonly expenseCategoryColumns: ResponsiveListColumn[] = [
+    { key: 'category', label: 'Categoria' },
+    { key: 'amount', label: 'Valor', align: 'end' },
+    { key: 'percent', label: '% do total', align: 'end' },
+    { key: 'share', label: 'Participação', widthClass: 'relatorios-share-column' }
+  ];
 
   constructor(
     private readonly reportsService: ReportsService,
@@ -60,6 +68,8 @@ export class RelatoriosComponent implements OnInit {
   get topExpenses(): CategoryExpenseResponse[] {
     return buildTopExpenses(this.report()?.topExpenses);
   }
+
+  readonly trackCategory = (cat: CategoryExpenseResponse): string => cat.categoryName;
 
   load(): void {
     this.loading.set(true);

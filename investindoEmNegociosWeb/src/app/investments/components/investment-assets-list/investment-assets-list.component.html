@@ -1,0 +1,126 @@
+<div class="card assets-list" id="sec-posicoes">
+  <div class="section-head">
+    <h3>Meus Ativos</h3>
+    <span class="muted">{{ positions.length }} item(ns) · {{ totalZeroed }} zerada(s)</span>
+  </div>
+
+  <app-filter-bar>
+    <div filter-left class="table-filters">
+      <input
+        type="text"
+        [ngModel]="searchTerm"
+        (ngModelChange)="updateSearchTerm($event)"
+        placeholder="Buscar por ativo, conta ou categoria" />
+      <select [ngModel]="filterType" (ngModelChange)="updateFilterType($event)">
+        <option value="ALL">Todos os tipos</option>
+      @for (t of tipos; track $index) {
+          <option [value]="t.value">{{ t.label }}</option>
+        }
+      </select>
+      <select [ngModel]="filterAccount" (ngModelChange)="updateFilterAccount($event)">
+        <option value="ALL">Todas as contas</option>
+        @for (account of accounts; track account) {
+          <option [value]="account">{{ account }}</option>
+        }
+      </select>
+      <select [ngModel]="filterStatus" (ngModelChange)="updateFilterStatus($event)">
+        <option value="ALL">Todos os status</option>
+        <option value="ACTIVE">Ativas</option>
+        <option value="ZEROED">Zeradas</option>
+      </select>
+    </div>
+  </app-filter-bar>
+
+  <app-responsive-list
+    [columns]="columns"
+    [items]="pagedPositions"
+    [getId]="trackPosition"
+    [sortBy]="sortBy"
+    [sortDir]="listSortDir"
+    emptyIcon="📊"
+    emptyTitle="Nenhuma posição encontrada"
+    emptyDescription="Ajuste os filtros ou cadastre um ativo para começar a acompanhar sua carteira."
+    (sort)="onSort($event)">
+    <ng-template appResponsiveListCell="asset" let-position>
+      <div class="asset-cell">
+        @if (marketLogo(position)) {
+          <img [src]="marketLogo(position)!" [alt]="marketLabel(position) || position.asset" loading="lazy" />
+        }
+        <span>{{ position.asset }}</span>
+        @if (position.currency !== 'BRL') {
+          <app-status-badge tone="info" size="sm" [label]="position.currency"></app-status-badge>
+        }
+      </div>
+    </ng-template>
+
+    <ng-template appResponsiveListCell="paperType" let-position>
+      {{ tipoPapel(position) }}
+    </ng-template>
+
+    <ng-template appResponsiveListCell="status" let-position>
+      <span class="status-pill" [class.zeroed]="position.quantity <= 0">
+        {{ position.quantity > 0 ? 'Ativa' : 'Zerada' }}
+      </span>
+    </ng-template>
+
+    <ng-template appResponsiveListCell="quantity" let-position>
+      {{ position.quantity }}
+    </ng-template>
+
+    <ng-template appResponsiveListCell="avgPrice" let-position>
+      {{ position.avgPrice | appCurrency:position.currency }}
+    </ng-template>
+
+    <ng-template appResponsiveListCell="marketPrice" let-position>
+      @if (marketPrice(position) !== null) {
+        <span>{{ marketPrice(position) | appCurrency:position.currency }}</span>
+      } @else {
+        <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
+          {{ position.avgPrice | appCurrency:position.currency }}*
+        </span>
+      }
+    </ng-template>
+
+    <ng-template appResponsiveListCell="priceChange" let-position>
+      <span [class.success]="(variacaoPrecoPercent(position) || 0) >= 0" [class.danger]="(variacaoPrecoPercent(position) || 0) < 0">
+        @if (variacaoPrecoPercent(position) !== null) {
+          {{ variacaoPrecoPercent(position) | number:'1.2-2' }}%
+        } @else {
+          <span class="muted">-</span>
+        }
+      </span>
+    </ng-template>
+
+    <ng-template appResponsiveListCell="currentValue" let-position>
+      {{ valorAtualPosicao(position) | appCurrency:position.currency }}
+    </ng-template>
+
+    <ng-template appResponsiveListCell="portfolioPercent" let-position>
+      {{ percentualNaCarteira(position) | number:'1.1-1' }}%
+    </ng-template>
+
+    <ng-template appResponsiveListCell="currentReturn" let-position>
+      <span [class.success]="rentabilidadeAtualPercent(position) >= 0" [class.danger]="rentabilidadeAtualPercent(position) < 0">
+        {{ rentabilidadeAtualPercent(position) | number:'1.1-1' }}%
+      </span>
+    </ng-template>
+
+    <ng-template appResponsiveListCell="estimatedResult" let-position>
+      <span [class.success]="resultadoPosicao(position) >= 0" [class.danger]="resultadoPosicao(position) < 0">
+        {{ resultadoPosicao(position) | appCurrency }}
+      </span>
+    </ng-template>
+
+    <ng-template appResponsiveListCell="actions" let-position>
+      <button class="btn-ghost sm" type="button" (click)="movement.emit(position)">Novo lançamento</button>
+    </ng-template>
+  </app-responsive-list>
+
+  @if (positions.length) {
+    <div class="table-pagination">
+      <button class="btn-ghost sm" type="button" (click)="pageChange.emit(-1)" [disabled]="currentPage <= 1">Anterior</button>
+      <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }}</small>
+      <button class="btn-ghost sm" type="button" (click)="pageChange.emit(1)" [disabled]="currentPage >= totalPages">Próxima</button>
+    </div>
+  }
+</div>

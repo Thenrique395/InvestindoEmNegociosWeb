@@ -57,7 +57,7 @@ import { BodyPortalDirective } from '../body-portal.directive';
     .confirm-sheet__backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
+      background: transparent;
       backdrop-filter: blur(6px);
     }
 
