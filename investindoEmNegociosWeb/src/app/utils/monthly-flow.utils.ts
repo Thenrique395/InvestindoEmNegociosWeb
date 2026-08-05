@@ -56,7 +56,3 @@ export function buildMonthlyFlowSeries(
     };
   });
 }
-
-export function hasMonthlyFlowData(points: MonthlyFlowPoint[]): boolean {
-  return points.some((point) => point.income > 0 || point.expense > 0);
-}

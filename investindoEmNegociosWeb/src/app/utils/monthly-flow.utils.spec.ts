@@ -1,5 +1,5 @@
 import { StoredIncome } from '../data/api-data.service';
-import { buildMonthlyFlowSeries, hasMonthlyFlowData } from './monthly-flow.utils';
+import { buildMonthlyFlowSeries } from './monthly-flow.utils';
 
 type IncomeSample = Pick<StoredIncome, 'valor' | 'recebimento' | 'status'>;
 
@@ -44,12 +44,5 @@ describe('buildMonthlyFlowSeries', () => {
     );
     expect(points.map((p) => p.key)).toEqual(['2025-11', '2025-12', '2026-01']);
     expect(points.every((p) => p.expense === 0)).toBeTrue();
-  });
-
-  it('hasMonthlyFlowData detecta série vazia', () => {
-    const empty = buildMonthlyFlowSeries([], [], reference, 3);
-    expect(hasMonthlyFlowData(empty)).toBeFalse();
-    const filled = buildMonthlyFlowSeries([{ valor: 5, vencimento: '01/07/2026' }], [], reference, 3);
-    expect(hasMonthlyFlowData(filled)).toBeTrue();
   });
 });

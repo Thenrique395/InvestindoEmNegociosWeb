@@ -1,8 +1,5 @@
 import { NetWorthHistoryPointResponse } from '../features/accounts/models/account.models';
 import {
-  debtAccentTone,
-  debtBucketAccent,
-  debtBucketPercent,
   netWorthDelta,
   netWorthMax,
   netWorthMin,
@@ -41,21 +38,4 @@ describe('dashboard-overview.model', () => {
     expect(netWorthScale(100, points)).toBe(100);
   });
 
-  it('acento do bucket por rótulo', () => {
-    expect(debtBucketAccent('Em atraso')).toBe('danger');
-    expect(debtBucketAccent('Cartões')).toBe('warning');
-    expect(debtBucketAccent('Outras obrigações')).toBe('info');
-  });
-
-  it('traduz acento para tom da UsageBar', () => {
-    expect(debtAccentTone('danger')).toBe('critical');
-    expect(debtAccentTone('warning')).toBe('warning');
-    expect(debtAccentTone('info')).toBe('ok');
-  });
-
-  it('participação do bucket é limitada a 0–100 e protege divisão por zero', () => {
-    expect(debtBucketPercent(50, 200)).toBe(25);
-    expect(debtBucketPercent(50, 0)).toBe(0);
-    expect(debtBucketPercent(300, 200)).toBe(100);
-  });
 });

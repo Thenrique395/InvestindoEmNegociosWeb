@@ -1,0 +1,82 @@
+<section class="activity-board" aria-label="Atividades e lembretes do dashboard">
+  <article class="activity-panel">
+    <div class="activity-panel__head">
+      <h3>Atividades recentes</h3>
+    </div>
+
+    @if (activities().length) {
+      <ul class="activity-list">
+        @for (item of activities(); track trackActivity($index, item)) {
+          <li>
+            <a
+              class="activity-row"
+              [routerLink]="item.type === 'income' ? '/receitas' : '/despesas'"
+              [attr.aria-label]="'Abrir ' + item.title">
+              <span class="activity-row__icon" [attr.data-kind]="item.type" aria-hidden="true">
+                @if (item.type === 'income') {
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M12 5v14m0-14 5 5m-5-5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path d="M12 19V5m0 14 5-5m-5 5-5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                }
+              </span>
+              <span class="activity-row__copy">
+                <strong>{{ item.title }}</strong>
+                <span [class.activity-row__amount--income]="item.type === 'income'">
+                  {{ item.type === 'income' ? '+' : '-' }}{{ item.amount | appCurrency }}
+                </span>
+              </span>
+              <span class="activity-row__time">{{ item.date }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="activity-empty">
+        <strong>Nenhuma atividade recente</strong>
+        <span>Receitas e despesas registradas aparecem aqui.</span>
+      </div>
+    }
+  </article>
+
+  <article class="activity-panel">
+    <div class="activity-panel__head">
+      <h3>Lembretes</h3>
+      <a class="activity-panel__details" routerLink="/calendario">
+        Ver calendário
+        <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </div>
+
+    @if (reminders().length) {
+      <ul class="activity-list">
+        @for (item of reminders(); track trackReminder($index, item)) {
+          <li>
+            <a class="activity-row" routerLink="/despesas" [attr.aria-label]="'Abrir lembrete ' + item.title">
+              <span class="activity-row__icon" [attr.data-kind]="item.tone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  <path d="M18 16v-5a6 6 0 0 0-12 0v5l-2 2h16l-2-2ZM10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="activity-row__copy">
+                <strong>{{ item.title }}</strong>
+                <span>{{ item.statusLabel }} · {{ item.amount | appCurrency }}</span>
+              </span>
+              <span class="activity-row__time">{{ item.dueLabel }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="activity-empty">
+        <strong>Nenhum lembrete urgente</strong>
+        <span>Despesas vencendo em breve aparecem aqui.</span>
+      </div>
+    }
+  </article>
+</section>

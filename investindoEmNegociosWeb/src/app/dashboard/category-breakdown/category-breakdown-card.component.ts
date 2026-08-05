@@ -5,8 +5,6 @@ import { FinancialPrivacyService } from '../../financial-privacy.service';
 import { formatCurrencyValue } from '../../utils/locale-utils';
 import { buildConicGradient } from '../../utils/home-insight.utils';
 import {
-  buildCategoryComparison,
-  buildCategoryInsight,
   categoryCountLabel,
   CategorySlice,
   CategoryVariant
@@ -41,10 +39,8 @@ export class CategoryBreakdownCardComponent {
   readonly countLabel = computed(() => categoryCountLabel(this.categoryCount()));
   readonly chartBackground = computed(() => buildConicGradient(this.slices()));
   readonly totalLabel = computed(() => this.format(this.total()));
+  readonly compactTotalLabel = computed(() => this.compactFormat(this.total()));
   readonly chartAriaLabel = computed(() => `Distribuição de ${this.title().toLowerCase()}: ${this.slices().map((s) => `${s.label} ${Math.round(s.percent)}%`).join(', ')}`);
-
-  readonly insight = computed(() => buildCategoryInsight(this.variant(), this.slices(), this.showInsights()));
-  readonly comparison = computed(() => buildCategoryComparison(this.variant(), this.slices(), this.showInsights()));
 
   formatValue(value: number): string {
     return this.format(value);
@@ -52,5 +48,13 @@ export class CategoryBreakdownCardComponent {
 
   private format(value: number): string {
     return this.financialPrivacy.hidden() ? '••••••' : formatCurrencyValue(value);
+  }
+
+  private compactFormat(value: number): string {
+    if (this.financialPrivacy.hidden()) return '••••••';
+    const abs = Math.abs(value || 0);
+    if (abs < 1000) return formatCurrencyValue(value);
+    const sign = value < 0 ? '-' : '';
+    return `${sign}R$ ${(abs / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mil`;
   }
 }

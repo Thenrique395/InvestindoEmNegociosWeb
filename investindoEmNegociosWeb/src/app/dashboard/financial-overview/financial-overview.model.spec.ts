@@ -35,14 +35,14 @@ describe('financial-overview.model', () => {
   });
 
   describe('buildOverviewCards — regras por plano', () => {
-    it('Basic vê apenas saldo, receitas, despesas e compromissos', () => {
+    it('Basic vê apenas saldo, receitas e despesas', () => {
       const ids = buildOverviewCards(baseInput(), 'Basic', 'month', fmt).map((c) => c.id);
-      expect(ids).toEqual(['saldo', 'receitas', 'despesas', 'compromissos']);
+      expect(ids).toEqual(['saldo', 'receitas', 'despesas']);
     });
 
-    it('Intermediate ganha patrimônio e saúde financeira', () => {
+    it('Intermediate ganha patrimônio', () => {
       const ids = buildOverviewCards(baseInput(), 'Intermediate', 'month', fmt).map((c) => c.id);
-      expect(ids).toEqual(['saldo', 'patrimonio', 'receitas', 'despesas', 'compromissos', 'saude']);
+      expect(ids).toEqual(['saldo', 'patrimonio', 'receitas', 'despesas']);
     });
 
     it('Basic usa saldo do período; Intermediate usa saldo disponível real', () => {
@@ -76,62 +76,6 @@ describe('financial-overview.model', () => {
 
       const up = buildOverviewCards(baseInput({ receitas: { total: 1100, pendentes: 0, anterior: 1000 } }), 'Basic', 'month', fmt);
       expect(up.find((c) => c.id === 'receitas')!.delta!.favorable).toBeTrue();
-    });
-  });
-
-  describe('buildOverviewCards — compromissos financeiros', () => {
-    it('sem compromissos mostra estado positivo sem valores falsos', () => {
-      const card = buildOverviewCards(baseInput(), 'Basic', 'month', fmt).find((c) => c.id === 'compromissos')!;
-      expect(card.value).toBe('Tudo em dia');
-      expect(card.tone).toBe('success');
-      expect(card.note).toContain('Nenhum compromisso crítico');
-      expect(card.note).not.toContain('cartões');
-    });
-
-    it('conta compromissos em atraso e dos próximos 7 dias', () => {
-      const input = baseInput({
-        compromissos: { emAtraso: 1, proximosSeteDias: 2, valorEmAberto: 450, dividaCartoes: 0, temCartoes: false }
-      });
-      const card = buildOverviewCards(input, 'Basic', 'month', fmt).find((c) => c.id === 'compromissos')!;
-      expect(card.value).toBe('3 compromissos');
-      expect(card.tone).toBe('danger');
-      expect(card.note).toContain('1 em atraso');
-      expect(card.note).toContain('2 nos próximos 7 dias');
-    });
-
-    it('só menciona fatura de cartões quando o usuário tem cartões com dívida', () => {
-      const semCartao = buildOverviewCards(
-        baseInput({ compromissos: { emAtraso: 0, proximosSeteDias: 0, valorEmAberto: 0, dividaCartoes: 300, temCartoes: false } }),
-        'Basic',
-        'month',
-        fmt
-      ).find((c) => c.id === 'compromissos')!;
-      expect(semCartao.note).not.toContain('cartões');
-
-      const comCartao = buildOverviewCards(
-        baseInput({ compromissos: { emAtraso: 0, proximosSeteDias: 0, valorEmAberto: 0, dividaCartoes: 300, temCartoes: true } }),
-        'Basic',
-        'month',
-        fmt
-      ).find((c) => c.id === 'compromissos')!;
-      expect(comCartao.note).toContain('Fatura em cartões');
-    });
-  });
-
-  describe('buildOverviewCards — saúde financeira', () => {
-    it('sem dados mostra estado inicial amigável', () => {
-      const card = buildOverviewCards(baseInput(), 'Intermediate', 'month', fmt).find((c) => c.id === 'saude')!;
-      expect(card.value).toBe('Sem dados');
-      expect(card.tone).toBe('neutral');
-      expect(card.note).toContain('Dados insuficientes');
-    });
-
-    it('mapeia status real da API para rótulo e tom', () => {
-      const input = baseInput({ saude: { status: 'warning', resumo: 'Fluxo de caixa apertado neste mês.' } });
-      const card = buildOverviewCards(input, 'Intermediate', 'month', fmt).find((c) => c.id === 'saude')!;
-      expect(card.value).toBe('Atenção');
-      expect(card.tone).toBe('warning');
-      expect(card.note).toBe('Fluxo de caixa apertado neste mês.');
     });
   });
 

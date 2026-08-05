@@ -32,7 +32,7 @@ export interface FinancialOverviewInput {
   saude: { status: AiHealthStatus; resumo: string } | null;
 }
 
-export type OverviewCardId = 'saldo' | 'receitas' | 'despesas' | 'patrimonio' | 'saude' | 'compromissos';
+export type OverviewCardId = 'saldo' | 'receitas' | 'despesas' | 'patrimonio';
 export type OverviewTone = 'primary' | 'success' | 'danger' | 'info' | 'warning' | 'neutral';
 
 export interface OverviewCardDelta {
@@ -93,15 +93,7 @@ export function buildOverviewCards(
     cards.push(buildPatrimonioCard(input, fmt));
   }
 
-  cards.push(
-    buildReceitasCard(input, deltaLabel, fmt),
-    buildDespesasCard(input, deltaLabel, fmt),
-    buildCompromissosCard(input, fmt)
-  );
-
-  if (intermediate) {
-    cards.push(buildSaudeCard(input));
-  }
+  cards.push(buildReceitasCard(input, deltaLabel, fmt), buildDespesasCard(input, deltaLabel, fmt));
 
   return cards;
 }
@@ -218,83 +210,6 @@ function buildDespesasCard(input: FinancialOverviewInput, deltaLabel: string, fm
     tooltip: 'Total de despesas com vencimento no período selecionado.',
     detailsRoute: '/despesas',
     detailsLabel: 'Ver despesas'
-  };
-}
-
-function buildCompromissosCard(input: FinancialOverviewInput, fmt: CurrencyFormatter): OverviewCard {
-  const { compromissos } = input;
-  const total = compromissos.emAtraso + compromissos.proximosSeteDias;
-  const cartoesNote =
-    compromissos.temCartoes && compromissos.dividaCartoes > 0
-      ? ` · Fatura em cartões: ${fmt(compromissos.dividaCartoes)}`
-      : '';
-
-  if (total === 0) {
-    return {
-      id: 'compromissos',
-      tone: 'success',
-      title: 'Compromissos financeiros',
-      question: 'Tem algo importante para pagar?',
-      value: 'Tudo em dia',
-      delta: null,
-      note: `Nenhum compromisso crítico no período.${cartoesNote}`,
-      detailsRoute: '/calendario',
-      detailsLabel: 'Ver calendário'
-    };
-  }
-
-  const partes: string[] = [];
-  if (compromissos.emAtraso > 0) {
-    partes.push(`${compromissos.emAtraso} em atraso`);
-  }
-  if (compromissos.proximosSeteDias > 0) {
-    partes.push(`${compromissos.proximosSeteDias} nos próximos 7 dias`);
-  }
-  partes.push(`${fmt(compromissos.valorEmAberto)} em aberto`);
-
-  return {
-    id: 'compromissos',
-    tone: compromissos.emAtraso > 0 ? 'danger' : 'warning',
-    title: 'Compromissos financeiros',
-    question: 'Tem algo importante para pagar?',
-    value: `${total} ${total === 1 ? 'compromisso' : 'compromissos'}`,
-    delta: null,
-    note: `${partes.join(' · ')}${cartoesNote}`,
-    detailsRoute: '/despesas',
-    detailsLabel: 'Ver despesas'
-  };
-}
-
-function buildSaudeCard(input: FinancialOverviewInput): OverviewCard {
-  if (!input.saude) {
-    return {
-      id: 'saude',
-      tone: 'neutral',
-      title: 'Saúde financeira',
-      question: 'Minha situação está boa?',
-      value: 'Sem dados',
-      delta: null,
-      note: 'Dados insuficientes para calcular sua saúde financeira. Continue registrando movimentações para liberar a análise.'
-    };
-  }
-
-  const statusMap: Record<AiHealthStatus, { label: string; tone: OverviewTone }> = {
-    ok: { label: 'Estável', tone: 'success' },
-    warning: { label: 'Atenção', tone: 'warning' },
-    critical: { label: 'Crítico', tone: 'danger' }
-  };
-  const status = statusMap[input.saude.status] ?? { label: 'Estável', tone: 'success' as OverviewTone };
-
-  return {
-    id: 'saude',
-    tone: status.tone,
-    title: 'Saúde financeira',
-    question: 'Minha situação está boa?',
-    value: status.label,
-    delta: null,
-    note: input.saude.resumo,
-    detailsRoute: '/assistente',
-    detailsLabel: 'Ver análise'
   };
 }
 

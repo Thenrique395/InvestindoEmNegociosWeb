@@ -2,7 +2,6 @@
   <div class="cat-card__head">
     <div class="cat-card__titles">
       <h3 class="cat-card__title">{{ title() }}</h3>
-      <p class="cat-card__subtitle">{{ subtitle() }}</p>
     </div>
     @if (hasData()) {
       <a class="cat-card__details" [routerLink]="detailsRoute()">
@@ -19,9 +18,8 @@
       <div class="cat-card__chart-wrap">
         <div class="cat-card__chart" [style.background]="chartBackground()" role="img" [attr.aria-label]="chartAriaLabel()">
           <div class="cat-card__chart-center">
-            <span class="cat-card__chart-eyebrow">Total</span>
-            <strong class="cat-card__chart-value">{{ totalLabel() }}</strong>
-            <span class="cat-card__chart-count">{{ countLabel() }}</span>
+            <strong class="cat-card__chart-value">{{ compactTotalLabel() }}</strong>
+            <span class="cat-card__chart-count">Total</span>
           </div>
         </div>
       </div>
@@ -39,35 +37,10 @@
                 <strong class="cat-card__legend-percent">{{ item.percent | number: '1.0-0' }}%</strong>
               </span>
             </div>
-            <div class="cat-card__legend-track" aria-hidden="true">
-              <div class="cat-card__legend-fill" [style.width.%]="item.percent" [style.background]="item.color"></div>
-            </div>
           </li>
         }
       </ul>
     </div>
-
-    @if (insight() || comparison()) {
-      <div class="cat-card__insights">
-        @if (insight()) {
-          <p class="cat-card__insight">
-            <svg viewBox="0 0 24 24" width="15" height="15" role="presentation" focusable="false" aria-hidden="true">
-              <path d="M12 3a6 6 0 0 0-3.5 10.9c.5.4.8.9.9 1.5l.2 1.1h4.8l.2-1.1c.1-.6.4-1.1.9-1.5A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M9.5 20h5M10.5 22h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-            </svg>
-            <span>{{ insight() }}</span>
-          </p>
-        }
-        @if (comparison()) {
-          <p class="cat-card__insight cat-card__insight--muted">
-            <svg viewBox="0 0 24 24" width="15" height="15" role="presentation" focusable="false" aria-hidden="true">
-              <path d="M4 19V5M4 19h16M8 16l3.5-4 3 2.5L20 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <span>{{ comparison() }}</span>
-          </p>
-        }
-      </div>
-    }
   } @else {
     <div class="cat-card__empty">
       <span class="cat-card__empty-icon" aria-hidden="true">
