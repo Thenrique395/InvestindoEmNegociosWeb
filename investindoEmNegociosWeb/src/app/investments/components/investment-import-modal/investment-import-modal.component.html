@@ -1,0 +1,123 @@
+<app-modal
+  [open]="open"
+  eyebrow="Importação"
+  title="Importações e exportações"
+  subtitle="Importe operações da B3 por PDF ou CSV para manter a carteira atualizada."
+  size="lg"
+  (close)="close.emit()">
+
+  <div modal-body>
+    <section class="import-section">
+      <p class="label">Relatório consolidado da B3 (PDF)</p>
+      <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
+      <div class="import-upload">
+        <label class="btn-primary sm import-upload__button">
+          <input type="file" accept="application/pdf" class="hidden" (change)="b3FileSelected.emit($event)" />
+          Escolher PDF
+        </label>
+        <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
+      </div>
+      @if (b3Loading) { <div class="muted">Lendo relatório...</div> }
+      @if (b3Error) { <div class="danger">{{ b3Error }}</div> }
+    </section>
+
+    <section class="import-section">
+      <p class="label">Planilha CSV</p>
+      <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
+      <div class="import-compact">
+        <div class="import-upload">
+          <label class="btn-primary sm import-upload__button">
+            <input type="file" accept=".csv,text/csv" class="hidden" (change)="csvSelected.emit($event)" />
+            Importar CSV
+          </label>
+          <button class="btn-ghost sm" type="button" (click)="downloadCsvModel.emit()">Exportar modelo</button>
+        </div>
+        <small class="muted">Importados nesta execução: {{ csvImported }}</small>
+      </div>
+      @if (csvError) { <div class="danger">{{ csvError }}</div> }
+      @if (csvPreviewRows.length) {
+        <details class="csv-preview">
+          <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Tipo</th><th>Ativo</th><th>Qtd</th><th>Preço médio</th><th>Conta</th></tr>
+              </thead>
+              <tbody>
+                @for (row of csvPreviewRows; track trackByIndex($index)) {
+                  <tr>
+                    <td>{{ row.type }}</td>
+                    <td>{{ row.asset }}</td>
+                    <td>{{ row.quantity }}</td>
+                    <td>{{ row.avgPrice | appCurrency }}</td>
+                    <td>{{ row.account }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </details>
+      }
+    </section>
+
+    @if (b3Preview) {
+      <div class="executive-grid">
+        <article class="card executive-card">
+          <p class="label">Mês de referência</p>
+          <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
+        </article>
+        <article class="card executive-card">
+          <p class="label">Total em posições</p>
+          <strong>{{ b3Preview.totals.positions | appCurrency }}</strong>
+        </article>
+        <article class="card executive-card">
+          <p class="label">Proventos</p>
+          <strong>{{ b3Preview.totals.incomes | appCurrency }}</strong>
+        </article>
+        <article class="card executive-card">
+          <p class="label">Negociações</p>
+          <strong>{{ b3Preview.trades.length }}</strong>
+        </article>
+      </div>
+      @if (b3Preview.positions.length) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Produto</th><th>Instituição</th><th>Qtd</th><th>Fechamento</th><th>Atualizado</th></tr>
+            </thead>
+            <tbody>
+              @for (p of b3Preview.positions; track trackByIndex($index)) {
+                <tr>
+                  <td>{{ p.product }}</td>
+                  <td>{{ p.institution }}</td>
+                  <td>{{ p.quantity }}</td>
+                  <td>{{ p.closingPrice | appCurrency }}</td>
+                  <td>{{ p.updatedValue | appCurrency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <div class="import-actions">
+        <label class="filter">
+          <span>Estratégia</span>
+          <select [ngModel]="b3Strategy" (ngModelChange)="b3StrategyChange.emit($event)">
+            <option value="merge">Mesclar com dados atuais</option>
+            <option value="replace">Substituir mês importado</option>
+          </select>
+        </label>
+      </div>
+    }
+  </div>
+
+  <div modal-footer>
+    <button class="btn-ghost sm" type="button" (click)="close.emit()">Cancelar</button>
+    @if (b3Preview) {
+      <button class="btn-primary sm" type="button" (click)="confirmB3Import.emit()" [disabled]="b3Importing">
+        {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
+      </button>
+    }
+  </div>
+
+</app-modal>

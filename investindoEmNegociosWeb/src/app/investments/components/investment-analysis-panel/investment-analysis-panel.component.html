@@ -1,0 +1,77 @@
+<article class="card action-card">
+  <div>
+    <p class="label">Panorama da carteira</p>
+    <strong>{{ nextAction.titulo }}</strong>
+    <small>{{ nextAction.descricao }}</small>
+  </div>
+  <button class="btn-secondary sm" type="button" (click)="executeNextAction.emit()">{{ nextAction.cta }}</button>
+</article>
+
+<section class="visual-grid">
+  <article class="card chart-card" id="sec-alocacao">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Alocação da carteira</h3>
+        <button type="button" class="hint" aria-label="Explicação do gráfico de alocação">
+          i
+          <span class="hint__panel">Mostra como sua carteira está distribuída por classe de ativo.</span>
+        </button>
+      </div>
+      <span class="muted">{{ distributionItems.length }} classe(s)</span>
+    </div>
+    <app-donut-chart [items]="distributionItems" emptyMessage="Sem posições para exibir distribuição." />
+  </article>
+
+  <article class="card chart-card">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Alocação alvo e alertas</h3>
+        <button type="button" class="hint" aria-label="Explicação da alocação alvo">
+          i
+          <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
+        </button>
+      </div>
+      <button class="btn-ghost sm" type="button" (click)="showConfigChange.emit(!showConfig)">
+        {{ showConfig ? 'Fechar parâmetros' : 'Editar alocação alvo' }}
+      </button>
+    </div>
+    @if (showConfig) {
+      <div class="allocation-config">
+        <p class="muted">Você define sua alocação-alvo. Este é um ponto de partida editável — ajuste ao seu perfil. <strong>Não é recomendação de investimento.</strong></p>
+        <div class="allocation-config__inputs">
+          @for (t of allocationTypes; track trackByIndex($index)) {
+            <label>
+              <span>{{ t.label }}</span>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                [ngModel]="targetAllocation[t.value]"
+                (ngModelChange)="updateTarget.emit({ type: t.value, value: $event })" />
+            </label>
+          }
+        </div>
+        <small class="muted" [class.danger]="targetAllocationTotal !== 100">
+          Total configurado: {{ targetAllocationTotal | number:'1.1-1' }}%
+        </small>
+        <div class="allocation-config__actions">
+          <button class="btn-ghost sm" type="button" (click)="resetTarget.emit()">Resetar padrão</button>
+          <button class="btn-primary sm" type="button" (click)="saveTarget.emit()">Salvar</button>
+        </div>
+      </div>
+    }
+    <div class="allocation-list">
+      @for (item of targetItems; track trackByIndex($index)) {
+        <div class="allocation-item">
+          <div class="allocation-item__top">
+            <strong>{{ item.label }}</strong>
+            <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
+          </div>
+          <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
+          <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? (item.atual > item.alvo ? '• acima do alvo' : '• abaixo do alvo') : '' }}</small>
+        </div>
+      }
+    </div>
+  </article>
+</section>

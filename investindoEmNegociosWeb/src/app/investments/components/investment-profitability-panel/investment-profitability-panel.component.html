@@ -1,0 +1,134 @@
+<section class="rentabilidade-grid">
+  <div class="rentabilidade-side">
+    <article class="card executive-card rent-card">
+      <p class="label">Total</p>
+      <small>Rentabilidade</small>
+      <strong [class.success]="totalPercent >= 0" [class.danger]="totalPercent < 0">
+        {{ totalPercent | number:'1.2-2' }}%
+      </strong>
+      <small>{{ comparisonLabel(totalPercent, totalBenchmarkPercent) }}</small>
+    </article>
+    <article class="card executive-card rent-card">
+      <p class="label">Últimos 12 meses</p>
+      <small>Rentabilidade</small>
+      <strong [class.success]="twelveMonthsPercent >= 0" [class.danger]="twelveMonthsPercent < 0">
+        {{ twelveMonthsPercent | number:'1.2-2' }}%
+      </strong>
+      <small>{{ comparisonLabel(twelveMonthsPercent, twelveMonthsBenchmarkPercent) }}</small>
+    </article>
+    <article class="card executive-card rent-card">
+      <p class="label">Último mês</p>
+      <small>Rentabilidade</small>
+      <strong [class.success]="lastMonthPercent >= 0" [class.danger]="lastMonthPercent < 0">
+        {{ lastMonthPercent | number:'1.2-2' }}%
+      </strong>
+      <small>{{ comparisonLabel(lastMonthPercent, lastMonthBenchmarkPercent) }}</small>
+    </article>
+  </div>
+
+  <article class="card chart-card rentabilidade-main" id="sec-evolucao">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Rentabilidade comparada com índices</h3>
+      </div>
+      <div class="chart-filters">
+        <select [ngModel]="period" (ngModelChange)="periodChange.emit($event)">
+          <option value="SINCE_START">Desde o início</option>
+          <option value="LAST_12M">Últimos 12 meses</option>
+        </select>
+        <select [ngModel]="benchmark" (ngModelChange)="benchmarkChange.emit($event)">
+          @for (item of benchmarkOptions; track trackByIndex($index)) {
+            <option [value]="item.key">{{ item.label }}</option>
+          }
+        </select>
+        <select [ngModel]="typeFilter" (ngModelChange)="typeFilterChange.emit($event)">
+          <option value="ALL">Todos os tipos</option>
+          @for (t of tipos; track trackByIndex($index)) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="rentabilidade-chart">
+      <div class="rentabilidade-axis">
+        @for (tick of chartTicks; track trackByIndex($index)) {
+          <span>{{ tick | number:'1.0-0' }}%</span>
+        }
+      </div>
+      <div class="rentabilidade-plot">
+        <div class="rentabilidade-grid-lines">
+          @for (_ of gridLines; track trackByIndex($index)) {
+            <span></span>
+          }
+        </div>
+        <svg
+          viewBox="0 0 1000 280"
+          preserveAspectRatio="none"
+          role="img"
+          aria-label="Evolução de rentabilidade da carteira e índice"
+          [style.--benchmark-color]="benchmarkColor">
+          <polyline class="line cdi" [attr.points]="lineBenchmark"></polyline>
+          <polyline class="line carteira" [attr.points]="linePortfolio"></polyline>
+        </svg>
+        @if (points.length) {
+          <div class="rentabilidade-hover-points">
+            @for (point of points; track trackByIndex($index); let i = $index) {
+              <div class="rentabilidade-hover-point" [style.left.%]="(i / (points.length - 1 || 1)) * 100">
+                <span class="chart-hover-tip">
+                  {{ point.label }}<br />
+                  Carteira: {{ point.carteiraAc | number:'1.1-1' }}%<br />
+                  {{ benchmarkLabel }}: {{ point.benchmarkAc | number:'1.1-1' }}%
+                </span>
+              </div>
+            }
+          </div>
+        }
+        <div class="rentabilidade-x-axis">
+          @for (point of points; track trackByIndex($index)) {
+            <small>{{ point.label }}</small>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="legend-row">
+      <span><i class="chip carteira"></i> Carteira</span>
+      <span><i class="chip cdi" [style.background]="benchmarkColor"></i> {{ benchmarkLabel }} (estimado no período)</span>
+    </div>
+  </article>
+</section>
+
+<article class="card chart-card">
+  <div class="section-head">
+    <div class="section-head__title">
+      <h3>Rentabilidade mensal</h3>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Ano</th>
+          @for (label of monthLabels; track trackByIndex($index)) {
+            <th>{{ label }}</th>
+          }
+          <th>Ano</th>
+          <th>Acumulado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of yearlyRows; track trackByIndex($index)) {
+          <tr>
+            <td><strong>{{ row.year }}</strong></td>
+            @for (monthValue of row.months; track trackByIndex($index)) {
+              <td [class.success]="(monthValue || 0) >= 0" [class.danger]="(monthValue || 0) < 0">
+                {{ monthValue === null ? '-' : ((monthValue | number:'1.2-2') + '%') }}
+              </td>
+            }
+            <td [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">{{ row.yearValue | number:'1.2-2' }}%</td>
+            <td [class.success]="row.acumulado >= 0" [class.danger]="row.acumulado < 0">{{ row.acumulado | number:'1.2-2' }}%</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</article>

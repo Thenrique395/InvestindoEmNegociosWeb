@@ -213,7 +213,12 @@ Status:
 - feito em 2026-08-05: o bloco `Meus Ativos` foi extraído para `app-investment-assets-list` e passou a usar `app-responsive-list`
 - feito em 2026-08-05: a aba `Proventos` foi extraída para `app-investment-dividends-panel`
 - feito em 2026-08-05: a aba `Consolidação` foi extraída para `app-investment-consolidation-panel` e os lançamentos consolidados passaram a usar `app-responsive-list`
-- ainda pendente: demais blocos de `Investimentos`, como evolução, rentabilidade/análise e modais
+- feito em 2026-08-05: a aba `Rentabilidade` foi extraída para `app-investment-profitability-panel`
+- feito em 2026-08-05: a aba `Análise` foi extraída para `app-investment-analysis-panel`
+- feito em 2026-08-05: os modais de lançamento/movimento foram extraídos para `app-investment-launch-modals`
+- feito em 2026-08-05: o modal B3/CSV foi extraído para `app-investment-import-modal`
+- feito em 2026-08-05: o resumo executivo/evolução/distribuição foi extraído para `app-investment-overview-panel`
+- ainda pendente: monitorar a tela após uso real; não há bloco grande restante no template principal de `Investimentos`
 
 Impacto:
 
@@ -406,6 +411,7 @@ Já concluído:
 - `Investimentos`: primeiro bloco extraído (`Meus Ativos`) e migrado para `app-responsive-list`
 - `Investimentos`: aba `Proventos` extraída para `app-investment-dividends-panel`
 - `Investimentos`: aba `Consolidação` extraída para `app-investment-consolidation-panel`, com lançamentos consolidados em `app-responsive-list`
+- `Investimentos`: resumo, rentabilidade, análise e modais extraídos para componentes dedicados
 
 Entregas:
 
@@ -475,9 +481,8 @@ Checks mínimos:
 ## Próximas fatias pequenas sugeridas
 
 1. Corrigir o contrato de tokens entre `DESIGN_SYSTEM.md`, `src/styles.scss` e `src/styles/design-tokens.scss`.
-2. Continuar `Investimentos` por blocos, priorizando `Rentabilidade`, `Análise` ou os modais de lançamento.
-3. Padronizar `confirm-dialog` antigo para `confirm-sheet` nas telas financeiras.
-4. Criar um checklist de validação visual com Playwright para as 8 telas principais.
+2. Padronizar `confirm-dialog` antigo para `confirm-sheet` nas telas financeiras.
+3. Criar um checklist de validação visual com Playwright para as 8 telas principais.
 
 ## Decisão recomendada
 

@@ -20,131 +20,33 @@
     </div>
 
   @if (activeTab === 'RESUMO') {
-    <section class="executive-grid">
-      <app-transaction-summary-card tone="primary" eyebrow="Patrimônio" [value]="overview.marketValue | appCurrency"
-        [note]="'Investido: ' + (overview.invested | appCurrency)"
-        tooltipText="Valor atual de mercado das posições (usa cotação quando disponível; senão, preço médio).">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18" fill="none" stroke="currentColor" stroke-width="1.7"/>
-        </svg>
-      </app-transaction-summary-card>
-
-      <app-transaction-summary-card [tone]="overview.growth >= 0 ? 'success' : 'danger'" eyebrow="Valorização"
-        [value]="overview.growth | appCurrency" [note]="'Rentabilidade: ' + (overview.profitPercent | number:'1.2-2') + '%'"
-        tooltipText="Diferença entre o valor de mercado e o total investido. Não inclui proventos.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M4 18h16M6 15l3-3 3 2 5-6M16 8h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </app-transaction-summary-card>
-
-      <app-transaction-summary-card tone="info" eyebrow="Proventos recebidos" [value]="overview.proventos | appCurrency"
-        [note]="overview.activeCount + ' posição(ões) ativa(s)'"
-        tooltipText="Dividendos, JCP e rendimentos registrados — não entram como aporte nem valorização.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <ellipse cx="12" cy="6.5" rx="7" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
-          <path d="M5 6.5v10c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-10" fill="none" stroke="currentColor" stroke-width="1.7"/>
-        </svg>
-      </app-transaction-summary-card>
-
-      <app-transaction-summary-card [tone]="overview.resultMonth >= 0 ? 'success' : 'warning'" eyebrow="Aportes no mês"
-        [value]="overview.aporteMonth | appCurrency" [note]="'Resgates: ' + (overview.resgateMonth | appCurrency)"
-        tooltipText="Aportes e resgates registrados no mês corrente.">
-        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </app-transaction-summary-card>
-    </section>
-  }
-
-  @if (activeTab === 'RESUMO') {
-    <section class="visual-grid visual-grid--resume">
-      <article class="card chart-card chart-card--allocation">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Evolução do patrimônio</h3>
-          </div>
-          <div class="chart-filters">
-            <select [(ngModel)]="patrimonioRangeMonths">
-              <option [ngValue]="12">12 meses</option>
-              <option [ngValue]="6">6 meses</option>
-            </select>
-            <select [(ngModel)]="patrimonioTypeFilter">
-              <option value="ALL">Todos os tipos</option>
-              @for (t of tipos; track trackByIndex($index, t)) {
-                <option [value]="t.value">{{ t.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-        <div class="patrimony-chart">
-          <div class="patrimony-axis">
-            @for (tick of patrimonioAxisTicks; track trackByIndex($index, tick)) {
-              <span>{{ formatPatrimonioAxisValue(tick) }}</span>
-            }
-          </div>
-          <div class="patrimony-plot">
-            <div class="patrimony-chart__bars" [style.gridTemplateColumns]="patrimonioGridColumns">
-              @for (item of patrimonioEvolucaoSeries; track trackByIndex($index, item)) {
-                <div class="patrimony-column">
-                  <div class="patrimony-bars">
-                    <div class="patrimony-chart__grid">
-                      @for (_ of [1,2,3,4,5,6]; track trackByIndex($index, _)) {
-                        <span class="patrimony-chart__line"></span>
-                      }
-                    </div>
-                    <div class="patrimony-bars__stack">
-                      <span class="bar aplicado" [style.height.%]="(item.aplicado / patrimonioChartMax) * 100"></span>
-                      <span class="bar ganho" [style.height.%]="(item.ganho / patrimonioChartMax) * 100"></span>
-                    </div>
-                  </div>
-                  <span class="chart-hover-tip">
-                    Aplicado: {{ item.aplicado | appCurrency }}<br />
-                    Ganho: {{ item.ganho | appCurrency }}<br />
-                    Total: {{ item.total | appCurrency }}
-                  </span>
-                  <small class="patrimony-x-label">{{ item.label }}</small>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-        <div class="legend-row">
-          <span><i class="chip aplicado"></i> Valor aplicado</span>
-          <span><i class="chip ganho"></i> Ganho capital</span>
-          @if (patrimonioEvolucaoEstimado) {
-            <span class="muted">Série estimada pelo saldo atual (histórico mensal insuficiente)</span>
-          }
-        </div>
-      </article>
-      <article class="card chart-card">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Ativos na carteira</h3>
-          </div>
-          <div class="chart-filters">
-            <select [(ngModel)]="carteiraTypeFilter">
-              <option value="ALL">Todos os tipos</option>
-              @for (t of tipos; track trackByIndex($index, t)) {
-                <option [value]="t.value">{{ t.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-        <app-donut-chart [items]="carteiraDistribuicaoChart" emptyMessage="Sem dados para a distribuição atual." />
-      </article>
-    </section>
+    <app-investment-overview-panel
+      [overview]="overview"
+      [(patrimonioRangeMonths)]="patrimonioRangeMonths"
+      [(patrimonioTypeFilter)]="patrimonioTypeFilter"
+      [(carteiraTypeFilter)]="carteiraTypeFilter"
+      [tipos]="tipos"
+      [patrimonioAxisTicks]="patrimonioAxisTicks"
+      [patrimonioGridColumns]="patrimonioGridColumns"
+      [patrimonioSeries]="patrimonioEvolucaoSeries"
+      [patrimonioChartMax]="patrimonioChartMax"
+      [patrimonioEstimado]="patrimonioEvolucaoEstimado"
+      [carteiraDistribuicaoChart]="carteiraDistribuicaoChart" />
   }
 
   @if (activeTab === 'ANALISE') {
-    <article class="card action-card">
-      <div>
-        <p class="label">Panorama da carteira</p>
-        <strong>{{ proximaAcao.titulo }}</strong>
-        <small>{{ proximaAcao.descricao }}</small>
-      </div>
-      <button class="btn-secondary sm" type="button" (click)="executarProximaAcao()">{{ proximaAcao.cta }}</button>
-    </article>
+    <app-investment-analysis-panel
+      [nextAction]="proximaAcao"
+      [distributionItems]="distribuicaoPorTipoComCor"
+      [(showConfig)]="showAlocacaoConfig"
+      [allocationTypes]="allocationTypes"
+      [targetAllocation]="targetAllocation"
+      [targetAllocationTotal]="targetAllocationTotal"
+      [targetItems]="alvoAlocacao"
+      (executeNextAction)="executarProximaAcao()"
+      (updateTarget)="updateTargetAllocation($event.type, $event.value)"
+      (resetTarget)="resetTargetAllocation()"
+      (saveTarget)="saveTargetAllocation()" />
   }
 
   @if (activeTab === 'RESUMO') {
@@ -182,124 +84,26 @@
       (horizonYearsChange)="consolidacaoHorizonteAnos = $event" />
   }
 
-  @if (activeTab === 'ANALISE') {
-    <section class="visual-grid">
-      @if (activeTab === 'ANALISE') {
-        <article class="card chart-card" id="sec-alocacao">
-          <div class="section-head">
-            <div class="section-head__title">
-              <h3>Alocação da carteira</h3>
-              <button type="button" class="hint" aria-label="Explicação do gráfico de alocação">
-                i
-                <span class="hint__panel">Mostra como sua carteira está distribuída por classe de ativo.</span>
-              </button>
-            </div>
-            <span class="muted">{{ distribuicaoPorTipoComCor.length }} classe(s)</span>
-          </div>
-          <app-donut-chart [items]="distribuicaoPorTipoComCor" emptyMessage="Sem posições para exibir distribuição." />
-        </article>
-      }
-    </section>
-  }
-
   @if (activeTab === 'RENTABILIDADE') {
-    <section class="rentabilidade-grid">
-      <div class="rentabilidade-side">
-        <article class="card executive-card rent-card">
-          <p class="label">Total</p>
-          <small>Rentabilidade</small>
-          <strong [class.success]="rentabilidadeTotalPercent >= 0" [class.danger]="rentabilidadeTotalPercent < 0">
-            {{ rentabilidadeTotalPercent | number:'1.2-2' }}%
-          </strong>
-          <small>{{ comparativoCdiLabel(rentabilidadeTotalPercent, rentabilidadeTotalCdiPercent) }}</small>
-        </article>
-        <article class="card executive-card rent-card">
-          <p class="label">Últimos 12 meses</p>
-          <small>Rentabilidade</small>
-          <strong [class.success]="rentabilidade12mPercent >= 0" [class.danger]="rentabilidade12mPercent < 0">
-            {{ rentabilidade12mPercent | number:'1.2-2' }}%
-          </strong>
-          <small>{{ comparativoCdiLabel(rentabilidade12mPercent, rentabilidade12mCdiPercent) }}</small>
-        </article>
-        <article class="card executive-card rent-card">
-          <p class="label">Último mês</p>
-          <small>Rentabilidade</small>
-          <strong [class.success]="rentabilidadeUltimoMesPercent >= 0" [class.danger]="rentabilidadeUltimoMesPercent < 0">
-            {{ rentabilidadeUltimoMesPercent | number:'1.2-2' }}%
-          </strong>
-          <small>{{ comparativoCdiLabel(rentabilidadeUltimoMesPercent, rentabilidadeUltimoMesCdiPercent) }}</small>
-        </article>
-      </div>
-      <article class="card chart-card rentabilidade-main" id="sec-evolucao">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Rentabilidade comparada com índices</h3>
-          </div>
-          <div class="chart-filters">
-            <select [(ngModel)]="rentabilidadePeriodo">
-              <option value="SINCE_START">Desde o início</option>
-              <option value="LAST_12M">Últimos 12 meses</option>
-            </select>
-            <select [(ngModel)]="rentabilidadeBenchmark">
-              @for (item of benchmarkOptions; track trackByIndex($index, item)) {
-                <option [value]="item.key">{{ item.label }}</option>
-              }
-            </select>
-            <select [(ngModel)]="rentabilidadeTipoFiltro">
-              <option value="ALL">Todos os tipos</option>
-              @for (t of tipos; track trackByIndex($index, t)) {
-                <option [value]="t.value">{{ t.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-        <div class="rentabilidade-chart">
-          <div class="rentabilidade-axis">
-            @for (tick of rentabilidadeChartTicks; track trackByIndex($index, tick)) {
-              <span>{{ tick | number:'1.0-0' }}%</span>
-            }
-          </div>
-          <div class="rentabilidade-plot">
-            <div class="rentabilidade-grid-lines">
-              @for (_ of [1,2,3,4,5]; track trackByIndex($index, _)) {
-                <span></span>
-              }
-            </div>
-            <svg
-              viewBox="0 0 1000 280"
-              preserveAspectRatio="none"
-              role="img"
-              aria-label="Evolução de rentabilidade da carteira e índice"
-              [style.--benchmark-color]="indiceSelecionadoCor">
-              <polyline class="line cdi" [attr.points]="rentabilidadeLinhaCdi"></polyline>
-              <polyline class="line carteira" [attr.points]="rentabilidadeLinhaCarteira"></polyline>
-            </svg>
-            @if (rentabilidadeSeries.length) {
-              <div class="rentabilidade-hover-points">
-                @for (point of rentabilidadeSeries; track trackByIndex($index, point); let i = $index) {
-                  <div class="rentabilidade-hover-point" [style.left.%]="(i / (rentabilidadeSeries.length - 1 || 1)) * 100">
-                    <span class="chart-hover-tip">
-                      {{ point.label }}<br />
-                      Carteira: {{ point.carteiraAc | number:'1.1-1' }}%<br />
-                      {{ indiceSelecionadoLabel }}: {{ point.benchmarkAc | number:'1.1-1' }}%
-                    </span>
-                  </div>
-                }
-              </div>
-            }
-            <div class="rentabilidade-x-axis">
-              @for (point of rentabilidadeSeries; track trackByIndex($index, point)) {
-                <small>{{ point.label }}</small>
-              }
-            </div>
-          </div>
-        </div>
-        <div class="legend-row">
-          <span><i class="chip carteira"></i> Carteira</span>
-          <span><i class="chip cdi" [style.background]="indiceSelecionadoCor"></i> {{ indiceSelecionadoLabel }} (estimado no período)</span>
-        </div>
-      </article>
-    </section>
+    <app-investment-profitability-panel
+      [totalPercent]="rentabilidadeTotalPercent"
+      [totalBenchmarkPercent]="rentabilidadeTotalCdiPercent"
+      [twelveMonthsPercent]="rentabilidade12mPercent"
+      [twelveMonthsBenchmarkPercent]="rentabilidade12mCdiPercent"
+      [lastMonthPercent]="rentabilidadeUltimoMesPercent"
+      [lastMonthBenchmarkPercent]="rentabilidadeUltimoMesCdiPercent"
+      [(period)]="rentabilidadePeriodo"
+      [(benchmark)]="rentabilidadeBenchmark"
+      [(typeFilter)]="rentabilidadeTipoFiltro"
+      [benchmarkOptions]="benchmarkOptions"
+      [tipos]="tipos"
+      [chartTicks]="rentabilidadeChartTicks"
+      [linePortfolio]="rentabilidadeLinhaCarteira"
+      [lineBenchmark]="rentabilidadeLinhaCdi"
+      [points]="rentabilidadeSeries"
+      [benchmarkLabel]="indiceSelecionadoLabel"
+      [benchmarkColor]="indiceSelecionadoCor"
+      [yearlyRows]="rentabilidadeTabelaAnual" />
   }
 
   @if (activeTab === 'PROVENTOS') {
@@ -312,385 +116,49 @@
       [assets]="proventosPorAtivo12Meses" />
   }
 
-  @if (activeTab === 'RENTABILIDADE') {
-    <article class="card chart-card">
-      <div class="section-head">
-        <div class="section-head__title">
-          <h3>Rentabilidade mensal</h3>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Ano</th>
-              <th>Jan</th>
-              <th>Fev</th>
-              <th>Mar</th>
-              <th>Abr</th>
-              <th>Mai</th>
-              <th>Jun</th>
-              <th>Jul</th>
-              <th>Ago</th>
-              <th>Set</th>
-              <th>Out</th>
-              <th>Nov</th>
-              <th>Dez</th>
-              <th>Ano</th>
-              <th>Acumulado</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of rentabilidadeTabelaAnual; track trackByIndex($index, row)) {
-              <tr>
-                <td><strong>{{ row.year }}</strong></td>
-                @for (monthValue of row.months; track trackByIndex($index, monthValue)) {
-                  <td [class.success]="(monthValue || 0) >= 0" [class.danger]="(monthValue || 0) < 0">
-                    {{ monthValue === null ? '-' : ((monthValue | number:'1.2-2') + '%') }}
-                  </td>
-                }
-                <td [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">{{ row.yearValue | number:'1.2-2' }}%</td>
-                <td [class.success]="row.acumulado >= 0" [class.danger]="row.acumulado < 0">{{ row.acumulado | number:'1.2-2' }}%</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </article>
-  }
-
-  @if (activeTab === 'ANALISE') {
-    <section class="visual-grid">
-      <article class="card chart-card">
-        <div class="section-head">
-          <div class="section-head__title">
-            <h3>Alocação alvo e alertas</h3>
-            <button type="button" class="hint" aria-label="Explicação da alocação alvo">
-              i
-              <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
-            </button>
-          </div>
-          <button class="btn-ghost sm" type="button" (click)="showAlocacaoConfig = !showAlocacaoConfig">
-            {{ showAlocacaoConfig ? 'Fechar parâmetros' : 'Editar alocação alvo' }}
-          </button>
-        </div>
-        @if (showAlocacaoConfig) {
-          <div class="allocation-config">
-            <p class="muted">Você define sua alocação-alvo. Este é um ponto de partida editável — ajuste ao seu perfil. <strong>Não é recomendação de investimento.</strong></p>
-            <div class="allocation-config__inputs">
-              @for (t of allocationTypes; track trackByIndex($index, t)) {
-                <label>
-                  <span>{{ t.label }}</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    [ngModel]="targetAllocation[t.value]"
-                    (ngModelChange)="updateTargetAllocation(t.value, $event)" />
-                </label>
-              }
-            </div>
-            <small class="muted" [class.danger]="targetAllocationTotal !== 100">
-              Total configurado: {{ targetAllocationTotal | number:'1.1-1' }}%
-            </small>
-            <div class="allocation-config__actions">
-              <button class="btn-ghost sm" type="button" (click)="resetTargetAllocation()">Resetar padrão</button>
-              <button class="btn-primary sm" type="button" (click)="saveTargetAllocation()">Salvar</button>
-            </div>
-          </div>
-        }
-        <div class="allocation-list">
-          @for (item of alvoAlocacao; track trackByIndex($index, item)) {
-            <div class="allocation-item">
-              <div class="allocation-item__top">
-                <strong>{{ item.label }}</strong>
-                <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
-              </div>
-              <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
-              <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? (item.atual > item.alvo ? '• acima do alvo' : '• abaixo do alvo') : '' }}</small>
-            </div>
-          }
-        </div>
-      </article>
-    </section>
-  }
-
   </section>
 
-  <app-modal
-    [open]="showCadastro"
-    eyebrow="Investimentos"
-    title="Adicionar lançamento"
-    subtitle="Registre compra, venda ou movimento na sua carteira."
-    size="md"
-    (close)="closeCadastroModal()">
+  <app-investment-launch-modals
+    [showCadastro]="showCadastro"
+    [cadastroOperacao]="cadastroOperacao"
+    [novaPosicao]="novaPosicao"
+    [tipos]="tipos"
+    [currencyOptions]="currencyOptions"
+    [institutions]="institutions"
+    [(cadastroCustos)]="cadastroCustos"
+    [posicoesVendaveis]="posicoesVendaveis"
+    [vendaPositionId]="vendaPositionId"
+    [venda]="venda"
+    [cadastroValorTotal]="cadastroValorTotal"
+    [vendaValorTotal]="vendaValorTotal"
+    [showMovimento]="showMovimento"
+    [posSelecionada]="posSelecionada"
+    [movimento]="movimento"
+    [movimentoTipos]="movimentoTipos"
+    [(movimentoCustos)]="movimentoCustos"
+    [movimentoValorTotal]="movimentoValorTotal"
+    (closeCadastro)="closeCadastroModal()"
+    (setCadastroOperacao)="setCadastroOperacao($event)"
+    (vendaPositionSelected)="onVendaPositionSelected($event)"
+    (savePosition)="salvarPosicao()"
+    (saveSale)="salvarVenda()"
+    (closeMovimento)="closeMovimentoModal()"
+    (saveMovement)="salvarMovimento()" />
 
-    <div modal-body>
-      <div class="launch-type">
-        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao('COMPRA')">Compra</button>
-        <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao('VENDA')">Venda</button>
-      </div>
-      @if (cadastroOperacao === 'COMPRA') {
-        <div class="form grid-form">
-          <div>
-            <label>Tipo de ativo</label>
-            <select [(ngModel)]="novaPosicao.type" name="type">
-              @for (t of tipos; track trackByIndex($index, t)) {
-                <option [value]="t.value">{{ t.label }}</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label>Ativo</label>
-            <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
-          </div>
-          <div>
-            <label>Moeda</label>
-            <select [(ngModel)]="novaPosicao.currency" name="currency">
-              @for (c of currencyOptions; track c) {
-                <option [value]="c">{{ c }}</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label>Quantidade</label>
-            <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
-          </div>
-          <div>
-            <label>Preço{{ novaPosicao.currency === 'BRL' ? ' em R$' : '' }}</label>
-            <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
-          </div>
-          <div>
-            <label>Outros custos <span class="muted">(opcional)</span></label>
-            <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="cadastroCustos" />
-          </div>
-          <div>
-            <label>Data da compra</label>
-            <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
-          </div>
-          <div>
-            <label>Conta/Corretora</label>
-            <input type="text" [(ngModel)]="novaPosicao.account" name="account" placeholder="Ex.: Nubank, XP" list="brokerOptions" />
-            <datalist id="brokerOptions">
-              @for (inst of institutions; track trackByIndex($index, inst)) {
-                <option [value]="inst.name"></option>
-              }
-            </datalist>
-          </div>
-          <div>
-            <label>Categoria (opcional)</label>
-            <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
-          </div>
-        </div>
-      }
-      @if (cadastroOperacao === 'VENDA') {
-        <div class="form grid-form">
-          <div>
-            <label>Ativo</label>
-            <select [(ngModel)]="vendaPositionId" name="vendaPositionId" (ngModelChange)="onVendaPositionChange()">
-              <option value="">Selecione</option>
-              @for (p of posicoesVendaveis; track trackById($index, p)) {
-                <option [value]="p.id">{{ p.asset }} ({{ p.quantity | number:'1.0-4' }})</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label>Quantidade</label>
-            <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
-          </div>
-          <div>
-            <label>Preço em R$</label>
-            <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
-          </div>
-          <div>
-            <label>Outros custos <span class="muted">(opcional)</span></label>
-            <input type="number" min="0" step="any" [(ngModel)]="cadastroCustos" name="vendaCustos" />
-          </div>
-          <div>
-            <label>Data da venda</label>
-            <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
-          </div>
-          <div>
-            <label>Observação (opcional)</label>
-            <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
-          </div>
-        </div>
-      }
-      <div class="launch-total">
-        <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
-        <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | appCurrency }}</strong>
-      </div>
-    </div>
-
-    <div modal-footer>
-      <button class="btn-ghost sm" type="button" (click)="closeCadastroModal()">Cancelar</button>
-      <button class="btn-primary sm" type="button" (click)="cadastroOperacao === 'COMPRA' ? salvarPosicao() : salvarVenda()">
-        {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
-      </button>
-    </div>
-
-  </app-modal>
-
-  <app-modal
-    [open]="showMovimento && !!posSelecionada"
-    eyebrow="Investimentos"
-    [title]="'Novo lançamento — ' + (posSelecionada?.asset ?? '')"
-    subtitle="Registre compra, venda ou movimento para esta posição."
-    size="sm"
-    (close)="closeMovimentoModal()">
-
-    <div modal-body>
-      <div class="form inline">
-        <label>Operação</label>
-        <select [(ngModel)]="movimento.type" name="movType">
-          @for (tipo of movimentoTipos; track trackByIndex($index, tipo)) {
-            <option [value]="tipo.value">{{ tipo.label }}</option>
-          }
-        </select>
-        <label>Qtd.</label>
-        <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
-        <label>Preço unitário</label>
-        <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
-        <label>Outros custos</label>
-        <input type="number" min="0" step="any" [(ngModel)]="movimentoCustos" name="movCost" />
-        <label>Data</label>
-        <input type="date" [(ngModel)]="movimento.date" name="movDate" />
-        <label>Nota</label>
-        <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
-      </div>
-      <div class="launch-total">
-        <span>Valor total</span>
-        <strong>{{ movimentoValorTotal | appCurrency }}</strong>
-      </div>
-    </div>
-
-    <div modal-footer>
-      <button class="btn-ghost sm" type="button" (click)="closeMovimentoModal()">Cancelar</button>
-      <button class="btn-primary sm" type="button" (click)="salvarMovimento()">Salvar movimento</button>
-    </div>
-
-  </app-modal>
-
-  <app-modal
+  <app-investment-import-modal
     [open]="showB3Import"
-    eyebrow="Importação"
-    title="Importações e exportações"
-    subtitle="Importe operações da B3 por PDF ou CSV para manter a carteira atualizada."
-    size="lg"
-    (close)="closeB3ImportModal()">
-
-    <div modal-body>
-      <section class="import-section">
-        <p class="label">Relatório consolidado da B3 (PDF)</p>
-        <p class="muted">Envie o PDF mensal da B3 para importar posições, proventos e negociações.</p>
-        <div class="import-upload">
-          <label class="btn-primary sm import-upload__button">
-            <input type="file" accept="application/pdf" class="hidden" (change)="onB3FileSelected($event)" />
-            Escolher PDF
-          </label>
-          <span class="muted">{{ b3FileName || 'Nenhum arquivo selecionado' }}</span>
-        </div>
-        @if (b3Loading) { <div class="muted">Lendo relatório...</div> }
-        @if (b3Error) { <div class="danger">{{ b3Error }}</div> }
-      </section>
-      <section class="import-section">
-        <p class="label">Planilha CSV</p>
-        <p class="muted">Importe posições por CSV e exporte o modelo para preenchimento rápido.</p>
-        <div class="import-compact">
-          <div class="import-upload">
-            <label class="btn-primary sm import-upload__button">
-              <input type="file" accept=".csv,text/csv" class="hidden" (change)="onCsvSelected($event)" />
-              Importar CSV
-            </label>
-            <button class="btn-ghost sm" type="button" (click)="baixarModeloCsv()">Exportar modelo</button>
-          </div>
-          <small class="muted">Importados nesta execução: {{ csvImported }}</small>
-        </div>
-        @if (csvError) { <div class="danger">{{ csvError }}</div> }
-        @if (csvPreviewRows.length) {
-          <details class="csv-preview">
-            <summary>Ver prévia ({{ csvPreviewRows.length }} linha(s))</summary>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr><th>Tipo</th><th>Ativo</th><th>Qtd</th><th>Preço médio</th><th>Conta</th></tr>
-                </thead>
-                <tbody>
-                  @for (row of csvPreviewRows; track trackByIndex($index, row)) {
-                    <tr>
-                      <td>{{ row.type }}</td>
-                      <td>{{ row.asset }}</td>
-                      <td>{{ row.quantity }}</td>
-                      <td>{{ row.avgPrice | appCurrency }}</td>
-                      <td>{{ row.account }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </details>
-        }
-      </section>
-      @if (b3Preview) {
-        <div class="executive-grid">
-          <article class="card executive-card">
-            <p class="label">Mês de referência</p>
-            <strong>{{ b3Preview.referenceMonth || '-' }}</strong>
-          </article>
-          <article class="card executive-card">
-            <p class="label">Total em posições</p>
-            <strong>{{ b3Preview.totals.positions | appCurrency }}</strong>
-          </article>
-          <article class="card executive-card">
-            <p class="label">Proventos</p>
-            <strong>{{ b3Preview.totals.incomes | appCurrency }}</strong>
-          </article>
-          <article class="card executive-card">
-            <p class="label">Negociações</p>
-            <strong>{{ b3Preview.trades.length }}</strong>
-          </article>
-        </div>
-        @if (b3Preview.positions.length) {
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Produto</th><th>Instituição</th><th>Qtd</th><th>Fechamento</th><th>Atualizado</th></tr>
-              </thead>
-              <tbody>
-                @for (p of b3Preview.positions; track trackByIndex($index, p)) {
-                  <tr>
-                    <td>{{ p.product }}</td>
-                    <td>{{ p.institution }}</td>
-                    <td>{{ p.quantity }}</td>
-                    <td>{{ p.closingPrice | appCurrency }}</td>
-                    <td>{{ p.updatedValue | appCurrency }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        }
-        <div class="import-actions">
-          <label class="filter">
-            <span>Estratégia</span>
-            <select [(ngModel)]="b3Strategy">
-              <option value="merge">Mesclar com dados atuais</option>
-              <option value="replace">Substituir mês importado</option>
-            </select>
-          </label>
-        </div>
-      }
-    </div>
-
-    <div modal-footer>
-      <button class="btn-ghost sm" type="button" (click)="closeB3ImportModal()">Cancelar</button>
-      @if (b3Preview) {
-        <button class="btn-primary sm" type="button" (click)="confirmarImportacaoB3()" [disabled]="b3Importing">
-          {{ b3Importing ? 'Importando...' : 'Confirmar importação' }}
-        </button>
-      }
-    </div>
-
-  </app-modal>
+    [b3Loading]="b3Loading"
+    [b3Importing]="b3Importing"
+    [b3Error]="b3Error"
+    [b3FileName]="b3FileName"
+    [b3Preview]="b3Preview"
+    [(b3Strategy)]="b3Strategy"
+    [csvError]="csvError"
+    [csvImported]="csvImported"
+    [csvPreviewRows]="csvPreviewRows"
+    (close)="closeB3ImportModal()"
+    (b3FileSelected)="onB3FileSelected($event)"
+    (csvSelected)="onCsvSelected($event)"
+    (downloadCsvModel)="baixarModeloCsv()"
+    (confirmB3Import)="confirmarImportacaoB3()" />
 </section>

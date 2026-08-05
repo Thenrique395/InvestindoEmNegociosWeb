@@ -1,0 +1,153 @@
+<app-modal
+  [open]="showCadastro"
+  eyebrow="Investimentos"
+  title="Adicionar lançamento"
+  subtitle="Registre compra, venda ou movimento na sua carteira."
+  size="md"
+  (close)="closeCadastro.emit()">
+
+  <div modal-body>
+    <div class="launch-type">
+      <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'COMPRA'" (click)="setCadastroOperacao.emit('COMPRA')">Compra</button>
+      <button type="button" class="launch-pill" [class.active]="cadastroOperacao === 'VENDA'" (click)="setCadastroOperacao.emit('VENDA')">Venda</button>
+    </div>
+    @if (cadastroOperacao === 'COMPRA') {
+      <div class="form grid-form">
+        <div>
+          <label>Tipo de ativo</label>
+          <select [(ngModel)]="novaPosicao.type" name="type">
+            @for (t of tipos; track trackByIndex($index)) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label>Ativo</label>
+          <input type="text" [(ngModel)]="novaPosicao.asset" name="asset" placeholder="Ex.: Tesouro Selic 2029" />
+        </div>
+        <div>
+          <label>Moeda</label>
+          <select [(ngModel)]="novaPosicao.currency" name="currency">
+            @for (c of currencyOptions; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label>Quantidade</label>
+          <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.quantity" name="quantity" />
+        </div>
+        <div>
+          <label>Preço{{ novaPosicao.currency === 'BRL' ? ' em R$' : '' }}</label>
+          <input type="number" min="0" step="any" [(ngModel)]="novaPosicao.avgPrice" name="avgPrice" />
+        </div>
+        <div>
+          <label>Outros custos <span class="muted">(opcional)</span></label>
+          <input type="number" min="0" step="any" [ngModel]="cadastroCustos" (ngModelChange)="cadastroCustosChange.emit($event)" name="cadastroCustos" />
+        </div>
+        <div>
+          <label>Data da compra</label>
+          <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
+        </div>
+        <div>
+          <label>Conta/Corretora</label>
+          <input type="text" [(ngModel)]="novaPosicao.account" name="account" placeholder="Ex.: Nubank, XP" list="brokerOptions" />
+          <datalist id="brokerOptions">
+            @for (inst of institutions; track trackByIndex($index)) {
+              <option [value]="inst.name"></option>
+            }
+          </datalist>
+        </div>
+        <div>
+          <label>Categoria (opcional)</label>
+          <input type="text" [(ngModel)]="novaPosicao.category" name="category" placeholder="RF, Ações, etc." />
+        </div>
+      </div>
+    }
+    @if (cadastroOperacao === 'VENDA') {
+      <div class="form grid-form">
+        <div>
+          <label>Ativo</label>
+          <select [ngModel]="vendaPositionId" name="vendaPositionId" (ngModelChange)="vendaPositionSelected.emit($event)">
+            <option value="">Selecione</option>
+            @for (p of posicoesVendaveis; track trackById($index, p)) {
+              <option [value]="p.id">{{ p.asset }} ({{ p.quantity | number:'1.0-4' }})</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label>Quantidade</label>
+          <input type="number" min="0" step="any" [(ngModel)]="venda.quantity" name="vendaQuantity" />
+        </div>
+        <div>
+          <label>Preço em R$</label>
+          <input type="number" min="0" step="any" [(ngModel)]="venda.price" name="vendaPrice" />
+        </div>
+        <div>
+          <label>Outros custos <span class="muted">(opcional)</span></label>
+          <input type="number" min="0" step="any" [ngModel]="cadastroCustos" (ngModelChange)="cadastroCustosChange.emit($event)" name="vendaCustos" />
+        </div>
+        <div>
+          <label>Data da venda</label>
+          <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
+        </div>
+        <div>
+          <label>Observação (opcional)</label>
+          <input type="text" [(ngModel)]="venda.note" name="vendaNote" placeholder="Ex.: realização parcial" />
+        </div>
+      </div>
+    }
+    <div class="launch-total">
+      <span>{{ cadastroOperacao === 'COMPRA' ? 'Valor total' : 'Valor líquido estimado' }}</span>
+      <strong>{{ (cadastroOperacao === 'COMPRA' ? cadastroValorTotal : vendaValorTotal) | appCurrency }}</strong>
+    </div>
+  </div>
+
+  <div modal-footer>
+    <button class="btn-ghost sm" type="button" (click)="closeCadastro.emit()">Cancelar</button>
+    <button class="btn-primary sm" type="button" (click)="cadastroOperacao === 'COMPRA' ? savePosition.emit() : saveSale.emit()">
+      {{ cadastroOperacao === 'COMPRA' ? 'Adicionar lançamento' : 'Registrar venda' }}
+    </button>
+  </div>
+
+</app-modal>
+
+<app-modal
+  [open]="showMovimento && !!posSelecionada"
+  eyebrow="Investimentos"
+  [title]="'Novo lançamento — ' + (posSelecionada?.asset ?? '')"
+  subtitle="Registre compra, venda ou movimento para esta posição."
+  size="sm"
+  (close)="closeMovimento.emit()">
+
+  <div modal-body>
+    <div class="form inline">
+      <label>Operação</label>
+      <select [(ngModel)]="movimento.type" name="movType">
+        @for (tipo of movimentoTipos; track trackByIndex($index)) {
+          <option [value]="tipo.value">{{ tipo.label }}</option>
+        }
+      </select>
+      <label>Qtd.</label>
+      <input type="number" min="0" step="any" [(ngModel)]="movimento.quantity" name="movQty" />
+      <label>Preço unitário</label>
+      <input type="number" min="0" step="any" [(ngModel)]="movimento.price" name="movPrice" />
+      <label>Outros custos</label>
+      <input type="number" min="0" step="any" [ngModel]="movimentoCustos" (ngModelChange)="movimentoCustosChange.emit($event)" name="movCost" />
+      <label>Data</label>
+      <input type="date" [(ngModel)]="movimento.date" name="movDate" />
+      <label>Nota</label>
+      <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
+    </div>
+    <div class="launch-total">
+      <span>Valor total</span>
+      <strong>{{ movimentoValorTotal | appCurrency }}</strong>
+    </div>
+  </div>
+
+  <div modal-footer>
+    <button class="btn-ghost sm" type="button" (click)="closeMovimento.emit()">Cancelar</button>
+    <button class="btn-primary sm" type="button" (click)="saveMovement.emit()">Salvar movimento</button>
+  </div>
+
+</app-modal>

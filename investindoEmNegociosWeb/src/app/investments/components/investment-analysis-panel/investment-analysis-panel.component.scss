@@ -1,0 +1,215 @@
+:host {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.chart-card {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.visual-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--spacing-2);
+  align-items: start;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+}
+
+.action-card strong {
+  display: block;
+  color: var(--text);
+}
+
+.action-card small {
+  color: var(--text-muted);
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
+}
+
+.section-head h3 {
+  margin: 0;
+}
+
+.section-head__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-bold);
+  cursor: help;
+  padding: 0;
+}
+
+.hint__panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 210px;
+  max-width: 280px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  font-size: var(--text-xs);
+  line-height: var(--line-height-control);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 3;
+}
+
+.hint:hover .hint__panel,
+.hint:focus-visible .hint__panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.allocation-config {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  padding: var(--spacing-1);
+  display: grid;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
+}
+
+.allocation-config__inputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-1);
+}
+
+.allocation-config__inputs label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.allocation-config__inputs input {
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 0.65rem;
+}
+
+.allocation-config__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-1);
+}
+
+.allocation-list {
+  display: grid;
+  gap: var(--spacing-1);
+}
+
+.allocation-item {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  padding: var(--spacing-1);
+  display: grid;
+  gap: 0.25rem;
+}
+
+.allocation-item small {
+  color: var(--text-muted);
+}
+
+.allocation-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-1);
+}
+
+.progress-bar {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 95%, transparent), color-mix(in srgb, var(--info) 75%, transparent));
+}
+
+.progress-bar.slim {
+  height: 8px;
+}
+
+.warning {
+  color: var(--warning-text);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+@media (max-width: 960px) {
+  .visual-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .section-head,
+  .action-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .allocation-config__inputs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

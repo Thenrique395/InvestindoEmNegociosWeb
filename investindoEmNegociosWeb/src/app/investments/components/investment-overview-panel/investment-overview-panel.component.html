@@ -1,0 +1,113 @@
+<section class="executive-grid">
+  <app-transaction-summary-card tone="primary" eyebrow="Patrimônio" [value]="overview.marketValue | appCurrency"
+    [note]="'Investido: ' + (overview.invested | appCurrency)"
+    tooltipText="Valor atual de mercado das posições (usa cotação quando disponível; senão, preço médio).">
+    <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+      <rect x="3" y="7" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18" fill="none" stroke="currentColor" stroke-width="1.7"/>
+    </svg>
+  </app-transaction-summary-card>
+
+  <app-transaction-summary-card [tone]="overview.growth >= 0 ? 'success' : 'danger'" eyebrow="Valorização"
+    [value]="overview.growth | appCurrency" [note]="'Rentabilidade: ' + (overview.profitPercent | number:'1.2-2') + '%'"
+    tooltipText="Diferença entre o valor de mercado e o total investido. Não inclui proventos.">
+    <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+      <path d="M4 18h16M6 15l3-3 3 2 5-6M16 8h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </app-transaction-summary-card>
+
+  <app-transaction-summary-card tone="info" eyebrow="Proventos recebidos" [value]="overview.proventos | appCurrency"
+    [note]="overview.activeCount + ' posição(ões) ativa(s)'"
+    tooltipText="Dividendos, JCP e rendimentos registrados — não entram como aporte nem valorização.">
+    <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+      <ellipse cx="12" cy="6.5" rx="7" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M5 6.5v10c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-10" fill="none" stroke="currentColor" stroke-width="1.7"/>
+    </svg>
+  </app-transaction-summary-card>
+
+  <app-transaction-summary-card [tone]="overview.resultMonth >= 0 ? 'success' : 'warning'" eyebrow="Aportes no mês"
+    [value]="overview.aporteMonth | appCurrency" [note]="'Resgates: ' + (overview.resgateMonth | appCurrency)"
+    tooltipText="Aportes e resgates registrados no mês corrente.">
+    <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+      <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </app-transaction-summary-card>
+</section>
+
+<section class="visual-grid visual-grid--resume">
+  <article class="card chart-card chart-card--allocation">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Evolução do patrimônio</h3>
+      </div>
+      <div class="chart-filters">
+        <select [ngModel]="patrimonioRangeMonths" (ngModelChange)="patrimonioRangeMonthsChange.emit($event)">
+          <option [ngValue]="12">12 meses</option>
+          <option [ngValue]="6">6 meses</option>
+        </select>
+        <select [ngModel]="patrimonioTypeFilter" (ngModelChange)="patrimonioTypeFilterChange.emit($event)">
+          <option value="ALL">Todos os tipos</option>
+          @for (t of tipos; track trackByIndex($index)) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="patrimony-chart">
+      <div class="patrimony-axis">
+        @for (tick of patrimonioAxisTicks; track trackByIndex($index)) {
+          <span>{{ tick | appCurrency }}</span>
+        }
+      </div>
+      <div class="patrimony-plot">
+        <div class="patrimony-chart__bars" [style.gridTemplateColumns]="patrimonioGridColumns">
+          @for (item of patrimonioSeries; track trackByIndex($index)) {
+            <div class="patrimony-column">
+              <div class="patrimony-bars">
+                <div class="patrimony-chart__grid">
+                  @for (_ of gridLines; track trackByIndex($index)) {
+                    <span class="patrimony-chart__line"></span>
+                  }
+                </div>
+                <div class="patrimony-bars__stack">
+                  <span class="bar aplicado" [style.height.%]="(item.aplicado / patrimonioChartMax) * 100"></span>
+                  <span class="bar ganho" [style.height.%]="(item.ganho / patrimonioChartMax) * 100"></span>
+                </div>
+              </div>
+              <span class="chart-hover-tip">
+                Aplicado: {{ item.aplicado | appCurrency }}<br />
+                Ganho: {{ item.ganho | appCurrency }}<br />
+                Total: {{ item.total | appCurrency }}
+              </span>
+              <small class="patrimony-x-label">{{ item.label }}</small>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="legend-row">
+      <span><i class="chip aplicado"></i> Valor aplicado</span>
+      <span><i class="chip ganho"></i> Ganho capital</span>
+      @if (patrimonioEstimado) {
+        <span class="muted">Série estimada pelo saldo atual (histórico mensal insuficiente)</span>
+      }
+    </div>
+  </article>
+
+  <article class="card chart-card">
+    <div class="section-head">
+      <div class="section-head__title">
+        <h3>Ativos na carteira</h3>
+      </div>
+      <div class="chart-filters">
+        <select [ngModel]="carteiraTypeFilter" (ngModelChange)="carteiraTypeFilterChange.emit($event)">
+          <option value="ALL">Todos os tipos</option>
+          @for (t of tipos; track trackByIndex($index)) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <app-donut-chart [items]="carteiraDistribuicaoChart" emptyMessage="Sem dados para a distribuição atual." />
+  </article>
+</section>

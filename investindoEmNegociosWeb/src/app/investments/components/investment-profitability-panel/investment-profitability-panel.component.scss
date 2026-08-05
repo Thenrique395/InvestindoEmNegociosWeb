@@ -1,0 +1,272 @@
+:host {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.chart-card {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.rentabilidade-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 290px) minmax(0, 1fr);
+  gap: var(--spacing-2);
+  align-items: start;
+}
+
+.rentabilidade-side {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.executive-card {
+  min-height: 160px;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.executive-card strong {
+  display: block;
+  font-size: var(--text-3xl);
+  line-height: var(--line-height-heading);
+}
+
+.executive-card small {
+  color: var(--text-muted);
+}
+
+.rent-card strong {
+  font-size: 1.75rem;
+}
+
+.rentabilidade-main {
+  min-height: 460px;
+}
+
+.rentabilidade-chart {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 0.55rem;
+}
+
+.rentabilidade-axis {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  align-items: center;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  padding-bottom: 1.35rem;
+}
+
+.rentabilidade-plot {
+  position: relative;
+  height: 330px;
+  min-width: 0;
+}
+
+.rentabilidade-grid-lines {
+  position: absolute;
+  inset: 0 0 1.35rem 0;
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  pointer-events: none;
+}
+
+.rentabilidade-grid-lines span {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+}
+
+.rentabilidade-plot svg {
+  position: absolute;
+  inset: 0 0 1.35rem 0;
+  width: 100%;
+  height: calc(100% - 1.35rem);
+  overflow: visible;
+}
+
+.rentabilidade-hover-points {
+  position: absolute;
+  inset: 0 0 1.35rem 0;
+  pointer-events: none;
+}
+
+.rentabilidade-hover-point {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  margin-left: -14px;
+  pointer-events: auto;
+}
+
+.rentabilidade-plot .line {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.rentabilidade-plot .line.carteira {
+  stroke: color-mix(in srgb, var(--primary) 82%, white);
+}
+
+.rentabilidade-plot .line.cdi {
+  stroke: var(--benchmark-color, var(--warning));
+}
+
+.rentabilidade-x-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 0.25rem;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.rentabilidade-x-axis small {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-1);
+}
+
+.section-head h3 {
+  margin: 0;
+}
+
+.section-head__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.chart-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.chart-filters select {
+  min-width: 150px;
+  max-width: 180px;
+}
+
+.chart-hover-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  min-width: 170px;
+  max-width: 220px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  font-size: var(--text-xs);
+  line-height: var(--line-height-control);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 4;
+}
+
+.rentabilidade-hover-point:hover .chart-hover-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.chip {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+
+.chip.carteira {
+  background: color-mix(in srgb, var(--primary) 82%, white);
+}
+
+.chip.cdi {
+  background: color-mix(in srgb, var(--warning) 85%, white);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap th,
+.table-wrap td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.success {
+  color: var(--success-text);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+@media (max-width: 960px) {
+  .rentabilidade-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .rentabilidade-chart {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .chart-filters {
+    flex-wrap: wrap;
+  }
+
+  .chart-filters select {
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 140px;
+  }
+
+  .rentabilidade-x-axis small:not(:nth-child(3n + 1)) {
+    display: none;
+  }
+}

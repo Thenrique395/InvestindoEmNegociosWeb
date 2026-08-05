@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule, DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import {
   InvestmentsService,
   B3ExtractResponse,
@@ -18,12 +17,9 @@ import { SUPPORTED_CURRENCIES } from '../utils/locale-settings';
 import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { firstValueFrom } from 'rxjs';
-import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
-import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
-import { ModalComponent } from '../shared/modal/modal.component';
-import { DonutChartComponent } from '../shared/donut-chart/donut-chart.component';
+import { InvestmentAnalysisPanelComponent } from './components/investment-analysis-panel/investment-analysis-panel.component';
 import { InvestmentAssetsListComponent, InvestmentPositionSortKey } from './components/investment-assets-list/investment-assets-list.component';
 import {
   ConsolidationBucket,
@@ -31,6 +27,17 @@ import {
   InvestmentConsolidationPanelComponent
 } from './components/investment-consolidation-panel/investment-consolidation-panel.component';
 import { InvestmentDividendsPanelComponent } from './components/investment-dividends-panel/investment-dividends-panel.component';
+import { InvestmentImportModalComponent } from './components/investment-import-modal/investment-import-modal.component';
+import {
+  InvestmentLaunchModalsComponent,
+  InvestmentLaunchOperation
+} from './components/investment-launch-modals/investment-launch-modals.component';
+import { InvestmentOverviewPanelComponent, PatrimonyBucket } from './components/investment-overview-panel/investment-overview-panel.component';
+import {
+  InvestmentProfitabilityPanelComponent,
+  ProfitabilityPoint,
+  ProfitabilityYearRow
+} from './components/investment-profitability-panel/investment-profitability-panel.component';
 import { buildInvestmentsOverview, InvestmentsOverview } from './investments-overview.model';
 import {
   AllocationInvestmentType,
@@ -48,28 +55,19 @@ import {
 } from '../utils/investments.utils';
 
 type FormMode = 'create' | 'movement';
-type CadastroOperacao = 'COMPRA' | 'VENDA';
+type CadastroOperacao = InvestmentLaunchOperation;
 type InvestmentsTab = 'RESUMO' | 'CONSOLIDACAO' | 'PROVENTOS' | 'RENTABILIDADE' | 'ANALISE';
 type ChartBucket = { key: string; label: string; aporte: number; resgate: number; proventos: number; saldo: number };
-type PatrimonioBucket = { key: string; label: string; aplicado: number; ganho: number; total: number };
+type PatrimonioBucket = PatrimonyBucket;
 type PositionSortKey = InvestmentPositionSortKey;
 type ProventoMonthBucket = { key: string; label: string; total: number };
 type ConsolidacaoBucket = ConsolidationBucket;
 type ConsolidacaoMovimentoRow = ConsolidationMovementRow;
-type RentabilidadeMonthPoint = {
-  key: string;
-  year: number;
-  month: number;
-  label: string;
-  carteiraMes: number;
-  benchmarkMes: number;
-  carteiraAc: number;
-  benchmarkAc: number;
-};
+type RentabilidadeMonthPoint = ProfitabilityPoint;
 @Component({
   selector: 'app-investments',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, AppCurrencyPipe, PageHeaderComponent, TransactionSummaryCardComponent, SegmentedSelectorComponent, ModalComponent, DonutChartComponent, InvestmentAssetsListComponent, InvestmentConsolidationPanelComponent, InvestmentDividendsPanelComponent],
+  imports: [CommonModule, PageHeaderComponent, SegmentedSelectorComponent, InvestmentAnalysisPanelComponent, InvestmentAssetsListComponent, InvestmentConsolidationPanelComponent, InvestmentDividendsPanelComponent, InvestmentImportModalComponent, InvestmentLaunchModalsComponent, InvestmentOverviewPanelComponent, InvestmentProfitabilityPanelComponent],
   templateUrl: './investments.component.html',
   styleUrls: ['./investments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -614,10 +612,6 @@ export class InvestmentsComponent implements OnInit {
     return Array.from({ length: steps + 1 }, (_, i) => top - i * niceStep);
   }
 
-  formatPatrimonioAxisValue(value: number): string {
-    return this.currencyFormatter.format(value);
-  }
-
   get carteiraDistribuicaoChart(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
     const base = this.distribuicaoPorTipoComCor;
     if (this.carteiraTypeFilter === 'ALL') return base;
@@ -875,7 +869,7 @@ export class InvestmentsComponent implements OnInit {
     return this.benchmarkOptions.find((item) => item.key === this.rentabilidadeBenchmark)?.color || 'var(--warning)';
   }
 
-  get rentabilidadeTabelaAnual(): Array<{ year: number; months: Array<number | null>; yearValue: number; acumulado: number }> {
+  get rentabilidadeTabelaAnual(): ProfitabilityYearRow[] {
     const byYear = new Map<number, RentabilidadeMonthPoint[]>();
     for (const point of this.rentabilidadeSeriesFull) {
       const list = byYear.get(point.year) || [];
@@ -892,12 +886,6 @@ export class InvestmentsComponent implements OnInit {
         const acumulado = points[points.length - 1]?.carteiraAc || 0;
         return { year, months, yearValue, acumulado };
       });
-  }
-
-  comparativoCdiLabel(carteira: number, benchmark: number): string {
-    const diff = carteira - benchmark;
-    const prefix = diff >= 0 ? 'acima' : 'abaixo';
-    return `${Math.abs(diff).toFixed(2)}% ${prefix} do ${this.indiceSelecionadoLabel}`;
   }
 
   private buildRentabilidadePolyline(field: 'carteiraAc' | 'benchmarkAc'): string {
@@ -1229,6 +1217,11 @@ export class InvestmentsComponent implements OnInit {
   onVendaPositionChange(): void {
     const pos = this.positions.find((p) => p.id === this.vendaPositionId);
     this.venda.price = pos?.avgPrice || 0;
+  }
+
+  onVendaPositionSelected(positionId: string): void {
+    this.vendaPositionId = positionId;
+    this.onVendaPositionChange();
   }
 
   setCadastroOperacao(tipo: CadastroOperacao): void {

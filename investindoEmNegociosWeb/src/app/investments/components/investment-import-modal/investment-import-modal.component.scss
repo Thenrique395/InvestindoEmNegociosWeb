@@ -1,0 +1,128 @@
+.muted {
+  color: var(--text-muted);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.hidden {
+  display: none;
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.executive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.executive-card {
+  min-height: 160px;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.executive-card strong {
+  display: block;
+  font-size: var(--text-3xl);
+  line-height: var(--line-height-heading);
+}
+
+.import-upload {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  flex-wrap: wrap;
+}
+
+.import-compact {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.import-upload__button {
+  display: inline-flex;
+}
+
+.import-section {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  padding: var(--spacing-1);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.import-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.csv-preview {
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
+  padding: 0.45rem 0.6rem;
+}
+
+.csv-preview summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+.csv-preview[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap th,
+.table-wrap td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.filter {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.filter select {
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 0.65rem;
+}
+
+@media (max-width: 640px) {
+  .executive-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
