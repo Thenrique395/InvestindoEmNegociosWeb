@@ -132,6 +132,8 @@ export class HomeComponent implements OnInit {
   totalRendas = 0;
   totalRendasPendentes = 0;
   totalDespesas = 0;
+  totalDespesasPagas = 0;
+  totalDespesasEmAberto = 0;
   saldo = 0;
   saldoAnterior = 0;
   periodo: 'month' | 'quarter' | 'year' = 'month';
@@ -300,7 +302,7 @@ export class HomeComponent implements OnInit {
     this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expensesLoaded = true;
       this.expensesRaw = lista;
-      this.totalDespesas = this.somarDespesasMes(lista);
+      this.updatePeriodTotals();
       this.atualizarSaldo();
       this.updateCategoryCharts();
       this.atualizarDividaCartoes();
@@ -314,8 +316,7 @@ export class HomeComponent implements OnInit {
     this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.incomesLoaded = true;
       this.incomesRaw = lista;
-      this.totalRendas = this.somarRendasMes(lista);
-      this.totalRendasPendentes = this.somarRendasPendentesMes(lista);
+      this.updatePeriodTotals();
       this.atualizarSaldo();
       this.updateCategoryCharts();
       this.updateRecentTransactions();
@@ -680,15 +681,15 @@ export class HomeComponent implements OnInit {
   }
 
   get saldoDisponivelReal(): number {
-    return this.realBalanceSummary?.realAvailableBalance ?? (this.totalSaldoContas - this.totalDespesas);
+    return this.realBalanceSummary?.realAvailableBalance ?? (this.totalSaldoContas - this.totalDespesasEmAberto);
   }
 
   get saldoDisponivelProjetado(): number {
-    return this.realBalanceSummary?.projectedAvailableBalance ?? (this.totalSaldoContas - this.totalDespesas + this.totalRendasPendentes);
+    return this.realBalanceSummary?.projectedAvailableBalance ?? (this.totalSaldoContas - this.totalDespesasEmAberto + this.totalRendasPendentes);
   }
 
   get pendenciasCaixa(): number {
-    return this.realBalanceSummary?.pendingExpensesAmount ?? this.totalDespesas;
+    return this.realBalanceSummary?.pendingExpensesAmount ?? this.totalDespesasEmAberto;
   }
 
   get patrimonioLiquido(): number {
@@ -723,15 +724,63 @@ export class HomeComponent implements OnInit {
     return String(this.dataAtual.getFullYear());
   }
 
+  get periodoContextoDashboard(): FinancialOverviewInput['periodoContexto'] {
+    switch (this.periodo) {
+      case 'quarter':
+        return {
+          nome: 'trimestre',
+          nomeComArtigo: 'no trimestre',
+          detalheReceitas: 'A receber no trimestre',
+          detalheDespesas: 'A pagar no trimestre',
+          detalheProjetado: 'Projetado no trimestre'
+        };
+      case 'year':
+        return {
+          nome: 'ano',
+          nomeComArtigo: 'no ano',
+          detalheReceitas: 'A receber no ano',
+          detalheDespesas: 'A pagar no ano',
+          detalheProjetado: 'Projetado no ano'
+        };
+      default:
+        return {
+          nome: 'mês',
+          nomeComArtigo: 'no mês',
+          detalheReceitas: 'A receber no mês',
+          detalheDespesas: 'A pagar no mês',
+          detalheProjetado: 'Projetado no mês'
+        };
+    }
+  }
+
+  get patrimonioChartDescription(): string {
+    if (this.periodo === 'month') {
+      return `Realizado e projeção financeira de ${formatMonthYearLabel(this.dataAtual)}.`;
+    }
+    if (this.periodo === 'quarter') {
+      return `Realizado e projeção financeira de ${this.mesAtualLabel}.`;
+    }
+    return `Realizado e projeção financeira de janeiro a dezembro de ${this.patrimonioChartYearLabel}.`;
+  }
+
   get patrimonioHistoryDelta(): number {
-    return netWorthDelta(this.patrimonioHistoryPoints);
+    return netWorthDelta(this.patrimonioPeriodHistoryPoints);
+  }
+
+  get patrimonioPeriodHistoryPoints() {
+    const range = this.getPeriodRange();
+    return this.patrimonioHistoryPoints.filter((point) => {
+      const key = point.referenceDate.slice(0, 7);
+      return this.isWithinRange(key, range);
+    });
   }
 
   get patrimonioLinePoints(): NetWorthLinePoint[] {
-    const historyPoints = this.patrimonioHistoryPoints;
+    const historyPoints = this.patrimonioPeriodHistoryPoints;
     const historyByKey = new Map(historyPoints.map((point) => [point.referenceDate.slice(0, 7), point]));
-    const basePoints = this.monthlyFlowSeries.length
-      ? this.monthlyFlowSeries
+    const flowSeries = this.patrimonioPeriodFlowSeries;
+    const basePoints = flowSeries.length
+      ? flowSeries
       : historyPoints.map((point) => ({
           key: point.referenceDate.slice(0, 7),
           label: point.label,
@@ -801,22 +850,6 @@ export class HomeComponent implements OnInit {
     return `${line} L ${last.x.toFixed(1)} ${bottom} L ${first.x.toFixed(1)} ${bottom} Z`;
   }
 
-  get patrimonioAnnualIncome(): number {
-    return this.monthlyFlowSeries.reduce((sum, point) => sum + point.income, 0);
-  }
-
-  get patrimonioAnnualExpense(): number {
-    return this.monthlyFlowSeries.reduce((sum, point) => sum + point.expense, 0);
-  }
-
-  get patrimonioAnnualResult(): number {
-    return this.patrimonioAnnualIncome - this.patrimonioAnnualExpense;
-  }
-
-  get patrimonioAnnualMargin(): number {
-    return this.patrimonioAnnualIncome > 0 ? (this.patrimonioAnnualResult / this.patrimonioAnnualIncome) * 100 : 0;
-  }
-
   get patrimonioAxisTicks(): NetWorthAxisTick[] {
     const { minValue, maxValue } = this.netWorthChartDomain();
     if (minValue === maxValue) {
@@ -842,13 +875,13 @@ export class HomeComponent implements OnInit {
   private netWorthChartDomain(): { minValue: number; maxValue: number } {
     const values: number[] = [];
     if (this.isPatrimonioSeriesVisible('netWorth')) {
-      values.push(...this.patrimonioHistoryPoints.map((point) => point.netWorth));
+      values.push(...this.patrimonioPeriodHistoryPoints.map((point) => point.netWorth));
     }
     if (this.isPatrimonioSeriesVisible('income')) {
-      values.push(...this.monthlyFlowSeries.map((point) => point.income));
+      values.push(...this.patrimonioPeriodFlowSeries.map((point) => point.income));
     }
     if (this.isPatrimonioSeriesVisible('expense')) {
-      values.push(...this.monthlyFlowSeries.map((point) => point.expense));
+      values.push(...this.patrimonioPeriodFlowSeries.map((point) => point.expense));
     }
     if (!values.length) return { minValue: 0, maxValue: 0 };
 
@@ -897,6 +930,11 @@ export class HomeComponent implements OnInit {
 
   get patrimonioHistoryEstimated(): boolean {
     return !!this.netWorthHistory?.hasEstimatedPoints;
+  }
+
+  private get patrimonioPeriodFlowSeries(): MonthlyFlowPoint[] {
+    const range = this.getPeriodRange();
+    return this.monthlyFlowSeries.filter((point) => this.isWithinRange(point.key, range));
   }
 
   get projectionHighlights(): Array<{
@@ -977,6 +1015,14 @@ export class HomeComponent implements OnInit {
     this.saldo = this.saldoPrincipal;
   }
 
+  private updatePeriodTotals(): void {
+    this.totalDespesas = this.somarDespesasMes(this.expensesRaw);
+    this.totalDespesasPagas = this.somarDespesasPagasMes(this.expensesRaw);
+    this.totalDespesasEmAberto = this.somarDespesasEmAbertoMes(this.expensesRaw);
+    this.totalRendas = this.somarRendasMes(this.incomesRaw);
+    this.totalRendasPendentes = this.somarRendasPendentesMes(this.incomesRaw);
+  }
+
   private isDateInRange(date: string, range: { startKey: string; endKey: string }): boolean {
     const key = monthKeyFromLocaleDate(date);
     return key ? this.isWithinRange(key, range) : false;
@@ -988,6 +1034,24 @@ export class HomeComponent implements OnInit {
   ): number {
     return lista
       .filter((d) => this.isDateInRange(d.vencimento, range))
+      .reduce((sum, d) => sum + (d.valor || 0), 0);
+  }
+
+  private somarDespesasPagasMes(
+    lista: StoredExpense[],
+    range: { startKey: string; endKey: string } = this.getPeriodRange()
+  ): number {
+    return lista
+      .filter((d) => this.isDateInRange(d.vencimento, range) && !isExpenseOpen(d.status))
+      .reduce((sum, d) => sum + (d.valor || 0), 0);
+  }
+
+  private somarDespesasEmAbertoMes(
+    lista: StoredExpense[],
+    range: { startKey: string; endKey: string } = this.getPeriodRange()
+  ): number {
+    return lista
+      .filter((d) => this.isDateInRange(d.vencimento, range) && isExpenseOpen(d.status))
       .reduce((sum, d) => sum + (d.valor || 0), 0);
   }
 
@@ -1091,12 +1155,20 @@ export class HomeComponent implements OnInit {
   }
 
   private updateMonthlyFlow(): void {
+    const range = this.getPeriodRange();
+    const reference = rangeEndDate(range.endKey);
     this.monthlyFlowSeries = buildMonthlyFlowSeries(
       this.expensesRaw,
       this.incomesRaw,
-      new Date(this.dataAtual.getFullYear(), 11, 1),
-      12
+      reference,
+      this.periodMonthsCount()
     );
+  }
+
+  private periodMonthsCount(): number {
+    if (this.periodo === 'year') return 12;
+    if (this.periodo === 'quarter') return 3;
+    return 1;
   }
 
   private updateUpcomingDueItems(): void {
@@ -1143,7 +1215,9 @@ export class HomeComponent implements OnInit {
     const hasPrevExpenses = this.expensesRaw.some((d) => this.isDateInRange(d.vencimento, prevRange));
     const hasPrevIncomes = this.incomesRaw.some((r) => this.isDateInRange(r.recebimento, prevRange));
     this.despesasPeriodoAnterior = hasPrevExpenses ? this.somarDespesasMes(this.expensesRaw, prevRange) : null;
-    this.receitasPeriodoAnterior = hasPrevIncomes ? this.somarRendasMes(this.incomesRaw, prevRange) : null;
+    this.receitasPeriodoAnterior = hasPrevIncomes
+      ? this.somarRendasMes(this.incomesRaw, prevRange) + this.somarRendasPendentesMes(this.incomesRaw, prevRange)
+      : null;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1185,6 +1259,7 @@ export class HomeComponent implements OnInit {
 
   get overviewData(): FinancialOverviewInput {
     return {
+      periodoContexto: this.periodoContextoDashboard,
       saldoPeriodo: this.saldo,
       saldoDisponivel: this.saldoDisponivelReal,
       saldoEmContas: this.totalSaldoContas,
@@ -1195,13 +1270,18 @@ export class HomeComponent implements OnInit {
         pendentes: this.totalRendasPendentes,
         anterior: this.receitasPeriodoAnterior
       },
-      despesas: { total: this.totalDespesas, anterior: this.despesasPeriodoAnterior },
+      despesas: {
+        total: this.totalDespesas,
+        pagas: this.totalDespesasPagas,
+        emAberto: this.totalDespesasEmAberto,
+        anterior: this.despesasPeriodoAnterior
+      },
       patrimonio: {
         liquido: this.patrimonioLiquido,
         ativos: this.patrimonioTotalAtivos,
         passivos: this.patrimonioPassivos,
         investimentos: this.patrimonioEmInvestimentos,
-        delta: this.patrimonioHistoryPoints.length > 1 ? this.patrimonioHistoryDelta : null
+        delta: this.patrimonioPeriodHistoryPoints.length > 1 ? this.patrimonioHistoryDelta : null
       },
       compromissos: {
         ...this.compromissosResumo,
@@ -1343,13 +1423,12 @@ export class HomeComponent implements OnInit {
 
   setPeriodo(periodo: 'month' | 'quarter' | 'year'): void {
     this.periodo = periodo;
-    this.totalDespesas = this.somarDespesasMes(this.expensesRaw);
-    this.totalRendas = this.somarRendasMes(this.incomesRaw);
-    this.totalRendasPendentes = this.somarRendasPendentesMes(this.incomesRaw);
+    this.updatePeriodTotals();
     this.atualizarSaldo();
     this.refreshSummaries();
     this.updateCategoryCharts();
     this.updateRecentTransactions();
+    this.updateMonthlyFlow();
     this.updateOverviewDerived();
     this.updateInsight();
   }
@@ -1509,8 +1588,12 @@ export class HomeComponent implements OnInit {
     }
 
     this.subNetWorthHistory?.unsubscribe();
+    const months = this.periodMonthsCount();
+    const referenceDate = this.periodo === 'year'
+      ? this.toIsoDate(new Date(this.dataAtual.getFullYear(), 11, 31))
+      : this.toIsoDate(rangeEndDate(this.getPeriodRange().endKey));
     this.subNetWorthHistory = this.accountsService
-      .getNetWorthHistory(12, this.toIsoDate(new Date(this.dataAtual.getFullYear(), 11, 31)))
+      .getNetWorthHistory(months, referenceDate)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (history) => {

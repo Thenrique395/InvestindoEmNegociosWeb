@@ -23,33 +23,33 @@
     @if (hasAccess('Advanced') && patrimonioChartMonthsCount) {
       <app-section-card
         title="Evolução patrimonial"
-        [description]="'Receitas, despesas e patrimônio líquido de janeiro a dezembro de ' + patrimonioChartYearLabel + '.'">
+        [description]="patrimonioChartDescription">
         <div card-actions class="flex flex-wrap items-center gap-2">
-          @if (patrimonioHistoryPoints.length > 1) {
+          @if (patrimonioPeriodHistoryPoints.length > 1) {
             <app-comparison-pill
-              label="no período"
+              [label]="periodoContextoDashboard.nomeComArtigo"
               [trend]="patrimonioHistoryDelta >= 0 ? 'up' : 'down'">
               {{ patrimonioHistoryDelta >= 0 ? '+' : '' }}{{ patrimonioHistoryDelta | appCurrency }}
             </app-comparison-pill>
           }
-          <app-status-badge tone="muted" [label]="'Atual: ' + (patrimonioLiquido | appCurrency)"></app-status-badge>
+          <app-status-badge tone="muted" [label]="'Projetado: ' + (saldoDisponivelProjetado | appCurrency)"></app-status-badge>
         </div>
         <div class="networth-summary">
           <div class="networth-summary__item networth-summary__item--income">
-            <span>Receitas</span>
-            <strong>{{ patrimonioAnnualIncome | appCurrency }}</strong>
+            <span>Receitas recebidas</span>
+            <strong>{{ totalRendas | appCurrency }}</strong>
+          </div>
+          <div class="networth-summary__item networth-summary__item--income">
+            <span>{{ periodoContextoDashboard.detalheReceitas }}</span>
+            <strong>{{ totalRendasPendentes | appCurrency }}</strong>
           </div>
           <div class="networth-summary__item networth-summary__item--expense">
-            <span>Despesas</span>
-            <strong>{{ patrimonioAnnualExpense | appCurrency }}</strong>
+            <span>{{ periodoContextoDashboard.detalheDespesas }}</span>
+            <strong>{{ totalDespesasEmAberto | appCurrency }}</strong>
           </div>
           <div class="networth-summary__item networth-summary__item--result">
-            <span>Resultado</span>
-            <strong>{{ patrimonioAnnualResult | appCurrency }}</strong>
-          </div>
-          <div class="networth-summary__item">
-            <span>Margem</span>
-            <strong>{{ patrimonioAnnualMargin | number:'1.0-1' }}%</strong>
+            <span>Saldo projetado</span>
+            <strong>{{ saldoDisponivelProjetado | appCurrency }}</strong>
           </div>
         </div>
         <div class="networth-chart">
@@ -57,7 +57,7 @@
             class="networth-chart__svg"
             viewBox="0 0 640 130"
             role="img"
-            [attr.aria-label]="'Evolução patrimonial de janeiro a dezembro de ' + patrimonioChartYearLabel">
+            [attr.aria-label]="patrimonioChartDescription">
             @for (tick of patrimonioAxisTicks; track trackByIndex($index, tick)) {
               <g class="networth-chart__grid" [class.networth-chart__grid--zero]="tick.isZero">
                 <line x1="64" x2="620" [attr.y1]="tick.y" [attr.y2]="tick.y" />
@@ -140,6 +140,10 @@
         @if (patrimonioHistoryEstimated) {
           <p class="m-0 mt-3 text-sm text-[var(--text-muted)]">
             Série estimada a partir do histórico disponível de contas, pagamentos e movimentos de investimento.
+          </p>
+        } @else {
+          <p class="m-0 mt-3 text-sm text-[var(--text-muted)]">
+            Valores previstos não alteram o saldo disponível até serem confirmados.
           </p>
         }
       </app-section-card>

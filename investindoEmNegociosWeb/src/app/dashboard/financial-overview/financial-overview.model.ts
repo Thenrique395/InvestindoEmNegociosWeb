@@ -8,13 +8,20 @@ export type OverviewPeriodo = 'month' | 'quarter' | 'year';
  * `null` significa "sem dados" — nunca inventar valor no lugar.
  */
 export interface FinancialOverviewInput {
+  periodoContexto: {
+    nome: string;
+    nomeComArtigo: string;
+    detalheReceitas: string;
+    detalheDespesas: string;
+    detalheProjetado: string;
+  };
   saldoPeriodo: number;
   saldoDisponivel: number;
   saldoEmContas: number;
   pendencias: number;
   saldoProjetado: number;
   receitas: { total: number; pendentes: number; anterior: number | null };
-  despesas: { total: number; anterior: number | null };
+  despesas: { total: number; pagas: number; emAberto: number; anterior: number | null };
   patrimonio: {
     liquido: number;
     ativos: number;
@@ -155,8 +162,8 @@ function buildSaldoCard(input: FinancialOverviewInput, intermediate: boolean, fm
     question: 'Quanto você tem para usar?',
     value: fmt(input.saldoDisponivel),
     delta: null,
-    note: `Em contas: ${fmt(input.saldoEmContas)} · Pendências: ${fmt(input.pendencias)} · Projetado: ${fmt(input.saldoProjetado)}`,
-    tooltip: 'Saldo disponível real = saldo atual das contas ativas menos despesas ainda pendentes no período selecionado.',
+    note: `Em contas: ${fmt(input.saldoEmContas)} · ${input.periodoContexto.detalheDespesas}: ${fmt(input.pendencias)} · ${input.periodoContexto.detalheProjetado}: ${fmt(input.saldoProjetado)}`,
+    tooltip: 'Saldo disponível real = saldo atual das contas ativas. A projeção considera receitas pendentes e despesas em aberto do período selecionado.',
     detailsRoute: '/contas',
     detailsLabel: 'Ver contas'
   };
@@ -176,23 +183,24 @@ function buildPatrimonioCard(input: FinancialOverviewInput, fmt: CurrencyFormatt
         : {
             direction: patrimonio.delta > 0 ? 'up' : 'down',
             favorable: patrimonio.delta > 0,
-            text: `${patrimonio.delta > 0 ? '+' : '−'}${fmt(Math.abs(patrimonio.delta))} no período`
+            text: `${patrimonio.delta > 0 ? '+' : '−'}${fmt(Math.abs(patrimonio.delta))} ${input.periodoContexto.nomeComArtigo}`
           },
     note: `Ativos: ${fmt(patrimonio.ativos)} · Passivos: ${fmt(patrimonio.passivos)} · Investimentos: ${fmt(patrimonio.investimentos)}`,
-    tooltip: 'Patrimônio líquido = ativos consolidados em contas, investimentos e patrimônio manual menos obrigações em aberto.'
+    tooltip: 'Patrimônio líquido = posição atual de ativos menos passivos. A variação respeita o período selecionado.'
   };
 }
 
 function buildReceitasCard(input: FinancialOverviewInput, deltaLabel: string, fmt: CurrencyFormatter): OverviewCard {
+  const totalPrevisto = input.receitas.total + input.receitas.pendentes;
   return {
     id: 'receitas',
     tone: 'success',
     title: 'Receitas',
-    question: 'Quanto entrou neste período?',
-    value: fmt(input.receitas.total),
-    delta: buildPercentDelta(input.receitas.total, input.receitas.anterior, deltaLabel, 'upIsGood'),
-    note: `Pendente a receber: ${fmt(input.receitas.pendentes)}`,
-    tooltip: 'Total de receitas com status recebido no período selecionado.',
+    question: 'Quanto entra no período?',
+    value: fmt(totalPrevisto),
+    delta: buildPercentDelta(totalPrevisto, input.receitas.anterior, deltaLabel, 'upIsGood'),
+    note: `Recebidas ${input.periodoContexto.nomeComArtigo}: ${fmt(input.receitas.total)} · ${input.periodoContexto.detalheReceitas}: ${fmt(input.receitas.pendentes)}`,
+    tooltip: 'Total previsto de receitas no período selecionado, separando valores recebidos e pendentes.',
     detailsRoute: '/receitas',
     detailsLabel: 'Ver receitas'
   };
@@ -203,11 +211,11 @@ function buildDespesasCard(input: FinancialOverviewInput, deltaLabel: string, fm
     id: 'despesas',
     tone: 'danger',
     title: 'Despesas',
-    question: 'Quanto saiu neste período?',
+    question: 'Quanto sai no período?',
     value: fmt(input.despesas.total),
     delta: buildPercentDelta(input.despesas.total, input.despesas.anterior, deltaLabel, 'downIsGood'),
-    note: 'Despesas com vencimento no período, incluindo fixas, variáveis e contas.',
-    tooltip: 'Total de despesas com vencimento no período selecionado.',
+    note: `Pagas ${input.periodoContexto.nomeComArtigo}: ${fmt(input.despesas.pagas)} · ${input.periodoContexto.detalheDespesas}: ${fmt(input.despesas.emAberto)}`,
+    tooltip: 'Total de despesas do período selecionado, separando valores pagos e obrigações em aberto.',
     detailsRoute: '/despesas',
     detailsLabel: 'Ver despesas'
   };

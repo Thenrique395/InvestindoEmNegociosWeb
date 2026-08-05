@@ -9,13 +9,20 @@ const fmt = (value: number) => `R$ ${value.toFixed(2)}`;
 
 function baseInput(overrides: Partial<FinancialOverviewInput> = {}): FinancialOverviewInput {
   return {
+    periodoContexto: {
+      nome: 'mês',
+      nomeComArtigo: 'no mês',
+      detalheReceitas: 'A receber no mês',
+      detalheDespesas: 'A pagar no mês',
+      detalheProjetado: 'Projetado no mês'
+    },
     saldoPeriodo: 500,
     saldoDisponivel: 1200,
     saldoEmContas: 2000,
     pendencias: 800,
     saldoProjetado: 1500,
     receitas: { total: 3000, pendentes: 200, anterior: null },
-    despesas: { total: 1800, anterior: null },
+    despesas: { total: 1800, pagas: 700, emAberto: 1100, anterior: null },
     patrimonio: { liquido: 10000, ativos: 12000, passivos: 2000, investimentos: 5000, delta: null },
     compromissos: { emAtraso: 0, proximosSeteDias: 0, valorEmAberto: 0, dividaCartoes: 0, temCartoes: false },
     saude: null,
@@ -61,7 +68,7 @@ describe('financial-overview.model', () => {
     });
 
     it('mostra variação percentual com rótulo do período selecionado', () => {
-      const input = baseInput({ despesas: { total: 1800, anterior: 2000 } });
+      const input = baseInput({ despesas: { total: 1800, pagas: 700, emAberto: 1100, anterior: 2000 } });
       const card = buildOverviewCards(input, 'Basic', 'quarter', fmt).find((c) => c.id === 'despesas')!;
       expect(card.delta).not.toBeNull();
       expect(card.delta!.direction).toBe('down');
@@ -76,6 +83,21 @@ describe('financial-overview.model', () => {
 
       const up = buildOverviewCards(baseInput({ receitas: { total: 1100, pendentes: 0, anterior: 1000 } }), 'Basic', 'month', fmt);
       expect(up.find((c) => c.id === 'receitas')!.delta!.favorable).toBeTrue();
+    });
+
+    it('separa valores realizados e previstos no período selecionado', () => {
+      const cards = buildOverviewCards(baseInput(), 'Intermediate', 'month', fmt);
+      const saldo = cards.find((c) => c.id === 'saldo')!;
+      const receitas = cards.find((c) => c.id === 'receitas')!;
+      const despesas = cards.find((c) => c.id === 'despesas')!;
+
+      expect(saldo.note).toContain('A pagar no mês');
+      expect(saldo.note).toContain('Projetado no mês');
+      expect(receitas.value).toBe(fmt(3200));
+      expect(receitas.note).toContain('Recebidas no mês');
+      expect(receitas.note).toContain('A receber no mês');
+      expect(despesas.note).toContain('Pagas no mês');
+      expect(despesas.note).toContain('A pagar no mês');
     });
   });
 
@@ -96,7 +118,7 @@ describe('financial-overview.model', () => {
       const summary = buildOverviewSummary(
         baseInput({
           patrimonio: { liquido: 10000, ativos: 12000, passivos: 2000, investimentos: 5000, delta: 950 },
-          despesas: { total: 1800, anterior: 2400 }
+          despesas: { total: 1800, pagas: 700, emAberto: 1100, anterior: 2400 }
         }),
         'Advanced',
         'month'
