@@ -5,11 +5,12 @@ import { ProfileService, UserProfile } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
+import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent, SectionCardComponent],
+  imports: [FormsModule, PageHeaderComponent, SectionCardComponent, DatePickerComponent],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })

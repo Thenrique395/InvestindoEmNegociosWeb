@@ -793,7 +793,14 @@ export class DespesasComponent implements OnInit {
   adicionar(): void {
     if (this.saving) return;
     const valor = this.parseValor(this.valorInput);
-    if (!this.novaDespesa.nome || !valor) return;
+    if (!this.novaDespesa.nome) {
+      this.setAlerta('Informe o nome da despesa.', 3000, 'error');
+      return;
+    }
+    if (!valor) {
+      this.setAlerta('Informe um valor maior que zero.', 3000, 'error');
+      return;
+    }
 
     if (!this.novaDespesa.categoryId) {
       this.erroCategoria = 'Selecione uma categoria.';
@@ -825,9 +832,15 @@ export class DespesasComponent implements OnInit {
       return;
     }
 
-    const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
+    // Clamp de sanidade: parcelas no cartão até 36 e duração fixa até 120 meses,
+    // evitando geração em massa de parcelas (e erro do backend por exceder o teto).
+    const parcelas = this.parcelar && this.parcelasCount > 1
+      ? Math.min(Math.max(Math.trunc(this.parcelasCount), 2), 36)
+      : 1;
     const valorParcela = valor;
-    const fixaMeses = this.fixa ? this.fixaMeses || null : null;
+    const fixaMeses = this.fixa && this.fixaMeses
+      ? Math.min(Math.max(Math.trunc(this.fixaMeses), 1), 120)
+      : null;
 
     this.saving = true;
     // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.

@@ -56,7 +56,7 @@
       </label>
       <label>
         Data de nascimento
-        <input type="date" [(ngModel)]="dataNascimento" />
+        <app-date-picker format="iso" [value]="dataNascimento" (valueChange)="dataNascimento = $event" ariaLabel="Data de nascimento" />
       </label>
       <label>
         Cidade

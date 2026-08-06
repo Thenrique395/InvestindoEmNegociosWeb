@@ -18,8 +18,12 @@ export const formatCurrencyFromDigits = (digits: string, locale = getActiveLocal
   return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
 };
 
+// Teto de 11 dígitos = até 999.999.999,99, mantendo o valor dentro de numeric(14,2)
+// do backend (evita erro 500 por overflow) e alinhado ao MoneyLimits.MaxAmount da API.
+export const MAX_MONEY_DIGITS = 11;
+
 export const maskMoneyInput = (value: string): string => {
-  const digits = onlyDigits(value);
+  const digits = onlyDigits(value).slice(0, MAX_MONEY_DIGITS);
   return formatCurrencyFromDigits(digits);
 };
 

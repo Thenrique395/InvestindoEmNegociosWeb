@@ -3,6 +3,8 @@ import {
   allowOnlyDigitsKeydown,
   formatCurrencyFromDigits,
   maskDateDDMMYYYY,
+  maskMoneyInput,
+  MAX_MONEY_DIGITS,
   maskMonthYear,
   parseDateDDMMYYYY
 } from './input-mask';
@@ -18,6 +20,15 @@ describe('input-mask utils', () => {
     setLocaleSettings({ locale: 'pt-BR', currency: 'BRL' });
     expect(formatCurrencyFromDigits('1234')).toBe('12,34');
     expect(formatCurrencyFromDigits('')).toBe('');
+  });
+
+  it('limita o valor a MAX_MONEY_DIGITS (evita overflow numeric(14,2) -> 500)', () => {
+    setLocaleSettings({ locale: 'pt-BR', currency: 'BRL' });
+    expect(MAX_MONEY_DIGITS).toBe(11);
+    // 15 dígitos -> corta em 11 -> 999.999.999,99 (teto)
+    expect(maskMoneyInput('999999999999999')).toBe('999.999.999,99');
+    // valor normal continua intacto
+    expect(maskMoneyInput('150000')).toBe('1.500,00');
   });
 
   it('mascara data em pt-BR e en-US', () => {

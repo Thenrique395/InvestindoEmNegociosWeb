@@ -5,6 +5,7 @@ import { InvestmentPosition, InvestmentType, MovementType } from '../../../inves
 import { InstitutionLookup } from '../../../lookups.service';
 import { AppCurrencyPipe } from '../../../shared/app-currency.pipe';
 import { ModalComponent } from '../../../shared/modal/modal.component';
+import { DatePickerComponent } from '../../../shared/date-picker/date-picker.component';
 
 export type InvestmentLaunchOperation = 'COMPRA' | 'VENDA';
 export type InvestmentSaleForm = { quantity: number; price: number; date: string; note?: string };
@@ -14,7 +15,7 @@ export type InvestmentPositionDraft = Omit<InvestmentPosition, 'id' | 'movements
 @Component({
   selector: 'app-investment-launch-modals',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, AppCurrencyPipe, ModalComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, AppCurrencyPipe, ModalComponent, DatePickerComponent],
   templateUrl: './investment-launch-modals.component.html',
   styleUrl: './investment-launch-modals.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

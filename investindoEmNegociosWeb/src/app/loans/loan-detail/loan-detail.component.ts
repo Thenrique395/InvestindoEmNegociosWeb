@@ -12,6 +12,7 @@ import { AccountsService, AccountResponse } from '../../accounts.service';
 import { UiFeedbackService } from '../../ui-feedback.service';
 import { AppCurrencyPipe } from '../../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
+import { DatePickerComponent } from '../../shared/date-picker/date-picker.component';
 import { TransactionSummaryCardComponent } from '../../shared/transactions/transaction-summary-card.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../../shared/segmented-selector/segmented-selector.component';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
@@ -29,7 +30,7 @@ type LoanDetailTab = 'resumo' | 'parcelas' | 'evolucao' | 'historico';
   selector: 'app-loan-detail',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, RouterModule, AppCurrencyPipe, PageHeaderComponent,
+    CommonModule, FormsModule, RouterModule, AppCurrencyPipe, PageHeaderComponent, DatePickerComponent,
     TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent,
     ConfirmSheetComponent, UiStateComponent, EmptyStateComponent,
     ResponsiveListComponent, ResponsiveListCellDirective

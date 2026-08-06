@@ -317,7 +317,14 @@ export class ReceitasComponent implements OnInit {
   salvar(): void {
     if (this.saving) return;
     const valor = this.parseValor(this.valorInput);
-    if (!this.novaRenda.fonte || !valor) return;
+    if (!this.novaRenda.fonte) {
+      this.setAlerta('Informe a fonte da receita.', 3000, 'error');
+      return;
+    }
+    if (!valor) {
+      this.setAlerta('Informe um valor maior que zero.', 3000, 'error');
+      return;
+    }
 
     if (!this.novaRenda.categoryId) {
       this.erroCategoria = 'Selecione uma categoria.';

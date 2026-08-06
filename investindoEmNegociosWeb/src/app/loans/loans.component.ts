@@ -10,6 +10,7 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
+import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
@@ -30,6 +31,7 @@ type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
   imports: [
     CommonModule,
     FormsModule,
+    DatePickerComponent,
     RouterLink,
     EmptyStateComponent,
     UiStateComponent,

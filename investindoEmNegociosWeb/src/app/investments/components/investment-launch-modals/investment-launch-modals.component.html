@@ -47,7 +47,7 @@
         </div>
         <div>
           <label>Data da compra</label>
-          <input type="date" [(ngModel)]="novaPosicao.openedAt" name="openedAt" />
+          <app-date-picker format="iso" [value]="novaPosicao.openedAt" (valueChange)="novaPosicao.openedAt = $event" ariaLabel="Data da compra" />
         </div>
         <div>
           <label>Conta/Corretora</label>
@@ -89,7 +89,7 @@
         </div>
         <div>
           <label>Data da venda</label>
-          <input type="date" [(ngModel)]="venda.date" name="vendaDate" />
+          <app-date-picker format="iso" [value]="venda.date" (valueChange)="venda.date = $event" ariaLabel="Data da venda" />
         </div>
         <div>
           <label>Observação (opcional)</label>
@@ -135,7 +135,7 @@
       <label>Outros custos</label>
       <input type="number" min="0" step="any" [ngModel]="movimentoCustos" (ngModelChange)="movimentoCustosChange.emit($event)" name="movCost" />
       <label>Data</label>
-      <input type="date" [(ngModel)]="movimento.date" name="movDate" />
+      <app-date-picker format="iso" [value]="movimento.date" (valueChange)="movimento.date = $event" ariaLabel="Data" />
       <label>Nota</label>
       <input type="text" [(ngModel)]="movimento.note" name="movNote" placeholder="Opcional" />
     </div>

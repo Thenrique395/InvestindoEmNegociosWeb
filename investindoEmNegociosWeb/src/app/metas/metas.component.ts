@@ -13,6 +13,7 @@ import { TransactionSummaryCardComponent } from '../shared/transactions/transact
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
@@ -29,6 +30,7 @@ import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, G
     SegmentedSelectorComponent,
     ModalComponent,
     FormFieldComponent,
+    DatePickerComponent,
     ConfirmDialogComponent,
     EmptyStateComponent,
     AppCurrencyPipe,

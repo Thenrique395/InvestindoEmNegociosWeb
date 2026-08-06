@@ -174,7 +174,7 @@
   (dismiss)="cancelPaySheet()">
   @if (paySheet) {
     <div class="pay-form">
-      <label>Data do pagamento<input type="date" [(ngModel)]="payForm.paidAt" /></label>
+      <label>Data do pagamento<app-date-picker format="iso" [value]="payForm.paidAt" (valueChange)="payForm.paidAt = $event" ariaLabel="Data do pagamento" /></label>
       <label>Conta de origem
         <select [(ngModel)]="payForm.accountId">
           <option value="">Sem conta (apenas registrar)</option>

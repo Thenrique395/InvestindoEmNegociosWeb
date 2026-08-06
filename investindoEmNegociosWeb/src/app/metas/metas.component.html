@@ -82,8 +82,8 @@
       </div>
 
       <div class="metas-form__row">
-        <app-form-field label="Início"><input type="date" [(ngModel)]="form.startDate" /></app-form-field>
-        <app-form-field label="Término"><input type="date" [(ngModel)]="form.endDate" /></app-form-field>
+        <app-form-field label="Início"><app-date-picker format="iso" [value]="form.startDate" (valueChange)="form.startDate = $event" ariaLabel="Início" /></app-form-field>
+        <app-form-field label="Término"><app-date-picker format="iso" [value]="form.endDate" (valueChange)="form.endDate = $event" ariaLabel="Término" /></app-form-field>
       </div>
 
       @if (!isInvestmentForm) {
@@ -112,7 +112,7 @@
   <app-modal [open]="showContribute()" eyebrow="Investimento" title="Registrar aporte" size="sm" (close)="closeContribute()">
     <div class="metas-form" modal-body>
       <app-form-field label="Valor do aporte (R$)"><input type="number" inputmode="decimal" [(ngModel)]="contributeAmount" placeholder="0,00" /></app-form-field>
-      <app-form-field label="Data"><input type="date" [(ngModel)]="contributeDate" /></app-form-field>
+      <app-form-field label="Data"><app-date-picker format="iso" [value]="contributeDate" (valueChange)="contributeDate = $event" ariaLabel="Data" /></app-form-field>
       <app-form-field label="Observação (opcional)"><input type="text" [(ngModel)]="contributeNote" /></app-form-field>
     </div>
     <div modal-footer>

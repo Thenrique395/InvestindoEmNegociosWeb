@@ -36,7 +36,7 @@
               <option [ngValue]="null" disabled>Sem categorias cadastradas</option>
             }
             @for (cat of categorias; track trackByIndex($index, cat)) {
-              <option [value]="cat.id">{{ cat.name }}</option>
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
             }
           </select>
         </app-form-field>
@@ -49,21 +49,17 @@
             [ngModel]="valorInput"
             digitOnly
             (ngModelChange)="onValorChange($event)"
+            (focus)="$any($event.target).select()"
             name="valor"
             required />
         </app-form-field>
         <app-form-field label="Data de recebimento" [error]="erroData" class="income-form__field--full">
-          <input
-            class="income-form__control"
-            type="text"
-            inputmode="numeric"
-            placeholder="05/09/2024"
-            maxlength="10"
-            [ngModel]="recebimentoInput"
-            digitOnly
-            (ngModelChange)="onRecebimentoChange($event)"
-            name="recebimento"
-            required />
+          <app-date-picker
+            [value]="recebimentoInput"
+            [invalid]="!!erroData"
+            placeholder="DD/MM/AAAA"
+            ariaLabel="Data de recebimento"
+            (valueChange)="onRecebimentoChange($event)" />
         </app-form-field>
       </div>
       @if (!categorias.length) {

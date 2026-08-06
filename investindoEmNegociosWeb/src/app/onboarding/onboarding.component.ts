@@ -31,11 +31,12 @@ import {
 } from './onboarding.helpers';
 import { cpfValidator, maskCpf } from '../utils/cpf.utils';
 import { OnboardingDraftService } from './onboarding-draft.service';
+import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ReceitasFormComponent, DespesasFormComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ReceitasFormComponent, DespesasFormComponent, DatePickerComponent],
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.scss']
 })
@@ -371,6 +372,12 @@ export class OnboardingComponent implements OnInit {
   hasError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country', type: string): boolean {
     const c = this.form.get(control);
     return !!c && c.touched && c.hasError(type);
+  }
+
+  onBirthDateChange(value: string): void {
+    const control = this.form.get('birthDate');
+    control?.setValue(value);
+    control?.markAsTouched();
   }
 
   getControlError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country'): string | null {

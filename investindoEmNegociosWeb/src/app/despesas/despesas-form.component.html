@@ -47,7 +47,7 @@
               <option [ngValue]="null" disabled>Sem categorias cadastradas</option>
             }
             @for (cat of categorias; track trackByIndex($index, cat)) {
-              <option [value]="cat.id">{{ cat.name }}</option>
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
             }
           </select>
         </app-form-field>
@@ -60,21 +60,17 @@
             [ngModel]="valorInput"
             digitOnly
             (ngModelChange)="onValorChange($event)"
+            (focus)="$any($event.target).select()"
             name="valor"
             required />
         </app-form-field>
         <app-form-field label="Primeiro vencimento" [error]="erroData">
-          <input
-            class="expense-form__control"
-            type="text"
-            inputmode="numeric"
-            placeholder="15/08/2026"
-            maxlength="10"
-            [ngModel]="vencimentoInput"
-            digitOnly
-            (ngModelChange)="onVencimentoChange($event)"
-            name="vencimento"
-            required />
+          <app-date-picker
+            [value]="vencimentoInput"
+            [invalid]="!!erroData"
+            placeholder="DD/MM/AAAA"
+            ariaLabel="Primeiro vencimento"
+            (valueChange)="onVencimentoChange($event)" />
         </app-form-field>
       </div>
       @if (!categorias.length) {
@@ -164,7 +160,7 @@
           </app-toggle-field>
         }
         @if (fixa && formaPagamento !== 'cartao') {
-          <app-form-field label="Duração (meses)" hint="Deixe em branco para repetir indefinidamente.">
+          <app-form-field label="Duração (meses)" hint="Deixe em branco para repetir todo mês; ou informe por quantos meses (até 120).">
             <input
               class="expense-form__control"
               type="number"

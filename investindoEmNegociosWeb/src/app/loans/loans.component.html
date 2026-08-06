@@ -221,7 +221,7 @@
           <input class="loan-form__control" type="number" min="1" max="28" name="paymentDay" [(ngModel)]="form.paymentDay" />
         </app-form-field>
         <app-form-field label="Data inicial">
-          <input class="loan-form__control" type="date" name="startDate" [(ngModel)]="form.startDate" />
+          <app-date-picker format="iso" [value]="form.startDate" (valueChange)="form.startDate = $event" ariaLabel="Data inicial" />
         </app-form-field>
         <app-form-field label="Sistema de amortização" class="loan-form__field--full">
           <app-segmented-selector
@@ -348,7 +348,7 @@
   @if (paySheet) {
     <div class="pay-form">
       <label>Data do pagamento
-        <input type="date" [(ngModel)]="payForm.paidAt" />
+        <app-date-picker format="iso" [value]="payForm.paidAt" (valueChange)="payForm.paidAt = $event" ariaLabel="Data do pagamento" />
       </label>
       <label>Conta de origem
         <select [(ngModel)]="payForm.accountId">

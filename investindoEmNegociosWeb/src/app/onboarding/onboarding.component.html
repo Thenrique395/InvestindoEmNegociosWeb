@@ -353,7 +353,14 @@
               </label>
               <label class="onboarding-field">
                 <span>Data de nascimento</span>
-                <input type="date" [min]="minBirthDate" [max]="maxBirthDate" formControlName="birthDate" />
+                <app-date-picker
+                  format="iso"
+                  [value]="form.get('birthDate')?.value || ''"
+                  [min]="minBirthDate"
+                  [max]="maxBirthDate"
+                  [invalid]="!!getControlError('birthDate')"
+                  ariaLabel="Data de nascimento"
+                  (valueChange)="onBirthDateChange($event)" />
                 @if (getControlError('birthDate'); as err) {
                   <small class="onboarding-field__error">{{ err }}</small>
                 }

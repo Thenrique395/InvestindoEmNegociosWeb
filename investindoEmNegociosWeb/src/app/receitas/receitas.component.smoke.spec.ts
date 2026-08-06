@@ -361,6 +361,19 @@ describe('ReceitasComponent - edição por escopo (parcela x recorrência)', () 
     expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
   });
 
+  it('salvar sem valor mostra erro e não persiste (#2 — sem retorno silencioso)', () => {
+    const ctx = createComponent();
+    ctx.component.novaRenda = { id: '', planId: '', fonte: 'Salário', categoria: '', categoryId: 'cat-1', valor: 0, recebimento: '', fixa: false, fixaInicio: '' };
+    ctx.component.valorInput = '';
+    ctx.component.recebimentoInput = '05/08/2026';
+
+    ctx.component.salvar();
+
+    expect(ctx.ui.error).toHaveBeenCalled();
+    expect(ctx.db.addIncome).not.toHaveBeenCalled();
+    expect(ctx.db.updateIncome).not.toHaveBeenCalled();
+  });
+
   it('receita avulsa (não recorrente) salva direto, sem modal de escopo', () => {
     const avulsa: StoredIncome = { ...receitaRecorrente, id: 'inst-x', schedule: 'OneTime', fixa: false };
     const ctx = editar(avulsa);

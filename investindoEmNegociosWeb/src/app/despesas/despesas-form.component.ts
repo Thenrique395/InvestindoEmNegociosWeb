@@ -8,11 +8,12 @@ import { CategoryDto } from '../categories.service';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.component';
+import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [FormsModule, DigitOnlyDirective, RouterLink, ModalComponent, FormFieldComponent, ToggleFieldComponent],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent],
   templateUrl: './despesas-form.component.html',
   styleUrls: ['./despesas-form.component.scss']
 })
