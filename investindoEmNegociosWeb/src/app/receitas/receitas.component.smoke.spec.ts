@@ -384,3 +384,52 @@ describe('ReceitasComponent - edição por escopo (parcela x recorrência)', () 
     expect(ctx.db.updateIncomeInstallment).not.toHaveBeenCalled();
   });
 });
+
+describe('ReceitasComponent - cobertura de cadastro/exclusão/estado', () => {
+  const novaBase = (over: Partial<StoredIncome> = {}): StoredIncome => ({
+    id: '', planId: '', fonte: 'Salário', categoria: '', categoryId: 'cat-1', valor: 0, recebimento: '', fixa: false, fixaInicio: '', ...over
+  });
+
+  it('salvar nova receita avulsa chama addIncome (cadastro sucesso)', () => {
+    const ctx = createComponent();
+    ctx.component.novaRenda = novaBase();
+    spyOn(ctx.component as any, 'parseValor').and.returnValue(3000);
+    ctx.component.valorInput = '3000';
+    ctx.component.recebimentoInput = '05/08/2026';
+    ctx.component.salvar();
+    expect(ctx.db.addIncome).toHaveBeenCalled();
+  });
+
+  it('salvar sem fonte mostra erro e não persiste (#2)', () => {
+    const ctx = createComponent();
+    ctx.component.novaRenda = novaBase({ fonte: '' });
+    spyOn(ctx.component as any, 'parseValor').and.returnValue(1000);
+    ctx.component.valorInput = '1000';
+    ctx.component.recebimentoInput = '05/08/2026';
+    ctx.component.salvar();
+    expect(ctx.ui.error).toHaveBeenCalled();
+    expect(ctx.db.addIncome).not.toHaveBeenCalled();
+  });
+
+  it('excluir "somente este mês" chama removeIncomeInstallment', () => {
+    const ctx = createComponent();
+    (ctx.component as any).deleteInstallmentId = 'inst-1';
+    ctx.component.confirmarExcluirSomenteEsta();
+    expect(ctx.db.removeIncomeInstallment).toHaveBeenCalledWith('inst-1');
+  });
+
+  it('excluir "encerrar recorrência" chama removeIncome', () => {
+    const ctx = createComponent();
+    (ctx.component as any).deletePlanId = 'plan-1';
+    ctx.component.confirmarExcluirRecorrencia();
+    expect(ctx.db.removeIncome).toHaveBeenCalledWith('plan-1');
+  });
+
+  it('editar receita já recebida (PAID) abre modal de reversão, não o form', () => {
+    const ctx = createComponent();
+    ctx.component.rendasAll.set([novaBase({ id: 'inst-1', planId: 'plan-1', valor: 1000, recebimento: '05/08/2026', status: 'PAID' })]);
+    ctx.component.editarPorId('inst-1');
+    expect(ctx.component.showEditReceivedModal).toBeTrue();
+    expect(ctx.component.mostrarForm).toBeFalse();
+  });
+});

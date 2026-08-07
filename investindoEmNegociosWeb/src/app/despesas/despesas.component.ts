@@ -825,6 +825,9 @@ export class DespesasComponent implements OnInit {
 
     if (this.editando) {
       if (this.editando.isParcela || this.editando.isRecorrente) {
+        // Fecha o modal do formulário (z alto) para a confirm-sheet de escopo
+        // (z menor, em portal) ficar visível por cima. Mesmo fix das receitas.
+        this.mostrarForm = false;
         this.confirmEdicao = { isRecorrente: this.editando.isRecorrente };
         return;
       }
@@ -1013,6 +1016,8 @@ export class DespesasComponent implements OnInit {
 
   cancelarEdicao(): void {
     this.confirmEdicao = null;
+    // Reabre o formulário para o usuário não perder a edição em andamento.
+    this.mostrarForm = true;
   }
 
   removerDespesa(mesKey: string, index: number): void {

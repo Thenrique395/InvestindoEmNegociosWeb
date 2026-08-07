@@ -237,3 +237,108 @@ describe('DespesasComponent - anexo de comprovante', () => {
     expect(installments.listPayments).not.toHaveBeenCalled();
   });
 });
+
+function makeDespesas(db: any, ui = new UiFeedbackServiceMock()) {
+  const component = new DespesasComponent(
+    db as any, {} as any, {} as any, {} as any, {} as any,
+    { getRole: () => 'Advanced' } as any, ui as any,
+    { canImportInvoices: () => true } as any,
+    { markForCheck: jasmine.createSpy('markForCheck') } as any,
+    { onDestroy: () => {} } as any,
+    { queryParamMap: of(convertToParamMap({})) } as any
+  );
+  return { component, ui };
+}
+
+function setDespesaForm(component: DespesasComponent, nome: string, valor: number) {
+  (component as any).novaDespesa = { nome, categoria: 'Categoria', categoryId: 'cat-1', valor, vencimento: '05/08/2026' };
+  spyOn(component, 'parseValor').and.returnValue(valor);
+  component.valorInput = String(valor);
+  component.vencimentoInput = '05/08/2026';
+}
+
+describe('DespesasComponent - fluxos de cadastro/edição (cobertura)', () => {
+  it('adicionar sem nome mostra erro e não persiste (#2)', () => {
+    const db = { addExpense: jasmine.createSpy('addExpense').and.returnValue(of({})) };
+    const { component, ui } = makeDespesas(db);
+    (component as any).editando = null;
+    setDespesaForm(component, '', 100);
+    component.adicionar();
+    expect(ui.error).toHaveBeenCalled();
+    expect(db.addExpense).not.toHaveBeenCalled();
+  });
+
+  it('adicionar sem valor mostra erro e não persiste (#2)', () => {
+    const db = { addExpense: jasmine.createSpy('addExpense').and.returnValue(of({})) };
+    const { component, ui } = makeDespesas(db);
+    (component as any).editando = null;
+    setDespesaForm(component, 'Aluguel', 0);
+    component.adicionar();
+    expect(ui.error).toHaveBeenCalled();
+    expect(db.addExpense).not.toHaveBeenCalled();
+  });
+
+  it('editar despesa recorrente abre modal de escopo e FECHA o formulário (fix z-index)', () => {
+    const { component } = makeDespesas({});
+    (component as any).editando = { id: 'exp-1', planId: 'plan-1', isParcela: false, isRecorrente: true, originalNome: 'Aluguel', originalCategoryId: 'cat-1' };
+    setDespesaForm(component, 'Aluguel', 100);
+    component.mostrarForm = true;
+    component.adicionar();
+    expect(component.confirmEdicao).not.toBeNull();
+    expect(component.mostrarForm).toBeFalse();
+  });
+
+  it('cancelar o modal de escopo reabre o formulário', () => {
+    const { component } = makeDespesas({});
+    (component as any).confirmEdicao = { isRecorrente: true };
+    component.mostrarForm = false;
+    component.cancelarEdicao();
+    expect(component.confirmEdicao).toBeNull();
+    expect(component.mostrarForm).toBeTrue();
+  });
+
+  it('confirmarEdicao("single") edita só a parcela (updateExpenseInstallment)', () => {
+    const db = { updateExpenseInstallment: jasmine.createSpy('uei').and.returnValue(of(void 0)), updateExpense: jasmine.createSpy('ue').and.returnValue(of(void 0)) };
+    const { component } = makeDespesas(db);
+    (component as any).editando = { id: 'exp-1', planId: 'plan-1', isParcela: true, isRecorrente: false, originalNome: 'X', originalCategoryId: 'cat-1' };
+    setDespesaForm(component, 'X', 150);
+    component.confirmarEdicao('single');
+    expect(db.updateExpenseInstallment).toHaveBeenCalled();
+    expect(db.updateExpense).not.toHaveBeenCalled();
+  });
+
+  it('confirmarEdicao("all") edita a série inteira (updateExpense)', () => {
+    const db = { updateExpenseInstallment: jasmine.createSpy('uei').and.returnValue(of(void 0)), updateExpense: jasmine.createSpy('ue').and.returnValue(of(void 0)) };
+    const { component } = makeDespesas(db);
+    (component as any).editando = { id: 'exp-1', planId: 'plan-1', isParcela: true, isRecorrente: false, originalNome: 'X', originalCategoryId: 'cat-1' };
+    setDespesaForm(component, 'X', 150);
+    component.confirmarEdicao('all');
+    expect(db.updateExpense).toHaveBeenCalled();
+    expect(db.updateExpenseInstallment).not.toHaveBeenCalled();
+  });
+
+  it('clampa parcelas do cartão em no máximo 36 (#3)', () => {
+    const db = { addExpense: jasmine.createSpy('addExpense').and.returnValue(of({})) };
+    const { component } = makeDespesas(db);
+    (component as any).editando = null;
+    setDespesaForm(component, 'TV', 100);
+    component.formaPagamento = 'cartao';
+    component.parcelar = true;
+    component.parcelasCount = 999;
+    component.cartaoSelecionadoId = 'card-1';
+    component.adicionar();
+    expect(db.addExpense.calls.mostRecent().args[0].parcelasTotal).toBe(36);
+  });
+
+  it('clampa duração de despesa fixa em no máximo 120 (#3)', () => {
+    const db = { addExpense: jasmine.createSpy('addExpense').and.returnValue(of({})) };
+    const { component } = makeDespesas(db);
+    (component as any).editando = null;
+    setDespesaForm(component, 'Aluguel', 100);
+    component.formaPagamento = 'avista';
+    component.fixa = true;
+    component.fixaMeses = 999;
+    component.adicionar();
+    expect(db.addExpense.calls.mostRecent().args[0].fixaMeses).toBe(120);
+  });
+});
