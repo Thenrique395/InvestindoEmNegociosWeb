@@ -1,4 +1,4 @@
-:host {
+app-onboarding {
   display: block;
   width: 100%;
 }
@@ -1081,4 +1081,34 @@ app-date-picker.onboarding-control {
   align-self: flex-start;
   margin-top: auto;
   min-width: 220px;
+}
+
+/* ── Fase 4: polimento fino ──────────────────────────────────────────────── */
+
+/* Entrada suave ao trocar de passo (cada .onboarding-step-shell monta no @if). */
+@keyframes onboarding-step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.onboarding-step-shell {
+  animation: onboarding-step-enter 260ms ease both;
+}
+
+/* Foco visível por teclado: o radio real é sr-only, então destacamos o card. */
+.onboarding-focus-card:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-step-shell {
+    animation: none;
+  }
 }

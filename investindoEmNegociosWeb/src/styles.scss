@@ -1,5 +1,9 @@
 @use '@fontsource-variable/inter';
 @use './styles/design-tokens';
+// Estilos do onboarding em escopo global: as classes .onboarding-* são usadas
+// pelos componentes de passo (rail/foco/preferências/perfil/conta) e precisam
+// valer além do encapsulamento de cada componente. Prefixo próprio evita colisão.
+@use './app/onboarding/onboarding.styles';
 
 @tailwind base;
 @tailwind components;

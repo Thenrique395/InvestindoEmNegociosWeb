@@ -1,3 +1,4 @@
+import { AbstractControl } from '@angular/forms';
 import {
   accountTypeLabel,
   brToIso,
@@ -5,8 +6,13 @@ import {
   createIncomeDraft,
   isoToBr,
   maskPhone,
+  onboardingProfileFieldError,
   toStoredCard
 } from './onboarding.helpers';
+
+function ctrlStub(errors: Record<string, unknown> | null, touched = true): AbstractControl {
+  return { errors, touched } as unknown as AbstractControl;
+}
 
 describe('onboarding helpers', () => {
   it('formata labels de tipos de conta', () => {
@@ -58,6 +64,24 @@ describe('onboarding helpers', () => {
     expect(brToIso('05/08/2026', '2026-01-01')).toBe('2026-08-05');
     expect(brToIso('5/8/26', '2026-01-01')).toBe('2026-01-01'); // incompleto -> fallback
     expect(brToIso('abc', '2026-01-01')).toBe('2026-01-01');
+  });
+
+  it('onboardingProfileFieldError: null quando não tocado, sem erros ou control ausente', () => {
+    expect(onboardingProfileFieldError('fullName', null)).toBeNull();
+    expect(onboardingProfileFieldError('fullName', ctrlStub(null))).toBeNull();
+    expect(onboardingProfileFieldError('fullName', ctrlStub({ required: true }, false))).toBeNull();
+  });
+
+  it('onboardingProfileFieldError: mensagens por campo e por tipo de erro', () => {
+    expect(onboardingProfileFieldError('document', ctrlStub({ required: true }))).toBe('Informe seu CPF.');
+    expect(onboardingProfileFieldError('city', ctrlStub({ blank: true }))).toBe('Informe sua cidade.');
+    expect(onboardingProfileFieldError('fullName', ctrlStub({ minlength: {} }))).toBe('Mínimo de 3 caracteres.');
+    expect(onboardingProfileFieldError('state', ctrlStub({ minlength: {} }))).toBe('Use 2 letras (UF).');
+    expect(onboardingProfileFieldError('state', ctrlStub({ maxlength: {} }))).toBe('Use 2 letras (UF).');
+    expect(onboardingProfileFieldError('document', ctrlStub({ cpf: true }))).toBe('CPF inválido.');
+    expect(onboardingProfileFieldError('phone', ctrlStub({ phone: true }))).toBe('Use o formato (81) 99525-7823.');
+    expect(onboardingProfileFieldError('birthDate', ctrlStub({ birthDateRange: true }))).toBe('Informe uma data válida entre 01/01/1900 e hoje.');
+    expect(onboardingProfileFieldError('country', ctrlStub({ someUnknown: true }))).toBe('Campo inválido.');
   });
 
   it('converte cartao da API para modelo de tela', () => {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
@@ -20,26 +20,29 @@ import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { parseLocaleDate, parseLocalizedNumber } from '../utils/locale-utils';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import {
-  accountTypeLabel,
   brToIso,
   createExpenseDraft,
   createIncomeDraft,
   isoToBr,
   maskPhone,
+  onboardingProfileFieldError,
+  OnboardingProfileField,
   toStoredCard,
   todayIso
 } from './onboarding.helpers';
 import { cpfValidator, maskCpf } from '../utils/cpf.utils';
 import { OnboardingDraftService } from './onboarding-draft.service';
-import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
-import { FormFieldComponent } from '../shared/form-field/form-field.component';
+import { OnboardingRailComponent } from './steps/onboarding-rail.component';
+import { FocusStepComponent } from './steps/focus-step.component';
+import { PreferencesStepComponent } from './steps/preferences-step.component';
+import { ProfileStepComponent } from './steps/profile-step.component';
+import { AccountStepComponent } from './steps/account-step.component';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ReceitasFormComponent, DespesasFormComponent, DatePickerComponent, FormFieldComponent],
-  templateUrl: './onboarding.component.html',
-  styleUrls: ['./onboarding.component.scss']
+  imports: [CommonModule, ReceitasFormComponent, DespesasFormComponent, OnboardingRailComponent, FocusStepComponent, PreferencesStepComponent, ProfileStepComponent, AccountStepComponent],
+  templateUrl: './onboarding.component.html'
 })
 export class OnboardingComponent implements OnInit {
   form: FormGroup;
@@ -281,6 +284,16 @@ export class OnboardingComponent implements OnInit {
     this.nextStep();
   }
 
+  onModeSelected(mode: IntelligenceMode): void {
+    this.intelligenceMode = mode;
+    this.saveDraft();
+  }
+
+  onCarryOverDayChanged(day: number): void {
+    this.carryOverDay = day;
+    this.saveDraft();
+  }
+
   continueFromPreferences(): void {
     if (!this.intelligenceMode) {
       this.uiFeedback.warning('Selecione o estilo inicial dos insights.');
@@ -366,60 +379,14 @@ export class OnboardingComponent implements OnInit {
     this.finishOnboarding();
   }
 
-  accountTypeLabel(type: AccountType): string {
-    return accountTypeLabel(type);
-  }
-
-  hasError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country', type: string): boolean {
-    const c = this.form.get(control);
-    return !!c && c.touched && c.hasError(type);
-  }
-
   onBirthDateChange(value: string): void {
     const control = this.form.get('birthDate');
     control?.setValue(value);
     control?.markAsTouched();
   }
 
-  getControlError(control: 'fullName' | 'document' | 'phone' | 'birthDate' | 'city' | 'state' | 'country'): string | null {
-    const c = this.form.get(control);
-    if (!c || !c.touched || !c.errors) return null;
-
-    if (c.errors['required']) {
-      switch (control) {
-        case 'fullName': return 'Informe seu nome.';
-        case 'document': return 'Informe seu CPF.';
-        case 'phone': return 'Informe seu telefone.';
-        case 'birthDate': return 'Informe sua data de nascimento.';
-        case 'city': return 'Informe sua cidade.';
-        case 'state': return 'Informe seu estado.';
-        case 'country': return 'Informe seu país.';
-      }
-    }
-
-    if (c.errors['blank']) {
-      switch (control) {
-        case 'fullName': return 'Informe seu nome.';
-        case 'city': return 'Informe sua cidade.';
-        case 'state': return 'Informe seu estado.';
-        case 'country': return 'Informe seu país.';
-      }
-    }
-
-    if (c.errors['minlength']) {
-      if (control === 'fullName') return 'Mínimo de 3 caracteres.';
-      if (control === 'state') return 'Use 2 letras (UF).';
-    }
-
-    if (c.errors['maxlength'] && control === 'state') {
-      return 'Use 2 letras (UF).';
-    }
-
-    if (c.errors['cpf']) return 'CPF inválido.';
-    if (c.errors['phone']) return 'Use o formato (81) 99525-7823.';
-    if (c.errors['birthDateRange']) return 'Informe uma data válida entre 01/01/1900 e hoje.';
-
-    return 'Campo inválido.';
+  getControlError(control: OnboardingProfileField): string | null {
+    return onboardingProfileFieldError(control, this.form.get(control));
   }
 
   onCpfInput(event: Event): void {
@@ -810,18 +777,6 @@ export class OnboardingComponent implements OnInit {
         /* ignore */
       }
     });
-  }
-
-  trackByIndex(index: number, _item?: unknown): number {
-    return index;
-  }
-
-  isStepActive(stepIndex: number): boolean {
-    return this.step === stepIndex;
-  }
-
-  isStepDone(stepIndex: number): boolean {
-    return this.step > stepIndex;
   }
 
   get currentRole(): UserRole | null {
