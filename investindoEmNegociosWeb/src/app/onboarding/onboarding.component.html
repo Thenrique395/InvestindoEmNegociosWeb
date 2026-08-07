@@ -465,8 +465,8 @@
           }
           <section class="onboarding-panel">
             <div class="onboarding-panel__header">
-              <strong>Primeiros lançamentos</strong>
-              <span>Adicione uma receita e uma despesa para começar com o dashboard refletindo sua realidade.</span>
+              <strong>Primeiros lançamentos (opcional)</strong>
+              <span>Adicione uma receita e uma despesa para o dashboard já começar refletindo sua realidade — mas você pode fazer isso depois.</span>
             </div>
             <div class="onboarding-entry-grid">
               <article
@@ -485,7 +485,7 @@
                     <strong>Receita inicial</strong>
                   </div>
                   <div class="onboarding-entry-card__header-meta">
-                    <span class="onboarding-entry-card__status">{{ hasInitialIncome ? 'Configurada' : 'Pendente' }}</span>
+                    <span class="onboarding-entry-card__status">{{ hasInitialIncome ? 'Configurada' : 'Opcional' }}</span>
                     <span class="onboarding-entry-card__tooltip-anchor">
                       <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma entrada real do mês, como salário, comissão ou recebimento recorrente.">?</span>
                       <span class="onboarding-entry-card__tooltip">Registre uma entrada real do mês, como salário, comissão ou recebimento recorrente.</span>
@@ -520,7 +520,7 @@
                     <strong>Despesa inicial</strong>
                   </div>
                   <div class="onboarding-entry-card__header-meta">
-                    <span class="onboarding-entry-card__status">{{ hasInitialExpense ? 'Registrada' : 'Pendente' }}</span>
+                    <span class="onboarding-entry-card__status">{{ hasInitialExpense ? 'Registrada' : 'Opcional' }}</span>
                     <span class="onboarding-entry-card__tooltip-anchor">
                       <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.">?</span>
                       <span class="onboarding-entry-card__tooltip">Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.</span>
@@ -578,7 +578,7 @@
           <div class="onboarding-actions onboarding-actions--footer">
             <div class="onboarding-actions__meta">
               <strong>Último passo</strong>
-              <span>Finalize com sua conta principal e os primeiros lançamentos para entrar no dashboard com dados reais.</span>
+              <span>Basta ter sua conta principal para concluir. Os primeiros lançamentos são opcionais — adicione agora ou depois.</span>
               @if (showStep4ValidationMessage) {
                 <span class="onboarding-actions__validation">{{ step4ValidationMessage }}</span>
               }

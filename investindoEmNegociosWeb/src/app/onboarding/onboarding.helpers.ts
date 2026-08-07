@@ -42,15 +42,22 @@ export function createExpenseDraft(): StoredExpense {
 export function maskPhone(value: string): string {
   const digits = (value || '').replace(/\D/g, '').slice(0, 11);
   if (!digits) return '';
-  if (digits.length <= 2) return `(${digits}`;
-  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  const ddd = digits.slice(0, 2);
+  if (digits.length <= 2) return `(${ddd}`;
+  const rest = digits.slice(2);
+  // Celular (11 dígitos): 5+4. Fixo/incompleto (até 10): 4+4.
+  const firstLen = digits.length === 11 ? 5 : 4;
+  const first = rest.slice(0, firstLen);
+  const second = rest.slice(firstLen);
+  return second ? `(${ddd}) ${first}-${second}` : `(${ddd}) ${first}`;
 }
 
 export function brToIso(value: string, fallbackIso = todayIso()): string {
-  const [dd, mm, yyyy] = value.split('/');
-  if (!dd || !mm || !yyyy) return fallbackIso;
-  return `${yyyy}-${mm}-${dd}`;
+  // Baseado nos dígitos (tolera entrada sem zero à esquerda) e exige DDMMYYYY completos;
+  // caso contrário devolve o fallback em vez de gerar um ISO malformado.
+  const digits = (value || '').replace(/\D/g, '');
+  if (digits.length !== 8) return fallbackIso;
+  return `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
 }
 
 export function isoToBr(value: string): string {

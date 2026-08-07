@@ -247,3 +247,50 @@ describe('OnboardingComponent smoke', () => {
     expect(ctx.component.savingEntries).toBeFalse();
   });
 });
+
+describe('OnboardingComponent - correções (auditoria)', () => {
+  it('#1 conclui o onboarding apenas com conta ativa (receita/despesa opcionais)', () => {
+    const ctx = createComponent();
+    ctx.component.step = 3;
+    ctx.component.accountReady = true;
+    ctx.component.initialIncome = { source: '', amount: 0, receivedOn: '' };
+    ctx.component.initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null };
+
+    ctx.component.saveInitialEntriesAndFinish();
+
+    expect(ctx.onboarding.updateStatus).toHaveBeenCalledWith({ step: 3, completed: true });
+    expect(ctx.router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('#1 ainda bloqueia conclusão sem conta ativa', () => {
+    const ctx = createComponent();
+    ctx.component.step = 3;
+    ctx.component.accountReady = false;
+
+    ctx.component.saveInitialEntriesAndFinish();
+
+    expect(ctx.ui.warning).toHaveBeenCalled();
+    expect(ctx.onboarding.updateStatus).not.toHaveBeenCalledWith({ step: 3, completed: true });
+  });
+
+  it('#2 aceita telefone fixo (10) e celular (11) dígitos', () => {
+    const ctx = createComponent();
+    const phone = ctx.component.form.get('phone')!;
+    phone.setValue('(81) 3333-4444');
+    expect(phone.hasError('phone')).toBeFalse();
+    phone.setValue('(81) 93333-4444');
+    expect(phone.hasError('phone')).toBeFalse();
+    phone.setValue('(81) 333');
+    expect(phone.hasError('phone')).toBeTrue();
+  });
+
+  it('#3 clampa parcelas (<=36) e duração (<=120) no cadastro do onboarding', () => {
+    const ctx = createComponent();
+    ctx.component.onExpenseParcelasChange(999);
+    expect(ctx.component.modalExpenseParcelas).toBe(36);
+    ctx.component.onExpenseFixaMesesChange(999);
+    expect(ctx.component.modalExpenseFixaMeses).toBe(120);
+    ctx.component.onExpenseParcelasChange(0);
+    expect(ctx.component.modalExpenseParcelas).toBe(1);
+  });
+});

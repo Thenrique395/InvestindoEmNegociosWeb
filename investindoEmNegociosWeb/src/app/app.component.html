@@ -59,6 +59,7 @@
   @if (isOnboardingRoute) {
     <div class="onboarding-route-shell">
       <app-topbar
+        [minimal]="true"
         [notificationsOpen]="notificationsOpen"
         [notificationsLoading]="notificationsLoading"
         [notificationsError]="notificationsError"

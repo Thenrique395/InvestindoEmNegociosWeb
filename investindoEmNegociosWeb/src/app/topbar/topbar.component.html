@@ -1,4 +1,5 @@
-<header class="topbar">
+<header class="topbar" [class.topbar--minimal]="minimal()">
+  @if (!minimal()) {
   <button
     type="button"
     class="menu-toggle"
@@ -20,8 +21,9 @@
     }
   </button>
   <app-global-search class="topbar__search" />
+  }
   <div class="topbar__actions">
-    @if (canUseAssistant()) {
+    @if (!minimal() && canUseAssistant()) {
       <a
         class="topbar__assistant"
         routerLink="/assistente"
@@ -71,6 +73,7 @@
         </svg>
       }
     </button>
+    @if (!minimal()) {
     <app-notification-bell
       [open]="notificationsOpen()"
       [loading]="notificationsLoading()"
@@ -81,6 +84,7 @@
       (refreshRequested)="notificationsRefresh.emit()"
       (itemRead)="notificationRead.emit($event)" />
     <span class="topbar__divider" aria-hidden="true"></span>
+    }
     <app-user-menu
       [open]="userMenuOpen()"
       [avatarUrl]="avatarUrl()"

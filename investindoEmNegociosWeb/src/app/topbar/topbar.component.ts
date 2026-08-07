@@ -38,6 +38,9 @@ export class TopbarComponent {
   readonly financialValuesHidden = input.required<boolean>();
   readonly currentRole = input<UserRole | null>(null);
   readonly mobileMenuOpen = input(false);
+  // Modo enxuto (ex.: onboarding): esconde busca, Assistente IA e notificações —
+  // não há o que buscar/notificar no primeiro acesso.
+  readonly minimal = input(false);
 
   readonly menuToggle = output<void>();
   readonly themeToggle = output<void>();

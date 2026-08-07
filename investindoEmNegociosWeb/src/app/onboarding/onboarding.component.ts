@@ -48,7 +48,11 @@ export class OnboardingComponent implements OnInit {
   liveMessage = '';
   readonly totalSteps = 4;
   readonly minBirthDate = '1900-01-01';
-  readonly maxBirthDate = todayIso();
+  // Getter (não readonly): recalcula "hoje" a cada acesso, evitando ficar preso na
+  // data em que a página foi aberta caso a sessão atravesse a meia-noite.
+  get maxBirthDate(): string {
+    return todayIso();
+  }
   step = 0;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode | null = null;
@@ -348,17 +352,13 @@ export class OnboardingComponent implements OnInit {
   }
 
   saveInitialEntriesAndFinish(): void {
+    // Para concluir basta ter uma CONTA ativa. Cadastrar a primeira receita/despesa é
+    // incentivado, mas opcional — não bloquear o usuário na entrada do app (#1).
     if (!this.accountReady) {
       this.showStep4Validation = true;
-      this.uiFeedback.warning('Crie uma conta antes de cadastrar receita e despesa.');
-      this.announce('Crie uma conta antes de cadastrar receita e despesa.');
+      this.uiFeedback.warning('Crie uma conta ativa para concluir.');
+      this.announce('Crie uma conta ativa para concluir o onboarding.');
       this.step = this.totalSteps - 1;
-      return;
-    }
-    if (!this.hasInitialIncome || !this.hasInitialExpense) {
-      this.showStep4Validation = true;
-      this.uiFeedback.warning('Cadastre uma receita e uma despesa para concluir.');
-      this.announce('Cadastre uma receita e uma despesa para concluir o onboarding.');
       return;
     }
     this.showStep4Validation = false;
@@ -429,20 +429,7 @@ export class OnboardingComponent implements OnInit {
 
   onPhoneInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
-    let masked = digits;
-
-    if (digits.length > 0) {
-      masked = `(${digits.slice(0, Math.min(2, digits.length))}`;
-    }
-    if (digits.length >= 3) {
-      masked = `(${digits.slice(0, 2)}) ${digits.slice(2, Math.min(7, digits.length))}`;
-    }
-    if (digits.length >= 8) {
-      masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
-    }
-
-    this.form.get('phone')?.setValue(masked, { emitEvent: false });
+    this.form.get('phone')?.setValue(maskPhone(input.value), { emitEvent: false });
   }
 
   get hasInitialIncome(): boolean {
@@ -454,27 +441,16 @@ export class OnboardingComponent implements OnInit {
   }
 
   get canFinishWithInitialEntries(): boolean {
-    return this.accountReady && this.hasInitialIncome && this.hasInitialExpense && !this.savingEntries;
+    // Conta ativa é o único requisito para concluir; receita/despesa são opcionais (#1).
+    return this.accountReady && !this.savingEntries;
   }
 
   get showStep4ValidationMessage(): boolean {
-    return this.showStep4Validation && (!this.accountReady || !this.hasInitialIncome || !this.hasInitialExpense);
+    return this.showStep4Validation && !this.accountReady;
   }
 
   get step4ValidationMessage(): string {
-    if (!this.accountReady) {
-      return 'Crie sua conta principal antes de concluir o onboarding.';
-    }
-
-    const missing: string[] = [];
-    if (!this.hasInitialIncome) missing.push('receita inicial');
-    if (!this.hasInitialExpense) missing.push('despesa inicial');
-
-    if (missing.length === 2) {
-      return 'Cadastre a receita inicial e a despesa inicial para concluir o onboarding.';
-    }
-
-    return `Cadastre a ${missing[0]} para concluir o onboarding.`;
+    return 'Crie sua conta principal para concluir o onboarding.';
   }
 
   get hasInitialCard(): boolean {
@@ -635,7 +611,8 @@ export class OnboardingComponent implements OnInit {
   }
 
   onExpenseParcelasChange(value: number): void {
-    this.modalExpenseParcelas = Math.max(1, Number(value || 1));
+    // Cartão: entre 1 e 36 parcelas (evita geração em massa / erro do backend). (#3)
+    this.modalExpenseParcelas = Math.min(Math.max(Math.trunc(Number(value || 1)), 1), 36);
   }
 
   onExpenseFixaChange(value: boolean): void {
@@ -655,7 +632,8 @@ export class OnboardingComponent implements OnInit {
       this.modalExpenseFixaMeses = null;
       return;
     }
-    this.modalExpenseFixaMeses = Number(value);
+    // Duração de despesa fixa: entre 1 e 120 meses. (#3)
+    this.modalExpenseFixaMeses = Math.min(Math.max(Math.trunc(Number(value)), 1), 120);
   }
 
   saveExpenseModal(): void {
@@ -729,11 +707,7 @@ export class OnboardingComponent implements OnInit {
 
   private normalizePayload() {
     const raw = this.form.value;
-    const phoneDigits = (raw.phone as string).replace(/\D/g, '').slice(0, 11);
-    const formattedPhone =
-      phoneDigits.length === 11
-        ? `(${phoneDigits.slice(0, 2)}) ${phoneDigits.slice(2, 7)}-${phoneDigits.slice(7, 11)}`
-        : raw.phone;
+    const formattedPhone = maskPhone(raw.phone as string) || raw.phone;
     const birthDateIso = raw.birthDate ? `${raw.birthDate}T00:00:00Z` : undefined;
 
     return {
@@ -802,7 +776,8 @@ export class OnboardingComponent implements OnInit {
     return (control: AbstractControl) => {
       const digits = (control.value || '').toString().replace(/\D/g, '');
       if (!digits) return null;
-      return digits.length === 11 ? null : { phone: true };
+      // Aceita fixo (10 dígitos) e celular (11 dígitos).
+      return digits.length === 10 || digits.length === 11 ? null : { phone: true };
     };
   }
 

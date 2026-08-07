@@ -42,11 +42,22 @@ describe('onboarding helpers', () => {
     expect(maskPhone('81')).toBe('(81');
   });
 
+  it('mascara telefone fixo (10) e celular (11) — #2', () => {
+    expect(maskPhone('8133334444')).toBe('(81) 3333-4444'); // fixo: 4+4
+    expect(maskPhone('81933334444')).toBe('(81) 93333-4444'); // celular: 5+4
+  });
+
   it('converte datas entre BR e ISO', () => {
     expect(brToIso('02/03/1991', '2026-06-04')).toBe('1991-03-02');
     expect(brToIso('', '2026-06-04')).toBe('2026-06-04');
     expect(isoToBr('1991-03-02')).toBe('02/03/1991');
     expect(isoToBr('')).toBe('');
+  });
+
+  it('brToIso: exige DDMMYYYY completo (senão fallback), evitando ISO malformado', () => {
+    expect(brToIso('05/08/2026', '2026-01-01')).toBe('2026-08-05');
+    expect(brToIso('5/8/26', '2026-01-01')).toBe('2026-01-01'); // incompleto -> fallback
+    expect(brToIso('abc', '2026-01-01')).toBe('2026-01-01');
   });
 
   it('converte cartao da API para modelo de tela', () => {
