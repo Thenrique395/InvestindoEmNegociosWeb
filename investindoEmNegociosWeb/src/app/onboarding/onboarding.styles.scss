@@ -180,9 +180,11 @@ app-onboarding {
 }
 
 .onboarding-progress__head strong {
-  font-size: 0.875rem;
+  font-size: 10px;
   font-weight: var(--font-weight-bold);
-  color: var(--text);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .onboarding-progress__head span {
@@ -281,6 +283,8 @@ app-onboarding {
 
 .onboarding-focus-card:hover {
   border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--text) 8%, transparent);
 }
 
 .onboarding-focus-card--selected {
@@ -301,9 +305,9 @@ app-onboarding {
 }
 
 .onboarding-focus-card__icon {
-  width: 44px;
-  height: 44px;
-  margin-bottom: 0.85rem;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.9rem;
   border-radius: var(--radius-md);
   background: var(--color-primary-weak);
   color: var(--primary-text);
@@ -312,8 +316,27 @@ app-onboarding {
 }
 
 .onboarding-focus-card__icon svg {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
+}
+
+/* Marca de seleção (canto superior direito), substitui o "?" quando escolhido. */
+.onboarding-focus-card__tick {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  display: grid;
+  place-items: center;
+}
+
+.onboarding-focus-card__tick svg {
+  width: 14px;
+  height: 14px;
 }
 
 .onboarding-focus-card--selected .onboarding-focus-card__icon {
@@ -369,7 +392,7 @@ app-onboarding {
   width: 240px;
   z-index: 20;
   background: var(--text);
-  color: var(--on-primary);
+  color: var(--surface);
   font-size: 0.75rem;
   font-weight: var(--font-weight-medium);
   line-height: 1.4;
@@ -534,6 +557,16 @@ app-date-picker.onboarding-control {
   padding: 1.15rem;
 }
 
+.onboarding-entry-card {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.onboarding-entry-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--text) 8%, transparent);
+}
+
 .onboarding-entry-card--done {
   border-color: color-mix(in srgb, var(--success) 40%, transparent);
   background: color-mix(in srgb, var(--success) 5%, var(--surface));
@@ -644,7 +677,7 @@ app-date-picker.onboarding-control {
   width: 220px;
   z-index: 20;
   background: var(--text);
-  color: var(--on-primary);
+  color: var(--surface);
   font-size: 0.72rem;
   font-weight: var(--font-weight-medium);
   line-height: 1.4;
@@ -702,6 +735,19 @@ app-date-picker.onboarding-control {
 .onboarding-btn--inline {
   width: 100%;
   margin-top: auto;
+}
+
+/* Respiro horizontal extra no CTA principal do rodapé (evita texto colado). */
+.onboarding-btn--confirm {
+  padding-inline: 1.6rem;
+}
+
+/* Estado desabilitado (ex.: CTA antes de escolher um objetivo/modo). */
+.onboarding-btn:disabled,
+.onboarding-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* ── Responsivo ──────────────────────────────────────────────────────────── */

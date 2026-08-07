@@ -26,15 +26,23 @@ import { FocusArea, FocusOption } from '../onboarding.types';
               class="onboarding-focus-card"
               [class.onboarding-focus-card--selected]="selected() === item.id"
               (click)="select.emit(item.id)">
-              <span class="onboarding-focus-card__tooltip-anchor">
-                <span
-                  class="onboarding-focus-card__tooltip-trigger"
-                  tabindex="0"
-                  [attr.aria-label]="item.tooltip">
-                  ?
+              @if (selected() === item.id) {
+                <span class="onboarding-focus-card__tick" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M5 12l4 4 10-10" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
                 </span>
-                <span class="onboarding-focus-card__tooltip">{{ item.tooltip }}</span>
-              </span>
+              } @else {
+                <span class="onboarding-focus-card__tooltip-anchor">
+                  <span
+                    class="onboarding-focus-card__tooltip-trigger"
+                    tabindex="0"
+                    [attr.aria-label]="item.tooltip">
+                    ?
+                  </span>
+                  <span class="onboarding-focus-card__tooltip">{{ item.tooltip }}</span>
+                </span>
+              }
               <input
                 class="sr-only"
                 type="radio"
@@ -89,7 +97,7 @@ import { FocusArea, FocusOption } from '../onboarding.types';
             <span>Selecione o objetivo que melhor representa seu momento para seguir para preferências.</span>
           </div>
           <div class="onboarding-actions__group onboarding-actions__group--footer">
-            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" (click)="next.emit()">
+            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" [disabled]="!selected()" (click)="next.emit()">
               Continuar para preferências
             </button>
           </div>
