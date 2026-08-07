@@ -323,37 +323,37 @@
               <span>Preencha os campos essenciais para continuar.</span>
             </div>
             <div class="onboarding-form-grid">
-              <label class="onboarding-field onboarding-field--full">
-                <span>Nome completo</span>
-                <input type="text" formControlName="fullName" placeholder="Nome Completo" />
-                @if (getControlError('fullName'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
+              <app-form-field
+                class="onboarding-field--full"
+                label="Nome completo"
+                [required]="true"
+                [error]="getControlError('fullName') || ''">
+                <input class="onboarding-control" type="text" formControlName="fullName" placeholder="Seu nome completo" />
+              </app-form-field>
               @if (hasDocument) {
-                <label class="onboarding-field">
-                  <span>CPF</span>
-                  <input type="text" formControlName="document" [readonly]="true" />
-                </label>
+                <app-form-field label="CPF" hint="Não editável">
+                  <input class="onboarding-control" type="text" formControlName="document" [readonly]="true" />
+                </app-form-field>
               } @else {
-                <label class="onboarding-field">
-                  <span>CPF</span>
-                  <input type="text" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
-                  @if (getControlError('document'); as err) {
-                    <small class="onboarding-field__error">{{ err }}</small>
-                  }
-                </label>
+                <app-form-field
+                  label="CPF"
+                  [required]="true"
+                  [error]="getControlError('document') || ''">
+                  <input class="onboarding-control" type="text" inputmode="numeric" formControlName="document" placeholder="000.000.000-00" (input)="onCpfInput($event)" />
+                </app-form-field>
               }
-              <label class="onboarding-field">
-                <span>Telefone</span>
-                <input type="tel" formControlName="phone" placeholder="(81) 91234-1234" (input)="onPhoneInput($event)" />
-                @if (getControlError('phone'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
-              <label class="onboarding-field">
-                <span>Data de nascimento</span>
+              <app-form-field
+                label="Telefone"
+                [required]="true"
+                [error]="getControlError('phone') || ''">
+                <input class="onboarding-control" type="tel" inputmode="numeric" formControlName="phone" placeholder="(81) 91234-1234" (input)="onPhoneInput($event)" />
+              </app-form-field>
+              <app-form-field
+                label="Data de nascimento"
+                [required]="true"
+                [error]="getControlError('birthDate') || ''">
                 <app-date-picker
+                  class="onboarding-control"
                   format="iso"
                   [value]="form.get('birthDate')?.value || ''"
                   [min]="minBirthDate"
@@ -361,31 +361,25 @@
                   [invalid]="!!getControlError('birthDate')"
                   ariaLabel="Data de nascimento"
                   (valueChange)="onBirthDateChange($event)" />
-                @if (getControlError('birthDate'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
-              <label class="onboarding-field">
-                <span>Cidade</span>
-                <input type="text" formControlName="city" placeholder="Ex: Recife" />
-                @if (getControlError('city'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
-              <label class="onboarding-field">
-                <span>Estado (UF)</span>
-                <input type="text" formControlName="state" placeholder="Ex: PE" maxlength="2" />
-                @if (getControlError('state'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
-              <label class="onboarding-field">
-                <span>País</span>
-                <input type="text" formControlName="country" placeholder="Ex: Brasil" />
-                @if (getControlError('country'); as err) {
-                  <small class="onboarding-field__error">{{ err }}</small>
-                }
-              </label>
+              </app-form-field>
+              <app-form-field
+                label="Cidade"
+                [required]="true"
+                [error]="getControlError('city') || ''">
+                <input class="onboarding-control" type="text" formControlName="city" placeholder="Ex: Recife" />
+              </app-form-field>
+              <app-form-field
+                label="Estado (UF)"
+                [required]="true"
+                [error]="getControlError('state') || ''">
+                <input class="onboarding-control" type="text" formControlName="state" placeholder="Ex: PE" maxlength="2" />
+              </app-form-field>
+              <app-form-field
+                label="País"
+                [required]="true"
+                [error]="getControlError('country') || ''">
+                <input class="onboarding-control" type="text" formControlName="country" placeholder="Ex: Brasil" />
+              </app-form-field>
             </div>
             <div class="onboarding-actions onboarding-actions--footer">
               <div class="onboarding-actions__meta">
@@ -395,7 +389,7 @@
               <div class="onboarding-actions__group onboarding-actions__group--footer">
                 <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="prevStep()">Voltar</button>
                 <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="submit" [disabled]="loading">
-                  {{ loading ? 'Salvando...' : 'Salvar e continuar para conta e lançamentos' }}
+                  {{ loading ? 'Salvando...' : 'Salvar e continuar' }}
                 </button>
               </div>
             </div>

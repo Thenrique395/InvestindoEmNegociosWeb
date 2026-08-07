@@ -32,11 +32,12 @@ import {
 import { cpfValidator, maskCpf } from '../utils/cpf.utils';
 import { OnboardingDraftService } from './onboarding-draft.service';
 import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
+import { FormFieldComponent } from '../shared/form-field/form-field.component';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ReceitasFormComponent, DespesasFormComponent, DatePickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ReceitasFormComponent, DespesasFormComponent, DatePickerComponent, FormFieldComponent],
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.scss']
 })

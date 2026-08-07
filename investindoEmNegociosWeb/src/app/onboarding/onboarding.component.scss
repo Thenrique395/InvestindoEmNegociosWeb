@@ -595,6 +595,37 @@
   color: var(--danger-text);
 }
 
+// Controle de input padronizado dentro do app-form-field (passo Dados básicos).
+// O app-form-field cuida de label, obrigatoriedade, erro, foco e estado inválido;
+// aqui fica só a aparência base do campo, alinhada aos demais inputs do onboarding.
+.onboarding-control {
+  width: 100%;
+  min-height: 56px;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  background-color: var(--surface);
+  color: var(--text);
+  padding: 0.9rem 1rem;
+  font-size: var(--font-size-body);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.onboarding-control:focus {
+  border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+  background: color-mix(in srgb, var(--surface) 96%, white);
+}
+
+// O app-date-picker renderiza o próprio input; deixa o host fluido para o grid.
+app-date-picker.onboarding-control {
+  display: block;
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .onboarding-field--compact {
   margin-top: 1rem;
 }
