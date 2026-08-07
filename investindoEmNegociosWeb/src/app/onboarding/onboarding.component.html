@@ -40,16 +40,16 @@
         <section class="onboarding-progress" aria-label="Progresso atual">
           <div class="onboarding-progress__head">
             <strong>Progresso atual</strong>
-            <span>{{ (((step + 1) / totalSteps) * 100) | number:'1.0-0' }}%</span>
+            <span>{{ progressPercent | number:'1.0-0' }}%</span>
           </div>
           <div
             class="onboarding-progress__bar"
             role="progressbar"
-            [attr.aria-valuenow]="step + 1"
-            [attr.aria-valuemin]="1"
-            [attr.aria-valuemax]="totalSteps"
+            [attr.aria-valuenow]="progressPercent | number:'1.0-0'"
+            [attr.aria-valuemin]="0"
+            [attr.aria-valuemax]="100"
             [attr.aria-valuetext]="'Passo ' + (step + 1) + ' de ' + totalSteps">
-            <span [style.width.%]="((step + 1) / totalSteps) * 100" aria-hidden="true"></span>
+            <span [style.width.%]="progressPercent" aria-hidden="true"></span>
           </div>
           <p>
             @switch (step) {

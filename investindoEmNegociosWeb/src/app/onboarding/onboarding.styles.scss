@@ -731,15 +731,27 @@ app-date-picker.onboarding-control {
   gap: 0.6rem;
 }
 
-/* Botões: usam .btn-primary / .ghost do app; aqui só ajustes de contexto. */
+/* Cor/hover vêm de .btn-primary / .ghost do app. Mas o Preflight do Tailwind
+   zera o padding de <button> (spec 0,0,1) e o :where(.btn-primary) (spec 0,0,0)
+   não consegue restaurar — por isso a base de altura/padding/raio fica aqui,
+   com especificidade real, senão os botões ficam achatados (padding vertical 0). */
+.onboarding-btn {
+  min-height: 2.75rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+/* Respiro horizontal extra no CTA principal do rodapé. */
+.onboarding-btn--confirm {
+  padding-inline: 1.75rem;
+}
+
 .onboarding-btn--inline {
   width: 100%;
   margin-top: auto;
-}
-
-/* Respiro horizontal extra no CTA principal do rodapé (evita texto colado). */
-.onboarding-btn--confirm {
-  padding-inline: 1.6rem;
 }
 
 /* Estado desabilitado (ex.: CTA antes de escolher um objetivo/modo). */

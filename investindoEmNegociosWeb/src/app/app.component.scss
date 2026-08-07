@@ -73,7 +73,7 @@
 
 .global-alert {
   position: fixed;
-  bottom: 1.5rem;
+  top: 1.5rem;
   right: 1.5rem;
   z-index: 30;
   display: inline-flex;
@@ -123,7 +123,7 @@
 }
 
 .global-alert--feedback {
-  bottom: 5.25rem;
+  top: 5.25rem;
 }
 
 .route-view {

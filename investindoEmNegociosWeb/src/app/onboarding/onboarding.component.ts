@@ -57,6 +57,10 @@ export class OnboardingComponent implements OnInit {
   get maxBirthDate(): string {
     return todayIso();
   }
+  // Progresso 0→100% distribuído pelos passos: passo 1 = 0%, último = 100%.
+  get progressPercent(): number {
+    return this.totalSteps > 1 ? (this.step / (this.totalSteps - 1)) * 100 : 0;
+  }
   step = 0;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode | null = null;
