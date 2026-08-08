@@ -61,6 +61,13 @@ export class OnboardingComponent implements OnInit {
   get progressPercent(): number {
     return this.totalSteps > 1 ? (this.step / (this.totalSteps - 1)) * 100 : 0;
   }
+  // Rótulos das escolhas anteriores, exibidos como resumo no trilho lateral.
+  get focusLabel(): string {
+    return this.focusOptions.find((o) => o.id === this.focus)?.title ?? '';
+  }
+  get modeLabel(): string {
+    return this.intelligenceModeOptions.find((o) => o.id === this.intelligenceMode)?.title ?? '';
+  }
   step = 0;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode | null = null;

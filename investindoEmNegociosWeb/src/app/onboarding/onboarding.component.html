@@ -2,7 +2,7 @@
   <p class="sr-only" aria-live="polite" role="status">{{ liveMessage }}</p>
 
   <div class="onboarding-layout" [attr.data-step]="step">
-    <app-onboarding-rail [step]="step" />
+    <app-onboarding-rail [step]="step" [focusLabel]="focusLabel" [modeLabel]="modeLabel" />
 
     <main class="onboarding-main">
       <div class="onboarding-main__hero">
@@ -23,7 +23,7 @@
               </p>
             }
             @case (2) {
-              <h2>Dados Básicos</h2>
+              <h2>Dados básicos</h2>
               <p>
                 Essas informações fecham a base do seu perfil e preparam a conta principal e os primeiros lançamentos.
               </p>

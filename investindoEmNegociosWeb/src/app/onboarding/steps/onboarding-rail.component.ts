@@ -63,11 +63,31 @@ interface RailStep {
           </article>
         }
       </div>
+
+      @if (focusLabel() || modeLabel()) {
+        <div class="onboarding-rail__summary">
+          <p class="onboarding-rail__summary-title">Suas escolhas</p>
+          @if (focusLabel()) {
+            <div class="onboarding-rail__summary-item">
+              <span>Objetivo</span>
+              <strong>{{ focusLabel() }}</strong>
+            </div>
+          }
+          @if (modeLabel()) {
+            <div class="onboarding-rail__summary-item">
+              <span>Estilo de insights</span>
+              <strong>{{ modeLabel() }}</strong>
+            </div>
+          }
+        </div>
+      }
     </aside>
   `
 })
 export class OnboardingRailComponent {
   readonly step = input.required<number>();
+  readonly focusLabel = input('');
+  readonly modeLabel = input('');
 
   readonly steps: RailStep[] = [
     { index: 0, label: '1', title: 'Objetivo inicial', desc: 'Definir a prioridade que vai orientar seus próximos passos.' },
