@@ -461,7 +461,7 @@ cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no templat
 | 7.2 | Onboarding | 4 passos |
 | 7.3 | Dashboard administrativo | + telas `admin-*` |
 | 7.4 | Tema escuro | segundo conjunto de tokens, não CSS duplicado |
-| 7.5 | Mobile | tabela → cards, header navy, bottom nav com FAB |
+| 7.5 | Mobile | 🔶 tabela → cards **feito** (9 telas). Falta bottom nav com FAB e revisão tela a tela |
 | — | ~~Checkout e plano~~ | **fora**: pagamento adiado até o gateway estar configurado |
 
 ---
@@ -540,6 +540,27 @@ features/  telas
 Um componente sobe para `shared/` quando a **terceira** feature precisar dele.
 
 ---
+
+### Auditoria de responsividade — 9 telas em 390px
+
+Varredura automatizada (scroll horizontal + elementos que estouram) em Dashboard, Despesas,
+Receitas, Cartões, Contas, Calendário, Categorias, Metas e Orçamento.
+
+**Resultado**: nenhuma página rola na horizontal. Mas o `responsive-list` — apesar do nome —
+**não tinha uma única media query**: em 390px mantinha a tabela com rolagem lateral, contra a
+regra de COMPONENTES.md §4 ("a tabela vira lista de cards (...) Nunca scroll horizontal
+infinito").
+
+Corrigido para as **9 telas** que usam o componente: cada linha vira card, com o rótulo da
+coluna reaparecendo como etiqueta via `data-label` — sem ele, o valor sozinho perde o
+significado ("R$ 318,42" de quê?).
+
+O `<thead>` é ocultado com `clip-path`, não `display:none`: some da tela mas continua na
+árvore de acessibilidade, então os `<th>` seguem nomeando as células para o leitor de tela.
+A tabela continua sendo `<table>` no HTML — só a apresentação vira blocos.
+
+**Ainda estouram em 390px** (fora do `responsive-list`): `page-header` no Calendário e o
+título de seção no Orçamento.
 
 ## 6. Pendências
 
