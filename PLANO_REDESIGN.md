@@ -354,19 +354,67 @@ Era o único uso herdado fora da sidebar do app. Corrigido para `--surface`.
 Passou por três fases sem ser notada porque `/styleguide` não estava no roteiro de verificação
 visual. Agora está, e os 13 primitivos vivem lá.
 
-### FASE 5 — Telas do dia a dia
+### FASE 5 — Telas do dia a dia 🔶 EM ANDAMENTO
 
 | # | Tela | Observação |
 |---|---|---|
 | 5.1 | Dashboard | perfil Completo primeiro (superconjunto), depois recortar |
-| 5.2 | Despesas | fazer por completo e extrair o comum |
+| 5.2 | Despesas | 🔶 em andamento |
 | 5.3 | Receitas | sai barato depois de 5.2 — muda conteúdo e polaridade |
-| 5.4 | Cartões | + `invoice-import` |
+| 5.4 | Cartões | + `invoice-import`; resolve os 3 hex de bandeira |
 | 5.5 | Contas | |
 | 5.6 | Calendário | 4 visões |
 | 5.7 | Categorias | paleta fixa `--chart-1..7`, sem seletor livre |
 
----
+#### Achado que muda a estratégia desta fase
+
+As telas **já estão componentizadas na mesma estrutura do protótipo**. Despesas, por exemplo,
+é composta de `transaction-summary-card`, `period-hero`, `period-total-card`,
+`bulk-action-bar`, `filter-bar` e `despesas-lista` — exatamente os blocos do
+`Despesas-e-Receitas.dc.html`.
+
+Ou seja: a fase 5 **não é reescrever telas, é repaginar componentes compartilhados**. E o
+alcance de cada um é grande:
+
+| Componente | Telas que o usam |
+|---|---|
+| `transaction-summary-card` | **20** |
+| `filter-bar` | 7 |
+| `period-hero` · `period-total-card` | 4 cada |
+
+É o mesmo princípio de maior retorno da fase 1: mexer em um componente muda dezenas de telas.
+
+#### Feito
+
+- [x] `transaction-summary-card` repaginado — **alcança 20 telas**. Verificado em `/despesas`:
+      raio 16px, **sem sombra em repouso**, valor em Poppins 26px com `tabular-nums`
+- [x] `period-hero` — setas ‹ › de 32px ao lado do título (eram botões "Mês anterior"/"Próximo
+      mês" abaixo), título em Poppins. **Alcança 4 telas**
+- [x] Filtros de Despesas com `app-select-menu` — zero `<select>` nativo, categoria com busca
+- [x] `period-total-card` — superfície branca, sem sombra, valor em Poppins. **4 telas**
+- [x] `responsive-list` repaginado à tabela do handoff — **alcança 9 telas**
+
+#### Decisão: repaginar `responsive-list` em vez de migrar para `data-table`
+
+9 telas usam `responsive-list` (Despesas, Receitas, Orçamento, Empréstimos, Relatórios,
+Investimentos…). Repaginar o SCSS dele entrega a aparência da tabela do handoff nas nove de
+uma vez; migrar cada tela para `app-data-table` daria o mesmo resultado visual com nove
+refatorações.
+
+Os dois convivem: `app-data-table` é o primitivo para telas refeitas do zero — ele traz grade
+única, seleção em lote e paginação que o `responsive-list` não tem.
+
+Verificado em `/despesas`: cabeçalho **10px uppercase** (inclusive nas colunas ordenáveis),
+linha de 66px, tabela e card de total **sem sombra em repouso**.
+
+Um detalhe que a verificação visual pegou: o botão de ordenar é um `<button>`, e o reset do
+Tailwind zerava fonte e caixa herdadas do `<th>` — as colunas ordenáveis ficavam em caixa
+normal ao lado de "AÇÕES" em caixa alta.
+
+#### A fazer
+
+- [ ] Ligar o modal de parcelado nas ações de baixa e edição
+- [ ] Repetir para Receitas (herda quase tudo), Cartões, Contas, Calendário, Categorias
 
 ### FASE 6 — Planejamento e análise
 
@@ -489,6 +537,7 @@ Um componente sobe para `shared/` quando a **terceira** feature precisar dele.
 | ~~P11~~ | ✅ Resolvido com `variant` no `site-plan-cards`: `landing` mostra `salesHeadline`+`salesSubheadline`, `tour` mostra `audience`+`highlight`. Muda a ênfase, não a fonte — os dois lêem o mesmo `MarketingPlan` | — |
 | **P12** | "Manter conectado" existe no protótipo de login mas não no `AuthService`. Implementar sessão persistente é decisão de produto e segurança, não de layout | — |
 | **P13** | `Histórico mensal` e `Calculadoras` não constam no `PERFIS_E_PERMISSOES.md`, mas as telas existem. Mantive as duas em "Análises" para não tornar a funcionalidade inacessível — confirmar se devem sair do menu | — |
+| **P14** | O título do período usa `TitleCasePipe` e sai "Despesas de Agosto De 2026"; o protótipo traz "Despesas de agosto". Preposição não deveria capitalizar | Fase 5 |
 
 ---
 

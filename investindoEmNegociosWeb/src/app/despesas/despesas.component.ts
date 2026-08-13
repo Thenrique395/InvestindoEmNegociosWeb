@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { computed, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { TitleCasePipe, DecimalPipe } from '@angular/common';
@@ -40,6 +40,7 @@ import {
   parseLocaleDate,
   parseLocalizedNumber
 } from '../utils/locale-utils';
+import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
@@ -62,6 +63,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     ComparisonPillComponent,
     PeriodTotalCardComponent,
     PeriodHeroComponent,
+    SelectMenuComponent,
     AppCurrencyPipe
 ],
   templateUrl: './despesas.component.html',
@@ -108,6 +110,28 @@ export class DespesasComponent implements OnInit {
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
+
+  /** Opções do dropdown de status. Rótulos vêm de `expenseStatusLabel`. */
+  readonly statusOptions = [
+    { value: 'ALL', label: 'Todos os status' },
+    { value: 'OPEN', label: expenseStatusLabel('OPEN') },
+    { value: 'PARTIALLY_PAID', label: expenseStatusLabel('PARTIALLY_PAID') },
+    { value: 'PAID', label: expenseStatusLabel('PAID') },
+    { value: 'ANTICIPATED', label: expenseStatusLabel('ANTICIPATED') },
+    { value: 'CANCELED', label: expenseStatusLabel('CANCELED') }
+  ];
+
+  /**
+   * Categorias como opções do dropdown.
+   *
+   * Sem ponto colorido: `CategoryDto` não carrega cor — ela é derivada por
+   * índice em `CATEGORY_PALETTE` na tela de Categorias. Trazer a cor para cá
+   * exigiria repetir essa derivação e as duas divergiriam.
+   */
+  readonly categoriaOptions = computed(() => [
+    { value: 'ALL', label: 'Todas as categorias' },
+    ...this.categorias().map((c) => ({ value: c.id, label: c.name }))
+  ]);
   filtroCategoria: string = 'ALL';
   filtroNome: string = '';
   readonly loadingPagar = signal(false);

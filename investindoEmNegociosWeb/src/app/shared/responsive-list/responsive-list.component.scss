@@ -1,8 +1,10 @@
+/* Tabela — COMPONENTES.md §4. Alcança as 9 telas que usam este componente.
+   O primitivo `app-data-table` é o destino para telas refeitas do zero; aqui a
+   aparência é a mesma, sem exigir migração de cada tela. */
 .responsive-list {
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-card-hover);
   overflow: hidden;
 }
 
@@ -22,17 +24,22 @@
 }
 
 .responsive-list__head {
-  background: color-mix(in srgb, var(--surface-sunken) 70%, white);
-  color: var(--text);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
 
   tr {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-inner);
   }
 }
 
+/* Cabeçalho em 10px/700 uppercase com tracking — o peso vem da caixa alta,
+   não do tamanho. */
 .responsive-list__cell {
-  padding: 1rem 1.15rem;
+  padding: var(--space-4) var(--table-padding-x);
+  font-size: var(--fs-micro);
   font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
+  text-transform: uppercase;
   text-align: left;
   white-space: nowrap;
 }
@@ -45,11 +52,22 @@
   text-align: right;
 }
 
+/* O botão de ordenar é um `<button>`, e o reset do Tailwind zera fonte e caixa
+   herdadas do `<th>` — sem repetir aqui, a coluna ordenável ficava em caixa
+   normal ao lado de "AÇÕES" em caixa alta. */
 .responsive-list__sort {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  color: var(--text);
+  gap: var(--space-1);
+  color: inherit;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
+  text-transform: uppercase;
+}
+
+.responsive-list__sort:hover {
+  color: var(--text-secondary);
 }
 
 .responsive-list__sort-dir {
@@ -59,7 +77,7 @@
 
 .responsive-list__body {
   tr + tr td {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-row);
   }
 }
 
@@ -67,12 +85,14 @@
   transition: background 160ms ease;
 }
 
+/* Sem sombra por linha: em tabela, sombra por linha vira ruído. */
 .responsive-list__row:hover {
-  background: color-mix(in srgb, var(--surface-sunken) 62%, white);
+  background: var(--surface-sunken);
 }
 
 .responsive-list__item {
-  padding: 1rem 1.15rem;
+  height: var(--h-table-row);
+  padding: var(--space-5) var(--table-padding-x);
   vertical-align: middle;
 }
 
@@ -82,13 +102,15 @@
 
 .responsive-list__item--value {
   text-align: right;
-  font-weight: var(--fw-bold);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .responsive-list__check {
-  inline-size: 16px;
-  block-size: 16px;
-  accent-color: var(--primary-text);
+  inline-size: 15px;
+  block-size: 15px;
+  accent-color: var(--primary);
 }
 
 .responsive-list__empty {

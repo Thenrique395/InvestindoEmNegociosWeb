@@ -44,13 +44,12 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
       --tone-soft: var(--primary-tint);
 
       display: grid;
-      gap: 0.7rem;
+      gap: var(--space-4);
       height: 100%;
-      padding: 1.1rem 1.15rem 1.05rem;
+      padding: var(--card-padding);
       border: 1px solid var(--border);
-      border-radius: var(--radius-panel);
+      border-radius: var(--radius-card);
       background: var(--surface);
-      box-shadow: var(--shadow-card-hover);
     }
 
     .tsc[data-tone='success'] { --tone: var(--income); --tone-text: var(--income-text); --tone-weak: var(--income-tint); --tone-soft: var(--income-tint); }
@@ -69,18 +68,18 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      inline-size: 2.5rem;
-      block-size: 2.5rem;
+      inline-size: 30px;
+      block-size: 30px;
       flex: none;
-      border: 1px solid var(--tone-soft);
-      border-radius: var(--radius-inner);
+      border: none;
+      border-radius: var(--radius-sm);
       background: var(--tone-weak);
       color: var(--tone-text);
     }
 
     .tsc__icon ::ng-deep svg {
-      inline-size: 1.25rem;
-      block-size: 1.25rem;
+      inline-size: 16px;
+      block-size: 16px;
     }
 
     .tsc__copy { min-width: 0; }
@@ -90,27 +89,31 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
       color: var(--text-tertiary);
       font-size: var(--fs-caption);
       font-weight: var(--fw-bold);
-      letter-spacing: var(--ls-column);
+      letter-spacing: 0.14em;
       line-height: var(--lh-tight);
       text-transform: uppercase;
     }
 
+    /* Poppins 26px/600 com tracking negativo — o valor é o elemento que
+       carrega o card (COMPONENTES.md §3.1). */
     .tsc__value {
-      margin: 0.1rem 0 0;
+      margin: var(--space-4) 0 0;
       color: var(--text);
-      font-size: clamp(1.35rem, 1.6vw, 1.6rem);
-      font-weight: var(--fw-bold);
+      font-family: var(--font-display);
+      font-size: var(--fs-kpi);
+      font-weight: var(--fw-semibold);
       line-height: var(--lh-tight);
-      letter-spacing: var(--ls-tight);
+      letter-spacing: var(--ls-tighter);
+      font-variant-numeric: tabular-nums;
       overflow-wrap: anywhere;
     }
 
     .tsc__tooltip { align-self: start; }
 
     .tsc__note {
-      margin: 0;
+      margin: var(--space-2) 0 0;
       color: var(--text-tertiary);
-      font-size: var(--fs-caption);
+      font-size: var(--fs-meta);
       line-height: var(--lh-control);
     }
   `]

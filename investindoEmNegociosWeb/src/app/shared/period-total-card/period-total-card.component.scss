@@ -4,14 +4,16 @@
   display: contents;
 }
 
+/* Card de total do período. Sem sombra em repouso e com a superfície branca do
+   protótipo — ele já está dentro de um painel, e o afundado somava um degrau
+   de fundo que não existe no design. */
 .app-period-total-card {
   border: 1px solid var(--border);
-  border-radius: var(--radius-panel);
-  background: var(--surface-sunken);
-  box-shadow: var(--shadow-card-hover);
-  padding: 1.45rem 1.4rem 1.3rem;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: var(--panel-padding);
   display: grid;
-  gap: 0.95rem;
+  gap: var(--space-5);
 }
 
 .app-period-total-card__eyebrow {
@@ -24,22 +26,25 @@
 }
 
 .app-period-total-card__value {
+  font-family: var(--font-display);
   font-size: var(--fs-kpi);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-display);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tighter);
+  font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 
 .app-period-total-card__text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: var(--fs-body);
+  font-size: var(--fs-meta);
   line-height: var(--lh-body);
 }
 
 .app-period-total-card__actions {
   display: grid;
-  gap: 0.7rem;
+  gap: var(--space-4);
 }
 
 @include actions.period-card-actions('.app-period-total-card__actions');
