@@ -562,6 +562,31 @@ A tabela continua sendo `<table>` no HTML — só a apresentação vira blocos.
 **Ainda estouram em 390px** (fora do `responsive-list`): `page-header` no Calendário e o
 título de seção no Orçamento.
 
+### Auditoria de contraste — tema escuro, 9 telas do app
+
+Medição automatizada de todo texto visível contra o fundo composto, com os limiares da WCAG
+(4.5:1 normal, 3:1 para texto grande ou negrito ≥18.66px).
+
+**Achado real**: os cards de ação primária ("Adicionar despesa/receita/cartão") usavam
+`color: white` fixo. No tema claro o fundo é o azul escuro `#2563EB` e funciona; no escuro a
+primária vira `#5B9DFF` — **branco sobre azul claro media 2.52:1**, abaixo do mínimo.
+
+Corrigido para `--on-primary`, que carrega o par certo em cada tema:
+**2.52:1 → 7.35:1** (passa AA e AAA); o subtítulo, a 80% de opacidade, ficou em 5.23:1.
+
+#### Duas armadilhas do próprio medidor, que valem para a próxima auditoria
+
+1. **Alpha**: um badge com fundo `rgba(224,164,88,.16)` e texto `#E0A458` mede 1:1 se o alpha
+   for ignorado — o script acusou **102 falsos positivos** em Categorias antes de compor as
+   camadas de fundo.
+2. **Gradiente**: `background: linear-gradient(...)` não aparece em `backgroundColor`, então o
+   medidor sobe para o pai e compara contra o fundo errado. Foi o que fez a correção do botão
+   *parecer* ter piorado. A conferência final teve que ser visual.
+
+Sobram 4.01:1 em rótulos de aba (Calendário e Categorias) — abaixo de 4.5 para texto normal.
+Não corrigido: exige decidir se o rótulo inativo sobe de `--text-tertiary` para
+`--text-secondary`, o que mexe no contraste entre aba ativa e inativa em ambos os temas.
+
 ## 6. Pendências
 
 | # | Pendência | Bloqueia |

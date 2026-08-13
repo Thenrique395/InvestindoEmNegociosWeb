@@ -47,7 +47,10 @@
       color-mix(in srgb, var(--primary) 92%, white),
       color-mix(in srgb, var(--primary) 76%, black)
     );
-    color: white;
+    /* `--on-primary`, não branco fixo: no tema escuro a primária é clara
+       (#5B9DFF) e branco sobre ela mede 1.21:1. O token já carrega o par certo
+       em cada tema. */
+    color: var(--on-primary);
     box-shadow: 0 18px 32px color-mix(in srgb, var(--primary) 28%, transparent);
   }
 
@@ -68,8 +71,8 @@
   }
 
   #{$actions-selector} ::ng-deep .period-total-card__action--primary .period-total-card__action-icon {
-    background: color-mix(in srgb, white 18%, transparent);
-    color: white;
+    background: color-mix(in srgb, var(--on-primary) 18%, transparent);
+    color: var(--on-primary);
   }
 
   #{$actions-selector} ::ng-deep .period-total-card__action-copy {
@@ -91,6 +94,6 @@
   }
 
   #{$actions-selector} ::ng-deep .period-total-card__action--primary .period-total-card__action-copy small {
-    color: color-mix(in srgb, white 80%, transparent);
+    color: color-mix(in srgb, var(--on-primary) 80%, transparent);
   }
 }
