@@ -1,4 +1,5 @@
 import { Component, OnInit, effect } from '@angular/core';
+import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -57,7 +58,8 @@ import {
     TransactionSummaryCardComponent,
     SegmentedSelectorComponent,
     DonutChartComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    SelectMenuComponent
   ],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
@@ -264,6 +266,18 @@ export class ContasComponent implements OnInit {
     { value: 'DigitalWallet', label: 'Carteira digital' },
     { value: 'Cash', label: 'Dinheiro' },
     { value: 'Other', label: 'Outro' }
+  ];
+
+  readonly statusFilterOptions = [
+    { value: 'all', label: 'Todos os status' },
+    { value: 'active', label: 'Ativas' },
+    { value: 'inactive', label: 'Inativas' }
+  ];
+
+  readonly balanceFilterOptions = [
+    { value: 'all', label: 'Todos os saldos' },
+    { value: 'positive', label: 'Positivo' },
+    { value: 'negative', label: 'Negativo' }
   ];
 
   readonly sortOptions: { value: AccountSort; label: string }[] = [

@@ -54,19 +54,19 @@
       </label>
       <label class="cat-filter">
         <span class="cat-filter__label">Origem</span>
-        <select [(ngModel)]="filters.origin" (ngModelChange)="onFilterChange()" aria-label="Filtrar por origem">
-          <option value="all">Todas</option>
-          <option value="default">Sistema</option>
-          <option value="custom">Minhas</option>
-        </select>
+        <app-select-menu
+          [options]="originFilterOptions"
+          [(ngModel)]="filters.origin"
+          (valueChange)="onFilterChange()"
+          ariaLabel="Filtrar por origem" />
       </label>
       <label class="cat-filter">
         <span class="cat-filter__label">Status</span>
-        <select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()" aria-label="Filtrar por status">
-          <option value="all">Todos</option>
-          <option value="active">Ativas</option>
-          <option value="inactive">Inativas</option>
-        </select>
+        <app-select-menu
+          [options]="statusFilterOptions"
+          [(ngModel)]="filters.status"
+          (valueChange)="onFilterChange()"
+          ariaLabel="Filtrar por status" />
       </label>
     </div>
   </div>

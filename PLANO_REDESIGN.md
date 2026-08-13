@@ -411,10 +411,31 @@ Um detalhe que a verificação visual pegou: o botão de ordenar é um `<button>
 Tailwind zerava fonte e caixa herdadas do `<th>` — as colunas ordenáveis ficavam em caixa
 normal ao lado de "AÇÕES" em caixa alta.
 
+- [x] Despesas — filtros em dropdown, título sem `titlecase`
+- [x] Receitas — filtros em dropdown; herdou cards, hero, total e tabela prontos
+
+**Medido nas 5 telas restantes**: todas já herdaram cards com raio 16px, tabela com
+cabeçalho 10px, sem scroll horizontal e sem erro de console. O visual chegou nelas pelos
+componentes compartilhados, sem uma linha por tela.
+
+- [x] Filtros em dropdown: Contas (4), Categorias (2), Calendário (2)
+
+**Todos os filtros de listagem** agora usam `app-select-menu`. Verificado no app: Despesas,
+Receitas, Categorias e Calendário com 2 dropdowns cada e **zero `<select>` nativo**; o
+comportamento foi testado ponta a ponta (abrir → listar → escolher → valor muda).
+
+Contas aparece com 0 dropdowns na medição porque a conta de teste **está sem contas
+cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no template.
+
 #### A fazer
 
-- [ ] Ligar o modal de parcelado nas ações de baixa e edição
-- [ ] Repetir para Receitas (herda quase tudo), Cartões, Contas, Calendário, Categorias
+- [ ] `<select>` em **formulários de modal**: `account-form`, `account-transfer`,
+      `account-import` e o formulário de cartão. Não são filtros; entram quando os modais
+      forem refeitos
+- [ ] Cartões: filtros de fatura usam `[ngValue]` **numérico** (mês). Converter para o
+      dropdown exige acertar o tipo, e errar ali quebra o filtro de competência
+- [ ] Ligar o modal de parcelado nas ações de baixa e edição de Despesas e Cartões
+- [ ] Dashboard (5.1) — depende dos três perfis; fazer o Completo e recortar
 
 ### FASE 6 — Planejamento e análise
 
@@ -530,14 +551,14 @@ Um componente sobe para `shared/` quando a **terceira** feature precisar dele.
 | **P4** | Nomes de plano divergem em três lugares: código `Basic/Intermediate/Advanced` · marketing `Essencial/Controle/Patrimônio` · handoff de perfis `Essencial/Inteligente/Completo`. **O marketing e o código de `marketing-plans.ts` já concordam entre si** — a divergência é só com o handoff de perfis | Fase 3 |
 | **P5** | Menu atual ≠ `PERFIS_E_PERMISSOES.md`: sobra "Histórico mensal" e "Calculadoras", Simulador está em Planejamento (handoff põe em Análises), falta grupo "Conta" | Fase 3 |
 | **P6** | Pasta do handoff no repo chama-se `design_handoff_investindo_redesign 2` — renomear? | — |
-| **P7** | `--warning` no tema escuro não é especificado pelo handoff; usei `#E0A458` clareado a partir do `#C97A15`. Confirmar na fase 7.4 | Fase 7.4 |
-| ~~P8~~ | ✅ `/termos` e `/privacidade` criadas com o estilo novo. **Falta revisão jurídica e preencher os placeholders** | — |
+| ~~P7~~ | ✅ `#E0A458` validado por contraste: **7.89:1** sobre `#011E29` (AA texto normal), na mesma faixa de income (9.67), expense (7.53) e primary (6.33) | — |
+| **P8** | ⚠️ **BLOQUEIA PUBLICAÇÃO.** `/termos` e `/privacidade` estão no ar com os placeholders `{{RAZAO_SOCIAL}}`, `{{CNPJ}}`, `{{ENDERECO}}` e `{{EMAIL_CONTATO}}` **visíveis ao usuário**, e o texto não passou por revisão jurídica. Decidido deixar assim enquanto o site não for publicado | antes de publicar |
 | ~~P9~~ | ✅ Site respondendo aos dois temas; prévia do app mantida clara via tokens `--preview-*` | — |
 | ~~P10~~ | ✅ `product-showcase` (2.100 linhas) e `pricing` (1.094 linhas) removidos, mais a regra órfã `.pricing-page` do `styles.scss`. Testes: 565 → 550 (−15 dos specs apagados) | — |
 | ~~P11~~ | ✅ Resolvido com `variant` no `site-plan-cards`: `landing` mostra `salesHeadline`+`salesSubheadline`, `tour` mostra `audience`+`highlight`. Muda a ênfase, não a fonte — os dois lêem o mesmo `MarketingPlan` | — |
-| **P12** | "Manter conectado" existe no protótipo de login mas não no `AuthService`. Implementar sessão persistente é decisão de produto e segurança, não de layout | — |
-| **P13** | `Histórico mensal` e `Calculadoras` não constam no `PERFIS_E_PERMISSOES.md`, mas as telas existem. Mantive as duas em "Análises" para não tornar a funcionalidade inacessível — confirmar se devem sair do menu | — |
-| **P14** | O título do período usa `TitleCasePipe` e sai "Despesas de Agosto De 2026"; o protótipo traz "Despesas de agosto". Preposição não deveria capitalizar | Fase 5 |
+| ~~P12~~ | ✅ **Decidido: não implementar.** Sessão persistente muda como o token é guardado e por quanto tempo — decisão a tomar junto com o backend, não com o layout | — |
+| ~~P13~~ | ✅ **Decidido: manter no menu**, em "Análises". Tirá-las deixaria funcionalidade existente inacessível | — |
+| ~~P14~~ | ✅ `titlecase` removido de Despesas — Receitas já fazia certo, e agora as duas dizem "de agosto de 2026". O `TitleCasePipe` saiu do componente |  — |
 
 ---
 

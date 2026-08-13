@@ -1,7 +1,7 @@
 import { computed, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { TitleCasePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -47,7 +47,6 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
   selector: 'app-despesas',
   standalone: true,
   imports: [
-    TitleCasePipe,
     DecimalPipe,
     FormsModule,
     DespesasListaComponent,

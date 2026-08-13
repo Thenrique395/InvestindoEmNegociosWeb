@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, OnInit, signal } from '@angular/core';
+import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -59,13 +60,29 @@ type GroupFilter = 'all' | CalendarEventGroup;
     FinancialTimelineComponent,
     FinancialEventCardComponent,
     CalendarSidebarComponent,
-    AppCurrencyPipe
+    AppCurrencyPipe,
+    SelectMenuComponent
   ],
   templateUrl: './calendario.component.html',
   styleUrls: ['./calendario.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CalendarioComponent implements OnInit {
+
+  /** `categoryOptions()` devolve nomes; o dropdown precisa de value+label. */
+  readonly categorySelectOptions = computed(() => [
+    { value: 'all', label: 'Todas as categorias' },
+    ...this.categoryOptions().map((c) => ({ value: c, label: c }))
+  ]);
+
+  readonly statusSelectOptions = [
+    { value: 'all', label: 'Todos os status' },
+    { value: 'forecast', label: 'Previsto' },
+    { value: 'paid', label: 'Pago' },
+    { value: 'received', label: 'Recebido' },
+    { value: 'overdue', label: 'Atrasado' },
+    { value: 'canceled', label: 'Cancelado' }
+  ];
   readonly today = new Date();
   currentMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
   selectedDate = new Date();

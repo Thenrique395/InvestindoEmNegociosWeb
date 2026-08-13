@@ -67,9 +67,9 @@
   --expense-tint-soft: rgba(240, 146, 138, .07);
   --expense-border:    rgba(240, 146, 138, .28);
 
-  /* PENDENTE — o handoff não especifica a cor de atenção no tema escuro.
-     Clareada a partir do #C97A15 para manter contraste sobre #011E29.
-     Confirmar na fase de tema escuro (7.4). */
+  /* O handoff não especifica a cor de atenção no tema escuro. Clareada a partir
+     do #C97A15 e validada por contraste: 7.89:1 sobre #011E29 (AA para texto
+     normal), na mesma faixa de income (9.67), expense (7.53) e primary (6.33). */
   --warning:           #E0A458;
   --warning-text:      #E0A458;
   --warning-tint:      rgba(224, 164, 88, .16);

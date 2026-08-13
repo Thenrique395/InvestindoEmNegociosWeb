@@ -130,19 +130,17 @@
         </label>
         <label class="tx-filter">
           <span class="tx-filter__label">Tipo</span>
-          <select [(ngModel)]="filtroTipo">
-            <option value="all">Todos</option>
-            <option value="recurring">Recorrente</option>
-            <option value="oneTime">Avulsa</option>
-          </select>
+          <app-select-menu
+            [options]="tipoOptions"
+            [(ngModel)]="filtroTipo"
+            ariaLabel="Filtrar por tipo" />
         </label>
         <label class="tx-filter">
           <span class="tx-filter__label">Status</span>
-          <select [(ngModel)]="filtroStatus">
-            <option value="all">Todos</option>
-            <option value="paid">Recebida</option>
-            <option value="pending">Pendente</option>
-          </select>
+          <app-select-menu
+            [options]="statusOptions"
+            [(ngModel)]="filtroStatus"
+            ariaLabel="Filtrar por status" />
         </label>
       </div>
     </app-filter-bar>

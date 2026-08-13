@@ -112,35 +112,31 @@
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Tipo</span>
-          <select [(ngModel)]="filters.type" aria-label="Filtrar por tipo de conta">
-            @for (opt of typeFilterOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
+          <app-select-menu
+            [options]="typeFilterOptions"
+            [(ngModel)]="filters.type"
+            ariaLabel="Filtrar por tipo de conta" />
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Status</span>
-          <select [(ngModel)]="filters.status" aria-label="Filtrar por status">
-            <option value="all">Todos</option>
-            <option value="active">Ativas</option>
-            <option value="inactive">Inativas</option>
-          </select>
+          <app-select-menu
+            [options]="statusFilterOptions"
+            [(ngModel)]="filters.status"
+            ariaLabel="Filtrar por status" />
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Saldo</span>
-          <select [(ngModel)]="filters.balance" aria-label="Filtrar por saldo">
-            <option value="all">Todos</option>
-            <option value="positive">Positivo</option>
-            <option value="negative">Negativo</option>
-          </select>
+          <app-select-menu
+            [options]="balanceFilterOptions"
+            [(ngModel)]="filters.balance"
+            ariaLabel="Filtrar por saldo" />
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Ordenar</span>
-          <select [(ngModel)]="sort" aria-label="Ordenar contas">
-            @for (opt of sortOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
+          <app-select-menu
+            [options]="sortOptions"
+            [(ngModel)]="sort"
+            ariaLabel="Ordenar contas" />
         </label>
       </div>
     }

@@ -86,23 +86,20 @@
       @if (canAdvanced) {
         <label class="cal-select">
           <span class="cal-select__label">Categoria</span>
-          <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()">
-            <option value="all">Todas</option>
-            @for (category of categoryOptions(); track category) {
-              <option [value]="category">{{ category }}</option>
-            }
-          </select>
+          <app-select-menu
+            [options]="categorySelectOptions()"
+            [(ngModel)]="selectedCategory"
+            (valueChange)="onFilterChange()"
+            [searchable]="true"
+            ariaLabel="Filtrar por categoria" />
         </label>
         <label class="cal-select">
           <span class="cal-select__label">Status</span>
-          <select [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
-            <option value="all">Todos</option>
-            <option value="forecast">Previsto</option>
-            <option value="paid">Pago</option>
-            <option value="received">Recebido</option>
-            <option value="overdue">Atrasado</option>
-            <option value="canceled">Cancelado</option>
-          </select>
+          <app-select-menu
+            [options]="statusSelectOptions"
+            [(ngModel)]="selectedStatus"
+            (valueChange)="onFilterChange()"
+            ariaLabel="Filtrar por status" />
         </label>
       }
     </div>
