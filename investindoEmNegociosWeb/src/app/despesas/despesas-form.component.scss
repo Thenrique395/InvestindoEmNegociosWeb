@@ -15,15 +15,15 @@
 
 .expense-form__section-title {
   margin: 0;
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
 .expense-form__section-text {
   margin: 0;
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
   color: var(--text-secondary);
 }
 
@@ -42,10 +42,10 @@
 
 .expense-form__control {
   min-height: 52px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 0 1rem;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-medium);
   width: 100%;
   box-sizing: border-box;
 }
@@ -56,8 +56,8 @@
 }
 
 .expense-form__hint {
-  font-size: var(--font-size-label);
-  color: var(--text-muted);
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
 }
 
 .expense-form__warning {
@@ -66,9 +66,9 @@
   align-items: center;
   gap: 0.75rem;
   justify-content: space-between;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 74%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 74%, white);
   padding: 0.95rem 1rem;
 }
 
@@ -83,14 +83,14 @@
 }
 
 .expense-form__warning-title {
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
 .expense-form__warning-text {
-  font-size: var(--font-size-label);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-body);
   color: var(--text-secondary);
 }
 
@@ -103,8 +103,8 @@
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   background: var(--surface);
   padding: 0.65rem 0.95rem;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
   color: var(--text);
   text-decoration: none;
 }
@@ -115,24 +115,24 @@
 }
 
 .expense-form__summary {
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 76%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 76%, white);
   padding: 1rem;
 }
 
 .expense-form__summary-eyebrow {
   margin: 0;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .expense-form__summary-text {
   margin: 0.45rem 0 0;
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
   color: var(--text);
 }

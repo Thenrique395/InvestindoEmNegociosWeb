@@ -1,0 +1,279 @@
+/* Tabela — COMPONENTES.md §4. */
+
+:host {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+}
+
+/* ---------- Seleção em lote ------------------------------------------------ */
+
+.dt__bulk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  padding: var(--space-5) var(--space-10);
+  background: var(--primary-tint-soft);
+  border-bottom: 1px solid var(--border-inner);
+}
+
+.dt__bulk-count {
+  color: var(--primary-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+}
+
+.dt__bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dt__bulk-clear {
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--fs-meta);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+/* ---------- Scroller ------------------------------------------------------- */
+
+/* A tabela rola dentro da própria caixa. Sem isto, uma tabela larga empurra a
+   página inteira para os lados. */
+.dt__scroller {
+  overflow-x: auto;
+}
+
+.dt__rail {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Cabeçalho e linhas --------------------------------------------- */
+
+.dt__head,
+.dt__row,
+.dt__total {
+  display: grid;
+  align-items: center;
+  gap: var(--space-7);
+  padding: 0 var(--table-padding-x);
+}
+
+.dt__head {
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border-inner);
+}
+
+.dt__th {
+  color: var(--text-tertiary);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
+  text-transform: uppercase;
+}
+
+.dt__th--sortable {
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    color: var(--text-secondary);
+  }
+}
+
+.dt__sort {
+  width: 12px;
+  height: 12px;
+  margin-left: var(--space-1);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  vertical-align: middle;
+}
+
+.dt__row {
+  min-height: var(--h-table-row);
+  border-bottom: 1px solid var(--border-row);
+  font-size: var(--fs-body);
+  transition: background var(--dur-hover) ease;
+
+  /* Sem sombra por linha: em tabela, sombra vira ruído. */
+  &:hover {
+    background: var(--surface-sunken);
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.dt__row--selected {
+  background: var(--primary-tint-soft);
+}
+
+.dt__cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &[data-align='right'] {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &[data-align='center'] {
+    text-align: center;
+  }
+}
+
+.dt__cell--check {
+  display: grid;
+  place-items: center;
+}
+
+.dt__check {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  border: 1.5px solid var(--border-hover);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+
+  &:checked,
+  &:indeterminate {
+    border-color: var(--primary);
+    background: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-size: 10px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &:indeterminate {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.6' stroke-linecap='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E");
+  }
+}
+
+.dt__empty {
+  padding: var(--space-12) var(--table-padding-x);
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  text-align: center;
+}
+
+.dt__total {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-6);
+  background: var(--surface-subtle);
+  border-top: 1px solid var(--border-inner);
+}
+
+.dt__total-label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------- Rodapé --------------------------------------------------------- */
+
+.dt__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  padding: var(--space-6) var(--table-padding-x);
+  border-top: 1px solid var(--border-inner);
+}
+
+.dt__count {
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+.dt__pagination {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dt__page {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--fs-meta);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-sunken);
+  }
+}
+
+.dt__page--current {
+  background: var(--brand-navy);
+  border-color: var(--brand-navy);
+  color: var(--surface);
+  font-weight: var(--fw-semibold);
+}
+
+/* ---------- Mobile: a tabela vira lista de cards ---------------------------- */
+
+@media (max-width: 720px) {
+  .dt__scroller {
+    overflow-x: visible;
+  }
+
+  .dt__rail {
+    min-width: 0 !important;
+    gap: var(--space-5);
+    padding: var(--space-5);
+  }
+
+  .dt__head {
+    display: none;
+  }
+
+  /* Cada linha vira um card: grade única, rótulo antes do valor. */
+  .dt__row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6) var(--space-7);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-inner);
+  }
+
+  .dt__cell {
+    white-space: normal;
+
+    &[data-align='right'] {
+      text-align: left;
+    }
+  }
+
+  .dt__total {
+    display: none;
+  }
+}

@@ -1,0 +1,104 @@
+/* Cabeçalho de tela — COMPONENTES.md §2. */
+
+:host {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-9);
+  flex-wrap: wrap;
+}
+
+:host(.page-header--elevated) {
+  padding: var(--panel-padding);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.page-header__text {
+  min-width: 0;
+}
+
+.page-header__eyebrow {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.page-header__title {
+  margin: var(--space-2) 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-page-title);
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+}
+
+/* `size` só reduz: as 23 telas que já passam o input continuam funcionando,
+   e nenhuma delas fica maior que o padrão do handoff. */
+:host([data-size='sm']) .page-header__title {
+  font-size: var(--fs-modal-title);
+}
+
+:host([data-size='lg']) .page-header__title {
+  font-size: var(--fs-page-title);
+}
+
+.page-header__description {
+  margin: 0;
+  max-width: 74ch;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.page-header__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+.page-header__meta:empty {
+  display: none;
+}
+
+.page-header__aside {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.page-header__period,
+.page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.page-header__period:empty,
+.page-header__actions:empty {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  :host {
+    align-items: flex-start;
+    gap: var(--space-7);
+  }
+
+  .page-header__aside {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

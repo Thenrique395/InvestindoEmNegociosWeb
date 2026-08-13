@@ -52,15 +52,15 @@ import { CalendarEvent, DayGroup, isSameDay } from './calendar-agenda.model';
       padding-top: 4px;
     }
     .agenda__date { display: grid; text-align: center; }
-    .agenda__weekday { font-size: var(--text-xs, 0.7rem); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+    .agenda__weekday { font-size: var(--fs-caption, 0.7rem); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
     .agenda__daynum { font-size: 1.6rem; font-weight: 700; color: var(--text); line-height: 1.1; }
     .agenda__daynum--today {
       color: var(--primary-text, var(--primary));
     }
-    .agenda__month { font-size: var(--text-xs, 0.7rem); color: var(--text-muted); text-transform: capitalize; }
-    .agenda__totals { display: grid; gap: 2px; text-align: center; font-size: var(--text-xs, 0.72rem); font-weight: 600; }
-    .agenda__in { color: var(--success-text, var(--success)); }
-    .agenda__out { color: var(--danger-text, var(--danger)); }
+    .agenda__month { font-size: var(--fs-caption, 0.7rem); color: var(--text-tertiary); text-transform: capitalize; }
+    .agenda__totals { display: grid; gap: 2px; text-align: center; font-size: var(--fs-caption, 0.72rem); font-weight: 600; }
+    .agenda__in { color: var(--income-text, var(--income)); }
+    .agenda__out { color: var(--expense-text, var(--expense)); }
     .agenda__events { display: grid; gap: 8px; }
 
     @media (max-width: 560px) {

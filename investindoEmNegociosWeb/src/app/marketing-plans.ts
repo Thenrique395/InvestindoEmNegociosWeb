@@ -13,6 +13,10 @@ export interface MarketingPlan {
   highlight: string;
   features: string[];
   limits: string[];
+  /** Selo no topo do card na landing: GRÁTIS, MAIS ESCOLHIDO, COMPLETO. */
+  tag: string;
+  /** Rótulo do botão do card. Muda por plano, não é genérico. */
+  ctaLabel: string;
 }
 
 export const MARKETING_PLANS: MarketingPlan[] = [
@@ -37,7 +41,9 @@ export const MARKETING_PLANS: MarketingPlan[] = [
       'Sem gestão avançada de cartões',
       'Sem importação de fatura',
       'Sem módulo de investimentos'
-    ]
+    ],
+    tag: 'GRÁTIS',
+    ctaLabel: 'Começar de graça'
   },
   {
     code: 'intermediate',
@@ -58,7 +64,9 @@ export const MARKETING_PLANS: MarketingPlan[] = [
     ],
     limits: [
       'Ainda sem carteira de investimentos completa'
-    ]
+    ],
+    tag: 'MAIS ESCOLHIDO',
+    ctaLabel: 'Quero fazer parte'
   },
   {
     code: 'advanced',
@@ -78,7 +86,9 @@ export const MARKETING_PLANS: MarketingPlan[] = [
     ],
     limits: [
       'Integrações externas premium entram na próxima fase'
-    ]
+    ],
+    tag: 'COMPLETO',
+    ctaLabel: 'Assinar Patrimônio'
   }
 ];
 

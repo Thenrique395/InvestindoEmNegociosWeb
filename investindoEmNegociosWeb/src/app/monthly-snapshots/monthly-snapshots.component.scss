@@ -11,18 +11,18 @@
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .text--sm {
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
 .snapshot {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   padding: 1rem;
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   display: grid;
   gap: 0.8rem;
 }
@@ -38,7 +38,7 @@
 .snapshot__head h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
+  font-size: var(--fs-card-title);
 }
 
 .snapshot__risk {
@@ -56,8 +56,8 @@
   padding-left: 1.1rem;
   display: grid;
   gap: 0.3rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
 }
 
 .grid {
@@ -69,16 +69,16 @@
 .grid > div {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 0.85rem;
 }
 
 .grid span {
   display: block;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-label);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
   margin-bottom: 0.25rem;
   text-transform: uppercase;
 }

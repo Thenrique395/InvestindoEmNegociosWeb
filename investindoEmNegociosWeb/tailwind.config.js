@@ -4,14 +4,15 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        // Corpo e UI. Títulos e valores usam `font-display` (Poppins).
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Poppins', 'system-ui', 'sans-serif'],
       },
       fontWeight: {
-        normal: 'var(--font-weight-regular)',
-        medium: 'var(--font-weight-medium)',
-        semibold: 'var(--font-weight-semibold)',
-        bold: 'var(--font-weight-bold)',
-        extrabold: 'var(--font-weight-extrabold)',
+        normal: 'var(--fw-regular)',
+        medium: 'var(--fw-medium)',
+        semibold: 'var(--fw-semibold)',
+        bold: 'var(--fw-bold)',
       },
     },
   },

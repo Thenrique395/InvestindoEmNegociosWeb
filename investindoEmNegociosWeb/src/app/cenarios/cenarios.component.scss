@@ -8,9 +8,9 @@
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card-hover);
   min-width: 0;
   display: grid;
   gap: 0.9rem;
@@ -19,12 +19,12 @@
 .card h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .params-grid {
@@ -38,7 +38,7 @@ label {
   display: grid;
   gap: 0.4rem;
   color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .field {
@@ -48,13 +48,13 @@ label {
 
 .field__label {
   color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 input {
   border: 1px solid var(--border);
-  background-color: var(--surface-2);
-  border-radius: var(--radius-lg);
+  background-color: var(--surface-sunken);
+  border-radius: var(--radius-inner);
   min-height: 48px;
   padding: 0.7rem 0.9rem;
   color: var(--text);
@@ -110,8 +110,8 @@ td {
   gap: 0.4rem;
   padding: 0.8rem 0.9rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
 }
 
 .projection-card__head {
@@ -123,18 +123,18 @@ td {
 
 .projection-card__date {
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .projection-card__meta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 0.9rem;
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
-.positive { color: var(--success-text); }
-.negative { color: var(--danger-text); }
+.positive { color: var(--income-text); }
+.negative { color: var(--expense-text); }
 
 @media (max-width: 860px) {
   .results-grid {

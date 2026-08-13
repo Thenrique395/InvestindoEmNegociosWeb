@@ -27,15 +27,15 @@ export type UsageBarTone = 'ok' | 'warning' | 'critical';
     :host { display: block; }
 
     .usage-bar {
-      --usage-tone: var(--success);
+      --usage-tone: var(--income);
       height: 7px;
       overflow: hidden;
       border-radius: var(--radius-pill);
-      background: var(--surface-3);
+      background: var(--surface-inset);
     }
 
     .usage-bar[data-tone='warning'] { --usage-tone: var(--warning); }
-    .usage-bar[data-tone='critical'] { --usage-tone: var(--danger); }
+    .usage-bar[data-tone='critical'] { --usage-tone: var(--expense); }
 
     .usage-bar__fill {
       height: 100%;

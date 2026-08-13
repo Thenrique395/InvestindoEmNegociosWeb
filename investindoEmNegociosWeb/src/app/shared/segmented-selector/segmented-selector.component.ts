@@ -39,45 +39,52 @@ export interface SegmentOption {
     </div>
   `,
   styles: `
+    /* Segmented — COMPONENTES.md §5.6. O trilho é uma superfície afundada e a
+       aba ativa "sobe" com fundo branco e sombra de 1px: é o contraste entre os
+       dois que comunica a seleção, não a cor do texto. */
     :host { display: inline-block; }
     .seg {
       display: inline-flex;
-      gap: 4px;
-      padding: 4px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      background: var(--surface-2);
+      padding: 3px;
+      border-radius: var(--radius-control);
+      background: var(--surface-inset);
     }
     .seg__item {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-2);
       border: 0;
-      border-radius: var(--radius-lg, 12px);
-      padding: 8px 14px;
+      border-radius: var(--radius-xs);
+      padding: 7px var(--space-6);
       background: transparent;
-      color: var(--text-muted);
-      font-size: var(--font-size-body-sm, 0.85rem);
-      font-weight: var(--font-weight-medium, 500);
+      color: var(--text-tertiary);
+      font-family: inherit;
+      font-size: var(--fs-meta);
+      font-weight: var(--fw-semibold);
       cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease;
+      transition: background var(--dur-hover) ease, color var(--dur-hover) ease;
       white-space: nowrap;
     }
     .seg__item:hover:not(:disabled):not(.seg__item--active) {
-      color: var(--text);
-      background: var(--surface-3);
+      color: var(--text-secondary);
     }
     .seg__item--active {
       background: var(--surface);
       color: var(--text);
-      box-shadow: var(--shadow-elevation-sm);
+      box-shadow: var(--shadow-segment);
     }
-    .seg__item:disabled { opacity: 0.5; cursor: not-allowed; }
+    .seg__item:disabled { opacity: var(--control-disabled-opacity); cursor: not-allowed; }
     .seg__item:focus-visible {
       outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
     .seg__icon { font-size: 0.95em; line-height: 1; }
+    /* Variante compacta: padding e raios menores. */
+    :host([data-size='sm']) .seg { border-radius: var(--radius-sm); }
+    :host([data-size='sm']) .seg__item {
+      padding: var(--space-2) var(--space-5);
+      border-radius: 7px;
+    }
     @media (max-width: 640px) {
       .seg { width: 100%; overflow-x: auto; }
     }

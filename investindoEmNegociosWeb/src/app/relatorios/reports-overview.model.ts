@@ -7,11 +7,11 @@ import { DonutChartItem } from '../shared/donut-chart/donut-chart.component';
  */
 
 export const CATEGORY_PALETTE = [
-  'var(--color-chart-series-1)',
-  'var(--color-chart-series-2)',
-  'var(--color-chart-series-3)',
-  'var(--color-chart-series-4)',
-  'var(--color-chart-series-5)'
+  'var(--chart-1)',
+  'var(--chart-2)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)'
 ];
 
 /** Monta os itens do donut de despesas por categoria com a cor da paleta. */

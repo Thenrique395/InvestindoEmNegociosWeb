@@ -1,0 +1,37 @@
+/* Barra de progresso — COMPONENTES.md §9. */
+
+:host {
+  display: block;
+}
+
+.progress__track {
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--income);
+  transition: width var(--dur-bar) var(--ease-out), background var(--dur-hover) ease;
+
+  &[data-tone='primary'] {
+    background: var(--primary);
+  }
+
+  &[data-tone='warning'] {
+    background: var(--warning);
+  }
+
+  &[data-tone='expense'] {
+    background: var(--expense);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__fill {
+    transition: none;
+  }
+}

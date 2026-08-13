@@ -48,10 +48,10 @@
   </div>
 
   <div class="mt-3">
-    <p class="text-sm text-[var(--text-muted)]">{{ ofxFileName || 'Nenhum arquivo OFX selecionado' }}</p>
+    <p class="text-sm text-[var(--text-tertiary)]">{{ ofxFileName || 'Nenhum arquivo OFX selecionado' }}</p>
 
     @if (extractingOfx) {
-      <p class="text-sm text-[var(--text-muted)]">Processando arquivo...</p>
+      <p class="text-sm text-[var(--text-tertiary)]">Processando arquivo...</p>
     }
 
     @if (hasOfxPreview) {
@@ -70,7 +70,7 @@
     <div class="mt-4 overflow-x-auto">
       <table class="min-w-full text-sm">
         <thead>
-          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-tertiary)]">
             <th class="py-2 px-3">Data</th>
             <th class="py-2 px-3">Descrição</th>
             <th class="py-2 px-3">Valor</th>
@@ -102,7 +102,7 @@
               </td>
               <td class="py-2 px-3">
             <span [ngClass]="{
-              'text-[var(--success-text)]': confidenceTone(item) === 'success',
+              'text-[var(--income-text)]': confidenceTone(item) === 'success',
               'text-[var(--warning-text)]': confidenceTone(item) === 'warning',
               'text-gray-500': confidenceTone(item) === 'muted'
             }">
@@ -118,12 +118,12 @@
   }
 
   <div class="mt-3">
-    <p class="text-sm text-[var(--text-muted)]">
+    <p class="text-sm text-[var(--text-tertiary)]">
       {{ hasCsvPreview ? 'CSV pronto para importar' : 'Nenhum arquivo CSV selecionado' }}
     </p>
 
     @if (extractingCsv) {
-      <p class="text-sm text-[var(--text-muted)]">Processando arquivo CSV...</p>
+      <p class="text-sm text-[var(--text-tertiary)]">Processando arquivo CSV...</p>
     }
 
     @if (hasCsvPreview) {
@@ -140,7 +140,7 @@
     <div class="mt-4 overflow-x-auto">
       <table class="min-w-full text-sm">
         <thead>
-          <tr class="border-b border-[var(--border)] text-left text-[var(--text-muted)]">
+          <tr class="border-b border-[var(--border)] text-left text-[var(--text-tertiary)]">
             <th class="py-2 px-3">Data</th>
             <th class="py-2 px-3">Descrição</th>
             <th class="py-2 px-3">Valor</th>
@@ -172,7 +172,7 @@
               </td>
               <td class="py-2 px-3">
             <span [ngClass]="{
-              'text-[var(--success-text)]': confidenceTone(item) === 'success',
+              'text-[var(--income-text)]': confidenceTone(item) === 'success',
               'text-[var(--warning-text)]': confidenceTone(item) === 'warning',
               'text-gray-500': confidenceTone(item) === 'muted'
             }">

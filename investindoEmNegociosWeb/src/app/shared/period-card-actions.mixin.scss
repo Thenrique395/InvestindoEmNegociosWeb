@@ -4,7 +4,7 @@
 // para manter o CSS gerado dentro do encapsulamento Angular de cada um, sem duplicar as regras.
 @mixin period-card-actions($actions-selector) {
   #{$actions-selector} ::ng-deep .period-total-card__action {
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-panel);
     border: 1px solid var(--border);
     min-height: 58px;
     padding: 0.8rem 0.95rem;
@@ -54,11 +54,11 @@
   #{$actions-selector} ::ng-deep .period-total-card__action-icon {
     inline-size: 38px;
     block-size: 38px;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-control);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--surface-2) 74%, white);
+    background: color-mix(in srgb, var(--surface-sunken) 74%, white);
     color: var(--primary-text);
   }
 
@@ -78,16 +78,16 @@
   }
 
   #{$actions-selector} ::ng-deep .period-total-card__action-copy strong {
-    font-size: var(--font-size-body);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-title);
+    font-size: var(--fs-subhead);
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tight);
   }
 
   #{$actions-selector} ::ng-deep .period-total-card__action-copy small {
-    font-size: var(--font-size-label);
-    line-height: var(--line-height-control);
-    color: var(--text-muted);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-control);
+    color: var(--text-tertiary);
   }
 
   #{$actions-selector} ::ng-deep .period-total-card__action--primary .period-total-card__action-copy small {

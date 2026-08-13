@@ -32,6 +32,11 @@ export class AppComponent implements OnInit, OnDestroy {
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
   isStandaloneAuthRoute = false;
+  /**
+   * Páginas do site que trazem o próprio cabeçalho e rodapé.
+   * Cada uma tem um nav diferente, então o shell não pode desenhá-lo por elas.
+   */
+  isSiteRoute = false;
   isLightTheme = false;
   showSignupModal = false;
   signupAlert = '';
@@ -308,6 +313,18 @@ export class AppComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/preferencias');
   }
 
+  /** Rodapé da sidebar: leva ao perfil, como o handoff especifica. */
+  goToProfile(event?: Event): void {
+    event?.preventDefault();
+    const currentPath = this.router.url.split('?')[0];
+    if (currentPath === '/perfil') {
+      this.apiDataService.refresh();
+      return;
+    }
+
+    this.router.navigateByUrl('/perfil');
+  }
+
   private ensureUserContext(): void {
     this.userContextFacade.loadProfile();
 
@@ -326,6 +343,15 @@ export class AppComponent implements OnInit, OnDestroy {
       currentPath.startsWith('/register') ||
       currentPath.startsWith('/forgot-password') ||
       currentPath.startsWith('/reset-password');
+    // `/produto` entra aqui quando for repaginado (fase 2.3). Até lá ele
+    // depende do cabeçalho e rodapé do shell, e listá-lo o deixaria sem ambos.
+    this.isSiteRoute =
+      currentPath === '/' ||
+      currentPath === '' ||
+      currentPath.startsWith('/produto') ||
+      currentPath.startsWith('/planos') ||
+      currentPath.startsWith('/termos') ||
+      currentPath.startsWith('/privacidade');
     this.closeTransientUi();
 
     if (this.isLogged) {

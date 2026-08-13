@@ -1,0 +1,53 @@
+<div class="auth-card">
+  <aside class="auth-aside">
+    <div class="auth-aside__glow" aria-hidden="true"></div>
+
+    <a class="auth-aside__brand" routerLink="/">
+      <img class="auth-aside__logo" [src]="logoSrc()" alt="" width="34" height="34" />
+      <span class="auth-aside__wordmark">{{ brandName() }}</span>
+    </a>
+
+    <div class="auth-aside__pitch">
+      <p class="auth-aside__eyebrow">{{ asideEyebrow() }}</p>
+      <h2 class="auth-aside__title">{{ asideTitle() }}</h2>
+      <p class="auth-aside__text">{{ asideText() }}</p>
+    </div>
+
+    @if (proofLabel() || proofText()) {
+      <div class="auth-aside__proof">
+        @if (proofLabel(); as label) {
+          <p class="auth-aside__proof-label">{{ label }}</p>
+        }
+        @if (proofText(); as text) {
+          <p class="auth-aside__proof-text">{{ text }}</p>
+        }
+      </div>
+    }
+  </aside>
+
+  <main class="auth-main">
+    <a class="auth-main__back" [routerLink]="backRoute()">
+      <svg class="auth-main__back-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 6-6 6 6 6" />
+      </svg>
+      {{ backLabel() }}
+    </a>
+
+    <header class="auth-main__head">
+      <p class="auth-main__eyebrow">{{ eyebrow() }}</p>
+      <h1 class="auth-main__title">{{ title() }}</h1>
+      @if (description(); as text) {
+        <p class="auth-main__description">{{ text }}</p>
+      }
+    </header>
+
+    <div class="auth-main__body">
+      <ng-content />
+    </div>
+
+    <!-- Rodapé do cartão: "Ainda não tem conta?", "Voltar para login"… -->
+    <div class="auth-main__footer">
+      <ng-content select="[auth-footer]" />
+    </div>
+  </main>
+</div>

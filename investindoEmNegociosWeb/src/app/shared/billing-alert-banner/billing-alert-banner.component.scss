@@ -10,9 +10,9 @@
 }
 
 .billing-banner--danger {
-  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
-  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
-  color: var(--danger);
+  background: color-mix(in srgb, var(--expense) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--expense) 30%, transparent);
+  color: var(--expense);
 }
 
 .billing-banner--warning {
@@ -40,7 +40,7 @@
 
 .billing-banner__action {
   white-space: nowrap;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   font-size: 0.8125rem;
   text-decoration: underline;
   color: inherit;

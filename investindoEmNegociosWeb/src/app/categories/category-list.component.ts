@@ -91,32 +91,32 @@ import { CategoryView } from './categories-overview.model';
   `,
   styles: `
     :host { display: block; }
-    .cl__table { width: 100%; border-collapse: collapse; font-size: var(--text-sm, 0.85rem); }
+    .cl__table { width: 100%; border-collapse: collapse; font-size: var(--fs-meta, 0.85rem); }
     .cl__table thead th {
-      text-align: left; padding: 0.55rem 0.75rem; font-size: var(--text-xs, 0.7rem);
-      text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border);
+      text-align: left; padding: 0.55rem 0.75rem; font-size: var(--fs-caption, 0.7rem);
+      text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); border-bottom: 1px solid var(--border);
     }
     .cl__table tbody td { padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
     .cl__right { text-align: right; }
     .cl__cat { display: flex; align-items: center; gap: 0.7rem; min-width: 0; }
     .cl__cat-main { display: grid; gap: 3px; min-width: 0; }
     .cl__name { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .cl__readonly { color: var(--text-muted); }
+    .cl__readonly { color: var(--text-tertiary); }
     .cl__actions { display: inline-flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
     .cl__action {
-      border: 1px solid var(--border); border-radius: var(--radius-md, 10px); padding: 6px 10px;
-      background: var(--surface); color: var(--text); font-size: var(--text-xs, 0.75rem); font-weight: 600; cursor: pointer;
+      border: 1px solid var(--border); border-radius: var(--radius-control, 10px); padding: 6px 10px;
+      background: var(--surface); color: var(--text); font-size: var(--fs-caption, 0.75rem); font-weight: 600; cursor: pointer;
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
-    .cl__action:hover { background: var(--surface-2); border-color: var(--border-strong, var(--primary)); }
+    .cl__action:hover { background: var(--surface-sunken); border-color: var(--border-strong, var(--primary)); }
     .cl__action:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-    .cl__action--danger { color: var(--color-danger-text); }
-    .cl__action--danger:hover { border-color: var(--color-danger-soft); background: var(--color-danger-weak); }
+    .cl__action--danger { color: var(--expense-text); }
+    .cl__action--danger:hover { border-color: var(--expense-tint); background: var(--expense-tint); }
 
     .cl__cards { display: none; list-style: none; margin: 0; padding: 0; }
     .cl__card {
       display: grid; gap: 0.6rem; padding: 0.9rem; border: 1px solid var(--border);
-      border-radius: var(--radius-lg, 14px); background: var(--surface); margin-bottom: 10px;
+      border-radius: var(--radius-inner, 14px); background: var(--surface); margin-bottom: 10px;
     }
     .cl__card-head { display: flex; align-items: flex-start; gap: 0.7rem; }
     .cl__badges { display: flex; flex-wrap: wrap; gap: 6px; }

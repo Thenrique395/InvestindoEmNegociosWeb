@@ -1,0 +1,9 @@
+@for (card of cards(); track card.title; let i = $index) {
+  <article class="site-card site-lift" [appReveal]="delayFor(i)">
+    @if (card.badge) {
+      <span class="site-card__badge" aria-hidden="true">{{ card.badge }}</span>
+    }
+    <h3 class="site-card__title">{{ card.title }}</h3>
+    <p class="site-card__text">{{ card.text }}</p>
+  </article>
+}

@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/styles.css">
+<script src="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #001620; font-family: Inter, system-ui, sans-serif; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  *, *::before, *::after { box-sizing: border-box; }
+  .ffx { font-variant-numeric: tabular-nums; }
+  .view { animation: viewIn .26s cubic-bezier(.16,.8,.3,1) both; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+  .btn { transition: background .14s ease, transform .1s ease, color .14s ease; }
+  .btn:active { transform: scale(.99); }
+  .lnk { color: #2563EB; font-weight: 600; cursor: pointer; }
+  .lnk:hover { color: #1D4ED8; }
+  .nav { transition: background .16s ease, color .16s ease; }
+  .nav:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .ico { transition: background .16s ease; }
+  .ico:hover { background: #EDF2F5; }
+  .tip { position: relative; display: inline-grid; place-items: center; width: 16px; height: 16px; flex: none; border-radius: 999px; border: 1px solid #C9D6DD; color: #7A929E; font: 700 10px Inter, sans-serif; cursor: help; vertical-align: middle; transition: border-color .16s ease, color .16s ease, background .16s ease; }
+  .tip::before { content: "i"; }
+  .tip:hover { border-color: #2563EB; color: #2563EB; background: rgba(37,99,235,.07); }
+  .tip::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 9px); left: 50%; transform: translate(-50%, 4px);
+    width: max-content; max-width: 268px; padding: 10px 12px;
+    border-radius: 10px; background: #04303F; color: #E6EEF1;
+    font: 400 12px/1.5 Inter, sans-serif; letter-spacing: 0; text-align: left; white-space: normal;
+    box-shadow: 0 14px 32px -12px rgba(0,20,28,.6); pointer-events: none;
+    opacity: 0; transition: opacity .16s ease, transform .16s ease; z-index: 40;
+  }
+  .tip:hover::after { opacity: 1; transform: translate(-50%, 0); }
+  .tip--right::after { left: auto; right: -6px; transform: translate(0, 4px); }
+  .tip--right:hover::after { transform: translate(0, 0); }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex; flex-direction:column; align-items:stretch; gap:22px; padding:40px 24px 60px">
+
+  <div style="width:min(1440px,100%); margin:0 auto; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; color:#E6EEF1; flex-wrap:wrap">
+    <div>
+      <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Protótipo navegável</span>
+      <h1 style="margin:8px 0 5px; font-family:Poppins,sans-serif; font-size:26px; font-weight:600; letter-spacing:-.02em; color:#fff">Dashboard</h1>
+      <p style="margin:0; font-size:14px; color:#9FB2BB">O shell do rebrand (1c) com as regras de plano do código aplicadas.</p>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; flex:none">
+      <span style="font-size:12px; color:#5E7F8B; margin-right:4px">Perfil</span>
+      <sc-for list="{{ planos }}" as="pl" hint-placeholder-count="4">
+        <button class="btn" onClick="{{ pl.pick }}" style="height:34px; padding:0 14px; border:1px solid {{ pl.border }}; border-radius:999px; background:{{ pl.bg }}; color:{{ pl.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ pl.label }}</button>
+      </sc-for>
+      <span style="width:1px; height:22px; background:#1E4353; margin:0 4px"></span>
+      <button class="btn" onClick="{{ toggleVazio }}" style="height:34px; padding:0 14px; border:1px solid {{ vazioBorder }}; border-radius:999px; background:{{ vazioBg }}; color:{{ vazioColor }}; font:600 12px Inter,sans-serif; cursor:pointer">Conta nova</button>
+    </div>
+  </div>
+
+  <div style="width:min(1440px,100%); margin:0 auto; min-height:1200px; overflow:hidden; border-radius:16px; background:#F4F7F9; color:#0A2430; display:grid; grid-template-columns:minmax(0,212px) minmax(0,1fr); box-shadow:0 30px 80px -40px rgba(0,0,0,.7); font-size:14px">
+
+    <aside style="background:#002E3E; display:flex; flex-direction:column; color:#9FBAC3">
+      <div style="display:flex; align-items:center; gap:10px; padding:18px 18px 16px">
+        <img src="assets/logo-header.png" alt="Investindo em Negócios" style="height:26px; width:auto; display:block">
+        <span style="font-family:Poppins,sans-serif; font-size:12px; font-weight:700; letter-spacing:-.01em; line-height:1.2; color:#fff; white-space:nowrap">Investindo em Negócios</span>
+      </div>
+      <nav style="flex:1; display:flex; flex-direction:column; gap:14px; padding:4px 10px 12px; overflow:auto">
+        <sc-for list="{{ grupos }}" as="g" hint-placeholder-count="4">
+          <div style="display:grid; gap:2px">
+            <span style="padding:0 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">{{ g.titulo }}</span>
+            <sc-for list="{{ g.itens }}" as="it" hint-placeholder-count="4">
+              <span class="nav" onClick="{{ it.pick }}" style="position:relative; display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; background:{{ it.bg }}; color:{{ it.cor }}; font-size:12px; font-weight:{{ it.peso }}; cursor:pointer">
+                <span style="position:absolute; left:0; top:50%; width:3px; height:16px; border-radius:999px; background:{{ it.barra }}; transform:translateY(-50%)"></span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none" dangerouslySetInnerHTML="{{ it.icone }}"></svg>
+                <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ it.label }}</span>
+              </span>
+            </sc-for>
+          </div>
+        </sc-for>
+      </nav>
+      <div style="padding:12px 10px; border-top:1px solid rgba(255,255,255,.08)">
+        <div style="display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:10px; background:rgba(255,255,255,.05)">
+          <span style="display:grid; place-items:center; width:30px; height:30px; border-radius:999px; background:rgba(255,255,255,.12); color:#fff; font-size:11px; font-weight:700">HS</span>
+          <div style="min-width:0; flex:1">
+            <div style="font-size:11px; font-weight:600; color:#fff; line-height:1.2">Henrique Santos</div>
+            <div style="font-size:10px; color:#7E9CA6">Plano {{ planoLabel }}</div>
+          </div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7E9CA6" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+        </div>
+      </div>
+    </aside>
+
+    <div style="display:flex; flex-direction:column; min-width:0; background:#F4F7F9">
+      <header style="display:flex; align-items:center; gap:14px; height:56px; padding:0 28px; border-bottom:1px solid #E4EBEF; background:rgba(255,255,255,.86)">
+        <div style="flex:1; max-width:360px; display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; color:#9FB2BB; font-size:13px; min-width:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">Buscar lançamento, categoria, conta…</span>
+          <span style="flex:none; padding:1px 6px; border:1px solid #E4EBEF; border-radius:6px; font-size:11px; color:#9FB2BB">⌘K</span>
+        </div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:4px">
+          <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+            <span class="btn" style="display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font-size:13px; font-weight:600; cursor:pointer">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>Assistente
+            </span>
+          </sc-if>
+          <button class="ico" onClick="{{ toggleValores }}" style="display:grid; place-items:center; width:36px; height:36px; border:none; border-radius:9px; background:transparent; color:#46606C; cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 20L20 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" style="opacity:{{ riscoOpacidade }}"/></svg></button>
+          <span class="ico" style="display:grid; place-items:center; width:36px; height:36px; border-radius:9px; color:#46606C; cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+          <span class="ico" style="position:relative; display:grid; place-items:center; width:36px; height:36px; border-radius:9px; color:#46606C; cursor:pointer">
+            <svg width="19" height="19" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            <i style="position:absolute; top:7px; right:8px; width:7px; height:7px; border-radius:999px; background:#D9483F; border:2px solid #fff"></i>
+          </span>
+        </div>
+      </header>
+
+      <main style="flex:1; padding:26px 28px 40px; display:flex; flex-direction:column; gap:16px; min-width:0">
+
+      <sc-if value="{{ isNormal }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex; flex-direction:column; gap:20px">
+
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px 20px; flex-wrap:wrap">
+          <div style="flex:1 1 340px; min-width:0">
+            <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Visão geral · {{ periodoTitulo }}</span>
+            <h1 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:28px; font-weight:600; letter-spacing:-.02em">Bom dia, Henrique</h1>
+            <p style="margin:0; font-size:14px; color:#46606C">{{ resumoTexto }}</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; flex:none">
+            <div style="display:inline-flex; padding:3px; background:#EAF0F3; border-radius:999px">
+              <sc-for list="{{ periodos }}" as="pe" hint-placeholder-count="3">
+                <button class="btn" onClick="{{ pe.pick }}" style="padding:6px 15px; border:none; border-radius:999px; background:{{ pe.bg }}; color:{{ pe.color }}; font:600 13px Inter,sans-serif; cursor:pointer; box-shadow:{{ pe.shadow }}">{{ pe.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <section key="{{ kpiKey }}" class="view" style="display:flex; flex-wrap:wrap; background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+          <div style="flex:1 1 200px; min-width:0; padding:22px 26px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5; background:linear-gradient(180deg,rgba(0,46,62,.04),transparent)">
+            <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">{{ saldoTitulo }}<span class="tip" data-tip="{{ saldoTip }}"></span></div>
+            <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(21px,2.4vw,34px); font-weight:600; letter-spacing:-.03em; margin-top:6px; line-height:1.1; white-space:nowrap">{{ saldoValor }}</div>
+            <div style="font-size:12px; color:#7A929E; margin-top:8px">{{ saldoNota }}</div>
+          </div>
+
+          <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1 1 200px; min-width:0; padding:22px 24px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+              <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">Patrimônio líquido<span class="tip" data-tip="Tudo que você tem menos tudo que você deve: saldos das contas e investimentos, descontando faturas em aberto, parcelas e financiamentos. É a foto do seu patrimônio real."></span></div>
+              <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(17px,1.7vw,24px); font-weight:600; letter-spacing:-.02em; margin-top:6px; white-space:nowrap">{{ patrimonioValor }}</div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
+                <span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font-size:12px; font-weight:600">↑ 2,6%</span>
+                <span style="font-size:12px; color:#7A929E">{{ nomeArtigo }}</span>
+              </div>
+              <div style="height:4px; border-radius:999px; background:#EAF0F3; margin-top:10px; overflow:hidden"><i style="display:block; width:88%; height:100%; background:#0A4A5C"></i></div>
+            </div>
+          </sc-if>
+
+          <div style="flex:1 1 200px; min-width:0; padding:22px 24px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+            <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">Receitas<span class="tip" data-tip="Tudo que entrou no período escolhido: salário, serviços, aluguéis, rendimentos. A nota abaixo mostra quanto ainda está previsto para cair."></span></div>
+            <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(17px,1.7vw,24px); font-weight:600; letter-spacing:-.02em; margin-top:6px; color:#2A7551; white-space:nowrap">{{ receitaValor }}</div>
+            <div style="font-size:12px; color:#7A929E; margin-top:8px">{{ receitaNota }}</div>
+            <div style="height:4px; border-radius:999px; background:#EAF0F3; margin-top:10px; overflow:hidden"><i style="display:block; width:94%; height:100%; background:#349063"></i></div>
+          </div>
+
+          <div style="flex:1 1 200px; min-width:0; padding:22px 24px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+            <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">Despesas<span class="tip" data-tip="Tudo que saiu ou ainda vai sair no período, pago ou em aberto. A barra mostra a proporção já quitada."></span></div>
+            <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(17px,1.7vw,24px); font-weight:600; letter-spacing:-.02em; margin-top:6px; color:#B3372F; white-space:nowrap">{{ despesaValor }}</div>
+            <div style="font-size:12px; color:#7A929E; margin-top:8px">{{ despesaNota }}</div>
+            <div style="height:4px; border-radius:999px; background:#EAF0F3; margin-top:10px; overflow:hidden"><i style="display:block; width:75%; height:100%; background:#D9483F"></i></div>
+          </div>
+
+          <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1 1 200px; min-width:0; padding:22px 24px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+              <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">Comprometido<span class="tip tip--right" data-tip="Cartões, parcelas e contas com vencimento futuro. É o que já tem dono no seu saldo, mesmo que ainda não tenha saído."></span></div>
+              <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(17px,1.7vw,24px); font-weight:600; letter-spacing:-.02em; margin-top:6px; white-space:nowrap">{{ comprometidoValor }}</div>
+              <div style="font-size:12px; color:#7A929E; margin-top:8px">{{ comprometidoNota }}</div>
+              <div style="height:4px; border-radius:999px; background:#EAF0F3; margin-top:10px; overflow:hidden"><i style="display:block; width:38%; height:100%; background:#002E3E"></i></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ basico }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1 1 200px; min-width:0; padding:22px 24px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5; background:linear-gradient(180deg,rgba(52,144,99,.06),transparent)">
+              <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">Dá para gastar<span class="tip tip--right" data-tip="Projeção do que ainda cabe no mês: pega o saldo de hoje, soma o que você tem a receber e desconta tudo que ainda vence até o dia 31. É o número para decidir se dá para gastar agora."></span></div>
+              <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(17px,1.7vw,24px); font-weight:600; letter-spacing:-.02em; margin-top:6px; color:#2A7551; white-space:nowrap">{{ sobraValor }}</div>
+              <div style="font-size:12px; color:#7A929E; margin-top:8px">Até 31/08, já descontado o que vence</div>
+              <div style="height:4px; border-radius:999px; background:#EAF0F3; margin-top:10px; overflow:hidden"><i style="display:block; width:62%; height:100%; background:#349063"></i></div>
+            </div>
+          </sc-if>
+        </section>
+
+        <sc-if value="{{ completo }}" hint-placeholder-val="{{ false }}">
+          <section class="view" style="display:grid; grid-template-columns:minmax(0,auto) minmax(0,1fr); gap:24px; align-items:center; background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 24px">
+            <div style="display:flex; align-items:center; gap:16px; min-width:0">
+              <span style="display:grid; place-items:center; width:38px; height:38px; flex:none; border-radius:11px; background:rgba(52,144,99,.12); color:#2A7551"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.1H9c0-.8-.4-1.5-1-2.1A6 6 0 0 1 12 3z"/></svg></span>
+              <div style="min-width:0">
+                <div style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:#46606C">Saúde financeira<span class="tip" data-tip="Nota de 0 a 100 calculada a partir de quatro sinais: quantos meses sua reserva cobre, o peso das dívidas na renda, quanto da renda você consegue guardar e o quanto se mantém dentro do orçamento."></span></div>
+                <div style="display:flex; align-items:baseline; gap:8px; margin-top:3px">
+                  <span class="ffx" style="font-family:Poppins,sans-serif; font-size:30px; font-weight:600; letter-spacing:-.03em; color:#2A7551">78</span>
+                  <span style="font-size:12px; color:#7A929E; white-space:nowrap">de 100 · boa</span>
+                </div>
+                <div style="width:150px; height:5px; border-radius:999px; background:#F1F5F7; overflow:hidden; margin-top:8px"><i style="display:block; width:78%; height:100%; background:#349063; border-radius:999px"></i></div>
+              </div>
+            </div>
+            <div style="min-width:0; padding-left:24px; border-left:1px solid #EEF3F5">
+              <p style="margin:0 0 12px; font-size:13px; line-height:1.65; color:#46606C">Reserva cobre 4,2 meses de despesa fixa e o endividamento está em 9% da renda. O ponto fraco do mês é a categoria alimentação.</p>
+              <div style="display:flex; flex-wrap:wrap; gap:8px 22px">
+                <span style="display:inline-flex; align-items:center; gap:8px; font-size:12px; color:#46606C"><i style="width:7px; height:7px; flex:none; border-radius:999px; background:#D9483F"></i>Alimentação passou do teto em {{ vlEstouro }}</span>
+                <span style="display:inline-flex; align-items:center; gap:8px; font-size:12px; color:#46606C"><i style="width:7px; height:7px; flex:none; border-radius:999px; background:#2563EB"></i>Sobra comporta aporte de {{ vlAporte }}</span>
+              </div>
+            </div>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{ temUpgrade }}" hint-placeholder-val="{{ false }}">
+          <section key="{{ upgradeKey }}" class="view" style="display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 24px; border:1px solid rgba(37,99,235,.22); border-radius:16px; background:linear-gradient(120deg, rgba(37,99,235,.06), #fff)">
+            <div style="min-width:0">
+              <div style="font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#1D4ED8">Disponível no plano {{ upgradePlano }}</div>
+              <div style="font-size:14px; font-weight:600; margin:6px 0 9px">{{ upgradeTitulo }}</div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12px; color:#46606C">
+                <sc-for list="{{ upgradeItens }}" as="u" hint-placeholder-count="4">
+                  <span style="display:inline-flex; align-items:center; gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M5 13l4 4L19 7"/></svg>{{ u.label }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <span class="btn" style="display:inline-flex; align-items:center; height:38px; padding:0 20px; border-radius:999px; background:#2563EB; color:#fff; font-size:12px; font-weight:600; cursor:pointer; flex:none">Conhecer planos</span>
+          </section>
+        </sc-if>
+
+        <div style="display:grid; grid-template-columns:minmax(0,1.62fr) minmax(0,1fr); gap:20px">
+
+          <div style="grid-column:1; grid-row:1; display:flex; flex-direction:column; gap:20px; min-width:0">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:22px 24px; display:flex; flex-direction:column">
+            <header style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px 12px; margin-bottom:18px; flex-wrap:wrap">
+              <div style="flex:1 1 200px; min-width:0">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">{{ graficoTitulo }}<span class="tip" data-tip="{{ graficoTip }}"></span></h2>
+                <p style="margin:3px 0 0; font-size:13px; color:#7A929E">{{ graficoSub }}</p>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:10px; flex:none">
+                <span class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.02em; white-space:nowrap">{{ graficoValor }}</span>
+                <span style="padding:2px 8px; border-radius:999px; background:{{ graficoTagBg }}; color:{{ graficoTagCor }}; font-size:12px; font-weight:600; white-space:nowrap">{{ graficoTag }}</span>
+              </div>
+            </header>
+
+            <div style="position:relative; min-width:0">
+              <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+                <div class="ffx" style="position:absolute; left:0; top:0; width:100%; height:52%; pointer-events:none">
+                  <span style="position:absolute; left:0; top:2%; font-size:11px; color:#9FB2BB; background:#fff; padding-right:6px">R$ 220 mil</span>
+                  <span style="position:absolute; left:0; top:44%; font-size:11px; color:#9FB2BB; background:#fff; padding-right:6px">R$ 200 mil</span>
+                  <span style="position:absolute; left:0; top:88%; font-size:11px; color:#9FB2BB; background:#fff; padding-right:6px">R$ 180 mil</span>
+                </div>
+              </sc-if>
+              <svg viewBox="0 0 820 300" style="width:100%; height:auto; display:block">
+                <defs>
+                  <linearGradient id="pnGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0A4A5C" stop-opacity=".16"></stop>
+                    <stop offset="100%" stop-color="#0A4A5C" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+
+                <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+                  <g>
+                    <sc-for list="{{ eixoY }}" as="e" hint-placeholder-count="3">
+                      <line x1="0" x2="820" y1="{{ e.y }}" y2="{{ e.y }}" stroke="#EEF3F5" stroke-width="1"></line>
+                    </sc-for>
+                    <path d="{{ areaPatrimonio }}" fill="url(#pnGrad)"></path>
+                    <path d="{{ linhaPatrimonio }}" fill="none" stroke="#0A4A5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <circle cx="{{ ultimoX }}" cy="{{ ultimoY }}" r="4.5" fill="#fff" stroke="#0A4A5C" stroke-width="2.5"></circle>
+                  </g>
+                </sc-if>
+
+                <g>
+                  <path d="{{ linhaReceitas }}" fill="none" stroke="#349063" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="{{ linhaDespesas }}" fill="none" stroke="#D9483F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <circle cx="{{ fimReceitaX }}" cy="{{ fimReceitaY }}" r="3.5" fill="#fff" stroke="#349063" stroke-width="2.2"></circle>
+                  <circle cx="{{ fimDespesaX }}" cy="{{ fimDespesaY }}" r="3.5" fill="#fff" stroke="#D9483F" stroke-width="2.2"></circle>
+                </g>
+              </svg>
+              <div class="ffx" style="position:absolute; left:0; bottom:8%; width:100%; height:0; pointer-events:none">
+                <span style="position:absolute; left:0; top:-12px; font-size:11px; color:#9FB2BB; background:#fff; padding-right:6px">{{ fluxoEixoLabel }}</span>
+              </div>
+              <div class="ffx" style="display:flex; justify-content:space-between; gap:0; margin-top:10px; font-size:11px; color:#9FB2BB">
+                <span>set</span><span>out</span><span>nov</span><span>dez</span><span>jan</span><span>fev</span><span>mar</span><span>abr</span><span>mai</span><span>jun</span><span>jul</span><span style="color:#46606C; font-weight:600">ago</span>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:18px; margin-top:16px; padding-top:14px; border-top:1px solid #EEF3F5; flex-wrap:wrap; font-size:12px; color:#46606C">
+              <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+                <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:12px; height:3px; border-radius:2px; background:#0A4A5C"></i>Patrimônio</span>
+              </sc-if>
+              <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:9px; height:9px; border-radius:2px; background:#349063"></i>Receitas</span>
+              <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:9px; height:9px; border-radius:2px; background:#D9483F"></i>Despesas</span>
+              <span style="margin-left:auto; font-size:12px; color:#9FB2BB">{{ graficoNota }}</span>
+            </div>
+          </section>
+
+          <section style="flex:1; display:flex; flex-direction:column; background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px">
+              <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Recorrências do mês<span class="tip" data-tip="Lançamentos que se repetem todo mês — aluguel, assinaturas, parcelas fixas, salário. Servem para você saber quanto do mês já está comprometido antes de gastar qualquer coisa."></span></h2>
+              <span class="lnk" style="font-size:12px">Ver todos</span>
+            </div>
+            <p style="margin:0 0 16px; font-size:12px; color:#7A929E">{{ recorrenteResumo }}</p>
+            <div style="flex:1; display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); grid-auto-rows:1fr; gap:10px; align-content:stretch">
+              <sc-for list="{{ recorrentes }}" as="r" hint-placeholder-count="6">
+                <div style="display:flex; align-items:center; gap:11px; padding:12px 14px; border:1px solid #EEF3F5; border-radius:11px; background:#FBFCFD; min-width:0">
+                  <span style="width:4px; align-self:stretch; flex:none; border-radius:3px; background:{{ r.cor }}"></span>
+                  <div style="flex:1; min-width:0">
+                    <div style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ r.nome }}</div>
+                    <div class="ffx" style="font-size:11px; color:#9FB2BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ r.quando }}</div>
+                  </div>
+                  <span class="ffx" style="flex:none; font-size:13px; font-weight:600; color:{{ r.valorCor }}">{{ r.valor }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid #F2F6F8">
+              <div style="flex:1 1 150px; min-width:0"><div style="font-size:11px; color:#7A929E">Total fixo de saídas</div><div class="ffx" style="font-size:15px; font-weight:600; margin-top:4px">{{ recorrenteTotal }}</div></div>
+              <div style="flex:1 1 150px; min-width:0"><div style="font-size:11px; color:#7A929E">Peso na renda</div><div class="ffx" style="font-size:15px; font-weight:600; margin-top:4px">{{ recorrentePeso }}</div></div>
+              <div style="flex:1 1 150px; min-width:0"><div style="font-size:11px; color:#7A929E">Próximo a vencer</div><div class="ffx" style="font-size:15px; font-weight:600; margin-top:4px">{{ recorrenteProximo }}</div></div>
+            </div>
+          </section>
+
+          </div>
+
+        <sc-if value="{{ completo }}" hint-placeholder-val="{{ false }}">
+            <section class="view" style="grid-column:1 / -1; grid-row:2; background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px">
+                <div style="flex:1 1 200px; min-width:0">
+                  <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Investimentos</h2>
+                  <p style="margin:0; font-size:12px; color:#7A929E">Carteira consolidada · proventos de {{ proventosMes }} em agosto</p>
+                </div>
+                <div style="display:flex; align-items:baseline; gap:10px; flex:none">
+                  <span class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.02em; white-space:nowrap">{{ investidoTotal }}</span>
+                  <span style="padding:2px 8px; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font-size:12px; font-weight:600; white-space:nowrap">↑ 11,4% no ano</span>
+                </div>
+              </div>
+
+              <div style="display:flex; height:10px; border-radius:999px; overflow:hidden; margin-bottom:12px">
+                <sc-for list="{{ alocacao }}" as="a" hint-placeholder-count="4">
+                  <i style="width:{{ a.largura }}; height:100%; background:{{ a.cor }}"></i>
+                </sc-for>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:20px">
+                <sc-for list="{{ alocacao }}" as="a" hint-placeholder-count="4">
+                  <span style="display:inline-flex; align-items:center; gap:7px; font-size:12px; color:#46606C"><i style="width:9px; height:9px; flex:none; border-radius:2px; background:{{ a.cor }}"></i>{{ a.nome }} <span class="ffx" style="color:#9FB2BB">{{ a.pct }}</span></span>
+                </sc-for>
+              </div>
+
+              <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px">
+                <sc-for list="{{ posicoes }}" as="p" hint-placeholder-count="4">
+                  <div style="padding:12px 14px; border:1px solid #EEF3F5; border-radius:11px; background:#FBFCFD; min-width:0">
+                    <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+                      <span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; font-weight:600">{{ p.nome }}</span>
+                      <span class="ffx" style="flex:none; font-size:13px; font-weight:600">{{ p.valor }}</span>
+                    </div>
+                    <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-top:4px">
+                      <span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; color:#9FB2BB">{{ p.classe }}</span>
+                      <span class="ffx" style="flex:none; font-size:11px; font-weight:600; color:{{ p.varCor }}">{{ p.variacao }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:16px; border-top:1px solid #F2F6F8">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.1H9c0-.8-.4-1.5-1-2.1A6 6 0 0 1 12 3z"/></svg>
+                <p style="margin:0; flex:1; min-width:0; font-size:12px; line-height:1.55; color:#46606C">A renda fixa responde por 41% da carteira. A sobra do mês comportaria um aporte de {{ vlAporte }}.</p>
+                <span class="lnk" style="flex:none; font-size:12px">Registrar aporte</span>
+              </div>
+            </section>
+          </sc-if>
+
+          <div style="grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:20px; min-width:0">
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Precisa da sua atenção<span class="tip" data-tip="Reúne o que está vencido, o que vence nos próximos dias e as faturas de cartão prestes a fechar. Se estiver vazio, não há pendência exigindo ação hoje."></span></h2>
+                <span style="padding:2px 8px; border-radius:999px; background:rgba(217,72,63,.12); color:#B3372F; font-size:11px; font-weight:700">{{ atencaoTotal }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <sc-for list="{{ atencao }}" as="a" hint-placeholder-count="3">
+                  <div style="display:flex; gap:12px; padding:11px 0; border-bottom:1px solid #F2F6F8">
+                    <span style="display:grid; place-items:center; width:32px; height:32px; flex:none; border-radius:9px; background:{{ a.bg }}; color:{{ a.cor }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" dangerouslySetInnerHTML="{{ a.icone }}"></svg></span>
+                    <div style="min-width:0; flex:1"><div style="font-size:13px; font-weight:600">{{ a.titulo }}</div><div class="ffx" style="font-size:12px; color:#7A929E">{{ a.detalhe }}</div></div>
+                    <span class="lnk" style="font-size:12px; white-space:nowrap; align-self:center">{{ a.acao }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+            <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+              <section class="view" style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px">
+                  <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Orçamento de agosto<span class="tip" data-tip="Compara o teto que você definiu para cada categoria com o que já foi gasto. Barra vermelha indica categoria estourada; o valor ao lado mostra quanto ainda resta ou quanto passou."></span></h2>
+                  <span class="lnk" style="font-size:12px">Ajustar</span>
+                </div>
+                <p style="margin:0 0 16px; font-size:12px; color:#7A929E">{{ orcamentoResumo }}</p>
+                <div style="display:flex; flex-direction:column; gap:14px">
+                  <sc-for list="{{ orcamento }}" as="o" hint-placeholder-count="3">
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:6px">
+                        <span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500">{{ o.nome }}</span>
+                        <span class="ffx" style="flex:none; font-size:12px; font-weight:600; color:{{ o.pctCor }}">{{ o.pct }}</span>
+                      </div>
+                      <div style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:{{ o.largura }}; height:100%; background:{{ o.cor }}; border-radius:999px"></i></div>
+                      <div class="ffx" style="margin-top:6px; font-size:11px; color:#9FB2BB">{{ o.detalhe }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+            </sc-if>
+
+            <sc-if value="{{ basico }}" hint-placeholder-val="{{ false }}">
+              <section class="view" style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px">
+                  <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Próximos 7 dias<span class="tip" data-tip="Agenda curta da semana: o que vence e o que você tem a receber, em ordem de data. Serve para não ser pego de surpresa por uma conta."></span></h2>
+                  <span class="lnk" style="font-size:12px">Ver agenda</span>
+                </div>
+                <p style="margin:0 0 16px; font-size:12px; color:#7A929E">{{ agendaResumo }}</p>
+                <div style="display:flex; flex-direction:column">
+                  <sc-for list="{{ agenda }}" as="ag" hint-placeholder-count="4">
+                    <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #F2F6F8">
+                      <div style="flex:none; width:38px; text-align:center">
+                        <div class="ffx" style="font-size:15px; font-weight:600; line-height:1.1; color:{{ ag.diaCor }}">{{ ag.dia }}</div>
+                        <div style="font-size:10px; color:#9FB2BB; text-transform:uppercase; letter-spacing:.08em">{{ ag.mes }}</div>
+                      </div>
+                      <div style="flex:1; min-width:0"><div style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ ag.nome }}</div><div style="font-size:11px; color:#9FB2BB">{{ ag.tipo }}</div></div>
+                      <span class="ffx" style="flex:none; font-size:13px; font-weight:600; color:{{ ag.valorCor }}">{{ ag.valor }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+            </sc-if>
+
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; flex:1">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Metas<span class="tip" data-tip="Objetivos de longo prazo com valor alvo e prazo. A barra mostra o progresso; a cor indica se o ritmo atual de aportes chega no prazo definido."></span></h2>
+                <span class="lnk" style="font-size:12px">Ver todas</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:16px">
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:7px"><span style="font-weight:500; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">Reserva de emergência</span><span class="ffx" style="flex:none; font-size:12px; color:#7A929E">{{ metaReserva }}</span></div>
+                  <div style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:67%; height:100%; background:#349063; border-radius:999px"></i></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:7px"><span style="font-weight:500; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">Viagem 2027</span><span class="ffx" style="flex:none; font-size:12px; color:#7A929E">{{ metaViagem }}</span></div>
+                  <div style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:32%; height:100%; background:#0A4A5C; border-radius:999px"></i></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:13px; margin-bottom:7px"><span style="font-weight:500; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">Troca do carro</span><span class="ffx" style="flex:none; font-size:12px; color:#7A929E">{{ metaCarro }}</span></div>
+                  <div style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:21%; height:100%; background:#2563EB; border-radius:999px"></i></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+
+        <sc-if value="{{ completo }}" hint-placeholder-val="{{ false }}">
+          <div class="view" style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px">
+
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Saldos por conta<span class="tip" data-tip="Quanto há em cada conta corrente, poupança ou carteira cadastrada. A soma é o saldo bruto — antes de descontar o que já está comprometido."></span></h2>
+                <span class="lnk" style="font-size:12px">Ver contas</span>
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <sc-for list="{{ contas }}" as="ct" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid #F2F6F8">
+                    <span style="width:4px; height:30px; flex:none; border-radius:3px; background:{{ ct.cor }}"></span>
+                    <div style="flex:1; min-width:0"><div style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ ct.nome }}</div><div style="font-size:11px; color:#9FB2BB">{{ ct.tipo }}</div></div>
+                    <span class="ffx" style="flex:none; font-size:13px; font-weight:600; color:{{ ct.valorCor }}">{{ ct.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Mapa de dívidas<span class="tip" data-tip="Todo saldo devedor reunido: financiamentos, empréstimos e compras parceladas. Mostra quanto falta pagar em cada um e quantas parcelas restam."></span></h2>
+                <span class="ffx" style="font-size:12px; color:#B3372F; font-weight:600">{{ dividaTotal }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:14px">
+                <sc-for list="{{ dividas }}" as="dv" hint-placeholder-count="3">
+                  <div>
+                    <div style="display:flex; justify-content:space-between; gap:12px; font-size:13px; margin-bottom:6px"><span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ dv.nome }}</span><span class="ffx" style="flex:none; font-weight:600">{{ dv.saldo }}</span></div>
+                    <div style="height:6px; border-radius:999px; background:#F1F5F7; overflow:hidden"><i style="display:block; width:{{ dv.largura }}; height:100%; background:{{ dv.cor }}; border-radius:999px"></i></div>
+                    <div class="ffx" style="margin-top:6px; font-size:11px; color:#9FB2BB">{{ dv.detalhe }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+          </div>
+        </sc-if>
+
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px">
+              <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Onde o dinheiro foi<span class="tip" data-tip="Distribuição das despesas do mês por categoria, da maior para a menor. Serve para identificar rapidamente onde o gasto se concentrou."></span></h2>
+              <span style="font-size:12px; color:#7A929E">agosto</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:11px">
+              <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="4">
+                <div style="min-width:0">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px">
+                    <span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; color:#46606C">{{ c.nome }}</span>
+                    <span class="ffx" style="flex:none; font-size:13px; font-weight:600">{{ c.valor }}</span>
+                  </div>
+                  <div style="height:8px; border-radius:999px; background:#F1F5F7; overflow:hidden"><i style="display:block; width:{{ c.largura }}; height:100%; background:{{ c.cor }}; border-radius:999px"></i></div>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ inter }}" hint-placeholder-val="{{ true }}">
+              <div class="view" style="display:flex; gap:10px; margin-top:16px; padding:12px 14px; border-radius:11px; background:#F8FAFB; border:1px solid #EEF3F5">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.1H9c0-.8-.4-1.5-1-2.1A6 6 0 0 1 12 3z"/></svg>
+                <p style="margin:0; font-size:12px; line-height:1.6; color:#46606C">Moradia foi sua maior despesa, com 51% do total.</p>
+              </div>
+            </sc-if>
+            <sc-if value="{{ basico }}" hint-placeholder-val="{{ false }}">
+              <div class="view" style="display:flex; align-items:center; gap:14px; margin-top:16px; padding:14px 16px; border-radius:12px; background:linear-gradient(120deg, rgba(37,99,235,.06), #F8FAFB); border:1px solid rgba(37,99,235,.20); flex-wrap:wrap">
+                <div style="flex:1 1 200px; min-width:0">
+                  <div style="font-size:13px; font-weight:600">Quer definir um teto para essas categorias?</div>
+                  <p style="margin:3px 0 0; font-size:12px; line-height:1.55; color:#7A929E">O orçamento avisa quando você se aproxima do limite — disponível no plano Inteligente.</p>
+                </div>
+                <span class="btn" style="display:inline-flex; align-items:center; height:34px; padding:0 16px; border-radius:999px; background:#2563EB; color:#fff; font-size:12px; font-weight:600; cursor:pointer; flex:none">Conhecer planos</span>
+              </div>
+            </sc-if>
+          </section>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px">
+              <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Atividade recente<span class="tip" data-tip="Os últimos lançamentos registrados, em ordem de data. Use para conferir se algo entrou errado ou duplicado."></span></h2>
+              <span class="lnk" style="font-size:12px">Ver extrato</span>
+            </div>
+            <div style="display:flex; flex-direction:column">
+              <sc-for list="{{ atividades }}" as="at" hint-placeholder-count="5">
+                <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #F2F6F8">
+                  <span style="display:grid; place-items:center; width:30px; height:30px; flex:none; border-radius:9px; background:{{ at.bg }}; color:{{ at.cor }}; font-size:13px">{{ at.seta }}</span>
+                  <div style="flex:1; min-width:0"><div style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ at.nome }}</div><div style="font-size:12px; color:#9FB2BB">{{ at.detalhe }}</div></div>
+                  <span class="ffx" style="flex:none; font-size:13px; font-weight:600; color:{{ at.valorCor }}">{{ at.valor }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isVazio }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; gap:20px">
+          <div>
+            <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Primeiros passos · agosto de 2026</span>
+            <h1 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:28px; font-weight:600; letter-spacing:-.02em">Bem-vindo, Henrique</h1>
+            <p style="margin:0; font-size:14px; color:#46606C">Seu painel ganha vida conforme você registra. Faltam poucos passos.</p>
+          </div>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:22px 24px">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px">
+              <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Configuração inicial<span class="tip" data-tip="Passos que faltam para o painel funcionar com dados completos. Some sozinho quando todos estiverem concluídos."></span></h2>
+              <span class="ffx" style="font-size:12px; color:#7A929E">2 de 5 concluídos</span>
+            </div>
+            <div style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden; margin-bottom:20px"><i style="display:block; width:40%; height:100%; background:#349063; border-radius:999px"></i></div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px">
+              <sc-for list="{{ passos }}" as="ps" hint-placeholder-count="5">
+                <div style="display:flex; align-items:flex-start; gap:11px; padding:14px 16px; border:1px solid {{ ps.borda }}; border-radius:12px; background:{{ ps.fundo }}">
+                  <span style="flex:none; display:grid; place-items:center; width:24px; height:24px; border-radius:999px; border:1px solid {{ ps.marcaBorda }}; background:{{ ps.marcaFundo }}; color:#fff"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ ps.check }}"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  <div style="flex:1; min-width:0">
+                    <div style="font-size:13px; font-weight:600; color:{{ ps.cor }}">{{ ps.titulo }}</div>
+                    <p style="margin:3px 0 0; font-size:12px; line-height:1.55; color:#7A929E">{{ ps.texto }}</p>
+                    <sc-if value="{{ ps.pendente }}" hint-placeholder-val="{{ true }}">
+                      <span class="lnk" style="display:inline-block; margin-top:8px; font-size:12px">{{ ps.acao }}</span>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px">
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; align-items:flex-start">
+              <span style="display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:#F1F5F7; color:#7A929E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M7 15l4-4 3 3 4-6"/></svg></span>
+              <h2 style="margin:16px 0 6px; font-size:15px; font-weight:600">Ainda sem histórico</h2>
+              <p style="margin:0; font-size:13px; line-height:1.65; color:#46606C">Os gráficos de evolução aparecem depois do primeiro mês fechado. Até lá, mostramos apenas o que já é verdade.</p>
+            </section>
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; align-items:flex-start">
+              <span style="display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:#F1F5F7; color:#7A929E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span>
+              <h2 style="margin:16px 0 6px; font-size:15px; font-weight:600">Nenhuma despesa registrada</h2>
+              <p style="margin:0; font-size:13px; line-height:1.65; color:#46606C">A distribuição por categoria aparece a partir do terceiro lançamento — antes disso, o gráfico só enganaria.</p>
+              <span class="lnk" style="margin-top:12px; font-size:13px">Registrar a primeira despesa</span>
+            </section>
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; align-items:flex-start">
+              <span style="display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:rgba(52,144,99,.12); color:#2A7551"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>
+              <h2 style="margin:16px 0 6px; font-size:15px; font-weight:600">Comece por uma meta</h2>
+              <p style="margin:0; font-size:13px; line-height:1.65; color:#46606C">Um objetivo com prazo dá sentido aos números desde o primeiro dia, mesmo sem histórico.</p>
+              <span class="lnk" style="margin-top:12px; font-size:13px">Criar minha primeira meta</span>
+            </section>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; gap:20px">
+
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px 20px; flex-wrap:wrap">
+            <div style="flex:1 1 340px; min-width:0">
+              <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Administração · últimas 24 horas</span>
+              <h1 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:28px; font-weight:600; letter-spacing:-.02em">Saúde da plataforma</h1>
+              <p style="margin:0; font-size:14px; color:#46606C">Dois robôs falharam na madrugada e três assinaturas estão em atraso.</p>
+            </div>
+            <div style="display:inline-flex; padding:3px; background:#EAF0F3; border-radius:999px; flex:none">
+              <span style="padding:6px 15px; border-radius:999px; background:#fff; color:#0A2430; font-size:13px; font-weight:600; box-shadow:0 1px 2px rgba(3,32,44,.08)">24h</span>
+              <span style="padding:6px 15px; border-radius:999px; color:#7A929E; font-size:13px; font-weight:600">7 dias</span>
+              <span style="padding:6px 15px; border-radius:999px; color:#7A929E; font-size:13px; font-weight:600">30 dias</span>
+            </div>
+          </div>
+
+          <section style="display:flex; flex-wrap:wrap; background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+            <sc-for list="{{ adminKpis }}" as="k" hint-placeholder-count="4">
+              <div style="flex:1 1 200px; min-width:0; padding:22px 24px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+                <div style="font-size:12px; font-weight:600; color:#46606C">{{ k.titulo }}</div>
+                <div class="ffx" style="font-family:Poppins,sans-serif; font-size:clamp(21px,2.2vw,30px); font-weight:600; letter-spacing:-.03em; margin-top:6px; line-height:1.1; color:{{ k.cor }}; white-space:nowrap">{{ k.valor }}</div>
+                <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
+                  <span class="ffx" style="padding:2px 8px; border-radius:999px; background:{{ k.tagBg }}; color:{{ k.tagCor }}; font-size:11px; font-weight:600">{{ k.tag }}</span>
+                  <span style="font-size:11px; color:#9FB2BB">{{ k.nota }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </section>
+
+          <div style="display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:20px">
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Robôs — execuções de hoje<span class="tip" data-tip="Rotinas automáticas do sistema: importação de faturas, cobrança de assinaturas, envio de lembretes. Mostra o resultado da última execução de cada uma."></span></h2>
+                <span class="lnk" style="font-size:12px">Abrir monitor</span>
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1fr 1.1fr .9fr; gap:14px; padding:9px 0; border-bottom:1px solid #EEF3F5; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7A929E"><span>Robô</span><span>Execução</span><span>Processados</span><span style="text-align:right">Status</span></div>
+              <sc-for list="{{ robos }}" as="rb" hint-placeholder-count="5">
+                <div style="display:grid; grid-template-columns:2fr 1fr 1.1fr .9fr; gap:14px; align-items:center; padding:11px 0; border-bottom:1px solid #F2F6F8; font-size:13px">
+                  <span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ rb.nome }}</span>
+                  <span class="ffx" style="font-size:12px; color:#7A929E">{{ rb.hora }}</span>
+                  <span class="ffx" style="font-size:12px; color:#7A929E">{{ rb.itens }}</span>
+                  <span style="text-align:right"><span style="display:inline-block; padding:3px 10px; border-radius:999px; background:{{ rb.bg }}; color:{{ rb.cor }}; font-size:11px; font-weight:600">{{ rb.status }}</span></span>
+                </div>
+              </sc-for>
+            </section>
+
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Precisa de intervenção<span class="tip" data-tip="Ocorrências que o sistema não resolve sozinho — pagamento recusado, importação travada, conta com erro. Exigem ação manual do administrador."></span></h2>
+                <span style="padding:2px 8px; border-radius:999px; background:rgba(217,72,63,.12); color:#B3372F; font-size:11px; font-weight:700">4</span>
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <sc-for list="{{ adminAlertas }}" as="al" hint-placeholder-count="4">
+                  <div style="display:flex; gap:12px; padding:11px 0; border-bottom:1px solid #F2F6F8">
+                    <span style="display:grid; place-items:center; width:32px; height:32px; flex:none; border-radius:9px; background:{{ al.bg }}; color:{{ al.cor }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" dangerouslySetInnerHTML="{{ al.icone }}"></svg></span>
+                    <div style="min-width:0; flex:1"><div style="font-size:13px; font-weight:600">{{ al.titulo }}</div><div style="font-size:12px; color:#7A929E">{{ al.detalhe }}</div></div>
+                    <span class="lnk" style="font-size:12px; white-space:nowrap; align-self:center">{{ al.acao }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px">
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Base por plano<span class="tip" data-tip="Como as contas ativas se distribuem entre Essencial, Inteligente e Completo. Serve para acompanhar conversão e migração de plano."></span></h2>
+                <span class="ffx" style="font-size:12px; color:#7A929E">1.284 contas ativas</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:13px">
+                <sc-for list="{{ base }}" as="b" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:12px">
+                    <span style="width:92px; flex:none; font-size:13px; color:#46606C">{{ b.nome }}</span>
+                    <div style="flex:1; min-width:0; height:8px; border-radius:999px; background:#F1F5F7; overflow:hidden"><i style="display:block; width:{{ b.largura }}; height:100%; background:{{ b.cor }}; border-radius:999px"></i></div>
+                    <span class="ffx" style="width:86px; flex:none; text-align:right; font-size:13px; font-weight:600">{{ b.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex; gap:20px; margin-top:18px; padding-top:16px; border-top:1px solid #F2F6F8">
+                <div><div style="font-size:11px; color:#7A929E">Novas no período</div><div class="ffx" style="font-size:15px; font-weight:600; margin-top:4px; color:#2A7551">+ 38</div></div>
+                <div><div style="font-size:11px; color:#7A929E">Cancelamentos</div><div class="ffx" style="font-size:15px; font-weight:600; margin-top:4px; color:#B3372F">− 6</div></div>
+                <div><div style="font-size:11px; color:#7A929E">Conversão do trial</div><div class="ffx" style="font-size:15px; font-weight:600; margin-top:4px">31%</div></div>
+              </div>
+            </section>
+
+            <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px; min-width:0">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px">
+                <h2 style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; font-weight:600">Últimos cadastros<span class="tip" data-tip="Contas criadas recentemente, com o plano escolhido e se concluíram o onboarding."></span></h2>
+                <span class="lnk" style="font-size:12px">Ver usuários</span>
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <sc-for list="{{ cadastros }}" as="cd" hint-placeholder-count="5">
+                  <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #F2F6F8">
+                    <span style="display:grid; place-items:center; width:30px; height:30px; flex:none; border-radius:999px; background:#F1F5F7; color:#46606C; font-size:11px; font-weight:700">{{ cd.iniciais }}</span>
+                    <div style="flex:1; min-width:0"><div style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ cd.nome }}</div><div style="font-size:12px; color:#9FB2BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ cd.email }}</div></div>
+                    <span style="flex:none; padding:3px 10px; border-radius:999px; background:{{ cd.bg }}; color:{{ cd.cor }}; font-size:11px; font-weight:600">{{ cd.plano }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </sc-if>
+
+      </main>
+    </div>
+  </div>
+
+  <p style="margin:0 auto; font-size:13px; color:#5E7F8B; width:min(1440px,100%)">Troque o perfil no topo para ver o que cada plano libera. O olho na topbar oculta os valores.</p>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ICO = {
+  dashboard: '<path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/>',
+  sistema: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M7 10l2.5 2.5L12 9l3 3.5L17 11"/>',
+  calendario: '<path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>',
+  usuarios: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.2 2.7-5.4 6-5.4s6 2.2 6 5.4"/><path d="M17 11.2a3 3 0 1 0-1.6-5.5"/><path d="M18 20c0-2.4-.8-4.1-2.2-5.1"/>',
+  parametros: '<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+  robos: '<rect x="5" y="8" width="14" height="11" rx="2.5"/><path d="M12 4v4M8 13h.01M16 13h.01M9.5 16.5h5"/><path d="M2 12v3M22 12v3"/>',
+  despesas: '<path d="M12 5v14m0 0l-5-5m5 5l5-5"/>',
+  receitas: '<path d="M12 19V5m0 0l-5 5m5-5l5 5"/>',
+  cartoes: '<path d="M3 7h18a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20"/>',
+  contas: '<path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zM9 21v-7h6v7"/>',
+  categorias: '<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
+  metas: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+  orcamento: '<path d="M4 6h16M4 12h16M4 18h10"/><circle cx="20" cy="18" r="2"/>',
+  investimentos: '<path d="M4 18h16M7 15l4-4 3 3 4-6"/>',
+  emprestimos: '<path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  simulador: '<path d="M4 12h4M10 8h4M16 6h4M4 12l3-3M10 8l3-1M16 6l3-2"/><path d="M3 20h18"/>',
+  relatorios: '<path d="M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  historico: '<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  assistente: '<path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z"/>',
+  calculadoras: '<path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 8h8M8 12h3M13 12h3M8 16h3M13 16h3"/>'
+};
+
+const GRUPOS = [
+  { titulo: 'Visão geral', itens: [
+    { label: 'Painel do sistema', icone: 'sistema', min: 'Admin', vista: 'sistema' },
+    { label: 'Dashboard', icone: 'dashboard', min: 'Basic', vista: 'pessoal' },
+    { label: 'Calendário', icone: 'calendario', min: 'Intermediate' }
+  ]},
+  { titulo: 'Movimentações', itens: [
+    { label: 'Despesas', icone: 'despesas', min: 'Basic' },
+    { label: 'Receitas', icone: 'receitas', min: 'Basic' },
+    { label: 'Cartões', icone: 'cartoes', min: 'Basic' },
+    { label: 'Contas', icone: 'contas', min: 'Intermediate' },
+    { label: 'Categorias', icone: 'categorias', min: 'Basic' }
+  ]},
+  { titulo: 'Planejamento', itens: [
+    { label: 'Metas', icone: 'metas', min: 'Basic' },
+    { label: 'Orçamento', icone: 'orcamento', min: 'Intermediate' },
+    { label: 'Investimentos', icone: 'investimentos', min: 'Advanced' },
+    { label: 'Empréstimos', icone: 'emprestimos', min: 'Advanced' },
+    { label: 'Simulador', icone: 'simulador', min: 'Advanced' }
+  ]},
+  { titulo: 'Análises', itens: [
+    { label: 'Relatórios', icone: 'relatorios', min: 'Advanced' },
+    { label: 'Histórico mensal', icone: 'historico', min: 'Advanced' },
+    { label: 'Assistente', icone: 'assistente', min: 'Advanced' },
+    { label: 'Calculadoras', icone: 'calculadoras', min: 'Advanced' }
+  ]},
+  { titulo: 'Administração', itens: [
+    { label: 'Usuários', icone: 'usuarios', min: 'Admin' },
+    { label: 'Parâmetros', icone: 'parametros', min: 'Admin' },
+    { label: 'Robôs', icone: 'robos', min: 'Admin' }
+  ]}
+];
+
+const SERIE12 = [
+  { m: 'set', p: 186200, r: 16400, d: 9100 },
+  { m: 'out', p: 189000, r: 16900, d: 8700 },
+  { m: 'nov', p: 191400, r: 17200, d: 9400 },
+  { m: 'dez', p: 194800, r: 19800, d: 11200 },
+  { m: 'jan', p: 193900, r: 16100, d: 8900 },
+  { m: 'fev', p: 198600, r: 17000, d: 9200 },
+  { m: 'mar', p: 201200, r: 17200, d: 9100 },
+  { m: 'abr', p: 200400, r: 16800, d: 9600 },
+  { m: 'mai', p: 205100, r: 19400, d: 10100 },
+  { m: 'jun', p: 207300, r: 17900, d: 8800 },
+  { m: 'jul', p: 209290, r: 17700, d: 9120 },
+  { m: 'ago', p: 214680, r: 18900, d: 9842 }
+];
+
+class Component extends DCLogic {
+  state = { plano: 'Advanced', periodo: 'month', ocultar: false, vazio: false, vista: 'sistema' };
+
+  brl(v) {
+    return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  fmt(v) {
+    return this.state.ocultar ? 'R$ ••••' : this.brl(v);
+  }
+
+  geometria(comPatrimonio) {
+    const X0 = 14, X1 = 806;
+    const passo = (X1 - X0) / (SERIE12.length - 1);
+    const cx = (i) => X0 + i * passo;
+
+    const baseY = 288;
+    const ult = SERIE12.length - 1;
+
+    const FT = comPatrimonio ? 186 : 40;
+    const FB = 276;
+    const fmin = 6000;
+    const fmax = 21000;
+    const fy = (v) => FB - ((v - fmin) / (fmax - fmin)) * (FB - FT);
+    const pathDe = (key) => 'M ' + SERIE12.map((v, i) => `${cx(i).toFixed(1)} ${fy(v[key]).toFixed(1)}`).join(' L ');
+
+    const base = {
+      baseY,
+      linhaReceitas: pathDe('r'),
+      linhaDespesas: pathDe('d'),
+      fimReceitaX: cx(ult).toFixed(1), fimReceitaY: fy(SERIE12[ult].r).toFixed(1),
+      fimDespesaX: cx(ult).toFixed(1), fimDespesaY: fy(SERIE12[ult].d).toFixed(1),
+      fluxoEixoLabel: 'Fluxo mensal · R$ 6 a 21 mil'
+    };
+
+    if (!comPatrimonio) {
+      return { ...base, eixoY: [], areaPatrimonio: '', linhaPatrimonio: '', ultimoX: 0, ultimoY: 0 };
+    }
+
+    const PT = 24, PB = 154;
+    const min = 180000, max = 220000;
+    const py = (v) => PB - ((v - min) / (max - min)) * (PB - PT);
+    const pts = SERIE12.map((v, i) => `${cx(i).toFixed(1)} ${py(v.p).toFixed(1)}`);
+
+    return {
+      ...base,
+      eixoY: [220000, 200000, 180000].map(v => ({ y: py(v).toFixed(1) })),
+      areaPatrimonio: `M ${pts.join(' L ')} L ${X1} ${PB} L ${X0} ${PB} Z`,
+      linhaPatrimonio: `M ${pts.join(' L ')}`,
+      ultimoX: cx(ult).toFixed(1),
+      ultimoY: py(SERIE12[ult].p).toFixed(1)
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const PLANOS = [
+      { id: 'Basic', label: 'Essencial' },
+      { id: 'Intermediate', label: 'Inteligente' },
+      { id: 'Advanced', label: 'Completo' },
+      { id: 'Admin', label: 'Admin' }
+    ];
+    const basico = s.plano === 'Basic';
+    const inter = !basico;
+    const avancado = s.plano === 'Advanced' || s.plano === 'Admin';
+    const planoLabel = (PLANOS.find(x => x.id === s.plano) || PLANOS[2]).label;
+
+    const mult = s.periodo === 'month' ? 1 : (s.periodo === 'quarter' ? 3 : 12);
+    const receitas = 18900 * mult;
+    const receitasPend = 1200 * mult;
+    const despesas = 9842.17 * mult;
+    const despesasPagas = 7420.52 * mult;
+    const despesasAberto = 2421.65 * mult;
+    const saldoPeriodo = 9057.83 * mult;
+    const nomeArtigo = { month: 'no mês', quarter: 'no trimestre', year: 'no ano' }[s.periodo];
+
+    const atencao = [];
+    atencao.push({
+      titulo: 'Fatura Nubank vence hoje', detalhe: `${this.fmt(1842.10)} · cartão principal`, acao: 'Pagar',
+      bg: 'rgba(217,72,63,.10)', cor: '#B3372F', icone: { __html: '<path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9"/>' }
+    });
+    atencao.push({
+      titulo: 'Energia vence em 3 dias', detalhe: `${this.fmt(318.42)} · Moradia`, acao: 'Ver',
+      bg: 'rgba(201,122,21,.12)', cor: '#9A5C0E', icone: { __html: '<path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/>' }
+    });
+    atencao.push({
+      titulo: 'Plano de saúde vencido', detalhe: `${this.fmt(892)} · há 3 dias`, acao: 'Pagar',
+      bg: 'rgba(217,72,63,.10)', cor: '#B3372F', icone: { __html: '<path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9"/>' }
+    });
+    if (inter) atencao.push({
+      titulo: 'Alimentação passou do orçamento', detalhe: `${this.fmt(1410)} de ${this.fmt(1200)} · 118%`, acao: 'Ajustar',
+      bg: 'rgba(37,99,235,.10)', cor: '#1D4ED8', icone: { __html: '<path d="M4 18h16M7 15l4-4 3 3 4-6"/>' }
+    });
+
+    return {
+      planos: PLANOS.map(x => ({
+        label: x.label,
+        border: s.plano === x.id ? 'rgba(79,183,131,.45)' : 'rgba(237,235,236,.16)',
+        bg: s.plano === x.id ? 'rgba(52,144,99,.14)' : 'transparent',
+        color: s.plano === x.id ? '#fff' : '#9FBAC3',
+        pick: () => this.setState({ plano: x.id })
+      })),
+      periodos: [
+        { id: 'month', label: 'Mês' }, { id: 'quarter', label: 'Trimestre' }, { id: 'year', label: 'Ano' }
+      ].map(x => ({
+        label: x.label,
+        bg: s.periodo === x.id ? '#fff' : 'transparent',
+        color: s.periodo === x.id ? '#0A2430' : '#7A929E',
+        shadow: s.periodo === x.id ? '0 1px 2px rgba(3,32,44,.08)' : 'none',
+        pick: () => this.setState({ periodo: x.id })
+      })),
+      grupos: (() => {
+        const nivel = { Basic: 1, Intermediate: 2, Advanced: 3, Admin: 4 };
+        return GRUPOS.map(g => ({
+          titulo: g.titulo,
+          itens: g.itens.filter(it => nivel[s.plano] >= nivel[it.min]).map(it => {
+            const admin = s.plano === 'Admin';
+            const ativo = it.vista ? (admin ? s.vista === it.vista : it.vista === 'pessoal') : false;
+            return {
+              label: it.label,
+              icone: { __html: ICO[it.icone] },
+              bg: ativo ? 'rgba(255,255,255,.10)' : 'transparent',
+              cor: ativo ? '#fff' : '#9FBAC3',
+              peso: ativo ? '600' : '500',
+              barra: ativo ? '#4FB783' : 'transparent',
+              pick: it.vista ? () => this.setState({ vista: it.vista }) : () => {}
+            };
+          })
+        })).filter(g => g.itens.length > 0);
+      })(),
+
+      planoLabel, basico, inter, nomeArtigo,
+      completo: avancado,
+      temUpgrade: s.plano === 'Intermediate',
+      upgradeKey: 'up-' + s.plano,
+      upgradePlano: basico ? 'Inteligente' : 'Completo',
+      upgradeTitulo: basico ? 'Veja o quadro completo do seu dinheiro' : 'Consolide patrimônio, contas e dívidas',
+      upgradeItens: (basico
+        ? ['Patrimônio líquido', 'Saldo disponível real', 'Análise do período', 'Contas, orçamento e calendário']
+        : ['Investimentos e carteira', 'Saldos por conta', 'Mapa de dívidas', 'Saúde financeira']
+      ).map(label => ({ label })),
+
+      contas: [
+        { nome: 'Itaú — Corrente', tipo: 'Conta corrente', cor: '#0A4A5C', valor: this.fmt(8420), valorCor: '#0A2430' },
+        { nome: 'Nubank — Conta', tipo: 'Conta de pagamento', cor: '#7C3AED', valor: this.fmt(3180), valorCor: '#0A2430' },
+        { nome: 'Reserva CDB', tipo: 'Aplicação', cor: '#349063', valor: this.fmt(32000), valorCor: '#2A7551' },
+        { nome: 'Carteira', tipo: 'Dinheiro em espécie', cor: '#C97A15', valor: this.fmt(302), valorCor: '#0A2430' }
+      ],
+      dividaTotal: this.fmt(15110),
+      dividas: [
+        { nome: 'Financiamento do carro', saldo: this.fmt(9840), largura: '65%', cor: '#D9483F', detalhe: '18 de 36 parcelas · 1,29% a.m.' },
+        { nome: 'Fatura Nubank', saldo: this.fmt(3184.68), largura: '21%', cor: '#C97A15', detalhe: 'Vence dia 10 · sem rotativo' },
+        { nome: 'Notebook parcelado', saldo: this.fmt(2085.32), largura: '14%', cor: '#2563EB', detalhe: '4 de 12 parcelas · sem juros' }
+      ],
+      vlEstouro: this.fmt(210.20),
+      vlAporte: this.fmt(1500),
+      kpiKey: 'kpi-' + s.plano + '-' + s.periodo,
+      comprometidoValor: this.fmt(2421.65),
+      comprometidoNota: 'Cartões, parcelas e contas a vencer',
+      periodoTitulo: s.periodo === 'month' ? 'agosto de 2026' : (s.periodo === 'quarter' ? '3º trimestre de 2026' : 'ano de 2026'),
+      resumoTexto: basico
+        ? 'Seu resumo financeiro do período está pronto.'
+        : 'Seu patrimônio cresceu no período. Suas despesas subiram 4,7% em relação ao mês anterior.',
+
+      saldoTitulo: inter ? 'Saldo disponível' : 'Saldo do período',
+      saldoTip: inter
+        ? 'A soma de todas as suas contas menos o que já tem destino: faturas em aberto, parcelas e contas a vencer. É quanto você realmente pode usar hoje.'
+        : 'Diferença entre o que entrou e o que saiu no período escolhido. Não é o seu saldo em conta — para isso é preciso cadastrar suas contas bancárias.',
+      saldoValor: this.fmt(inter ? 12480.35 : saldoPeriodo),
+      saldoNota: inter
+        ? `Em contas: ${this.fmt(14902)} · Em aberto: ${this.fmt(2421.65)}`
+        : 'Receitas recebidas menos despesas com vencimento no período.',
+      patrimonioValor: this.fmt(214680),
+      receitaValor: this.fmt(receitas + receitasPend),
+      receitaNota: `Recebidas ${nomeArtigo}: ${this.fmt(receitas)} · A receber ${this.fmt(receitasPend)}`,
+      sobraValor: this.fmt(saldoPeriodo + receitasPend - despesasAberto),
+      despesaValor: this.fmt(despesas),
+      despesaNota: `Pagas: ${this.fmt(despesasPagas)} · Em aberto ${this.fmt(despesasAberto)}`,
+
+      graficoTitulo: inter ? 'Patrimônio' : 'Receitas e despesas',
+      graficoTip: inter
+        ? 'Evolução do seu patrimônio líquido mês a mês, já somando investimentos e descontando dívidas. A linha subindo significa que você terminou o mês com mais do que começou.'
+        : 'Comparação entre o que entrou e o que saiu em cada mês. A distância entre as duas linhas é quanto sobrou — quanto maior, melhor.',
+      graficoSub: avancado
+        ? 'Últimos 12 meses · líquido, com investimentos'
+        : (inter ? 'Últimos 12 meses · líquido' : 'Últimos 12 meses'),
+      graficoValor: this.fmt(inter ? 214680 : saldoPeriodo),
+      graficoTag: inter ? '↑ 2,6%' : 'sobra do mês',
+      graficoTagBg: inter ? 'rgba(52,144,99,.12)' : '#F1F5F7',
+      graficoTagCor: inter ? '#2A7551' : '#46606C',
+      patrimonioOpacidade: inter ? 1 : 0,
+      ...this.geometria(inter),
+      graficoNota: inter
+        ? 'Patrimônio e fluxo mensal em escalas próprias.'
+        : 'Entrada e saída de cada mês.',
+
+      atencao,
+      atencaoTotal: atencao.length,
+      investidoTotal: this.fmt(148290),
+      proventosMes: this.fmt(412.80),
+      alocacao: [
+        { nome: 'Renda fixa', pct: '41%', largura: '41%', cor: '#0A4A5C' },
+        { nome: 'Ações', pct: '27%', largura: '27%', cor: '#2563EB' },
+        { nome: 'Fundos imobiliários', pct: '19%', largura: '19%', cor: '#349063' },
+        { nome: 'Internacional', pct: '13%', largura: '13%', cor: '#C97A15' }
+      ],
+      posicoes: [
+        { nome: 'Tesouro Selic 2029', classe: 'Renda fixa · 18 títulos', valor: this.fmt(61425), variacao: '+ 7,3%', varCor: '#2A7551' },
+        { nome: 'ITSA4', classe: 'Ações · 1.200 cotas', valor: this.fmt(13296), variacao: '+ 17,6%', varCor: '#2A7551' },
+        { nome: 'HGLG11', classe: 'Fundos imobiliários · 180 cotas', valor: this.fmt(28175), variacao: '+ 4,1%', varCor: '#2A7551' },
+        { nome: 'IVVB11', classe: 'Internacional · 42 cotas', valor: this.fmt(19278), variacao: '− 5,0%', varCor: '#B3372F' }
+      ],
+      agendaResumo: 'O que ainda não apareceu acima, até 15/08.',
+      agenda: [
+        { dia: '12', mes: 'ago', diaCor: '#2A7551', nome: 'Consultoria', tipo: 'Serviços · a receber', valor: this.fmt(3500), valorCor: '#2A7551' },
+        { dia: '12', mes: 'ago', diaCor: '#46606C', nome: 'Notebook 4/12', tipo: 'Cartão · parcela', valor: this.fmt(641.58), valorCor: '#0A2430' },
+        { dia: '14', mes: 'ago', diaCor: '#46606C', nome: 'Academia', tipo: 'Lazer · recorrente', valor: this.fmt(149.90), valorCor: '#0A2430' },
+        { dia: '15', mes: 'ago', diaCor: '#46606C', nome: 'Internet e telefone', tipo: 'Moradia · recorrente', valor: this.fmt(219.90), valorCor: '#0A2430' }
+      ],
+      recorrenteResumo: 'Entradas e saídas que se repetem todo mês.',
+      recorrentes: (basico ? [
+        { nome: 'Aluguel', quando: 'todo dia 05 · Moradia', valor: this.fmt(2400), valorCor: '#0A2430', cor: '#0A4A5C' },
+        { nome: 'Plano de saúde', quando: 'todo dia 01 · Saúde', valor: this.fmt(892), valorCor: '#B3372F', cor: '#D9483F' },
+        { nome: 'Energia elétrica', quando: 'todo dia 10 · Moradia', valor: this.fmt(318.42), valorCor: '#0A2430', cor: '#C97A15' },
+        { nome: 'Salário', quando: 'todo dia 05 · Receita', valor: this.fmt(8400), valorCor: '#2A7551', cor: '#349063' }
+      ] : [
+        { nome: 'Aluguel', quando: 'todo dia 05 · Moradia', valor: this.fmt(2400), valorCor: '#0A2430', cor: '#0A4A5C' },
+        { nome: 'Plano de saúde', quando: 'todo dia 01 · Saúde', valor: this.fmt(892), valorCor: '#B3372F', cor: '#D9483F' },
+        { nome: 'Energia elétrica', quando: 'todo dia 10 · Moradia', valor: this.fmt(318.42), valorCor: '#0A2430', cor: '#C97A15' },
+        { nome: 'Notebook 4/12', quando: 'todo dia 12 · Cartão', valor: this.fmt(641.58), valorCor: '#0A2430', cor: '#2563EB' },
+        { nome: 'Internet e telefone', quando: 'todo dia 15 · Moradia', valor: this.fmt(219.90), valorCor: '#0A2430', cor: '#7C3AED' },
+        { nome: 'Salário', quando: 'todo dia 05 · Receita', valor: this.fmt(8400), valorCor: '#2A7551', cor: '#349063' }
+      ]),
+      recorrenteTotal: this.fmt(basico ? 3610.42 : 4471.90),
+      recorrentePeso: s.ocultar ? '••••' : (basico ? '19,1% da renda' : '23,7% da renda'),
+      recorrenteProximo: s.ocultar ? '••••' : 'Plano de saúde · 01/09',
+      orcamentoResumo: '1 categoria estourada · 2 acima de 80% do teto',
+      orcamento: [
+        { nome: 'Alimentação', pct: '118%', pctCor: '#B3372F', largura: '100%', cor: '#D9483F', detalhe: `${this.fmt(1410.20)} de ${this.fmt(1200)} · excedeu ${this.fmt(210.20)}` },
+        { nome: 'Moradia', pct: '87%', pctCor: '#9A5C0E', largura: '87%', cor: '#C97A15', detalhe: `${this.fmt(3140)} de ${this.fmt(3600)} · restam ${this.fmt(460)}` },
+        { nome: 'Transporte', pct: '64%', pctCor: '#2A7551', largura: '64%', cor: '#349063', detalhe: `${this.fmt(962.80)} de ${this.fmt(1500)} · restam ${this.fmt(537.20)}` }
+      ],
+      metaReserva: s.ocultar ? '•••• / ••••' : 'R$ 32.000 / 48.000',
+      metaViagem: s.ocultar ? '•••• / ••••' : 'R$ 6.400 / 20.000',
+      metaCarro: s.ocultar ? '•••• / ••••' : 'R$ 18.900 / 90.000',
+
+      categorias: [
+        { nome: 'Moradia', largura: '78%', cor: '#0A4A5C', valor: this.fmt(3140) },
+        { nome: 'Alimentação', largura: '35%', cor: '#D9483F', valor: this.fmt(1410.20) },
+        { nome: 'Transporte', largura: '24%', cor: '#349063', valor: this.fmt(962.80) },
+        { nome: 'Educação', largura: '18%', cor: '#2563EB', valor: this.fmt(720) }
+      ],
+      atividades: [
+        { nome: 'Salário', detalhe: '05 ago · Conta Itaú', seta: '↑', bg: 'rgba(52,144,99,.12)', cor: '#2A7551', valor: '+ ' + this.fmt(8400), valorCor: '#2A7551' },
+        { nome: 'Consultoria — Grupo Vega', detalhe: '04 ago · Serviços', seta: '↑', bg: 'rgba(52,144,99,.12)', cor: '#2A7551', valor: '+ ' + this.fmt(3500), valorCor: '#2A7551' },
+        { nome: 'Supermercado', detalhe: '03 ago · Alimentação', seta: '↓', bg: 'rgba(217,72,63,.10)', cor: '#B3372F', valor: '− ' + this.fmt(428.90), valorCor: '#0A2430' },
+        { nome: 'Aluguel', detalhe: '02 ago · Moradia', seta: '↓', bg: 'rgba(217,72,63,.10)', cor: '#B3372F', valor: '− ' + this.fmt(2400), valorCor: '#0A2430' },
+        { nome: 'Combustível', detalhe: '01 ago · Transporte', seta: '↓', bg: 'rgba(217,72,63,.10)', cor: '#B3372F', valor: '− ' + this.fmt(412.80), valorCor: '#0A2430' }
+      ],
+
+      riscoOpacidade: s.ocultar ? 1 : 0,
+      toggleValores: () => this.setState(x => ({ ocultar: !x.ocultar })),
+
+      isAdmin: s.plano === 'Admin' && s.vista === 'sistema',
+      isVazio: s.vazio && !(s.plano === 'Admin' && s.vista === 'sistema'),
+      isNormal: !s.vazio && !(s.plano === 'Admin' && s.vista === 'sistema'),
+      vazioBg: s.vazio ? 'rgba(52,144,99,.14)' : 'transparent',
+      vazioBorder: s.vazio ? 'rgba(79,183,131,.45)' : 'rgba(237,235,236,.16)',
+      vazioColor: s.vazio ? '#fff' : '#9FBAC3',
+      toggleVazio: () => this.setState(x => ({ vazio: !x.vazio })),
+
+      passos: [
+        { titulo: 'Conta criada', texto: 'Seu acesso está ativo.', feito: true },
+        { titulo: 'Conta bancária cadastrada', texto: 'Itaú — Corrente, saldo inicial informado.', feito: true },
+        { titulo: 'Primeira receita', texto: 'Registre a entrada principal do mês.', acao: 'Adicionar receita', feito: false },
+        { titulo: 'Primeira despesa', texto: 'Comece pela conta fixa mais pesada.', acao: 'Adicionar despesa', feito: false },
+        { titulo: 'Primeira meta', texto: 'Um objetivo com prazo para acompanhar.', acao: 'Criar meta', feito: false }
+      ].map(p => ({
+        titulo: p.titulo, texto: p.texto, acao: p.acao || '',
+        pendente: !p.feito,
+        check: p.feito ? 1 : 0,
+        cor: p.feito ? '#7A929E' : '#0A2430',
+        borda: p.feito ? '#EEF3F5' : '#E4EBEF',
+        fundo: p.feito ? '#FBFCFD' : '#fff',
+        marcaBorda: p.feito ? '#349063' : '#D6E0E6',
+        marcaFundo: p.feito ? '#349063' : '#fff'
+      })),
+
+      adminKpis: [
+        { titulo: 'Contas ativas', valor: '1.284', cor: '#0A2430', tag: '↑ 3,1%', tagBg: 'rgba(52,144,99,.12)', tagCor: '#2A7551', nota: 'vs. ontem' },
+        { titulo: 'Receita recorrente', valor: 'R$ 41.290', cor: '#2A7551', tag: '↑ 2,4%', tagBg: 'rgba(52,144,99,.12)', tagCor: '#2A7551', nota: 'mensal' },
+        { titulo: 'Assinaturas em atraso', valor: '3', cor: '#B3372F', tag: '+ 1', tagBg: 'rgba(217,72,63,.10)', tagCor: '#B3372F', nota: 'desde ontem' },
+        { titulo: 'Trials expirando', valor: '11', cor: '#9A5C0E', tag: '7 dias', tagBg: 'rgba(201,122,21,.14)', tagCor: '#9A5C0E', nota: 'sem conversão' }
+      ],
+      robos: [
+        { nome: 'Lançamentos recorrentes', hora: '03:00', itens: '412 itens', status: 'Sucesso', bg: 'rgba(52,144,99,.12)', cor: '#2A7551' },
+        { nome: 'Fechamento de faturas', hora: '03:12', itens: '188 itens', status: 'Sucesso', bg: 'rgba(52,144,99,.12)', cor: '#2A7551' },
+        { nome: 'Alertas de vencimento', hora: '03:20', itens: '—', status: 'Falha', bg: 'rgba(217,72,63,.10)', cor: '#B3372F' },
+        { nome: 'Snapshot patrimonial', hora: '03:31', itens: '1.284 itens', status: 'Sucesso', bg: 'rgba(52,144,99,.12)', cor: '#2A7551' },
+        { nome: 'Cobrança de renovação', hora: '04:00', itens: '—', status: 'Falha', bg: 'rgba(217,72,63,.10)', cor: '#B3372F' },
+        { nome: 'Limpeza de sessões', hora: '04:10', itens: 'pulado', status: 'Pulado', bg: '#F1F5F7', cor: '#46606C' }
+      ],
+      adminAlertas: [
+        { titulo: 'Robô de alertas falhou', detalhe: 'Timeout no provedor de e-mail · 03:20', acao: 'Reexecutar', bg: 'rgba(217,72,63,.10)', cor: '#B3372F', icone: { __html: '<path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9"/>' } },
+        { titulo: '3 cobranças recusadas', detalhe: 'Cartão expirado · plano Completo', acao: 'Ver', bg: 'rgba(217,72,63,.10)', cor: '#B3372F', icone: { __html: '<rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/>' } },
+        { titulo: '11 trials expiram em 7 dias', detalhe: 'Nenhum converteu até agora', acao: 'Exportar', bg: 'rgba(201,122,21,.14)', cor: '#9A5C0E', icone: { __html: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>' } },
+        { titulo: '2 contas sem acesso há 60 dias', detalhe: 'Plano Inteligente ativo', acao: 'Ver', bg: 'rgba(37,99,235,.10)', cor: '#1D4ED8', icone: { __html: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/>' } }
+      ],
+      base: [
+        { nome: 'Essencial', largura: '54%', cor: '#0A4A5C', valor: '694' },
+        { nome: 'Inteligente', largura: '31%', cor: '#2563EB', valor: '398' },
+        { nome: 'Completo', largura: '14%', cor: '#349063', valor: '178' },
+        { nome: 'Trial ativo', largura: '3%', cor: '#C97A15', valor: '14' }
+      ],
+      cadastros: [
+        { iniciais: 'MR', nome: 'Marina Rocha', email: 'marina.rocha@email.com', plano: 'Completo', bg: 'rgba(52,144,99,.12)', cor: '#2A7551' },
+        { iniciais: 'TL', nome: 'Thiago Lemos', email: 'thiago.lemos@email.com', plano: 'Essencial', bg: '#F1F5F7', cor: '#46606C' },
+        { iniciais: 'CB', nome: 'Camila Barros', email: 'camila.barros@email.com', plano: 'Inteligente', bg: 'rgba(37,99,235,.10)', cor: '#1D4ED8' },
+        { iniciais: 'RS', nome: 'Rafael Souza', email: 'rafael.souza@email.com', plano: 'Trial', bg: 'rgba(201,122,21,.14)', cor: '#9A5C0E' },
+        { iniciais: 'AF', nome: 'Ana Freitas', email: 'ana.freitas@email.com', plano: 'Essencial', bg: '#F1F5F7', cor: '#46606C' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

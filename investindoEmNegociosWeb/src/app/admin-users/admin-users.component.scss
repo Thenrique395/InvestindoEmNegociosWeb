@@ -38,9 +38,9 @@
   background: var(--text);
   color: var(--surface);
   font-size: 0.72rem;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
   line-height: 1.2;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.12s ease, transform 0.12s ease;

@@ -8,13 +8,13 @@ import { AuthService, AuthSessionResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
+import { AuthLayoutComponent } from '../auth-layout/auth-layout.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, AuthLayoutComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
   email = '';

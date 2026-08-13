@@ -143,7 +143,7 @@ export function getFinancialGoalLabel(financialGoal: string | null): string | nu
 
 export function buildConicGradient(slices: { percent: number; color: string }[]): string {
   if (!slices.length || slices.every((item) => item.percent <= 0)) {
-    return 'conic-gradient(var(--surface-3) 0deg 360deg)';
+    return 'conic-gradient(var(--surface-inset) 0deg 360deg)';
   }
 
   let start = 0;

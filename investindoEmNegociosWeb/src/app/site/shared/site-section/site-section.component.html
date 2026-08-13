@@ -1,0 +1,24 @@
+<div class="site-section__inner" [class.site-section__inner--centered]="centered()">
+  @if (eyebrow() || title() || description()) {
+    <div class="site-section__top">
+      <header class="site-section__head">
+        @if (eyebrow(); as text) {
+          <p class="site-section__eyebrow">{{ text }}</p>
+        }
+        @if (title(); as text) {
+          <h2 class="site-section__title">{{ text }}</h2>
+        }
+        @if (description(); as text) {
+          <p class="site-section__description">{{ text }}</p>
+        }
+      </header>
+
+      <!-- Ações alinhadas ao título: alternador de ciclo, atalhos. -->
+      <div class="site-section__aside">
+        <ng-content select="[site-section-aside]" />
+      </div>
+    </div>
+  }
+
+  <ng-content />
+</div>

@@ -1,0 +1,88 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  height: var(--site-header-h);
+  padding: 0 var(--space-12);
+  background: var(--site-header-bg);
+  backdrop-filter: var(--site-header-blur);
+  border-bottom: 1px solid var(--site-header-border);
+}
+
+.site-header__brand {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.site-header__wordmark {
+  font-family: var(--font-display);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+/* `min-width:0` + `overflow:hidden`: em telas estreitas o nav encolhe em vez
+   de empurrar as ações para fora da tela. */
+.site-header__nav {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-9);
+  overflow: hidden;
+}
+
+.site-header__link {
+  color: var(--text-secondary);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-hover) ease;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.site-header__actions {
+  flex: none;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* O nav vira o primeiro corte: marca e ações são o que precisa sobreviver. */
+@media (max-width: 900px) {
+  :host {
+    padding: 0 var(--space-9);
+    gap: var(--space-7);
+  }
+
+  .site-header__nav {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header__wordmark {
+    display: none;
+  }
+}

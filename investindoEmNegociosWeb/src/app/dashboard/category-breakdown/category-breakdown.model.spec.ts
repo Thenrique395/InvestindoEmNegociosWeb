@@ -6,7 +6,7 @@ import {
 } from './category-breakdown.model';
 
 function slice(partial: Partial<CategorySlice> & { label: string }): CategorySlice {
-  return { total: 0, percent: 0, color: 'var(--color-chart-series-1)', ...partial };
+  return { total: 0, percent: 0, color: 'var(--chart-1)', ...partial };
 }
 
 describe('category-breakdown.model', () => {

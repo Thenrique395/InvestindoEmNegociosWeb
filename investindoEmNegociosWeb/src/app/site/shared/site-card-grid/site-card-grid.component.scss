@@ -1,0 +1,49 @@
+:host {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--site-card-min, 260px), 1fr));
+  gap: var(--space-7);
+}
+
+.site-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-10) var(--space-11);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+/* Quadrado verde com número (passos) ou sigla (recursos). */
+.site-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--income-tint);
+  color: var(--income-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
+}
+
+.site-card__title {
+  margin: 0;
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: 1.3;
+  letter-spacing: var(--ls-tight);
+}
+
+.site-card__text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  text-wrap: pretty;
+}

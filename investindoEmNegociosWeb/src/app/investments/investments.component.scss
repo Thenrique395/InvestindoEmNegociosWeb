@@ -5,9 +5,9 @@
 
 .investments-shell {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   padding: 1.6rem;
   display: grid;
   gap: 1.3rem;

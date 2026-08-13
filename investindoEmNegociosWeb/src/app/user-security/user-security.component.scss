@@ -18,7 +18,7 @@
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   margin: 0;
 }
 
@@ -31,7 +31,7 @@
   display: grid;
   gap: 0.45rem;
   color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
 }
 
 .scope div {

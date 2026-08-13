@@ -29,7 +29,7 @@ describe('categories-overview.model', () => {
       expect(v.origin).toBe('default');
       expect(v.isActive).toBeTrue();
       expect(v.icon).toBe('🍽️');
-      expect(v.color).toContain('--color-chart-series');
+      expect(v.color).toContain('--chart-');
     });
   });
 

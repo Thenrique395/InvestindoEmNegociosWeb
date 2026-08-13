@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/styles.css">
+<script src="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #001620; font-family: Inter, system-ui, sans-serif; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  .ffx { font-variant-numeric: tabular-nums; }
+  .view { animation: viewIn .28s cubic-bezier(.16,.8,.3,1) both; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .fld { height: 46px; border: 1px solid #E4EBEF; border-radius: 11px; background: #F8FAFB; padding: 0 13px; font: 400 14px Inter, sans-serif; color: #0A2430; outline: none; width: 100%; box-sizing: border-box; transition: border-color .16s ease, box-shadow .16s ease, background .16s ease; }
+  .fld:focus { border-color: #2563EB; background: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
+  .fld::placeholder { color: #9FB2BB; }
+  .lnk { color: #2563EB; font-weight: 600; cursor: pointer; }
+  .lnk:hover { color: #1D4ED8; }
+  .btn { transition: background .14s ease, transform .1s ease; }
+  .btn:active { transform: scale(.99); }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:26px; padding:44px 40px 64px">
+
+  <div style="width:100%; max-width:1080px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; color:#E6EEF1">
+    <div>
+      <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Protótipo navegável</span>
+      <h1 style="margin:8px 0 5px; font-family:Poppins,sans-serif; font-size:26px; font-weight:600; letter-spacing:-.02em; color:#fff">Entrar, recuperar e criar conta</h1>
+      <p style="margin:0; font-size:14px; color:#9FB2BB">Os três fluxos na mesma página. Tudo funciona: validação, erro, sucesso e navegação entre eles.</p>
+    </div>
+    <div style="display:flex; gap:8px; flex:none">
+      <sc-for list="{{ atalhos }}" as="a" hint-placeholder-count="3">
+        <button class="btn" onClick="{{ a.pick }}" style="height:34px; padding:0 14px; border:1px solid {{ a.border }}; border-radius:999px; background:{{ a.bg }}; color:{{ a.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ a.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1080px; display:grid; grid-template-columns:{{ gridCols }}; background:#fff; border-radius:22px; overflow:hidden; box-shadow:0 40px 100px -50px rgba(0,0,0,.8)">
+
+    <sc-if value="{{ temVisual }}" hint-placeholder-val="{{ true }}">
+      <aside style="position:relative; overflow:hidden; background:#002E3E; color:#fff; padding:44px 40px; display:flex; flex-direction:column; justify-content:space-between; min-height:600px">
+        <div style="position:absolute; top:-160px; right:-120px; width:460px; height:460px; background:radial-gradient(circle at center, rgba(52,144,99,.30), transparent 62%); pointer-events:none"></div>
+        <div style="position:relative">
+          <img src="assets/lockup-horizontal-light.png" alt="Investindo em Negócios" style="width:200px; height:auto; display:block">
+        </div>
+        <div style="position:relative">
+          <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#4FB783">{{ visualEyebrow }}</span>
+          <h2 style="margin:14px 0 12px; font-family:Poppins,sans-serif; font-size:34px; font-weight:600; line-height:1.12; letter-spacing:-.03em; max-width:16ch">{{ visualTitulo }}</h2>
+          <p style="margin:0; font-size:15px; line-height:1.65; color:#BBD3DA; max-width:34ch">{{ visualTexto }}</p>
+        </div>
+        <div style="position:relative; padding-top:22px; border-top:1px solid rgba(237,235,236,.14)">
+          <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#6E8B96">{{ provaLabel }}</div>
+          <p style="margin:9px 0 0; font-size:14px; line-height:1.6; color:#DCE8EC">{{ provaTexto }}</p>
+        </div>
+      </aside>
+    </sc-if>
+
+    <main style="padding:44px 48px; display:flex; flex-direction:column; color:#0A2430; min-height:600px">
+
+      <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1">
+          <span onClick="{{ irSite }}" class="lnk" style="display:inline-flex; align-items:center; gap:7px; font-size:13px; color:#7A929E; font-weight:500; margin-bottom:36px" style-hover="color:#46606C"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>Voltar para o site</span>
+          <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Login</span>
+          <h1 style="margin:9px 0 7px; font-family:Poppins,sans-serif; font-size:30px; font-weight:600; letter-spacing:-.03em">Acesse sua conta</h1>
+          <p style="margin:0 0 28px; font-size:14px; line-height:1.6; color:#46606C; max-width:42ch">Use seu e-mail e senha para voltar ao dashboard e continuar sua organização financeira.</p>
+
+          <sc-if value="{{ erroLogin }}" hint-placeholder-val="{{ false }}">
+            <div class="view" style="display:flex; align-items:flex-start; gap:11px; padding:13px 15px; margin-bottom:20px; border:1px solid rgba(217,72,63,.26); border-radius:12px; background:rgba(217,72,63,.07)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B3372F" stroke-width="2.2" stroke-linecap="round" style="flex:none; margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+              <div><div style="font-size:13px; font-weight:600; color:#B3372F">E-mail ou senha incorretos</div><p style="margin:3px 0 0; font-size:13px; color:#8E4B45">Confira os dados e tente novamente, ou recupere sua senha.</p></div>
+            </div>
+          </sc-if>
+
+          <div style="display:flex; flex-direction:column; gap:16px">
+            <div style="display:flex; flex-direction:column; gap:7px">
+              <label style="font-size:13px; font-weight:600">E-mail</label>
+              <input class="fld" value="{{ email }}" onChange="{{ setEmail }}" placeholder="Digite seu e-mail" type="email">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:7px">
+              <label style="font-size:13px; font-weight:600">Senha</label>
+              <div style="position:relative">
+                <input class="fld" style="padding-right:78px" value="{{ senha }}" onChange="{{ setSenha }}" placeholder="Digite sua senha" type="{{ tipoSenha }}">
+                <span onClick="{{ toggleSenha }}" class="lnk" style="position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:12px">{{ labelSenha }}</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:14px">
+              <label style="display:flex; align-items:center; gap:9px; font-size:13px; color:#46606C; cursor:pointer">
+                <button onClick="{{ toggleLembrar }}" style="width:18px; height:18px; flex:none; border:1px solid {{ lembrarBorder }}; border-radius:5px; background:{{ lembrarBg }}; display:grid; place-items:center; cursor:pointer; padding:0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ lembrarOpacity }}"><path d="M20 6 9 17l-5-5"/></svg></button>
+                Manter conectado
+              </label>
+              <span onClick="{{ irEsqueci }}" class="lnk" style="font-size:13px">Esqueci minha senha</span>
+            </div>
+            <button class="btn" onClick="{{ entrar }}" style="display:inline-flex; align-items:center; justify-content:center; gap:9px; height:50px; margin-top:6px; border:none; border-radius:12px; background:{{ loginBg }}; color:#fff; font:600 15px Inter,sans-serif; cursor:pointer">{{ loginLabel }}<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ loginSetaOpacity }}"><path d="M5 12h14m0 0-5-5m5 5-5 5"/></svg></button>
+          </div>
+
+          <p style="margin:auto 0 0; padding-top:28px; font-size:14px; color:#46606C">Ainda não tem uma conta? <span onClick="{{ irCadastro }}" class="lnk">Criar conta agora.</span></p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEsqueci }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1">
+          <span onClick="{{ irLogin }}" class="lnk" style="display:inline-flex; align-items:center; gap:7px; font-size:13px; color:#7A929E; font-weight:500; margin-bottom:36px" style-hover="color:#46606C"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>Voltar para login</span>
+          <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Recuperação de senha</span>
+          <h1 style="margin:9px 0 7px; font-family:Poppins,sans-serif; font-size:30px; font-weight:600; letter-spacing:-.03em">Esqueci minha senha</h1>
+          <p style="margin:0 0 26px; font-size:14px; line-height:1.6; color:#46606C; max-width:42ch">Informe o e-mail da sua conta. Se ele estiver cadastrado, enviaremos um link de redefinição.</p>
+
+          <div style="display:flex; flex-direction:column; gap:16px">
+            <div style="display:flex; flex-direction:column; gap:7px">
+              <label style="font-size:13px; font-weight:600">E-mail</label>
+              <input class="fld" value="{{ email }}" onChange="{{ setEmail }}" placeholder="Digite seu e-mail" type="email">
+            </div>
+            <button class="btn" onClick="{{ enviarLink }}" style="display:inline-flex; align-items:center; justify-content:center; gap:9px; height:50px; margin-top:2px; border:none; border-radius:12px; background:{{ recBg }}; color:#fff; font:600 15px Inter,sans-serif; cursor:pointer">{{ recLabel }}</button>
+          </div>
+
+          <div style="margin-top:26px; padding-top:24px; border-top:1px solid #EEF3F5">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:16px">Como funciona</div>
+            <div style="display:flex; flex-direction:column; gap:14px">
+              <div style="display:flex; gap:12px">
+                <span style="flex:none; display:grid; place-items:center; width:32px; height:32px; border-radius:10px; background:#F1F5F7; color:#46606C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 7h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><path d="m3 8 9 6 9-6" stroke-linecap="round"/></svg></span>
+                <div><div style="font-size:13px; font-weight:600">Chega em até dois minutos</div><p style="margin:2px 0 0; font-size:13px; line-height:1.55; color:#7A929E">Se não aparecer, confira a caixa de spam antes de pedir outro.</p></div>
+              </div>
+              <div style="display:flex; gap:12px">
+                <span style="flex:none; display:grid; place-items:center; width:32px; height:32px; border-radius:10px; background:#F1F5F7; color:#46606C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+                <div><div style="font-size:13px; font-weight:600">Vale por uma hora</div><p style="margin:2px 0 0; font-size:13px; line-height:1.55; color:#7A929E">Depois disso o link expira e você precisa pedir um novo.</p></div>
+              </div>
+              <div style="display:flex; gap:12px">
+                <span style="flex:none; display:grid; place-items:center; width:32px; height:32px; border-radius:10px; background:#F1F5F7; color:#46606C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+                <div><div style="font-size:13px; font-weight:600">Uso único</div><p style="margin:2px 0 0; font-size:13px; line-height:1.55; color:#7A929E">Assim que a nova senha é salva, o link deixa de funcionar.</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:auto; padding-top:24px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:14px; color:#46606C">
+            <span>Lembrou a senha? <span onClick="{{ irLogin }}" class="lnk">Voltar para login.</span></span>
+            <span onClick="{{ irCadastro }}" class="lnk" style="font-size:13px">Criar conta</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEnviado }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; justify-content:center; align-items:flex-start; max-width:42ch">
+          <span style="display:grid; place-items:center; width:48px; height:48px; border-radius:14px; background:rgba(52,144,99,.12); color:#2A7551"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 7h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><path d="m3 8 9 6 9-6" stroke-linecap="round"/></svg></span>
+          <h1 style="margin:20px 0 8px; font-family:Poppins,sans-serif; font-size:27px; font-weight:600; letter-spacing:-.03em">Enviamos as instruções</h1>
+          <p style="margin:0 0 8px; font-size:15px; line-height:1.65; color:#46606C">Se <strong style="color:#0A2430">{{ emailMostrado }}</strong> estiver cadastrado, o link de redefinição chega em instantes.</p>
+          <p style="margin:0 0 28px; font-size:13px; line-height:1.6; color:#7A929E">O link vale por uma hora e só pode ser usado uma vez.</p>
+          <div style="display:flex; gap:10px">
+            <button class="btn" onClick="{{ irLogin }}" style="height:46px; padding:0 20px; border:none; border-radius:11px; background:#2563EB; color:#fff; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8">Voltar para login</button>
+            <button class="btn" onClick="{{ irEsqueci }}" style="height:46px; padding:0 18px; border:1px solid #D6E0E6; border-radius:11px; background:#fff; color:#46606C; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Usar outro e-mail</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCadastro }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1">
+          <span onClick="{{ irSite }}" class="lnk" style="display:inline-flex; align-items:center; gap:7px; font-size:13px; color:#7A929E; font-weight:500; margin-bottom:28px" style-hover="color:#46606C"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>Voltar para o site</span>
+          <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Primeiro acesso</span>
+          <h1 style="margin:9px 0 7px; font-family:Poppins,sans-serif; font-size:30px; font-weight:600; letter-spacing:-.03em">Vamos começar</h1>
+          <p style="margin:0 0 24px; font-size:14px; line-height:1.6; color:#46606C; max-width:44ch">Informe seus dados de acesso. Depois disso, o onboarding guia a criação da sua base financeira.</p>
+
+          <div style="display:flex; flex-direction:column; gap:14px">
+            <div style="display:flex; flex-direction:column; gap:7px">
+              <label style="font-size:13px; font-weight:600">Nome completo</label>
+              <input class="fld" value="{{ nome }}" onChange="{{ setNome }}" placeholder="Digite seu nome completo">
+              <sc-if value="{{ erroNome }}" hint-placeholder-val="{{ false }}"><small style="font-size:12px; color:#B3372F">Use ao menos 2 caracteres.</small></sc-if>
+            </div>
+            <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:14px">
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <label style="font-size:13px; font-weight:600">E-mail</label>
+                <input class="fld" value="{{ email }}" onChange="{{ setEmail }}" placeholder="Digite seu e-mail" type="email">
+                <sc-if value="{{ erroEmail }}" hint-placeholder-val="{{ false }}"><small style="font-size:12px; color:#B3372F">Digite um e-mail válido.</small></sc-if>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <label style="font-size:13px; font-weight:600">CPF</label>
+                <input class="fld ffx" value="{{ cpf }}" onChange="{{ setCpf }}" placeholder="000.000.000-00" inputmode="numeric">
+                <sc-if value="{{ erroCpf }}" hint-placeholder-val="{{ false }}"><small style="font-size:12px; color:#B3372F">CPF incompleto.</small></sc-if>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:7px">
+              <label style="font-size:13px; font-weight:600">Senha</label>
+              <div style="position:relative">
+                <input class="fld" style="padding-right:78px" value="{{ senha }}" onChange="{{ setSenha }}" placeholder="Crie uma senha" type="{{ tipoSenha }}">
+                <span onClick="{{ toggleSenha }}" class="lnk" style="position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:12px">{{ labelSenha }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-top:3px">
+                <div style="flex:1; display:flex; gap:4px">
+                  <i style="flex:1; height:4px; border-radius:999px; background:{{ f1 }}; transition:background .2s ease"></i>
+                  <i style="flex:1; height:4px; border-radius:999px; background:{{ f2 }}; transition:background .2s ease"></i>
+                  <i style="flex:1; height:4px; border-radius:999px; background:{{ f3 }}; transition:background .2s ease"></i>
+                </div>
+                <span style="font-size:12px; font-weight:600; color:{{ forcaColor }}; min-width:52px; text-align:right">{{ forcaLabel }}</span>
+              </div>
+              <small style="font-size:12px; color:#7A929E">Ao menos 6 caracteres. Misture letras e números para uma senha forte.</small>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:7px">
+              <label style="font-size:13px; font-weight:600">Confirmar senha</label>
+              <input class="fld" value="{{ confirma }}" onChange="{{ setConfirma }}" placeholder="Repita a senha" type="{{ tipoSenha }}">
+              <sc-if value="{{ erroConfirma }}" hint-placeholder-val="{{ false }}"><small style="font-size:12px; color:#B3372F">As senhas não conferem.</small></sc-if>
+            </div>
+            <label style="display:flex; align-items:flex-start; gap:10px; font-size:13px; line-height:1.55; color:#46606C; cursor:pointer; margin-top:2px">
+              <button onClick="{{ toggleTermos }}" style="width:18px; height:18px; flex:none; margin-top:1px; border:1px solid {{ termosBorder }}; border-radius:5px; background:{{ termosBg }}; display:grid; place-items:center; cursor:pointer; padding:0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ termosOpacity }}"><path d="M20 6 9 17l-5-5"/></svg></button>
+              <span>Li e aceito os <span class="lnk">termos de uso</span> e a <span class="lnk">política de privacidade</span>.</span>
+            </label>
+            <button class="btn" onClick="{{ criarConta }}" style="display:inline-flex; align-items:center; justify-content:center; gap:9px; height:50px; margin-top:6px; border:none; border-radius:12px; background:{{ cadBg }}; color:{{ cadColor }}; font:600 15px Inter,sans-serif; cursor:pointer">{{ cadLabel }}</button>
+          </div>
+
+          <p style="margin:auto 0 0; padding-top:24px; font-size:14px; color:#46606C">Já tem uma conta? <span onClick="{{ irLogin }}" class="lnk">Entrar.</span></p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isConfirma }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; justify-content:center; align-items:flex-start; max-width:46ch">
+          <span style="display:grid; place-items:center; width:54px; height:54px; border-radius:16px; background:rgba(52,144,99,.12); color:#2A7551"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <h1 style="margin:24px 0 8px; font-family:Poppins,sans-serif; font-size:30px; font-weight:600; letter-spacing:-.03em">Conta criada</h1>
+          <p style="margin:0 0 24px; font-size:15px; line-height:1.65; color:#46606C">Enviamos um e-mail de confirmação para <strong style="color:#0A2430">{{ emailMostrado }}</strong>. Confirme para liberar todos os recursos — você já pode começar a configurar seu painel.</p>
+          <div style="width:100%; padding:18px 20px; margin-bottom:26px; border:1px solid #E4EBEF; border-radius:14px; background:#F8FAFB">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:12px">A seguir</div>
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:#46606C">
+              <span style="display:flex; align-items:center; gap:10px"><i style="width:22px; height:22px; flex:none; display:grid; place-items:center; border-radius:999px; background:rgba(37,99,235,.10); color:#1D4ED8; font-size:11px; font-weight:700; font-style:normal">1</i>Definir seu perfil e a renda do mês</span>
+              <span style="display:flex; align-items:center; gap:10px"><i style="width:22px; height:22px; flex:none; display:grid; place-items:center; border-radius:999px; background:rgba(37,99,235,.10); color:#1D4ED8; font-size:11px; font-weight:700; font-style:normal">2</i>Cadastrar contas e cartões</span>
+              <span style="display:flex; align-items:center; gap:10px"><i style="width:22px; height:22px; flex:none; display:grid; place-items:center; border-radius:999px; background:rgba(37,99,235,.10); color:#1D4ED8; font-size:11px; font-weight:700; font-style:normal">3</i>Escolher categorias e a primeira meta</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px">
+            <button class="btn" onClick="{{ irLogin }}" style="height:46px; padding:0 20px; border:none; border-radius:11px; background:#2563EB; color:#fff; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8">Começar o onboarding</button>
+            <button class="btn" style="height:46px; padding:0 18px; border:1px solid #D6E0E6; border-radius:11px; background:#fff; color:#46606C; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Reenviar e-mail</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <p style="margin:0; font-size:13px; color:#5E7F8B; max-width:1080px">Dica: entre com qualquer e-mail e senha para ver o sucesso. Use a senha <span class="ffx" style="color:#9FB2BB">errada</span> para ver o estado de erro.</p>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    tela: 'login',
+    email: '', senha: '', nome: '', cpf: '', confirma: '',
+    verSenha: false, lembrar: true, termos: false,
+    carregando: false, erroLogin: false, tentouCadastro: false
+  };
+
+  cpfMask(v) {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2');
+  }
+
+  forca() {
+    const s = this.state.senha;
+    if (s.length < 6) return 0;
+    let n = 1;
+    if (s.length >= 9) n++;
+    if (/\d/.test(s) && /[a-zA-Z]/.test(s)) n++;
+    return Math.min(n, 3);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const t = s.tela;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email);
+    const cpfOk = s.cpf.replace(/\D/g, '').length === 11;
+    const f = this.forca();
+    const cadValido = s.nome.trim().length >= 2 && emailOk && cpfOk && s.senha.length >= 6 && s.confirma === s.senha && s.termos;
+    const FORCAS = [
+      { label: 'Fraca', color: '#B3372F' },
+      { label: 'Fraca', color: '#B3372F' },
+      { label: 'Média', color: '#9A5C0E' },
+      { label: 'Forte', color: '#2A7551' }
+    ];
+    const cores = ['#EAF0F3', '#D9483F', '#C97A15', '#349063'];
+    const visual = {
+      login: {
+        eyebrow: 'Painel financeiro pessoal',
+        titulo: 'Controle seu dinheiro com clareza.',
+        texto: 'Uma visão objetiva para acompanhar entradas, saídas, cartões e metas sem perder o contexto do mês.',
+        provaLabel: 'Tudo em um só lugar',
+        provaTexto: 'Receitas, despesas, cartões e metas conectados em um só lugar.'
+      },
+      cadastro: {
+        eyebrow: 'Conta gratuita',
+        titulo: 'Sua rotina financeira começa aqui',
+        texto: 'Monte seu primeiro painel e acompanhe o mês com decisões mais simples, visuais e consistentes.',
+        provaLabel: 'Etapas iniciais',
+        provaTexto: 'Perfil · Contas e cartões · Categorias · Dashboard pronto em três minutos.'
+      },
+      esqueci: {
+        eyebrow: 'Segurança da conta',
+        titulo: 'Sua conta continua protegida',
+        texto: 'O link de redefinição vale por uma hora, funciona uma única vez e não revela se o e-mail está cadastrado.',
+        provaLabel: 'Enquanto isso',
+        provaTexto: 'Nenhuma sessão ativa é encerrada até que você defina a nova senha.'
+      },
+      enviado: {
+        eyebrow: 'Segurança da conta',
+        titulo: 'Sua conta continua protegida',
+        texto: 'O link de redefinição vale por uma hora, funciona uma única vez e não revela se o e-mail está cadastrado.',
+        provaLabel: 'Enquanto isso',
+        provaTexto: 'Nenhuma sessão ativa é encerrada até que você defina a nova senha.'
+      },
+      confirma: {
+        eyebrow: 'Bem-vindo',
+        titulo: 'Falta pouco para o seu painel',
+        texto: 'Confirme o e-mail e siga para o onboarding. Em três passos seu mês já aparece organizado.',
+        provaLabel: 'Próximo passo',
+        provaTexto: 'O onboarding leva cerca de três minutos e pode ser retomado depois.'
+      }
+    };
+    const v = visual[t] || visual.login;
+    const comVisual = true;
+
+    const ir = (tela) => () => this.setState({ tela, erroLogin: false, tentouCadastro: false });
+
+    return {
+      isLogin: t === 'login',
+      isEsqueci: t === 'esqueci',
+      isEnviado: t === 'enviado',
+      isCadastro: t === 'cadastro',
+      isConfirma: t === 'confirma',
+      temVisual: comVisual,
+      gridCols: comVisual ? '.85fr 1fr' : '1fr',
+      visualEyebrow: v.eyebrow,
+      visualTitulo: v.titulo,
+      visualTexto: v.texto,
+      provaLabel: v.provaLabel,
+      provaTexto: v.provaTexto,
+
+      atalhos: [
+        { label: 'Entrar', tela: 'login' },
+        { label: 'Recuperar senha', tela: 'esqueci' },
+        { label: 'Criar conta', tela: 'cadastro' }
+      ].map(a => ({
+        label: a.label,
+        border: t === a.tela || (a.tela === 'esqueci' && t === 'enviado') || (a.tela === 'cadastro' && t === 'confirma') ? 'rgba(79,183,131,.45)' : 'rgba(237,235,236,.16)',
+        bg: t === a.tela || (a.tela === 'esqueci' && t === 'enviado') || (a.tela === 'cadastro' && t === 'confirma') ? 'rgba(52,144,99,.14)' : 'transparent',
+        color: t === a.tela || (a.tela === 'esqueci' && t === 'enviado') || (a.tela === 'cadastro' && t === 'confirma') ? '#fff' : '#9FBAC3',
+        pick: ir(a.tela)
+      })),
+
+      email: s.email, senha: s.senha, nome: s.nome, cpf: s.cpf, confirma: s.confirma,
+      emailMostrado: s.email || 'seu e-mail',
+      setEmail: e => this.setState({ email: e.target.value, erroLogin: false }),
+      setSenha: e => this.setState({ senha: e.target.value, erroLogin: false }),
+      setNome: e => this.setState({ nome: e.target.value }),
+      setCpf: e => this.setState({ cpf: this.cpfMask(e.target.value) }),
+      setConfirma: e => this.setState({ confirma: e.target.value }),
+
+      tipoSenha: s.verSenha ? 'text' : 'password',
+      labelSenha: s.verSenha ? 'Ocultar' : 'Mostrar',
+      toggleSenha: () => this.setState(p => ({ verSenha: !p.verSenha })),
+
+      lembrarBg: s.lembrar ? '#2563EB' : '#fff',
+      lembrarBorder: s.lembrar ? '#2563EB' : '#D6E0E6',
+      lembrarOpacity: s.lembrar ? 1 : 0,
+      toggleLembrar: () => this.setState(p => ({ lembrar: !p.lembrar })),
+
+      termosBg: s.termos ? '#2563EB' : '#fff',
+      termosBorder: s.termos ? '#2563EB' : '#D6E0E6',
+      termosOpacity: s.termos ? 1 : 0,
+      toggleTermos: () => this.setState(p => ({ termos: !p.termos })),
+
+      erroLogin: s.erroLogin,
+      loginBg: s.carregando ? '#93AFDF' : '#2563EB',
+      loginLabel: s.carregando ? 'Autenticando…' : 'Entrar no dashboard',
+      loginSetaOpacity: s.carregando ? 0 : 1,
+      entrar: () => {
+        if (s.carregando) return;
+        this.setState({ carregando: true, erroLogin: false });
+        setTimeout(() => {
+          if (s.senha.toLowerCase() === 'errada') this.setState({ carregando: false, erroLogin: true });
+          else this.setState({ carregando: false, tela: 'confirma' });
+        }, 800);
+      },
+
+      recBg: s.carregando ? '#93AFDF' : '#2563EB',
+      recLabel: s.carregando ? 'Enviando…' : 'Enviar link de recuperação',
+      enviarLink: () => {
+        if (s.carregando) return;
+        this.setState({ carregando: true });
+        setTimeout(() => this.setState({ carregando: false, tela: 'enviado' }), 800);
+      },
+
+      erroNome: s.tentouCadastro && s.nome.trim().length < 2,
+      erroEmail: s.tentouCadastro && !emailOk,
+      erroCpf: s.tentouCadastro && !cpfOk,
+      erroConfirma: s.tentouCadastro && s.confirma !== s.senha,
+      f1: cores[Math.min(f, 3)] && f >= 1 ? cores[f] : '#EAF0F3',
+      f2: f >= 2 ? cores[f] : '#EAF0F3',
+      f3: f >= 3 ? cores[f] : '#EAF0F3',
+      forcaLabel: s.senha ? FORCAS[f].label : '',
+      forcaColor: s.senha ? FORCAS[f].color : '#9FB2BB',
+      cadBg: s.carregando ? '#93AFDF' : (cadValido ? '#2563EB' : '#DCE4E8'),
+      cadColor: cadValido || s.carregando ? '#fff' : '#9FB2BB',
+      cadLabel: s.carregando ? 'Criando conta…' : 'Criar conta',
+      criarConta: () => {
+        if (s.carregando) return;
+        if (!cadValido) { this.setState({ tentouCadastro: true }); return; }
+        this.setState({ carregando: true });
+        setTimeout(() => this.setState({ carregando: false, tela: 'confirma' }), 900);
+      },
+
+      irLogin: ir('login'),
+      irEsqueci: ir('esqueci'),
+      irCadastro: ir('cadastro'),
+      irSite: ir('login')
+    };
+  }
+}
+
+</script>
+</body>
+</html>

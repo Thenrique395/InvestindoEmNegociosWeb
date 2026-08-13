@@ -27,9 +27,9 @@
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card-hover);
   min-width: 0;
   display: grid;
   gap: 0.9rem;
@@ -38,12 +38,12 @@
 .card h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .inline-form {
@@ -60,8 +60,8 @@
 
 input {
   border: 1px solid var(--border);
-  background-color: var(--surface-2);
-  border-radius: var(--radius-lg);
+  background-color: var(--surface-sunken);
+  border-radius: var(--radius-inner);
   min-height: 48px;
   padding: 0.7rem 0.9rem;
   color: var(--text);
@@ -79,7 +79,7 @@ input {
   background: transparent;
   padding: 0.2rem 0.35rem;
   margin: -0.2rem -0.35rem;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-control, 8px);
   color: var(--text);
   font: inherit;
   cursor: pointer;
@@ -88,13 +88,13 @@ input {
 }
 
 .link-btn:hover {
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--primary-text);
 }
 
 .category-name {
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .usage-cell {
@@ -111,9 +111,9 @@ input {
 .usage-cell__pct {
   min-width: 2.75rem;
   text-align: right;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-tertiary);
 }
 
 .list-actions {
@@ -129,8 +129,8 @@ input {
   min-width: 12rem;
 }
 
-.negative { color: var(--danger-text); }
-.over-budget { color: var(--danger-text); font-weight: 600; }
+.negative { color: var(--expense-text); }
+.over-budget { color: var(--expense-text); font-weight: 600; }
 
 @media (max-width: 900px) {
   .summary-grid {

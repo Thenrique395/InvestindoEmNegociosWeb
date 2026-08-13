@@ -45,11 +45,11 @@ export interface AccountsOverview {
 }
 
 export const ACCOUNT_CHART_PALETTE = [
-  'var(--color-chart-series-1)',
-  'var(--color-chart-series-2)',
-  'var(--color-chart-series-3)',
-  'var(--color-chart-series-4)',
-  'var(--color-chart-series-5)'
+  'var(--chart-1)',
+  'var(--chart-2)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)'
 ];
 
 export function emptyActivity(accountId: string): AccountActivity {

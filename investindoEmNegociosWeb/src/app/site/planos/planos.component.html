@@ -1,0 +1,93 @@
+<app-site-header
+  [links]="nav"
+  ctaLabel="Começar"
+  ctaAnchor="#planos"
+  (anchorSelected)="scrollTo($event.anchor, $event.event)" />
+
+<!-- 1. Hero -->
+<section class="hero">
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <p class="hero__eyebrow">{{ hero.eyebrow }}</p>
+      <h1 class="hero__title">{{ hero.title }}</h1>
+      <p class="hero__description">{{ hero.description }}</p>
+    </div>
+
+    <aside class="hero__aside">
+      <div class="cycle__switch" role="group" aria-label="Ciclo de cobrança">
+        <button
+          type="button"
+          class="cycle__option"
+          [class.cycle__option--active]="cycle() === 'Monthly'"
+          [attr.aria-pressed]="cycle() === 'Monthly'"
+          (click)="setCycle('Monthly')">
+          Mensal
+        </button>
+        <button
+          type="button"
+          class="cycle__option"
+          [class.cycle__option--active]="cycle() === 'Yearly'"
+          [attr.aria-pressed]="cycle() === 'Yearly'"
+          (click)="setCycle('Yearly')">
+          Anual
+        </button>
+      </div>
+
+      <div class="hero__hint">
+        <p class="hero__hint-title">{{ hero.hint }}</p>
+        <p class="hero__hint-note">{{ hero.hintNote }}</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- 2. Cards de plano -->
+<app-site-section anchor="planos" tone="surface">
+  <app-site-plan-cards
+    [plans]="plans"
+    [cycle]="cycle()"
+    (planSelected)="goToCheckout($event)" />
+  <p class="planos__note">{{ nota }}</p>
+</app-site-section>
+
+<!-- 3. Progressão comercial -->
+<app-site-section
+  anchor="progressao"
+  [eyebrow]="progressao.eyebrow"
+  [title]="progressao.title"
+  [description]="progressao.description">
+  <app-site-card-grid [cards]="progressao.steps" minWidth="300px" />
+</app-site-section>
+
+<!-- 4. Comparativo -->
+<app-site-section
+  anchor="comparar"
+  tone="surface"
+  eyebrow="Comparar"
+  title="O que muda entre os planos">
+  <app-site-compare-table
+    class="compare-table--text"
+    [columns]="planNames"
+    [rows]="comparativo"
+    [highlightIndex]="recommendedIndex" />
+</app-site-section>
+
+<!-- 5. Dúvidas -->
+<app-site-section anchor="faq" eyebrow="Dúvidas" title="Antes de escolher" [centered]="true">
+  <app-site-faq [items]="faq" />
+</app-site-section>
+
+<!-- 6. Garantias e fechamento -->
+<app-site-section tone="surface">
+  <app-site-card-grid [cards]="garantias" minWidth="260px" />
+
+  <div class="closing" [appReveal]="0">
+    <h2 class="closing__title">Comece pelo gratuito e suba quando fizer sentido.</h2>
+    <div class="closing__actions">
+      <a appSiteCta routerLink="/register">Criar conta grátis</a>
+      <a appSiteCta variant="outline" routerLink="/produto">Ver o produto</a>
+    </div>
+  </div>
+</app-site-section>
+
+<app-site-footer [columns]="footerColumns" />

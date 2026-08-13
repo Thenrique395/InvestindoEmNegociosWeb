@@ -1,0 +1,39 @@
+/* Investindo em Negócios — color tokens */
+:root {
+  /* Base palette (from brand guide, Apresentação Marca - Henrique) */
+  --in-navy: #002E3E;        /* primary background */
+  --in-navy-800: #01394C;    /* raised navy surface */
+  --in-navy-900: #00232F;    /* deep navy */
+  --in-green: #349063;       /* brand green */
+  --in-green-600: #2C7D55;   /* green hover */
+  --in-green-300: #6FBF94;   /* green tint (used in "em" of wordmark) */
+  --in-offwhite: #EDEBEC;    /* light surface / text on dark */
+  --in-black: #262626;       /* neutral black */
+  --in-white: #FFFFFF;
+
+  /* Semantic aliases */
+  --surface-page: var(--in-navy);
+  --surface-card: var(--in-navy-800);
+  --surface-light: var(--in-offwhite);
+  --surface-inverse: var(--in-white);
+
+  --text-primary: var(--in-offwhite);
+  --text-secondary: rgba(237, 235, 236, 0.68);
+  --text-on-light: var(--in-navy);
+  --text-muted-on-light: rgba(0, 46, 62, 0.62);
+  --text-accent: var(--in-green);
+
+  --accent: var(--in-green);
+  --accent-hover: var(--in-green-600);
+  --accent-soft: rgba(52, 144, 99, 0.16);
+
+  --border-on-dark: rgba(237, 235, 236, 0.14);
+  --border-on-light: rgba(0, 46, 62, 0.14);
+
+  --focus-ring: 0 0 0 3px rgba(52, 144, 99, 0.45);
+
+  /* Feedback (derived from palette, kept quiet) */
+  --success: var(--in-green);
+  --danger: #B4543C;
+  --warning: #C99B3F;
+}

@@ -1,0 +1,53 @@
+<svg
+  class="line"
+  [attr.viewBox]="viewBox"
+  [style.height.px]="height()"
+  preserveAspectRatio="none"
+  role="img"
+  aria-hidden="true">
+  <defs>
+    @for (s of series(); track s.label; let i = $index) {
+      @if (!s.dashed) {
+        <linearGradient [attr.id]="gradientId(i)" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" [attr.stop-color]="s.color" stop-opacity="0.18" />
+          <stop offset="100%" [attr.stop-color]="s.color" stop-opacity="0" />
+        </linearGradient>
+      }
+    }
+  </defs>
+
+  @for (y of gridLines; track y) {
+    <line class="line__grid" x1="0" [attr.y1]="y" x2="600" [attr.y2]="y" />
+  }
+
+  @for (s of series(); track s.label; let i = $index) {
+    @if (showArea() && !s.dashed) {
+      <path [attr.d]="areaFor(s)" [attr.fill]="'url(#' + gradientId(i) + ')'" stroke="none" />
+    }
+    <path
+      class="line__series"
+      [class.line__series--dashed]="s.dashed"
+      [attr.d]="pathFor(s)"
+      [attr.stroke]="s.color"
+      fill="none" />
+  }
+</svg>
+
+@if (labels().length) {
+  <div class="line__labels">
+    @for (label of labels(); track label) {
+      <span class="line__label">{{ label }}</span>
+    }
+  </div>
+}
+
+@if (showLegend()) {
+  <div class="line__legend">
+    @for (s of series(); track s.label) {
+      <span class="line__legend-item">
+        <i class="line__marker" [class.line__marker--dashed]="s.dashed" [style.background]="s.color"></i>
+        {{ s.label }}
+      </span>
+    }
+  </div>
+}

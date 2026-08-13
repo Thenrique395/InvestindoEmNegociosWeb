@@ -1,0 +1,44 @@
+<div class="compare-scroller">
+  <table class="compare-table">
+    @if (caption(); as text) {
+      <caption class="compare-table__caption">{{ text }}</caption>
+    }
+
+    <thead>
+      <tr>
+        <th class="compare-table__corner" scope="col">Recurso</th>
+        @for (column of columns(); track column; let i = $index) {
+          <th
+            class="compare-table__col"
+            [class.compare-table__col--highlight]="i === highlightIndex()"
+            scope="col">
+            {{ column }}
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows(); track row.feature) {
+        <tr class="compare-table__row">
+          <th class="compare-table__feature" scope="row">{{ row.feature }}</th>
+          @for (value of row.availability; track $index; let i = $index) {
+            <td
+              class="compare-table__cell"
+              [class.compare-table__cell--highlight]="i === highlightIndex()">
+              @if (value === true) {
+                <svg class="compare-table__check" viewBox="0 0 24 24" role="img" aria-label="Incluído">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              } @else if (value === false) {
+                <span class="compare-table__dash" role="img" aria-label="Não incluído"></span>
+              } @else {
+                <span class="compare-table__text">{{ value }}</span>
+              }
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

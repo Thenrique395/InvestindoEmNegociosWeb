@@ -1,187 +1,174 @@
-<section class="signup-shell" [class.signup-shell--page]="isRoutePage">
-  <div class="signup-card">
-    @if (isRoutePage) {
-      <aside class="signup-visual">
-        <img class="signup-visual__logo" src="/assets/logoHeaderInvestindoemNegocios.png" alt="Investindo em Negócios" />
-        <div class="signup-visual__mark" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="signup-visual__content">
-          <p class="signup-eyebrow signup-eyebrow--light">Conta gratuita</p>
-          <h2>Sua rotina financeira começa aqui</h2>
-          <p>
-            Monte seu primeiro painel e acompanhe o mês com decisões mais simples, visuais e
-            consistentes.
-          </p>
-        </div>
-        <div class="signup-visual__dock" aria-label="Etapas iniciais">
-          <span>Perfil</span>
-          <span>Contas</span>
-          <span>Dashboard</span>
-        </div>
-      </aside>
+<!--
+  Este componente serve dois contextos: a rota `/register`, que ganha o cartão
+  de autenticação, e o modal de cadastro do shell, que já tem a própria
+  moldura. O formulário fica num `ng-template` para não ser escrito duas vezes.
+-->
+<ng-template #formTpl>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="auth-field">
+      <label class="auth-field__label" for="signup-nome">Nome completo</label>
+      <input
+        id="signup-nome"
+        class="auth-field__control"
+        [class.auth-field__control--invalid]="hasControlError('nome')"
+        formControlName="nome"
+        type="text"
+        placeholder="Digite seu nome completo"
+        autocomplete="name" />
+      @if (hasError('nome', 'required')) {
+        <p class="auth-field__error">Informe seu nome.</p>
+      } @else if (hasError('nome', 'minlength')) {
+        <p class="auth-field__error">O nome precisa ter ao menos 2 caracteres.</p>
+      }
+    </div>
+
+    <div class="auth-row">
+      <div class="auth-field">
+        <label class="auth-field__label" for="signup-email">E-mail</label>
+        <input
+          id="signup-email"
+          class="auth-field__control"
+          [class.auth-field__control--invalid]="hasControlError('email')"
+          formControlName="email"
+          type="email"
+          placeholder="Digite seu e-mail"
+          autocomplete="email" />
+        @if (hasError('email', 'required')) {
+          <p class="auth-field__error">Informe seu e-mail.</p>
+        } @else if (hasError('email', 'email')) {
+          <p class="auth-field__error">E-mail inválido.</p>
+        } @else if (hasError('email', 'emailInUse')) {
+          <p class="auth-field__error">Este e-mail já está em uso.</p>
+        }
+      </div>
+
+      <div class="auth-field">
+        <label class="auth-field__label" for="signup-cpf">CPF</label>
+        <input
+          id="signup-cpf"
+          class="auth-field__control"
+          [class.auth-field__control--invalid]="hasControlError('cpf')"
+          formControlName="cpf"
+          type="text"
+          inputmode="numeric"
+          placeholder="000.000.000-00"
+          autocomplete="off"
+          (input)="onCpfInput($event)" />
+        @if (hasError('cpf', 'required')) {
+          <p class="auth-field__error">Informe seu CPF.</p>
+        } @else if (hasError('cpf', 'documentInUse')) {
+          <p class="auth-field__error">Este CPF já está em uso.</p>
+        } @else if (hasControlError('cpf')) {
+          <p class="auth-field__error">CPF inválido.</p>
+        }
+      </div>
+    </div>
+
+    <div class="auth-field">
+      <label class="auth-field__label" for="signup-senha">Senha</label>
+      <div class="auth-field__wrap" [class.auth-field__wrap--invalid]="hasControlError('senha')">
+        <input
+          id="signup-senha"
+          class="auth-field__control"
+          formControlName="senha"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Crie uma senha"
+          autocomplete="new-password" />
+        <button
+          class="auth-field__toggle"
+          type="button"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+
+      <div class="auth-strength" aria-hidden="true">
+        @for (level of [1, 2, 3]; track level) {
+          <span
+            class="auth-strength__bar"
+            [class.auth-strength__bar--weak]="passwordStrength >= level && passwordStrength === 1"
+            [class.auth-strength__bar--medium]="passwordStrength >= level && passwordStrength === 2"
+            [class.auth-strength__bar--strong]="passwordStrength >= level && passwordStrength === 3"></span>
+        }
+      </div>
+
+      @if (hasError('senha', 'required')) {
+        <p class="auth-field__error">Crie uma senha.</p>
+      } @else if (hasError('senha', 'minlength')) {
+        <p class="auth-field__error">A senha precisa ter ao menos 6 caracteres.</p>
+      } @else {
+        <p class="auth-field__hint">
+          Ao menos 6 caracteres. Misture letras e números para uma senha forte.
+        </p>
+      }
+    </div>
+
+    <div class="auth-field">
+      <label class="auth-field__label" for="signup-confirmar">Confirmar senha</label>
+      <div
+        class="auth-field__wrap"
+        [class.auth-field__wrap--invalid]="hasControlError('confirmarSenha') || hasPasswordMismatch()">
+        <input
+          id="signup-confirmar"
+          class="auth-field__control"
+          formControlName="confirmarSenha"
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Repita a senha"
+          autocomplete="new-password" />
+        <button
+          class="auth-field__toggle"
+          type="button"
+          (click)="toggleConfirmPasswordVisibility()"
+          [attr.aria-label]="
+            showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'
+          ">
+          {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      @if (hasError('confirmarSenha', 'required')) {
+        <p class="auth-field__error">Repita a senha.</p>
+      } @else if (hasPasswordMismatch()) {
+        <p class="auth-field__error">As senhas não coincidem.</p>
+      }
+    </div>
+
+    <label class="auth-check">
+      <input class="auth-check__input" type="checkbox" formControlName="aceitarTermos" />
+      <span class="auth-check__label">
+        Li e aceito os
+        <a class="auth-link" routerLink="/termos" target="_blank">termos de uso</a>
+        e a
+        <a class="auth-link" routerLink="/privacidade" target="_blank">política de privacidade</a>.
+      </span>
+    </label>
+    @if (hasError('aceitarTermos', 'required')) {
+      <p class="auth-field__error">É preciso aceitar os termos para continuar.</p>
     }
 
-    <main class="signup-panel">
-      <section class="signup-panel__card" aria-labelledby="signup-title">
-        <div class="signup-panel__topline">
-          <a routerLink="/" class="signup-panel__site-link">
-            <span aria-hidden="true">←</span>
-            <span>Voltar para o site</span>
-          </a>
-        </div>
+    <button type="submit" class="auth-submit" [disabled]="loading || form.invalid">
+      {{ loading ? 'Criando conta…' : 'Criar conta' }}
+    </button>
+  </form>
+</ng-template>
 
-        <div class="signup-panel__head">
-          <p class="signup-eyebrow">Primeiro acesso</p>
-          <h1 id="signup-title">Vamos começar</h1>
-          <p>
-            Informe seus dados de acesso. Depois disso, o onboarding guia a criação da sua base
-            financeira.
-          </p>
-        </div>
+@if (isRoutePage) {
+  <app-auth-layout
+    asideEyebrow="Conta gratuita"
+    asideTitle="Sua rotina financeira começa aqui"
+    asideText="Monte seu primeiro painel e acompanhe o mês com decisões mais simples, visuais e consistentes."
+    proofLabel="Etapas iniciais"
+    proofText="Perfil · Contas e cartões · Categorias · Dashboard pronto em três minutos."
+    eyebrow="Primeiro acesso"
+    title="Vamos começar"
+    description="Informe seus dados de acesso. Depois disso, o onboarding guia a criação da sua base financeira.">
+    <ng-container [ngTemplateOutlet]="formTpl" />
 
-        <form class="signup-form" (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
-          <label class="signup-form__field">
-            <span>Nome completo</span>
-            <input
-              class="signup-form__input"
-              [class.signup-form__input--invalid]="hasControlError('nome')"
-              [attr.aria-invalid]="hasControlError('nome')"
-              type="text"
-              formControlName="nome"
-              placeholder="Digite seu nome completo"
-              autocomplete="name" />
-            @if (hasError('nome', 'required')) {
-              <small class="signup-form__error">Informe seu nome.</small>
-            }
-            @if (hasError('nome', 'minlength')) {
-              <small class="signup-form__error">Use ao menos 2 caracteres.</small>
-            }
-          </label>
-
-          <label class="signup-form__field">
-            <span>E-mail</span>
-            <input
-              class="signup-form__input"
-              [class.signup-form__input--invalid]="hasControlError('email')"
-              [attr.aria-invalid]="hasControlError('email')"
-              type="email"
-              formControlName="email"
-              placeholder="Digite seu e-mail"
-              autocomplete="email" />
-            @if (hasError('email', 'required')) {
-              <small class="signup-form__error">Informe um e-mail.</small>
-            }
-            @if (hasError('email', 'email')) {
-              <small class="signup-form__error">Digite um e-mail válido.</small>
-            }
-            @if (hasError('email', 'emailInUse')) {
-              <small class="signup-form__error">E-mail já está em uso.</small>
-            }
-          </label>
-
-          <label class="signup-form__field">
-            <span>CPF</span>
-            <input
-              class="signup-form__input"
-              [class.signup-form__input--invalid]="hasControlError('cpf')"
-              [attr.aria-invalid]="hasControlError('cpf')"
-              type="text"
-              inputmode="numeric"
-              formControlName="cpf"
-              (input)="onCpfInput($event)"
-              placeholder="000.000.000-00"
-              autocomplete="off" />
-            @if (hasError('cpf', 'required')) {
-              <small class="signup-form__error">Informe seu CPF.</small>
-            }
-            @if (hasError('cpf', 'cpf')) {
-              <small class="signup-form__error">CPF inválido.</small>
-            }
-            @if (hasError('cpf', 'documentInUse')) {
-              <small class="signup-form__error">CPF já está em uso.</small>
-            }
-          </label>
-
-          <label class="signup-form__field">
-            <span>Senha</span>
-            <div class="signup-form__input-shell" [class.signup-form__input-shell--invalid]="hasControlError('senha')">
-              <input
-                class="signup-form__input"
-                [attr.aria-invalid]="hasControlError('senha')"
-                [type]="showPassword ? 'text' : 'password'"
-                formControlName="senha"
-                placeholder="Digite sua senha"
-                autocomplete="new-password" />
-              <button
-                class="signup-form__toggle"
-                type="button"
-                (click)="togglePasswordVisibility()"
-                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
-                {{ showPassword ? 'Ocultar' : 'Mostrar' }}
-              </button>
-            </div>
-            @if (hasError('senha', 'required')) {
-              <small class="signup-form__error">Informe uma senha.</small>
-            }
-            @if (hasError('senha', 'minlength')) {
-              <small class="signup-form__error">Use ao menos 6 caracteres.</small>
-            }
-          </label>
-
-          <label class="signup-form__field">
-            <span>Confirmar senha</span>
-            <div
-              class="signup-form__input-shell"
-              [class.signup-form__input-shell--invalid]="hasControlError('confirmarSenha') || hasPasswordMismatch()">
-              <input
-                class="signup-form__input"
-                [attr.aria-invalid]="hasControlError('confirmarSenha') || hasPasswordMismatch()"
-                [type]="showConfirmPassword ? 'text' : 'password'"
-                formControlName="confirmarSenha"
-                placeholder="Confirme sua senha"
-                autocomplete="new-password" />
-              <button
-                class="signup-form__toggle"
-                type="button"
-                (click)="toggleConfirmPasswordVisibility()"
-                [attr.aria-label]="showConfirmPassword ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'">
-                {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
-              </button>
-            </div>
-            @if (hasError('confirmarSenha', 'required')) {
-              <small class="signup-form__error">Confirme sua senha.</small>
-            }
-            @if (hasPasswordMismatch()) {
-              <small class="signup-form__error">As senhas precisam ser iguais.</small>
-            }
-          </label>
-
-          <label class="signup-form__terms" [class.signup-form__terms--invalid]="hasControlError('aceitarTermos')">
-            <input type="checkbox" formControlName="aceitarTermos" />
-            <span>Li e aceito os termos de uso e a política de privacidade.</span>
-          </label>
-          @if (hasError('aceitarTermos', 'required')) {
-            <small class="signup-form__error">
-              Aceite os termos para continuar.
-            </small>
-          }
-
-          <button
-            class="signup-form__submit"
-            type="submit"
-            [disabled]="loading"
-            [attr.aria-disabled]="loading || form.invalid">
-            <span aria-hidden="true">{{ loading ? '...' : '→' }}</span>
-            {{ loading ? 'Criando conta...' : 'Criar conta agora' }}
-          </button>
-
-          <p class="signup-form__login">
-            Já tem conta?
-            <a routerLink="/login">Entrar.</a>
-          </p>
-        </form>
-      </section>
-    </main>
-  </div>
-</section>
+    <p auth-footer class="auth-footer-text">
+      Já tem uma conta?
+      <a class="auth-link" routerLink="/login">Entrar.</a>
+    </p>
+  </app-auth-layout>
+} @else {
+  <ng-container [ngTemplateOutlet]="formTpl" />
+}

@@ -1,10 +1,10 @@
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .form {
   display: grid;
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .grid-form {
@@ -17,8 +17,8 @@
 }
 
 .form label {
-  color: var(--text-muted);
-  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
 }
 
 .form input,
@@ -26,7 +26,7 @@
   width: 100%;
   min-height: 42px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: var(--surface);
   color: var(--text);
   padding: 0.55rem 0.7rem;
@@ -36,17 +36,17 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.35rem;
-  background: var(--surface-2);
-  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-control);
   padding: 0.25rem;
 }
 
 .launch-pill {
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: transparent;
-  color: var(--text-muted);
-  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
   padding: 0.55rem 0.8rem;
 }
 
@@ -56,18 +56,18 @@
 }
 
 .launch-total {
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
   padding: 0.7rem 0.9rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .launch-total strong {
-  font-size: var(--text-xl);
+  font-size: var(--fs-section);
 }
 
 @media (max-width: 640px) {

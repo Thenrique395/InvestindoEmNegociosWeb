@@ -1,0 +1,270 @@
+<app-site-header
+  [links]="nav"
+  ctaLabel="Começar"
+  ctaAnchor="#planos"
+  (anchorSelected)="scrollTo($event.anchor, $event.event)" />
+
+<!-- 1. Hero navy -->
+<section class="hero">
+  <div class="hero__inner">
+    <h1 class="hero__title">
+      {{ hero.title }}<br /><span class="hero__title-accent">{{ hero.titleAccent }}</span>
+    </h1>
+    <p class="hero__description">{{ hero.description }}</p>
+    <div class="hero__actions">
+      <a appSiteCta href="#planos" (click)="scrollTo('planos', $event)">{{ hero.primaryCta }}</a>
+      <a appSiteCta variant="outline" class="hero__ghost" href="#painel" (click)="scrollTo('painel', $event)">
+        {{ hero.secondaryCta }}
+        <svg class="hero__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Saldo disponível em três degraus -->
+<app-site-section
+  anchor="painel"
+  [title]="saldo.title"
+  [description]="saldo.description"
+  [centered]="true">
+  <div class="steps" [appReveal]="0">
+    @for (step of saldo.steps; track step.label) {
+      <div class="steps__cell">
+        <p class="steps__label">{{ step.label }}</p>
+        <p
+          class="steps__value tabular"
+          [class.steps__value--muted]="step.tone === 'muted'"
+          [class.steps__value--expense]="step.tone === 'expense'"
+          [class.steps__value--income]="step.tone === 'income'">
+          {{ step.value }}
+        </p>
+        <p class="steps__note">{{ step.note }}</p>
+      </div>
+    }
+  </div>
+</app-site-section>
+
+<!-- 3. Cada tela responde uma pergunta -->
+<app-site-section
+  tone="surface"
+  eyebrow="O que tem dentro"
+  title="Cada tela responde uma pergunta.">
+  <app-site-card-grid [cards]="perguntas" minWidth="340px" />
+</app-site-section>
+
+<!-- 4. Cartões — faixa navy -->
+<app-site-section anchor="cartoes" tone="navy">
+  <div class="split">
+    <div class="split__copy" [appReveal]="0">
+      <h2 class="split__title">
+        {{ cartoes.title }}<br /><span class="split__title-accent">{{ cartoes.titleAccent }}</span>
+      </h2>
+      <p class="split__description">{{ cartoes.description }}</p>
+    </div>
+
+    <div class="split__visual" [appReveal]="120">
+      <div class="credit-card">
+        <div class="credit-card__top">
+          <span class="credit-card__brand">{{ cartoes.card.brand }}</span>
+          <span class="credit-card__chip" aria-hidden="true"></span>
+        </div>
+        <p class="credit-card__digits tabular">{{ cartoes.card.digits }}</p>
+        <div class="credit-card__bottom">
+          <div>
+            <p class="credit-card__label">{{ cartoes.card.invoiceLabel }}</p>
+            <p class="credit-card__value tabular">{{ cartoes.card.invoiceValue }}</p>
+          </div>
+          <span class="credit-card__due">{{ cartoes.card.dueBadge }}</span>
+        </div>
+      </div>
+
+      <div class="limit">
+        <div class="limit__head">
+          <span class="limit__label">{{ cartoes.card.limitLabel }}</span>
+          <span class="limit__value tabular">{{ cartoes.card.limitValue }}</span>
+        </div>
+        <div class="limit__track">
+          <div class="limit__fill" [style.width.%]="cartoes.card.limitPercent"></div>
+        </div>
+        <div class="limit__purchase">
+          <span>{{ cartoes.card.purchase }}</span>
+          <span class="tabular">{{ cartoes.card.purchaseNote }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-site-section>
+
+<!-- 5. Metas -->
+<app-site-section
+  anchor="metas"
+  [title]="metas.title"
+  [description]="metas.description"
+  [centered]="true">
+  <div class="goals">
+    @for (goal of metas.goals; track goal.name; let i = $index) {
+      <article class="goal" [appReveal]="i * 120">
+        <header class="goal__head">
+          <h3 class="goal__name">{{ goal.name }}</h3>
+          <span class="goal__status" [class.goal__status--off]="!goal.onTrack">{{ goal.status }}</span>
+        </header>
+        <p class="goal__value tabular">
+          {{ goal.value }} <span class="goal__target">{{ goal.target }}</span>
+        </p>
+        <div class="goal__track">
+          <div
+            class="goal__fill"
+            [class.goal__fill--off]="!goal.onTrack"
+            [style.width.%]="goal.percent"></div>
+        </div>
+        <p class="goal__note">{{ goal.note }}</p>
+      </article>
+    }
+  </div>
+</app-site-section>
+
+<!-- 6. Mobile — faixa navy -->
+<app-site-section anchor="celular" tone="navy">
+  <div class="split">
+    <div class="split__copy" [appReveal]="0">
+      <h2 class="split__title">
+        {{ celular.title }}<br /><span class="split__title-accent">{{ celular.titleAccent }}</span>
+      </h2>
+      <p class="split__description">{{ celular.description }}</p>
+      <a appSiteCta href="#planos" (click)="scrollTo('planos', $event)">{{ celular.cta }}</a>
+    </div>
+
+    <div class="phones" [appReveal]="120">
+      <div class="phone">
+        <p class="phone__eyebrow">{{ celular.listTitle }}</p>
+        <p class="phone__total tabular">{{ celular.listTotal }}</p>
+        @for (item of celular.items; track item.name) {
+          <div class="phone__row">
+            <div>
+              <p class="phone__row-name">{{ item.name }}</p>
+              <p class="phone__row-meta">{{ item.meta }}</p>
+            </div>
+            <span class="phone__row-value tabular">{{ item.value }}</span>
+          </div>
+        }
+        <span class="phone__fab" aria-hidden="true">+</span>
+      </div>
+
+      <div class="phone phone--keypad">
+        <p class="phone__eyebrow">{{ celular.keypad.eyebrow }}</p>
+        <p class="phone__question">{{ celular.keypad.question }}</p>
+        <p class="phone__amount tabular">{{ celular.keypad.amount }}</p>
+        <div class="keypad" aria-hidden="true">
+          @for (key of [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]; track key) {
+            <span class="keypad__key">{{ key }}</span>
+          }
+        </div>
+        <span class="phone__continue">{{ celular.keypad.cta }}</span>
+      </div>
+    </div>
+  </div>
+</app-site-section>
+
+<!-- 7. Rotina: relatórios, orçamento e destaque -->
+<app-site-section tone="surface" [title]="rotina.title" [centered]="true">
+  <div class="bento">
+    <article class="bento__card bento__card--reports" [appReveal]="0">
+      <p class="bento__eyebrow">{{ rotina.reports.eyebrow }}</p>
+      <h3 class="bento__title">{{ rotina.reports.title }}</h3>
+
+      <div class="chart">
+        @for (month of rotina.reports.months; track month; let i = $index) {
+          <div class="chart__group">
+            <div class="chart__track">
+              <div class="chart__bar chart__bar--income" [style.height.%]="rotina.reports.series[i].income"></div>
+              <div class="chart__bar chart__bar--expense" [style.height.%]="rotina.reports.series[i].expense"></div>
+            </div>
+            <span class="chart__label">{{ month }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="chart__legend">
+        <span class="chart__legend-item"><i class="chart__marker chart__marker--income"></i>Receitas</span>
+        <span class="chart__legend-item"><i class="chart__marker chart__marker--expense"></i>Despesas</span>
+      </div>
+    </article>
+
+    <article class="bento__card" [appReveal]="120">
+      <p class="bento__eyebrow">{{ rotina.budget.eyebrow }}</p>
+      <h3 class="bento__title">{{ rotina.budget.title }}</h3>
+      @for (row of rotina.budget.rows; track row.label) {
+        <div class="budget">
+          <div class="budget__head">
+            <span>{{ row.label }}</span>
+            <span
+              class="budget__percent tabular"
+              [class.budget__percent--over]="row.percent > 100"
+              [class.budget__percent--warn]="row.percent > 80 && row.percent <= 100">
+              {{ row.percent }}%
+            </span>
+          </div>
+          <div class="budget__track">
+            <div
+              class="budget__fill"
+              [class.budget__fill--over]="row.percent > 100"
+              [class.budget__fill--warn]="row.percent > 80 && row.percent <= 100"
+              [style.width.%]="row.percent > 100 ? 100 : row.percent"></div>
+          </div>
+        </div>
+      }
+    </article>
+
+    <article class="bento__card bento__card--highlight" [appReveal]="240">
+      <p class="bento__highlight tabular">{{ rotina.highlight.value }}</p>
+      <p class="bento__highlight-text">{{ rotina.highlight.text }}</p>
+    </article>
+  </div>
+</app-site-section>
+
+<!-- 8. Planos e comparativo -->
+<app-site-section anchor="planos" [title]="planosCopy.title" [description]="planosCopy.description">
+  <div site-section-aside class="cycle">
+    <div class="cycle__switch" role="group" aria-label="Ciclo de cobrança">
+      <button
+        type="button"
+        class="cycle__option"
+        [class.cycle__option--active]="cycle() === 'Monthly'"
+        [attr.aria-pressed]="cycle() === 'Monthly'"
+        (click)="setCycle('Monthly')">
+        Mensal
+      </button>
+      <button
+        type="button"
+        class="cycle__option"
+        [class.cycle__option--active]="cycle() === 'Yearly'"
+        [attr.aria-pressed]="cycle() === 'Yearly'"
+        (click)="setCycle('Yearly')">
+        Anual
+      </button>
+    </div>
+  </div>
+
+  <app-site-plan-cards
+    variant="tour"
+    [plans]="plans"
+    [cycle]="cycle()"
+    (planSelected)="goToCheckout($event)" />
+
+  <app-site-compare-table
+    class="compare"
+    [caption]="planosCopy.compareTitle"
+    [columns]="planNames"
+    [rows]="comparativo"
+    [highlightIndex]="recommendedIndex" />
+
+  <app-site-card-grid class="guarantees" [cards]="garantias" minWidth="260px" />
+</app-site-section>
+
+<app-site-footer
+  variant="compact"
+  [inlineLinks]="[
+    { label: 'Produto', anchor: 'painel' },
+    { label: 'Planos', anchor: 'planos' },
+    { label: 'Privacidade', route: '/privacidade' }
+  ]" />

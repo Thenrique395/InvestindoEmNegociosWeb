@@ -4,24 +4,24 @@
 }
 
 h1 {
-  margin: 0 0 var(--spacing-2);
-  font-size: var(--text-3xl);
+  margin: 0 0 var(--space-6);
+  font-size: var(--fs-page-title);
 }
 
 h2 {
-  margin: var(--spacing-4) 0 var(--spacing-1);
-  font-size: var(--text-xl);
+  margin: var(--space-12) 0 var(--space-3);
+  font-size: var(--fs-section);
 }
 
 p {
   color: var(--text-secondary);
-  line-height: var(--leading-body);
+  line-height: var(--lh-body);
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.85em;
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   border-radius: 4px;
   padding: 0.1em 0.35em;
 }
@@ -33,7 +33,7 @@ code {
 .styleguide-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: var(--spacing-2);
+  margin-top: var(--space-6);
 }
 
 .styleguide-table th,
@@ -42,12 +42,12 @@ code {
   padding: 0.6rem 0.8rem;
   text-align: left;
   vertical-align: top;
-  font-size: var(--text-sm);
+  font-size: var(--fs-meta);
 }
 
 .styleguide-table th {
-  color: var(--text-muted);
-  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
 }
 
 .styleguide-table a {
@@ -57,19 +57,19 @@ code {
 
 .styleguide-demo {
   border: 1px dashed var(--border-strong);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  padding: var(--spacing-3);
-  margin: var(--spacing-2) 0;
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+  padding: var(--space-10);
+  margin: var(--space-6) 0;
   display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .styleguide-snippet {
   background: var(--text);
   color: var(--surface);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-2);
+  border-radius: var(--radius-control);
+  padding: var(--space-6);
   overflow-x: auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.8rem;
@@ -79,8 +79,8 @@ code {
 
 .styleguide-note {
   border-left: 3px solid var(--warning);
-  background: var(--warning-10, rgba(245, 158, 11, 0.12));
+  background: var(--warning-tint, rgba(245, 158, 11, 0.12));
   padding: 0.6rem 0.9rem;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
+  border-radius: var(--radius-control);
+  font-size: var(--fs-meta);
 }

@@ -38,7 +38,7 @@
 }
 
 .networth-summary__item span {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: 0.8125rem;
   line-height: 1.15;
 }
@@ -53,15 +53,15 @@
 }
 
 .networth-summary__item--income strong {
-  color: var(--color-chart-series-1, var(--info));
+  color: var(--chart-1, var(--primary));
 }
 
 .networth-summary__item--expense strong {
-  color: var(--color-chart-expense, var(--danger));
+  color: var(--expense, var(--expense));
 }
 
 .networth-summary__item--result strong {
-  color: var(--success-text);
+  color: var(--income-text);
 }
 
 .networth-chart__svg {
@@ -78,12 +78,12 @@
 }
 
 .networth-chart__grid--zero line {
-  stroke: color-mix(in srgb, var(--text-muted) 42%, transparent);
+  stroke: color-mix(in srgb, var(--text-tertiary) 42%, transparent);
   stroke-width: 1;
 }
 
 .networth-chart__grid text {
-  fill: color-mix(in srgb, var(--text-muted) 72%, transparent);
+  fill: color-mix(in srgb, var(--text-tertiary) 72%, transparent);
   font-size: 0.5rem;
   font-weight: 550;
   letter-spacing: 0.01em;
@@ -114,15 +114,15 @@
 }
 
 .networth-chart__line--income {
-  stroke: var(--color-chart-income, var(--success));
+  stroke: var(--income, var(--income));
 }
 
 .networth-chart__line--expense {
-  stroke: var(--color-chart-expense, var(--danger));
+  stroke: var(--expense, var(--expense));
 }
 
 .networth-chart__line--networth {
-  stroke: var(--color-chart-series-1, var(--info));
+  stroke: var(--chart-1, var(--primary));
 }
 
 .networth-chart__area {
@@ -130,7 +130,7 @@
 }
 
 .networth-chart__area--networth {
-  fill: color-mix(in srgb, var(--color-chart-series-1, var(--info)) 14%, transparent);
+  fill: color-mix(in srgb, var(--chart-1, var(--primary)) 14%, transparent);
 }
 
 .networth-chart__point circle {
@@ -140,15 +140,15 @@
 }
 
 .networth-chart__point--income circle {
-  stroke: var(--color-chart-income, var(--success));
+  stroke: var(--income, var(--income));
 }
 
 .networth-chart__point--expense circle {
-  stroke: var(--color-chart-expense, var(--danger));
+  stroke: var(--expense, var(--expense));
 }
 
 .networth-chart__point--networth circle {
-  stroke: var(--color-chart-series-1, var(--info));
+  stroke: var(--chart-1, var(--primary));
 }
 
 .networth-chart__point--current circle {
@@ -193,7 +193,7 @@
 }
 
 .networth-chart__legend-item--muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   opacity: 0.48;
 }
 
@@ -210,15 +210,15 @@
 }
 
 .networth-chart__dot--income {
-  background: var(--color-chart-income, var(--success));
+  background: var(--income, var(--income));
 }
 
 .networth-chart__dot--expense {
-  background: var(--color-chart-expense, var(--danger));
+  background: var(--expense, var(--expense));
 }
 
 .networth-chart__dot--networth {
-  background: var(--color-chart-series-1, var(--info));
+  background: var(--chart-1, var(--primary));
 }
 
 .networth-chart__labels {
@@ -232,7 +232,7 @@
 
 .networth-chart__label {
   font-size: 0.6875rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   text-transform: capitalize;
   text-align: center;
   min-width: 0;

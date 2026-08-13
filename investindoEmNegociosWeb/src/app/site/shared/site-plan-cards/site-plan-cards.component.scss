@@ -1,0 +1,155 @@
+:host {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-7);
+  align-items: start;
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-11) var(--space-11) var(--space-10);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+}
+
+/* O recomendado sobe 8px e ganha borda azul: no protótipo ele é o caminho
+   sugerido, não só um card com selo. */
+.plan--featured {
+  border-color: var(--primary);
+  background: var(--income-tint-soft);
+  box-shadow: var(--shadow-card-hover);
+}
+
+@media (min-width: 980px) {
+  .plan--featured {
+    transform: translateY(-8px);
+  }
+}
+
+.plan__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+.plan__name {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.plan__tag {
+  flex: none;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  color: var(--text-tertiary);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+}
+
+.plan__tag--featured {
+  background: var(--brand-green);
+  color: var(--site-cta-fg);
+}
+
+.plan__headline {
+  margin: 0;
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: 1.35;
+  letter-spacing: var(--ls-tight);
+  text-wrap: pretty;
+}
+
+.plan__sub {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.plan__price-block {
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border-inner);
+  border-bottom: 1px solid var(--border-inner);
+}
+
+.plan__price {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.05;
+  letter-spacing: var(--ls-tighter);
+}
+
+.plan__period {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  color: var(--text-tertiary);
+  letter-spacing: var(--ls-normal);
+}
+
+.plan__note {
+  margin: var(--space-4) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+.plan__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+.plan__check {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  fill: none;
+  stroke: var(--income);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.plan__item--limit {
+  color: var(--text-muted);
+}
+
+.plan__dash {
+  flex: none;
+  width: 11px;
+  height: 1.5px;
+  margin-top: 9px;
+  border-radius: var(--radius-pill);
+  background: var(--text-faint);
+}
+
+.plan__cta {
+  margin-top: auto;
+  width: 100%;
+}

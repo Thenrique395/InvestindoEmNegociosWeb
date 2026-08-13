@@ -11,13 +11,28 @@ export const routes: Routes = [
     canActivate: [publicHomeGuard],
     data: { preload: true },
     pathMatch: 'full',
-    loadComponent: () =>
-      import('./product-showcase/product-showcase.component').then((m) => m.ProductShowcaseComponent),
+    loadComponent: () => import('./site/vendas/vendas.component').then((m) => m.VendasComponent),
+  },
+  {
+    // Tour do produto. Era a home até o redesign; a landing de conversão tomou a `/`.
+    path: 'produto',
+    data: { preload: false },
+    loadComponent: () => import('./site/produto/produto.component').then((m) => m.ProdutoComponent),
+  },
+  {
+    path: 'termos',
+    data: { preload: false, slug: 'termos' },
+    loadComponent: () => import('./site/legal/legal-page.component').then((m) => m.LegalPageComponent),
+  },
+  {
+    path: 'privacidade',
+    data: { preload: false, slug: 'privacidade' },
+    loadComponent: () => import('./site/legal/legal-page.component').then((m) => m.LegalPageComponent),
   },
   {
     path: 'planos',
     data: { preload: true },
-    loadComponent: () => import('./pricing/pricing.component').then((m) => m.PricingComponent),
+    loadComponent: () => import('./site/planos/planos.component').then((m) => m.PlanosComponent),
   },
   {
     path: 'checkout',

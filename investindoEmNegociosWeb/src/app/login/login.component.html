@@ -1,104 +1,87 @@
-<section class="login-shell">
-  <div class="login-card">
-    <aside class="login-visual" aria-label="Resumo do sistema Investindo em Negócios">
-      <img
-        class="login-visual__logo"
-        src="assets/logoHeaderInvestindoemNegocios.png"
-        alt="Investindo em Negócios" />
-
-      <div class="login-visual__mark" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </div>
-
-      <div class="login-visual__content">
-        <h2>Controle seu dinheiro com clareza.</h2>
-        <p>
-          Uma visão objetiva para acompanhar entradas, saídas, cartões e metas sem perder o
-          contexto do mês.
-        </p>
-      </div>
-
-      <div class="login-visual__proof">
-        <span>Painel financeiro pessoal</span>
-        <strong>Receitas, despesas, cartões e metas conectados em um só lugar.</strong>
-      </div>
-    </aside>
-
-    <main class="login-main">
-      <section class="login-panel" aria-labelledby="login-title">
-        <div class="login-main__topline">
-          <a routerLink="/" class="login-main__site-link">
-            <span aria-hidden="true">←</span>
-            <span>Voltar para o site</span>
-          </a>
-        </div>
-
-        <div class="login-main__head">
-          <p class="login-eyebrow">LOGIN</p>
-          <h1 id="login-title">Acesse sua conta</h1>
-          <p>
-            Use seu e-mail e senha para voltar ao dashboard e continuar sua organização financeira.
+<app-auth-layout
+  asideEyebrow="Painel financeiro pessoal"
+  asideTitle="Controle seu dinheiro com clareza."
+  asideText="Uma visão objetiva para acompanhar entradas, saídas, cartões e metas sem perder o contexto do mês."
+  proofLabel="Tudo em um só lugar"
+  proofText="Receitas, despesas, cartões e metas conectados em um só lugar."
+  eyebrow="Login"
+  title="Acesse sua conta"
+  description="Use seu e-mail e senha para voltar ao dashboard e continuar sua organização financeira.">
+  <form class="auth-form" (ngSubmit)="onSubmit()">
+    @if (emailNotConfirmed) {
+      <div class="auth-alert auth-alert--error" role="alert">
+        <svg class="auth-alert__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 8v5M12 16.5v.01" />
+        </svg>
+        <div>
+          <p class="auth-alert__title">Confirme seu e-mail para entrar</p>
+          <p class="auth-alert__text">
+            Verifique sua caixa de entrada.
+            <button
+              type="button"
+              class="auth-field__toggle"
+              [disabled]="resending"
+              (click)="resendConfirmation()">
+              {{ resending ? 'Reenviando…' : 'Reenviar e-mail de confirmação' }}
+            </button>
           </p>
         </div>
+      </div>
+    }
 
-        <form class="login-form" (ngSubmit)="onSubmit()">
-          <label class="login-form__field">
-            <span>E-mail</span>
-            <div class="login-form__input-shell">
-              <input
-                [(ngModel)]="email"
-                name="email"
-                type="email"
-                placeholder="Digite seu e-mail"
-                autocomplete="email"
-                required />
-            </div>
-          </label>
+    <div class="auth-field">
+      <label class="auth-field__label" for="login-email">E-mail</label>
+      <input
+        id="login-email"
+        class="auth-field__control"
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        placeholder="Digite seu e-mail"
+        autocomplete="email"
+        required />
+    </div>
 
-          <label class="login-form__field">
-            <span>Senha</span>
-            <div class="login-form__input-shell login-form__input-shell--with-action">
-              <input
-                [(ngModel)]="password"
-                name="password"
-                [type]="showPassword ? 'text' : 'password'"
-                placeholder="Digite sua senha"
-                autocomplete="current-password"
-                required />
-              <button
-                class="login-form__toggle"
-                type="button"
-                (click)="togglePasswordVisibility()"
-                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
-                {{ showPassword ? 'Ocultar' : 'Mostrar' }}
-              </button>
-            </div>
-          </label>
+    <div class="auth-field">
+      <label class="auth-field__label" for="login-password">Senha</label>
+      <div class="auth-field__wrap">
+        <input
+          id="login-password"
+          class="auth-field__control"
+          [(ngModel)]="password"
+          name="password"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Digite sua senha"
+          autocomplete="current-password"
+          required />
+        <button
+          class="auth-field__toggle"
+          type="button"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+    </div>
 
-          <div class="login-form__links">
-            <a routerLink="/forgot-password">Esqueci minha senha</a>
-          </div>
+    <div class="auth-options">
+      <span></span>
+      <a class="auth-link" routerLink="/forgot-password">Esqueci minha senha</a>
+    </div>
 
-          <button type="submit" class="login-form__submit" [disabled]="loading">
-            <span class="login-form__submit-icon" aria-hidden="true">→</span>
-            <span>{{ loading ? 'Autenticando...' : 'Entrar no dashboard' }}</span>
-          </button>
+    <button type="submit" class="auth-submit" [disabled]="loading">
+      {{ loading ? 'Autenticando…' : 'Entrar no dashboard' }}
+      @if (!loading) {
+        <svg class="auth-submit__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      }
+    </button>
+  </form>
 
-          @if (emailNotConfirmed) {
-            <p class="login-form__confirm-hint">
-              Seu e-mail ainda não foi confirmado.
-              <button type="button" class="login-form__resend" [disabled]="resending" (click)="resendConfirmation()">
-                {{ resending ? 'Reenviando...' : 'Reenviar e-mail de confirmação' }}
-              </button>
-            </p>
-          }
-        </form>
-
-        <p class="login-main__register">
-          Ainda não tem uma conta?
-          <a routerLink="/register">Criar conta agora.</a>
-        </p>
-      </section>
-    </main>
-  </div>
-</section>
+  <p auth-footer class="auth-footer-text">
+    Ainda não tem uma conta?
+    <a class="auth-link" routerLink="/register">Criar conta agora.</a>
+  </p>
+</app-auth-layout>

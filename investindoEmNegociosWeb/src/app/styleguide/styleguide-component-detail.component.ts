@@ -1,6 +1,7 @@
 import { Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { SectionCardComponent } from '../shared/section-card/section-card.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
@@ -18,6 +19,16 @@ import { ToastContainerComponent } from '../shared/toast-container/toast-contain
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
+import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
+import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
+import { KpiStripComponent } from '../shared/kpi-strip/kpi-strip.component';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
+import { DataTableComponent, DataTableCellDirective } from '../shared/data-table/data-table.component';
+import { ChartBarsComponent } from '../shared/charts/chart-bars/chart-bars.component';
+import { ChartLineComponent } from '../shared/charts/chart-line/chart-line.component';
+import { MoneyComponent } from '../shared/money/money.component';
+import { SegmentedSelectorComponent } from '../shared/segmented-selector/segmented-selector.component';
+import { InstallmentScopeModalComponent } from '../shared/installment-scope/installment-scope-modal.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -64,7 +75,19 @@ interface DemoListItem {
     ResponsiveListComponent,
     ResponsiveListCellDirective,
     AccountListComponent,
-    CartoesListagemComponent
+    CartoesListagemComponent,
+    FormsModule,
+    SelectMenuComponent,
+    NumberStepperComponent,
+    KpiStripComponent,
+    ProgressBarComponent,
+    DataTableComponent,
+    DataTableCellDirective,
+    ChartBarsComponent,
+    ChartLineComponent,
+    MoneyComponent,
+    SegmentedSelectorComponent,
+    InstallmentScopeModalComponent
   ],
   templateUrl: './styleguide-component-detail.component.html',
   styleUrls: ['./styleguide-content.scss', './styleguide-component-detail.component.scss']
@@ -338,4 +361,59 @@ if (!confirmed) return;`,
   (emptyAction)="novoCartao()">
 </app-cartoes-listagem>`
   };
+
+  // ---- Demos dos primitivos da fase 4 ------------------------------------
+
+  readonly demoCategorias = [
+    { value: 'moradia', label: 'Moradia', color: 'var(--chart-1)', meta: 'R$ 2.400' },
+    { value: 'alimentacao', label: 'Alimentação', color: 'var(--chart-2)', meta: 'R$ 890' },
+    { value: 'transporte', label: 'Transporte', color: 'var(--chart-3)', meta: 'R$ 320' },
+    { value: 'saude', label: 'Saúde', color: 'var(--chart-4)', meta: 'R$ 892' }
+  ];
+  demoCategoria = 'moradia';
+  demoParcelas = 12;
+
+  readonly demoKpis = [
+    { label: 'Saldo disponível', value: 'R$ 12.480,35', note: 'Já descontado o comprometido', tooltip: 'Quanto sobrou até hoje.', tone: 'neutral' as const },
+    { label: 'Receitas', value: 'R$ 18.900,00', tooltip: 'Tudo que entrou no período.', tone: 'income' as const },
+    { label: 'Despesas', value: 'R$ 9.842,17', tooltip: 'Tudo que saiu ou vai sair.', tone: 'expense' as const },
+    { label: 'Comprometido', value: 'R$ 2.421,65', tooltip: 'Cartões, parcelas e contas futuras.', tone: 'warning' as const }
+  ];
+
+  readonly demoColunas = [
+    { key: 'nome', label: 'Nome', width: 'minmax(180px,2.1fr)', sortable: true },
+    { key: 'categoria', label: 'Categoria', width: 'minmax(110px,1fr)' },
+    { key: 'valor', label: 'Valor', width: '112px', align: 'right' as const }
+  ];
+  readonly demoLinhas = [
+    { id: '1', nome: 'Aluguel', categoria: 'Moradia', valor: 'R$ 2.400,00' },
+    { id: '2', nome: 'Energia elétrica', categoria: 'Moradia', valor: 'R$ 318,42' },
+    { id: '3', nome: 'Plano de saúde', categoria: 'Saúde', valor: 'R$ 892,00' }
+  ];
+
+  readonly demoSeries = [
+    { label: 'Receitas', color: 'var(--income)', points: [7800, 7400, 8800, 7600, 8400, 9200] },
+    { label: 'Despesas', color: 'var(--expense)', points: [4200, 4600, 5200, 4000, 4800, 4400] }
+  ];
+  readonly demoMeses = ['mar', 'abr', 'mai', 'jun', 'jul', 'ago'];
+
+  readonly demoVisoes = [
+    { value: 'mes', label: 'Mês' },
+    { value: 'trimestre', label: 'Trimestre' },
+    { value: 'ano', label: 'Ano' }
+  ];
+  demoVisao = 'mes';
+
+  readonly demoLinha = [
+    { label: 'Patrimônio', color: 'var(--income)', points: [32000, 34500, 33800, 38200, 41000, 45800] },
+    { label: 'Aporte acumulado', color: 'var(--text-muted)', points: [30000, 32000, 34000, 36000, 38000, 40000], dashed: true }
+  ];
+
+  readonly demoParcelaContexto = { current: 3, total: 12, description: 'Notebook Dell' };
+  demoScopeOpen = false;
+  demoScopeEscolha = '';
+
+  formatarReal(value: number): string {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
 }

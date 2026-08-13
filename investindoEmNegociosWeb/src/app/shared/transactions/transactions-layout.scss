@@ -18,9 +18,9 @@
   gap: 1.3rem;
   padding: 1.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .tx-list-wrap {
@@ -42,10 +42,10 @@
 }
 
 .tx-filter__label {
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
@@ -53,9 +53,9 @@
 .tx-filter input {
   min-height: 60px;
   padding: 0 1.15rem;
-  border-radius: var(--radius-xl);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-panel);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
 }
 
 @media (max-width: 960px) {

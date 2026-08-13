@@ -30,28 +30,28 @@ import { RouterModule } from '@angular/router';
     :host { display: block; }
     .upgrade-cta {
       display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-      gap: var(--spacing-2); border: 1px solid var(--color-primary-soft);
-      border-radius: var(--radius-lg, 1rem); padding: var(--spacing-2);
-      background: linear-gradient(120deg, var(--color-primary-weak), var(--surface));
+      gap: var(--space-6); border: 1px solid var(--primary-tint);
+      border-radius: var(--radius-inner, 1rem); padding: var(--space-6);
+      background: linear-gradient(120deg, var(--primary-tint), var(--surface));
     }
     .upgrade-cta__copy { display: grid; gap: 6px; min-width: 0; }
     .upgrade-cta__eyebrow {
       margin: 0; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--color-primary-text);
+      text-transform: uppercase; color: var(--primary-text);
     }
-    .upgrade-cta__title { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--text); }
+    .upgrade-cta__title { margin: 0; font-size: var(--fs-meta); font-weight: 600; color: var(--text); }
     .upgrade-cta__features {
       list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px;
     }
     .upgrade-cta__features li {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size: var(--text-xs); color: var(--text-secondary);
+      font-size: var(--fs-caption); color: var(--text-secondary);
     }
-    .upgrade-cta__features svg { color: var(--color-primary-text); flex: 0 0 14px; }
+    .upgrade-cta__features svg { color: var(--primary-text); flex: 0 0 14px; }
     .upgrade-cta__button {
       display: inline-flex; align-items: center; border-radius: 999px;
-      background: var(--color-primary); color: var(--color-text-inverse, #fff);
-      padding: 8px 18px; font-size: var(--text-xs); font-weight: 600;
+      background: var(--primary); color: var(--on-primary);
+      padding: 8px 18px; font-size: var(--fs-caption); font-weight: 600;
       text-decoration: none; white-space: nowrap; transition: opacity 0.15s ease;
     }
     .upgrade-cta__button:hover { opacity: 0.9; }

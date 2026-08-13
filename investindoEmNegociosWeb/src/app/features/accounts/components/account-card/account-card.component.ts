@@ -90,55 +90,55 @@ import { formatLocaleDateFromIso } from '../../../../utils/locale-utils';
       height: 100%;
       padding: 1.1rem 1.15rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
+      border-radius: var(--radius-panel);
       background: var(--surface);
-      box-shadow: var(--shadow-elevation-sm);
+      box-shadow: var(--shadow-card-hover);
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .ac--primary { border-color: var(--color-info-soft); }
-    .ac--negative { border-color: var(--color-danger-soft); }
+    .ac--primary { border-color: var(--primary-tint); }
+    .ac--negative { border-color: var(--expense-tint); }
     .ac--inactive { opacity: 0.82; }
 
     .ac__head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 0.7rem; }
     .ac__icon {
       display: grid; place-items: center; width: 38px; height: 38px;
-      border-radius: 12px; background: var(--surface-2); color: var(--text-muted);
+      border-radius: 12px; background: var(--surface-sunken); color: var(--text-tertiary);
     }
     .ac__icon svg { width: 20px; height: 20px; }
     .ac__title { min-width: 0; }
-    .ac__name { margin: 0; font-size: var(--font-size-body, 0.95rem); font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ac__type { margin: 2px 0 0; font-size: var(--text-xs, 0.72rem); color: var(--text-muted); }
+    .ac__name { margin: 0; font-size: var(--fs-subhead, 0.95rem); font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ac__type { margin: 2px 0 0; font-size: var(--fs-caption, 0.72rem); color: var(--text-tertiary); }
     .ac__badges { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
 
     .ac__balance { display: grid; gap: 2px; }
-    .ac__balance-label { font-size: var(--text-xs, 0.68rem); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+    .ac__balance-label { font-size: var(--fs-caption, 0.68rem); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
     .ac__balance-value { font-size: 1.5rem; font-weight: 700; color: var(--text); }
-    .ac--negative .ac__balance-value { color: var(--color-danger-text); }
-    .ac__balance-hint { font-size: var(--text-xs, 0.72rem); color: var(--color-danger-text); }
+    .ac--negative .ac__balance-value { color: var(--expense-text); }
+    .ac__balance-hint { font-size: var(--fs-caption, 0.72rem); color: var(--expense-text); }
 
     .ac__activity {
       display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem 0.9rem; margin: 0;
-      padding: 0.7rem 0.8rem; border-radius: var(--radius-lg, 12px); background: var(--surface-2);
+      padding: 0.7rem 0.8rem; border-radius: var(--radius-inner, 12px); background: var(--surface-sunken);
     }
     .ac__activity-item { display: grid; gap: 1px; min-width: 0; }
-    .ac__activity dt { font-size: var(--text-xs, 0.68rem); color: var(--text-muted); }
-    .ac__activity dd { margin: 0; font-size: var(--text-sm, 0.82rem); font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ac__in { color: var(--success-text, var(--success)); }
-    .ac__out { color: var(--danger-text, var(--danger)); }
+    .ac__activity dt { font-size: var(--fs-caption, 0.68rem); color: var(--text-tertiary); }
+    .ac__activity dd { margin: 0; font-size: var(--fs-meta, 0.82rem); font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ac__in { color: var(--income-text, var(--income)); }
+    .ac__out { color: var(--expense-text, var(--expense)); }
 
     .ac__actions { display: flex; flex-wrap: wrap; gap: 6px; }
     .ac__action {
-      border: 1px solid var(--border); border-radius: var(--radius-md, 10px);
+      border: 1px solid var(--border); border-radius: var(--radius-control, 10px);
       padding: 6px 12px; background: var(--surface); color: var(--text);
-      font-size: var(--text-xs, 0.78rem); font-weight: 600; cursor: pointer;
+      font-size: var(--fs-caption, 0.78rem); font-weight: 600; cursor: pointer;
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
-    .ac__action:hover { background: var(--surface-2); border-color: var(--border-strong, var(--primary)); }
+    .ac__action:hover { background: var(--surface-sunken); border-color: var(--border-strong, var(--primary)); }
     .ac__action:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-    .ac__action--primary { background: var(--primary); border-color: var(--primary); color: var(--primary-contrast, #fff); }
-    .ac__action--primary:hover { filter: brightness(1.05); background: var(--primary); color: var(--primary-contrast, #fff); }
-    .ac__action--danger { color: var(--color-danger-text); }
-    .ac__action--danger:hover { border-color: var(--color-danger-soft); background: var(--color-danger-weak); }
+    .ac__action--primary { background: var(--primary); border-color: var(--primary); color: var(--primary-contrast); }
+    .ac__action--primary:hover { filter: brightness(1.05); background: var(--primary); color: var(--primary-contrast); }
+    .ac__action--danger { color: var(--expense-text); }
+    .ac__action--danger:hover { border-color: var(--expense-tint); background: var(--expense-tint); }
   `
 })
 export class AccountCardComponent {

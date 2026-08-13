@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/styles.css">
+<script src="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #F4F7F9; font-family: Inter, system-ui, sans-serif; color: #0A2430; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  .ffx { font-variant-numeric: tabular-nums; }
+  .day { transition: background .14s ease, border-color .14s ease; }
+  .day:hover { background: #F4F7F9; border-color: #C3D2DA; }
+  .ev { transition: background .14s ease; }
+  .ev:hover { background: #F8FAFB; }
+  .fade { animation: fadeIn .2s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex">
+
+  <aside style="width:212px; flex:none; background:#002E3E; color:#fff; display:flex; flex-direction:column; position:sticky; top:0; height:100vh">
+    <div style="display:flex; align-items:center; gap:10px; padding:18px 18px 16px">
+      <img src="assets/logo-header.png" alt="" style="height:26px; width:auto; display:block">
+      <span style="font-family:Poppins,sans-serif; font-size:12px; font-weight:700; letter-spacing:-.01em; white-space:nowrap">Investindo em Negócios</span>
+    </div>
+    <nav style="flex:1; display:grid; gap:2px; padding:4px 10px; align-content:start; overflow:auto">
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Visão geral</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Dashboard</span>
+      <span style="position:relative; display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; background:rgba(255,255,255,.10); color:#fff; font-size:12px; font-weight:600"><i style="position:absolute; left:0; top:50%; width:3px; height:16px; margin-top:-8px; border-radius:999px; background:#4FB783"></i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Calendário</span>
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Movimentações</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg>Despesas</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 19V5m0 0l-5 5m5-5l5 5"/></svg>Receitas</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 7h18a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20"/></svg>Cartões</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg>Contas</span>
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Planejamento</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Metas</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Orçamento</span>
+      <span style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; color:#9FBAC3; font-size:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 18h16M7 15l4-4 3 3 4-6"/></svg>Investimentos</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:10px; padding:14px 16px; border-top:1px solid rgba(255,255,255,.08)">
+      <span style="display:grid; place-items:center; width:30px; height:30px; border-radius:999px; background:rgba(255,255,255,.12); font-size:11px; font-weight:700">HS</span>
+      <div><div style="font-size:11px; font-weight:600">Henrique Santos</div><div style="font-size:10px; color:#7E9CA6">Plano Completo</div></div>
+    </div>
+  </aside>
+
+  <main style="flex:1; min-width:0; display:flex; flex-direction:column">
+
+    <header style="position:sticky; top:0; z-index:4; display:flex; align-items:center; gap:14px; height:56px; padding:0 28px; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid #E4EBEF">
+      <div style="flex:1; max-width:360px; display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; color:#9FB2BB; font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Buscar lançamento, categoria, conta...<span class="ffx" style="margin-left:auto; padding:2px 6px; border-radius:5px; background:#EDF2F5; font-size:10px; color:#7A929E">⌘K</span></div>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:10px">
+        <span style="display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font-size:12px; font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z"/></svg>Assistente</span>
+        <span style="position:relative; display:grid; place-items:center; width:28px; height:28px; color:#7A929E"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20h4" stroke-linecap="round"/></svg><i style="position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:999px; background:#D9483F"></i></span>
+      </div>
+    </header>
+
+    <div style="flex:1; padding:26px 28px 40px; display:flex; flex-direction:column; gap:18px">
+
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px">
+        <div>
+          <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Agenda financeira</span>
+          <h1 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:26px; font-weight:600; letter-spacing:-.025em">Calendário Financeiro</h1>
+          <p style="margin:0; font-size:13px; color:#46606C">Visualize todos os seus compromissos financeiros em um único lugar.</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex:none">
+          <button onClick="{{ goToday }}" style="height:36px; padding:0 15px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#0A2430; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Hoje</button>
+          <button style="display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 16px; border:none; border-radius:10px; background:#2563EB; color:#fff; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo evento financeiro</button>
+        </div>
+      </div>
+
+      <section style="display:grid; grid-template-columns:repeat(5,1fr); background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+        <div style="flex:1 1 200px; min-width:0; padding:18px 20px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+          <div style="display:flex; align-items:center; gap:8px; color:#2A7551"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 11l6-6 6 6"/></svg><span style="font-size:11px; font-weight:600; color:#46606C">Receitas previstas</span></div>
+          <div class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.025em; margin-top:6px; white-space:nowrap">{{ kpiReceita }}</div>
+          <div style="font-size:11px; color:#9FB2BB; margin-top:5px">Entradas previstas em {{ mesLabel }}.</div>
+        </div>
+        <div style="flex:1 1 200px; min-width:0; padding:18px 20px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+          <div style="display:flex; align-items:center; gap:8px; color:#B3372F"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 13l6 6 6-6"/></svg><span style="font-size:11px; font-weight:600; color:#46606C">Despesas previstas</span></div>
+          <div class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.025em; margin-top:6px; white-space:nowrap">{{ kpiDespesa }}</div>
+          <div style="font-size:11px; color:#9FB2BB; margin-top:5px">Contas e parcelas a pagar no período.</div>
+        </div>
+        <div style="flex:1 1 200px; min-width:0; padding:18px 20px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+          <div style="display:flex; align-items:center; gap:8px; color:#1D4ED8"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16c1.5 2 3.5 3 6 3 3.5 0 6-2 6-6 0-3.2-2.3-5.5-5.7-5.5H6.5M6 16V9m0 7h7"/></svg><span style="font-size:11px; font-weight:600; color:#46606C">Saldo previsto</span></div>
+          <div class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.025em; margin-top:6px; white-space:nowrap; color:#2A7551">{{ kpiSaldo }}</div>
+          <div style="font-size:11px; color:#9FB2BB; margin-top:5px">Diferença entre o que entra e o que sai.</div>
+        </div>
+        <div style="flex:1 1 200px; min-width:0; padding:18px 20px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+          <div style="display:flex; align-items:center; gap:8px; color:#46606C"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v3m10-3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/></svg><span style="font-size:11px; font-weight:600; color:#46606C">Compromissos</span></div>
+          <div class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.025em; margin-top:6px">{{ kpiCompromissos }}</div>
+          <div style="font-size:11px; color:#9FB2BB; margin-top:5px">Vencimentos no mês: {{ kpiVencimentos }}</div>
+        </div>
+        <div style="flex:1 1 200px; min-width:0; padding:18px 20px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5">
+          <div style="display:flex; align-items:center; gap:8px; color:#9A5C0E"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z"/></svg><span style="font-size:11px; font-weight:600; color:#46606C">Pendências</span></div>
+          <div class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.025em; margin-top:6px; color:#B3372F">{{ kpiPendencias }}</div>
+          <div style="font-size:11px; color:#9FB2BB; margin-top:5px">Compromissos atrasados a regularizar.</div>
+        </div>
+      </section>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
+        <div style="display:inline-flex; padding:3px; border-radius:10px; background:#EDF2F5">
+          <sc-for list="{{ views }}" as="v" hint-placeholder-count="4">
+            <button onClick="{{ v.pick }}" style="padding:7px 14px; border:none; border-radius:8px; background:{{ v.bg }}; color:{{ v.color }}; box-shadow:{{ v.shadow }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ v.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px">
+          <button onClick="{{ prevMes }}" style="display:grid; place-items:center; width:32px; height:32px; border:1px solid #D6E0E6; border-radius:9px; background:#fff; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button>
+          <span style="min-width:150px; text-align:center; font-size:14px; font-weight:600">{{ mesLabel }}</span>
+          <button onClick="{{ nextMes }}" style="display:grid; place-items:center; width:32px; height:32px; border:1px solid #D6E0E6; border-radius:9px; background:#fff; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; background:#fff; border:1px solid #E4EBEF; border-radius:14px; flex-wrap:wrap">
+        <div style="display:inline-flex; padding:3px; border-radius:9px; background:#EDF2F5">
+          <sc-for list="{{ grupos }}" as="g" hint-placeholder-count="6">
+            <button onClick="{{ g.pick }}" style="padding:6px 12px; border:none; border-radius:7px; background:{{ g.bg }}; color:{{ g.color }}; box-shadow:{{ g.shadow }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ g.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:11px; color:#46606C">
+          <sc-for list="{{ legenda }}" as="l" hint-placeholder-count="6">
+            <span title="{{ l.tooltip }}" style="display:inline-flex; align-items:center; gap:6px"><i style="width:9px; height:9px; border-radius:3px; background:{{ l.cor }}; display:inline-block"></i>{{ l.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; align-items:start">
+
+        <div style="display:flex; flex-direction:column; gap:18px; min-width:0">
+
+          <sc-if value="{{ isMes }}" hint-placeholder-val="{{ true }}">
+            <section class="fade" style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:18px 20px">
+              <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:8px">
+                <sc-for list="{{ semana }}" as="s" hint-placeholder-count="7">
+                  <div style="text-align:center; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#9FB2BB">{{ s }}</div>
+                </sc-for>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px">
+                <sc-for list="{{ dias }}" as="d" hint-placeholder-count="35">
+                  <button class="day" onClick="{{ d.pick }}" style="display:flex; flex-direction:column; gap:5px; min-height:84px; padding:8px; border:1px solid {{ d.border }}; border-radius:10px; background:{{ d.bg }}; text-align:left; cursor:pointer; font-family:inherit">
+                    <span class="ffx" style="font-size:12px; font-weight:{{ d.peso }}; color:{{ d.numCor }}">{{ d.num }}</span>
+                    <span style="display:flex; flex-wrap:wrap; gap:3px">
+                      <sc-for list="{{ d.pontos }}" as="p" hint-placeholder-count="2">
+                        <i style="width:6px; height:6px; border-radius:999px; background:{{ p }}; display:inline-block"></i>
+                      </sc-for>
+                    </span>
+                    <span class="ffx" style="margin-top:auto; font-size:10px; font-weight:600; color:{{ d.totalCor }}">{{ d.total }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </section>
+
+            <section class="fade" style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px">
+                <div>
+                  <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Dia selecionado</span>
+                  <h2 style="margin:5px 0 0; font-size:16px; font-weight:600">{{ diaLabel }}</h2>
+                </div>
+                <span style="padding:4px 11px; border-radius:999px; background:rgba(37,99,235,.10); color:#1D4ED8; font-size:11px; font-weight:600">{{ diaContagem }}</span>
+              </div>
+              <sc-if value="{{ temEventosDia }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; flex-direction:column; gap:8px">
+                  <sc-for list="{{ eventosDia }}" as="e" hint-placeholder-count="3">
+                    <div class="ev" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid #EEF3F5; border-radius:11px">
+                      <span style="width:4px; align-self:stretch; flex:none; border-radius:3px; background:{{ e.cor }}"></span>
+                      <div style="flex:1; min-width:0">
+                        <div style="font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ e.titulo }}</div>
+                        <div style="font-size:11px; color:#9FB2BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ e.meta }}</div>
+                      </div>
+                      <span style="flex:none; padding:3px 9px; border-radius:999px; background:{{ e.statusBg }}; color:{{ e.statusCor }}; font-size:10px; font-weight:600">{{ e.status }}</span>
+                      <span class="ffx" style="flex:none; min-width:96px; text-align:right; font-size:13px; font-weight:600; color:{{ e.valorCor }}">{{ e.valor }}</span>
+                      <sc-if value="{{ e.acionavel }}" hint-placeholder-val="{{ false }}">
+                        <button style="flex:none; height:30px; padding:0 11px; border:1px solid #D6E0E6; border-radius:8px; background:#fff; color:#0A2430; font:600 11px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Dar baixa</button>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ semEventosDia }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0; padding:24px 0; text-align:center; font-size:13px; color:#9FB2BB">Nenhum compromisso neste dia com os filtros atuais.</p>
+              </sc-if>
+            </section>
+          </sc-if>
+
+          <sc-if value="{{ isLista }}" hint-placeholder-val="{{ false }}">
+            <section class="fade" style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <div style="margin-bottom:16px">
+                <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">{{ listaEyebrow }}</span>
+                <h2 style="margin:5px 0 0; font-size:16px; font-weight:600">{{ listaTitulo }}</h2>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:18px">
+                <sc-for list="{{ grupoLista }}" as="g" hint-placeholder-count="3">
+                  <div>
+                    <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding-bottom:8px; border-bottom:1px solid #EEF3F5; margin-bottom:10px">
+                      <span style="font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#46606C">{{ g.titulo }}</span>
+                      <span class="ffx" style="font-size:12px; font-weight:600; color:{{ g.saldoCor }}">{{ g.saldo }}</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:8px">
+                      <sc-for list="{{ g.eventos }}" as="e" hint-placeholder-count="3">
+                        <div class="ev" style="display:flex; align-items:center; gap:12px; padding:11px 14px; border:1px solid #EEF3F5; border-radius:11px">
+                          <span style="width:4px; align-self:stretch; flex:none; border-radius:3px; background:{{ e.cor }}"></span>
+                          <span class="ffx" style="flex:none; width:52px; font-size:11px; color:#9FB2BB">{{ e.dia }}</span>
+                          <div style="flex:1; min-width:0">
+                            <div style="font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ e.titulo }}</div>
+                            <div style="font-size:11px; color:#9FB2BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ e.meta }}</div>
+                          </div>
+                          <span style="flex:none; padding:3px 9px; border-radius:999px; background:{{ e.statusBg }}; color:{{ e.statusCor }}; font-size:10px; font-weight:600">{{ e.status }}</span>
+                          <span class="ffx" style="flex:none; min-width:96px; text-align:right; font-size:13px; font-weight:600; color:{{ e.valorCor }}">{{ e.valor }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </sc-if>
+
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:18px">
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:18px 20px">
+            <h2 style="margin:0 0 4px; font-size:14px; font-weight:600">Resumo de hoje</h2>
+            <p style="margin:0 0 14px; font-size:12px; color:#7A929E">{{ hojeLabel }}</p>
+            <div style="display:grid; gap:8px">
+              <sc-for list="{{ digest }}" as="d" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:#FBFCFD; border:1px solid #EEF3F5">
+                  <i style="width:8px; height:8px; flex:none; border-radius:999px; background:{{ d.cor }}"></i>
+                  <span style="flex:1; font-size:12px">{{ d.label }}</span>
+                  <span class="ffx" style="font-size:13px; font-weight:600">{{ d.n }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:18px 20px">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px">
+              <h2 style="margin:0; font-size:14px; font-weight:600">Próximos 7 dias</h2>
+              <a href="#" style="font-size:12px; font-weight:600">Ver todos</a>
+            </div>
+            <div style="display:flex; flex-direction:column">
+              <sc-for list="{{ proximos }}" as="p" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid #F2F6F8">
+                  <div style="flex:none; width:34px; text-align:center">
+                    <div class="ffx" style="font-size:14px; font-weight:700; line-height:1">{{ p.dia }}</div>
+                    <div style="font-size:9px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#9FB2BB">{{ p.mes }}</div>
+                  </div>
+                  <div style="flex:1; min-width:0">
+                    <div style="font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ p.titulo }}</div>
+                    <div style="font-size:11px; color:#9FB2BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ p.meta }}</div>
+                  </div>
+                  <span class="ffx" style="flex:none; font-size:12px; font-weight:600; color:{{ p.cor }}">{{ p.valor }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="background:#fff; border:1px solid rgba(217,72,63,.24); border-radius:16px; padding:18px 20px">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B3372F" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z"/></svg>
+              <h2 style="margin:0; font-size:14px; font-weight:600">Pendências</h2>
+            </div>
+            <p style="margin:0 0 12px; font-size:12px; color:#7A929E">Compromissos atrasados a regularizar.</p>
+            <div style="display:flex; flex-direction:column; gap:8px">
+              <sc-for list="{{ pendencias }}" as="p" hint-placeholder-count="2">
+                <div style="padding:11px 13px; border:1px solid rgba(217,72,63,.18); border-radius:11px; background:rgba(217,72,63,.05)">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+                    <span style="font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ p.titulo }}</span>
+                    <span class="ffx" style="flex:none; font-size:12px; font-weight:600; color:#B3372F">{{ p.valor }}</span>
+                  </div>
+                  <div class="ffx" style="margin-top:3px; font-size:11px; color:#B3372F">{{ p.meta }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+const CORES = { income: '#349063', expense: '#D9483F', card: '#2563EB', loan: '#C97A15', goal: '#0A4A5C' };
+
+const LEGENDA = [
+  { label: 'Receitas', grupo: 'income', tooltip: 'Entradas previstas: salário, freelance, reembolsos e outras receitas.' },
+  { label: 'Despesas', grupo: 'expense', tooltip: 'Contas e despesas com vencimento no período (água, luz, internet, etc.).' },
+  { label: 'Fechamento de fatura', grupo: 'card', tooltip: 'Dia em que a fatura do cartão fecha.' },
+  { label: 'Vencimento de fatura', grupo: 'card', tooltip: 'Dia em que a fatura do cartão precisa ser paga.' },
+  { label: 'Financiamentos', grupo: 'loan', tooltip: 'Parcelas de financiamentos e empréstimos ativos.' },
+  { label: 'Metas', grupo: 'goal', tooltip: 'Prazo-alvo das suas metas financeiras.' }
+];
+
+const EVENTOS = [
+  { dia: 1, g: 'expense', t: 'Plano de saúde', m: 'Saúde · recorrente', v: -892.00, s: 'overdue' },
+  { dia: 3, g: 'expense', t: 'Combustível', m: 'Transporte', v: -412.80, s: 'paid' },
+  { dia: 5, g: 'income', t: 'Salário', m: 'Receita fixa · Itaú', v: 8400.00, s: 'received' },
+  { dia: 5, g: 'expense', t: 'Aluguel', m: 'Moradia · recorrente', v: -2400.00, s: 'paid' },
+  { dia: 8, g: 'card', t: 'Fechamento Nubank', m: 'Fatura de agosto fecha', v: null, s: 'forecast' },
+  { dia: 10, g: 'expense', t: 'Energia elétrica', m: 'Moradia · recorrente', v: -318.42, s: 'forecast' },
+  { dia: 12, g: 'expense', t: 'Notebook 4/12', m: 'Cartão · parcela', v: -641.58, s: 'forecast' },
+  { dia: 14, g: 'expense', t: 'Academia', m: 'Lazer · recorrente', v: -149.90, s: 'forecast' },
+  { dia: 15, g: 'expense', t: 'Internet e telefone', m: 'Moradia · recorrente', v: -219.90, s: 'forecast' },
+  { dia: 15, g: 'loan', t: 'Financiamento do carro 18/48', m: 'Parcela · Santander', v: -1284.00, s: 'forecast' },
+  { dia: 18, g: 'card', t: 'Vencimento Nubank', m: 'Fatura de agosto', v: -1842.10, s: 'forecast' },
+  { dia: 20, g: 'income', t: 'Consultoria — Grupo Vega', m: 'Serviços · a receber', v: 3500.00, s: 'forecast' },
+  { dia: 22, g: 'expense', t: 'Mensalidade escolar', m: 'Educação', v: -720.00, s: 'forecast' },
+  { dia: 25, g: 'expense', t: 'Seguro do carro 7/12', m: 'Transporte · parcela', v: -389.40, s: 'forecast' },
+  { dia: 28, g: 'goal', t: 'Reserva de emergência', m: 'Aporte planejado', v: -1200.00, s: 'forecast' },
+  { dia: 30, g: 'income', t: 'Aluguel recebido', m: 'Imóvel · Kitnet centro', v: 1400.00, s: 'forecast' }
+];
+
+const STATUS = {
+  forecast: { label: 'Previsto', bg: '#EDF2F5', cor: '#46606C' },
+  paid: { label: 'Pago', bg: 'rgba(52,144,99,.12)', cor: '#2A7551' },
+  received: { label: 'Recebido', bg: 'rgba(52,144,99,.12)', cor: '#2A7551' },
+  overdue: { label: 'Atrasado', bg: 'rgba(217,72,63,.12)', cor: '#B3372F' }
+};
+
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const MES_CURTO = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+
+class Component extends DCLogic {
+  state = { view: 'month', grupo: 'all', dia: 15, mes: 7 };
+
+  brl(v) {
+    const s = Math.abs(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (v < 0 ? '− R$ ' : 'R$ ') + s;
+  }
+
+  visiveis() {
+    const g = this.state.grupo;
+    return g === 'all' ? EVENTOS : EVENTOS.filter(e => e.g === g);
+  }
+
+  mapa(e) {
+    const st = STATUS[e.s];
+    return {
+      cor: CORES[e.g],
+      titulo: e.t,
+      meta: e.m,
+      dia: String(e.dia).padStart(2, '0') + ' ' + MES_CURTO[this.state.mes],
+      status: st.label,
+      statusBg: st.bg,
+      statusCor: st.cor,
+      valor: e.v === null ? '—' : this.brl(e.v),
+      valorCor: e.v === null ? '#9FB2BB' : (e.v > 0 ? '#2A7551' : '#0A2430'),
+      acionavel: e.s === 'forecast' || e.s === 'overdue'
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const vis = this.visiveis();
+    const receita = vis.filter(e => e.v > 0).reduce((a, e) => a + e.v, 0);
+    const despesa = vis.filter(e => e.v < 0).reduce((a, e) => a - e.v, 0);
+    const pend = EVENTOS.filter(e => e.s === 'overdue');
+
+    const primeiroDiaSemana = 5;
+    const totalDias = 31;
+    const dias = [];
+    for (let i = 0; i < primeiroDiaSemana; i++) {
+      dias.push({ num: '', pontos: [], total: '', bg: '#FBFCFD', border: '#F2F6F8', numCor: '#C3D2DA', peso: '400', totalCor: '#9FB2BB', pick: () => {} });
+    }
+    for (let d = 1; d <= totalDias; d++) {
+      const evs = vis.filter(e => e.dia === d);
+      const net = evs.reduce((a, e) => a + (e.v || 0), 0);
+      const sel = s.dia === d;
+      const hoje = d === 8;
+      dias.push({
+        num: String(d),
+        pontos: [...new Set(evs.map(e => CORES[e.g]))],
+        total: evs.length ? this.brl(net) : '',
+        bg: sel ? 'rgba(37,99,235,.07)' : '#fff',
+        border: sel ? '#2563EB' : (hoje ? '#9FB2BB' : '#EEF3F5'),
+        numCor: sel ? '#1D4ED8' : (hoje ? '#0A2430' : '#46606C'),
+        peso: sel || hoje ? '700' : '500',
+        totalCor: net > 0 ? '#2A7551' : (net < 0 ? '#B3372F' : '#9FB2BB'),
+        pick: () => this.setState({ dia: d })
+      });
+    }
+
+    const eventosDia = vis.filter(e => e.dia === s.dia).map(e => this.mapa(e));
+
+    const buckets = s.view === 'timeline'
+      ? [
+          { titulo: 'Hoje', filtro: e => e.dia === 8 },
+          { titulo: 'Amanhã', filtro: e => e.dia === 9 },
+          { titulo: 'Esta semana', filtro: e => e.dia > 9 && e.dia <= 15 },
+          { titulo: 'Ainda em agosto', filtro: e => e.dia > 15 }
+        ]
+      : s.view === 'week'
+        ? [{ titulo: 'Semana de 10 a 16 de agosto', filtro: e => e.dia >= 10 && e.dia <= 16 }]
+        : [
+            { titulo: 'Primeira quinzena', filtro: e => e.dia <= 15 },
+            { titulo: 'Segunda quinzena', filtro: e => e.dia > 15 }
+          ];
+
+    const grupoLista = buckets.map(b => {
+      const evs = vis.filter(b.filtro);
+      const net = evs.reduce((a, e) => a + (e.v || 0), 0);
+      return {
+        titulo: b.titulo,
+        saldo: evs.length ? this.brl(net) : 'sem compromissos',
+        saldoCor: net > 0 ? '#2A7551' : (net < 0 ? '#B3372F' : '#9FB2BB'),
+        eventos: evs.map(e => this.mapa(e))
+      };
+    }).filter(g => g.eventos.length);
+
+    const vLabels = [['month', 'Mês'], ['week', 'Semana'], ['agenda', 'Agenda'], ['timeline', 'Linha do tempo']];
+    const gLabels = [['all', 'Todos'], ['income', 'Receitas'], ['expense', 'Despesas'], ['card', 'Cartões'], ['loan', 'Financiamentos'], ['goal', 'Metas']];
+
+    return {
+      views: vLabels.map(([k, label]) => ({
+        label, pick: () => this.setState({ view: k }),
+        bg: s.view === k ? '#fff' : 'transparent',
+        color: s.view === k ? '#0A2430' : '#7A929E',
+        shadow: s.view === k ? '0 1px 2px rgba(3,32,44,.08)' : 'none'
+      })),
+      grupos: gLabels.map(([k, label]) => ({
+        label, pick: () => this.setState({ grupo: k }),
+        bg: s.grupo === k ? '#fff' : 'transparent',
+        color: s.grupo === k ? '#0A2430' : '#7A929E',
+        shadow: s.grupo === k ? '0 1px 2px rgba(3,32,44,.08)' : 'none'
+      })),
+      legenda: LEGENDA.map(l => ({ label: l.label, tooltip: l.tooltip, cor: CORES[l.grupo] })),
+
+      mesLabel: MESES[s.mes] + ' de 2026',
+      prevMes: () => this.setState(p => ({ mes: (p.mes + 11) % 12 })),
+      nextMes: () => this.setState(p => ({ mes: (p.mes + 1) % 12 })),
+      goToday: () => this.setState({ mes: 7, dia: 8, view: 'month' }),
+
+      kpiReceita: this.brl(receita),
+      kpiDespesa: this.brl(despesa),
+      kpiSaldo: this.brl(receita - despesa),
+      kpiCompromissos: String(vis.length),
+      kpiVencimentos: String(vis.filter(e => e.s === 'forecast').length),
+      kpiPendencias: String(pend.length),
+
+      semana: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
+      dias,
+
+      isMes: s.view === 'month',
+      isLista: s.view !== 'month',
+      listaEyebrow: s.view === 'week' ? 'Visão semanal' : (s.view === 'agenda' ? 'Agenda do mês' : 'Linha do tempo'),
+      listaTitulo: s.view === 'week' ? 'Compromissos da semana' : (s.view === 'agenda' ? 'Todos os compromissos por data' : 'O que vem primeiro'),
+      grupoLista,
+
+      diaLabel: String(s.dia).padStart(2, '0') + ' de ' + MESES[s.mes] + ' de 2026',
+      diaContagem: eventosDia.length + ' compromisso(s)',
+      eventosDia,
+      temEventosDia: eventosDia.length > 0,
+      semEventosDia: eventosDia.length === 0,
+
+      hojeLabel: 'Sábado, 08 de agosto de 2026',
+      digest: [
+        { label: 'Despesas', n: '4', cor: CORES.expense },
+        { label: 'Receitas', n: '2', cor: CORES.income },
+        { label: 'Cartões', n: '2', cor: CORES.card },
+        { label: 'Financiamentos', n: '1', cor: CORES.loan },
+        { label: 'Metas', n: '1', cor: CORES.goal }
+      ],
+      proximos: EVENTOS.filter(e => e.dia >= 10 && e.dia <= 16).map(e => ({
+        dia: String(e.dia).padStart(2, '0'),
+        mes: MES_CURTO[s.mes],
+        titulo: e.t,
+        meta: e.m,
+        valor: e.v === null ? '—' : this.brl(e.v),
+        cor: e.v === null ? '#9FB2BB' : (e.v > 0 ? '#2A7551' : '#0A2430')
+      })),
+      pendencias: pend.map(e => ({
+        titulo: e.t,
+        valor: this.brl(e.v),
+        meta: 'venceu em ' + String(e.dia).padStart(2, '0') + '/' + String(s.mes + 1).padStart(2, '0') + ' · 7 dias de atraso'
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

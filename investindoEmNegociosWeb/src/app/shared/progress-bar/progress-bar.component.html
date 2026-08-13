@@ -1,0 +1,9 @@
+<div
+  class="progress__track"
+  role="progressbar"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-valuenow]="value()"
+  [attr.aria-valuemin]="0"
+  [attr.aria-valuemax]="max()">
+  <div class="progress__fill" [attr.data-tone]="effectiveTone()" [style.width.%]="width()"></div>
+</div>

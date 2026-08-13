@@ -8,15 +8,15 @@
   border: 1px solid rgba(56, 189, 248, 0.28);
   background: rgba(56, 189, 248, 0.1);
   padding: 0.55rem 0.9rem;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  color: var(--info-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  color: var(--primary-text);
 }
 
 .receitas-total-card__split {
   display: grid;
   gap: 0.35rem;
-  font-size: var(--font-size-label);
+  font-size: var(--fs-meta);
   color: var(--text-secondary);
 }
 

@@ -11,7 +11,7 @@
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <span stat-note class="text-[var(--color-text-muted)] text-[length:var(--font-size-label)] font-semibold"> · {{ statusResumo.pagos }} lançamento(s)</span>
+        <span stat-note class="text-[var(--text-tertiary)] text-[length:var(--fs-meta)] font-semibold"> · {{ statusResumo.pagos }} lançamento(s)</span>
       </app-transaction-summary-card>
 
       <app-transaction-summary-card
@@ -25,7 +25,7 @@
           <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
           <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
         </svg>
-        <span stat-note class="text-[var(--color-text-muted)] text-[length:var(--font-size-label)] font-semibold"> · {{ statusResumo.pendentes }} lançamento(s)</span>
+        <span stat-note class="text-[var(--text-tertiary)] text-[length:var(--fs-meta)] font-semibold"> · {{ statusResumo.pendentes }} lançamento(s)</span>
       </app-transaction-summary-card>
 
       <app-transaction-summary-card
@@ -44,12 +44,12 @@
         </svg>
         <span
           stat-note
-          class="text-[length:var(--font-size-label)] font-bold"
+          class="text-[length:var(--fs-meta)] font-bold"
           [ngClass]="previousComparison.trend === 'up'
-            ? 'text-[var(--color-success-text)]'
+            ? 'text-[var(--income-text)]'
             : previousComparison.trend === 'down'
-              ? 'text-[var(--color-danger-text)]'
-              : 'text-[var(--color-text-muted)]'">
+              ? 'text-[var(--expense-text)]'
+              : 'text-[var(--text-tertiary)]'">
           · {{ previousComparison.trend === 'up' ? 'Acima' : previousComparison.trend === 'down' ? 'Abaixo' : 'Estável' }}
           @if (!previousComparison.isNew) {
             <span>({{ previousComparison.percent | number:'1.0-0' }}%)</span>

@@ -23,10 +23,10 @@
 
 .section-title {
   margin: 0 0 0.65rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
@@ -38,11 +38,11 @@
 
 .calc__selector button {
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 1rem;
   background: var(--surface);
   color: var(--text);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   text-align: left;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
@@ -57,7 +57,7 @@
 .calc__selector button:hover {
   border-color: var(--primary);
   transform: translateY(-3px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .selector__item--disabled {
@@ -79,28 +79,28 @@
 
 .selector__copy span {
   display: block;
-  font-size: var(--font-size-body);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-subhead);
+  letter-spacing: var(--ls-tight);
 }
 
 .selector__copy small {
-  color: var(--text-muted);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-body);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-body);
 }
 
 .calc__selector .icon {
   width: 42px;
   height: 42px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-display);
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-display);
 }
 
 .selector__badge {
@@ -111,7 +111,7 @@
 
 .calc__panel {
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 1.25rem;
   background: var(--surface);
   display: grid;
@@ -126,15 +126,15 @@
 .panel__title h3 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-title);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-modal-title);
+  letter-spacing: var(--ls-tight);
 }
 
 .muted,
 .calc__panel .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   margin: 0;
-  line-height: var(--line-height-body);
+  line-height: var(--lh-body);
 }
 
 .form {
@@ -149,15 +149,15 @@ label {
   flex-direction: column;
   gap: 0.45rem;
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 input {
   min-height: 48px;
   padding: 0.75rem 0.9rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   border: 1px solid var(--border);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
   font: inherit;
 }
@@ -172,10 +172,10 @@ input:focus {
   min-height: 48px;
   border: none;
   padding: 0.75rem 1.05rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--primary);
   color: var(--on-primary);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   cursor: pointer;
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
@@ -187,8 +187,8 @@ input:focus {
 
 .result {
   margin: 0;
-  color: var(--info-text);
-  font-weight: var(--font-weight-bold);
+  color: var(--primary-text);
+  font-weight: var(--fw-bold);
 }
 
 .chart {
@@ -199,15 +199,15 @@ input:focus {
   margin-top: 0.25rem;
   padding: 1rem 0.85rem 2.2rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
 }
 
 .chart__bar {
   flex: 1;
   min-height: 20px;
   background: var(--primary);
-  border-radius: var(--radius-sm) var(--radius-sm) calc(var(--radius-sm) / 2) calc(var(--radius-sm) / 2);
+  border-radius: var(--radius-xs) var(--radius-xs) calc(var(--radius-xs) / 2) calc(var(--radius-xs) / 2);
   position: relative;
 }
 
@@ -215,8 +215,8 @@ input:focus {
   position: absolute;
   inset: auto 0 -1.45rem 0;
   text-align: center;
-  font-size: var(--font-size-caption);
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
 }
 
 .chart--inline .chart__bar {
@@ -224,7 +224,7 @@ input:focus {
 }
 
 .chart__bar--renda {
-  background: var(--success);
+  background: var(--income);
 }
 
 .chart__bar--patrimonio {
@@ -234,7 +234,7 @@ input:focus {
 .table {
   margin-top: 0.35rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   overflow: hidden;
   background: var(--surface);
 }
@@ -258,9 +258,9 @@ input:focus {
 }
 
 .table__head {
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
 }
 
 .table__row {
@@ -268,12 +268,12 @@ input:focus {
 }
 
 .table__row:nth-child(even) {
-  background: color-mix(in srgb, var(--surface-2) 72%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 72%, white);
 }
 
 .back-link {
   color: var(--primary-text);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   cursor: pointer;
   text-decoration: none;
 }

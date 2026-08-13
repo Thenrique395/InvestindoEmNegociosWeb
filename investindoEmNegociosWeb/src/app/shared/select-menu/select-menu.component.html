@@ -1,0 +1,76 @@
+@let current = selected();
+
+<button
+  type="button"
+  class="select-menu__trigger"
+  role="combobox"
+  [attr.aria-expanded]="open()"
+  [attr.aria-haspopup]="'listbox'"
+  [attr.aria-label]="ariaLabel()"
+  [disabled]="isDisabled()"
+  (click)="toggle()"
+  (keydown)="onTriggerKeydown($event)">
+  <span class="select-menu__value">
+    <span
+      class="select-menu__dot"
+      [style.background]="current?.color || 'transparent'"
+      aria-hidden="true"></span>
+    <span class="select-menu__label" [class.select-menu__label--placeholder]="!current">
+      {{ current?.label || placeholder() }}
+    </span>
+  </span>
+
+  <svg class="select-menu__chevron" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+</button>
+
+@if (open()) {
+  <div class="select-menu__panel" (keydown)="onMenuKeydown($event)">
+    @if (searchable()) {
+      <div class="select-menu__search">
+        <input
+          #searchInput
+          type="text"
+          class="select-menu__search-input"
+          placeholder="Buscar…"
+          [value]="query()"
+          (input)="onSearch($any($event.target).value)" />
+      </div>
+    }
+
+    <ul class="select-menu__list" role="listbox" [attr.aria-label]="ariaLabel()">
+      @for (option of visibleOptions(); track option.value; let i = $index) {
+        <li
+          class="select-menu__option"
+          role="option"
+          [class.select-menu__option--selected]="option.value === value()"
+          [class.select-menu__option--active]="i === activeIndex()"
+          [class.select-menu__option--disabled]="option.disabled"
+          [attr.aria-selected]="option.value === value()"
+          [attr.aria-disabled]="option.disabled"
+          (click)="select(option)">
+          <span
+            class="select-menu__dot"
+            [style.background]="option.color || 'transparent'"
+            aria-hidden="true"></span>
+          <span class="select-menu__option-label">{{ option.label }}</span>
+          @if (option.meta) {
+            <span class="select-menu__option-meta">{{ option.meta }}</span>
+          }
+          @if (option.value === value()) {
+            <svg class="select-menu__check" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          }
+        </li>
+      } @empty {
+        <li class="select-menu__empty">Nada encontrado.</li>
+      }
+    </ul>
+
+    @if (createLabel(); as label) {
+      <button type="button" class="select-menu__create" (click)="requestCreate()">{{ label }}</button>
+    }
+  </div>
+}

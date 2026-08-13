@@ -17,14 +17,14 @@
 .accounts-feedback {
   margin: 0;
   padding: 0.75rem 1rem;
-  border-radius: var(--radius-lg, 12px);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  border-radius: var(--radius-inner, 12px);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 .accounts-feedback--error {
-  border: 1px solid var(--color-danger-soft);
-  background: var(--color-danger-weak);
-  color: var(--color-danger-text);
+  border: 1px solid var(--expense-tint);
+  background: var(--expense-tint);
+  color: var(--expense-text);
 }
 
 // ---- Cards de resumo --------------------------------------------------------
@@ -52,17 +52,17 @@
 }
 
 .accounts-controls__label {
-  font-size: var(--text-xs, 0.68rem);
+  font-size: var(--fs-caption, 0.68rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .accounts-controls__alert {
   margin: 0;
-  font-size: var(--font-size-body-sm, 0.82rem);
-  color: var(--color-danger-text);
+  font-size: var(--fs-body, 0.82rem);
+  color: var(--expense-text);
   font-weight: 600;
 }
 
@@ -96,14 +96,14 @@
   gap: 0.7rem;
   padding: 1.05rem 1.1rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .avail__title {
   margin: 0;
-  font-size: var(--text-sm, 0.9rem);
+  font-size: var(--fs-meta, 0.9rem);
   font-weight: 700;
   color: var(--text);
 }
@@ -119,11 +119,11 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  font-size: var(--font-size-body-sm, 0.85rem);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 .avail__row dt {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .avail__row dd {
@@ -144,25 +144,25 @@
 }
 
 .avail__row--total dd {
-  font-size: var(--font-size-body, 1rem);
+  font-size: var(--fs-subhead, 1rem);
 }
 
 .avail__row--muted dt,
 .avail__row--muted dd {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-weight: 500;
 }
 
-.avail__pos { color: var(--success-text, var(--success)) !important; }
-.avail__neg { color: var(--danger-text, var(--danger)) !important; }
+.avail__pos { color: var(--income-text, var(--income)) !important; }
+.avail__neg { color: var(--expense-text, var(--expense)) !important; }
 
 .avail__alert {
   margin: 0;
   padding: 0.55rem 0.7rem;
-  border-radius: var(--radius-md, 10px);
-  background: var(--color-danger-weak);
-  color: var(--color-danger-text);
-  font-size: var(--text-xs, 0.75rem);
+  border-radius: var(--radius-control, 10px);
+  background: var(--expense-tint);
+  color: var(--expense-text);
+  font-size: var(--fs-caption, 0.75rem);
   font-weight: 600;
 }
 
@@ -190,7 +190,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.6rem;
-  font-size: var(--font-size-body-sm, 0.82rem);
+  font-size: var(--fs-body, 0.82rem);
 }
 
 .accounts-distribution__swatch {
@@ -207,7 +207,7 @@
 }
 
 .accounts-distribution__pct {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   min-width: 3rem;
   text-align: right;
 }
@@ -221,7 +221,7 @@
   gap: 0.75rem;
   padding: 1rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
 }
 
@@ -236,11 +236,11 @@
 }
 
 .accounts-filter__label {
-  font-size: var(--text-xs, 0.68rem);
+  font-size: var(--fs-caption, 0.68rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .accounts-filter input,
@@ -248,10 +248,10 @@
   min-height: 42px;
   padding: 0 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-inner, 12px);
   background: var(--surface);
   color: var(--text);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 .accounts-filter input:focus-visible,
@@ -284,18 +284,18 @@
 .accounts-statement__field {
   display: grid;
   gap: 0.3rem;
-  font-size: var(--text-xs, 0.72rem);
-  color: var(--text-muted);
+  font-size: var(--fs-caption, 0.72rem);
+  color: var(--text-tertiary);
 }
 
 .accounts-statement__field input {
   min-height: 38px;
   padding: 0 0.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md, 10px);
-  background: var(--surface-2);
+  border-radius: var(--radius-control, 10px);
+  background: var(--surface-sunken);
   color: var(--text);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 .accounts-statement__pager {
@@ -304,8 +304,8 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding-top: 0.75rem;
-  font-size: var(--font-size-body-sm, 0.82rem);
-  color: var(--text-muted);
+  font-size: var(--fs-body, 0.82rem);
+  color: var(--text-tertiary);
 }
 
 .accounts-statement__pager-actions {

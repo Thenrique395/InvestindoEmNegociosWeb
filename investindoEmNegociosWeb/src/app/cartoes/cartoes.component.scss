@@ -3,7 +3,7 @@
 .cards-page {
   display: grid;
   gap: 1.5rem;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -11,9 +11,9 @@
 
 .cards-statements {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
+  box-shadow: var(--shadow-card-hover);
   padding: 1.5rem;
   display: grid;
   gap: 1.25rem;
@@ -28,27 +28,27 @@
 
 .cards-statements__eyebrow {
   margin: 0 0 0.35rem;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cards-statements__title {
   margin: 0;
   font-size: clamp(1.75rem, 2.3vw, 2.25rem);
-  line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-display);
-  font-weight: var(--font-weight-semibold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-tighter);
+  font-weight: var(--fw-semibold);
   color: var(--text);
 }
 
 .cards-statements__text {
   margin: 0.6rem 0 0;
   max-inline-size: 58ch;
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-body);
   color: var(--text-secondary);
 }
 
@@ -62,17 +62,17 @@
 .cards-statements__apply {
   min-height: 3.5rem;
   padding: 0.9rem 1.2rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid transparent;
   background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 78%, white));
   color: white;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   white-space: nowrap;
 }
 
 .cards-statements__feedback {
   margin: 0;
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
   color: var(--text-secondary);
 }
 
@@ -83,10 +83,10 @@
 
 .cards-statements__item {
   padding: 1.2rem 1.25rem;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   border: 1px solid var(--border);
-  background: var(--surface-2);
-  box-shadow: var(--shadow-elevation-sm);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-card-hover);
   display: grid;
   gap: 1rem;
 }
@@ -100,15 +100,15 @@
 
 .cards-statements__item-title {
   margin: 0;
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
   color: var(--text);
 }
 
 .cards-statements__item-copy {
   margin: 0.25rem 0 0;
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
   color: var(--text-secondary);
 }
 
@@ -127,10 +127,10 @@
   min-height: 2rem;
   padding: 0.35rem 0.8rem;
   border-radius: var(--radius-pill);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text-secondary);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .cards-statements__metrics {
@@ -143,48 +143,48 @@
   display: grid;
   gap: 0.35rem;
   padding: 0.9rem 1rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.88);
 
   span {
-    font-size: var(--font-size-caption);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--letter-spacing-eyebrow);
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow);
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-tertiary);
   }
 
   strong {
-    font-size: var(--font-size-body);
-    font-weight: var(--font-weight-bold);
+    font-size: var(--fs-subhead);
+    font-weight: var(--fw-bold);
     color: var(--text);
   }
 }
 
 .cards-statements__metric--success {
-  border-color: color-mix(in srgb, var(--success) 18%, transparent);
-  background: color-mix(in srgb, var(--success) 8%, transparent);
+  border-color: color-mix(in srgb, var(--income) 18%, transparent);
+  background: color-mix(in srgb, var(--income) 8%, transparent);
 
   strong {
-    color: var(--success-text);
+    color: var(--income-text);
   }
 }
 
 .cards-statements__metric--danger {
-  border-color: color-mix(in srgb, var(--danger) 16%, transparent);
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border-color: color-mix(in srgb, var(--expense) 16%, transparent);
+  background: color-mix(in srgb, var(--expense) 8%, transparent);
 
   strong {
-    color: var(--danger-text);
+    color: var(--expense-text);
   }
 }
 
 .cards-purchases {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--surface-2);
-  box-shadow: var(--shadow-elevation-sm);
+  border-radius: var(--radius-panel);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-card-hover);
   padding: 1.2rem;
   display: grid;
   gap: 1rem;
@@ -199,26 +199,26 @@
 
 .cards-purchases__eyebrow {
   margin: 0 0 0.25rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
 .cards-purchases__title {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
 }
 
 .cards-purchases__subtitle {
   margin: 0.35rem 0 0;
   color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
 }
 
 .cards-purchases__count {
@@ -231,14 +231,14 @@
   padding: 0.35rem 0.8rem;
   background: color-mix(in srgb, var(--primary) 9%, white);
   color: var(--primary-text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .cards-purchases__empty {
   margin: 0;
   color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
 }
 
 .cards-purchases__list {
@@ -252,7 +252,7 @@
   align-items: center;
   gap: 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background: var(--surface);
   padding: 0.9rem 1rem;
 }
@@ -260,13 +260,13 @@
 .cards-purchases__icon {
   inline-size: 2.85rem;
   block-size: 2.85rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--danger) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--expense) 14%, transparent);
   background: rgba(254, 226, 226, 0.72);
-  color: var(--danger-text);
+  color: var(--expense-text);
 
   svg {
     inline-size: 1.25rem;
@@ -281,20 +281,20 @@
 
   strong {
     color: var(--text);
-    font-size: var(--font-size-body);
-    font-weight: var(--font-weight-bold);
+    font-size: var(--fs-subhead);
+    font-weight: var(--fw-bold);
   }
 
   span {
     color: var(--text-secondary);
-    font-size: var(--font-size-body-sm);
+    font-size: var(--fs-body);
   }
 }
 
 .cards-purchases__date {
   color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
   white-space: nowrap;
 }
 
@@ -306,17 +306,17 @@
   border-radius: var(--radius-pill);
   padding: 0.35rem 0.75rem;
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 72%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 72%, white);
   color: var(--text-secondary);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
   white-space: nowrap;
 }
 
 .cards-purchases__amount {
   color: var(--text);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-bold);
   text-align: right;
 }
 
@@ -335,7 +335,7 @@
   display: grid;
   gap: 1rem;
   padding: 1.2rem;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface) 96%, white);
 }
@@ -347,15 +347,15 @@
 
 .cards-form__section-title {
   margin: 0;
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
 .cards-form__section-text {
   margin: 0;
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
   color: var(--text-secondary);
 }
 
@@ -378,10 +378,10 @@
 
 .cards-form__control {
   min-height: 52px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 0 1rem;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-medium);
   width: 100%;
   box-sizing: border-box;
 }
@@ -392,7 +392,7 @@
   gap: 0.75rem;
   align-items: center;
   min-height: 52px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid var(--border);
   background: var(--surface);
   padding: 0 0.5rem 0 1rem;
@@ -403,8 +403,8 @@
   border: 0;
   background: transparent;
   padding: 0;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-medium);
   color: var(--text);
 }
 
@@ -415,7 +415,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.9);
   color: var(--text-secondary);
@@ -437,11 +437,11 @@
   gap: 1.25rem;
   min-height: 250px;
   padding: 1.4rem;
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent), rgba(15, 23, 42, 0.9));
   color: white;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
 }
 
 .cards-preview__top {
@@ -453,14 +453,14 @@
 .cards-preview__chip {
   inline-size: 3rem;
   block-size: 2.15rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(226, 232, 240, 0.55));
 }
 
 .cards-preview__brand {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
@@ -490,9 +490,9 @@
 }
 
 .cards-preview__number {
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-eyebrow);
 }
 
 .cards-preview__footer {
@@ -506,9 +506,9 @@
 .cards-preview__label {
   display: block;
   margin-bottom: 0.25rem;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.72);
 }
@@ -528,17 +528,17 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-2) 72%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 72%, white);
 
   span {
-    font-size: var(--font-size-label);
+    font-size: var(--fs-meta);
     color: var(--text-secondary);
   }
 
   strong {
-    font-size: var(--font-size-body-sm);
+    font-size: var(--fs-body);
     color: var(--text);
   }
 }

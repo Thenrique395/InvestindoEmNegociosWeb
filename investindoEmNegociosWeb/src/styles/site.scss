@@ -1,0 +1,112 @@
+/* ==========================================================================
+   Site público — estilos de escopo global.
+
+   Aqui moram só os padrões aplicados por diretiva (`appSiteCta`), que não
+   podem viver no SCSS encapsulado de um componente. Layout de cada seção fica
+   no SCSS do componente que a desenha.
+
+   Valores extraídos de `prototipos/Site - pagina de vendas -claro-.dc.html`.
+   ========================================================================== */
+
+/* ---------- CTA ---------------------------------------------------------- */
+
+.site-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-hover) ease,
+    border-color var(--dur-hover) ease,
+    color var(--dur-hover) ease,
+    transform 100ms ease;
+
+  &:active {
+    transform: scale(0.985);
+  }
+}
+
+.site-cta--lg {
+  height: var(--site-cta-h);
+  padding: 0 var(--space-11);
+}
+
+.site-cta--sm {
+  height: var(--site-cta-h-sm);
+  padding: 0 var(--space-8);
+}
+
+/* Primário: pílula verde, caixa alta, tracking largo. */
+.site-cta--primary {
+  background: var(--site-cta-bg);
+  color: var(--site-cta-fg);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--site-cta-ls);
+  text-transform: uppercase;
+
+  &:hover {
+    background: var(--site-cta-bg-hover);
+    color: var(--site-cta-fg);
+  }
+
+  &.site-cta--sm {
+    font-size: var(--fs-meta);
+  }
+}
+
+/* Secundário: contorno, sem caixa alta. */
+.site-cta--outline {
+  border-color: var(--border-strong);
+  color: var(--text);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+
+  &:hover {
+    background: var(--surface-inset);
+    color: var(--text);
+  }
+}
+
+/* Discreto: usado no "Entrar" do header. Retangular, não pílula. */
+.site-cta--quiet {
+  border-radius: var(--radius-control);
+  color: var(--text);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+
+  &:hover {
+    background: var(--site-header-border);
+    color: var(--text);
+  }
+}
+
+/* ---------- Elevação em hover -------------------------------------------- */
+
+/* Card clicável do site. Sobe 3px — um a mais que no app, porque a escala do
+   site é maior e 2px some. */
+.site-lift {
+  transition:
+    transform var(--dur-lift) var(--ease-out),
+    border-color var(--dur-lift) ease,
+    background var(--dur-lift) ease,
+    box-shadow var(--dur-lift) ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-hover);
+    box-shadow: var(--site-lift-shadow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-lift:hover {
+    transform: none;
+  }
+}

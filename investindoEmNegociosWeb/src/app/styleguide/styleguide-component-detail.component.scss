@@ -1,6 +1,6 @@
 .styleguide-back {
   display: inline-block;
-  margin-top: var(--spacing-3);
+  margin-top: var(--space-10);
   color: var(--primary);
   text-decoration: none;
 }
@@ -9,11 +9,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .styleguide-demo__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }

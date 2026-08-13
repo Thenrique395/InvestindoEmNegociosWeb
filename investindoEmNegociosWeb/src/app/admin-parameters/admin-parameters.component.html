@@ -14,31 +14,31 @@
     <app-ui-state type="loading" />
   }
   @if (!loading && scalabilityRuntime; as runtime) {
-    <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+    <section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
       <div class="flex flex-col gap-1">
         <div class="text-sm font-semibold text-[var(--text)]">Escalabilidade por fases</div>
-        <p class="text-sm text-[var(--text-muted)]">Fase atual: {{ runtime.currentPhase }}</p>
+        <p class="text-sm text-[var(--text-tertiary)]">Fase atual: {{ runtime.currentPhase }}</p>
       </div>
       <div class="mt-4 grid gap-4 grid-cols-3">
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
           <strong class="text-sm text-[var(--text)]">Ativo agora</strong>
-          <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+          <ul class="mt-3 space-y-2 text-sm text-[var(--text-tertiary)]">
             @for (item of runtime.enabledControls; track trackByIndex($index, item)) {
               <li>{{ item }}</li>
             }
           </ul>
         </div>
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
           <strong class="text-sm text-[var(--text)]">Próxima fase</strong>
-          <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+          <ul class="mt-3 space-y-2 text-sm text-[var(--text-tertiary)]">
             @for (item of runtime.nextPhaseTargets; track trackByIndex($index, item)) {
               <li>{{ item }}</li>
             }
           </ul>
         </div>
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
           <strong class="text-sm text-[var(--text)]">Longo prazo</strong>
-          <ul class="mt-3 space-y-2 text-sm text-[var(--text-muted)]">
+          <ul class="mt-3 space-y-2 text-sm text-[var(--text-tertiary)]">
             @for (item of runtime.longTermTargets; track trackByIndex($index, item)) {
               <li>{{ item }}</li>
             }
@@ -49,9 +49,9 @@
   }
   @if (!loading) {
     <div class="grid gap-6 grid-cols-2">
-      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
         <div class="text-sm font-semibold text-[var(--text)]">Bandeiras de cartão</div>
-        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
           <input
             type="text"
             class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
@@ -84,20 +84,20 @@
             placeholder="Buscar por nome ou codigo"
             [(ngModel)]="brandFilter" />
           @if (brandFilter) {
-            <span class="text-sm text-[var(--text-muted)]">
+            <span class="text-sm text-[var(--text-tertiary)]">
               {{ filteredCardBrands.length }} de {{ cardBrands.length }}
             </span>
           }
         </div>
         <div class="mt-4 space-y-3">
           @for (brand of filteredCardBrands; track trackByIndex($index, brand)) {
-            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-3">
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <strong>{{ brand.name }}</strong>
-                <span class="text-[var(--text-muted)]">{{ brand.code }}</span>
+                <span class="text-[var(--text-tertiary)]">{{ brand.code }}</span>
                 <app-status-badge [tone]="brand.isActive ? 'success' : 'muted'" [label]="brand.isActive ? 'Ativo' : 'Desativado'" />
                 @if (brandUpdatedLabel(brand)) {
-                  <span class="text-[var(--text-muted)]">{{ brandUpdatedLabel(brand) }}</span>
+                  <span class="text-[var(--text-tertiary)]">{{ brandUpdatedLabel(brand) }}</span>
                 }
                 @if (isSavingBrand(brand)) {
                   <span class="text-[var(--warning-text)]">Salvando...</span>
@@ -114,18 +114,18 @@
             </div>
           }
           @if (!filteredCardBrands.length) {
-            <div class="text-sm text-[var(--text-muted)]">
+            <div class="text-sm text-[var(--text-tertiary)]">
               {{ brandFilter ? 'Nenhuma bandeira encontrada.' : 'Nenhuma bandeira cadastrada.' }}
               @if (!brandFilter) {
-                <span class="mt-1 block text-sm text-[var(--text-muted)]">Use o cadastro acima para adicionar a primeira.</span>
+                <span class="mt-1 block text-sm text-[var(--text-tertiary)]">Use o cadastro acima para adicionar a primeira.</span>
               }
             </div>
           }
         </div>
       </div>
-      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
         <div class="text-sm font-semibold text-[var(--text)]">Formas de pagamento</div>
-        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
           <input
             type="text"
             class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
@@ -152,19 +152,19 @@
             placeholder="Buscar por nome"
             [(ngModel)]="methodFilter" />
           @if (methodFilter) {
-            <span class="text-sm text-[var(--text-muted)]">
+            <span class="text-sm text-[var(--text-tertiary)]">
               {{ filteredPaymentMethods.length }} de {{ paymentMethods.length }}
             </span>
           }
         </div>
         <div class="mt-4 space-y-3">
           @for (method of filteredPaymentMethods; track trackByIndex($index, method)) {
-            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-3">
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <strong>{{ method.name }}</strong>
                 <app-status-badge [tone]="method.isActive ? 'success' : 'muted'" [label]="method.isActive ? 'Ativo' : 'Desativado'" />
                 @if (methodUpdatedLabel(method)) {
-                  <span class="text-[var(--text-muted)]">{{ methodUpdatedLabel(method) }}</span>
+                  <span class="text-[var(--text-tertiary)]">{{ methodUpdatedLabel(method) }}</span>
                 }
                 @if (isSavingMethod(method)) {
                   <span class="text-[var(--warning-text)]">Salvando...</span>
@@ -181,18 +181,18 @@
             </div>
           }
           @if (!filteredPaymentMethods.length) {
-            <div class="text-sm text-[var(--text-muted)]">
+            <div class="text-sm text-[var(--text-tertiary)]">
               {{ methodFilter ? 'Nenhuma forma encontrada.' : 'Nenhuma forma de pagamento cadastrada.' }}
               @if (!methodFilter) {
-                <span class="mt-1 block text-sm text-[var(--text-muted)]">Use o cadastro acima para adicionar a primeira.</span>
+                <span class="mt-1 block text-sm text-[var(--text-tertiary)]">Use o cadastro acima para adicionar a primeira.</span>
               }
             </div>
           }
         </div>
       </div>
-      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
         <div class="text-sm font-semibold text-[var(--text)]">Bancos e corretoras</div>
-        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <div class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
           <input
             type="text"
             class="h-10 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
@@ -226,20 +226,20 @@
             placeholder="Buscar por nome"
             [(ngModel)]="institutionFilter" />
           @if (institutionFilter) {
-            <span class="text-sm text-[var(--text-muted)]">
+            <span class="text-sm text-[var(--text-tertiary)]">
               {{ filteredInstitutions.length }} de {{ institutions.length }}
             </span>
           }
         </div>
         <div class="mt-4 space-y-3">
           @for (inst of filteredInstitutions; track trackByIndex($index, inst)) {
-            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+            <div class="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-3">
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <strong>{{ inst.name }}</strong>
-                <span class="text-[var(--text-muted)]">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
+                <span class="text-[var(--text-tertiary)]">{{ inst.type === 'Bank' ? 'Banco' : 'Corretora' }}</span>
                 <app-status-badge [tone]="inst.isActive ? 'success' : 'muted'" [label]="inst.isActive ? 'Ativo' : 'Desativado'" />
                 @if (institutionUpdatedLabel(inst)) {
-                  <span class="text-[var(--text-muted)]">{{ institutionUpdatedLabel(inst) }}</span>
+                  <span class="text-[var(--text-tertiary)]">{{ institutionUpdatedLabel(inst) }}</span>
                 }
                 @if (isSavingInstitution(inst)) {
                   <span class="text-[var(--warning-text)]">Salvando...</span>
@@ -256,20 +256,20 @@
             </div>
           }
           @if (!filteredInstitutions.length) {
-            <div class="text-sm text-[var(--text-muted)]">
+            <div class="text-sm text-[var(--text-tertiary)]">
               {{ institutionFilter ? 'Nenhuma instituição encontrada.' : 'Nenhuma instituição cadastrada.' }}
               @if (!institutionFilter) {
-                <span class="mt-1 block text-sm text-[var(--text-muted)]">Use o cadastro acima para adicionar a primeira.</span>
+                <span class="mt-1 block text-sm text-[var(--text-tertiary)]">Use o cadastro acima para adicionar a primeira.</span>
               }
             </div>
           }
         </div>
       </div>
-      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
         <div class="text-sm font-semibold text-[var(--text)]">Notificações globais</div>
-        <p class="mt-1 text-sm text-[var(--text-muted)]">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
+        <p class="mt-1 text-sm text-[var(--text-tertiary)]">Defina regras gerais. O usuário só escolhe se quer receber ou não.</p>
         <div class="mt-4 grid gap-4 grid-cols-2">
-          <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
             <strong class="text-sm text-[var(--text)]">Receitas</strong>
             <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
               <span>Ativar lembretes</span>
@@ -281,7 +281,7 @@
               <span>dias</span>
             </label>
           </div>
-          <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <div class="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
             <strong class="text-sm text-[var(--text)]">Despesas</strong>
             <label class="toggle-row flex items-center justify-between text-sm text-[var(--text)]">
               <span>Vencimento próximo</span>
@@ -358,12 +358,12 @@
           }
         </div>
       </div>
-      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
         <div class="text-sm font-semibold text-[var(--text)]">Agendamento de robôs</div>
-        <p class="mt-1 text-sm text-[var(--text-muted)]">
+        <p class="mt-1 text-sm text-[var(--text-tertiary)]">
           Defina se a execução automática diária fica ativa e o horário em UTC.
         </p>
-        <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
           <label class="toggle-row">
             <span>Execução automática ativa</span>
             <input type="checkbox" [(ngModel)]="robotSettings.enabled" />
@@ -376,9 +376,9 @@
               class="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 text-sm text-[var(--text)]" />
           </label>
         </div>
-        <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div class="mt-4 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
           <div class="text-sm font-semibold text-[var(--text)]">Teste de envio de e-mail</div>
-          <p class="text-sm text-[var(--text-muted)]">Use para validar credenciais SMTP configuradas no ambiente.</p>
+          <p class="text-sm text-[var(--text-tertiary)]">Use para validar credenciais SMTP configuradas no ambiente.</p>
           <div class="flex flex-col gap-3 flex-row">
             <input
               type="email"

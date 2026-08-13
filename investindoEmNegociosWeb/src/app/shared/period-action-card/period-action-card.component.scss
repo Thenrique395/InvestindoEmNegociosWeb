@@ -6,9 +6,9 @@
 
 .app-period-action-card {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-panel);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-sunken) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
+  box-shadow: var(--shadow-card-hover);
   padding: 1.45rem 1.4rem 1.3rem;
   display: grid;
   gap: 0.95rem;
@@ -16,27 +16,27 @@
 
 .app-period-action-card__eyebrow {
   margin: 0;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .app-period-action-card__title {
   margin: 0;
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-title);
-  line-height: var(--line-height-tight);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
   color: var(--text);
 }
 
 .app-period-action-card__text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
 }
 
 .app-period-action-card__actions {

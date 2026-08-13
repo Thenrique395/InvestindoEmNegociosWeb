@@ -5,9 +5,9 @@
 .card {
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card-hover);
   min-width: 0;
 }
 
@@ -26,12 +26,12 @@
 .section-head h3 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .table-filters {
@@ -45,8 +45,8 @@
 .table-filters select {
   min-height: 42px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
   color: var(--text);
   padding: 0.6rem 0.8rem;
 }
@@ -61,7 +61,7 @@
   gap: 0.55rem;
   min-width: 10rem;
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .asset-cell img {
@@ -69,7 +69,7 @@
   height: 28px;
   border-radius: 8px;
   object-fit: contain;
-  background: var(--surface-2);
+  background: var(--surface-sunken);
 }
 
 .status-pill {
@@ -79,26 +79,26 @@
   min-height: 28px;
   border-radius: var(--radius-pill);
   padding: 0.25rem 0.65rem;
-  border: 1px solid color-mix(in srgb, var(--success) 24%, var(--border));
-  background: color-mix(in srgb, var(--success) 10%, transparent);
-  color: var(--success-text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
+  border: 1px solid color-mix(in srgb, var(--income) 24%, var(--border));
+  background: color-mix(in srgb, var(--income) 10%, transparent);
+  color: var(--income-text);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
   white-space: nowrap;
 }
 
 .status-pill.zeroed {
   border-color: var(--border);
-  background: var(--surface-2);
-  color: var(--text-muted);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
 }
 
 .success {
-  color: var(--success-text);
+  color: var(--income-text);
 }
 
 .danger {
-  color: var(--danger-text);
+  color: var(--expense-text);
 }
 
 .table-pagination {

@@ -1,26 +1,26 @@
 :host {
   display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .card {
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card-hover);
   min-width: 0;
 }
 
 .chart-card {
   display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .visual-grid {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
   align-items: start;
 }
 
@@ -28,7 +28,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .action-card strong {
@@ -37,15 +37,15 @@
 }
 
 .action-card small {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .section-head h3 {
@@ -59,7 +59,7 @@
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .hint {
@@ -71,10 +71,10 @@
   height: 22px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
   cursor: help;
   padding: 0;
 }
@@ -86,14 +86,14 @@
   min-width: 210px;
   max-width: 280px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: var(--surface);
   color: var(--text);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   padding: 0.5rem 0.6rem;
   text-align: left;
-  font-size: var(--text-xs);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-control);
   opacity: 0;
   pointer-events: none;
   transform: translateY(4px);
@@ -110,31 +110,31 @@
 
 .allocation-config {
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  padding: var(--spacing-1);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+  padding: var(--space-3);
   display: grid;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .allocation-config__inputs {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .allocation-config__inputs label {
   display: grid;
   gap: 0.35rem;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
 }
 
 .allocation-config__inputs input {
   height: 40px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: var(--surface);
   color: var(--text);
   padding: 0 0.65rem;
@@ -143,45 +143,45 @@
 .allocation-config__actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .allocation-list {
   display: grid;
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .allocation-item {
   border: 0;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--surface-2) 85%, transparent);
-  padding: var(--spacing-1);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--surface-sunken) 85%, transparent);
+  padding: var(--space-3);
   display: grid;
   gap: 0.25rem;
 }
 
 .allocation-item small {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .allocation-item__top {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .progress-bar {
   height: 10px;
   border-radius: var(--radius-pill);
-  background: var(--surface-3);
+  background: var(--surface-inset);
   overflow: hidden;
 }
 
 .progress-bar span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 95%, transparent), color-mix(in srgb, var(--info) 75%, transparent));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 95%, transparent), color-mix(in srgb, var(--primary) 75%, transparent));
 }
 
 .progress-bar.slim {
@@ -193,7 +193,7 @@
 }
 
 .danger {
-  color: var(--danger);
+  color: var(--expense);
 }
 
 @media (max-width: 960px) {

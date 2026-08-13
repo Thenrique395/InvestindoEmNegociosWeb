@@ -1,0 +1,124 @@
+/* Faixa de indicadores — COMPONENTES.md §3.1(b). */
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+/* `flex: 1 1 200px` é o que faz a última linha crescer e preencher quando a
+   faixa quebra. Com `grid auto-fit` sobraria célula vazia à direita. */
+.kpi {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: var(--card-padding);
+  /* Divisor à direita E abaixo, numa só declaração: cobre a quebra de linha
+     sem deixar borda solta na última célula. */
+  box-shadow: var(--shadow-cell-divider);
+}
+
+.kpi--feature {
+  background: linear-gradient(180deg, rgba(0, 46, 62, 0.04), transparent);
+  border-radius: var(--radius-card) 0 0 var(--radius-card);
+}
+
+.kpi__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.kpi__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-inset);
+  font-size: var(--fs-body);
+
+  &[data-tone='income'] {
+    background: var(--income-tint);
+  }
+
+  &[data-tone='expense'] {
+    background: var(--expense-tint);
+  }
+
+  &[data-tone='warning'] {
+    background: var(--warning-tint);
+  }
+
+  &[data-tone='primary'] {
+    background: var(--primary-tint);
+  }
+}
+
+.kpi__label {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kpi__help {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  cursor: help;
+}
+
+.kpi__value {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-kpi-strip);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tighter);
+  color: var(--text);
+
+  &[data-tone='income'] {
+    color: var(--income-text);
+  }
+
+  &[data-tone='expense'] {
+    color: var(--expense-text);
+  }
+
+  &[data-tone='warning'] {
+    color: var(--warning-text);
+  }
+
+  &[data-tone='primary'] {
+    color: var(--primary-text);
+  }
+}
+
+.kpi--feature .kpi__value {
+  font-size: var(--fs-kpi);
+}
+
+.kpi__note {
+  margin: var(--space-2) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}

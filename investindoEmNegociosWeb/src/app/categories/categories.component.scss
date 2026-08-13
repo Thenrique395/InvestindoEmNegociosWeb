@@ -28,7 +28,7 @@
 
 .cat-filterbar {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
   padding: 1rem;
 }
@@ -51,11 +51,11 @@
 }
 
 .cat-filter__label {
-  font-size: var(--text-xs, 0.68rem);
+  font-size: var(--fs-caption, 0.68rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cat-filter input,
@@ -63,10 +63,10 @@
   min-height: 42px;
   padding: 0 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-inner, 12px);
   background: var(--surface);
   color: var(--text);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 .cat-filter input:focus-visible,
@@ -82,18 +82,18 @@
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .cat-hint {
   padding: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  color: var(--text-muted);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  color: var(--text-tertiary);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 // ---- Form (modal) -----------------------------------------------------------

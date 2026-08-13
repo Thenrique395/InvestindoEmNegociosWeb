@@ -11,7 +11,7 @@ app-onboarding {
 .onboarding-shell {
   width: 100%;
   padding: clamp(1rem, 2vw, 1.75rem);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   min-height: 100%;
 }
 
@@ -31,7 +31,7 @@ app-onboarding {
   top: 1rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.4rem;
 }
 
@@ -39,16 +39,16 @@ app-onboarding {
 .onboarding-main__eyebrow {
   margin: 0;
   font-size: 10px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-rail__title {
   margin: 0.6rem 0 0.4rem;
   font-size: 1.25rem;
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--fw-bold);
   letter-spacing: -0.01em;
   line-height: 1.2;
   color: var(--text);
@@ -57,7 +57,7 @@ app-onboarding {
 .onboarding-rail__desc {
   margin-bottom: 1.25rem;
   font-size: 0.8125rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   line-height: 1.5;
 }
 
@@ -73,7 +73,7 @@ app-onboarding {
   gap: 0.75rem;
   align-items: flex-start;
   padding: 0.75rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid transparent;
 }
 
@@ -90,7 +90,7 @@ app-onboarding {
 }
 
 .onboarding-step--done::after {
-  background: var(--color-success-soft);
+  background: var(--income-tint);
 }
 
 .onboarding-step__index {
@@ -101,16 +101,16 @@ app-onboarding {
   display: grid;
   place-items: center;
   font-size: 12px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   border: 1px solid var(--border-strong);
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   background: var(--surface);
 }
 
 .onboarding-step strong {
   display: block;
   font-size: 0.875rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   line-height: 1.2;
   color: var(--text);
 }
@@ -120,12 +120,12 @@ app-onboarding {
   margin-top: 2px;
   font-size: 0.75rem;
   line-height: 1.4;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-step--active {
-  background: var(--color-primary-weak);
-  border-color: var(--color-primary-soft);
+  background: var(--primary-tint);
+  border-color: var(--primary-tint);
 }
 
 .onboarding-step--active .onboarding-step__index {
@@ -135,9 +135,9 @@ app-onboarding {
 }
 
 .onboarding-step--done .onboarding-step__index {
-  background: var(--color-success-weak);
+  background: var(--income-tint);
   border-color: transparent;
-  color: var(--success-text);
+  color: var(--income-text);
 }
 
 .onboarding-step:not(.onboarding-step--active):not(.onboarding-step--done) strong {
@@ -157,10 +157,10 @@ app-onboarding {
 .onboarding-rail__summary-title {
   margin: 0;
   font-size: 10px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-rail__summary-item {
@@ -170,12 +170,12 @@ app-onboarding {
 
 .onboarding-rail__summary-item span {
   font-size: 0.72rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-rail__summary-item strong {
   font-size: 0.8125rem;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
   color: var(--text);
 }
 
@@ -200,7 +200,7 @@ app-onboarding {
 .onboarding-main__copy h2 {
   margin: 0.5rem 0 0.6rem;
   font-size: clamp(1.9rem, 3vw, 2.4rem);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--fw-bold);
   letter-spacing: -0.02em;
   line-height: 1.05;
   color: var(--text);
@@ -211,7 +211,7 @@ app-onboarding {
   max-width: 640px;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 /* Card de progresso (mesma linguagem do painel "TOTAL DO MÊS") */
@@ -220,7 +220,7 @@ app-onboarding {
   width: 320px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   padding: 1.1rem;
 }
 
@@ -233,17 +233,17 @@ app-onboarding {
 
 .onboarding-progress__head strong {
   font-size: 10px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-progress__head span {
   font-size: 0.75rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   color: var(--primary-text);
-  background: var(--color-primary-weak);
+  background: var(--primary-tint);
   padding: 3px 9px;
   border-radius: var(--radius-pill);
 }
@@ -251,7 +251,7 @@ app-onboarding {
 .onboarding-progress__bar {
   height: 8px;
   border-radius: var(--radius-pill);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   overflow: hidden;
 }
 
@@ -267,7 +267,7 @@ app-onboarding {
   margin-top: 0.75rem;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 /* ── Conteúdo do passo ───────────────────────────────────────────────────── */
@@ -283,7 +283,7 @@ app-onboarding {
 .onboarding-panel--accent {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.5rem;
 }
 
@@ -294,7 +294,7 @@ app-onboarding {
 .onboarding-panel__header strong {
   display: block;
   font-size: 1rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
@@ -302,7 +302,7 @@ app-onboarding {
   display: block;
   margin-top: 3px;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-split {
@@ -327,7 +327,7 @@ app-onboarding {
   text-align: left;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
   cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
@@ -341,13 +341,13 @@ app-onboarding {
 
 .onboarding-focus-card--selected {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--color-primary-weak);
+  box-shadow: 0 0 0 3px var(--primary-tint);
   background: color-mix(in srgb, var(--primary) 4%, var(--surface));
 }
 
 .onboarding-focus-card:focus-within {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--color-primary-weak);
+  box-shadow: 0 0 0 3px var(--primary-tint);
 }
 
 .onboarding-focus-card__head {
@@ -360,8 +360,8 @@ app-onboarding {
   width: 48px;
   height: 48px;
   margin-bottom: 0.9rem;
-  border-radius: var(--radius-md);
-  background: var(--color-primary-weak);
+  border-radius: var(--radius-control);
+  background: var(--primary-tint);
   color: var(--primary-text);
   display: grid;
   place-items: center;
@@ -399,7 +399,7 @@ app-onboarding {
 .onboarding-focus-card__head strong {
   margin-bottom: 0.35rem;
   font-size: 1rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
@@ -407,7 +407,7 @@ app-onboarding {
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-focus-card__tooltip-anchor {
@@ -422,11 +422,11 @@ app-onboarding {
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface);
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   display: grid;
   place-items: center;
   font-size: 12px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   cursor: help;
 }
 
@@ -446,10 +446,10 @@ app-onboarding {
   background: var(--text);
   color: var(--surface);
   font-size: 0.75rem;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--fw-medium);
   line-height: 1.4;
   padding: 0.6rem 0.75rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.15s ease;
@@ -490,10 +490,10 @@ app-onboarding {
 .onboarding-form-section__title {
   margin: 0;
   font-size: 10px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-field {
@@ -511,14 +511,14 @@ app-onboarding {
 
 .onboarding-field span {
   font-size: 0.8125rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
 .onboarding-field small {
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 /* input/select do passo Conta e o control do app-form-field */
@@ -527,8 +527,8 @@ app-onboarding {
 .onboarding-control {
   width: 100%;
   min-height: 48px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--control-border);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
   padding: 0.7rem 0.9rem;
@@ -541,7 +541,7 @@ app-onboarding {
 .onboarding-control:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--color-primary-weak);
+  box-shadow: 0 0 0 3px var(--primary-tint);
 }
 
 /* app-date-picker renderiza o próprio input; host fica fluido no grid */
@@ -560,21 +560,21 @@ app-date-picker.onboarding-control {
   align-items: center;
   gap: 0.75rem;
   padding: 0.9rem 1rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   font-size: 0.9375rem;
   line-height: 1.5;
   border: 1px solid transparent;
 }
 
 .onboarding-status--success {
-  background: var(--color-success-weak);
-  border-color: color-mix(in srgb, var(--success) 22%, transparent);
-  color: var(--success-text);
+  background: var(--income-tint);
+  border-color: color-mix(in srgb, var(--income) 22%, transparent);
+  color: var(--income-text);
 }
 
 .onboarding-status--info {
-  background: var(--color-primary-weak);
-  border-color: var(--color-primary-soft);
+  background: var(--primary-tint);
+  border-color: var(--primary-tint);
   color: var(--primary-text);
 }
 
@@ -629,7 +629,7 @@ app-date-picker.onboarding-control {
   gap: 0.7rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   padding: 1.15rem;
 }
 
@@ -644,8 +644,8 @@ app-date-picker.onboarding-control {
 }
 
 .onboarding-entry-card--done {
-  border-color: color-mix(in srgb, var(--success) 40%, transparent);
-  background: color-mix(in srgb, var(--success) 5%, var(--surface));
+  border-color: color-mix(in srgb, var(--income) 40%, transparent);
+  background: color-mix(in srgb, var(--income) 5%, var(--surface));
 }
 
 .onboarding-entry-card__header {
@@ -663,23 +663,23 @@ app-date-picker.onboarding-control {
 
 .onboarding-entry-card__header-main strong {
   font-size: 0.9375rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
 .onboarding-entry-card__icon {
   width: 34px;
   height: 34px;
-  border-radius: var(--radius-md);
-  background: var(--color-primary-weak);
+  border-radius: var(--radius-control);
+  background: var(--primary-tint);
   color: var(--primary-text);
   display: grid;
   place-items: center;
 }
 
 .onboarding-entry-card--expense .onboarding-entry-card__icon {
-  background: var(--color-danger-weak);
-  color: var(--danger-text);
+  background: var(--expense-tint);
+  color: var(--expense-text);
 }
 
 .onboarding-entry-card__icon svg {
@@ -695,36 +695,36 @@ app-date-picker.onboarding-control {
 
 .onboarding-entry-card__status {
   font-size: 0.6875rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  background: var(--surface-2);
+  color: var(--text-tertiary);
+  background: var(--surface-sunken);
   padding: 3px 8px;
   border-radius: var(--radius-pill);
 }
 
 .onboarding-entry-card--done .onboarding-entry-card__status {
-  color: var(--success-text);
-  background: var(--color-success-weak);
+  color: var(--income-text);
+  background: var(--income-tint);
 }
 
 .onboarding-entry-card p {
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-entry-card__summary {
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
   color: var(--text) !important;
 }
 
 .onboarding-entry-card small {
   font-size: 0.75rem;
   line-height: 1.4;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-entry-card__tooltip-anchor {
@@ -738,11 +738,11 @@ app-date-picker.onboarding-control {
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface);
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   display: grid;
   place-items: center;
   font-size: 11px;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   cursor: help;
 }
 
@@ -755,10 +755,10 @@ app-date-picker.onboarding-control {
   background: var(--text);
   color: var(--surface);
   font-size: 0.72rem;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--fw-medium);
   line-height: 1.4;
   padding: 0.55rem 0.7rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.15s ease;
@@ -784,21 +784,21 @@ app-date-picker.onboarding-control {
   display: block;
   margin-bottom: 2px;
   font-size: 0.875rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   color: var(--text);
 }
 
 .onboarding-actions__meta span {
   font-size: 0.8125rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .onboarding-actions__validation {
   display: block;
   margin-top: 4px;
   font-size: 0.8125rem;
-  font-weight: var(--font-weight-semibold);
-  color: var(--danger-text);
+  font-weight: var(--fw-semibold);
+  color: var(--expense-text);
 }
 
 .onboarding-actions__group--footer {
@@ -814,9 +814,9 @@ app-date-picker.onboarding-control {
 .onboarding-btn {
   min-height: 2.75rem;
   padding: 0.7rem 1.5rem;
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-inner);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
   line-height: 1.2;
 }
 

@@ -79,8 +79,8 @@ const GROUP_ORDER: CalendarEventGroup[] = ['income', 'expense', 'card', 'loan', 
     .cal { display: grid; gap: 0.5rem; }
     .cal__weekdays {
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
-      font-size: var(--text-xs, 0.7rem); font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--text-muted); text-align: center;
+      font-size: var(--fs-caption, 0.7rem); font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-tertiary); text-align: center;
     }
     .cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
     .cal__cell {
@@ -91,43 +91,43 @@ const GROUP_ORDER: CalendarEventGroup[] = ['income', 'expense', 'card', 'loan', 
       min-height: 82px;
       padding: 8px;
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg, 14px);
+      border-radius: var(--radius-inner, 14px);
       background: var(--surface);
       text-align: left;
       cursor: pointer;
       transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
     }
-    .cal__cell:hover { border-color: var(--border-strong, var(--primary)); background: var(--surface-2); }
+    .cal__cell:hover { border-color: var(--border-strong, var(--primary)); background: var(--surface-sunken); }
     .cal__cell--outside { opacity: 0.45; }
     .cal__cell--today { border-color: var(--primary); }
     .cal__cell--selected { box-shadow: 0 0 0 2px var(--primary); border-color: var(--primary); }
     .cal__cell--overdue::after {
       content: ''; position: absolute; top: 8px; right: 8px;
-      width: 6px; height: 6px; border-radius: 50%; background: var(--danger);
+      width: 6px; height: 6px; border-radius: 50%; background: var(--expense);
     }
     .cal__cell:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
     .cal__num {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size: var(--text-sm, 0.85rem); font-weight: 600; color: var(--text);
+      font-size: var(--fs-meta, 0.85rem); font-weight: 600; color: var(--text);
     }
     .cal__count {
       display: inline-grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px;
-      border-radius: 8px; background: var(--surface-3); color: var(--text-muted);
+      border-radius: 8px; background: var(--surface-inset); color: var(--text-tertiary);
       font-size: 0.62rem; font-weight: 700;
     }
     .cal__dots { display: inline-flex; flex-wrap: wrap; gap: 4px; }
-    .cal__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--info); }
-    .cal__dot[data-group='income'] { background: var(--success); }
-    .cal__dot[data-group='expense'] { background: var(--danger); }
+    .cal__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+    .cal__dot[data-group='income'] { background: var(--income); }
+    .cal__dot[data-group='expense'] { background: var(--expense); }
     .cal__dot[data-group='card'] { background: var(--warning); }
     .cal__dot[data-group='loan'] { background: var(--warning); }
-    .cal__dot[data-group='goal'] { background: var(--info); }
+    .cal__dot[data-group='goal'] { background: var(--primary); }
     .cal__net {
-      font-size: 0.65rem; font-weight: 600; color: var(--danger-text, var(--danger));
+      font-size: 0.65rem; font-weight: 600; color: var(--expense-text, var(--expense));
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .cal__net--pos { color: var(--success-text, var(--success)); }
+    .cal__net--pos { color: var(--income-text, var(--income)); }
 
     @media (max-width: 640px) {
       .cal__cell { min-height: 62px; padding: 6px; }

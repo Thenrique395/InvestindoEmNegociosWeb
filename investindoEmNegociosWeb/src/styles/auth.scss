@@ -1,0 +1,439 @@
+/* ==========================================================================
+   Formulários de autenticação — escopo global.
+
+   Global porque as quatro telas (login, cadastro, recuperar e redefinir)
+   projetam o formulário dentro do `app-auth-layout`: o SCSS encapsulado de
+   cada componente não alcançaria o conteúdo projetado sem `::ng-deep`.
+
+   Valores de `prototipos/Autenticacao.dc.html`.
+   ========================================================================== */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.auth-field__label {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text);
+}
+
+.auth-field__control {
+  width: 100%;
+  height: var(--auth-field-h);
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--auth-field-radius);
+  background: var(--surface-sunken);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-subhead);
+  outline: none;
+  transition:
+    border-color var(--dur-control) ease,
+    box-shadow var(--dur-control) ease,
+    background var(--dur-control) ease;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    border-color: var(--primary);
+    background: var(--surface);
+    box-shadow: var(--shadow-focus);
+  }
+
+  &:disabled {
+    opacity: var(--control-disabled-opacity);
+    cursor: not-allowed;
+  }
+}
+
+/* Campo com ação à direita (Mostrar/Ocultar senha). O botão fica dentro da
+   caixa, então o input perde a borda e quem a desenha é o invólucro. */
+.auth-field__wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--auth-field-h);
+  padding-right: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--auth-field-radius);
+  background: var(--surface-sunken);
+  transition:
+    border-color var(--dur-control) ease,
+    box-shadow var(--dur-control) ease,
+    background var(--dur-control) ease;
+
+  &:focus-within {
+    border-color: var(--primary);
+    background: var(--surface);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .auth-field__control {
+    height: 100%;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+.auth-field__toggle {
+  flex: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--primary-text);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+.auth-field__hint {
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.auth-field__error {
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  color: var(--expense-text);
+}
+
+.auth-field__control--invalid,
+.auth-field__wrap--invalid {
+  border-color: var(--expense);
+}
+
+/* Dois campos na mesma linha (E-mail + CPF). */
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-7);
+}
+
+@media (max-width: 560px) {
+  .auth-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Caixa de seleção --------------------------------------------- */
+
+.auth-check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.auth-check__input {
+  flex: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background var(--dur-hover) ease, border-color var(--dur-hover) ease;
+
+  &:checked {
+    border-color: var(--primary);
+    background: var(--primary);
+    /* O check é desenhado no próprio fundo: sem pseudo-elemento, que em
+       `appearance:none` não é renderizado de forma consistente. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-size: 12px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--primary-ring-strong);
+    outline-offset: 2px;
+  }
+}
+
+.auth-check__label {
+  line-height: 1.45;
+}
+
+/* ---------- Linha de opções (lembrar + esqueci) --------------------------- */
+
+.auth-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  flex-wrap: wrap;
+}
+
+.auth-link {
+  color: var(--primary-text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ---------- Botão principal ---------------------------------------------- */
+
+.auth-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: var(--auth-field-h);
+  border: none;
+  border-radius: var(--auth-field-radius);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: inherit;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background var(--dur-hover) ease, transform 100ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+
+  /* Em envio o rótulo troca mas a largura não muda: o botão ocupa a linha
+     inteira, então não há salto de layout. */
+  &:disabled {
+    background: var(--border-strong);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+}
+
+.auth-submit__icon {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Avisos -------------------------------------------------------- */
+
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-7);
+  border-radius: var(--radius-item);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+.auth-alert--error {
+  background: var(--expense-tint-soft);
+  border: 1px solid var(--expense-border);
+  color: var(--expense-text);
+}
+
+.auth-alert--success {
+  background: var(--income-tint-soft);
+  border: 1px solid var(--income-tint);
+  color: var(--income-text);
+}
+
+.auth-alert__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.auth-alert__title {
+  margin: 0;
+  font-weight: var(--fw-semibold);
+}
+
+.auth-alert__text {
+  margin: var(--space-1) 0 0;
+  opacity: 0.85;
+}
+
+/* ---------- Medidor de força da senha ------------------------------------- */
+
+.auth-strength {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.auth-strength__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  transition: background var(--dur-hover) ease;
+}
+
+.auth-strength__bar--weak {
+  background: var(--expense);
+}
+
+.auth-strength__bar--medium {
+  background: var(--warning);
+}
+
+.auth-strength__bar--strong {
+  background: var(--income);
+}
+
+/* ---------- Requisitos de senha ------------------------------------------- */
+
+.auth-rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Neutro enquanto o campo está vazio: marcar tudo em vermelho antes de o
+   usuário digitar transforma a lista em acusação. */
+.auth-rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+
+  &::before {
+    content: '';
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-pill);
+    background: var(--text-faint);
+    transition: background var(--dur-hover) ease;
+  }
+}
+
+.auth-rule--ok {
+  color: var(--income-text);
+
+  &::before {
+    background: var(--income);
+  }
+}
+
+.auth-rule--fail {
+  color: var(--expense-text);
+
+  &::before {
+    background: var(--expense);
+  }
+}
+
+/* ---------- Rodapé do cartão ---------------------------------------------- */
+
+.auth-footer-text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+}
+
+.auth-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  flex-wrap: wrap;
+}
+
+/* ---------- Lista explicativa (como funciona a recuperação) --------------- */
+
+.auth-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin: 0;
+  padding: var(--space-10) 0 0;
+  border-top: 1px solid var(--border-inner);
+  list-style: none;
+}
+
+.auth-steps__title {
+  margin: 0 0 var(--space-7);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.auth-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.auth-step__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-inset);
+  color: var(--text-secondary);
+
+  svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.auth-step__title {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+}
+
+.auth-step__text {
+  margin: var(--space-1) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+}

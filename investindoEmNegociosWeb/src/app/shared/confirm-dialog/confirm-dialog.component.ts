@@ -16,7 +16,7 @@ import { ConfirmDialogService, ConfirmDialogTone } from './confirm-dialog.servic
         [attr.aria-label]="state.title">
         <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" (click)="cancel()"></div>
 
-        <section class="relative w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-lg)]">
+        <section class="relative w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--shadow-modal)]">
           <div class="flex items-start gap-3">
             <div [class]="iconClass(state.tone)" aria-hidden="true">
               {{ icon(state.tone) }}
@@ -26,7 +26,7 @@ import { ConfirmDialogService, ConfirmDialogTone } from './confirm-dialog.servic
               <h2 class="m-0 text-lg font-semibold text-[var(--text)]">
                 {{ state.title }}
               </h2>
-              <p class="m-0 mt-2 text-sm leading-6 text-[var(--text-muted)]">
+              <p class="m-0 mt-2 text-sm leading-6 text-[var(--text-tertiary)]">
                 {{ state.message }}
               </p>
             </div>
@@ -69,8 +69,8 @@ export class ConfirmDialogComponent {
 
   iconClass(tone: ConfirmDialogTone | undefined): string {
     const base = 'grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg';
-    if (tone === 'danger') return `${base} bg-[var(--color-danger-weak)] text-[var(--danger-text)]`;
-    if (tone === 'warning') return `${base} bg-[var(--color-warning-weak)] text-[var(--warning-text)]`;
-    return `${base} bg-[var(--color-success-weak)] text-[var(--success-text)]`;
+    if (tone === 'danger') return `${base} bg-[var(--expense-tint)] text-[var(--expense-text)]`;
+    if (tone === 'warning') return `${base} bg-[var(--warning-tint)] text-[var(--warning-text)]`;
+    return `${base} bg-[var(--income-tint)] text-[var(--income-text)]`;
   }
 }

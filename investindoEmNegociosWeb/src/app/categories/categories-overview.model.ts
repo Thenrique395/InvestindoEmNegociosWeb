@@ -33,12 +33,15 @@ export interface CategoriesOverview {
   customCount: number;
 }
 
+/** Paleta fixa de categoria: `--chart-1` a `--chart-7`, sem seletor livre. TELAS.md §7. */
 export const CATEGORY_PALETTE = [
-  'var(--color-chart-series-1)',
-  'var(--color-chart-series-2)',
-  'var(--color-chart-series-3)',
-  'var(--color-chart-series-4)',
-  'var(--color-chart-series-5)'
+  'var(--chart-1)',
+  'var(--chart-2)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'var(--chart-6)',
+  'var(--chart-7)'
 ];
 
 const ICON_BY_NAME: Record<string, string> = {

@@ -13,19 +13,29 @@ import { UiFeedbackMessage, UiFeedbackService } from '../../ui-feedback.service'
       aria-atomic="false">
       <article
         *ngFor="let message of feedback.messages$ | async; trackBy: trackByMessage"
-        class="pointer-events-auto rounded-2xl border px-4 py-3 shadow-[var(--shadow-md)] backdrop-blur"
+        class="pointer-events-auto rounded-2xl border px-4 py-3 shadow-[var(--shadow-dropdown)] backdrop-blur"
         [ngClass]="toastClass(message.type)">
         <div class="flex items-start gap-3">
-          <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--surface-3)]" aria-hidden="true">
+          <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--surface-inset)]" aria-hidden="true">
             {{ icon(message.type) }}
           </span>
           <div class="min-w-0 flex-1">
             <p class="m-0 text-sm font-semibold text-[var(--text)]">{{ title(message.type) }}</p>
-            <p class="m-0 mt-1 text-sm text-[var(--text-muted)]">{{ message.text }}</p>
+            <p class="m-0 mt-1 text-sm text-[var(--text-tertiary)]">{{ message.text }}</p>
           </div>
+          <!-- Desfazer antes do fechar: é a ação que protege, e precisa estar
+               no caminho do olhar antes do botão que só descarta. -->
+          @if (message.undo) {
+            <button
+              type="button"
+              class="shrink-0 rounded-full px-3 py-1 text-sm font-semibold text-[var(--primary-text)] transition hover:bg-[var(--primary-tint)]"
+              (click)="feedback.runUndo(message)">
+              Desfazer
+            </button>
+          }
           <button
             type="button"
-            class="rounded-full px-2 py-1 text-sm text-[var(--text-muted)] transition hover:bg-[var(--surface-3)] hover:text-[var(--text)]"
+            class="rounded-full px-2 py-1 text-sm text-[var(--text-tertiary)] transition hover:bg-[var(--surface-inset)] hover:text-[var(--text)]"
             aria-label="Fechar mensagem"
             (click)="feedback.dismiss(message.id)">
             ×
@@ -62,9 +72,9 @@ export class ToastContainerComponent {
 
   toastClass(type: UiFeedbackMessage['type']): string {
     switch (type) {
-      case 'success': return 'border-[var(--color-success-soft)] bg-[var(--surface)]';
-      case 'error': return 'border-[var(--color-danger-soft)] bg-[var(--surface)]';
-      case 'warning': return 'border-[var(--color-warning-soft)] bg-[var(--surface)]';
+      case 'success': return 'border-[var(--income-tint)] bg-[var(--surface)]';
+      case 'error': return 'border-[var(--expense-tint)] bg-[var(--surface)]';
+      case 'warning': return 'border-[var(--warning-tint)] bg-[var(--surface)]';
       default: return 'border-[var(--border)] bg-[var(--surface)]';
     }
   }

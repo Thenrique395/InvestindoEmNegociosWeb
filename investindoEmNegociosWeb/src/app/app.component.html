@@ -1,5 +1,6 @@
-<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isStandaloneAuthRoute">
-  @if (showPublicExperience && !isStandaloneAuthRoute) {
+<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isStandaloneAuthRoute"
+  [class.page--site]="isSiteRoute">
+  @if (showPublicExperience && !isStandaloneAuthRoute && !isSiteRoute) {
     <app-public-header
       [brandName]="brandName"
       [isLightTheme]="isLightTheme"
@@ -11,14 +12,18 @@
 
   @if (isLogged && !isOnboardingRoute && !isStyleguideRoute) {
     <!-- overflow-clip (e não hidden): ancestral com overflow hidden desabilita o position: sticky da sidebar -->
-    <div class="shell relative grid min-h-screen overflow-clip border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+    <div class="shell relative grid min-h-screen overflow-clip">
       <app-sidebar
         [isLightTheme]="isLightTheme"
         [brandName]="brandName"
         [currentRole]="currentRole"
         [mobileOpen]="mobileSidebarOpen"
+        [displayName]="displayName"
+        [userInitials]="userInitials"
+        [avatarUrl]="avatarUrl"
         (routeReload)="reloadIfSame($event.path, $event.event)"
-        (preferencesOpen)="goToPreferences($event)" />
+        (preferencesOpen)="goToPreferences($event)"
+        (profileOpen)="goToProfile($event)" />
       @if (mobileSidebarOpen) {
         <div class="shell__backdrop" (click)="closeMobileSidebar()"></div>
       }
@@ -47,7 +52,7 @@
           (routeReload)="reloadIfSame($event.path, $event.event)"
           (logoutRequested)="logout()" />
         <app-billing-alert-banner />
-        <main class="main relative z-0 flex min-w-0 flex-col gap-8 p-[var(--spacing-3)]">
+        <main class="main relative z-0 min-w-0">
           <div class="route-view" [class.route-view--enter]="routeTransitionActive">
             <router-outlet />
           </div>
@@ -100,7 +105,7 @@
     </main>
   }
 
-  @if (showPublicExperience && !isStandaloneAuthRoute) {
+  @if (showPublicExperience && !isStandaloneAuthRoute && !isSiteRoute) {
     <app-public-footer
       [brandName]="brandName"
       [brandSlogan]="brandSlogan"

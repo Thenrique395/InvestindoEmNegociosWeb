@@ -1,0 +1,8 @@
+@for (stat of stats(); track stat.label) {
+  <div class="site-stat">
+    <p class="site-stat__value tabular" [class.site-stat__value--income]="stat.tone === 'income'">
+      {{ stat.value }}
+    </p>
+    <p class="site-stat__label">{{ stat.label }}</p>
+  </div>
+}

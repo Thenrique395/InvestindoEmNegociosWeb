@@ -29,18 +29,18 @@ let nextTooltipId = 0;
       flex: 0 0 auto;
       border-radius: var(--radius-pill);
       border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
-      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+      background: color-mix(in srgb, var(--surface-sunken) 82%, transparent);
       color: var(--primary-text);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font: inherit;
-      font-weight: var(--font-weight-bold);
-      line-height: var(--line-height-display);
+      font-weight: var(--fw-bold);
+      line-height: var(--lh-display);
       cursor: help;
       transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
     }
-    .tooltip--sm { inline-size: 1.625rem; block-size: 1.625rem; font-size: var(--font-size-label); }
+    .tooltip--sm { inline-size: 1.625rem; block-size: 1.625rem; font-size: var(--fs-meta); }
     .tooltip:hover, .tooltip:focus-visible, .tooltip--open {
       transform: translateY(-1px);
       border-color: color-mix(in srgb, var(--primary) 30%, transparent);
@@ -58,15 +58,15 @@ let nextTooltipId = 0;
       inset-inline-end: 0;
       inline-size: min(17.5rem, 75vw);
       padding: 0.85rem 0.95rem;
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-inner);
       border: 1px solid var(--border-strong);
       background: var(--surface);
       color: var(--text);
-      font-size: var(--font-size-label);
-      font-weight: var(--font-weight-medium);
-      line-height: var(--line-height-body);
+      font-size: var(--fs-meta);
+      font-weight: var(--fw-medium);
+      line-height: var(--lh-body);
       text-align: left;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-dropdown);
       z-index: 50;
     }
     .tooltip__arrow {

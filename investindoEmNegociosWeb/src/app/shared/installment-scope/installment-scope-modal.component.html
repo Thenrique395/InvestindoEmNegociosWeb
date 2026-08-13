@@ -1,0 +1,55 @@
+@if (open()) {
+  <div class="scope__backdrop" (click)="cancelled.emit()">
+    <div
+      class="scope__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="scope-title"
+      (click)="$event.stopPropagation()">
+      <header class="scope__head">
+        <p class="scope__eyebrow">Parcelamento</p>
+        <h2 class="scope__title" id="scope-title">{{ title() }}</h2>
+        <p class="scope__subtitle">
+          {{ context().description }} · parcela {{ context().current }} de {{ context().total }}
+        </p>
+      </header>
+
+      <div class="scope__body">
+        <label class="scope__option" [class.scope__option--active]="scope() === 'single'">
+          <input
+            type="radio"
+            name="installment-scope"
+            class="scope__radio"
+            [checked]="scope() === 'single'"
+            (change)="choose('single')" />
+          <span>
+            <span class="scope__option-title">Somente esta parcela</span>
+            <span class="scope__option-text">
+              As outras parcelas seguem como estão.
+            </span>
+          </span>
+        </label>
+
+        <label class="scope__option" [class.scope__option--active]="scope() === 'forward'">
+          <input
+            type="radio"
+            name="installment-scope"
+            class="scope__radio"
+            [checked]="scope() === 'forward'"
+            (change)="choose('forward')" />
+          <span>
+            <span class="scope__option-title">Esta e as seguintes</span>
+            <span class="scope__option-text">
+              Atinge {{ forwardCount() }} parcela(s), da atual até a última.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      <footer class="scope__foot">
+        <button type="button" class="scope__cancel" (click)="cancelled.emit()">Cancelar</button>
+        <button type="button" class="scope__confirm" (click)="confirm()">{{ actionLabel() }}</button>
+      </footer>
+    </div>
+  </div>
+}

@@ -62,26 +62,26 @@ import { AccountTransactionResponse, AccountTransactionType } from '../../models
   `,
   styles: `
     :host { display: block; }
-    .mv__table { width: 100%; border-collapse: collapse; font-size: var(--text-sm, 0.85rem); }
+    .mv__table { width: 100%; border-collapse: collapse; font-size: var(--fs-meta, 0.85rem); }
     .mv__table thead th {
       text-align: left; padding: 0.5rem 0.75rem 0.5rem 0;
-      font-size: var(--text-xs, 0.7rem); text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--text-muted); border-bottom: 1px solid var(--border);
+      font-size: var(--fs-caption, 0.7rem); text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-tertiary); border-bottom: 1px solid var(--border);
     }
     .mv__table tbody td { padding: 0.6rem 0.75rem 0.6rem 0; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
     .mv__num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .mv__desc { overflow: hidden; text-overflow: ellipsis; }
-    .mv__muted { color: var(--text-muted); }
-    .mv__pos { color: var(--success-text, var(--success)); }
-    .mv__neg { color: var(--danger-text, var(--danger)); }
+    .mv__muted { color: var(--text-tertiary); }
+    .mv__pos { color: var(--income-text, var(--income)); }
+    .mv__neg { color: var(--expense-text, var(--expense)); }
 
     .mv__cards { display: none; list-style: none; margin: 0; padding: 0; }
     .mv__card {
       display: grid; gap: 6px; padding: 0.75rem; border: 1px solid var(--border);
-      border-radius: var(--radius-lg, 12px); background: var(--surface-2); margin-bottom: 8px;
+      border-radius: var(--radius-inner, 12px); background: var(--surface-sunken); margin-bottom: 8px;
     }
     .mv__card-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-    .mv__card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--text-xs, 0.72rem); color: var(--text-muted); }
+    .mv__card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--fs-caption, 0.72rem); color: var(--text-tertiary); }
 
     @media (max-width: 720px) {
       .mv__table { display: none; }

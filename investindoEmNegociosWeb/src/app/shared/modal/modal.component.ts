@@ -24,20 +24,20 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
         <section [class]="modalClass()">
           @if (eyebrow() || title() || subtitle() || showCloseButton()) {
             <header
-              class="flex items-start justify-between gap-4 border-b border-[var(--color-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]">
+              class="flex flex-none items-start justify-between gap-4 border-b border-[var(--border-inner)] px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-10)]">
               <div class="min-w-0 space-y-1">
                 @if (eyebrow()) {
-                  <p class="m-0 text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)]">{{ eyebrow() }}</p>
+                  <p class="m-0 text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)]">{{ eyebrow() }}</p>
                 }
                 @if (title()) {
                   <h2
-                    class="m-0 text-lg font-semibold text-[var(--color-text)]">
+                    class="m-0 text-lg font-semibold text-[var(--text)]">
                     {{ title() }}
                   </h2>
                 }
                 @if (subtitle()) {
                   <p
-                    class="m-0 text-sm text-[var(--color-text-muted)]">
+                    class="m-0 text-sm text-[var(--text-tertiary)]">
                     {{ subtitle() }}
                   </p>
                 }
@@ -45,7 +45,7 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
               @if (showCloseButton()) {
                 <button
                   type="button"
-                  class="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-pill)] border border-[var(--color-border)] text-[var(--color-text-muted)] transition hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]"
+                  class="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-pill)] border border-[var(--border)] text-[var(--text-tertiary)] transition hover:bg-[var(--surface-sunken)] hover:text-[var(--text)]"
                   aria-label="Fechar modal"
                   (click)="close.emit()">
                   ✕
@@ -53,13 +53,13 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
               }
             </header>
           }
-          <div class="max-h-[calc(100vh-14rem)] overflow-y-auto px-[var(--spacing-4)] py-[var(--spacing-3)]">
+          <div class="min-h-0 flex-1 overflow-y-auto px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-10)]">
             <ng-content></ng-content>
             <ng-content select="[modal-body]"></ng-content>
           </div>
           @if (hasFooter()) {
             <footer
-              class="flex flex-wrap justify-end gap-[var(--spacing-2)] border-t border-[var(--color-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]">
+              class="flex flex-none flex-wrap justify-end gap-[var(--space-6)] border-t border-[var(--border-inner)] bg-[var(--surface-subtle)] px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-7)]">
               <ng-content select="[modal-footer]"></ng-content>
             </footer>
           }
@@ -82,12 +82,16 @@ export class ModalComponent {
 
   readonly modalClass = computed(() => {
     const sizeClass = this.resolveSizeClass(this.size());
+    // Três faixas (COMPONENTES.md §7): o card é flex column com altura máxima,
+    // cabeçalho e rodapé são `flex-none` e só o corpo rola. Com `max-height` no
+    // corpo em vez de aqui, um cabeçalho alto empurra o rodapé para fora da tela.
     return `
-      relative w-full ${sizeClass}
-      rounded-[var(--radius-xl)]
-      border border-[var(--color-border)]
-      bg-[var(--color-surface)]
-      shadow-[var(--shadow-elevation-lg)]
+      relative flex w-full flex-col ${sizeClass}
+      max-h-[88vh]
+      rounded-[var(--radius-card)]
+      border border-[var(--border)]
+      bg-[var(--surface)]
+      shadow-[var(--shadow-modal)]
     `;
   });
 

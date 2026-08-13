@@ -29,6 +29,6 @@ export class DonutChartComponent {
       parts.push(`${item.color} ${cursor}% ${next}%`);
       cursor = next;
     }
-    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(var(--color-border-strong) 0 100%)';
+    return parts.length ? `conic-gradient(${parts.join(', ')})` : 'conic-gradient(var(--border-strong) 0 100%)';
   });
 }

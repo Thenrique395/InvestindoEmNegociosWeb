@@ -1,0 +1,45 @@
+@let doc = document();
+
+<app-site-header [links]="[]" />
+
+<article class="legal">
+  <header class="legal__head">
+    <p class="legal__eyebrow">{{ doc.eyebrow }}</p>
+    <h1 class="legal__title">{{ doc.title }}</h1>
+    <p class="legal__summary">{{ doc.summary }}</p>
+    <p class="legal__updated">Última atualização: {{ doc.updatedAt }}</p>
+  </header>
+
+  <nav class="legal__toc" aria-label="Índice do documento">
+    <p class="legal__toc-title">Nesta página</p>
+    <ol class="legal__toc-list">
+      @for (section of doc.sections; track section.title) {
+        <li>
+          <a class="legal__toc-link" [href]="'#' + anchorId(section.title)">{{ section.title }}</a>
+        </li>
+      }
+    </ol>
+  </nav>
+
+  <div class="legal__body">
+    @for (section of doc.sections; track section.title) {
+      <section class="legal__section" [id]="anchorId(section.title)">
+        <h2 class="legal__section-title">{{ section.title }}</h2>
+
+        @for (paragraph of section.paragraphs; track paragraph) {
+          <p class="legal__paragraph">{{ paragraph }}</p>
+        }
+
+        @if (section.bullets?.length) {
+          <ul class="legal__list">
+            @for (bullet of section.bullets; track bullet) {
+              <li class="legal__item">{{ bullet }}</li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  </div>
+</article>
+
+<app-site-footer [columns]="footerColumns" />

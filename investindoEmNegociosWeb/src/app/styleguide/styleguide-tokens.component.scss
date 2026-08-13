@@ -1,26 +1,26 @@
 .tokens-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .token-swatch__box {
   height: 64px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   border: 1px solid var(--border);
 }
 
 .token-swatch__name {
   margin: 0.4rem 0 0.1rem;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-meta);
 }
 
 .scale-row {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--spacing-3);
+  gap: var(--space-10);
 }
 
 .scale-item {
@@ -67,7 +67,7 @@
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
 
   th, td {
     padding: 0.6rem 1rem;
@@ -76,9 +76,9 @@
   }
 
   thead th {
-    font-weight: var(--font-weight-bold);
-    color: var(--text-muted);
-    font-size: var(--font-size-caption);
+    font-weight: var(--fw-bold);
+    color: var(--text-tertiary);
+    font-size: var(--fs-caption);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -91,14 +91,14 @@
 .controls-demo {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-4);
+  gap: var(--space-12);
 
   input[type='text'],
   input[type='date'],
   select,
   textarea {
-    height: var(--control-height);
-    border-radius: var(--radius-lg);
+    height: var(--h-input);
+    border-radius: var(--radius-inner);
     width: 100%;
     padding: 0 0.75rem;
     outline: none;
@@ -119,7 +119,7 @@
 .controls-demo__col {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: var(--space-10);
 }
 
 .controls-demo__field {
@@ -130,26 +130,26 @@
 
 .controls-demo__label {
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .controls-demo__input--error {
-  border-color: var(--danger) !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent) !important;
+  border-color: var(--expense) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--expense) 18%, transparent) !important;
 }
 
 .controls-demo__error-msg {
-  color: var(--danger-text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
+  color: var(--expense-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
 }
 
 .controls-demo__check-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
 
   input {
     width: 16px;

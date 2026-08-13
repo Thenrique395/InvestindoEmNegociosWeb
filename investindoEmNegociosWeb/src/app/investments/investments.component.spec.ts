@@ -95,8 +95,8 @@ describe('InvestmentsComponent', () => {
 
     const chart = component.distribuicaoPorTipoComCor;
 
-    expect(chart.find((item) => item.key === 'IMOVEL')?.color).toBe('var(--color-chart-investment)');
-    expect(chart.find((item) => item.key === 'VEICULO')?.color).toBe('var(--color-chart-expense)');
+    expect(chart.find((item) => item.key === 'IMOVEL')?.color).toBe('var(--chart-6)');
+    expect(chart.find((item) => item.key === 'VEICULO')?.color).toBe('var(--expense)');
   });
 
   it('deve limitar updateTargetAllocation entre 0 e 100', () => {

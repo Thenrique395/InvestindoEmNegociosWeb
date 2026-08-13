@@ -1,5 +1,11 @@
 @use '@fontsource-variable/inter';
+// Poppins carrega apenas 600 e 700: os únicos pesos usados em título e valor.
+// O `as` é obrigatório: um namespace Sass não pode começar com dígito.
+@use '@fontsource/poppins/600.css' as poppins-semibold;
+@use '@fontsource/poppins/700.css' as poppins-bold;
 @use './styles/design-tokens';
+@use './styles/site';
+@use './styles/auth';
 // Estilos do onboarding em escopo global: as classes .onboarding-* são usadas
 // pelos componentes de passo (rail/foco/preferências/perfil/conta) e precisam
 // valer além do encapsulamento de cada componente. Prefixo próprio evita colisão.
@@ -13,126 +19,70 @@
   box-sizing: border-box;
 }
 
+/* Esquema de cor. Todos os tokens vivem em styles/design-tokens.scss. */
 :root {
   color-scheme: light;
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --surface-3: #e2e8f0;
-  --sidebar: #ffffff;
-  --border: #e5e7eb;
-  --border-strong: #cbd5e1;
-  --text: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  --font-caption: 0.75rem;
-  --font-label: 0.875rem;
-  --font-body-sm: 0.9375rem;
-  --font-body: 1rem;
-  --font-body-lg: 1.125rem;
-  --font-title-sm: 1.25rem;
-  --font-title: 1.5rem;
-  --font-title-lg: 1.875rem;
-  --font-display: clamp(2rem, 3vw, 3rem);
-  --font-display-lg: clamp(3rem, 5vw, 4.5rem);
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
-  --primary: #2563eb;
-  --primary-text: #1d4ed8;
-  --on-primary: #f8fafc;
-  --success: #22c55e;
-  --success-text: #15803d;
-  --danger: #ef4444;
-  --danger-text: #dc2626;
-  --info: #0ea5e9;
-  --info-text: #0369a1;
-  --warning: #f59e0b;
-  --warning-text: #b45309;
-  --leading-display: 1;
-  --leading-tight: 1.2;
-  --leading-control: 1.35;
-  --leading-body: 1.6;
-  --tracking-display: -0.04em;
-  --tracking-title: -0.02em;
-  --tracking-normal: 0;
-  --tracking-label: 0.08em;
-  --tracking-eyebrow: 0.2em;
-  --chart-income: #16a34a;
-  --chart-expense: #dc2626;
-  --chart-goal: #2563eb;
-  --chart-investment: #7c3aed;
-  --chart-series-1: #2563eb;
-  --chart-series-2: #16a34a;
-  --chart-series-3: #d97706;
-  --chart-series-4: #7c3aed;
-  --chart-series-5: #0891b2;
-  --control-h: 2.625rem;
-  --control-pad: var(--spacing-1) var(--spacing-2);
-  --shadow-sm: 0 10px 20px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 18px 40px rgba(15, 23, 42, 0.12);
-  --shadow-lg: 0 24px 70px rgba(15, 23, 42, 0.18);
-  --overlay: rgba(4, 20, 28, 0.7);
-  --primary-10: color-mix(in srgb, var(--primary) 12%, transparent);
-  --primary-20: color-mix(in srgb, var(--primary) 22%, transparent);
-  --success-10: color-mix(in srgb, var(--success) 12%, transparent);
-  --success-20: color-mix(in srgb, var(--success) 22%, transparent);
-  --danger-10: color-mix(in srgb, var(--danger) 12%, transparent);
-  --danger-20: color-mix(in srgb, var(--danger) 22%, transparent);
-  --warning-10: color-mix(in srgb, var(--warning) 12%, transparent);
-  --warning-20: color-mix(in srgb, var(--warning) 22%, transparent);
-  --info-10: color-mix(in srgb, var(--info) 12%, transparent);
-  --info-20: color-mix(in srgb, var(--info) 22%, transparent);
 }
 
+/* Tema escuro — segundo conjunto de tokens, não CSS duplicado.
+   Cores conforme ORDEM_DE_IMPLEMENTACAO.md, seção "Tema escuro". */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #08111f;
-  --surface: #0f1b2d;
-  --surface-2: #17243a;
-  --surface-3: #22324b;
-  --sidebar: #0b1627;
-  --border: #2a3a52;
-  --border-strong: #40536f;
-  --text: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --on-primary: #ffffff;
-  --primary: #60a5fa;
-  --primary-text: #93c5fd;
-  --success: #4ade80;
-  --success-text: #4ade80;
-  --danger: #f87171;
-  --danger-text: #f87171;
-  --info: #38bdf8;
-  --info-text: #38bdf8;
-  --warning: #fbbf24;
-  --warning-text: #fbbf24;
-  --chart-income: #4ade80;
-  --chart-expense: #f87171;
-  --chart-goal: #60a5fa;
-  --chart-investment: #c4b5fd;
-  --chart-series-1: #60a5fa;
-  --chart-series-2: #4ade80;
-  --chart-series-3: #fbbf24;
-  --chart-series-4: #c4b5fd;
-  --chart-series-5: #67e8f9;
-  --overlay: rgba(2, 6, 23, 0.82);
-  --shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.28);
-  --shadow-md: 0 20px 48px rgba(0, 0, 0, 0.38);
-  --shadow-lg: 0 28px 76px rgba(0, 0, 0, 0.48);
+
+  --bg-app:            #001620;
+  --surface:           #011E29;
+  --surface-sunken:    #042A38;
+  --surface-subtle:    #042A38;
+  --surface-inset:     #0E3948;
+  --track:             #0E3948;
+
+  --border:            #123544;
+  --border-inner:      #0E3948;
+  --border-row:        #0E3948;
+  --border-strong:     #123544;
+  --border-hover:      #1B4A5C;
+
+  --text:              #E8EFF1;
+  --text-secondary:    #A9C1CA;
+  --text-tertiary:     #7C97A2;
+  --text-muted:        #7C97A2;
+  --text-faint:        #5E7F8B;
+
+  --primary:           #5B9DFF;
+  --primary-hover:     #7FB4FF;
+  --primary-text:      #5B9DFF;
+  --on-primary:        #001620;  /* texto escuro sobre a primária clara */
+  --primary-tint:      rgba(91, 157, 255, .14);
+  --primary-tint-soft: rgba(91, 157, 255, .10);
+  --primary-ring:      rgba(91, 157, 255, .18);
+
+  --income:            #7FD3A8;
+  --income-text:       #7FD3A8;
+  --income-tint:       rgba(127, 211, 168, .14);
+  --income-tint-soft:  rgba(127, 211, 168, .08);
+
+  --expense:           #F0928A;
+  --expense-text:      #F0928A;
+  --expense-tint:      rgba(240, 146, 138, .14);
+  --expense-tint-soft: rgba(240, 146, 138, .07);
+  --expense-border:    rgba(240, 146, 138, .28);
+
+  /* PENDENTE — o handoff não especifica a cor de atenção no tema escuro.
+     Clareada a partir do #C97A15 para manter contraste sobre #011E29.
+     Confirmar na fase de tema escuro (7.4). */
+  --warning:           #E0A458;
+  --warning-text:      #E0A458;
+  --warning-tint:      rgba(224, 164, 88, .16);
+  --warning-tint-soft: rgba(224, 164, 88, .10);
+
+  --overlay:           rgba(0, 8, 12, .66);
+
+  /* Site público no tema navy. `Site - página de vendas.dc.html`. */
+  --site-header-bg:     rgba(0, 46, 62, .86);
+  --site-header-border: rgba(237, 235, 236, .08);
+  --site-cta-bg:        var(--brand-green);
+  --site-cta-bg-hover:  var(--brand-green-light);
+  --site-cta-fg:        #FFFFFF;
 }
 
 html {
@@ -141,12 +91,12 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--bg-app);
   color: var(--text);
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--leading-body);
+  font-family: var(--font-body);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -159,7 +109,7 @@ body {
 select:not([multiple]) {
   appearance: none;
   -webkit-appearance: none;
-  min-height: var(--control-h);
+  min-height: var(--h-input);
   padding: 0.5rem 2.25rem 0.5rem 0.75rem;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -184,8 +134,8 @@ select:not([multiple]) {
   .form select,
   .form textarea
 ) {
-  border: 1px solid var(--control-border);
-  background: var(--control-background);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
   color: var(--text);
   font-family: inherit;
   transition: var(--control-transition);
@@ -208,12 +158,12 @@ select:not([multiple]) {
   .form textarea
 ):focus {
   border-color: var(--primary);
-  background: var(--control-background-focus);
-  box-shadow: 0 0 0 4px var(--control-focus-ring);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--primary-ring);
 }
 
 :where(input, textarea)::placeholder {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   opacity: 1;
 }
 
@@ -229,18 +179,18 @@ select:not([multiple]) {
   .account-card__action,
   .invoice-import-modal__button
 ) {
-  min-height: var(--control-height);
+  min-height: var(--h-button);
   border: 1px solid transparent;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: var(--control-pad);
+  gap: var(--space-3);
+  padding: 0 var(--space-7);
   color: inherit;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-control);
   text-decoration: none;
   cursor: pointer;
   transition: var(--control-transition);
@@ -257,9 +207,9 @@ select:not([multiple]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--control-border);
-  border-radius: var(--radius-md);
-  background: var(--control-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
   color: var(--text-secondary);
   cursor: pointer;
   transition: var(--control-transition);
@@ -281,7 +231,7 @@ select:not([multiple]) {
 ):focus-visible {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--primary) 26%, transparent);
-  background: var(--control-background-focus);
+  background: var(--surface);
   color: var(--primary-text);
 }
 
@@ -299,9 +249,9 @@ select:not([multiple]) {
   .receitas-lista__icon-action--danger,
   .despesas-lista__icon-action--danger
 ):focus-visible {
-  border-color: color-mix(in srgb, var(--danger) 24%, transparent);
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
-  color: var(--danger-text);
+  border-color: color-mix(in srgb, var(--expense) 24%, transparent);
+  background: color-mix(in srgb, var(--expense) 8%, transparent);
+  color: var(--expense-text);
 }
 
 :where(
@@ -312,9 +262,9 @@ select:not([multiple]) {
   .form-field__label
 ) {
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-control);
 }
 
 :where(
@@ -326,10 +276,10 @@ select:not([multiple]) {
   .error-text,
   .form-field__message--danger
 ) {
-  color: var(--danger-text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
+  color: var(--expense-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-control);
 }
 
 :where(
@@ -338,34 +288,34 @@ select:not([multiple]) {
   .field-hint,
   .form-field__message
 ) {
-  color: var(--text-muted);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-control);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-control);
 }
 
 :where(.form-field__message--success) {
-  color: var(--success-text);
+  color: var(--income-text);
 }
 
 body [class*='summary-card__eyebrow'],
 body [class*='total-card__eyebrow'],
 body [class*='action-card__eyebrow'],
 body [class*='goal-card__eyebrow'] {
-  font-size: var(--font-size-card-eyebrow);
-  font-weight: var(--font-weight-card-eyebrow);
-  line-height: var(--line-height-control);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-control);
+  letter-spacing: var(--ls-eyebrow);
 }
 
 body [class*='summary-card__title'],
 body [class*='summary-card__value'],
 body [class*='total-card__value'],
 body .basic-home-kpi__title {
-  font-size: var(--font-size-card-metric);
-  font-weight: var(--font-weight-card-metric);
-  line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-display);
+  font-size: var(--fs-kpi);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-tighter);
 }
 
 body [class*='action-card__title'],
@@ -373,25 +323,25 @@ body [class*='insight-card__title'],
 body [class*='recent-card__title'],
 body [class*='cards-list__title'],
 body [class*='goal-card__title'] {
-  font-size: var(--font-size-card-title);
-  font-weight: var(--font-weight-card-title);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
 }
 
 body [class*='summary-card__note'],
 body [class*='total-card__text'],
 body [class*='action-card__text'],
 body [class*='goal-card__description'] {
-  font-size: var(--font-size-card-body);
-  font-weight: var(--font-weight-card-body);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
 }
 
 :where(.btn, .btn-primary, .btn-ghost, .btn-danger, .btn-cancel, .ghost).sm {
-  min-height: var(--control-height-sm);
+  min-height: var(--h-button-sm);
   padding: 0.375rem 0.75rem;
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
 /* Sem `:where()` aqui de propósito: `:where()` zera a especificidade do seletor, e o reset do
@@ -414,7 +364,7 @@ body [class*='goal-card__description'] {
 .btn-cancel,
 .ghost,
 .btn--ghost {
-  border-color: var(--control-border);
+  border-color: var(--border);
   background: var(--surface);
   color: var(--text-secondary);
 }
@@ -423,18 +373,18 @@ body [class*='goal-card__description'] {
 .btn-cancel:hover:not(:disabled, [aria-disabled='true']),
 .ghost:hover:not(:disabled, [aria-disabled='true']),
 .btn--ghost:hover:not(:disabled, [aria-disabled='true']) {
-  border-color: var(--control-border-hover);
-  background: var(--control-background-hover);
+  border-color: var(--border-hover);
+  background: var(--surface-inset);
   color: var(--text);
 }
 
 .btn-danger {
-  background: var(--danger);
+  background: var(--expense);
   color: var(--on-primary);
 }
 
 .btn-danger:hover:not(:disabled, [aria-disabled='true']) {
-  background: color-mix(in srgb, var(--danger) 86%, black);
+  background: color-mix(in srgb, var(--expense) 86%, black);
 }
 
 :where(button, input, select, textarea):disabled,
@@ -452,17 +402,17 @@ body [class*='goal-card__description'] {
 
 :where(.modal-actions__secondary, .modal-actions__primary) {
   min-height: 50px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 0.875rem 1.4rem;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
   transition: var(--control-transition);
 }
 
 :where(.modal-actions__secondary) {
   border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 72%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 72%, white);
   color: var(--text);
 }
 
@@ -481,7 +431,7 @@ body [class*='goal-card__description'] {
 
 :where(.modal-actions__secondary):hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--text) 14%, transparent);
-  background: color-mix(in srgb, var(--surface-2) 86%, white);
+  background: color-mix(in srgb, var(--surface-sunken) 86%, white);
 }
 
 :where(.modal-actions__primary):hover:not(:disabled) {
@@ -489,54 +439,121 @@ body [class*='goal-card__description'] {
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
-  font-weight: var(--font-weight-bold);
-  line-height: var(--leading-tight);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
   text-wrap: balance;
 }
 
 :where(strong, b) {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
 }
 
 :where(p, li, dd) {
   text-wrap: pretty;
 }
 
+/* Título e valor usam Poppins; corpo e UI usam Inter. COMPONENTES.md §2 e §3. */
 .type-page-title {
-  font-size: var(--font-size-display);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-display);
+  font-family: var(--font-display);
+  font-size: var(--fs-page-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
 }
 
 .type-section-title {
-  font-size: var(--font-size-title);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-title);
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+}
+
+.type-modal-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-modal-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
 }
 
 .type-body {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
 }
 
 .type-label {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-control);
+}
+
+/* Eyebrow: 10px/700 uppercase. COMPONENTES.md §2. */
+.type-eyebrow {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-control);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
 .type-metric {
-  font-size: var(--font-size-title-lg);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-display);
-  letter-spacing: var(--letter-spacing-title);
+  font-family: var(--font-display);
+  font-size: var(--fs-kpi);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-tighter);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Todo valor numérico alinha em coluna. README do handoff, decisão 7.
+   `.ffx` é o nome usado nos protótipos; mantido para facilitar a conferência. */
+.ffx,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skeleton. COMPONENTES.md §10 — só no que vem do servidor. */
+@keyframes skShimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -80% 0;
+  }
+}
+
+.sk {
+  background: linear-gradient(
+    90deg,
+    var(--surface-inset) 20%,
+    var(--surface-sunken) 50%,
+    var(--surface-inset) 80%
+  );
+  background-size: 220% 100%;
+  animation: skShimmer 1600ms linear infinite;
+}
+
+/* Revelação ao rolar — só no site público, via `appReveal`.
+   O estado inicial é invisível, então a diretiva é obrigatória: sem ela o
+   elemento nunca aparece. COMPONENTES.md §11. */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--site-reveal-shift));
+  transition:
+    opacity var(--site-reveal-dur) var(--ease-reveal),
+    transform var(--site-reveal-dur) var(--ease-reveal);
+}
+
+.reveal--on {
+  opacity: 1;
+  transform: none;
 }
 
 :where(button, a, input, select, textarea, [role='button']):focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--primary) 72%, white);
+  outline: 3px solid var(--primary-ring-strong);
   outline-offset: 3px;
 }
 
@@ -548,6 +565,14 @@ body [class*='goal-card__description'] {
     transition-duration: 0.01ms;
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
+  }
+
+  /* Sem isto o conteúdo revelado ficaria invisível para sempre: a regra acima
+     mata a transição, mas não o `opacity: 0` do estado inicial. */
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
@@ -567,7 +592,6 @@ body [class*='goal-card__description'] {
   .cards-purchases__row,
   .cards-statements__item,
   .cards-preview__meta-item,
-  .pricing-page article,
   .progression-card,
   .comparison-card,
   .trust-card {
@@ -582,7 +606,7 @@ body [class*='goal-card__description'] {
   input,
   select,
   textarea {
-    background: var(--surface-2);
+    background: var(--surface-sunken);
     color: var(--text);
     border-color: var(--border);
   }

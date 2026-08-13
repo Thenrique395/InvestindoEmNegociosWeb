@@ -23,12 +23,12 @@ export const INVESTMENT_TYPE_LABELS: Record<InvestmentType, string> = {
 };
 
 const TYPE_COLORS: Record<InvestmentType, string> = {
-  RF: 'var(--color-chart-series-1)',
-  ACOES: 'var(--color-chart-income)',
-  FUNDOS: 'var(--color-chart-series-5)',
-  CRIPTO: 'var(--color-chart-series-3)',
-  IMOVEL: 'var(--color-chart-investment)',
-  VEICULO: 'var(--color-chart-expense)'
+  RF: 'var(--chart-1)',
+  ACOES: 'var(--income)',
+  FUNDOS: 'var(--chart-5)',
+  CRIPTO: 'var(--chart-3)',
+  IMOVEL: 'var(--chart-6)',
+  VEICULO: 'var(--expense)'
 };
 
 export interface AllocationSlice {
@@ -103,7 +103,7 @@ export function buildDistribution(positions: InvestmentPosition[]): AllocationSl
       label: INVESTMENT_TYPE_LABELS[key] ?? key,
       value,
       percent: total > 0 ? (value / total) * 100 : 0,
-      color: TYPE_COLORS[key] ?? 'var(--color-chart-series-1)'
+      color: TYPE_COLORS[key] ?? 'var(--chart-1)'
     }))
     .sort((a, b) => b.value - a.value);
 }

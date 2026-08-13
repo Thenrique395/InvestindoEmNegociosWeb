@@ -1,10 +1,10 @@
 .receitas-lista__name {
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
   color: var(--text);
 }
 
 .receitas-lista__muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .receitas-lista__amount {
@@ -34,12 +34,12 @@
   inset-block-end: calc(100% + 10px);
   transform: translateX(-50%) translateY(4px);
   padding: 0.45rem 0.65rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: color-mix(in srgb, var(--text) 90%, white);
   color: white;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-display);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-display);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;

@@ -28,9 +28,9 @@
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card-hover);
   min-width: 0;
   display: grid;
   gap: 0.9rem;
@@ -39,17 +39,17 @@
 .card h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .category-name {
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 :host ::ng-deep .relatorios-share-column {
@@ -73,8 +73,8 @@
   gap: 0.75rem;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
 }
 
 .top-expense__rank {
@@ -84,23 +84,23 @@
   inline-size: 1.6rem;
   block-size: 1.6rem;
   border-radius: var(--radius-pill);
-  background: var(--surface-3);
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
+  background: var(--surface-inset);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
 }
 
 .top-expense__name {
   min-width: 0;
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .top-expense__percent {
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
 .top-expense__value {

@@ -65,18 +65,18 @@ import { formatLocaleDate } from '../utils/locale-utils';
       gap: 0.7rem;
       padding: 0.75rem 0.9rem 0.75rem 1rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg, 14px);
+      border-radius: var(--radius-inner, 14px);
       background: var(--surface);
-      --kind: var(--info);
-      --kind-weak: var(--color-info-weak);
+      --kind: var(--primary);
+      --kind-weak: var(--primary-tint);
     }
-    .fe[data-kind='income'] { --kind: var(--success); --kind-weak: var(--color-success-weak); }
-    .fe[data-kind='expense'] { --kind: var(--danger); --kind-weak: var(--color-danger-weak); }
-    .fe[data-kind='card-due'] { --kind: var(--warning); --kind-weak: var(--color-warning-weak); }
-    .fe[data-kind='card-close'] { --kind: var(--info); --kind-weak: var(--color-info-weak); }
-    .fe[data-kind='loan'] { --kind: var(--warning); --kind-weak: var(--color-warning-weak); }
-    .fe[data-kind='goal'] { --kind: var(--info); --kind-weak: var(--color-info-weak); }
-    .fe--overdue { border-color: var(--color-danger-soft); }
+    .fe[data-kind='income'] { --kind: var(--income); --kind-weak: var(--income-tint); }
+    .fe[data-kind='expense'] { --kind: var(--expense); --kind-weak: var(--expense-tint); }
+    .fe[data-kind='card-due'] { --kind: var(--warning); --kind-weak: var(--warning-tint); }
+    .fe[data-kind='card-close'] { --kind: var(--primary); --kind-weak: var(--primary-tint); }
+    .fe[data-kind='loan'] { --kind: var(--warning); --kind-weak: var(--warning-tint); }
+    .fe[data-kind='goal'] { --kind: var(--primary); --kind-weak: var(--primary-tint); }
+    .fe--overdue { border-color: var(--expense-tint); }
 
     .fe__rail {
       position: absolute;
@@ -97,13 +97,13 @@ import { formatLocaleDate } from '../utils/locale-utils';
     .fe__body { min-width: 0; display: grid; gap: 4px; }
     .fe__top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; }
     .fe__title {
-      margin: 0; font-size: var(--text-sm, 0.9rem); font-weight: var(--font-weight-bold, 600);
+      margin: 0; font-size: var(--fs-meta, 0.9rem); font-weight: var(--fw-bold, 600);
       color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .fe__amount { font-size: var(--text-sm, 0.9rem); color: var(--text); white-space: nowrap; }
+    .fe__amount { font-size: var(--fs-meta, 0.9rem); color: var(--text); white-space: nowrap; }
     .fe__meta {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-      font-size: var(--text-xs, 0.75rem); color: var(--text-muted);
+      font-size: var(--fs-caption, 0.75rem); color: var(--text-tertiary);
     }
     .fe__type { font-weight: 500; }
     .fe__dot { opacity: 0.6; }
@@ -111,11 +111,11 @@ import { formatLocaleDate } from '../utils/locale-utils';
     .fe__action {
       justify-self: end;
       border: 1px solid var(--border-strong, var(--border));
-      border-radius: var(--radius-md, 10px);
+      border-radius: var(--radius-control, 10px);
       padding: 6px 12px;
-      background: var(--surface-2);
+      background: var(--surface-sunken);
       color: var(--text);
-      font-size: var(--text-xs, 0.75rem);
+      font-size: var(--fs-caption, 0.75rem);
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;

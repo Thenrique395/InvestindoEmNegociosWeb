@@ -40,23 +40,23 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
     .tsc {
       --tone: var(--primary);
       --tone-text: var(--primary-text);
-      --tone-weak: var(--color-primary-weak);
-      --tone-soft: var(--color-primary-soft);
+      --tone-weak: var(--primary-tint);
+      --tone-soft: var(--primary-tint);
 
       display: grid;
       gap: 0.7rem;
       height: 100%;
       padding: 1.1rem 1.15rem 1.05rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
+      border-radius: var(--radius-panel);
       background: var(--surface);
-      box-shadow: var(--shadow-elevation-sm);
+      box-shadow: var(--shadow-card-hover);
     }
 
-    .tsc[data-tone='success'] { --tone: var(--success); --tone-text: var(--success-text); --tone-weak: var(--color-success-weak); --tone-soft: var(--color-success-soft); }
-    .tsc[data-tone='warning'] { --tone: var(--warning); --tone-text: var(--warning-text); --tone-weak: var(--color-warning-weak); --tone-soft: var(--color-warning-soft); }
-    .tsc[data-tone='info'] { --tone: var(--info); --tone-text: var(--info-text); --tone-weak: var(--color-info-weak); --tone-soft: var(--color-info-soft); }
-    .tsc[data-tone='danger'] { --tone: var(--danger); --tone-text: var(--danger-text); --tone-weak: var(--color-danger-weak); --tone-soft: var(--color-danger-soft); }
+    .tsc[data-tone='success'] { --tone: var(--income); --tone-text: var(--income-text); --tone-weak: var(--income-tint); --tone-soft: var(--income-tint); }
+    .tsc[data-tone='warning'] { --tone: var(--warning); --tone-text: var(--warning-text); --tone-weak: var(--warning-tint); --tone-soft: var(--warning-tint); }
+    .tsc[data-tone='info'] { --tone: var(--primary); --tone-text: var(--primary-text); --tone-weak: var(--primary-tint); --tone-soft: var(--primary-tint); }
+    .tsc[data-tone='danger'] { --tone: var(--expense); --tone-text: var(--expense-text); --tone-weak: var(--expense-tint); --tone-soft: var(--expense-tint); }
 
     .tsc__head {
       display: grid;
@@ -73,7 +73,7 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
       block-size: 2.5rem;
       flex: none;
       border: 1px solid var(--tone-soft);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-inner);
       background: var(--tone-weak);
       color: var(--tone-text);
     }
@@ -87,11 +87,11 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
 
     .tsc__eyebrow {
       margin: 0;
-      color: var(--text-muted);
-      font-size: var(--font-size-caption);
-      font-weight: var(--font-weight-bold);
-      letter-spacing: var(--letter-spacing-label);
-      line-height: var(--line-height-tight);
+      color: var(--text-tertiary);
+      font-size: var(--fs-caption);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-column);
+      line-height: var(--lh-tight);
       text-transform: uppercase;
     }
 
@@ -99,9 +99,9 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
       margin: 0.1rem 0 0;
       color: var(--text);
       font-size: clamp(1.35rem, 1.6vw, 1.6rem);
-      font-weight: var(--font-weight-bold);
-      line-height: var(--line-height-tight);
-      letter-spacing: var(--letter-spacing-title);
+      font-weight: var(--fw-bold);
+      line-height: var(--lh-tight);
+      letter-spacing: var(--ls-tight);
       overflow-wrap: anywhere;
     }
 
@@ -109,9 +109,9 @@ export type TransactionSummaryTone = 'primary' | 'success' | 'warning' | 'info' 
 
     .tsc__note {
       margin: 0;
-      color: var(--text-muted);
-      font-size: var(--font-size-caption);
-      line-height: var(--line-height-control);
+      color: var(--text-tertiary);
+      font-size: var(--fs-caption);
+      line-height: var(--lh-control);
     }
   `]
 })

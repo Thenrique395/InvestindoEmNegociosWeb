@@ -153,13 +153,13 @@ export class InvestmentsComponent implements OnInit {
     { key: 'ANALISE', label: 'Análise' }
   ];
   benchmarkOptions: Array<{ key: BenchmarkKey; label: string; color: string }> = [
-    { key: 'CDI', label: 'CDI', color: 'var(--color-chart-series-3)' },
-    { key: 'IPCA', label: 'IPCA', color: 'var(--color-chart-series-2)' },
-    { key: 'IFIX', label: 'IFIX', color: 'var(--color-warning-text)' },
-    { key: 'IBOV', label: 'IBOV', color: 'var(--color-chart-expense)' },
-    { key: 'SMLL', label: 'SMLL', color: 'var(--color-chart-series-5)' },
-    { key: 'IDIV', label: 'IDIV', color: 'var(--color-chart-income)' },
-    { key: 'IVVB11', label: 'IVVB11', color: 'var(--color-chart-series-4)' }
+    { key: 'CDI', label: 'CDI', color: 'var(--chart-3)' },
+    { key: 'IPCA', label: 'IPCA', color: 'var(--chart-2)' },
+    { key: 'IFIX', label: 'IFIX', color: 'var(--warning-text)' },
+    { key: 'IBOV', label: 'IBOV', color: 'var(--expense)' },
+    { key: 'SMLL', label: 'SMLL', color: 'var(--chart-5)' },
+    { key: 'IDIV', label: 'IDIV', color: 'var(--income)' },
+    { key: 'IVVB11', label: 'IVVB11', color: 'var(--chart-4)' }
   ];
 
   // Prioridade 7: importação CSV
@@ -470,12 +470,12 @@ export class InvestmentsComponent implements OnInit {
 
   get distribuicaoPorTipoComCor(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
     const palette: Record<InvestmentType, string> = {
-      RF: 'var(--color-chart-series-1)',
-      ACOES: 'var(--color-chart-income)',
-      FUNDOS: 'var(--color-chart-series-5)',
-      CRIPTO: 'var(--color-chart-series-3)',
-      IMOVEL: 'var(--color-chart-investment)',
-      VEICULO: 'var(--color-chart-expense)'
+      RF: 'var(--chart-1)',
+      ACOES: 'var(--income)',
+      FUNDOS: 'var(--chart-5)',
+      CRIPTO: 'var(--chart-3)',
+      IMOVEL: 'var(--chart-6)',
+      VEICULO: 'var(--expense)'
     };
     return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
   }

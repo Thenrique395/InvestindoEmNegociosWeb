@@ -1,131 +1,287 @@
+/* ==========================================================================
+   Investindo em Negócios — Design Tokens
+   Fonte: design_handoff_investindo_redesign 2/tokens.css (agosto/2026).
+
+   Este arquivo é a ÚNICA fonte de cor, espaçamento, raio, sombra e tipografia.
+   Nenhum hex, px de espaçamento, raio ou sombra literal deve existir fora daqui.
+
+   As seções marcadas com [COMPLEMENTO] não estão no tokens.css original: são
+   valores que a documentação especifica em prosa (pesos, alturas de linha) mas
+   não tokenizou. Foram tokenizados aqui para que nenhum literal escape.
+   ========================================================================== */
+
 :root {
-  /* Brand */
-  --color-primary: var(--primary, #2563eb);
-  --color-primary-text: var(--primary-text, #1d4ed8);
-  --color-primary-weak: var(--primary-10, rgba(37, 99, 235, 0.12));
-  --color-primary-soft: var(--primary-20, rgba(37, 99, 235, 0.22));
+  /* ---------- MARCA ------------------------------------------------------ */
+  --brand-navy:            #002E3E;  /* sidebar, headers de marca, fundo dark */
+  --brand-navy-deep:       #001620;  /* fundo do palco em telas dark          */
+  --brand-navy-soft:       #0A4A5C;  /* navy claro, categoria/acento          */
+  --brand-green:           #349063;  /* verde da marca, séries de gráfico     */
+  --brand-green-light:     #4FB783;  /* verde sobre navy (barra ativa, check) */
+  --brand-offwhite:        #EDEBEC;
 
-  /* Surfaces */
-  --color-bg: var(--bg, #f8fafc);
-  --color-surface: var(--surface, #ffffff);
-  --color-surface-muted: var(--surface-2, #f1f5f9);
-  --color-surface-raised: var(--surface-3, #e2e8f0);
+  /* ---------- AÇÃO (primária de UI) ------------------------------------- */
+  --primary:               #2563EB;
+  --primary-hover:         #1D4ED8;
+  --primary-text:          #1D4ED8;  /* texto/ícone azul sobre fundo claro    */
+  --primary-tint:          rgba(37, 99, 235, .10);  /* badge, ícone-caixa     */
+  --primary-tint-soft:     rgba(37, 99, 235, .08);  /* item selecionado       */
+  --primary-ring:          rgba(37, 99, 235, .12);  /* foco (box-shadow 4px)  */
+  --primary-ring-strong:   rgba(37, 99, 235, .35);  /* :focus-visible         */
 
-  /* Text */
-  --color-text: var(--text, #0f172a);
-  --color-text-secondary: var(--text-secondary, #475569);
-  --color-text-muted: var(--text-muted, #64748b);
-  --color-text-inverse: var(--on-primary, #ffffff);
+  /* ---------- SEMÂNTICO FINANCEIRO -------------------------------------- */
+  --income:                #349063;  /* receita, positivo                     */
+  --income-text:           #2A7551;  /* texto verde legível em fundo claro    */
+  --income-tint:           rgba(52, 144, 99, .12);
+  --income-tint-soft:      rgba(52, 144, 99, .07);
 
-  /* Borders */
-  --color-border: var(--border, #e5e7eb);
-  --color-border-strong: var(--border-strong, #cbd5e1);
+  --expense:               #D9483F;  /* despesa, estouro, atraso              */
+  --expense-text:          #B3372F;
+  --expense-tint:          rgba(217, 72, 63, .12);
+  --expense-tint-soft:     rgba(217, 72, 63, .05);
+  --expense-border:        rgba(217, 72, 63, .24);
 
-  /* Status */
-  --color-success: var(--success, #22c55e);
-  --color-success-text: var(--success-text, #15803d);
-  --color-success-weak: var(--success-10, rgba(34, 197, 94, 0.12));
-  --color-success-soft: var(--success-20, rgba(34, 197, 94, 0.22));
+  --warning:               #C97A15;  /* atenção, 80–100% do limite            */
+  --warning-text:          #9A5C0E;
+  --warning-tint:          rgba(201, 122, 21, .14);
+  --warning-tint-soft:     rgba(201, 122, 21, .08);
 
-  --color-danger: var(--danger, #ef4444);
-  --color-danger-text: var(--danger-text, #dc2626);
-  --color-danger-weak: var(--danger-10, rgba(239, 68, 68, 0.12));
-  --color-danger-soft: var(--danger-20, rgba(239, 68, 68, 0.22));
+  /* ---------- SÉRIES DE GRÁFICO / CATEGORIA ----------------------------- */
+  --chart-1:               #2563EB;  /* Moradia, Renda Fixa, Serviços         */
+  --chart-2:               #D9483F;  /* Alimentação, Veículos                 */
+  --chart-3:               #349063;  /* Transporte, Ações, Salário            */
+  --chart-4:               #0A4A5C;  /* Saúde, Imóveis                        */
+  --chart-5:               #C97A15;  /* Educação, Cripto, Investimentos       */
+  --chart-6:               #7A4FB7;  /* Lazer, Reembolsos                     */
+  --chart-7:               #B7377A;  /* Assinaturas, Fundos                   */
+  --chart-neutral:         #9FB2BB;  /* Outros                                */
 
-  --color-warning: var(--warning, #f59e0b);
-  --color-warning-text: var(--warning-text, #b45309);
-  --color-warning-weak: var(--warning-10, rgba(245, 158, 11, 0.12));
-  --color-warning-soft: var(--warning-20, rgba(245, 158, 11, 0.22));
+  /* ---------- TEXTO ----------------------------------------------------- */
+  --text:                  #0A2430;  /* títulos, valores                      */
+  --text-secondary:        #46606C;  /* descrições, corpo                     */
+  --text-tertiary:         #7A929E;  /* eyebrow, notas de card                */
+  --text-muted:            #9FB2BB;  /* metadados, placeholder de gráfico     */
+  --text-faint:            #C3D2DA;  /* dias fora do mês, valor não digitado  */
 
-  --color-info: var(--info, #0ea5e9);
-  --color-info-text: var(--info-text, #0369a1);
-  --color-info-weak: var(--info-10, rgba(14, 165, 233, 0.12));
-  --color-info-soft: var(--info-20, rgba(14, 165, 233, 0.22));
+  /* ---------- SUPERFÍCIE ------------------------------------------------ */
+  --bg-app:                #F4F7F9;  /* fundo da área de conteúdo             */
+  --surface:               #FFFFFF;  /* card, tabela, modal                   */
+  --surface-sunken:        #F8FAFB;  /* input, cabeçalho de tabela            */
+  --surface-subtle:        #FBFCFD;  /* rodapé de modal, item interno         */
+  --surface-inset:         #EDF2F5;  /* trilho de segmented, atalho ⌘K        */
+  --track:                 #EAF0F3;  /* trilho de barra de progresso          */
 
-  /* Spacing scale */
-  --spacing-1: 0.5rem;
-  --spacing-2: 1rem;
-  --spacing-3: 1.5rem;
-  --spacing-4: 2rem;
-  --spacing-5: 2.5rem;
-  --spacing-6: 3rem;
-  --spacing-8: 4rem;
-  --spacing-10: 5rem;
+  /* ---------- BORDA ----------------------------------------------------- */
+  --border:                #E4EBEF;  /* borda de card, input                  */
+  --border-inner:          #EEF3F5;  /* divisor dentro do card                */
+  --border-row:            #F2F6F8;  /* divisor entre linhas de tabela        */
+  --border-strong:         #D6E0E6;  /* botão secundário                      */
+  --border-hover:          #C3D2DA;  /* card em hover                         */
 
-  /* Radius scale */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-pill: 999px;
+  /* ---------- SIDEBAR (sobre navy) ------------------------------------- */
+  --nav-bg:                #002E3E;
+  --nav-item:              #9FBAC3;
+  --nav-item-active:       #FFFFFF;
+  --nav-item-active-bg:    rgba(255, 255, 255, .10);
+  --nav-item-hover-bg:     rgba(255, 255, 255, .06);
+  --nav-indicator:         #4FB783;  /* barra de 3px à esquerda do ativo      */
+  --nav-group:             #5E7F8B;  /* rótulo de grupo, 9px uppercase        */
+  --nav-divider:           rgba(255, 255, 255, .08);
+  --nav-profile:           #7E9CA6;
 
-  /* Controls and interaction */
-  --control-height: var(--control-h, 2.625rem);
-  --control-height-sm: 2.25rem;
-  --control-background: var(--surface-2, #f1f5f9);
-  --control-background-hover: var(--surface-3, #e2e8f0);
-  --control-background-focus: var(--surface, #ffffff);
-  --control-border: var(--border, #e5e7eb);
-  --control-border-hover: var(--border-strong, #cbd5e1);
-  --control-focus-ring: color-mix(in srgb, var(--primary, #2563eb) 16%, transparent);
-  --control-disabled-opacity: 0.55;
+  /* ---------- TIPOGRAFIA ------------------------------------------------ */
+  --font-display: 'Poppins', system-ui, sans-serif;  /* títulos e valores     */
+  --font-body:    'Inter', system-ui, sans-serif;    /* corpo e UI            */
+
+  --fs-page-title:  26px;  /* Poppins 600, letter-spacing -.025em             */
+  --fs-modal-title: 20px;  /* Poppins 600, -.02em                            */
+  --fs-section:     18px;  /* Poppins 600, -.02em                            */
+  --fs-card-title:  15px;  /* Inter 600                                      */
+  --fs-subhead:     14px;  /* Inter 600                                      */
+  --fs-kpi:         26px;  /* Poppins 600, -.03em (faixa isolada)            */
+  --fs-kpi-strip:   20px;  /* Poppins 600, -.03em (faixa unida de 5)         */
+  --fs-body:        13px;
+  --fs-meta:        12px;
+  --fs-caption:     11px;
+  --fs-micro:       10px;  /* eyebrow e cabeçalho de coluna                  */
+
+  --ls-tight:      -.025em;
+  --ls-tighter:    -.03em;
+  --ls-eyebrow:     .18em;  /* eyebrow: 10px/700 uppercase                   */
+  --ls-column:      .10em;  /* cabeçalho de tabela: 10px/700 uppercase       */
+  --ls-nav-group:   .16em;  /* grupo da sidebar: 9px/700 uppercase           */
+
+  /* ---------- ESPAÇAMENTO ---------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --space-5: 12px;
+  --space-6: 14px;
+  --space-7: 16px;
+  --space-8: 18px;
+  --space-9: 20px;
+  --space-10: 22px;
+  --space-11: 26px;
+  --space-12: 28px;
+
+  --page-padding:      26px 28px 40px;  /* área de conteúdo                   */
+  --stack-gap:         16px;            /* entre seções da página             */
+  --card-padding:      18px 20px;       /* card de KPI                        */
+  --panel-padding:     20px 22px;       /* seção com título                   */
+  --table-padding-x:   22px;            /* recuo lateral de linha de tabela   */
+  --modal-padding:     22px 26px;
+
+  /* ---------- RAIO ------------------------------------------------------ */
+  --radius-panel:   18px;  /* seção grande com tabela dentro                 */
+  --radius-card:    16px;  /* card, modal                                    */
+  --radius-inner:   13px;  /* card dentro de card                            */
+  --radius-item:    11px;  /* item de lista, alerta                          */
+  --radius-control: 10px;  /* input, botão                                   */
+  --radius-sm:       9px;  /* botão pequeno, ícone-botão                     */
+  --radius-xs:       8px;  /* aba de segmented, ícone de ação                */
+  --radius-pill:   999px;
+
+  /* ---------- SOMBRA --------------------------------------------------- */
+  --shadow-card-hover: 0 14px 30px -20px rgba(3, 32, 44, .40);
+  --shadow-dropdown:   0 20px 44px -18px rgba(3, 32, 44, .45);
+  --shadow-modal:      0 40px 90px -30px rgba(0, 20, 28, .60);
+  --shadow-toast:      0 20px 44px -18px rgba(0, 20, 28, .70);
+  --shadow-segment:    0 1px 2px rgba(3, 32, 44, .08);  /* aba ativa         */
+  --shadow-focus:      0 0 0 4px var(--primary-ring);
+  /* divisor de faixa que quebra em várias linhas: */
+  --shadow-cell-divider: 1px 0 0 var(--border-inner), 0 1px 0 var(--border-inner);
+
+  /* ---------- ALTURAS FIXAS -------------------------------------------- */
+  --h-topbar:        56px;
+  --w-sidebar:      212px;
+  --h-nav-item:      34px;
+  --h-input:         42px;
+  --h-button:        40px;
+  --h-button-sm:     36px;
+  --h-button-xs:     30px;
+  --h-stepper:       38px;
+  --h-table-row:     56px;
+  --h-icon-button:   28px;
+
+  /* ---------- MOVIMENTO ------------------------------------------------ */
+  --ease-out:      cubic-bezier(.2, .7, .3, 1);
+  --ease-reveal:   cubic-bezier(.16, .8, .3, 1);
+  --dur-hover:     140ms;  /* background, cor                                */
+  --dur-control:   160ms;  /* chevron, borda                                 */
+  --dur-lift:      180ms;  /* elevação de card                               */
+  --dur-fade:      200ms;  /* entrada de painel/modal                        */
+  --dur-bar:       500ms;  /* barra de progresso                             */
+  --dur-count:     700ms;  /* número entrando (só KPI de dashboard)          */
+
+  /* ====================================================================== */
+  /* [COMPLEMENTO] — valores que a documentação especifica mas não tokeniza  */
+  /* ====================================================================== */
+
+  /* Pesos. COMPONENTES.md usa 400/500/600/700 ao longo de toda a spec.
+     O peso 800 não aparece em nenhum ponto do redesign.                     */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* Alturas de linha. O handoff não as especifica; mantidas as do sistema
+     atual, que estão corretas e não conflitam com a nova densidade.         */
+  --lh-display: 1;
+  --lh-tight:   1.2;
+  --lh-control: 1.35;
+  --lh-body:    1.6;
+
+  --ls-normal: 0;
+
+  /* Texto sobre superfície de ação. COMPONENTES.md seção 6: botão primário
+     e toast usam `color:#fff`.                                              */
+  --on-primary: #FFFFFF;
+
+  /* Controles. COMPONENTES.md seção 5 e 6 definem estados de foco, hover e
+     desabilitado; aqui viram tokens para não repetir a composição.          */
+  --control-disabled-opacity: .55;
   --control-transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    color 160ms ease,
-    opacity 160ms ease,
-    transform 160ms ease;
+    background-color var(--dur-hover) ease,
+    border-color var(--dur-hover) ease,
+    box-shadow var(--dur-control) ease,
+    color var(--dur-hover) ease,
+    opacity var(--dur-hover) ease,
+    transform 100ms ease;
 
-  /* Shadows */
-  --shadow-elevation-sm: var(--shadow-sm, 0 10px 20px rgba(15, 23, 42, 0.08));
-  --shadow-elevation-md: var(--shadow-md, 0 18px 40px rgba(15, 23, 42, 0.12));
-  --shadow-elevation-lg: var(--shadow-lg, 0 24px 70px rgba(15, 23, 42, 0.18));
+  /* Sobreposição de modal. COMPONENTES.md seção 7: backdrop.                 */
+  --overlay: rgba(0, 20, 28, .45);
 
-  /* Typography */
-  --font-family-sans: var(--font-sans, 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
-  --font-size-caption: var(--font-caption, 0.75rem);
-  --font-size-label: var(--font-label, 0.875rem);
-  --font-size-body-sm: var(--font-body-sm, 0.9375rem);
-  --font-size-body: var(--font-body, 1rem);
-  --font-size-body-lg: var(--font-body-lg, 1.125rem);
-  --font-size-title-sm: var(--font-title-sm, 1.25rem);
-  --font-size-title: var(--font-title, 1.5rem);
-  --font-size-title-lg: var(--font-title-lg, 1.875rem);
-  --font-size-display: var(--font-display, clamp(2rem, 3vw, 3rem));
-  --font-size-display-lg: var(--font-display-lg, clamp(3rem, 5vw, 4.5rem));
-  --font-size-card-eyebrow: var(--font-size-caption);
-  --font-size-card-metric: 2.25rem;
-  --font-size-card-title: 1.125rem;
-  --font-size-card-body: 0.9375rem;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
-  --font-weight-card-eyebrow: var(--font-weight-bold);
-  --font-weight-card-metric: var(--font-weight-bold);
-  --font-weight-card-title: var(--font-weight-semibold);
-  --font-weight-card-body: var(--font-weight-regular);
-  --line-height-tight: var(--leading-tight, 1.2);
-  --line-height-display: var(--leading-display, 1);
-  --line-height-control: var(--leading-control, 1.35);
-  --line-height-body: var(--leading-body, 1.6);
-  --letter-spacing-display: var(--tracking-display, -0.04em);
-  --letter-spacing-title: var(--tracking-title, -0.02em);
-  --letter-spacing-normal: var(--tracking-normal, 0);
-  --letter-spacing-label: var(--tracking-label, 0.08em);
-  --letter-spacing-eyebrow: var(--tracking-eyebrow, 0.2em);
+  /* ====================================================================== */
+  /* SITE PÚBLICO                                                           */
+  /* Extraídos de `prototipos/Site - pagina de vendas -claro-.dc.html` e     */
+  /* `Site - estilo produto.dc.html`.                                       */
+  /*                                                                        */
+  /* ATENÇÃO: no site a ação primária é VERDE (--brand-green), não azul.    */
+  /* O azul segue sendo a ação dentro do app autenticado. São escalas        */
+  /* diferentes — não reaproveitar o botão de uma na outra.                  */
+  /* ====================================================================== */
+  --site-header-h:      72px;
+  --site-max-width:   1280px;
+  --site-section-y:     80px;  /* padding vertical de seção                  */
+  --site-section-x:     56px;  /* padding lateral de seção                   */
+  --site-hero-pt:       88px;
+  --site-hero-pb:       72px;
 
-  /* Data visualization */
-  --color-chart-income: var(--chart-income, #16a34a);
-  --color-chart-expense: var(--chart-expense, #dc2626);
-  --color-chart-goal: var(--chart-goal, #2563eb);
-  --color-chart-investment: var(--chart-investment, #7c3aed);
-  --color-chart-series-1: var(--chart-series-1, #2563eb);
-  --color-chart-series-2: var(--chart-series-2, #16a34a);
-  --color-chart-series-3: var(--chart-series-3, #d97706);
-  --color-chart-series-4: var(--chart-series-4, #7c3aed);
-  --color-chart-series-5: var(--chart-series-5, #0891b2);
+  --site-header-bg:     rgba(255, 255, 255, .88);
+  --site-header-border: rgba(10, 36, 48, .10);
+  --site-header-blur:   blur(12px);
+
+  --site-cta-h:         52px;  /* CTA do hero e do fechamento                */
+  --site-cta-h-sm:      40px;  /* CTA do header                              */
+  --site-cta-bg:        var(--brand-green);
+  --site-cta-bg-hover:  var(--income-text);
+  --site-cta-fg:        #FFFFFF;
+  --site-cta-ls:        .12em;
+
+  --site-lift-shadow:   0 12px 28px -18px rgba(3, 32, 44, .32);
+  --site-hero-shadow:   0 50px 100px -40px rgba(0, 0, 0, .70);
+
+  --site-reveal-shift:  34px;
+  --site-reveal-dur:    900ms;
+
+  /* Prévia do app no hero. Mantém a paleta CLARA nos dois temas do site: é uma
+     imagem do produto, não uma superfície da página. No protótipo navy a
+     janela do painel continua branca — escurecê-la faria o site parecer estar
+     mostrando um app diferente do que o usuário vai encontrar. */
+  --preview-bg:           #F4F7F9;
+  --preview-surface:      #FFFFFF;
+  --preview-chrome:       #EDF2F5;
+  --preview-text:         #0A2430;
+  --preview-text-2:       #46606C;
+  --preview-text-3:       #7A929E;
+  --preview-border:       #E4EBEF;
+  --preview-border-inner: #EEF3F5;
+  --preview-income:       #2A7551;
+  --preview-income-tint:  rgba(52, 144, 99, .12);
+  --preview-expense:      #B3372F;
+  --preview-warning:      #C97A15;
+  --preview-green:        #4FB783;
+
+  /* ====================================================================== */
+  /* AUTENTICAÇÃO                                                           */
+  /* `prototipos/Autenticacao.dc.html`. Escala própria: o formulário é o     */
+  /* único conteúdo da tela, então respira mais que um formulário do app     */
+  /* (campo de 46px contra 42px, raio de 11px contra 10px).                  */
+  /* ====================================================================== */
+  --auth-stage-bg:      #001620;  /* fundo atrás do cartão                  */
+  --auth-card-max:      1080px;
+  --auth-card-radius:   22px;
+  --auth-card-shadow:   0 40px 100px -50px rgba(0, 0, 0, .80);
+  --auth-min-height:    600px;
+  --auth-pad-y:         44px;
+  --auth-pad-x:         48px;
+  --auth-aside-pad-x:   40px;
+
+  --auth-field-h:       46px;
+  --auth-field-radius:  11px;
+
+  --auth-aside-text:    #BBD3DA;  /* descrição sobre navy                   */
+  --auth-aside-proof:   #DCE8EC;  /* prova social, mais claro               */
+  --auth-aside-label:   #6E8B96;  /* rótulo do rodapé do painel             */
+  --auth-aside-divider: rgba(237, 235, 236, .14);
 }
