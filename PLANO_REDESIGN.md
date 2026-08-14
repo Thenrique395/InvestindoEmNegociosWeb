@@ -358,7 +358,7 @@ visual. Agora está, e os 13 primitivos vivem lá.
 
 | # | Tela | Observação |
 |---|---|---|
-| 5.1 | Dashboard | perfil Completo primeiro (superconjunto), depois recortar |
+| 5.1 | Dashboard | 🔶 faixa de KPIs feita; faltam saúde financeira, evolução, atenção, recorrências, orçamento e metas |
 | 5.2 | Despesas | 🔶 em andamento |
 | 5.3 | Receitas | sai barato depois de 5.2 — muda conteúdo e polaridade |
 | 5.4 | Cartões | + `invoice-import`; resolve os 3 hex de bandeira |
@@ -586,6 +586,32 @@ Corrigido para `--on-primary`, que carrega o par certo em cada tema:
 Sobram 4.01:1 em rótulos de aba (Calendário e Categorias) — abaixo de 4.5 para texto normal.
 Não corrigido: exige decidir se o rótulo inativo sobe de `--text-tertiary` para
 `--text-secondary`, o que mexe no contraste entre aba ativa e inativa em ambos os temas.
+
+### Dashboard — faixa de indicadores
+
+O `financial-overview` usava exatamente o que o handoff proíbe:
+
+```
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+```
+
+ARQUITETURA_ANGULAR.md §7 e COMPONENTES.md §3.1(b): *"flex com quebra, **proibido `grid` com
+`auto-fit`** — deixa célula vazia"*. Com 5 KPIs no perfil Completo, é o caso exato.
+
+Convertido para faixa unida: `flex: 1 1 200px`, divisor por `box-shadow` (cobre a quebra de
+linha sem borda solta), primeira célula com gradiente e valor maior, valores em Poppins com
+`tabular-nums` — sem isso, dígitos de largura variável fazem as 5 colunas dançarem a cada
+atualização.
+
+**Medido**: faixa de 1172px, células somando 1170px — preenche a linha inteira, sem sobra.
+
+#### Restante do Dashboard
+
+Saúde financeira (só Completo), evolução de 12 meses, "Precisa da sua atenção", recorrências,
+orçamento do mês, metas e insights. Mais o recorte por perfil (Essencial 3 KPIs, Inteligente e
+Completo 5) e a regra de **histórico insuficiente**: com menos de dois meses de dados, o
+gráfico de evolução é substituído por um bloco explicativo — desenhar tendência com dois
+pontos mente sobre o dado.
 
 ## 6. Pendências
 
