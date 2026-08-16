@@ -30,7 +30,9 @@
   min-height: var(--auth-min-height);
   padding: var(--auth-pad-y) var(--auth-aside-pad-x);
   background: var(--brand-navy);
-  color: var(--surface);
+  /* Cor fixa, não `--surface`: o painel não muda com o tema, então o texto
+     dele também não pode mudar. */
+  color: var(--auth-aside-strong);
 }
 
 .auth-aside__glow {

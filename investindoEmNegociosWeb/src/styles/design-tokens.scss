@@ -283,10 +283,18 @@
   /* único conteúdo da tela, então respira mais que um formulário do app     */
   /* (campo de 46px contra 42px, raio de 11px contra 10px).                  */
   /* ====================================================================== */
-  --auth-stage-bg:      #001620;  /* fundo atrás do cartão                  */
+  /* Fundo atrás do cartão é o fundo do app, e muda com o tema. O protótipo
+     tinha `body { background:#001620 }`, mas aquilo era a moldura da PÁGINA de
+     protótipo — a mesma que mostra "PROTÓTIPO NAVEGÁVEL" e as pílulas de
+     navegação entre os três fluxos. Não é a tela. */
+  --auth-stage-bg:      var(--bg-app);
   --auth-card-max:      1080px;
   --auth-card-radius:   22px;
-  --auth-card-shadow:   0 40px 100px -50px rgba(0, 0, 0, .80);
+  /* Sombra do cartão: o valor do protótipo (rgba(0,0,0,.8)) foi calibrado
+     contra o fundo #001620 da página de protótipo. Sobre o fundo real do app
+     ele vira uma mancha cinza. `--shadow-modal` é o token do handoff para
+     camada flutuante grande, e já está calibrado para este fundo. */
+  --auth-card-shadow:   var(--shadow-modal);
   --auth-min-height:    600px;
   --auth-pad-y:         44px;
   --auth-pad-x:         48px;
@@ -295,6 +303,10 @@
   --auth-field-h:       46px;
   --auth-field-radius:  11px;
 
+  /* O painel esquerdo é SEMPRE navy, nos dois temas. Por isso estas cores são
+     fixas e claras: usar `--surface` deixava o título escuro sobre escuro no
+     tema dark, porque `--surface` inverte e o fundo do painel não. */
+  --auth-aside-strong:  #FFFFFF;  /* título e marca sobre navy              */
   --auth-aside-text:    #BBD3DA;  /* descrição sobre navy                   */
   --auth-aside-proof:   #DCE8EC;  /* prova social, mais claro               */
   --auth-aside-label:   #6E8B96;  /* rótulo do rodapé do painel             */
