@@ -971,13 +971,13 @@ Contagem do dia, por regra do gate (`npm run handoff:report`):
 | Regra | Violações | O que é |
 |---|---|---|
 | **R1** | 7 | Primitivos criados na Fase 4 que só aparecem no `/styleguide` |
-| **R2** | 6 | `grid auto-fit` em faixa de indicadores |
+| ~~R2~~ | ✅ 0 | `grid auto-fit` em faixa de indicadores — **quitada, e fora do baseline** |
 | ~~R3~~ | ✅ 0 | Tela com card de indicador sem nenhum tooltip — **quitada, e fora do baseline** |
 | **R4** | 10 | Gráfico desenhado à mão dentro da feature |
-| **R5** | 27 | `--shadow-card-hover` aplicada em repouso |
+| ~~R5~~ | ✅ 0 | `--shadow-card-hover` aplicada em repouso — **quitada, e fora do baseline** |
 | **R6** | 4 | Hex literal fora do `design-tokens.scss` |
-| **R8** | 51 | Componente sem `OnPush` (dívida anterior ao redesign) |
-| **R9** | 22 | Feature repintando primitivo por dentro com `::ng-deep` |
+| **R8** | 49 | Componente sem `OnPush` (dívida anterior ao redesign) |
+| **R9** | 19 | Feature repintando primitivo por dentro com `::ng-deep` — parcialmente quitada na 8.6 |
 
 **R1 é a que decide o resultado do rebrand.** `app-kpi-strip`, `app-money`, `app-data-table`,
 `app-number-stepper`, `app-progress-bar`, `app-chart-bars` e `app-chart-line` foram
@@ -1098,16 +1098,26 @@ primitivo é apagado e o plano registra por que o legado venceu. Não existe man
       não o sintoma — enquanto os dois existirem, a próxima tela escolhe o errado.
 - [ ] `/styleguide` passa a listar só o que está em uso.
 
-### 8.2 — Faixa de indicadores em flex · R2: 6 → 0
+### 8.2 — Faixa de indicadores em flex · R2: ~~6~~ ✅ CONCLUÍDA
 
-Sai de `grid auto-fit` para `flex-wrap` com `flex: 1 1 210px` (README §4).
+16 faixas convertidas para `flex-wrap` com `flex: 1 1 210px`, em 2026-08-16.
 
-- [ ] `shared/transactions/transactions-layout.scss:13` — **resolve 3 telas de uma vez**
-      (despesas, receitas, cartões). Começar por aqui.
-- [ ] `metas.component.scss:11`
-- [ ] `calendario`, `categories`, `contas`, `loan-detail`
-- [ ] Verificar em 1440/1024/390px que a última linha cresce e não sobra célula vazia —
-      é o bug que a regra existe para impedir, e ele só aparece em largura específica.
+**O gate apontava 6; corrigi 16.** As outras 10 usavam `repeat(N, minmax(0,1fr))` fixo, que
+o regex não pega — mas a regra do README §4 é "flex com quebra", não "sem `auto-fit`".
+Corrigir só onde o checker aponta é o erro nº 3 do briefing.
+
+O flex ainda dispensou os breakpoints que existiam só para recontar colunas.
+
+**Medido**: com `grid`, Contas deixava **890px vazios** na última linha a 1440px. É esse o
+defeito que a regra evita, e ele só aparece em largura específica —
+`quality-tests/e2e/kpi-strip-fill.spec.ts` mede a sobra em 9 larguras e foi verificado
+falhando quando a tela volta para grid.
+
+**Efeito colateral que precisou de correção**: com os 5 cards de Contas cabendo numa linha,
+cada um ficou estreito e o valor partia no meio — `R$ 8.580` numa linha, `,00` na outra,
+porque a base do card tinha `overflow-wrap: anywhere`. Dinheiro não parte. A base passou a
+não quebrar e as faixas de 5 usam `density="compact"`, que é o degrau que o handoff já
+tokenizava: `--fs-kpi` (26px) é "faixa isolada", `--fs-kpi-strip` (20px) é "faixa unida de 5".
 
 ### 8.3 — Tooltip em todo indicador · R3: ~~16~~ ✅ CONCLUÍDA
 
@@ -1153,14 +1163,32 @@ renomear atravessa o card, o badge e a barra, e é chamada do dono do produto.
       hover por ponto), **estender o primitivo** conforme o contrato `ChartSeries` de §8.
       Não voltar a desenhar na feature.
 
-### 8.5 — Sombra só em hover e camada flutuante · R5: 27 → 0
+### 8.5 — Sombra só em hover e camada flutuante · R5: ~~27~~ ✅ CONCLUÍDA
 
-README §3: card em repouso tem borda de 1px e nenhuma sombra.
+24 cards perderam a sombra de repouso em 2026-08-16. Ficam com borda de 1px e raio, como o
+README §3 pede.
 
-- [ ] Trocar `box-shadow: var(--shadow-card-hover)` em repouso por borda + sombra no `:hover`.
-- [ ] Começar por `transactions-layout.scss` e `dashboard-*`, os mais visíveis.
-- [ ] Conferir no tema escuro: sem a sombra, a separação passa a depender só da borda, e
-      `--border` no escuro tem contraste menor.
+**Três dos 27 eram falso positivo da regra, não do código** — e a correção foi na regra:
+
+- o knob do switch (`toggle-field__thumb`): controle elevado, não card;
+- a aba ativa do segmented: a própria Fase 4.3 pede "aba ativa branca com sombra";
+- o plano destacado do site: linguagem visual própria, por D8.
+
+Isto **não é afrouxar a regra**. A regra do handoff é sobre card em repouso; minha
+implementação estava larga demais e pegava controle e site junto. A distinção está escrita no
+código do gate, para não virar exceção silenciosa.
+
+**Cartões, faturas e categorias eram clicáveis e ficaram sem retorno visual nenhum**: ganharam
+a elevação de 2px no `:hover` que o handoff especifica. Card não interativo não ganhou hover.
+
+**Verificado nos dois temas.** O risco anotado antes desta etapa era o tema escuro, onde
+`--border` tem menos contraste e a separação passaria a depender só dela. Confirmado em
+captura: os cards continuam legíveis.
+
+**Defeito pré-existente encontrado na verificação**: `.btn-secondary` não existe no
+`styles.scss` — a classe nunca foi definida. Quatro telas a usavam, e o botão renderizava sem
+estilo nenhum: em Contas, "Nova transferência" era texto solto entre dois botões. Trocado por
+`.btn-ghost`.
 
 ### 8.6 — Fim do `::ng-deep` em feature · R9: ~~22~~ 19 → 0
 
