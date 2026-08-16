@@ -234,8 +234,8 @@ Uma tela por sessão, na ordem do ORDEM_DE_IMPLEMENTACAO.md.
 Implemente a tela de Dashboard conforme a seção 1 do TELAS.md e o
 PERFIS_E_PERMISSOES.md.
 
-Faça o perfil Completo primeiro — é o superconjunto. Depois recorte para
-Inteligente e Essencial. Use os primitivos de shared/ já criados; se precisar
+Faça o perfil Patrimônio primeiro — é o superconjunto. Depois recorte para
+Controle e Essencial. Use os primitivos de shared/ já criados; se precisar
 de uma variação, estenda o primitivo em vez de criar um componente irmão.
 
 Antes de finalizar, rode o checklist do ARQUITETURA_ANGULAR.md.

@@ -78,7 +78,7 @@ Ordem por frequência de uso.
 
 - 2.2 e 2.3 compartilham quase tudo. Implementar Despesas por completo, extrair o que é comum, e Receitas sai em uma fração do tempo.
 - A **regra de parcelado** (perguntar se a ação vale para esta parcela ou todas as seguintes) atravessa Despesas, Cartões e Calendário. Implementar o modal de escolha uma vez, em `shared/`.
-- O **dashboard depende dos três perfis** — ver `PERFIS_E_PERMISSOES.md`. Fazer o perfil Completo primeiro (é o superconjunto) e depois recortar.
+- O **dashboard depende dos três perfis** — ver `PERFIS_E_PERMISSOES.md`. Fazer o perfil Patrimônio primeiro (é o superconjunto) e depois recortar.
 
 ---
 

@@ -24,9 +24,9 @@ Rótulos e tooltips:
 - **Despesas** — "Tudo que saiu ou ainda vai sair no período, pago ou em aberto."
 - **Comprometido** — "Cartões, parcelas e contas com vencimento futuro."
 
-**Saúde financeira** (só Completo) — índice de 0 a 100 com os fatores que o compõem em barras.
+**Saúde financeira** (só Patrimônio) — índice de 0 a 100 com os fatores que o compõem em barras.
 
-**Evolução** — gráfico de linha ou barras de 6 (Inteligente) ou 12 meses (Completo), receita × despesa. Substituído pelo bloco de "histórico começando" quando há menos de dois meses de dados.
+**Evolução** — gráfico de linha ou barras de 6 (Controle) ou 12 meses (Patrimônio), receita × despesa. Substituído pelo bloco de "histórico começando" quando há menos de dois meses de dados.
 
 **Precisa da sua atenção** — lista de pendências: contas atrasadas, orçamento estourado, meta fora do ritmo. Cada item com ação direta.
 
@@ -36,7 +36,7 @@ Rótulos e tooltips:
 
 **Recorrências do mês** — grade compacta de assinaturas, contas fixas e parcelas, com cor da categoria, dia de recorrência e valor. Rodapé com total fixo de saídas, peso na renda e contagem.
 
-**Investimentos** (Completo) — patrimônio, variação no ano, proventos, e as posições principais em 2×2.
+**Investimentos** (Patrimônio) — patrimônio, variação no ano, proventos, e as posições principais em 2×2.
 
 **Atividades recentes** — últimos lançamentos.
 

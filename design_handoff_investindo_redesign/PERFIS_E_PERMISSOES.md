@@ -2,7 +2,10 @@
 
 O sistema tem quatro perfis. A diferença entre eles não é só "mais cards" — é **qual pergunta o dashboard responde primeiro** e **quais itens existem no menu**.
 
-Fonte: `dashboard.component.ts`, `financial-overview.model.ts` e a decisão de produto tomada com o cliente.
+Fonte: `navigation.ts`, `features.ts`, `app.routes.ts`, `financial-overview.model.ts` e a decisão de produto tomada com o cliente.
+
+Nomes técnicos continuam sendo `Basic`, `Intermediate`, `Advanced` e `Admin`. Na UI comercial,
+eles aparecem como **Essencial**, **Controle**, **Patrimônio** e **Admin**.
 
 ---
 
@@ -13,18 +16,25 @@ Fonte: `dashboard.component.ts`, `financial-overview.model.ts` e a decisão de p
 ```
 Visão geral
   Dashboard
+  Calendário
 Movimentações
   Despesas
   Receitas
   Cartões
+  Contas
+  Categorias
 Planejamento
   Metas
-  Categorias
+Análises
+  Calculadoras
+Conta
+  Perfil
+  Configurações
 ```
 
-Não tem: Calendário, Contas, Orçamento, Investimentos, Relatórios, Simulador, Assistente, Empréstimos.
+Não tem: Orçamento, Empréstimos, Investimentos, Relatórios, Simulador, Assistente, Histórico mensal.
 
-### Inteligente
+### Controle
 
 ```
 Visão geral
@@ -39,11 +49,21 @@ Movimentações
 Planejamento
   Metas
   Orçamento
+  Empréstimos
+Análises
+  Relatórios
+  Simulador
+  Assistente
+  Histórico mensal
+  Calculadoras
+Conta
+  Perfil
+  Configurações
 ```
 
-Não tem: Investimentos, Relatórios, Simulador, Assistente, Empréstimos.
+Não tem: Investimentos.
 
-### Completo
+### Patrimônio
 
 Todos os itens:
 
@@ -60,12 +80,14 @@ Movimentações
 Planejamento
   Metas
   Orçamento
-  Empréstimos e Financiamentos
+  Empréstimos
   Investimentos
 Análises
   Relatórios
   Simulador
   Assistente
+  Histórico mensal
+  Calculadoras
 Conta
   Perfil
   Configurações
@@ -73,19 +95,14 @@ Conta
 
 ### Admin
 
-Todo o menu do Completo **mais** o grupo administrativo, e o grupo "Visão geral" ganha **dois** itens de dashboard:
+Todo o menu do Patrimônio **mais** o grupo administrativo:
 
 ```
-Visão geral
-  Painel do sistema      ← dashboard administrativo
-  Dashboard              ← dashboard financeiro pessoal
 ...
 Administração
   Usuários
-  Assinaturas
   Parâmetros
   Robôs
-  Auditoria
 ```
 
 ---
@@ -106,7 +123,7 @@ Depois:
 
 Sem gráfico de evolução, sem patrimônio, sem distribuição por categoria. O perfil Essencial responde uma pergunta só.
 
-### Inteligente — "estou dentro do planejado"
+### Controle — "estou dentro do planejado"
 
 Cinco indicadores: **Saldo**, **Patrimônio líquido**, **Receitas**, **Despesas**, **Comprometido**.
 
@@ -117,7 +134,7 @@ Depois:
 - **Próximos vencimentos**
 - **Recorrências do mês**
 
-### Completo — "como está minha vida financeira"
+### Patrimônio — "como está minha vida financeira"
 
 Mesmos cinco indicadores, mais:
 - **Saúde financeira** no topo — o índice e os fatores que o compõem
@@ -131,7 +148,7 @@ Mesmos cinco indicadores, mais:
 
 **Painel do sistema** (novo): contas ativas, assinaturas, receita recorrente, robôs em execução, falhas recentes, fila de processamento, últimos cadastros e log de auditoria resumido.
 
-**Dashboard**: o dashboard financeiro pessoal completo, idêntico ao perfil Completo.
+**Dashboard**: o dashboard financeiro pessoal completo, idêntico ao perfil Patrimônio.
 
 O item ativo no grupo "Visão geral" alterna entre os dois.
 
@@ -151,18 +168,18 @@ Não repetir o checklist do onboarding no dashboard. Se o onboarding foi conclu�
 
 ## Restrições de ação por perfil
 
-| Ação | Essencial | Inteligente | Completo | Admin |
+| Ação | Essencial | Controle | Patrimônio | Admin |
 |---|---|---|---|---|
 | Lançar despesa / receita | sim | sim | sim | sim |
 | Cadastrar cartão | sim | sim | sim | sim |
-| Cadastrar conta bancária | — | sim | sim | sim |
+| Cadastrar conta bancária | sim | sim | sim | sim |
 | Cadastrar categoria | sim | sim | sim | sim |
 | Criar meta | sim | sim | sim | sim |
 | Montar orçamento | — | sim | sim | sim |
 | Importar fatura em PDF | — | sim | sim | sim |
 | Registrar investimento / importar B3 | — | — | sim | sim |
-| Exportar relatório | — | — | sim | sim |
-| Usar Assistente / Simulador | — | — | sim | sim |
+| Exportar relatório | — | sim | sim | sim |
+| Usar Assistente / Simulador | — | sim | sim | sim |
 | Administração | — | — | — | sim |
 
 Onde a ação não existe para o perfil, **o item simplesmente não aparece no menu** — sem card de upsell dentro da tela, sem botão desabilitado. O upsell fica no CTA contextual do dashboard e na tela de plano em Configurações.
