@@ -261,7 +261,7 @@
 
   .cards-list__brand {
     border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-    background: linear-gradient(135deg, #0f3ea8, var(--primary-text));
+    background: linear-gradient(135deg, var(--brand-visa-from), var(--primary-text));
     color: white;
   }
 }
@@ -288,7 +288,7 @@
 
   .cards-list__brand {
     border-color: rgba(15, 23, 42, 0.12);
-    background: linear-gradient(135deg, #111827, #334155);
+    background: linear-gradient(135deg, var(--brand-elo-from), var(--brand-elo-to));
     color: white;
   }
 }
@@ -300,7 +300,7 @@
 
   .cards-list__brand {
     border-color: rgba(8, 145, 178, 0.18);
-    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    background: linear-gradient(135deg, var(--brand-amex-from), var(--brand-amex-to));
     color: white;
   }
 }

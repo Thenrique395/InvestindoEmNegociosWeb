@@ -19,6 +19,18 @@
   --brand-green-light:     #4FB783;  /* verde sobre navy (barra ativa, check) */
   --brand-offwhite:        #EDEBEC;
 
+  /* ---------- BANDEIRAS DE CARTÃO --------------------------------------- */
+  /* Cores de marca de TERCEIROS, não do design system: são a identidade de
+     Visa, Elo e Amex e não seguem a paleta do handoff. Vivem aqui porque a
+     regra é uma só — nenhum literal fora deste arquivo (ARQUITETURA §6) —
+     e porque centralizá-las é o que permite trocar a arte do cartão num
+     lugar. Não usar em nada que não seja o selo da bandeira. */
+  --brand-visa-from:       #0F3EA8;
+  --brand-elo-from:        #111827;
+  --brand-elo-to:          #334155;
+  --brand-amex-from:       #0891B2;
+  --brand-amex-to:         #06B6D4;
+
   /* ---------- AÇÃO (primária de UI) ------------------------------------- */
   --primary:               #2563EB;
   --primary-hover:         #1D4ED8;

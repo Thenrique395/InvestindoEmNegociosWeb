@@ -233,12 +233,45 @@ rules.push({
   ref: 'ARQUITETURA_ANGULAR.md §6 · §12',
   run() {
     const hex = /#[0-9a-fA-F]{3,8}\b/;
-    const comentario = /^\s*(\/\/|\/\*|\*)/;
-    return [
-      ...scan(scss, (line) => hex.test(line) && !comentario.test(line)),
-      ...scan(html, (line) => /#[0-9a-fA-F]{6}\b/.test(line)),
-      ...scan(ts, (line) => /['"`]#[0-9a-fA-F]{3,8}['"`]/.test(line) && !comentario.test(line)),
-    ];
+
+    /**
+     * Devolve cada linha do arquivo com os comentários removidos, para que um hex citado
+     * numa explicação não conte como violação. Testar `^\s*(\/\/|\/\*|\*)` não bastava:
+     * a linha do meio de um bloco começa com qualquer coisa.
+     */
+    const semComentarios = (file) => {
+      let emBloco = false;
+      return lines(file).map((linha) => {
+        let resto = emBloco ? linha : linha.replace(/\/\/.*$/, '');
+        let codigo = '';
+        while (resto.length) {
+          if (emBloco) {
+            const fim = resto.indexOf('*/');
+            if (fim === -1) return codigo;
+            resto = resto.slice(fim + 2);
+            emBloco = false;
+          } else {
+            const inicio = resto.indexOf('/*');
+            if (inicio === -1) return codigo + resto;
+            codigo += resto.slice(0, inicio);
+            resto = resto.slice(inicio + 2);
+            emBloco = true;
+          }
+        }
+        return codigo;
+      });
+    };
+
+    const hits = [];
+    for (const file of [...scss, ...ts]) {
+      if (isStyleguide(file)) continue;
+      const alvo = file.endsWith('.scss') ? hex : /['"`]#[0-9a-fA-F]{3,8}['"`]/;
+      semComentarios(file).forEach((codigo, i) => {
+        if (alvo.test(codigo)) hits.push({ file: rel(file), line: i + 1, text: codigo.trim() });
+      });
+    }
+    hits.push(...scan(html, (line) => /#[0-9a-fA-F]{6}\b/.test(line)));
+    return hits;
   },
 });
 
@@ -306,7 +339,7 @@ rules.push({
  * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
  * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
  */
-export const BASELINE = { R1: 7, R4: 10, R6: 4, R8: 49, R9: 19 };
+export const BASELINE = { R1: 7, R4: 10, R8: 49, R9: 19 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing
