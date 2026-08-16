@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ import { UiPermissionsService } from '../ui-permissions.service';
 import { formatMonthYearLabel } from '../utils/locale-utils';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
-import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
+import { KpiItem, KpiStripComponent } from '../shared/kpi-strip/kpi-strip.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
@@ -21,6 +21,8 @@ import { FinancialTimelineComponent } from './financial-timeline.component';
 import { FinancialEventCardComponent } from './financial-event-card.component';
 import { CalendarSidebarComponent } from './calendar-sidebar.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { FinancialPrivacyService } from '../financial-privacy.service';
+import { formatCurrencyValue } from '../utils/locale-utils';
 import {
   buildCalendarEvents,
   buildPeriodSummary,
@@ -51,7 +53,7 @@ type GroupFilter = 'all' | CalendarEventGroup;
     FormsModule,
     PageHeaderComponent,
     FilterBarComponent,
-    TransactionSummaryCardComponent,
+    KpiStripComponent,
     StatusBadgeComponent,
     EmptyStateComponent,
     SegmentedSelectorComponent,
@@ -115,6 +117,53 @@ export class CalendarioComponent implements OnInit {
   readonly digest = signal<TodayDigest>({ expenses: 0, incomes: 0, cards: 0, loans: 0, goals: 0, total: 0 });
   readonly upcoming = signal<CalendarEvent[]>([]);
   readonly pending = signal<CalendarEvent[]>([]);
+
+  /**
+   * Faixa unida do formato (b) — COMPONENTES.md §3.1 atribui Calendário a ele.
+   * O `computed` só adapta o resumo ao contrato; a semântica continua no modelo.
+   */
+  private readonly privacy = inject(FinancialPrivacyService);
+
+  /** Mesmo comportamento do AppCurrencyPipe: respeita "ocultar valores" da topbar. */
+  private currency(value: number): string {
+    return this.privacy.hidden() ? '••••••' : formatCurrencyValue(value);
+  }
+
+  readonly kpiItems = computed<KpiItem[]>(() => {
+    const s = this.periodSummary();
+    return [
+      {
+        key: 'receitas', label: 'Receitas previstas', tone: 'success',
+        value: this.currency(s.incomeForecast),
+        note: `Entradas previstas em ${this.monthTitle}.`,
+        tooltip: 'Soma das receitas com data no mês exibido, previstas ou já recebidas. Lançamento cancelado não entra.',
+      },
+      {
+        key: 'despesas', label: 'Despesas previstas', tone: 'danger',
+        value: this.currency(s.expenseForecast),
+        note: 'Contas e parcelas a pagar no período.',
+        tooltip: 'Despesas do mês somadas às parcelas de empréstimo e financiamento, que também vencem no período. Fatura de cartão entra pelo vencimento, não pelo fechamento.',
+      },
+      {
+        key: 'saldo', label: 'Saldo previsto', tone: s.projectedBalance >= 0 ? 'info' : 'warning',
+        value: this.currency(s.projectedBalance),
+        note: 'Diferença entre o que entra e o que sai.',
+        tooltip: 'Receitas previstas menos despesas previstas do mês. É o fluxo do período isolado — não soma o saldo que você já tem em conta.',
+      },
+      {
+        key: 'compromissos', label: 'Compromissos', tone: 'primary',
+        value: s.commitments.toString(),
+        note: `Vencimentos no mês: ${s.dueCount}`,
+        tooltip: 'Todos os eventos do mês — receitas, despesas, parcelas, metas e vencimento de fatura. O fechamento de fatura não conta, porque não é uma data em que algo precisa ser pago.',
+      },
+      {
+        key: 'pendencias', label: 'Pendências', tone: 'warning',
+        value: this.pending().length.toString(),
+        note: 'Compromissos atrasados a regularizar.',
+        tooltip: 'Compromissos com vencimento já passado e ainda não quitados, de qualquer mês — não só do período exibido.',
+      },
+    ];
+  });
   readonly categoryOptions = signal<string[]>([]);
   readonly viewHasEvents = signal(false);
 

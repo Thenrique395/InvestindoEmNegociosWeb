@@ -152,7 +152,9 @@ rules.push({
       const src = readFileSync(file, 'utf8');
       const usos = (src.match(/<app-transaction-summary-card|<app-metric-card|<app-kpi-strip/g) || []).length;
       if (!usos) continue;
-      const tips = (src.match(/tooltipText|\[tooltip\]|appTooltip|items=/g) || []).length;
+      // `[items]` cobre o app-kpi-strip: lá o tooltip é obrigatório no tipo `KpiItem`,
+      // o que o compilador garante melhor do que esta busca por texto.
+      const tips = (src.match(/tooltipText|\[tooltip\]|appTooltip|\[?items\]?=/g) || []).length;
       if (tips === 0) {
         hits.push({
           file: rel(file),
