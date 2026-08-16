@@ -34,18 +34,18 @@
     </app-transaction-summary-card>
     <app-transaction-summary-card
       tone="info"
-      eyebrow="Parcelas abertas"
-      [value]="overview.totalOpenInstallments.toString()"
-      [note]="overview.contractsCount + ' contrato(s) acompanhado(s).'">
+      eyebrow="Próximo vencimento"
+      [value]="overview.nextDueDate ? (overview.nextDueDate | date:'dd/MM/yyyy')! : 'Sem vencimento'"
+      [note]="overview.nextDueDate ? ('Parcela de ' + (overview.nextDueAmount | appCurrency)) : 'Nenhuma parcela aberta.'">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
     <app-transaction-summary-card
       tone="success"
-      eyebrow="Progresso geral"
-      [value]="overview.paidPercent + '%'"
-      note="Parcelas já quitadas no conjunto de contratos.">
+      eyebrow="Quitação prevista"
+      [value]="overview.expectedPayoffDate ? (overview.expectedPayoffDate | date:'dd/MM/yyyy')! : 'Sem previsão'"
+      [note]="overview.totalOpenInstallments + ' parcela(s) abertas no conjunto.'">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -96,7 +96,7 @@
                 <p class="muted text--sm">
                   {{ view.contract.amortizationType === 'Sac' ? 'SAC' : 'PRICE' }} ·
                   {{ view.contract.termMonths }} meses ·
-                  saldo aberto {{ view.contract.openBalance | appCurrency }}
+                  {{ view.contract.annualInterestRate | number:'1.0-2' }}% a.a.
                 </p>
               </div>
               <app-status-badge [tone]="view.statusTone" [label]="view.statusLabel" [dot]="true" />
@@ -120,14 +120,23 @@
               }
             </div>
 
-            <div class="kpis compact">
+            <div class="contract-metrics">
+              <div><span>Saldo devedor</span><strong>{{ view.contract.openBalance | appCurrency }}</strong></div>
               <div><span>Parcela</span><strong>{{ view.contract.monthlyPayment | appCurrency }}</strong></div>
-              <div><span>Juros totais</span><strong>{{ view.contract.totalInterest | appCurrency }}</strong></div>
-              <div><span>Parcelas abertas</span><strong>{{ view.contract.openInstallments }}</strong></div>
+              <div><span>Parcelas</span><strong>{{ view.paidCount }}/{{ view.totalCount }}</strong></div>
+              <div><span>Taxa</span><strong>{{ view.contract.annualInterestRate | number:'1.0-2' }}% a.a.</strong></div>
+              <div>
+                <span>Vencimento</span>
+                <strong>{{ view.nextInstallment ? (view.nextInstallment.dueDate | date:'dd/MM/yyyy') : 'Sem vencimento' }}</strong>
+              </div>
             </div>
 
             <div class="contract__footer">
-              <a class="btn-primary sm" [routerLink]="['/emprestimos', view.contract.id]">Ver detalhes</a>
+              @if (view.nextInstallment) {
+                <button type="button" class="btn-primary sm" (click)="openPaySheet(view.contract, view.nextInstallment)" [disabled]="paying()">Pagar parcela</button>
+              }
+              <a class="btn-ghost sm" [routerLink]="['/emprestimos', view.contract.id]">Amortizar</a>
+              <a class="btn-ghost sm" [routerLink]="['/emprestimos', view.contract.id]">Ver detalhes</a>
               <button type="button" class="btn-ghost sm" (click)="toggleInstallments(view.contract.id)">
                 {{ expandedContractId === view.contract.id ? 'Ocultar parcelas' : 'Ver parcelas' }}
               </button>

@@ -25,6 +25,7 @@ export interface LoansOverview {
   activeCount: number;
   nextDueDate: string | null;
   nextDueAmount: number;
+  expectedPayoffDate: string | null;
   paidPercent: number;
 }
 
@@ -96,6 +97,8 @@ export function buildLoansOverview(contracts: LoanContractResponse[]): LoansOver
   let nextDate: Date | null = null;
   let nextDueDate: string | null = null;
   let nextAmount = 0;
+  let payoffDate: Date | null = null;
+  let expectedPayoffDate: string | null = null;
 
   for (const view of views) {
     const next = view.nextInstallment;
@@ -105,6 +108,14 @@ export function buildLoansOverview(contracts: LoanContractResponse[]): LoansOver
       nextDate = due;
       nextDueDate = next.dueDate;
       nextAmount = Number(next.totalAmount || 0);
+    }
+
+    for (const installment of openInstallments(view.contract)) {
+      const installmentDate = parseIso(installment.dueDate);
+      if (installmentDate && (!payoffDate || installmentDate > payoffDate)) {
+        payoffDate = installmentDate;
+        expectedPayoffDate = installment.dueDate;
+      }
     }
   }
 
@@ -116,6 +127,7 @@ export function buildLoansOverview(contracts: LoanContractResponse[]): LoansOver
     activeCount: activeViews.length,
     nextDueDate,
     nextDueAmount: nextAmount,
+    expectedPayoffDate,
     paidPercent: totalInstallments > 0 ? Math.round((paidInstallments / totalInstallments) * 100) : 0
   };
 }

@@ -77,7 +77,7 @@ describe('loans-overview.model', () => {
     expect(view.paidPercent).toBe(100);
   });
 
-  it('consolida saldo, mensal, parcelas abertas e próximo vencimento', () => {
+  it('consolida saldo, mensal, próximo vencimento e quitação prevista', () => {
     const overview = buildLoansOverview([
       contract({
         id: 'c1',
@@ -107,6 +107,7 @@ describe('loans-overview.model', () => {
     expect(overview.contractsCount).toBe(2);
     expect(overview.nextDueDate).toBe('2026-03-10');
     expect(overview.nextDueAmount).toBe(300);
+    expect(overview.expectedPayoffDate).toBe('2026-06-10');
     // 1 paga de 4 no total
     expect(overview.paidPercent).toBe(25);
   });
@@ -125,6 +126,7 @@ describe('loans-overview.model', () => {
     const overview = buildLoansOverview([]);
     expect(overview.totalOpenBalance).toBe(0);
     expect(overview.nextDueDate).toBeNull();
+    expect(overview.expectedPayoffDate).toBeNull();
     expect(overview.paidPercent).toBe(0);
     expect(buildContractViews([])).toEqual([]);
   });

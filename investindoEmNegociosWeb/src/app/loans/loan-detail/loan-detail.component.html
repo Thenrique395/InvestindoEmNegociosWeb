@@ -24,19 +24,33 @@
         <section class="loans-summary-grid">
           <app-transaction-summary-card tone="warning" eyebrow="Saldo devedor" [value]="c.openBalance | appCurrency" note="Valor ainda pendente." />
           <app-transaction-summary-card tone="primary" eyebrow="Parcela" [value]="c.monthlyPayment | appCurrency" note="Compromisso mensal." />
-          <app-transaction-summary-card tone="info" eyebrow="Parcelas abertas" [value]="c.openInstallments.toString()"
-            [note]="v.paidCount + ' de ' + v.totalCount + ' quitadas.'" />
-          <app-transaction-summary-card tone="success" eyebrow="Progresso" [value]="v.paidPercent + '%'"
-            [note]="v.nextInstallment ? ('Próximo venc. ' + (v.nextInstallment.dueDate | date:'dd/MM/yyyy')) : 'Sem parcelas em aberto.'" />
+          <app-transaction-summary-card
+            tone="info"
+            eyebrow="Próximo vencimento"
+            [value]="v.nextInstallment ? (v.nextInstallment.dueDate | date:'dd/MM/yyyy')! : 'Sem vencimento'"
+            [note]="v.nextInstallment ? ('Parcela de ' + (v.nextInstallment.totalAmount | appCurrency)) : 'Sem parcelas em aberto.'" />
+          <app-transaction-summary-card
+            tone="success"
+            eyebrow="Quitação prevista"
+            [value]="expectedPayoffDate ? (expectedPayoffDate | date:'dd/MM/yyyy')! : 'Sem previsão'"
+            [note]="v.paidCount + '/' + v.totalCount + ' parcelas quitadas · ' + v.paidPercent + '% amortizado.'" />
         </section>
 
         <article class="card">
-          <h2>Detalhes do contrato</h2>
+          <div class="section-head">
+            <div>
+              <h2>Detalhes do contrato</h2>
+              <p class="muted text--sm">Sistema, taxa, prazo e custo total do financiamento.</p>
+            </div>
+            <app-status-badge [tone]="v.statusTone" [label]="v.statusLabel" [dot]="true" />
+          </div>
           <dl class="detail-grid">
             <div><dt>Sistema</dt><dd>{{ c.amortizationType === 'Sac' ? 'SAC' : 'PRICE' }}</dd></div>
             <div><dt>Principal</dt><dd>{{ c.principalAmount | appCurrency }}</dd></div>
-            <div><dt>Taxa (a.a.)</dt><dd>{{ c.annualInterestRate }}%</dd></div>
+            <div><dt>Taxa anual</dt><dd>{{ c.annualInterestRate | number:'1.0-2' }}% a.a.</dd></div>
             <div><dt>Prazo</dt><dd>{{ c.termMonths }} meses</dd></div>
+            <div><dt>Parcelas</dt><dd>{{ v.paidCount }}/{{ v.totalCount }}</dd></div>
+            <div><dt>Vencimento</dt><dd>{{ v.nextInstallment ? (v.nextInstallment.dueDate | date:'dd/MM/yyyy') : 'Sem vencimento' }}</dd></div>
             <div><dt>Custo total</dt><dd>{{ c.totalCost | appCurrency }}</dd></div>
             <div><dt>Juros totais</dt><dd>{{ c.totalInterest | appCurrency }}</dd></div>
             <div><dt>Início</dt><dd>{{ c.startDate | date:'dd/MM/yyyy' }}</dd></div>
@@ -53,7 +67,20 @@
 
       @if (activeTab === 'parcelas') {
         <article class="card">
+          <div class="section-head">
+            <div>
+              <h2>Cronograma de parcelas</h2>
+              <p class="muted text--sm">
+                {{ v.paidCount }} de {{ v.totalCount }} parcelas quitadas ·
+                saldo devedor {{ c.openBalance | appCurrency }}
+              </p>
+            </div>
+            @if (v.nextInstallment) {
+              <button type="button" class="btn-primary sm" (click)="openPaySheet(v.nextInstallment)" [disabled]="paying()">Pagar próxima parcela</button>
+            }
+          </div>
           <app-responsive-list
+            class="installments-list"
             [columns]="installmentColumns"
             [items]="c.installments"
             [getId]="trackInstallment"
