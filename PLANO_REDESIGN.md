@@ -9,7 +9,7 @@ Documento vivo. Fonte da verdade para a ordem de execução do redesign.
 ## 1. Fontes do design
 
 ### Pacote de handoff (dentro do repo)
-`InvestindoEmNegociosWeb/design_handoff_investindo_redesign 2/`
+`InvestindoEmNegociosWeb/design_handoff_investindo_redesign/`
 
 | Arquivo | Papel |
 |---|---|
@@ -309,13 +309,13 @@ Corrigido com `align-content: start`. As linhas passaram de `209px 153px 558px` 
 
 #### Pendência
 
-`Histórico mensal` e `Calculadoras` **não constam** no `PERFIS_E_PERMISSOES.md`, mas as telas
-existem e estão no ar. Mantive as duas em "Análises" — tirá-las do menu deixaria funcionalidade
-inacessível. Ver P13.
+`Histórico mensal` e `Calculadoras` existem e estão no ar. Mantive as duas em "Análises" — tirá-las
+do menu deixaria funcionalidade inacessível. `PERFIS_E_PERMISSOES.md` foi atualizado para
+registrar essa decisão.
 
 ---
 
-### FASE 4 — Primitivos compartilhados — `app/shared/` ✅ CONCLUÍDA (13 de 13)
+### FASE 4 — Primitivos compartilhados — `app/shared/` 🔶 CRIADOS (13 de 13), ADOTADOS (6 de 13)
 
 Contrato de cada um na seção 7 de `ARQUITETURA_ANGULAR.md`.
 
@@ -358,7 +358,7 @@ visual. Agora está, e os 13 primitivos vivem lá.
 
 | # | Tela | Observação |
 |---|---|---|
-| 5.1 | Dashboard | 🔶 faixa de KPIs feita; faltam saúde financeira, evolução, atenção, recorrências, orçamento e metas |
+| 5.1 | Dashboard | 🔶 KPIs, saúde financeira Patrimônio, evolução Controle, orçamento do mês, recorrências do mês, dívidas/contas, investimentos, recortes por perfil e regras de histórico insuficiente aplicados; falta acabamento visual |
 | 5.2 | Despesas | 🔶 em andamento |
 | 5.3 | Receitas | sai barato depois de 5.2 — muda conteúdo e polaridade |
 | 5.4 | Cartões | + `invoice-import`; resolve os 3 hex de bandeira |
@@ -429,27 +429,214 @@ cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no templat
 
 #### A fazer
 
-- [ ] `<select>` em **formulários de modal**: `account-form`, `account-transfer`,
-      `account-import` e o formulário de cartão. Não são filtros; entram quando os modais
-      forem refeitos
-- [ ] Cartões: filtros de fatura usam `[ngValue]` **numérico** (mês). Converter para o
-      dropdown exige acertar o tipo, e errar ali quebra o filtro de competência
-- [ ] Ligar o modal de parcelado nas ações de baixa e edição de Despesas e Cartões
-- [ ] Dashboard (5.1) — depende dos três perfis; fazer o Completo e recortar
+- [x] `<select>` em **formulários de modal**: `account-form`, `account-transfer`,
+      `account-import` e formulário de cartão migrados para `app-select-menu`
+- [x] Cartões: filtros de fatura migrados para `app-select-menu`; mês preservado como
+      `number | null` via conversão explícita entre valor do dropdown e filtro de competência
+- [ ] Ligar o modal de parcelado nas ações de baixa e edição de Despesas e Cartões — bloqueado
+      por contrato: o handoff pede "esta e as seguintes", mas o frontend hoje só tem APIs para
+      parcela atual (`/installments/:id`) ou plano inteiro (`/plans/:id`)
+- [ ] Dashboard (5.1) — continuar pelo superconjunto Patrimônio e recortar por perfil; próximo bloco: acabamento visual incremental
+- [ ] QA visual final app real × handoff — rodar quando a rodada principal do rebrand fechar,
+      com screenshots pareados por tela/viewport e checklist de espaçamento, tipografia, cores,
+      hierarquia, estados e responsividade
 
 ### FASE 6 — Planejamento e análise
 
 | # | Tela | Observação |
 |---|---|---|
 | 6.1 | Metas | consumo × conquista é o núcleo; ler `goal-view.model.ts` antes |
-| 6.2 | Orçamento | edição na linha |
-| 6.3 | Investimentos | **a maior**: 9 componentes, ~4.700 linhas, 5 abas |
-| 6.4 | Empréstimos | |
-| 6.5 | Relatórios | + `monthly-snapshots` |
+| 6.2 | Orçamento | ✅ concluída — média 3m bloqueada por contrato |
+| 6.3 | Investimentos | ✅ concluída — 5 abas alinhadas e evidenciadas |
+| 6.4 | Empréstimos | ✅ concluída — KPIs, cards, detalhe e parcelas alinhados |
+| 6.5 | Relatórios | 🔶 em andamento — distribuição por categoria em barras |
 | 6.6 | Simulador | + `calculator` |
 | 6.7 | Assistente | |
 | 6.8 | Perfil | + `user-security` |
 | 6.9 | Configurações | barra de salvar fixa, zona sensível |
+
+---
+
+### FASE 6.1 — Metas 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+
+O modelo `goal-view.model.ts` continua sendo a fonte da semântica: Despesa é consumo de
+limite; Receita e Investimento são conquista de alvo.
+
+- [x] Cards já usam rótulos por tipo: `Limite/Gasto/Disponível`, `Objetivo/Recebido/Falta
+      receber`, `Meta de aporte/Aportado/Falta aportar`.
+- [x] `GoalView.monthlyRequired` calcula quanto falta por mês para metas de conquista quando
+      há valor restante e prazo. Despesa não recebe esse cálculo porque é consumo de limite.
+- [x] `app-goal-card` renderiza a dica contextual `Precisa de R$ X por mês para chegar no prazo.`
+      e o E2E de Metas valida a dica no fluxo assíncrono.
+- [x] Recorrência aparece como badge no card (`Período único`, `Mensal`, `Trimestral` etc.).
+- [x] Formulário de Investimento mostra nota explicativa no lugar de categoria/limiares de
+      consumo.
+- [x] Menu de ações usa `canCompleteGoalView`: `Concluir` só aparece para metas de conquista
+      com 100% ou mais, e não aparece para despesa, arquivada, cancelada ou concluída.
+- [x] Detalhes refletem as mesmas dicas do card, incluindo cadência mensal e previsto não
+      contabilizado.
+- [x] Detalhes mostram evolução por período com barras acessíveis baseadas nos dados reais de
+      `occurrences`, sem sintetizar períodos.
+- [x] Modal de aporte mostra atalhos calculados a partir do restante da meta e prévia acessível
+      do progresso resultante antes de registrar.
+- [x] Criação/edição em mobile foi reorganizada em seções (`Objetivo`, `Período`, `Regras`),
+      dropdowns nativos foram trocados por `app-select-menu`, e o E2E valida 390px sem overflow.
+- [x] Estados/filtros mostram contagem contextual (`N metas neste filtro`) e vazio filtrado com
+      CTA para voltar a `Todas`, alinhado ao protótipo de Metas.
+- [x] Edição de meta existente validada no E2E: `app-select-menu` preserva Recorrência e
+      Categoria carregadas do backend, além dos limiares de alerta.
+- [x] Ações de ciclo de vida validadas no E2E: `Pausar` muda badge para `Pausada`, `Reativar`
+      volta ao estado calculado do backend, e `Arquivar` remove de `Todas` e aparece em
+      `Arquivadas`.
+- [x] Erro das ações de ciclo de vida usa `extractApiErrorMessage`: mensagens de domínio da API
+      aparecem no feedback global e a meta permanece no estado atual quando a operação falha.
+- [x] Exclusão validada no E2E: confirmação destrutiva mantém cópia do handoff, erro de API usa
+      mensagem de domínio e sucesso remove a meta da listagem atual.
+- [x] Captura visual focada de Metas executada em Playwright com evidências desktop/mobile e
+      guarda contra overflow horizontal:
+      `docs/ai-reports/metas-rebrand-desktop.png` e
+      `docs/ai-reports/metas-rebrand-mobile.png`.
+- [x] Próximo bloco iniciado em Orçamento.
+
+---
+
+### FASE 6.2 — Orçamento 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+
+Fonte do handoff: `TELAS.md` §10. A edição na linha já existia; esta fase alinha filtros,
+tabela editável, coluna direita e modal de adicionar categoria.
+
+- [x] Filtros `Todas · Em atenção · Estouradas` adicionados acima da tabela, com contagem
+      contextual e lista filtrada por uso real (`>80%`) / estouro (`realizado > planejado`).
+- [x] Linha de total no rodapé da lista mostra Planejado, Realizado, Variação e Uso do filtro
+      atual, mantendo `Salvar`/`Sair` na edição inline conforme o handoff.
+- [x] Tabela editável recebeu densidade própria de Orçamento e valor planejado com borda
+      tracejada no hover/focus para sinalizar edição inline.
+- [x] Coluna direita adicionada com `Ritmo do mês`, `Composição planejada` e `Estouraram o
+      planejado`, todos derivados dos dados reais do orçamento atual.
+- [x] Modal de adicionar categoria substitui o formulário inline, com dropdown de categorias de
+      despesa, prévia do planejado total após adicionar e evidência visual desktop/mobile.
+- [x] Ação `Copiar do mês anterior` implementada usando o contrato atual: busca o orçamento do
+      mês anterior e reaplica `categoryName` + `plannedAmount` no mês aberto.
+- [ ] Média real dos últimos 3 meses no dropdown e atalho `Usar a média` — bloqueados por
+      contrato: `BudgetService` só expõe o mês consultado e não retorna histórico/média por
+      categoria.
+- [x] Semântica de filtro isolada em `budget-overview.model.ts` e coberta por teste unitário.
+- [x] E2E autenticado cobre filtro, total, edição inline, coluna direita, modal e cópia do mês
+      anterior.
+- [x] Captura visual focada de Orçamento executada em Playwright com evidências desktop/mobile e
+      guarda contra overflow horizontal:
+      `docs/ai-reports/orcamento-rebrand-desktop.png` e
+      `docs/ai-reports/orcamento-rebrand-mobile.png`, além do modal em
+      `docs/ai-reports/orcamento-rebrand-add-modal-desktop.png` e
+      `docs/ai-reports/orcamento-rebrand-add-modal-mobile.png`.
+- [x] Fase encerrada com bloqueio explícito para contrato de histórico/média.
+
+---
+
+### FASE 6.3 — Investimentos 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+
+Fonte do handoff: `TELAS.md` §11. A tela já tinha as cinco abas (`Resumo`,
+`Consolidação`, `Proventos`, `Rentabilidade`, `Análise`); esta fase começou pelo resumo
+executivo para preservar a regra central de não misturar aporte, valorização e proventos.
+
+- [x] KPIs do resumo alinhados para cinco cards na ordem do handoff: `Valor de mercado`,
+      `Total investido`, `Valorização`, `Proventos (12m)` e `Aporte do mês`.
+- [x] `investments-overview.model.ts` mantém valor de mercado, total investido,
+      valorização e proventos como métricas separadas; o KPI de proventos considera apenas
+      dividendos, JCP e rendimentos dos últimos 12 meses.
+- [x] Parser local de datas adicionado ao cálculo de proventos para evitar perda de eventos
+      em datas ISO sem hora por conversão de fuso.
+- [x] Evolução do patrimônio agora expõe seleção `6 meses`, `12 meses` e `24 meses`,
+      conforme o handoff.
+- [x] Captura visual focada do resumo executada em Playwright com evidências desktop/mobile e
+      guarda contra overflow horizontal:
+      `docs/ai-reports/investimentos-rebrand-resumo-desktop.png` e
+      `docs/ai-reports/investimentos-rebrand-resumo-mobile.png`.
+- [x] Tabela de posições do Resumo mostra a fonte do preço por linha (`Cotação` ou
+      `Preço médio`) e uma linha de total do filtro atual com investido, valor atual,
+      resultado e contagem de fontes.
+- [x] Colunas da tabela compactadas para o conjunto do protótipo: `Ativo`, `Qtd.`,
+      `Preço médio`, `Atual`, `Investido`, `Mercado` e `Result.`, mantendo `Ações`
+      como coluna operacional sticky.
+- [x] Cabeçalho da seção atualizado para `Posições`, com a nota do protótipo sobre fallback
+      para preço médio e chips de filtro por tipo (`Todos` + tipos do modelo).
+- [x] Comportamento mobile da tabela de posições revisado em screenshot Playwright 390x900:
+      linhas viram cards com rótulos (`Ativo`, `Qtd.`, `Investido`, `Mercado`, `Ações`),
+      ação acessível e sem overflow horizontal.
+- [x] Aba `Consolidação` passa a considerar `APORTE`/`RESGATE` junto de `COMPRA`/`VENDA`,
+      mantendo proventos fora do gráfico e da tabela; o painel agora exibe resumo do período
+      (`Compras`, `Vendas`, `Saldo`, `Lançamentos`) e evidências desktop/mobile:
+      `docs/ai-reports/investimentos-rebrand-consolidacao-desktop.png` e
+      `docs/ai-reports/investimentos-rebrand-consolidacao-mobile.png`.
+- [x] Aba `Proventos` alinhada ao protótipo: gráfico de barras dos últimos 12 meses,
+      resumo no mesmo card (`Total em 12 meses`, `Média mensal`, `Ativos pagadores`) e
+      lista `Por ativo` com acumulado de 12 meses; seed E2E recebeu pagadores reais para
+      validar o estado preenchido. Evidências:
+      `docs/ai-reports/investimentos-rebrand-proventos-desktop.png` e
+      `docs/ai-reports/investimentos-rebrand-proventos-mobile.png`.
+- [x] Aba `Rentabilidade` alinhada ao protótipo: título `Carteira contra índice`, chips dos
+      sete benchmarks (`CDI`, `IPCA`, `IFIX`, `IBOV`, `SMLL`, `IDIV`, `IVVB11`) recalculando
+      cards/gráfico/tabela, três cards no mesmo bloco do gráfico e seção `Por ano` com barra da
+      carteira e coluna do benchmark selecionado. Evidências:
+      `docs/ai-reports/investimentos-rebrand-rentabilidade-desktop.png` e
+      `docs/ai-reports/investimentos-rebrand-rentabilidade-mobile.png`.
+- [x] Aba `Análise` alinhada ao protótipo: alocação alvo com soma visível, desvio em pontos
+      percentuais, valor estimado da classe mais distante do alvo e ressalva permanente de que
+      o cálculo é sobre a alocação alvo do usuário, não recomendação de ativos. Evidências:
+      `docs/ai-reports/investimentos-rebrand-analise-desktop.png` e
+      `docs/ai-reports/investimentos-rebrand-analise-mobile.png`.
+- [x] Fase encerrada com E2E visual desktop/mobile cobrindo as cinco abas e guarda contra
+      overflow horizontal.
+
+---
+
+### FASE 6.4 — Empréstimos 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+
+Fonte do handoff: `TELAS.md` §9. A tela cobre contratos com saldo devedor, parcela,
+parcelas pagas/total, taxa/vencimento e barra de amortização.
+
+- [x] KPIs do topo alinhados ao handoff: `Saldo devedor`, `Parcela mensal`,
+      `Próximo vencimento` e `Quitação prevista`.
+- [x] `loans-overview.model.ts` deriva `expectedPayoffDate` da última parcela aberta,
+      sem inventar previsão quando não há cronograma.
+- [x] Cards de contrato expõem o conjunto do handoff no corpo principal: saldo devedor,
+      parcela, parcelas pagas/total, taxa anual e vencimento da próxima parcela, mantendo
+      a barra de amortização por contrato.
+- [x] Detalhe do contrato alinhado ao mesmo conjunto: resumo com próximo vencimento e
+      quitação prevista, card de detalhes com sistema/taxa/prazo/parcelas/vencimento e
+      cronograma de parcelas com cabeçalho contextual.
+- [x] Mock Playwright passa a responder `GET /api/v1/loans/:id`, permitindo QA visual real
+      do detalhe depois da criação de contrato no próprio fluxo autenticado.
+- [x] Captura visual focada de Empréstimos executada em Playwright com evidências
+      desktop/mobile e guarda contra overflow horizontal:
+      `docs/ai-reports/emprestimos-rebrand-desktop.png` e
+      `docs/ai-reports/emprestimos-rebrand-mobile.png`, além do detalhe em
+      `docs/ai-reports/emprestimos-rebrand-detalhe-resumo-desktop.png`,
+      `docs/ai-reports/emprestimos-rebrand-detalhe-resumo-mobile.png`,
+      `docs/ai-reports/emprestimos-rebrand-detalhe-parcelas-desktop.png` e
+      `docs/ai-reports/emprestimos-rebrand-detalhe-parcelas-mobile.png`.
+- [x] Fase encerrada sem pendência de contrato: a tela não tem protótipo dedicado e segue os
+      padrões compartilhados do handoff.
+
+---
+
+### FASE 6.5 — Relatórios 🔶 EM ANDAMENTO
+
+Fonte do handoff: `TELAS.md` §12. A fase cobre `app/relatorios/` e, em seguida,
+`app/monthly-snapshots/`.
+
+- [x] `Despesas por categoria` trocada de rosca para barras horizontais, conforme handoff.
+- [x] `reports-overview.model.ts` deriva `expenseCategoryBars` sem inventar valores e limita
+      percentuais a 0–100 para largura CSS.
+- [x] Layout mobile dos KPIs revisado localmente em Relatórios para manter dois cards por linha
+      em 390px sem quebrar valores monetários caractere a caractere.
+- [x] Captura visual focada de Relatórios executada em Playwright com evidências
+      desktop/mobile e guarda contra overflow horizontal:
+      `docs/ai-reports/relatorios-rebrand-desktop.png` e
+      `docs/ai-reports/relatorios-rebrand-mobile.png`.
+- [ ] Próximo bloco: receitas × despesas de 6/12 meses em barras comparativas e seletor de tipo
+      de relatório.
+- [ ] Próximo bloco: `monthly-snapshots` com fechamento mensal.
 
 ---
 
@@ -461,8 +648,20 @@ cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no templat
 | 7.2 | Onboarding | 4 passos |
 | 7.3 | Dashboard administrativo | + telas `admin-*` |
 | 7.4 | Tema escuro | segundo conjunto de tokens, não CSS duplicado |
-| 7.5 | Mobile | 🔶 tabela → cards **feito** (9 telas). Falta bottom nav com FAB e revisão tela a tela |
+| 7.5 | Mobile | 🔶 tabela → cards **feito** (9 telas); bottom nav com FAB **feito**. Falta revisão tela a tela |
 | — | ~~Checkout e plano~~ | **fora**: pagamento adiado até o gateway estar configurado |
+
+---
+
+### FASE 7.5 — Mobile 🔶 EM ANDAMENTO
+
+- [x] Tabelas viram cards responsivos nas 9 telas que usam `responsive-list`.
+- [x] Bottom nav do shell autenticado em até 900px: atalhos para Dashboard, Despesas,
+      Receitas e Calendário, filtrados pela mesma fonte `NAV_SECTIONS`, com FAB "Menu" para
+      abrir a sidebar completa.
+- [x] E2E em 390x900 valida os atalhos, navegação para Receitas, abertura da gaveta completa e
+      ausência de overflow horizontal.
+- [ ] Revisão tela a tela fica para o QA visual final app real × handoff.
 
 ---
 
@@ -559,8 +758,9 @@ O `<thead>` é ocultado com `clip-path`, não `display:none`: some da tela mas c
 árvore de acessibilidade, então os `<th>` seguem nomeando as células para o leitor de tela.
 A tabela continua sendo `<table>` no HTML — só a apresentação vira blocos.
 
-**Ainda estouram em 390px** (fora do `responsive-list`): `page-header` no Calendário e o
-título de seção no Orçamento.
+**Resolvido em 390px** (fora do `responsive-list`): `page-header` no Calendário e título/ações
+do Orçamento receberam `min-width: 0`, quebra de texto e empilhamento mobile. Verificado em
+`/orcamento` com viewport 390px: `documentElement.scrollWidth === clientWidth`.
 
 ### Auditoria de contraste — tema escuro, 9 telas do app
 
@@ -596,7 +796,7 @@ grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 ```
 
 ARQUITETURA_ANGULAR.md §7 e COMPONENTES.md §3.1(b): *"flex com quebra, **proibido `grid` com
-`auto-fit`** — deixa célula vazia"*. Com 5 KPIs no perfil Completo, é o caso exato.
+`auto-fit`** — deixa célula vazia"*. Com 5 KPIs no perfil Patrimônio, é o caso exato.
 
 Convertido para faixa unida: `flex: 1 1 200px`, divisor por `box-shadow` (cobre a quebra de
 linha sem borda solta), primeira célula com gradiente e valor maior, valores em Poppins com
@@ -607,11 +807,156 @@ atualização.
 
 #### Restante do Dashboard
 
-Saúde financeira (só Completo), evolução de 12 meses, "Precisa da sua atenção", recorrências,
-orçamento do mês, metas e insights. Mais o recorte por perfil (Essencial 3 KPIs, Inteligente e
-Completo 5) e a regra de **histórico insuficiente**: com menos de dois meses de dados, o
+Saúde financeira (só Patrimônio), evolução de 12 meses, "Precisa da sua atenção", recorrências,
+orçamento do mês, metas e insights. Mais o recorte por perfil (Essencial 3 KPIs, Controle e
+Patrimônio 5) e a regra de **histórico insuficiente**: com menos de dois meses de dados, o
 gráfico de evolução é substituído por um bloco explicativo — desenhar tendência com dois
 pontos mente sobre o dado.
+
+**Recorte aplicado**: `Saúde financeira (IA)` agora carrega e renderiza só para Patrimônio
+(`Advanced+`). Controle mantém Assinaturas, Relatórios/Simulador e demais análises permitidas,
+mas não recebe o bloco de saúde IA.
+
+**Recorte aplicado**: `Distribuição por categoria` agora renderiza só para Controle+
+(`Intermediate+`). Essencial mantém a faixa de 3 KPIs, projeção/insight e próximos vencimentos,
+sem gráfico de categorias.
+
+**Recorte aplicado**: o modal de detalhes do insight mantém o resumo contextual no Essencial,
+mas esconde `Painel de risco`, simulação diária e comparação mensal até Controle+
+(`Intermediate+`), coerente com o CTA de upgrade.
+
+**Regra de conta nova aplicada**: os cards de distribuição por categoria agora só desenham o
+donut e liberam insight/comparação com pelo menos 3 categorias movimentadas. Com 1 ou 2
+categorias, mostram um bloco explicativo; com zero dados, mantêm o estado vazio com CTA.
+
+**Regra de conta nova aplicada**: `Evolução patrimonial` agora exige pelo menos 2 pontos para
+desenhar o gráfico. Com 1 ponto, mostra o bloco "Histórico começando" em vez de inferir
+tendência.
+
+**Recorte aplicado**: o bloco `Metas` do Dashboard agora renderiza só para Controle+
+(`Intermediate+`). Essencial continua podendo acessar a tela de Metas pelo menu/CTA, mas o
+Dashboard não mostra acompanhamento de ritmo.
+
+**Recorte aplicado**: `Próximos vencimentos` do Dashboard agora usa janela de 7 dias, alinhada
+ao perfil Essencial do handoff. Vencimentos em 8+ dias não entram no board inicial.
+O painel de risco e a meta curta usam a mesma janela.
+
+**Recorte aplicado**: Controle (`Intermediate`) agora tem `Evolução do caixa` de 6 meses
+(receitas recebidas × despesas). Com apenas 1 mês movimentado, renderiza "Histórico começando".
+
+**Recorte aplicado**: `Orçamento do mês` agora carrega via `BudgetService` para Controle+
+(`Intermediate+`) e mostra planejado, realizado, variação, uso e até 3 categorias em destaque.
+Falha da API deixa o bloco oculto e não bloqueia o Dashboard.
+
+**Recorte aplicado**: `Recorrências do mês` agora consolida assinaturas, contas fixas,
+parcelas e receitas fixas a partir dos lançamentos do mês para Controle+ (`Intermediate+`).
+O fallback de `subscriptionsSummary` fica apenas quando não há recorrências locais carregadas.
+
+**Recorte aplicado**: `Dívidas e contas` agora aparece para Controle+ (`Intermediate+`) quando
+há saldo real, contas ativas ou dívida aberta. O card consolida saldo em contas, disponível real,
+dívida aberta, próximos compromissos e as principais contas sem depender de novo contrato backend.
+
+**Recorte aplicado**: `Investimentos` agora aparece para Patrimônio (`Advanced+`) quando há
+posições ativas ou valor de carteira. O card reaproveita `buildInvestmentsOverview` para valor
+atual, aportado, resultado, rentabilidade e principais alocações, com CTA para a carteira.
+
+**Acabamento visual aplicado**: `Saúde financeira (IA)` não renderiza mais card vazio quando a
+resposta da API/mock é inválida. Quando a resposta é válida mas não traz áreas detalhadas, o
+card mostra o resumo geral em um bloco compacto.
+
+**Acabamento visual aplicado**: o harness Playwright autenticado agora mocka
+`/financial-assistant/health`, então as capturas e E2E do perfil Patrimônio exercitam o card real
+de `Saúde financeira (IA)`. O page object também foi alinhado ao nome rebrandado
+`Dívidas e contas`.
+
+**Validação visual atualizada**: o Dashboard Patrimônio foi capturado em 1440x1200 e 390x900
+com os blocos `Investimentos`, `Dívidas e contas` e `Saúde financeira (IA)` visíveis e sem
+overflow horizontal. Evidências: `docs/ai-reports/dashboard-rebrand-advanced-1440.png` e
+`docs/ai-reports/dashboard-rebrand-advanced-390.png`.
+
+**Guarda E2E permanente**: `authenticated-home-wealth.spec.ts` agora valida o mesmo conjunto
+rebrandado em desktop e mobile, com `DashboardPage.expectNoHorizontalOverflow()` para impedir
+regressão de largura no Dashboard Patrimônio.
+
+**Cobertura E2E rebrandada**: os smokes autenticados de shell/fallback não procuram mais
+`Mapa de dívidas`. `authenticated-shell.spec.ts` e `authenticated-home-fallback.spec.ts` agora
+validam `Dívidas e contas`, incluindo o cenário em que os resumos oficiais falham e o Dashboard
+mantém os cálculos locais.
+
+## 5.1 Auditoria de fidelidade — 2026-08-16
+
+Auditoria do código contra o handoff, não contra o próprio plano. O resultado mudou o status
+de quatro fases: elas entregaram o **conteúdo** certo (rótulos, KPIs, regras de negócio,
+modelos puros com teste) e divergiram na **forma** em regras que o handoff declara
+vinculantes. `TELAS.md` foi seguido; `ARQUITETURA_ANGULAR.md` e o `README.md` do handoff, não
+inteiramente.
+
+**O critério mudou**: até aqui, "concluída" queria dizer que a tela ficou parecida com o
+protótipo. Passa a querer dizer **igual** — sem violação aberta no gate.
+
+### O que a auditoria confirmou como correto
+
+Nada disso precisa ser revisitado:
+
+- **128 de 128 tokens** do `tokens.css` presentes no `design-tokens.scss`. Zero divergência.
+- Poppins e Inter carregadas de verdade; `--font-display` resolve.
+- Medidas do shell tokenizadas conforme README §9: `--w-sidebar 212px`, `--h-topbar 56px`,
+  `--h-table-row 56px`.
+- `OnPush` em **100%** dos componentes criados ou tocados no redesign.
+- Regra de negócio em função pura com spec — `budget-overview`, `loans-overview`,
+  `investments-overview`, `goal-view`. O padrão do §9 não regrediu.
+- `typecheck` e a suíte de testes verdes no estado auditado.
+
+### O que divergiu
+
+Contagem do dia, por regra do gate (`npm run handoff:report`):
+
+| Regra | Violações | O que é |
+|---|---|---|
+| **R1** | 7 | Primitivos criados na Fase 4 que só aparecem no `/styleguide` |
+| **R2** | 6 | `grid auto-fit` em faixa de indicadores |
+| **R3** | 16 | Tela com card de indicador sem nenhum tooltip |
+| **R4** | 10 | Gráfico desenhado à mão dentro da feature |
+| **R5** | 27 | `--shadow-card-hover` aplicada em repouso |
+| **R6** | 4 | Hex literal fora do `design-tokens.scss` |
+| **R8** | 51 | Componente sem `OnPush` (dívida anterior ao redesign) |
+| **R9** | 22 | Feature repintando primitivo por dentro com `::ng-deep` |
+
+**R1 é a que decide o resultado do rebrand.** `app-kpi-strip`, `app-money`, `app-data-table`,
+`app-number-stepper`, `app-progress-bar`, `app-chart-bars` e `app-chart-line` foram
+construídos, testados e demonstrados — e nenhuma tela os importa. As telas seguem usando os
+equivalentes legados (`app-transaction-summary-card`, `app-usage-bar`, `app-responsive-list`,
+`app-donut-chart`, SVG próprio). São dois design systems no mesmo repositório, que é
+exatamente o cenário que `ARQUITETURA_ANGULAR.md` §13.1 descreve como o erro mais caro.
+
+**R9 é o mesmo erro em outra forma.** Em vez de copiar o SCSS do primitivo, a tela fura o
+encapsulamento e reescreve o interior dele. O primitivo fica sem dono e a próxima mudança nele
+quebra telas que ninguém lembra que dependiam do detalhe interno.
+
+**Por que a revisão por leitura não pegou**: `4df1a1c` corrigiu `grid auto-fit` no dashboard e
+o plano registrou a correção — mas a mesma violação continuava em cinco outros arquivos,
+inclusive no `transactions-layout.scss`, que é compartilhado por três telas. Corrigir o
+sintoma na tela em que ele foi visto não fecha a regra. É por isso que existe o gate.
+
+### O gate
+
+```bash
+npm run handoff:check    # bloqueia regressão · roda dentro de quality:frontend
+npm run handoff:report   # lista tudo que está aberto, com arquivo:linha
+```
+
+Nove regras do handoff viraram verificação executável em `scripts/check-handoff-fidelity.mjs`,
+cada uma citando a seção que a define. Funciona por **baseline**: a dívida de hoje está
+congelada em números e o gate falha quando um número **sobe**. Código novo nasce conforme sem
+precisar limpar o legado inteiro antes.
+
+**Regra de uso, e ela não tem exceção**: quando o gate falhar, corrija o código. Não suba o
+baseline, não adicione ignore, não reescreva a regra para caber no que já está lá. Se a regra
+estiver errada, ela muda **primeiro** em `design_handoff_investindo_redesign/`, com a decisão
+registrada aqui — e só depois no script. Ao quitar dívida, baixe o número no mesmo commit,
+senão ela volta sem ninguém perceber.
+
+---
 
 ## 6. Pendências
 
@@ -620,11 +965,11 @@ pontos mente sobre o dado.
 | ~~P1~~ | ✅ `--info` → `--primary` (41 usos), `--info-text` → `--primary-text`, `--info-10/20` → `--primary-tint` | — |
 | ~~P2~~ | ✅ `--fw-regular/medium/semibold/bold` tokenizados conforme os pesos usados na spec; `tailwind.config.js` aponta para eles | — |
 | ~~P3~~ | ✅ 4 protótipos de site + `_ds/`, `support.js`, `assets/` copiados para `prototipos/` (1,8 MB); renderização confirmada a partir do repo | — |
-| **P4** | Nomes de plano divergem em três lugares: código `Basic/Intermediate/Advanced` · marketing `Essencial/Controle/Patrimônio` · handoff de perfis `Essencial/Inteligente/Completo`. **O marketing e o código de `marketing-plans.ts` já concordam entre si** — a divergência é só com o handoff de perfis | Fase 3 |
-| **P5** | Menu atual ≠ `PERFIS_E_PERMISSOES.md`: sobra "Histórico mensal" e "Calculadoras", Simulador está em Planejamento (handoff põe em Análises), falta grupo "Conta" | Fase 3 |
-| **P6** | Pasta do handoff no repo chama-se `design_handoff_investindo_redesign 2` — renomear? | — |
+| ~~P4~~ | ✅ Rótulos comerciais consolidados em `Essencial/Controle/Patrimônio` na landing, sidebar, dashboard, `PERFIS_E_PERMISSOES.md` e `TELAS.md`. Código/API continuam usando `Basic/Intermediate/Advanced` | — |
+| ~~P5~~ | ✅ `PERFIS_E_PERMISSOES.md` alinhado ao `NAV_SECTIONS`: menu mantém "Histórico mensal" e "Calculadoras" em Análises por serem telas existentes, Simulador fica em Análises, e o grupo "Conta" lista Perfil/Configurações | — |
+| ~~P6~~ | ✅ Pasta do handoff renomeada para `design_handoff_investindo_redesign/`; referências do plano e dos tokens atualizadas para remover o sufixo temporário ` 2` | — |
 | ~~P7~~ | ✅ `#E0A458` validado por contraste: **7.89:1** sobre `#011E29` (AA texto normal), na mesma faixa de income (9.67), expense (7.53) e primary (6.33) | — |
-| **P8** | ⚠️ **BLOQUEIA PUBLICAÇÃO.** `/termos` e `/privacidade` estão no ar com os placeholders `{{RAZAO_SOCIAL}}`, `{{CNPJ}}`, `{{ENDERECO}}` e `{{EMAIL_CONTATO}}` **visíveis ao usuário**, e o texto não passou por revisão jurídica. Decidido deixar assim enquanto o site não for publicado | antes de publicar |
+| **P8** | ⚠️ **BLOQUEIA PUBLICAÇÃO.** `/termos` e `/privacidade` estão no ar com os placeholders `{{RAZAO_SOCIAL}}`, `{{CNPJ}}`, `{{ENDERECO}}` e `{{EMAIL_CONTATO}}` **visíveis ao usuário**, e o texto não passou por revisão jurídica. `npm run legal:ready` falha enquanto os placeholders existirem | antes de publicar |
 | ~~P9~~ | ✅ Site respondendo aos dois temas; prévia do app mantida clara via tokens `--preview-*` | — |
 | ~~P10~~ | ✅ `product-showcase` (2.100 linhas) e `pricing` (1.094 linhas) removidos, mais a regra órfã `.pricing-page` do `styles.scss`. Testes: 565 → 550 (−15 dos specs apagados) | — |
 | ~~P11~~ | ✅ Resolvido com `variant` no `site-plan-cards`: `landing` mostra `salesHeadline`+`salesSubheadline`, `tour` mostra `audience`+`highlight`. Muda a ênfase, não a fonte — os dois lêem o mesmo `MarketingPlan` | — |
@@ -638,12 +983,116 @@ pontos mente sobre o dado.
 
 ```bash
 npm run typecheck      # tsc --noEmit
+npm run handoff:check  # fidelidade ao handoff — bloqueia regressão
+npm run handoff:report # fidelidade — lista o que está aberto, com arquivo:linha
 npm run test:ci        # karma headless + cobertura
 npm run build:prod     # build de produção
-npm run quality:frontend  # os três acima
+npm run quality:frontend  # typecheck + handoff:check + test:ci + build:prod
+npm run legal:ready    # gate manual antes de publicar o site
 ```
 
 Protótipos renderizam com Playwright a partir de
 `~/Downloads/code-exploration-and-branding-setup/project/` — dependem de `support.js` e `_ds/`
 na mesma pasta, e exigem **scroll até o fim** antes da captura, senão a revelação ao rolar
 não dispara e a página sai em branco.
+
+---
+
+## 8. FASE 8 — Quitação da dívida de fidelidade
+
+Aberta pela auditoria da seção 5.1. **Precede a Fase 7.2 em diante**: cada tela nova
+construída sobre os componentes legados aumenta o custo de adotar os primitivos depois.
+
+Ordem por dependência, não por tamanho. 8.1 primeiro porque as etapas seguintes reescrevem
+os mesmos arquivos — fazer 8.4 antes de 8.1 é ajustar sombra em card que vai ser trocado.
+
+Regra para todas as etapas: **uma etapa por commit**, com o `BASELINE` do
+`scripts/check-handoff-fidelity.mjs` baixado no mesmo commit, e captura Playwright
+desktop/mobile da tela afetada em `docs/ai-reports/`.
+
+### 8.1 — Adotar os primitivos ou apagá-los · R1: 7 → 0
+
+Para cada par, a decisão é binária: **o primitivo do handoff substitui o legado**, ou o
+primitivo é apagado e o plano registra por que o legado venceu. Não existe manter os dois —
+é isso que R1 mede.
+
+| Primitivo do handoff | Legado que ele substitui | Telas afetadas |
+|---|---|---|
+| `app-kpi-strip` + `app-metric-card` | `app-transaction-summary-card` solto em grid | 16 telas |
+| `app-money` | `formatCurrency`/`toLocaleString` no `.ts` da tela | home, relatórios, cartões, investimentos |
+| `app-progress-bar` | `app-usage-bar` | orçamento, metas, cartões, empréstimos |
+| `app-chart-line` / `app-chart-bars` | SVG próprio da feature | home, investimentos, empréstimos |
+| `app-data-table` | `app-responsive-list` | 9 telas |
+| `app-number-stepper` | `<input type="number">` | formulários de parcela |
+
+- [ ] Decidir par a par e **registrar a decisão nesta tabela** antes de escrever código.
+      `app-responsive-list` tem argumento real a favor — ele já resolve tabela→cards no
+      mobile, que o `app-data-table` do handoff não cobre. Se ele vencer, o `app-data-table`
+      é apagado e `ARQUITETURA_ANGULAR.md` §7 recebe a emenda.
+- [ ] Migrar tela por tela, começando por Metas (a menor).
+- [ ] Apagar o primitivo perdedor de cada par. **Código morto em `shared/` é o problema**,
+      não o sintoma — enquanto os dois existirem, a próxima tela escolhe o errado.
+- [ ] `/styleguide` passa a listar só o que está em uso.
+
+### 8.2 — Faixa de indicadores em flex · R2: 6 → 0
+
+Sai de `grid auto-fit` para `flex-wrap` com `flex: 1 1 210px` (README §4).
+
+- [ ] `shared/transactions/transactions-layout.scss:13` — **resolve 3 telas de uma vez**
+      (despesas, receitas, cartões). Começar por aqui.
+- [ ] `metas.component.scss:11`
+- [ ] `calendario`, `categories`, `contas`, `loan-detail`
+- [ ] Verificar em 1440/1024/390px que a última linha cresce e não sobra célula vazia —
+      é o bug que a regra existe para impedir, e ele só aparece em largura específica.
+
+### 8.3 — Tooltip em todo indicador · R3: 16 → 0
+
+README §8 e §7: "indicador sem explicação não passa em revisão". Pedido explícito do usuário.
+
+- [ ] Escrever o texto de cada indicador **junto com quem conhece o cálculo** — tooltip que
+      repete o rótulo ("Saldo devedor: o saldo devedor") não conta como resolvido. Deve dizer
+      o que é **e como é calculado**.
+- [ ] Prioridade: metas, orçamento, empréstimos, contas, calendário (telas já repaginadas).
+- [ ] Depois: as 11 restantes que o `handoff:report` lista.
+- [ ] Referência de como fazer: `investment-overview-panel.component.html`, hoje a única tela
+      com tooltip nos cinco indicadores.
+
+### 8.4 — Gráficos para `shared/charts/` · R4: 10 → 0
+
+- [ ] `home.component.html` — 6 séries de patrimônio desenhadas com `<path [attr.d]>`
+- [ ] `investment-profitability-panel` — carteira × benchmark
+- [ ] `loan-detail` — evolução do saldo devedor
+- [ ] Se o `app-chart-line` atual não cobre algum caso (área preenchida, série tracejada,
+      hover por ponto), **estender o primitivo** conforme o contrato `ChartSeries` de §8.
+      Não voltar a desenhar na feature.
+
+### 8.5 — Sombra só em hover e camada flutuante · R5: 27 → 0
+
+README §3: card em repouso tem borda de 1px e nenhuma sombra.
+
+- [ ] Trocar `box-shadow: var(--shadow-card-hover)` em repouso por borda + sombra no `:hover`.
+- [ ] Começar por `transactions-layout.scss` e `dashboard-*`, os mais visíveis.
+- [ ] Conferir no tema escuro: sem a sombra, a separação passa a depender só da borda, e
+      `--border` no escuro tem contraste menor.
+
+### 8.6 — Fim do `::ng-deep` em feature · R9: 22 → 0
+
+- [ ] Cada `::ng-deep` vira `@Input` de variante no primitivo, ou uma classe utilitária.
+- [ ] Piores casos: `orcamento` (10), `relatorios` (8) — os dois repintam o
+      `app-transaction-summary-card` e o `app-responsive-list` por dentro.
+- [ ] Se três telas precisam da mesma variação, ela vira o padrão do primitivo (§2, regra
+      da terceira feature).
+
+### 8.7 — Hex literal e `OnPush` · R6: 4 → 0 · R8: 51 → 0
+
+- [ ] `cartoes-listagem.component.scss` — gradientes de Visa, Elo e Amex viram
+      `--brand-visa` e companhia. São cores de marca de terceiros: viram token, não sumem.
+      A Fase 1 já previa isso para a 5.4 e ficou pendente.
+- [ ] `OnPush`: dívida anterior ao redesign, 51 componentes. Não abrir frente própria —
+      cada tela que a Fase 8 tocar sai com `OnPush`, e o baseline desce junto.
+
+### Encerramento da Fase 8
+
+- [ ] `npm run handoff:check` sem nenhuma dívida aberta.
+- [ ] Todo `BASELINE` do script em `0`, e o objeto vazio no arquivo.
+- [ ] Só então as fases 6.1 a 6.4 voltam a `✅ CONCLUÍDA` e a Fase 7.2 começa.

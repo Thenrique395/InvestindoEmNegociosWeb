@@ -457,6 +457,10 @@ Critério de pronto:
 
 Objetivo: impedir regressão visual depois da padronização.
 
+Status:
+
+- feito em 2026-08-05: criado o checklist operacional [CHECKLIST_VALIDACAO_VISUAL_PLAYWRIGHT.md](./CHECKLIST_VALIDACAO_VISUAL_PLAYWRIGHT.md) para revisão visual assistida por Playwright das telas principais.
+
 Telas mínimas para validação:
 
 - Dashboard
@@ -482,7 +486,6 @@ Checks mínimos:
 
 1. Corrigir o contrato de tokens entre `DESIGN_SYSTEM.md`, `src/styles.scss` e `src/styles/design-tokens.scss`.
 2. Padronizar `confirm-dialog` antigo para `confirm-sheet` nas telas financeiras.
-3. Criar um checklist de validação visual com Playwright para as 8 telas principais.
 
 ## Decisão recomendada
 
