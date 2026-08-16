@@ -1,0 +1,374 @@
+#!/usr/bin/env node
+/**
+ * Gate de fidelidade ao handoff de design.
+ *
+ * O handoff (`design_handoff_investindo_redesign/`) tem regras vinculantes. Elas foram
+ * escritas porque cada uma já custou um bug ou um retrabalho. Revisão humana não pega
+ * todas — este script pega, e roda no `quality:frontend`.
+ *
+ * Cada regra aponta para a seção do handoff que a define. Quando uma regra falhar, a
+ * correção é ajustar o código, não afrouxar a regra. Se a regra estiver errada, ela muda
+ * no handoff primeiro, e aqui depois.
+ *
+ * Uso:
+ *   node scripts/check-handoff-fidelity.mjs           # falha se houver violação
+ *   node scripts/check-handoff-fidelity.mjs --report  # lista tudo, sai 0 (diagnóstico)
+ */
+
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
+const APP = join(ROOT, 'investindoEmNegociosWeb', 'src', 'app');
+const TOKENS = join(ROOT, 'investindoEmNegociosWeb', 'src', 'styles', 'design-tokens.scss');
+const HANDOFF_TOKENS = join(ROOT, 'design_handoff_investindo_redesign', 'tokens.css');
+
+const REPORT_ONLY = process.argv.includes('--report');
+
+/* ------------------------------------------------------------------ helpers */
+
+function walk(dir, exts) {
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...walk(full, exts));
+    else if (exts.some((e) => entry.endsWith(e))) out.push(full);
+  }
+  return out;
+}
+
+const rel = (f) => relative(ROOT, f).split(sep).join('/');
+const isStyleguide = (f) => rel(f).includes('/styleguide/');
+const isSpec = (f) => f.endsWith('.spec.ts');
+
+const scss = walk(APP, ['.scss']);
+const html = walk(APP, ['.html']);
+const ts = walk(APP, ['.ts']).filter((f) => !isSpec(f));
+
+function lines(file) {
+  return readFileSync(file, 'utf8').split('\n');
+}
+
+/** Percorre linhas de arquivos e reporta as que casam com `test`. */
+function scan(files, test, { skipStyleguide = true } = {}) {
+  const hits = [];
+  for (const file of files) {
+    if (skipStyleguide && isStyleguide(file)) continue;
+    lines(file).forEach((line, i) => {
+      if (test(line, file)) hits.push({ file: rel(file), line: i + 1, text: line.trim() });
+    });
+  }
+  return hits;
+}
+
+/* -------------------------------------------------------------------- regras */
+
+const rules = [];
+
+/**
+ * R1 — Primitivos de `shared/` adotados de verdade.
+ * ARQUITETURA_ANGULAR.md §7 e §13.1: os primitivos não podem ser reimplementados por
+ * feature. Um primitivo que só aparece no /styleguide não é adoção — é um segundo design
+ * system convivendo com o legado, que é justamente o que o handoff quer evitar.
+ */
+rules.push({
+  id: 'R1',
+  titulo: 'Primitivo de shared/ usado só no /styleguide',
+  ref: 'ARQUITETURA_ANGULAR.md §7 · §13.1',
+  run() {
+    const primitivos = [
+      'app-kpi-strip',
+      'app-money',
+      'app-data-table',
+      'app-number-stepper',
+      'app-progress-bar',
+      'app-chart-bars',
+      'app-chart-line',
+      'app-select-menu',
+    ];
+    const usoReal = new Map(primitivos.map((p) => [p, 0]));
+    for (const file of html) {
+      if (isStyleguide(file)) continue;
+      const src = readFileSync(file, 'utf8');
+      for (const p of primitivos) if (src.includes(`<${p}`)) usoReal.set(p, usoReal.get(p) + 1);
+    }
+    return [...usoReal.entries()]
+      .filter(([, n]) => n === 0)
+      .map(([p]) => ({
+        file: `src/app/shared/${p.replace('app-', '')}/`,
+        line: 0,
+        text: `${p} não é usado em nenhuma tela — existe só na demo do /styleguide`,
+      }));
+  },
+});
+
+/**
+ * R2 — Faixa de indicadores é flex com quebra.
+ * README.md §4 e ARQUITETURA_ANGULAR.md §7 (app-kpi-strip) e §12.
+ * `grid auto-fit` deixa célula vazia à direita quando a contagem de KPIs não divide pelo
+ * número de colunas. Flex faz a última linha crescer e preencher. Já foi corrigido uma vez
+ * no dashboard (commit 4df1a1c) e voltou em outras telas.
+ */
+rules.push({
+  id: 'R2',
+  titulo: 'grid auto-fit/auto-fill em faixa de indicadores',
+  ref: 'README.md §4 · ARQUITETURA_ANGULAR.md §7, §12',
+  run() {
+    // Só vale para a faixa de KPI. O seletor que a precede identifica o bloco.
+    const marcadores = /(summary|kpi|indicador|metric|stat)[a-z-]*\s*\{/i;
+    const hits = [];
+    for (const file of scss) {
+      if (isStyleguide(file)) continue;
+      const ls = lines(file);
+      let blocoKpi = false;
+      ls.forEach((line, i) => {
+        if (marcadores.test(line)) blocoKpi = true;
+        else if (line.trim() === '}') blocoKpi = false;
+        if (blocoKpi && /repeat\(\s*auto-(fit|fill)/.test(line)) {
+          hits.push({ file: rel(file), line: i + 1, text: line.trim() });
+        }
+      });
+    }
+    return hits;
+  },
+});
+
+/**
+ * R3 — Todo indicador tem tooltip.
+ * README.md §8 e ARQUITETURA_ANGULAR.md §7 (app-metric-card): "tooltip é obrigatório.
+ * Indicador sem explicação não passa em revisão." O usuário pediu isso explicitamente.
+ */
+rules.push({
+  id: 'R3',
+  titulo: 'Card de indicador sem tooltip',
+  ref: 'README.md §8 · ARQUITETURA_ANGULAR.md §7',
+  run() {
+    const hits = [];
+    for (const file of html) {
+      if (isStyleguide(file)) continue;
+      const src = readFileSync(file, 'utf8');
+      const usos = (src.match(/<app-transaction-summary-card|<app-metric-card|<app-kpi-strip/g) || []).length;
+      if (!usos) continue;
+      const tips = (src.match(/tooltipText|\[tooltip\]|appTooltip|items=/g) || []).length;
+      if (tips === 0) {
+        hits.push({
+          file: rel(file),
+          line: 0,
+          text: `${usos} card(s) de indicador, nenhum com tooltip`,
+        });
+      }
+    }
+    return hits;
+  },
+});
+
+/**
+ * R4 — Nenhuma feature desenha gráfico à mão.
+ * ARQUITETURA_ANGULAR.md §8 e §13.5. Ícone SVG inline é permitido (README "Assets");
+ * série de dados não é — ela reintroduz o bug de altura percentual da barra e foge do
+ * contrato `ChartSeries`. O que denuncia gráfico é `points` vindo de binding.
+ */
+rules.push({
+  id: 'R4',
+  titulo: 'SVG de gráfico dentro de feature (use shared/charts)',
+  ref: 'ARQUITETURA_ANGULAR.md §8 · §13.5',
+  run() {
+    return scan(
+      html,
+      (line, file) =>
+        !rel(file).includes('/shared/') &&
+        /<(polyline|polygon|path)\b/.test(line) &&
+        /\[attr\.(points|d)\]|\[attr\.points\]/.test(line),
+    );
+  },
+});
+
+/**
+ * R5 — Card não tem sombra em repouso.
+ * README.md §3: "sem sombra em repouso. Sombra apenas em hover (elevação de 2px) e em
+ * camadas flutuantes (modal, dropdown, toast)." Sombra fixa achata a hierarquia: quando
+ * tudo está elevado, nada está.
+ */
+rules.push({
+  id: 'R5',
+  titulo: 'Sombra de hover aplicada em estado de repouso',
+  ref: 'README.md §3',
+  run() {
+    const flutuante = /(modal|dropdown|toast|menu|popover|tooltip|sheet|overlay)/i;
+    const hits = [];
+    for (const file of scss) {
+      if (isStyleguide(file) || flutuante.test(rel(file))) continue;
+      const ls = lines(file);
+      let emHover = false;
+      ls.forEach((line, i) => {
+        if (/:hover|:focus|:active|\.is-|\[open\]/.test(line)) emHover = true;
+        else if (line.trim() === '}') emHover = false;
+        if (!emHover && /box-shadow:\s*var\(--shadow-card-hover\)/.test(line)) {
+          hits.push({ file: rel(file), line: i + 1, text: line.trim() });
+        }
+      });
+    }
+    return hits;
+  },
+});
+
+/**
+ * R6 — Nenhum hex literal fora de design-tokens.scss.
+ * ARQUITETURA_ANGULAR.md §6: "Se você precisa de uma cor que não existe no token, ela vira
+ * token primeiro." Vale para SCSS de componente, template e .ts.
+ */
+rules.push({
+  id: 'R6',
+  titulo: 'Cor hex literal fora de design-tokens.scss',
+  ref: 'ARQUITETURA_ANGULAR.md §6 · §12',
+  run() {
+    const hex = /#[0-9a-fA-F]{3,8}\b/;
+    const comentario = /^\s*(\/\/|\/\*|\*)/;
+    return [
+      ...scan(scss, (line) => hex.test(line) && !comentario.test(line)),
+      ...scan(html, (line) => /#[0-9a-fA-F]{6}\b/.test(line)),
+      ...scan(ts, (line) => /['"`]#[0-9a-fA-F]{3,8}['"`]/.test(line) && !comentario.test(line)),
+    ];
+  },
+});
+
+/**
+ * R7 — Todo token do handoff existe no código.
+ * README.md §"Fidelidade": os valores de `tokens.css` são a fonte. Um token que sumiu é
+ * uma medida do design que virou literal em algum lugar.
+ */
+rules.push({
+  id: 'R7',
+  titulo: 'Token do handoff ausente em design-tokens.scss',
+  ref: 'README.md "Fidelidade" · tokens.css',
+  run() {
+    const nomes = (src) => new Set((src.match(/^\s*(--[a-z0-9-]+)\s*:/gm) || []).map((m) => m.trim().split(':')[0]));
+    const doHandoff = nomes(readFileSync(HANDOFF_TOKENS, 'utf8'));
+    const doCodigo = nomes(readFileSync(TOKENS, 'utf8'));
+    return [...doHandoff]
+      .filter((t) => !doCodigo.has(t))
+      .map((t) => ({ file: 'src/styles/design-tokens.scss', line: 0, text: `${t} definido no handoff e ausente no código` }));
+  },
+});
+
+/**
+ * R8 — ChangeDetectionStrategy.OnPush em todo componente.
+ * ARQUITETURA_ANGULAR.md §4.5: "em todos os componentes. Sem exceção."
+ * Legado ainda tem dívida aqui; o gate trava a entrada de componente NOVO sem OnPush.
+ */
+rules.push({
+  id: 'R8',
+  titulo: 'Componente sem ChangeDetectionStrategy.OnPush',
+  ref: 'ARQUITETURA_ANGULAR.md §4.5 · §12',
+  baseline: true,
+  run() {
+    return ts
+      .filter((f) => {
+        const src = readFileSync(f, 'utf8');
+        return src.includes('@Component') && !src.includes('OnPush');
+      })
+      .map((f) => ({ file: rel(f), line: 0, text: 'sem ChangeDetectionStrategy.OnPush' }));
+  },
+});
+
+/**
+ * R9 — Feature não repinta primitivo por dentro com ::ng-deep.
+ * ARQUITETURA_ANGULAR.md §3 e §7. É a versão CSS do erro §13.1: em vez de copiar o SCSS
+ * do card, a tela fura o encapsulamento e reescreve o interior dele. O resultado é o
+ * mesmo — cada tela com sua versão do primitivo, e o primitivo sem dono. Quando a tela
+ * precisa de uma variação, ela vira `@Input` de variante no próprio primitivo.
+ */
+rules.push({
+  id: 'R9',
+  titulo: 'Feature reestiliza primitivo por dentro (::ng-deep)',
+  ref: 'ARQUITETURA_ANGULAR.md §3 · §7 · §13.1',
+  run() {
+    return scan(scss, (line, file) => !rel(file).includes('/shared/') && line.includes('::ng-deep'));
+  },
+});
+
+/* ------------------------------------------------------------------ execução */
+
+/**
+ * Dívida herdada, medida em 2026-08-16 (auditoria do handoff — ver PLANO_REDESIGN.md §8).
+ *
+ * O gate falha quando um número SOBE: quem escreve código novo não pode piorar o placar.
+ * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
+ * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
+ */
+const BASELINE = { R1: 7, R2: 6, R3: 16, R4: 10, R5: 27, R6: 4, R8: 51, R9: 22 };
+
+const VERDE = '\x1b[32m';
+const VERMELHO = '\x1b[31m';
+const AMARELO = '\x1b[33m';
+const FRACO = '\x1b[2m';
+const FIM = '\x1b[0m';
+
+let regrediu = false;
+let dividaAberta = 0;
+let melhorou = [];
+const resumo = [];
+
+for (const rule of rules) {
+  const hits = rule.run();
+  const teto = BASELINE[rule.id] ?? 0;
+  // 'regressao' = pior que o baseline. 'divida' = dentro do baseline, mas ainda não zerado.
+  const estado = hits.length > teto ? 'regressao' : hits.length > 0 ? 'divida' : 'ok';
+  if (estado === 'regressao') regrediu = true;
+  if (estado === 'divida') dividaAberta += hits.length;
+  if (teto > 0 && hits.length < teto) melhorou.push(`${rule.id} ${teto}→${hits.length}`);
+  resumo.push({ rule, hits, teto, estado });
+}
+
+console.log(`\n  Fidelidade ao handoff de design\n  ${'─'.repeat(64)}\n`);
+
+for (const { rule, hits, teto, estado } of resumo) {
+  const marca = { ok: `${VERDE}✓${FIM}`, divida: `${AMARELO}⚠${FIM}`, regressao: `${VERMELHO}✗${FIM}` }[estado];
+  const placar =
+    estado === 'regressao'
+      ? `— ${VERMELHO}REGREDIU: ${hits.length}, o teto é ${teto}${FIM}`
+      : estado === 'divida'
+        ? `— ${AMARELO}${hits.length} de dívida herdada (teto ${teto})${FIM}`
+        : '';
+  console.log(`  ${marca} ${rule.id}  ${rule.titulo}  ${placar}`);
+  console.log(`       ${FRACO}${rule.ref}${FIM}`);
+  if ((estado === 'regressao' || REPORT_ONLY) && hits.length) {
+    for (const h of hits.slice(0, 12)) {
+      console.log(`       ${h.file}${h.line ? `:${h.line}` : ''}  ${h.text.slice(0, 96)}`);
+    }
+    if (hits.length > 12) console.log(`       ${FRACO}… e mais ${hits.length - 12} (use --report)${FIM}`);
+  }
+  console.log('');
+}
+
+if (melhorou.length) {
+  console.log(`  ${VERDE}Dívida quitada nesta rodada: ${melhorou.join(', ')}.${FIM}`);
+  console.log(`  ${FRACO}Baixe o BASELINE deste script no mesmo commit, senão ela pode voltar.${FIM}\n`);
+}
+
+if (REPORT_ONLY) {
+  console.log(`  ${FRACO}modo --report: nada é bloqueado.${FIM}\n`);
+  process.exit(0);
+}
+
+if (regrediu) {
+  console.error(
+    `  ${VERMELHO}O código divergiu do handoff.${FIM} O handoff é a especificação: a tela precisa ficar\n` +
+      `  igual ao protótipo, não parecida. Corrija o código — não afrouxe a regra nem suba o\n` +
+      `  baseline. Se a regra estiver errada, ela muda em design_handoff_investindo_redesign/\n` +
+      `  primeiro, e só depois aqui.\n`,
+  );
+  process.exit(1);
+}
+
+if (dividaAberta) {
+  console.log(
+    `  ${AMARELO}Sem regressão${FIM}, mas ainda há ${dividaAberta} violações de dívida herdada.\n` +
+      `  ${FRACO}O plano de quitação é a Fase 8 do PLANO_REDESIGN.md. Enquanto houver dívida, a tela\n` +
+      `  está parecida com o handoff, não igual.${FIM}\n`,
+  );
+  process.exit(0);
+}
+
+console.log(`  ${VERDE}Tudo conforme o handoff, sem dívida aberta.${FIM}\n`);
