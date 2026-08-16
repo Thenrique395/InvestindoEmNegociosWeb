@@ -449,8 +449,8 @@ cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no templat
 | 6.2 | Orçamento | ✅ concluída — média 3m bloqueada por contrato |
 | 6.3 | Investimentos | ✅ concluída — 5 abas alinhadas e evidenciadas |
 | 6.4 | Empréstimos | ✅ concluída — KPIs, cards, detalhe e parcelas alinhados |
-| 6.5 | Relatórios | 🔶 conteúdo pronto — falta tooltip nos indicadores (R3) |
-| 6.6 | Simulador | 🔶 conteúdo pronto — falta tooltip nos indicadores (R3) |
+| 6.5 | Relatórios | ✅ **CONCLUÍDA** — resumo, comparativo 6/12, snapshots e tooltips |
+| 6.6 | Simulador | ✅ **CONCLUÍDA** — simulador, calculadoras e tooltips |
 | 6.7 | Assistente | |
 | 6.8 | Perfil | + `user-security` |
 | 6.9 | Configurações | barra de salvar fixa, zona sensível |
@@ -620,7 +620,7 @@ parcelas pagas/total, taxa/vencimento e barra de amortização.
 
 ---
 
-### FASE 6.5 — Relatórios 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+### FASE 6.5 — Relatórios ✅ CONCLUÍDA
 
 Fonte do handoff: `TELAS.md` §12. A fase cobre `app/relatorios/` e, em seguida,
 `app/monthly-snapshots/`.
@@ -661,7 +661,7 @@ Fonte do handoff: `TELAS.md` §12. A fase cobre `app/relatorios/` e, em seguida,
 
 ---
 
-### FASE 6.6 — Simulador 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+### FASE 6.6 — Simulador ✅ CONCLUÍDA
 
 Fonte do handoff: `TELAS.md` §13. A fase cobre `app/cenarios/` e `app/calculator/`.
 
@@ -972,7 +972,7 @@ Contagem do dia, por regra do gate (`npm run handoff:report`):
 |---|---|---|
 | **R1** | 7 | Primitivos criados na Fase 4 que só aparecem no `/styleguide` |
 | **R2** | 6 | `grid auto-fit` em faixa de indicadores |
-| **R3** | 16 | Tela com card de indicador sem nenhum tooltip |
+| ~~R3~~ | ✅ 0 | Tela com card de indicador sem nenhum tooltip — **quitada, e fora do baseline** |
 | **R4** | 10 | Gráfico desenhado à mão dentro da feature |
 | **R5** | 27 | `--shadow-card-hover` aplicada em repouso |
 | **R6** | 4 | Hex literal fora do `design-tokens.scss` |
@@ -1109,17 +1109,40 @@ Sai de `grid auto-fit` para `flex-wrap` com `flex: 1 1 210px` (README §4).
 - [ ] Verificar em 1440/1024/390px que a última linha cresce e não sobra célula vazia —
       é o bug que a regra existe para impedir, e ele só aparece em largura específica.
 
-### 8.3 — Tooltip em todo indicador · R3: 16 → 0
+### 8.3 — Tooltip em todo indicador · R3: ~~16~~ ✅ CONCLUÍDA
 
-README §8 e §7: "indicador sem explicação não passa em revisão". Pedido explícito do usuário.
+55 tooltips em 16 telas, concluída em 2026-08-16. **R3 saiu do `BASELINE`**: virou regra
+dura, e indicador novo sem tooltip quebra o gate na hora.
 
-- [ ] Escrever o texto de cada indicador **junto com quem conhece o cálculo** — tooltip que
-      repete o rótulo ("Saldo devedor: o saldo devedor") não conta como resolvido. Deve dizer
-      o que é **e como é calculado**.
-- [ ] Prioridade: metas, orçamento, empréstimos, contas, calendário (telas já repaginadas).
-- [ ] Depois: as 11 restantes que o `handoff:report` lista.
-- [ ] Referência de como fazer: `investment-overview-panel.component.html`, hoje a única tela
-      com tooltip nos cinco indicadores.
+Cada texto foi derivado da função que produz o número — não do rótulo. Foi o que fez a etapa
+valer mais que o checklist: escrever a explicação obrigou a ler o cálculo, e o cálculo
+contradizia a tela em três lugares.
+
+O que os tooltips passaram a dizer e a tela escondia:
+
+- **Empréstimos** — saldo devedor soma todos os contratos; parcela mensal, só os ativos. É
+  por isso que os dois números não se correspondem, e ninguém explicava.
+- **Metas** — "atingidas" é acumulado e conta as arquivadas; o progresso médio limita cada
+  meta a 100%, então meta superada não puxa a média para cima.
+- **Calendário** — "despesas previstas" inclui parcela de financiamento, e o saldo previsto é
+  o fluxo do mês isolado: não soma o que já está em conta.
+- **Histórico mensal** — o "Risco" é um índice de saúde: quanto maior, melhor.
+
+**Bug encontrado por causa disto** (commit `2876644`): o front lia a classificação por
+substring em português contra valores que a API emite em inglês, e `'healthy'.includes('alt')`
+é verdadeiro — he-**alt**-hy. O estado mais saudável caía na regra de risco alto: badge
+vermelho e barra crítica para quem está com as contas em dia. O fallback numérico ainda
+invertia a escala, e a spec cravava o comportamento errado. Corrigido com os limiares do
+próprio backend e verificado no navegador.
+
+**Legibilidade verificada**: `quality-tests/e2e/indicator-tooltips-visual.spec.ts`. O painel
+abre para cima com 280px fixos — texto longo em faixa no topo da página poderia sair pela
+borda superior. Medido em três telas, incluindo o texto mais longo do app. Metas ficou de
+fora da spec porque o mock não serve `/api/v1/goals` e a tela cai no estado vazio.
+
+**Fica em aberto, e é decisão de produto**: o KPI diz "Risco 84/100" para um número em que
+84 é bom. O tooltip resolve a ambiguidade, mas o rótulo honesto seria "Saúde financeira" —
+renomear atravessa o card, o badge e a barra, e é chamada do dono do produto.
 
 ### 8.4 — Gráficos para `shared/charts/` · R4: 10 → 0
 
