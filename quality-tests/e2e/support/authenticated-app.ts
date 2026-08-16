@@ -1579,12 +1579,12 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
-  if (method === 'POST' && path === '/api/v1/monthlysnapshots/generate') {
+  if (method === 'POST' && (path === '/api/v1/monthlysnapshots/generate' || path === '/api/v1/monthly-snapshots/generate')) {
     const payload = JSON.parse(route.request().postData() || '{}');
     const month = Number(payload.month || 1);
     const year = Number(payload.year || 2026);
     const created = {
-      id: crypto.randomUUID(),
+      id: `snapshot-${year}-${month}`,
       year,
       month,
       snapshotLabel: `${String(month).padStart(2, '0')}/${year}`,
@@ -2368,7 +2368,7 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
-  if (path === '/api/v1/monthlysnapshots') {
+  if (path === '/api/v1/monthlysnapshots' || path === '/api/v1/monthly-snapshots') {
     await json(route, state.snapshots);
     return;
   }
@@ -2551,6 +2551,9 @@ async function fulfillApi(route: Route, state: {
     const parts = path.split('/');
     const year = Number(parts[5]);
     const month = Number(parts[6]);
+    const income = 6800 + (month % 6) * 420;
+    const expenses = 2600 + (month % 5) * 260;
+    const netBalance = income - expenses;
     const expensesByCategory = [
       { categoryName: 'Alimentação', amount: 1500, percentageOfTotal: 48.4 },
       { categoryName: 'Transporte', amount: 800, percentageOfTotal: 25.8 },
@@ -2558,10 +2561,10 @@ async function fulfillApi(route: Route, state: {
     ];
     await json(route, {
       year, month,
-      totalIncome: 8000,
-      totalExpenses: 3100,
-      netBalance: 4900,
-      savingsRate: 61.3,
+      totalIncome: income,
+      totalExpenses: expenses,
+      netBalance,
+      savingsRate: income ? (netBalance / income) * 100 : 0,
       expensesByCategory,
       topExpenses: expensesByCategory.slice(0, 3)
     });

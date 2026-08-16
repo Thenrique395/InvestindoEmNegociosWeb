@@ -288,7 +288,9 @@ test.describe('simulador de cenários', () => {
     await page.getByLabel('Despesa extra mensal').fill('200');
     await page.getByRole('button', { name: 'Simular cenário' }).click();
 
-    await expect(page.getByRole('heading', { level: 2, name: 'Projeção diária' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Projeção comparada' })).toBeVisible();
+    await expect(page.locator('.scenario-chart')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Detalhamento da projeção' })).toBeVisible();
     await expect(page.getByRole('columnheader', { name: 'Saldo base' })).toBeVisible();
     await expect(page.getByRole('columnheader', { name: 'Saldo cenário' })).toBeVisible();
   });

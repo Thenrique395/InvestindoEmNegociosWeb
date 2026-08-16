@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MonthlyFinancialSnapshotResponse, MonthlySnapshotsService } from '../monthly-snapshots.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
@@ -25,7 +26,8 @@ import { riskBadgeTone, riskLevel, riskUsageTone } from './snapshots-overview.mo
     EmptyStateComponent
   ],
   templateUrl: './monthly-snapshots.component.html',
-  styleUrl: './monthly-snapshots.component.scss'
+  styleUrl: './monthly-snapshots.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MonthlySnapshotsComponent implements OnInit {
   snapshots: MonthlyFinancialSnapshotResponse[] = [];
@@ -33,7 +35,11 @@ export class MonthlySnapshotsComponent implements OnInit {
   generating = false;
   error = '';
 
-  constructor(private readonly snapshotsService: MonthlySnapshotsService) {}
+  constructor(
+    private readonly snapshotsService: MonthlySnapshotsService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -60,6 +66,22 @@ export class MonthlySnapshotsComponent implements OnInit {
     return level === 'high' ? 'danger' : level === 'moderate' ? 'warning' : 'success';
   }
 
+  get latestPendingExpenses(): number {
+    return Number(this.latestSnapshot?.pendingExpenses || 0);
+  }
+
+  get latestPendingIncomes(): number {
+    return Number(this.latestSnapshot?.pendingIncomes || 0);
+  }
+
+  get latestTotalDebt(): number {
+    return Number(this.latestSnapshot?.totalDebt || 0);
+  }
+
+  get latestNetWorth(): number {
+    return Number(this.latestSnapshot?.netWorth || 0);
+  }
+
   riskBadgeTone(snapshot: MonthlyFinancialSnapshotResponse): StatusBadgeTone {
     return riskBadgeTone(riskLevel(snapshot.riskClassification, snapshot.riskScore));
   }
@@ -71,14 +93,18 @@ export class MonthlySnapshotsComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.error = '';
-    this.snapshotsService.list().subscribe({
+    this.snapshotsService.list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: (items) => {
         this.snapshots = items;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = extractApiErrorMessage(err, 'Falha ao carregar snapshots.');
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -87,14 +113,18 @@ export class MonthlySnapshotsComponent implements OnInit {
     const now = new Date();
     this.generating = true;
     this.error = '';
-    this.snapshotsService.generate(now.getFullYear(), now.getMonth() + 1).subscribe({
+    this.snapshotsService.generate(now.getFullYear(), now.getMonth() + 1)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: (snapshot) => {
         this.snapshots = [snapshot, ...this.snapshots.filter((item) => item.id !== snapshot.id)];
         this.generating = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = extractApiErrorMessage(err, 'Falha ao gerar snapshot.');
         this.generating = false;
+        this.cdr.markForCheck();
       }
     });
   }

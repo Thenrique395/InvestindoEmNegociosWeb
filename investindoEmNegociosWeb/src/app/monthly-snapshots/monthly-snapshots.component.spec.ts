@@ -42,7 +42,14 @@ describe('MonthlySnapshotsComponent', () => {
       }))
     };
 
-    return { component: new MonthlySnapshotsComponent(snapshotsService), snapshotsService };
+    return {
+      component: new MonthlySnapshotsComponent(
+        snapshotsService,
+        { markForCheck: jasmine.createSpy('markForCheck') } as any,
+        { onDestroy: () => {} } as any
+      ),
+      snapshotsService
+    };
   }
 
   it('deve carregar snapshots ao iniciar', () => {

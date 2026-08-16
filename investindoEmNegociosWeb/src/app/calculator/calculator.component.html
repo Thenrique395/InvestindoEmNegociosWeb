@@ -12,6 +12,7 @@
 
   <section class="calculator-summary-grid">
     <app-transaction-summary-card
+      density="compact"
       tone="primary"
       eyebrow="Modelos"
       [value]="calculators.length.toString()"
@@ -21,6 +22,7 @@
       </svg>
     </app-transaction-summary-card>
     <app-transaction-summary-card
+      density="compact"
       tone="success"
       eyebrow="Ativos"
       [value]="implementedCount.toString()"
@@ -30,6 +32,7 @@
       </svg>
     </app-transaction-summary-card>
     <app-transaction-summary-card
+      density="compact"
       tone="info"
       eyebrow="Em breve"
       [value]="pendingCount.toString()"

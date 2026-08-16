@@ -70,6 +70,8 @@ describe('CenariosComponent', () => {
     expect(component.pointViews.length).toBe(1);
     expect(component.pointViews[0].difference).toBe(100);
     expect(component.pointViews[0].tone).toBe('positive');
+    expect(component.chartPoints.length).toBe(1);
+    expect(component.chartPoints[0].scenarioPercent).toBe(100);
   });
 
   it('atualiza o período pelo seletor', () => {

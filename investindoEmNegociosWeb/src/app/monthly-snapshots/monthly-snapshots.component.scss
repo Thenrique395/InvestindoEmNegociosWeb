@@ -4,10 +4,57 @@
   gap: 1.5rem;
 }
 
+.snapshots-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.latest-snapshot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.latest-snapshot h2,
+.latest-snapshot p {
+  margin: 0;
+}
+
+.latest-snapshot h2 {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-section-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
+}
+
+.latest-snapshot p {
+  margin-top: 0.35rem;
+  color: var(--text-secondary);
+  line-height: var(--lh-control);
+}
+
+.latest-snapshot__eyebrow {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.14em;
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+}
+
 .snapshots-summary-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .muted {
@@ -21,10 +68,10 @@
 .snapshot {
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
-  padding: 1rem;
-  background: var(--surface-sunken);
+  padding: 1.25rem;
+  background: var(--surface);
   display: grid;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .snapshot__head {
@@ -49,6 +96,7 @@
 .snapshot__insight {
   margin: 0;
   color: var(--text-secondary);
+  line-height: var(--lh-control);
 }
 
 .snapshot__recs {
@@ -63,14 +111,15 @@
 .grid {
   display: grid;
   gap: 0.8rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .grid > div {
-  background: var(--surface);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
   border-radius: var(--radius-inner);
   padding: 0.85rem;
+  min-width: 0;
 }
 
 .grid span {
@@ -85,9 +134,26 @@
 
 .grid strong {
   color: var(--text);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
+  .snapshots-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .latest-snapshot {
+    display: grid;
+  }
+
   .snapshots-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -97,7 +163,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 360px) {
   .snapshots-summary-grid,
   .grid {
     grid-template-columns: minmax(0, 1fr);

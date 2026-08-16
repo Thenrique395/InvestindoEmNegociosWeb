@@ -10,7 +10,14 @@ import { TransactionSummaryCardComponent } from '../shared/transactions/transact
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pill.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
-import { ScenarioPointView, buildScenarioPointViews, impactSign, impactTone } from './scenario-overview.model';
+import {
+  ScenarioChartPoint,
+  ScenarioPointView,
+  buildScenarioChartPoints,
+  buildScenarioPointViews,
+  impactSign,
+  impactTone
+} from './scenario-overview.model';
 
 @Component({
   selector: 'app-cenarios',
@@ -91,5 +98,9 @@ export class CenariosComponent {
 
   get pointViews(): ScenarioPointView[] {
     return buildScenarioPointViews(this.result()?.scenarioPoints);
+  }
+
+  get chartPoints(): ScenarioChartPoint[] {
+    return buildScenarioChartPoints(this.result()?.scenarioPoints);
   }
 }

@@ -2,8 +2,8 @@
   <app-page-header
     eyebrow="Fechamento mensal"
     title="Histórico mensal"
-    description="Congele um retrato do mês com SDR, projeção, dívida, patrimônio e risco.">
-    <div page-actions>
+    description="Snapshot mensal com SDR, projeção, pendências, dívida, patrimônio e risco no fechamento.">
+    <div page-actions class="snapshots-actions">
       <button type="button" class="btn-primary" (click)="generateCurrentMonth()" [disabled]="generating">
         {{ generating ? 'Gerando...' : 'Gerar snapshot do mês' }}
       </button>
@@ -11,8 +11,21 @@
   </app-page-header>
 
   @if (latestSnapshot) {
+    <article class="latest-snapshot">
+      <div>
+        <span class="latest-snapshot__eyebrow">Fechamento mais recente</span>
+        <h2>{{ latestSnapshot.snapshotLabel }}</h2>
+        <p>{{ latestSnapshot.primaryInsight || 'Snapshot gerado com os indicadores consolidados do mês.' }}</p>
+      </div>
+      <app-status-badge
+        [tone]="riskBadgeTone(latestSnapshot)"
+        [label]="latestSnapshot.riskClassification + ' · ' + latestSnapshot.riskScore + '/100'"
+        [dot]="true" />
+    </article>
+
     <section class="snapshots-summary-grid">
       <app-transaction-summary-card
+        density="compact"
         tone="primary"
         eyebrow="SDR atual"
         [value]="latestRealBalance | appCurrency"
@@ -22,6 +35,7 @@
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
+        density="compact"
         tone="info"
         eyebrow="Projeção"
         [value]="latestProjectedBalance | appCurrency"
@@ -31,6 +45,27 @@
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
+        density="compact"
+        tone="warning"
+        eyebrow="Pendências"
+        [value]="latestPendingExpenses | appCurrency"
+        [note]="'Entradas previstas: ' + (latestPendingIncomes | appCurrency)">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        density="compact"
+        [tone]="latestTotalDebt > 0 ? 'warning' : 'success'"
+        eyebrow="Dívida"
+        [value]="latestTotalDebt | appCurrency"
+        [note]="'Patrimônio líquido: ' + (latestNetWorth | appCurrency)">
+        <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
+          <path d="M4 7h16v10H4zM7 10h5M7 14h10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </app-transaction-summary-card>
+      <app-transaction-summary-card
+        density="compact"
         [tone]="latestRiskTone"
         eyebrow="Risco"
         [value]="latestRiskScore + '/100'"
@@ -85,6 +120,8 @@
           <div class="grid">
             <div><span>SDR</span><strong>{{ item.realAvailableBalance | appCurrency }}</strong></div>
             <div><span>Projeção</span><strong>{{ item.projectedBalance | appCurrency }}</strong></div>
+            <div><span>Pendências</span><strong>{{ item.pendingExpenses | appCurrency }}</strong></div>
+            <div><span>Entradas</span><strong>{{ item.pendingIncomes | appCurrency }}</strong></div>
             <div><span>Dívida</span><strong>{{ item.totalDebt | appCurrency }}</strong></div>
             <div><span>Patrimônio</span><strong>{{ item.netWorth | appCurrency }}</strong></div>
           </div>

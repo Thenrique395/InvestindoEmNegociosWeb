@@ -449,8 +449,8 @@ cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no templat
 | 6.2 | Orçamento | ✅ concluída — média 3m bloqueada por contrato |
 | 6.3 | Investimentos | ✅ concluída — 5 abas alinhadas e evidenciadas |
 | 6.4 | Empréstimos | ✅ concluída — KPIs, cards, detalhe e parcelas alinhados |
-| 6.5 | Relatórios | 🔶 em andamento — distribuição por categoria em barras |
-| 6.6 | Simulador | + `calculator` |
+| 6.5 | Relatórios | 🔶 conteúdo pronto — falta tooltip nos indicadores (R3) |
+| 6.6 | Simulador | 🔶 conteúdo pronto — falta tooltip nos indicadores (R3) |
 | 6.7 | Assistente | |
 | 6.8 | Perfil | + `user-security` |
 | 6.9 | Configurações | barra de salvar fixa, zona sensível |
@@ -620,7 +620,7 @@ parcelas pagas/total, taxa/vencimento e barra de amortização.
 
 ---
 
-### FASE 6.5 — Relatórios 🔶 EM ANDAMENTO
+### FASE 6.5 — Relatórios 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
 
 Fonte do handoff: `TELAS.md` §12. A fase cobre `app/relatorios/` e, em seguida,
 `app/monthly-snapshots/`.
@@ -630,13 +630,70 @@ Fonte do handoff: `TELAS.md` §12. A fase cobre `app/relatorios/` e, em seguida,
       percentuais a 0–100 para largura CSS.
 - [x] Layout mobile dos KPIs revisado localmente em Relatórios para manter dois cards por linha
       em 390px sem quebrar valores monetários caractere a caractere.
+- [x] Seletor de tipo de relatório implementado: `Resumo mensal` mostra categorias/maiores
+      despesas; `Comparativo` mostra receitas × despesas e evolução de saldo.
+- [x] Seletor de período do comparativo implementado para `6 meses` e `12 meses`, compondo a
+      série com o contrato mensal existente (`GET /reports/monthly-summary/{year}/{month}`) sem
+      criar endpoint fictício.
+- [x] `reports-overview.model.ts` deriva janela mensal, escala única das barras de receitas ×
+      despesas e escala de evolução do saldo, com testes de virada de ano e percentuais.
 - [x] Captura visual focada de Relatórios executada em Playwright com evidências
       desktop/mobile e guarda contra overflow horizontal:
       `docs/ai-reports/relatorios-rebrand-desktop.png` e
       `docs/ai-reports/relatorios-rebrand-mobile.png`.
-- [ ] Próximo bloco: receitas × despesas de 6/12 meses em barras comparativas e seletor de tipo
-      de relatório.
-- [ ] Próximo bloco: `monthly-snapshots` com fechamento mensal.
+- [x] Captura visual focada do comparativo executada em Playwright com evidências
+      desktop/mobile:
+      `docs/ai-reports/relatorios-rebrand-comparativo-desktop.png` e
+      `docs/ai-reports/relatorios-rebrand-comparativo-mobile.png`.
+- [x] `monthly-snapshots` alinhado como fechamento mensal: destaque do fechamento mais recente,
+      KPIs de SDR, projeção, pendências, dívida e risco, além de lista com patrimônio e
+      recomendações de cada mês.
+- [x] `MonthlySnapshotsComponent` convertido para `OnPush` com `takeUntilDestroyed`, mantendo o
+      contrato atual de listagem e geração de snapshots.
+- [x] Mock Playwright aceita `/monthly-snapshots` e o caminho legado `/monthlysnapshots`, e a
+      geração usa id estável por ano/mês para simular substituição do fechamento do mês.
+- [x] Captura visual focada de `monthly-snapshots` executada em Playwright com evidências
+      desktop/mobile e guarda contra overflow horizontal:
+      `docs/ai-reports/monthly-snapshots-rebrand-desktop.png` e
+      `docs/ai-reports/monthly-snapshots-rebrand-mobile.png`.
+- [x] Fase encerrada sem endpoint novo: o comparativo usa relatórios mensais existentes e o
+      fechamento mensal usa o contrato atual de snapshots.
+
+---
+
+### FASE 6.6 — Simulador 🔶 CONTEÚDO PRONTO, FIDELIDADE PENDENTE
+
+Fonte do handoff: `TELAS.md` §13. A fase cobre `app/cenarios/` e `app/calculator/`.
+
+- [x] `app/cenarios` trocou inputs numéricos por sliders para receita extra, despesa extra e
+      taxa de poupança, com o valor atual visível acima do trilho.
+- [x] `scenario-overview.model.ts` deriva pontos de gráfico comparativo usando apenas
+      `scenarioPoints` do contrato atual, com escala compartilhada para saldo base e saldo
+      cenário.
+- [x] Resultado do simulador agora exibe gráfico comparado `Base × Cenário` antes do
+      detalhamento tabular dos pontos retornados pela API.
+- [x] Layout mobile revisado: o seletor de período vira grade 2×2 para manter todos os rótulos
+      legíveis em 390px, e o gráfico usa rolagem horizontal interna sem overflow da página.
+- [x] Captura visual focada de Simulador executada em Playwright com evidências desktop/mobile e
+      guarda contra overflow horizontal:
+      `docs/ai-reports/simulador-rebrand-desktop.png` e
+      `docs/ai-reports/simulador-rebrand-mobile.png`.
+- [x] `app/calculator` convertido para `OnPush` com `takeUntilDestroyed`, preservando as
+      fórmulas existentes e a navegação pública `/calculadora/:id`.
+- [x] Catálogo de calculadoras recebeu ajustes responsivos: KPIs em 2 colunas no mobile, cards
+      sem overflow de texto e painéis com `scroll-margin-top` para reduzir conflito com header
+      público sticky.
+- [x] Tabelas largas de calculadoras agora usam overflow interno: a classe local `.table`
+      sobrescreve o utilitário global/Tailwind `display: table`, que fazia a tabela anual
+      aumentar a largura do documento em mobile.
+- [x] Captura visual focada de Calculadoras executada em Playwright com evidências de catálogo e
+      de `Juros Compostos` calculado, desktop/mobile e guarda contra overflow horizontal:
+      `docs/ai-reports/calculadoras-rebrand-catalogo-desktop.png`,
+      `docs/ai-reports/calculadoras-rebrand-catalogo-mobile.png`,
+      `docs/ai-reports/calculadoras-rebrand-juros-compostos-desktop.png` e
+      `docs/ai-reports/calculadoras-rebrand-juros-compostos-mobile.png`.
+- [x] Fase encerrada sem contrato novo: `app/cenarios` usa `POST /scenarios/simulate` e
+      `app/calculator` mantém cálculo local.
 
 ---
 
@@ -1082,7 +1139,16 @@ README §3: card em repouso tem borda de 1px e nenhuma sombra.
 - [ ] Conferir no tema escuro: sem a sombra, a separação passa a depender só da borda, e
       `--border` no escuro tem contraste menor.
 
-### 8.6 — Fim do `::ng-deep` em feature · R9: 22 → 0
+### 8.6 — Fim do `::ng-deep` em feature · R9: ~~22~~ 19 → 0
+
+**Parcialmente quitada em 2026-08-16.** Relatórios, Histórico mensal e Calculadoras tinham o
+**mesmo** bloco de override copiado — sete regras cada, mirando o interior do
+`app-transaction-summary-card`. Pela regra da terceira feature (§2), virou
+`density="compact"` no próprio primitivo. Os valores em `rem` do bloco copiado reinventavam
+tokens que já existiam: `--fs-micro` é literalmente o token de eyebrow e `--fs-kpi-strip` o de
+faixa unida.
+
+É o modelo para o resto desta etapa: a variação sobe para o primitivo, não desce para a tela.
 
 - [ ] Cada `::ng-deep` vira `@Input` de variante no primitivo, ou uma classe utilitária.
 - [ ] Piores casos: `orcamento` (10), `relatorios` (8) — os dois repintam o

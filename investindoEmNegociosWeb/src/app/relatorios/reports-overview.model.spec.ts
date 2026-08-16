@@ -1,8 +1,28 @@
 import { CategoryExpenseResponse } from '../reports.service';
-import { CATEGORY_PALETTE, buildExpenseCategoryBars, buildTopExpenses } from './reports-overview.model';
+import {
+  CATEGORY_PALETTE,
+  buildComparisonWindow,
+  buildExpenseCategoryBars,
+  buildReportComparison,
+  buildTopExpenses
+} from './reports-overview.model';
+import { MonthlySummaryReportResponse } from '../reports.service';
 
 function cat(name: string, amount: number, percent: number): CategoryExpenseResponse {
   return { categoryName: name, amount, percentageOfTotal: percent };
+}
+
+function report(year: number, month: number, income: number, expenses: number): MonthlySummaryReportResponse {
+  return {
+    year,
+    month,
+    totalIncome: income,
+    totalExpenses: expenses,
+    netBalance: income - expenses,
+    savingsRate: income ? ((income - expenses) / income) * 100 : 0,
+    expensesByCategory: [],
+    topExpenses: []
+  };
 }
 
 describe('reports-overview.model', () => {
@@ -44,5 +64,39 @@ describe('reports-overview.model', () => {
   it('lida com topExpenses vazio/ausente', () => {
     expect(buildTopExpenses([])).toEqual([]);
     expect(buildTopExpenses(undefined)).toEqual([]);
+  });
+
+  it('monta janela comparativa preservando virada de ano', () => {
+    const window = buildComparisonWindow(2026, 2, 6, [
+      'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
+    ]);
+
+    expect(window.map((m) => `${m.year}-${m.month}`)).toEqual([
+      '2025-9', '2025-10', '2025-11', '2025-12', '2026-1', '2026-2'
+    ]);
+    expect(window[0].label).toBe('Set 25');
+    expect(window[5].label).toBe('Fev 26');
+  });
+
+  it('monta comparação mensal com escala única para receitas/despesas e saldo', () => {
+    const monthRefs = buildComparisonWindow(2026, 3, 6, [
+      'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
+    ]);
+    const comparison = buildReportComparison([
+      report(2026, 1, 1000, 700),
+      report(2026, 2, 2000, 1500),
+      report(2026, 3, 500, 800)
+    ], monthRefs);
+
+    const january = comparison.find((m) => m.year === 2026 && m.month === 1);
+    const february = comparison.find((m) => m.year === 2026 && m.month === 2);
+    const march = comparison.find((m) => m.year === 2026 && m.month === 3);
+
+    expect(january?.incomePercent).toBe(50);
+    expect(february?.incomePercent).toBe(100);
+    expect(march?.netBalance).toBe(-300);
+    expect(march?.balancePercent).toBe(60);
   });
 });

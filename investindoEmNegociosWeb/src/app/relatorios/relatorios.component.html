@@ -31,8 +31,43 @@
   }
 
   @if (!loading() && !error() && report(); as report) {
+    <section class="report-controls" aria-label="Configurações do relatório">
+      <div class="report-control">
+        <span class="report-control__label">Tipo</span>
+        <div class="segmented-control" role="group" aria-label="Tipo de relatório">
+          @for (type of reportViewTypes; track type.value) {
+            <button
+              type="button"
+              class="segmented-control__option"
+              [class.is-active]="reportViewType === type.value"
+              [attr.aria-pressed]="reportViewType === type.value"
+              (click)="setReportViewType(type.value)">
+              {{ type.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="report-control">
+        <span class="report-control__label">Período</span>
+        <div class="segmented-control" role="group" aria-label="Período do comparativo">
+          @for (period of comparisonPeriods; track period) {
+            <button
+              type="button"
+              class="segmented-control__option"
+              [class.is-active]="comparisonPeriod === period"
+              [attr.aria-pressed]="comparisonPeriod === period"
+              (click)="setComparisonPeriod(period)">
+              {{ period }} meses
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+
     <section class="summary-grid">
       <app-transaction-summary-card
+        density="compact"
         tone="success"
         eyebrow="Receitas"
         [value]="report.totalIncome | appCurrency"
@@ -42,6 +77,7 @@
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
+        density="compact"
         tone="danger"
         eyebrow="Despesas"
         [value]="report.totalExpenses | appCurrency"
@@ -51,6 +87,7 @@
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
+        density="compact"
         [tone]="report.netBalance < 0 ? 'warning' : 'info'"
         eyebrow="Saldo líquido"
         [value]="report.netBalance | appCurrency"
@@ -60,6 +97,7 @@
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
+        density="compact"
         tone="primary"
         eyebrow="Taxa de poupança"
         [value]="(report.savingsRate | number:'1.1-1') + '%'"
@@ -70,7 +108,65 @@
       </app-transaction-summary-card>
     </section>
 
-    <article class="card">
+    @if (reportViewType === 'comparison') {
+      <article class="card comparison-card">
+      <div class="card__head">
+        <div>
+          <h2>Receitas × despesas</h2>
+          <p class="muted">Comparativo dos últimos {{ comparisonPeriod }} meses e evolução do saldo.</p>
+        </div>
+      </div>
+
+      @if (comparisonLoading()) {
+        <app-ui-state type="loading" />
+      } @else if (comparisonError()) {
+        <app-ui-state
+          type="error"
+          title="Comparativo indisponível"
+          [description]="comparisonError()"
+          retryLabel="Tentar novamente"
+          (retry)="loadComparison()" />
+      } @else {
+        <div class="comparison-bars" [class.is-twelve]="comparisonPeriod === 12" aria-label="Receitas e despesas em barras comparativas">
+          @for (point of comparisonPoints; track point.year + '-' + point.month) {
+            <div class="comparison-month">
+              <div class="comparison-month__bars" aria-hidden="true">
+                <span
+                  class="comparison-month__bar comparison-month__bar--income"
+                  [style.height.%]="point.incomePercent"></span>
+                <span
+                  class="comparison-month__bar comparison-month__bar--expense"
+                  [style.height.%]="point.expensePercent"></span>
+              </div>
+              <span class="comparison-month__label">{{ point.label }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="comparison-legend" aria-label="Legenda do comparativo">
+          <span><i class="legend-dot legend-dot--income" aria-hidden="true"></i>Receitas</span>
+          <span><i class="legend-dot legend-dot--expense" aria-hidden="true"></i>Despesas</span>
+        </div>
+
+        <div class="balance-evolution" aria-label="Evolução do saldo">
+          @for (point of comparisonPoints; track 'balance-' + point.year + '-' + point.month) {
+            <div class="balance-row">
+              <span class="balance-row__label">{{ point.label }}</span>
+              <div class="balance-row__track" aria-hidden="true">
+                <span
+                  class="balance-row__fill"
+                  [class.is-negative]="point.netBalance < 0"
+                  [style.width.%]="point.balancePercent"></span>
+              </div>
+              <strong class="balance-row__value">{{ point.netBalance | appCurrency }}</strong>
+            </div>
+          }
+        </div>
+      }
+      </article>
+
+    } @else {
+      <article class="card">
       <h2>Despesas por categoria</h2>
       @if (report.expensesByCategory.length) {
         <div class="category-bars" aria-label="Distribuição de despesas por categoria em barras">
@@ -113,22 +209,23 @@
             [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
         </ng-template>
       </app-responsive-list>
-    </article>
-
-    @if (topExpenses.length) {
-      <article class="card">
-        <h2>Maiores despesas</h2>
-        <ol class="top-expenses">
-          @for (cat of topExpenses; track cat.categoryName; let i = $index) {
-            <li class="top-expense">
-              <span class="top-expense__rank" aria-hidden="true">{{ i + 1 }}</span>
-              <span class="top-expense__name">{{ cat.categoryName }}</span>
-              <span class="top-expense__percent muted">{{ cat.percentageOfTotal | number:'1.1-1' }}%</span>
-              <strong class="top-expense__value">{{ cat.amount | appCurrency }}</strong>
-            </li>
-          }
-        </ol>
       </article>
+
+      @if (topExpenses.length) {
+        <article class="card">
+          <h2>Maiores despesas</h2>
+          <ol class="top-expenses">
+            @for (cat of topExpenses; track cat.categoryName; let i = $index) {
+              <li class="top-expense">
+                <span class="top-expense__rank" aria-hidden="true">{{ i + 1 }}</span>
+                <span class="top-expense__name">{{ cat.categoryName }}</span>
+                <span class="top-expense__percent muted">{{ cat.percentageOfTotal | number:'1.1-1' }}%</span>
+                <strong class="top-expense__value">{{ cat.amount | appCurrency }}</strong>
+              </li>
+            }
+          </ol>
+        </article>
+      }
     }
   }
 </section>

@@ -10,12 +10,6 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-@media (max-width: 720px) {
-  .calculator-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 .calc__selector {
   display: grid;
   gap: 0.85rem;
@@ -32,11 +26,12 @@
 
 .selector__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 0.85rem;
 }
 
 .calc__selector button {
+  width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius-inner);
   padding: 1rem;
@@ -72,6 +67,7 @@
 }
 
 .selector__copy {
+  min-width: 0;
   display: grid;
   gap: 0.35rem;
   padding-inline-end: 5rem;
@@ -81,6 +77,8 @@
   display: block;
   font-size: var(--fs-subhead);
   letter-spacing: var(--ls-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .selector__copy small {
@@ -110,12 +108,14 @@
 }
 
 .calc__panel {
+  scroll-margin-top: 6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-inner);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
   background: var(--surface);
   display: grid;
   gap: 1rem;
+  min-width: 0;
 }
 
 .panel__title {
@@ -201,10 +201,12 @@ input:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius-inner);
   background: var(--surface-sunken);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .chart__bar {
-  flex: 1;
+  flex: 1 0 1.4rem;
   min-height: 20px;
   background: var(--primary);
   border-radius: var(--radius-xs) var(--radius-xs) calc(var(--radius-xs) / 2) calc(var(--radius-xs) / 2);
@@ -232,14 +234,20 @@ input:focus {
 }
 
 .table {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
   margin-top: 0.35rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-inner);
-  overflow: hidden;
+  overflow: auto;
   background: var(--surface);
 }
 
 .table--wide {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
 }
 
@@ -249,6 +257,28 @@ input:focus {
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   padding: 0.85rem 1rem;
+}
+
+@media (max-width: 720px) {
+  .calculator-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .selector__copy {
+    padding-inline-end: 0;
+  }
+
+  .selector__badge {
+    position: static;
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 360px) {
+  .calculator-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .table--wide .table__head,
