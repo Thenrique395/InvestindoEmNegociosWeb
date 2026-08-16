@@ -3,6 +3,7 @@
     <div class="section-head">
       <div class="section-head__title">
         <h3>Consolidação de aportes</h3>
+        <p>Compras, vendas e saldos de quantidade por mês, sem misturar proventos.</p>
       </div>
       <app-filter-bar>
         <div filter-left class="chart-filters">
@@ -22,6 +23,24 @@
           </select>
         </div>
       </app-filter-bar>
+    </div>
+    <div class="summary-strip" aria-label="Resumo da consolidação">
+      <div class="summary-item">
+        <span>Compras</span>
+        <strong>{{ totalCompras | appCurrency }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Vendas</span>
+        <strong>{{ totalVendas | appCurrency }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Saldo</span>
+        <strong [class.negative]="saldoPeriodo < 0">{{ saldoPeriodo | appCurrency }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Lançamentos</span>
+        <strong>{{ totalLancamentos }}</strong>
+      </div>
     </div>
     @if (!series.length) {
       <div class="empty">Sem lançamentos de aportes no período.</div>
@@ -74,6 +93,7 @@
     <div class="section-head">
       <div class="section-head__title">
         <h3>Lançamentos consolidados</h3>
+        <p>Entradas e saídas do período filtrado, mantendo a fonte do lançamento.</p>
       </div>
       <input
         type="text"

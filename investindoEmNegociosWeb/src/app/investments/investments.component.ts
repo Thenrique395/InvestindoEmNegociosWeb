@@ -315,34 +315,20 @@ export class InvestmentsComponent implements OnInit {
     const list = [...this.filteredPositions];
     const direction = this.sortDir === 'asc' ? 1 : -1;
     list.sort((a, b) => {
-      const statusA = a.quantity > 0 ? 1 : 0;
-      const statusB = b.quantity > 0 ? 1 : 0;
       const valueA = positionCurrentValue(a);
       const valueB = positionCurrentValue(b);
       const resultA = this.resultadoPosicao(a);
       const resultB = this.resultadoPosicao(b);
-      const portfolioA = this.percentualNaCarteira(a);
-      const portfolioB = this.percentualNaCarteira(b);
-      const currentReturnA = this.rentabilidadeAtualPercent(a);
-      const currentReturnB = this.rentabilidadeAtualPercent(b);
-      const paperTypeA = this.tipoPapel(a);
-      const paperTypeB = this.tipoPapel(b);
 
       switch (this.sortBy) {
-        case 'paperType':
-          return paperTypeA.localeCompare(paperTypeB, 'pt-BR') * direction;
-        case 'status':
-          return (statusA - statusB) * direction;
         case 'quantity':
           return ((a.quantity || 0) - (b.quantity || 0)) * direction;
         case 'avgPrice':
           return ((a.avgPrice || 0) - (b.avgPrice || 0)) * direction;
+        case 'invested':
+          return (positionNetContributed(a) - positionNetContributed(b)) * direction;
         case 'currentValue':
           return (valueA - valueB) * direction;
-        case 'portfolioPercent':
-          return (portfolioA - portfolioB) * direction;
-        case 'currentReturn':
-          return (currentReturnA - currentReturnB) * direction;
         case 'estimatedResult':
           return (resultA - resultB) * direction;
         case 'asset':
@@ -528,7 +514,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get patrimonioEvolucaoSeries(): PatrimonioBucket[] {
-    const months = this.patrimonioRangeMonths === 6 ? 6 : 12;
+    const months = [6, 12, 24].includes(this.patrimonioRangeMonths) ? this.patrimonioRangeMonths : 12;
     const now = new Date();
     const timeline: { key: string; label: string }[] = [];
 
@@ -883,8 +869,10 @@ export class InvestmentsComponent implements OnInit {
         const months: Array<number | null> = Array.from({ length: 12 }, () => null);
         for (const point of points) months[point.month - 1] = point.carteiraMes;
         const yearValue = points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.carteiraMes / 100) - 1) * 100, 0);
+        const benchmarkYearValue = points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.benchmarkMes / 100) - 1) * 100, 0);
         const acumulado = points[points.length - 1]?.carteiraAc || 0;
-        return { year, months, yearValue, acumulado };
+        const benchmarkAcumulado = points[points.length - 1]?.benchmarkAc || 0;
+        return { year, months, yearValue, benchmarkYearValue, acumulado, benchmarkAcumulado };
       });
   }
 
@@ -948,7 +936,7 @@ export class InvestmentsComponent implements OnInit {
     for (const pos of this.positions) {
       if (this.consolidacaoTipoFiltro !== 'ALL' && pos.type !== this.consolidacaoTipoFiltro) continue;
       const relevant = (pos.movements || [])
-        .filter((mov) => mov.type === 'COMPRA' || mov.type === 'VENDA')
+        .filter((mov) => this.isConsolidacaoMovement(mov.type))
         .map((mov, idx) => ({ mov, idx }))
         .sort((a, b) => new Date(a.mov.date).getTime() - new Date(b.mov.date).getTime());
 
@@ -956,7 +944,7 @@ export class InvestmentsComponent implements OnInit {
       for (const entry of relevant) {
         const date = new Date(entry.mov.date);
         if (Number.isNaN(date.getTime())) continue;
-        runningQty += entry.mov.type === 'COMPRA' ? entry.mov.quantity : -entry.mov.quantity;
+        runningQty += this.isConsolidacaoEntrada(entry.mov.type) ? entry.mov.quantity : -entry.mov.quantity;
 
         if (date < horizonStart) continue;
         const source: 'B3' | 'Manual' = (entry.mov.note || '').toUpperCase().includes('B3') ? 'B3' : 'Manual';
@@ -966,7 +954,7 @@ export class InvestmentsComponent implements OnInit {
           id: `${pos.id}-${entry.idx}`,
           asset: pos.asset,
           investmentType: pos.type,
-          ordem: entry.mov.type === 'COMPRA' ? 'Compra' : 'Venda',
+          ordem: this.isConsolidacaoEntrada(entry.mov.type) ? 'Compra' : 'Venda',
           quantity: entry.mov.quantity,
           unitPrice: entry.mov.price,
           total: entry.mov.quantity * entry.mov.price,
@@ -980,17 +968,50 @@ export class InvestmentsComponent implements OnInit {
     return rows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
+  private isConsolidacaoMovement(type: MovementType): boolean {
+    return this.isConsolidacaoEntrada(type) || this.isConsolidacaoSaida(type);
+  }
+
+  private isConsolidacaoEntrada(type: MovementType): boolean {
+    return type === 'COMPRA' || type === 'APORTE';
+  }
+
+  private isConsolidacaoSaida(type: MovementType): boolean {
+    return type === 'VENDA' || type === 'RESGATE';
+  }
+
   get mesesComparativo(): number {
     return Math.max(this.evolucaoMensalSeries.length, 1);
   }
 
-  get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; alerta: boolean }[] {
-    const atualMap = new Map(this.distribuicaoPorTipo.map((i) => [i.key, i.percent]));
+  get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; suggestedAmount: number; alerta: boolean }[] {
+    const distribution = this.distribuicaoPorTipo;
+    const atualMap = new Map(distribution.map((i) => [i.key, i.percent]));
+    const valueMap = new Map(distribution.map((i) => [i.key, i.value]));
+    const total = distribution.reduce((sum, item) => sum + item.value, 0);
     return this.allocationTypes.map((t) => {
       const atual = atualMap.get(t.value) || 0;
+      const currentValue = valueMap.get(t.value) || 0;
       const desvio = atual - this.targetAllocation[t.value];
-      return { key: t.value, label: t.label, alvo: this.targetAllocation[t.value], atual, desvio, alerta: Math.abs(desvio) >= 7 };
+      return {
+        key: t.value,
+        label: t.label,
+        alvo: this.targetAllocation[t.value],
+        atual,
+        desvio,
+        suggestedAmount: this.allocationSuggestedAmount(currentValue, total, this.targetAllocation[t.value]),
+        alerta: Math.abs(desvio) >= 7
+      };
     });
+  }
+
+  private allocationSuggestedAmount(currentValue: number, totalValue: number, targetPercent: number): number {
+    if (totalValue <= 0) return 0;
+    const target = Math.max(0, Math.min(targetPercent, 100)) / 100;
+    const targetValue = totalValue * target;
+    if (currentValue > targetValue) return currentValue - targetValue;
+    if (target >= 1) return Math.max(totalValue - currentValue, 0);
+    return Math.max((targetValue - currentValue) / (1 - target), 0);
   }
 
   get allocationTypes(): Array<{ value: AllocationInvestmentType; label: string }> {

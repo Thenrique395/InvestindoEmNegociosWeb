@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DonutChartComponent, DonutChartItem } from '../../../shared/donut-chart/donut-chart.component';
 import { InvestmentType } from '../../../investments.service';
 import { AllocationInvestmentType } from '../../../utils/investments.utils';
+import { AppCurrencyPipe } from '../../../shared/app-currency.pipe';
 
 export type AllocationTargetItem = {
   key: InvestmentType;
@@ -11,6 +12,7 @@ export type AllocationTargetItem = {
   alvo: number;
   atual: number;
   desvio: number;
+  suggestedAmount: number;
   alerta: boolean;
 };
 
@@ -23,7 +25,7 @@ export type NextInvestmentAction = {
 @Component({
   selector: 'app-investment-analysis-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, DonutChartComponent],
+  imports: [CommonModule, FormsModule, DecimalPipe, AppCurrencyPipe, DonutChartComponent],
   templateUrl: './investment-analysis-panel.component.html',
   styleUrl: './investment-analysis-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -50,5 +52,9 @@ export class InvestmentAnalysisPanelComponent {
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  get mostDistantTarget(): AllocationTargetItem | null {
+    return [...this.targetItems].sort((a, b) => Math.abs(b.desvio) - Math.abs(a.desvio))[0] || null;
   }
 }

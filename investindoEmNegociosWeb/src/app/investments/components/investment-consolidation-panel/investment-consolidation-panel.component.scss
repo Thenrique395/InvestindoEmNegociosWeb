@@ -24,7 +24,7 @@
 .section-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
@@ -34,9 +34,16 @@
 }
 
 .section-head__title {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.section-head__title p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body);
 }
 
 .chart-filters {
@@ -53,6 +60,39 @@
   background: var(--surface);
   color: var(--text);
   padding: 0.55rem 0.7rem;
+}
+
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.summary-item {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-subtle);
+  padding: 0.85rem;
+}
+
+.summary-item span {
+  display: block;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  margin-bottom: 0.35rem;
+}
+
+.summary-item strong {
+  display: block;
+  color: var(--text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-control);
+  overflow-wrap: anywhere;
+}
+
+.summary-item strong.negative {
+  color: var(--expense);
 }
 
 .consolidacao-chart {
@@ -226,6 +266,15 @@
 
   .chart-filters {
     flex-wrap: wrap;
+  }
+
+  .chart-filters select,
+  .section-head input {
+    width: 100%;
+  }
+
+  .summary-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .consolidacao-chart {

@@ -26,7 +26,7 @@
 
 .action-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-6);
 }
@@ -40,10 +40,40 @@
   color: var(--text-tertiary);
 }
 
+.next-action-metrics {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface-subtle);
+}
+
+.next-action-metrics span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--fs-body-sm);
+}
+
+.next-action-metrics strong {
+  color: var(--text);
+  font-size: var(--fs-body-sm);
+}
+
+.disclaimer {
+  margin: var(--space-3) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-body);
+}
+
 .section-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
@@ -53,13 +83,35 @@
 }
 
 .section-head__title {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.section-head__title p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body);
 }
 
 .muted {
   color: var(--text-tertiary);
+}
+
+.sum-pill {
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--income) 14%, var(--surface));
+  color: var(--income-text);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  padding: 0.25rem 0.7rem;
+}
+
+.sum-pill.invalid {
+  background: color-mix(in srgb, var(--expense) 12%, var(--surface));
+  color: var(--expense);
 }
 
 .hint {
@@ -148,27 +200,43 @@
 
 .allocation-list {
   display: grid;
-  gap: var(--space-3);
 }
 
+.allocation-list__head,
 .allocation-item {
-  border: 0;
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--surface-sunken) 85%, transparent);
-  padding: var(--space-3);
   display: grid;
-  gap: 0.25rem;
-}
-
-.allocation-item small {
-  color: var(--text-tertiary);
-}
-
-.allocation-item__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  grid-template-columns: minmax(110px, 1.15fr) minmax(0, 1.4fr) 76px 82px;
   gap: var(--space-3);
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.allocation-list__head {
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.allocation-current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.allocation-current .progress-bar {
+  flex: 1;
+  min-width: 0;
+}
+
+.allocation-current span,
+.allocation-item > span {
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+  text-align: right;
 }
 
 .progress-bar {
@@ -196,6 +264,23 @@
   color: var(--expense);
 }
 
+.allocation-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+}
+
+.allocation-footer div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
 @media (max-width: 960px) {
   .visual-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -204,12 +289,46 @@
 
 @media (max-width: 720px) {
   .section-head,
-  .action-card {
+  .action-card,
+  .allocation-footer {
     align-items: stretch;
     flex-direction: column;
   }
 
   .allocation-config__inputs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .allocation-list__head {
+    display: none;
+  }
+
+  .allocation-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2);
+    align-items: start;
+  }
+
+  .allocation-current {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+
+  .allocation-current span {
+    width: 48px;
+  }
+
+  .allocation-item > span:nth-of-type(1)::before {
+    content: "Alvo ";
+  }
+
+  .allocation-item > span:nth-of-type(2) {
+    grid-column: 1 / -1;
+    text-align: left;
+    order: 4;
+  }
+
+  .allocation-footer div {
+    justify-content: stretch;
   }
 }

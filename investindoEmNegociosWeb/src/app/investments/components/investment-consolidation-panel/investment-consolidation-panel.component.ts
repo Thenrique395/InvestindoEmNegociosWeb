@@ -63,6 +63,26 @@ export class InvestmentConsolidationPanelComponent {
 
   readonly gridLines = [1, 2, 3, 4, 5];
 
+  get totalCompras(): number {
+    return this.rows
+      .filter((row) => row.ordem === 'Compra')
+      .reduce((total, row) => total + row.total, 0);
+  }
+
+  get totalVendas(): number {
+    return this.rows
+      .filter((row) => row.ordem === 'Venda')
+      .reduce((total, row) => total + row.total, 0);
+  }
+
+  get saldoPeriodo(): number {
+    return this.totalCompras - this.totalVendas;
+  }
+
+  get totalLancamentos(): number {
+    return this.rows.length;
+  }
+
   trackByIndex(index: number): number {
     return index;
   }

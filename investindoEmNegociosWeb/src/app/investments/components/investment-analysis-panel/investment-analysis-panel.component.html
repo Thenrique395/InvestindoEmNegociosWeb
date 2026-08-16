@@ -1,8 +1,15 @@
 <article class="card action-card">
   <div>
-    <p class="label">Panorama da carteira</p>
+    <p class="label">Próxima ação</p>
     <strong>{{ nextAction.titulo }}</strong>
     <small>{{ nextAction.descricao }}</small>
+    @if (mostDistantTarget) {
+      <div class="next-action-metrics">
+        <span>Tipo mais distante do alvo <strong>{{ mostDistantTarget.label }}</strong></span>
+        <span>Valor sugerido <strong>{{ mostDistantTarget.suggestedAmount | appCurrency }}</strong></span>
+      </div>
+    }
+    <p class="disclaimer">Cálculo de reequilíbrio sobre a sua própria alocação alvo. Não é recomendação de ativos.</p>
   </div>
   <button class="btn-secondary sm" type="button" (click)="executeNextAction.emit()">{{ nextAction.cta }}</button>
 </article>
@@ -25,19 +32,13 @@
   <article class="card chart-card">
     <div class="section-head">
       <div class="section-head__title">
-        <h3>Alocação alvo e alertas</h3>
-        <button type="button" class="hint" aria-label="Explicação da alocação alvo">
-          i
-          <span class="hint__panel">Alerta acende quando o desvio absoluto entre alocação atual e alvo passa de 7 pontos percentuais.</span>
-        </button>
+        <h3>Alocação alvo</h3>
+        <p>Defina a distribuição desejada. A soma precisa fechar em 100%.</p>
       </div>
-      <button class="btn-ghost sm" type="button" (click)="showConfigChange.emit(!showConfig)">
-        {{ showConfig ? 'Fechar parâmetros' : 'Editar alocação alvo' }}
-      </button>
+      <span class="sum-pill" [class.invalid]="targetAllocationTotal !== 100">Soma: {{ targetAllocationTotal | number:'1.1-1' }}%</span>
     </div>
     @if (showConfig) {
       <div class="allocation-config">
-        <p class="muted">Você define sua alocação-alvo. Este é um ponto de partida editável — ajuste ao seu perfil. <strong>Não é recomendação de investimento.</strong></p>
         <div class="allocation-config__inputs">
           @for (t of allocationTypes; track trackByIndex($index)) {
             <label>
@@ -62,16 +63,33 @@
       </div>
     }
     <div class="allocation-list">
+      <div class="allocation-list__head">
+        <span>Classe</span>
+        <span>Atual</span>
+        <span>Alvo</span>
+        <span>Desvio</span>
+      </div>
       @for (item of targetItems; track trackByIndex($index)) {
         <div class="allocation-item">
-          <div class="allocation-item__top">
-            <strong>{{ item.label }}</strong>
-            <span [class.warning]="item.alerta">{{ item.atual | number:'1.1-1' }}% / alvo {{ item.alvo | number:'1.0-0' }}%</span>
+          <strong>{{ item.label }}</strong>
+          <div class="allocation-current">
+            <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
+            <span>{{ item.atual | number:'1.1-1' }}%</span>
           </div>
-          <div class="progress-bar slim"><span [style.width.%]="item.atual"></span></div>
-          <small [class.warning]="item.alerta">Desvio: {{ item.desvio | number:'1.1-1' }} p.p. {{ item.alerta ? (item.atual > item.alvo ? '• acima do alvo' : '• abaixo do alvo') : '' }}</small>
+          <span>{{ item.alvo | number:'1.0-0' }}%</span>
+          <span [class.warning]="item.alerta">{{ item.desvio | number:'1.1-1' }} p.p.</span>
         </div>
       }
+    </div>
+    <div class="allocation-footer">
+      <span>O desvio mostra quanto falta ou sobra frente ao alvo.</span>
+      <div>
+        <button class="btn-ghost sm" type="button" (click)="showConfigChange.emit(!showConfig)">
+          {{ showConfig ? 'Fechar edição' : 'Editar alvo' }}
+        </button>
+        <button class="btn-ghost sm" type="button" (click)="resetTarget.emit()">Restaurar</button>
+        <button class="btn-primary sm" type="button" (click)="saveTarget.emit()">Salvar alocação</button>
+      </div>
     </div>
   </article>
 </section>

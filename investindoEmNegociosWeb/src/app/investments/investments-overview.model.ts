@@ -48,6 +48,7 @@ export interface InvestmentsOverview {
   growth: number;
   /** Rentabilidade % sobre o investido. */
   profitPercent: number;
+  /** Proventos registrados nos últimos 12 meses, sem somar a aporte/valorização. */
   proventos: number;
   aporteMonth: number;
   resgateMonth: number;
@@ -82,9 +83,20 @@ function monthMovementSum(positions: InvestmentPosition[], today: Date, types: s
   }, 0);
 }
 
-function proventosTotal(positions: InvestmentPosition[]): number {
+function isWithinLastMonths(iso: string, today: Date, months: number): boolean {
+  if (!iso) return false;
+  const [datePart] = iso.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const date = year && month && day ? new Date(year, month - 1, day) : new Date(iso);
+  if (Number.isNaN(date.getTime())) return false;
+  const start = new Date(today.getFullYear(), today.getMonth() - (months - 1), 1);
+  const end = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+  return date >= start && date <= end;
+}
+
+function proventosTotal12Months(positions: InvestmentPosition[], today: Date): number {
   return positions.reduce((sum, pos) => {
-    const provs = (pos.movements || []).filter((m) => isProventoMovement(m.type));
+    const provs = (pos.movements || []).filter((m) => isProventoMovement(m.type) && isWithinLastMonths(m.date, today, 12));
     return sum + provs.reduce((acc, m) => acc + (m.quantity || 0) * (m.price || 0), 0);
   }, 0);
 }
@@ -121,7 +133,7 @@ export function buildInvestmentsOverview(positions: InvestmentPosition[], today:
     invested,
     growth,
     profitPercent: invested > 0 ? (growth / invested) * 100 : 0,
-    proventos: proventosTotal(list),
+    proventos: proventosTotal12Months(list, today),
     aporteMonth,
     resgateMonth,
     resultMonth: aporteMonth - resgateMonth,

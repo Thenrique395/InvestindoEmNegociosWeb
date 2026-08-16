@@ -1,7 +1,21 @@
 <div class="card assets-list" id="sec-posicoes">
-  <div class="section-head">
-    <h3>Meus Ativos</h3>
-    <span class="muted">{{ positions.length }} item(ns) · {{ totalZeroed }} zerada(s)</span>
+  <div class="positions-head">
+    <div class="positions-head__copy">
+      <h3>Posições</h3>
+      <p>Sem cotação de mercado, o valor cai para o preço médio — nunca inventamos preço.</p>
+    </div>
+    <div class="type-chips" aria-label="Filtrar posições por tipo">
+      @for (chip of typeFilterChips; track chip) {
+        <button
+          type="button"
+          class="type-chip"
+          [class.type-chip--active]="filterType === chip"
+          [attr.aria-pressed]="filterType === chip"
+          (click)="updateFilterType(chip)">
+          {{ typeChipLabel(chip) }}
+        </button>
+      }
+    </div>
   </div>
 
   <app-filter-bar>
@@ -11,12 +25,6 @@
         [ngModel]="searchTerm"
         (ngModelChange)="updateSearchTerm($event)"
         placeholder="Buscar por ativo, conta ou categoria" />
-      <select [ngModel]="filterType" (ngModelChange)="updateFilterType($event)">
-        <option value="ALL">Todos os tipos</option>
-      @for (t of tipos; track $index) {
-          <option [value]="t.value">{{ t.label }}</option>
-        }
-      </select>
       <select [ngModel]="filterAccount" (ngModelChange)="updateFilterAccount($event)">
         <option value="ALL">Todas as contas</option>
         @for (account of accounts; track account) {
@@ -53,16 +61,6 @@
       </div>
     </ng-template>
 
-    <ng-template appResponsiveListCell="paperType" let-position>
-      {{ tipoPapel(position) }}
-    </ng-template>
-
-    <ng-template appResponsiveListCell="status" let-position>
-      <span class="status-pill" [class.zeroed]="position.quantity <= 0">
-        {{ position.quantity > 0 ? 'Ativa' : 'Zerada' }}
-      </span>
-    </ng-template>
-
     <ng-template appResponsiveListCell="quantity" let-position>
       {{ position.quantity }}
     </ng-template>
@@ -72,42 +70,30 @@
     </ng-template>
 
     <ng-template appResponsiveListCell="marketPrice" let-position>
-      @if (marketPrice(position) !== null) {
-        <span>{{ marketPrice(position) | appCurrency:position.currency }}</span>
-      } @else {
-        <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
-          {{ position.avgPrice | appCurrency:position.currency }}*
-        </span>
-      }
+      <span class="price-source-cell" [class.price-source-cell--fallback]="marketPrice(position) === null">
+        @if (marketPrice(position) !== null) {
+          <span>{{ marketPrice(position) | appCurrency:position.currency }}</span>
+        } @else {
+          <span class="muted" title="Sem cotação em tempo real. Exibindo preço médio da posição.">
+            {{ position.avgPrice | appCurrency:position.currency }}
+          </span>
+        }
+        <app-status-badge [tone]="priceSourceTone(position)" size="sm" [label]="priceSourceLabel(position)"></app-status-badge>
+      </span>
     </ng-template>
 
-    <ng-template appResponsiveListCell="priceChange" let-position>
-      <span [class.success]="(variacaoPrecoPercent(position) || 0) >= 0" [class.danger]="(variacaoPrecoPercent(position) || 0) < 0">
-        @if (variacaoPrecoPercent(position) !== null) {
-          {{ variacaoPrecoPercent(position) | number:'1.2-2' }}%
-        } @else {
-          <span class="muted">-</span>
-        }
-      </span>
+    <ng-template appResponsiveListCell="invested" let-position>
+      {{ valorInvestidoPosicao(position) | appCurrency:position.currency }}
     </ng-template>
 
     <ng-template appResponsiveListCell="currentValue" let-position>
       {{ valorAtualPosicao(position) | appCurrency:position.currency }}
     </ng-template>
 
-    <ng-template appResponsiveListCell="portfolioPercent" let-position>
-      {{ percentualNaCarteira(position) | number:'1.1-1' }}%
-    </ng-template>
-
-    <ng-template appResponsiveListCell="currentReturn" let-position>
-      <span [class.success]="rentabilidadeAtualPercent(position) >= 0" [class.danger]="rentabilidadeAtualPercent(position) < 0">
-        {{ rentabilidadeAtualPercent(position) | number:'1.1-1' }}%
-      </span>
-    </ng-template>
-
     <ng-template appResponsiveListCell="estimatedResult" let-position>
-      <span [class.success]="resultadoPosicao(position) >= 0" [class.danger]="resultadoPosicao(position) < 0">
-        {{ resultadoPosicao(position) | appCurrency }}
+      <span class="result-cell" [class.success]="resultadoPosicao(position) >= 0" [class.danger]="resultadoPosicao(position) < 0">
+        <strong>{{ rentabilidadeAtualPercent(position) | number:'1.1-1' }}%</strong>
+        <small>{{ resultadoPosicao(position) | appCurrency }}</small>
       </span>
     </ng-template>
 
@@ -117,9 +103,34 @@
   </app-responsive-list>
 
   @if (positions.length) {
+    <div class="assets-total-row" aria-label="Total das posições filtradas">
+      <div class="assets-total-row__label">
+        <strong>Total do filtro</strong>
+        <span>{{ positionsNote }}</span>
+      </div>
+      <div>
+        <span>Investido</span>
+        <strong>{{ totalInvested | appCurrency }}</strong>
+      </div>
+      <div>
+        <span>Mercado</span>
+        <strong>{{ totalMarketValue | appCurrency }}</strong>
+      </div>
+      <div>
+        <span>Resultado</span>
+        <strong [class.success]="totalResult >= 0" [class.danger]="totalResult < 0">{{ totalResult | appCurrency }}</strong>
+      </div>
+      <div>
+        <span>Fonte dos preços</span>
+        <strong>{{ quotedPositionsCount }} cotação · {{ averagePriceFallbackCount }} preço médio</strong>
+      </div>
+    </div>
+  }
+
+  @if (positions.length) {
     <div class="table-pagination">
       <button class="btn-ghost sm" type="button" (click)="pageChange.emit(-1)" [disabled]="currentPage <= 1">Anterior</button>
-      <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }}</small>
+      <small class="muted">Página {{ currentPage }} de {{ totalPages }} · {{ pageLabel }} · {{ positionsNote }}</small>
       <button class="btn-ghost sm" type="button" (click)="pageChange.emit(1)" [disabled]="currentPage >= totalPages">Próxima</button>
     </div>
   }

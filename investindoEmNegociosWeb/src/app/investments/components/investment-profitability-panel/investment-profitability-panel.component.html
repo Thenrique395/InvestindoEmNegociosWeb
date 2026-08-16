@@ -1,45 +1,14 @@
 <section class="rentabilidade-grid">
-  <div class="rentabilidade-side">
-    <article class="card executive-card rent-card">
-      <p class="label">Total</p>
-      <small>Rentabilidade</small>
-      <strong [class.success]="totalPercent >= 0" [class.danger]="totalPercent < 0">
-        {{ totalPercent | number:'1.2-2' }}%
-      </strong>
-      <small>{{ comparisonLabel(totalPercent, totalBenchmarkPercent) }}</small>
-    </article>
-    <article class="card executive-card rent-card">
-      <p class="label">Últimos 12 meses</p>
-      <small>Rentabilidade</small>
-      <strong [class.success]="twelveMonthsPercent >= 0" [class.danger]="twelveMonthsPercent < 0">
-        {{ twelveMonthsPercent | number:'1.2-2' }}%
-      </strong>
-      <small>{{ comparisonLabel(twelveMonthsPercent, twelveMonthsBenchmarkPercent) }}</small>
-    </article>
-    <article class="card executive-card rent-card">
-      <p class="label">Último mês</p>
-      <small>Rentabilidade</small>
-      <strong [class.success]="lastMonthPercent >= 0" [class.danger]="lastMonthPercent < 0">
-        {{ lastMonthPercent | number:'1.2-2' }}%
-      </strong>
-      <small>{{ comparisonLabel(lastMonthPercent, lastMonthBenchmarkPercent) }}</small>
-    </article>
-  </div>
-
   <article class="card chart-card rentabilidade-main" id="sec-evolucao">
     <div class="section-head">
       <div class="section-head__title">
-        <h3>Rentabilidade comparada com índices</h3>
+        <h3>Carteira contra índice</h3>
+        <p>Rentabilidade acumulada sobre o valor investido.</p>
       </div>
       <div class="chart-filters">
         <select [ngModel]="period" (ngModelChange)="periodChange.emit($event)">
           <option value="SINCE_START">Desde o início</option>
           <option value="LAST_12M">Últimos 12 meses</option>
-        </select>
-        <select [ngModel]="benchmark" (ngModelChange)="benchmarkChange.emit($event)">
-          @for (item of benchmarkOptions; track trackByIndex($index)) {
-            <option [value]="item.key">{{ item.label }}</option>
-          }
         </select>
         <select [ngModel]="typeFilter" (ngModelChange)="typeFilterChange.emit($event)">
           <option value="ALL">Todos os tipos</option>
@@ -48,6 +17,43 @@
           }
         </select>
       </div>
+    </div>
+    <div class="benchmark-pills" aria-label="Benchmarks">
+      @for (item of benchmarkOptions; track trackByIndex($index)) {
+        <button
+          type="button"
+          class="benchmark-pill"
+          [class.active]="benchmark === item.key"
+          [style.--benchmark-color]="item.color"
+          [attr.aria-pressed]="benchmark === item.key"
+          (click)="benchmarkChange.emit(item.key)">
+          <i></i>
+          {{ item.label }}
+        </button>
+      }
+    </div>
+    <div class="rent-cards" aria-label="Resumo da rentabilidade">
+      <article class="executive-card rent-card">
+        <p class="label">Desde o início</p>
+        <strong [class.success]="totalPercent >= 0" [class.danger]="totalPercent < 0">
+          {{ totalPercent | number:'1.2-2' }}%
+        </strong>
+        <small>{{ comparisonLabel(totalPercent, totalBenchmarkPercent) }}</small>
+      </article>
+      <article class="executive-card rent-card">
+        <p class="label">12 meses</p>
+        <strong [class.success]="twelveMonthsPercent >= 0" [class.danger]="twelveMonthsPercent < 0">
+          {{ twelveMonthsPercent | number:'1.2-2' }}%
+        </strong>
+        <small>{{ comparisonLabel(twelveMonthsPercent, twelveMonthsBenchmarkPercent) }}</small>
+      </article>
+      <article class="executive-card rent-card">
+        <p class="label">Último mês</p>
+        <strong [class.success]="lastMonthPercent >= 0" [class.danger]="lastMonthPercent < 0">
+          {{ lastMonthPercent | number:'1.2-2' }}%
+        </strong>
+        <small>{{ comparisonLabel(lastMonthPercent, lastMonthBenchmarkPercent) }}</small>
+      </article>
     </div>
     <div class="rentabilidade-chart">
       <div class="rentabilidade-axis">
@@ -91,8 +97,8 @@
       </div>
     </div>
     <div class="legend-row">
-      <span><i class="chip carteira"></i> Carteira</span>
-      <span><i class="chip cdi" [style.background]="benchmarkColor"></i> {{ benchmarkLabel }} (estimado no período)</span>
+      <span><i class="chip carteira"></i> Sua carteira</span>
+      <span><i class="chip cdi" [style.background]="benchmarkColor"></i> {{ benchmarkLabel }}</span>
     </div>
   </article>
 </section>
@@ -100,35 +106,29 @@
 <article class="card chart-card">
   <div class="section-head">
     <div class="section-head__title">
-      <h3>Rentabilidade mensal</h3>
+      <h3>Por ano</h3>
     </div>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Ano</th>
-          @for (label of monthLabels; track trackByIndex($index)) {
-            <th>{{ label }}</th>
-          }
-          <th>Ano</th>
-          <th>Acumulado</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of yearlyRows; track trackByIndex($index)) {
-          <tr>
-            <td><strong>{{ row.year }}</strong></td>
-            @for (monthValue of row.months; track trackByIndex($index)) {
-              <td [class.success]="(monthValue || 0) >= 0" [class.danger]="(monthValue || 0) < 0">
-                {{ monthValue === null ? '-' : ((monthValue | number:'1.2-2') + '%') }}
-              </td>
-            }
-            <td [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">{{ row.yearValue | number:'1.2-2' }}%</td>
-            <td [class.success]="row.acumulado >= 0" [class.danger]="row.acumulado < 0">{{ row.acumulado | number:'1.2-2' }}%</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+  <div class="yearly-list">
+    <div class="yearly-row yearly-row--head">
+      <span>Ano</span>
+      <span>Carteira</span>
+      <span>Carteira</span>
+      <span>{{ benchmarkLabel }}</span>
+    </div>
+    @for (row of yearlyRows; track trackByIndex($index)) {
+      <div class="yearly-row">
+        <strong>{{ row.year }}</strong>
+        <div class="progress-bar">
+          <span
+            [class.negative]="row.yearValue < 0"
+            [style.width.%]="yearBarWidth(row)"></span>
+        </div>
+        <strong [class.success]="row.yearValue >= 0" [class.danger]="row.yearValue < 0">
+          {{ row.yearValue | number:'1.2-2' }}%
+        </strong>
+        <span>{{ row.benchmarkYearValue | number:'1.2-2' }}%</span>
+      </div>
+    }
   </div>
 </article>
