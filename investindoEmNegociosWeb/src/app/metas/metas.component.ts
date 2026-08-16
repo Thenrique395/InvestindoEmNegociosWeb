@@ -17,6 +17,8 @@ import { DatePickerComponent } from '../shared/date-picker/date-picker.component
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
+import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { GoalCardComponent } from './goal-card.component';
 import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, GoalView } from './goal-view.model';
 
@@ -34,6 +36,7 @@ import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, G
     ConfirmDialogComponent,
     EmptyStateComponent,
     AppCurrencyPipe,
+    SelectMenuComponent,
     GoalCardComponent
   ],
   templateUrl: './metas.component.html',
@@ -64,6 +67,7 @@ export class MetasComponent implements OnInit {
   readonly showContribute = signal(false);
   readonly contributing = signal(false);
   contributeGoal?: Goal;
+  contributeProgress?: GoalProgress | null;
   contributeAmount = '';
   contributeDate = new Date().toISOString().slice(0, 10);
   contributeNote = '';
@@ -116,10 +120,29 @@ export class MetasComponent implements OnInit {
     ];
   }
 
+  get currentTabLabel(): string {
+    return this.tabOptions.find((option) => option.value === this.tab())?.label ?? 'Todas';
+  }
+
+  get filteredCountLabel(): string {
+    const count = this.filtered().length;
+    return `${count} ${count === 1 ? 'meta' : 'metas'} neste filtro`;
+  }
+
   get categoryOptions(): CategoryDto[] {
     if (this.form.kind === 'Income') return this.categories().filter((c) => c.appliesTo === 'Income');
     if (this.form.kind === 'Expense') return this.categories().filter((c) => c.appliesTo === 'Expense');
     return [];
+  }
+
+  get categorySelectOptions(): SelectMenuOption[] {
+    return [
+      { value: '', label: `Todas as ${this.form.kind === 'Income' ? 'receitas' : 'despesas'}` },
+      ...this.categoryOptions.map((category) => ({
+        value: category.id,
+        label: category.name
+      }))
+    ];
   }
 
   get isInvestmentForm(): boolean {
@@ -263,6 +286,7 @@ export class MetasComponent implements OnInit {
 
   openContribute(goal: Goal): void {
     this.contributeGoal = goal;
+    this.contributeProgress = this.progressMap[goal.id] ?? null;
     this.contributeAmount = '';
     this.contributeDate = new Date().toISOString().slice(0, 10);
     this.contributeNote = '';
@@ -280,6 +304,48 @@ export class MetasComponent implements OnInit {
       next: () => { this.contributing.set(false); this.showContribute.set(false); this.uiFeedback.success('Aporte registrado.'); this.loadGoals(); },
       error: () => { this.contributing.set(false); this.uiFeedback.error('Não foi possível registrar o aporte.'); this.cdr.markForCheck(); }
     });
+  }
+
+  get contributionPreview(): { current: number; next: number; remaining: number; percent: number; barPercent: number } | null {
+    const goal = this.contributeGoal;
+    if (!goal) return null;
+    const amount = this.contributionAmountValue();
+    const target = this.contributeProgress?.target ?? goal.targetAmount ?? 0;
+    const current = this.contributeProgress?.realized ?? goal.currentAmount ?? 0;
+    const next = current + amount;
+    const remaining = Math.max(0, target - next);
+    const percent = target > 0 ? Math.round((next / target) * 100) : 0;
+    return {
+      current,
+      next,
+      remaining,
+      percent,
+      barPercent: Math.max(0, Math.min(100, percent))
+    };
+  }
+
+  contributionShortcuts(): number[] {
+    const goal = this.contributeGoal;
+    if (!goal) return [];
+    const progress = this.contributeProgress;
+    const target = progress?.target ?? goal.targetAmount ?? 0;
+    const current = progress?.realized ?? goal.currentAmount ?? 0;
+    const remaining = Math.max(0, target - current);
+    const base = [
+      Math.min(remaining, Math.max(100, Math.round(remaining * 0.1))),
+      Math.min(remaining, Math.max(250, Math.round(remaining * 0.25))),
+      remaining
+    ].filter((value) => Number.isFinite(value) && value > 0);
+    return Array.from(new Set(base));
+  }
+
+  setContributionAmount(amount: number): void {
+    this.contributeAmount = String(amount);
+  }
+
+  private contributionAmountValue(): number {
+    const amount = Number(this.contributeAmount);
+    return Number.isFinite(amount) && amount > 0 ? amount : 0;
   }
 
   // ---- Detalhes / histórico ----------------------------------------------
@@ -301,6 +367,13 @@ export class MetasComponent implements OnInit {
     return this.detailsGoal ? buildGoalView(this.detailsGoal, this.detailsProgress) : null;
   }
 
+  occurrenceBarPercent(percent: number): number {
+    if (!Number.isFinite(percent)) {
+      return 0;
+    }
+    return Math.max(0, Math.min(100, percent));
+  }
+
   // ---- Ciclo de vida ------------------------------------------------------
 
   pause(goal: Goal) { this.lifecycle(this.goalsService.pause(goal.id), 'Meta pausada.'); }
@@ -311,7 +384,7 @@ export class MetasComponent implements OnInit {
   private lifecycle(op: ReturnType<GoalsService['pause']>, success: string): void {
     op.subscribe({
       next: () => { this.uiFeedback.success(success); this.loadGoals(); },
-      error: () => this.uiFeedback.error('Ação indisponível no momento.')
+      error: (err) => this.uiFeedback.error(extractApiErrorMessage(err, 'Ação indisponível no momento.'))
     });
   }
 
@@ -325,7 +398,7 @@ export class MetasComponent implements OnInit {
     this.deleteTarget = null;
     this.goalsService.delete(goal.id).subscribe({
       next: () => { this.uiFeedback.success('Meta excluída.'); this.loadGoals(); },
-      error: () => this.uiFeedback.error('Não foi possível excluir a meta.')
+      error: (err) => this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível excluir a meta.'))
     });
   }
 }

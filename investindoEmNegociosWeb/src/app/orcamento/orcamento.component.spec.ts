@@ -27,20 +27,31 @@ function createComponent(overrides?: { budgetService?: any }) {
     upsertItems: jasmine.createSpy('upsertItems').and.returnValue(of(budget())),
     deleteItem: jasmine.createSpy('deleteItem').and.returnValue(of(void 0))
   };
-  const uiFeedback = { success: jasmine.createSpy('success'), error: jasmine.createSpy('error') } as any;
+  const categoriesService = {
+    list: jasmine.createSpy('list').and.returnValue(of([
+      { id: 'cat-1', name: 'Moradia', appliesTo: 'Expense', isDefault: true, isActive: true }
+    ]))
+  };
+  const uiFeedback = {
+    success: jasmine.createSpy('success'),
+    error: jasmine.createSpy('error'),
+    info: jasmine.createSpy('info')
+  } as any;
   const cdr = { markForCheck: jasmine.createSpy('markForCheck') } as any;
   const destroyRef = { onDestroy: () => {} } as any;
-  return { component: new OrcamentoComponent(budgetService, uiFeedback, cdr, destroyRef), budgetService, uiFeedback };
+  return { component: new OrcamentoComponent(budgetService, categoriesService as any, uiFeedback, cdr, destroyRef), budgetService, categoriesService, uiFeedback };
 }
 
 describe('OrcamentoComponent', () => {
   it('carrega o orçamento do mês ao iniciar', () => {
-    const { component, budgetService } = createComponent();
+    const { component, budgetService, categoriesService } = createComponent();
 
     component.ngOnInit();
 
     expect(budgetService.get).toHaveBeenCalledWith(component.year, component.month);
+    expect(categoriesService.list).toHaveBeenCalledWith('Expense');
     expect(component.budget()?.totalPlanned).toBe(1000);
+    expect(component.categories().length).toBe(1);
     expect(component.loading()).toBeFalse();
   });
 
@@ -93,6 +104,66 @@ describe('OrcamentoComponent', () => {
     expect(budgetService.upsertItems).toHaveBeenCalledWith(component.year, component.month, [{ categoryName: 'Moradia', plannedAmount: 1500 }]);
     expect(component.editingId).toBeNull();
     expect(uiFeedback.success).toHaveBeenCalled();
+  });
+
+  it('adiciona categoria pelo modal usando a categoria selecionada', () => {
+    const { component, budgetService, uiFeedback } = createComponent();
+    component.categories.set([{ id: 'cat-1', name: 'Mercado', appliesTo: 'Expense', isDefault: true, isActive: true }]);
+    component.selectedCategoryId = 'cat-1';
+    component.newAmount = 700;
+    component.showAddModal.set(true);
+
+    component.addItem();
+
+    expect(budgetService.upsertItems).toHaveBeenCalledWith(component.year, component.month, [{ categoryName: 'Mercado', plannedAmount: 700 }]);
+    expect(component.showAddModal()).toBeFalse();
+    expect(uiFeedback.success).toHaveBeenCalled();
+  });
+
+  it('copia categorias planejadas do mês anterior para o mês atual', () => {
+    const { component, budgetService, uiFeedback } = createComponent();
+    component.year = 2026;
+    component.month = 8;
+    budgetService.get.and.returnValue(of(budget({
+      year: 2026,
+      month: 7,
+      items: [
+        item({ id: 'prev-1', categoryName: 'Moradia', plannedAmount: 1200, realizedAmount: 900 }),
+        item({ id: 'prev-2', categoryName: 'Transporte', plannedAmount: 300, realizedAmount: 100 })
+      ]
+    })));
+    budgetService.upsertItems.and.returnValue(of(budget({
+      totalPlanned: 1500,
+      items: [
+        item({ id: 'new-1', categoryName: 'Moradia', plannedAmount: 1200 }),
+        item({ id: 'new-2', categoryName: 'Transporte', plannedAmount: 300 })
+      ]
+    })));
+
+    component.copyPreviousMonth();
+
+    expect(budgetService.get).toHaveBeenCalledWith(2026, 7);
+    expect(budgetService.upsertItems).toHaveBeenCalledWith(2026, 8, [
+      { categoryName: 'Moradia', plannedAmount: 1200 },
+      { categoryName: 'Transporte', plannedAmount: 300 }
+    ]);
+    expect(component.budget()?.totalPlanned).toBe(1500);
+    expect(component.copyingPrevious()).toBeFalse();
+    expect(uiFeedback.success).toHaveBeenCalledWith('Orçamento do mês anterior copiado.');
+  });
+
+  it('informa quando o mês anterior não possui categorias para copiar', () => {
+    const { component, budgetService, uiFeedback } = createComponent();
+    component.year = 2026;
+    component.month = 1;
+    budgetService.get.and.returnValue(of(budget({ year: 2025, month: 12, items: [] })));
+
+    component.copyPreviousMonth();
+
+    expect(budgetService.get).toHaveBeenCalledWith(2025, 12);
+    expect(budgetService.upsertItems).not.toHaveBeenCalled();
+    expect(component.copyingPrevious()).toBeFalse();
+    expect(uiFeedback.info).toHaveBeenCalledWith('O mês anterior não possui categorias planejadas para copiar.');
   });
 
   it('remove item apenas após confirmação', () => {

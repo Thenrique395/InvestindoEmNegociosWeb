@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { DecimalPipe } from '@angular/common';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
-import { GoalView } from './goal-view.model';
+import { canCompleteGoalView, GoalView } from './goal-view.model';
 
 /**
  * Card único e configurável por tipo (Despesa/Receita/Investimento). Os rótulos
@@ -23,6 +23,7 @@ import { GoalView } from './goal-view.model';
           <div class="gc__badges">
             <app-status-badge tone="muted" size="sm" [label]="view().config.typeLabel" />
             <app-status-badge [tone]="view().stateTone" size="sm" [label]="view().stateLabel" [dot]="true" />
+            <app-status-badge tone="muted" size="sm" [label]="view().recurrenceLabel" />
           </div>
         </div>
         <div class="gc__menu">
@@ -81,6 +82,9 @@ import { GoalView } from './goal-view.model';
 
       @if (view().pending > 0) {
         <p class="gc__hint">Previsto (não contabilizado): {{ view().pending | appCurrency }}</p>
+      }
+      @if (view().monthlyRequired != null) {
+        <p class="gc__hint">Precisa de {{ view().monthlyRequired | appCurrency }} por mês para chegar no prazo.</p>
       }
       @if (forecastHint()) {
         <p class="gc__hint">{{ forecastHint() }}</p>
@@ -151,7 +155,7 @@ export class GoalCardComponent {
 
   menuOpen = false;
 
-  readonly canComplete = computed(() => this.view().goal.kind !== 'Expense' && this.view().state !== 'completed' && this.view().state !== 'achieved');
+  readonly canComplete = computed(() => canCompleteGoalView(this.view()));
 
   readonly forecastHint = computed(() => {
     const v = this.view();

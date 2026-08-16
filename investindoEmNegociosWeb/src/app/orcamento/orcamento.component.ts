@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnIn
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { BudgetService, BudgetResponse, BudgetItemResponse } from '../budget.service';
+import { CategoriesService, CategoryDto } from '../categories.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
@@ -12,8 +13,12 @@ import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
+import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
+import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut-chart.component';
+import { ModalComponent } from '../shared/modal/modal.component';
+import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
-import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOverview } from './budget-overview.model';
+import { BudgetFilter, BudgetItemView, BudgetListTotals, BudgetOverrun, BudgetOverview, BudgetPace, buildBudgetComposition, buildBudgetItemViews, buildBudgetListTotals, buildBudgetOverruns, buildBudgetOverview, buildBudgetPace, filterBudgetItemViews } from './budget-overview.model';
 
 @Component({
   selector: 'app-orcamento',
@@ -28,7 +33,11 @@ import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOvervi
     UsageBarComponent,
     ConfirmSheetComponent,
     ResponsiveListComponent,
-    ResponsiveListCellDirective
+    ResponsiveListCellDirective,
+    SegmentedSelectorComponent,
+    DonutChartComponent,
+    ModalComponent,
+    SelectMenuComponent
   ],
   templateUrl: './orcamento.component.html',
   styleUrl: './orcamento.component.scss',
@@ -41,8 +50,13 @@ export class OrcamentoComponent implements OnInit {
   readonly budget = signal<BudgetResponse | null>(null);
   readonly loading = signal(false);
   readonly saving = signal(false);
+  readonly copyingPrevious = signal(false);
   readonly deletingId = signal<string | null>(null);
   readonly error = signal('');
+  readonly filter = signal<BudgetFilter>('all');
+  readonly showAddModal = signal(false);
+  readonly categories = signal<CategoryDto[]>([]);
+  readonly categoriesLoading = signal(false);
 
   editingId: string | null = null;
   editingAmount: number | null = null;
@@ -53,6 +67,7 @@ export class OrcamentoComponent implements OnInit {
 
   newCategory = '';
   newAmount: number | null = null;
+  selectedCategoryId = '';
 
   readonly months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   readonly categoryColumns: ResponsiveListColumn[] = [
@@ -64,14 +79,24 @@ export class OrcamentoComponent implements OnInit {
     { key: 'actions', label: 'Ações', align: 'end' }
   ];
 
+  readonly filterOptions: SegmentOption[] = [
+    { value: 'all', label: 'Todas' },
+    { value: 'attention', label: 'Em atenção' },
+    { value: 'overBudget', label: 'Estouradas' }
+  ];
+
   constructor(
     private readonly budgetService: BudgetService,
+    private readonly categoriesService: CategoriesService,
     private readonly uiFeedback: UiFeedbackService,
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef
   ) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+    this.loadCategories();
+  }
 
   get monthName(): string { return this.months[this.month - 1]; }
 
@@ -83,7 +108,113 @@ export class OrcamentoComponent implements OnInit {
     return buildBudgetItemViews(this.budget());
   }
 
+  get filteredItemViews(): BudgetItemView[] {
+    return filterBudgetItemViews(this.itemViews, this.filter());
+  }
+
+  get filteredTotals(): BudgetListTotals {
+    return buildBudgetListTotals(this.filteredItemViews);
+  }
+
+  get pace(): BudgetPace {
+    return buildBudgetPace(this.budget());
+  }
+
+  get compositionItems(): DonutChartItem[] {
+    return buildBudgetComposition(this.itemViews);
+  }
+
+  get overrunItems(): BudgetOverrun[] {
+    return buildBudgetOverruns(this.itemViews);
+  }
+
+  get categoryOptions(): SelectMenuOption[] {
+    return this.categories().map((category, index) => ({
+      value: category.id,
+      label: category.name,
+      meta: 'Sem histórico',
+      color: `var(--chart-${(index % 7) + 1})`
+    }));
+  }
+
+  get selectedCategory(): CategoryDto | null {
+    return this.categories().find((category) => category.id === this.selectedCategoryId) ?? null;
+  }
+
+  get addPreviewTotal(): number {
+    return this.overview.totalPlanned + Number(this.newAmount || 0);
+  }
+
+  get filterCountLabel(): string {
+    const count = this.filteredItemViews.length;
+    return `${count} ${count === 1 ? 'categoria' : 'categorias'} neste filtro`;
+  }
+
   readonly trackBudgetItem = (view: BudgetItemView): string => view.item.id;
+
+  setFilter(filter: string): void {
+    this.filter.set(filter as BudgetFilter);
+  }
+
+  openAddModal(): void {
+    if (!this.selectedCategoryId && this.categories().length) {
+      this.selectedCategoryId = this.categories()[0].id;
+      this.newCategory = this.categories()[0].name;
+    }
+    this.showAddModal.set(true);
+    if (!this.categories().length && !this.categoriesLoading()) {
+      this.loadCategories();
+    }
+  }
+
+  closeAddModal(): void {
+    if (this.saving()) return;
+    this.showAddModal.set(false);
+  }
+
+  onCategoryChange(categoryId: string): void {
+    this.selectedCategoryId = categoryId;
+    this.newCategory = this.selectedCategory?.name ?? '';
+  }
+
+  copyPreviousMonth(): void {
+    if (this.copyingPrevious()) return;
+    const previous = this.previousPeriod();
+    this.copyingPrevious.set(true);
+    this.budgetService.get(previous.year, previous.month).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (previousBudget) => {
+        const items = (previousBudget.items || [])
+          .filter((item) => item.categoryName.trim() && Number(item.plannedAmount || 0) > 0)
+          .map((item) => ({ categoryName: item.categoryName, plannedAmount: Number(item.plannedAmount || 0) }));
+
+        if (!items.length) {
+          this.copyingPrevious.set(false);
+          this.uiFeedback.info('O mês anterior não possui categorias planejadas para copiar.');
+          this.cdr.markForCheck();
+          return;
+        }
+
+        this.budgetService.upsertItems(this.year, this.month, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+          next: (budget) => {
+            this.budget.set(budget);
+            this.copyingPrevious.set(false);
+            this.uiFeedback.success('Orçamento do mês anterior copiado.');
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            this.copyingPrevious.set(false);
+            this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao copiar orçamento do mês anterior.'));
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        this.copyingPrevious.set(false);
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao carregar o orçamento do mês anterior.'));
+        this.cdr.markForCheck();
+      }
+    });
+  }
 
   load(): void {
     this.loading.set(true);
@@ -99,15 +230,40 @@ export class OrcamentoComponent implements OnInit {
     });
   }
 
+  loadCategories(): void {
+    this.categoriesLoading.set(true);
+    this.categoriesService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (categories) => {
+        const active = (categories || []).filter((category) => category.isActive !== false);
+        this.categories.set(active);
+        if (!this.selectedCategoryId && active.length) {
+          this.selectedCategoryId = active[0].id;
+          this.newCategory = active[0].name;
+        }
+        this.categoriesLoading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.categories.set([]);
+        this.categoriesLoading.set(false);
+        this.uiFeedback.error('Não foi possível carregar as categorias de despesa.');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   addItem(): void {
-    if (!this.newCategory.trim() || !this.newAmount) return;
+    const categoryName = (this.selectedCategory?.name || this.newCategory).trim();
+    if (!categoryName || !this.newAmount) return;
     this.saving.set(true);
-    const items = [{ categoryName: this.newCategory.trim(), plannedAmount: this.newAmount }];
+    const items = [{ categoryName, plannedAmount: this.newAmount }];
     this.budgetService.upsertItems(this.year, this.month, items).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (b) => {
         this.budget.set(b);
         this.newCategory = '';
+        this.selectedCategoryId = '';
         this.newAmount = null;
+        this.showAddModal.set(false);
         this.saving.set(false);
         this.uiFeedback.success('Categoria adicionada ao orçamento.');
         this.cdr.markForCheck();
@@ -197,6 +353,12 @@ export class OrcamentoComponent implements OnInit {
   nextMonth(): void {
     if (this.month === 12) { this.month = 1; this.year++; } else { this.month++; }
     this.load();
+  }
+
+  private previousPeriod(): { year: number; month: number } {
+    return this.month === 1
+      ? { year: this.year - 1, month: 12 }
+      : { year: this.year, month: this.month - 1 };
   }
 
   exportCsv(): void {

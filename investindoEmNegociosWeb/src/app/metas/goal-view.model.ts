@@ -1,4 +1,4 @@
-import { Goal, GoalKind, GoalProgress, GoalStatus } from '../goals.service';
+import { Goal, GoalKind, GoalProgress, GoalStatus, RecurrenceType } from '../goals.service';
 import { StatusBadgeTone } from '../shared/status-badge/status-badge.component';
 
 /**
@@ -51,12 +51,14 @@ export interface GoalView {
   /** Percentual limitado a 100 para a barra. */
   barPercent: number;
   remaining: number;
+  monthlyRequired: number | null;
   forecast: number | null;
   daysRemaining: number | null;
   state: GoalDisplayState;
   stateLabel: string;
   stateTone: StatusBadgeTone;
   progressTone: GoalProgressTone;
+  recurrenceLabel: string;
 }
 
 export function configFor(kind: GoalKind): GoalTypeConfig {
@@ -127,6 +129,32 @@ function progressTone(config: GoalTypeConfig, percent: number, state: GoalDispla
   return 'neutral';
 }
 
+function monthlyRequired(config: GoalTypeConfig, remaining: number, daysRemaining: number | null): number | null {
+  if (config.isConsumption || remaining <= 0 || daysRemaining == null || daysRemaining <= 0) return null;
+
+  const monthsRemaining = Math.max(1, Math.ceil(daysRemaining / 30));
+  return Math.round((remaining / monthsRemaining) * 100) / 100;
+}
+
+const RECURRENCE_LABELS: Record<RecurrenceType, string> = {
+  None: 'Período único',
+  Weekly: 'Semanal',
+  Monthly: 'Mensal',
+  Quarterly: 'Trimestral',
+  Semiannual: 'Semestral',
+  Annual: 'Anual',
+  Custom: 'Personalizada'
+};
+
+export function recurrenceLabelFor(recurrence?: RecurrenceType | null): string {
+  return recurrence ? RECURRENCE_LABELS[recurrence] ?? 'Período único' : 'Período único';
+}
+
+export function canCompleteGoalView(view: GoalView): boolean {
+  if (view.config.isConsumption || view.percent < 100) return false;
+  return !['completed', 'archived', 'canceled'].includes(view.state);
+}
+
 export function buildGoalView(goal: Goal, progress?: GoalProgress | null): GoalView {
   const config = configFor(goal.kind);
   const target = progress?.target ?? goal.targetAmount ?? 0;
@@ -153,12 +181,14 @@ export function buildGoalView(goal: Goal, progress?: GoalProgress | null): GoalV
     percent,
     barPercent: Math.max(0, Math.min(100, percent)),
     remaining,
+    monthlyRequired: monthlyRequired(config, remaining, daysRemaining),
     forecast,
     daysRemaining,
     state,
     stateLabel: meta.label,
     stateTone: meta.tone,
-    progressTone: progressTone(config, percent, state, warning)
+    progressTone: progressTone(config, percent, state, warning),
+    recurrenceLabel: recurrenceLabelFor(goal.recurrence)
   };
 }
 

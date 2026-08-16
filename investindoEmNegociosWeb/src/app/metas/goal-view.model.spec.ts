@@ -1,5 +1,5 @@
 import { Goal, GoalProgress } from '../goals.service';
-import { buildGoalsSummary, buildGoalView, configFor, filterGoals } from './goal-view.model';
+import { buildGoalsSummary, buildGoalView, canCompleteGoalView, configFor, filterGoals, recurrenceLabelFor } from './goal-view.model';
 
 function goal(p: Partial<Goal> & { id: string; kind: Goal['kind'] }): Goal {
   return {
@@ -20,6 +20,10 @@ describe('goal-view.model', () => {
     it('receita é conquista', () => {
       expect(configFor('Income').isConsumption).toBeFalse();
       expect(configFor('Income').realizedLabel).toBe('Recebido');
+    });
+    it('traduz recorrência para o badge do card', () => {
+      expect(recurrenceLabelFor('Monthly')).toBe('Mensal');
+      expect(recurrenceLabelFor(null)).toBe('Período único');
     });
   });
 
@@ -44,6 +48,17 @@ describe('goal-view.model', () => {
       expect(v.pending).toBe(2000);
       expect(v.percent).toBe(75);
     });
+    it('calcula quanto falta por mês para metas de conquista', () => {
+      const progress: GoalProgress = { goalId: '1', kind: 'Investment', mode: 'RecurringContribution', target: 5000, realized: 2000, pending: 0, percent: 40, remaining: 3000, daysRemaining: 75, state: 'OnTrack' };
+      const v = buildGoalView(goal({ id: '1', kind: 'Investment', recurrence: 'Monthly' }), progress);
+      expect(v.monthlyRequired).toBe(1000);
+      expect(v.recurrenceLabel).toBe('Mensal');
+    });
+    it('não calcula quanto falta por mês para metas de consumo', () => {
+      const progress: GoalProgress = { goalId: '1', kind: 'Expense', mode: 'Limit', target: 1000, realized: 600, pending: 0, percent: 60, remaining: 400, daysRemaining: 20, state: 'OnTrack' };
+      const v = buildGoalView(goal({ id: '1', kind: 'Expense' }), progress);
+      expect(v.monthlyRequired).toBeNull();
+    });
   });
 
   describe('fallback sem progresso do backend', () => {
@@ -56,6 +71,35 @@ describe('goal-view.model', () => {
       const v = buildGoalView(goal({ id: '1', kind: 'Income', status: 'Paused' }));
       expect(v.state).toBe('paused');
       expect(v.stateLabel).toBe('Pausada');
+    });
+  });
+
+  describe('menu de ações', () => {
+    it('só permite concluir metas de conquista com 100% ou mais', () => {
+      const incomplete = buildGoalView(goal({ id: '1', kind: 'Investment' }), {
+        goalId: '1', kind: 'Investment', mode: 'RecurringContribution', target: 1000, realized: 900, pending: 0, percent: 90, remaining: 100, state: 'OnTrack'
+      });
+      const achieved = buildGoalView(goal({ id: '2', kind: 'Income' }), {
+        goalId: '2', kind: 'Income', mode: 'Target', target: 1000, realized: 1000, pending: 0, percent: 100, remaining: 0, state: 'Achieved'
+      });
+      const exceededExpense = buildGoalView(goal({ id: '3', kind: 'Expense' }), {
+        goalId: '3', kind: 'Expense', mode: 'Limit', target: 1000, realized: 1100, pending: 0, percent: 110, remaining: 0, state: 'Exceeded'
+      });
+
+      expect(canCompleteGoalView(incomplete)).toBeFalse();
+      expect(canCompleteGoalView(achieved)).toBeTrue();
+      expect(canCompleteGoalView(exceededExpense)).toBeFalse();
+    });
+    it('não permite concluir meta já concluída ou arquivada', () => {
+      const completed = buildGoalView(goal({ id: '1', kind: 'Investment', status: 'Completed' }), {
+        goalId: '1', kind: 'Investment', mode: 'RecurringContribution', target: 1000, realized: 1000, pending: 0, percent: 100, remaining: 0, state: 'Achieved'
+      });
+      const archived = buildGoalView(goal({ id: '2', kind: 'Income', status: 'Archived' }), {
+        goalId: '2', kind: 'Income', mode: 'Target', target: 1000, realized: 1000, pending: 0, percent: 100, remaining: 0, state: 'Achieved'
+      });
+
+      expect(canCompleteGoalView(completed)).toBeFalse();
+      expect(canCompleteGoalView(archived)).toBeFalse();
     });
   });
 

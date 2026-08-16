@@ -28,6 +28,11 @@
     <div class="metas-tabs">
       <app-segmented-selector [options]="tabOptions" [value]="tab()" ariaLabel="Filtrar metas" (valueChange)="setTab($event)" />
     </div>
+
+    <div class="metas-filter-state" aria-live="polite">
+      <span>{{ currentTabLabel }}</span>
+      <strong>{{ filteredCountLabel }}</strong>
+    </div>
   }
 
   @if (loading() && !views().length) {
@@ -41,7 +46,13 @@
       (action)="openCreate()">
     </app-empty-state>
   } @else if (!filtered().length) {
-    <app-empty-state title="Nenhuma meta neste filtro" description="Ajuste o filtro para ver suas metas."></app-empty-state>
+    <app-empty-state
+      icon="⌕"
+      title="Nenhuma meta neste filtro"
+      description="Ajuste o filtro para ver suas metas."
+      ctaLabel="Ver todas as metas"
+      (action)="setTab('all')">
+    </app-empty-state>
   } @else {
     <div class="metas-grid">
       @for (view of filtered(); track view.goal.id) {
@@ -63,46 +74,66 @@
   <!-- Criar / editar meta -->
   <app-modal [open]="showForm()" eyebrow="Planejamento" [title]="editingId ? 'Editar meta' : 'Nova meta'" size="md" (close)="closeForm()">
     <div class="metas-form" modal-body>
-      <div class="metas-form__kind">
-        <span class="metas-form__label">Tipo de meta</span>
-        <app-segmented-selector [options]="kindOptions" [value]="form.kind" ariaLabel="Tipo de meta" (valueChange)="setFormKind($event)" />
-      </div>
+      <div class="metas-form__section">
+        <div class="metas-form__section-head">
+          <span>Objetivo</span>
+          <p>Defina o tipo e o valor que será acompanhado.</p>
+        </div>
 
-      <app-form-field label="Nome"><input type="text" [(ngModel)]="form.title" placeholder="Ex.: Alimentação, Renda extra, Reserva" /></app-form-field>
+        <div class="metas-form__kind">
+          <span class="metas-form__label">Tipo de meta</span>
+          <app-segmented-selector [options]="kindOptions" [value]="form.kind" ariaLabel="Tipo de meta" (valueChange)="setFormKind($event)" />
+        </div>
 
-      <div class="metas-form__row">
-        <app-form-field [label]="form.kind === 'Expense' ? 'Limite (R$)' : form.kind === 'Income' ? 'Objetivo (R$)' : 'Meta de aporte (R$)'">
-          <input type="number" inputmode="decimal" [(ngModel)]="form.targetAmount" placeholder="0,00" />
-        </app-form-field>
-        <app-form-field label="Recorrência">
-          <select [(ngModel)]="form.recurrence">
-            @for (r of recurrenceOptions; track r.value) { <option [value]="r.value">{{ r.label }}</option> }
-          </select>
-        </app-form-field>
-      </div>
-
-      <div class="metas-form__row">
-        <app-form-field label="Início"><app-date-picker format="iso" [value]="form.startDate" (valueChange)="form.startDate = $event" ariaLabel="Início" /></app-form-field>
-        <app-form-field label="Término"><app-date-picker format="iso" [value]="form.endDate" (valueChange)="form.endDate = $event" ariaLabel="Término" /></app-form-field>
-      </div>
-
-      @if (!isInvestmentForm) {
-        <app-form-field label="Categoria (opcional)">
-          <select [(ngModel)]="form.categoryId">
-            <option value="">Todas as {{ form.kind === 'Income' ? 'receitas' : 'despesas' }}</option>
-            @for (c of categoryOptions; track c.id) { <option [value]="c.id">{{ c.name }}</option> }
-          </select>
-        </app-form-field>
+        <app-form-field label="Nome"><input type="text" [(ngModel)]="form.title" placeholder="Ex.: Alimentação, Renda extra, Reserva" /></app-form-field>
 
         <div class="metas-form__row">
-          <app-form-field label="Alerta de atenção (%)"><input type="number" [(ngModel)]="form.warningThreshold" /></app-form-field>
-          <app-form-field label="Alerta crítico (%)"><input type="number" [(ngModel)]="form.criticalThreshold" /></app-form-field>
+          <app-form-field [label]="form.kind === 'Expense' ? 'Limite (R$)' : form.kind === 'Income' ? 'Objetivo (R$)' : 'Meta de aporte (R$)'">
+            <input type="number" inputmode="decimal" [(ngModel)]="form.targetAmount" placeholder="0,00" />
+          </app-form-field>
+          <app-form-field label="Recorrência">
+            <app-select-menu [options]="recurrenceOptions" [(ngModel)]="form.recurrence" ariaLabel="Recorrência" />
+          </app-form-field>
         </div>
-      }
+      </div>
 
-      <app-form-field label="Descrição (opcional)"><input type="text" [(ngModel)]="form.description" /></app-form-field>
+      <div class="metas-form__section">
+        <div class="metas-form__section-head">
+          <span>Período</span>
+          <p>Use as datas para calcular ritmo, recorrência e prazo.</p>
+        </div>
+
+        <div class="metas-form__row">
+          <app-form-field label="Início"><app-date-picker format="iso" [value]="form.startDate" (valueChange)="form.startDate = $event" ariaLabel="Início" /></app-form-field>
+          <app-form-field label="Término"><app-date-picker format="iso" [value]="form.endDate" (valueChange)="form.endDate = $event" ariaLabel="Término" /></app-form-field>
+        </div>
+      </div>
+
+      <div class="metas-form__section">
+        <div class="metas-form__section-head">
+          <span>Regras</span>
+          <p>{{ isInvestmentForm ? 'Investimentos acompanham aportes, sem categoria de consumo.' : 'Conecte a meta a categorias e alertas de acompanhamento.' }}</p>
+        </div>
+
+        @if (!isInvestmentForm) {
+          <app-form-field label="Categoria (opcional)">
+            <app-select-menu [options]="categorySelectOptions" [(ngModel)]="form.categoryId" [searchable]="true" ariaLabel="Categoria da meta" />
+          </app-form-field>
+
+          <div class="metas-form__row">
+            <app-form-field label="Alerta de atenção (%)"><input type="number" [(ngModel)]="form.warningThreshold" /></app-form-field>
+            <app-form-field label="Alerta crítico (%)"><input type="number" [(ngModel)]="form.criticalThreshold" /></app-form-field>
+          </div>
+        } @else {
+          <div class="metas-form__note">
+            Metas de investimento acompanham aportes e evolução patrimonial. Categoria e limiares de consumo não se aplicam a este tipo.
+          </div>
+        }
+
+        <app-form-field label="Descrição (opcional)"><input type="text" [(ngModel)]="form.description" /></app-form-field>
+      </div>
     </div>
-    <div modal-footer>
+    <div class="metas-form__footer" modal-footer>
       <button type="button" class="btn-ghost sm" (click)="closeForm()">Cancelar</button>
       <button type="button" class="btn-primary sm" (click)="save()" [disabled]="saving()">{{ saving() ? 'Salvando...' : (editingId ? 'Salvar' : 'Criar meta') }}</button>
     </div>
@@ -112,10 +143,41 @@
   <app-modal [open]="showContribute()" eyebrow="Investimento" title="Registrar aporte" size="sm" (close)="closeContribute()">
     <div class="metas-form" modal-body>
       <app-form-field label="Valor do aporte (R$)"><input type="number" inputmode="decimal" [(ngModel)]="contributeAmount" placeholder="0,00" /></app-form-field>
+      @if (contributionShortcuts().length) {
+        <div class="metas-contribute__shortcuts" aria-label="Atalhos de aporte">
+          @for (amount of contributionShortcuts(); track amount) {
+            <button type="button" class="btn-ghost sm" (click)="setContributionAmount(amount)">
+              {{ amount | appCurrency }}
+            </button>
+          }
+        </div>
+      }
+      @if (contributionPreview; as preview) {
+        <div class="metas-contribute__preview" aria-live="polite">
+          <div class="metas-contribute__preview-head">
+            <span>Após este aporte</span>
+            <strong>{{ preview.percent }}%</strong>
+          </div>
+          <div
+            class="metas-contribute__bar"
+            role="progressbar"
+            [attr.aria-label]="'Progresso previsto após este aporte: ' + preview.percent + '%'"
+            [attr.aria-valuenow]="preview.percent"
+            aria-valuemin="0"
+            aria-valuemax="100">
+            <span class="metas-contribute__bar-fill" [style.width.%]="preview.barPercent"></span>
+          </div>
+          <div class="metas-contribute__preview-grid">
+            <span>Aportado agora <strong>{{ preview.current | appCurrency }}</strong></span>
+            <span>Depois <strong>{{ preview.next | appCurrency }}</strong></span>
+            <span>Falta <strong>{{ preview.remaining | appCurrency }}</strong></span>
+          </div>
+        </div>
+      }
       <app-form-field label="Data"><app-date-picker format="iso" [value]="contributeDate" (valueChange)="contributeDate = $event" ariaLabel="Data" /></app-form-field>
       <app-form-field label="Observação (opcional)"><input type="text" [(ngModel)]="contributeNote" /></app-form-field>
     </div>
-    <div modal-footer>
+    <div class="metas-form__footer" modal-footer>
       <button type="button" class="btn-ghost sm" (click)="closeContribute()">Cancelar</button>
       <button type="button" class="btn-primary sm" (click)="saveContribution()" [disabled]="contributing()">{{ contributing() ? 'Salvando...' : 'Registrar' }}</button>
     </div>
@@ -132,6 +194,7 @@
           <div><span class="metas-form__label">{{ dv.config.percentLabel }}</span><strong>{{ dv.percent }}%</strong></div>
         </div>
         @if (dv.pending > 0) { <p class="metas-hint">Previsto (não contabilizado): {{ dv.pending | appCurrency }}</p> }
+        @if (dv.monthlyRequired != null) { <p class="metas-hint">Precisa de {{ dv.monthlyRequired | appCurrency }} por mês para chegar no prazo.</p> }
       }
 
       <h4 class="metas-details__h">Evolução por período</h4>
@@ -139,9 +202,22 @@
         <ul class="metas-occ">
           @for (o of detailsOccurrences(); track o.id) {
             <li class="metas-occ__row" [class.metas-occ__row--current]="o.isCurrent">
-              <span>{{ o.periodStart }} — {{ o.periodEnd }}</span>
-              <span>{{ o.realized | appCurrency }} / {{ o.targetAmount | appCurrency }}</span>
-              <span>{{ o.percent }}%</span>
+              <div class="metas-occ__meta">
+                <span>{{ o.periodStart }} — {{ o.periodEnd }}</span>
+                <strong>{{ o.realized | appCurrency }} / {{ o.targetAmount | appCurrency }}</strong>
+              </div>
+              <div class="metas-occ__progress">
+                <div
+                  class="metas-occ__bar"
+                  role="progressbar"
+                  [attr.aria-label]="'Evolução de ' + o.periodStart + ' a ' + o.periodEnd + ': ' + o.percent + '%'"
+                  [attr.aria-valuenow]="o.percent"
+                  aria-valuemin="0"
+                  aria-valuemax="100">
+                  <span class="metas-occ__bar-fill" [style.width.%]="occurrenceBarPercent(o.percent)"></span>
+                </div>
+                <span>{{ o.percent }}%</span>
+              </div>
             </li>
           }
         </ul>
