@@ -1,5 +1,5 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { SignupComponent } from './signup/signup.component';
 import { Subscription } from 'rxjs';
 import { UserRole } from './roles';
@@ -19,11 +19,12 @@ import { AppSessionFacadeService } from './app-session-facade.service';
 import { FinancialPrivacyService } from './financial-privacy.service';
 import { BillingAlertBannerComponent } from './shared/billing-alert-banner/billing-alert-banner.component';
 import { ModalComponent } from './shared/modal/modal.component';
+import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './navigation';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent, BillingAlertBannerComponent, ModalComponent],
+  imports: [RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent, BillingAlertBannerComponent, ModalComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -61,6 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private userContextSub?: Subscription;
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
+  private readonly mobileBottomPaths = new Set(['/dashboard', '/despesas', '/receitas', '/calendario']);
 
   constructor(
     private router: Router,
@@ -248,6 +250,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   hasAccess(minRole: UserRole): boolean {
     return this.appSession.hasAccess(minRole);
+  }
+
+  get mobileBottomItems(): SidebarNavItem[] {
+    const role = this.currentRole;
+
+    return NAV_SECTIONS
+      .flatMap(section => section.items)
+      .filter(item => this.mobileBottomPaths.has(item.path) && canShowItem(role, item));
   }
 
   toggleUserMenu(): void {

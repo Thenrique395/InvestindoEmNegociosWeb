@@ -43,6 +43,10 @@ import { MonthlyFlowPoint, buildMonthlyFlowSeries } from './utils/monthly-flow.u
 import { SectionCardComponent } from './shared/section-card/section-card.component';
 import { ComparisonPillComponent } from './shared/comparison-pill/comparison-pill.component';
 import { netWorthDelta } from './dashboard/dashboard-overview.model';
+import { BudgetResponse, BudgetService } from './budget.service';
+import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOverview } from './orcamento/budget-overview.model';
+import { InvestmentPosition, InvestmentsService } from './investments.service';
+import { buildInvestmentsOverview, InvestmentsOverview } from './investments/investments-overview.model';
 
 type InsightDiagnostics = {
   healthScore: number;
@@ -66,6 +70,25 @@ type InsightTodoItem = {
   queryParams: Record<string, string>;
 };
 
+type DashboardRecurrenceItem = {
+  id: string;
+  title: string;
+  amount: number;
+  dateLabel: string;
+  kindLabel: string;
+  tone: 'success' | 'warning' | 'danger' | 'info' | 'muted';
+  direction: 'income' | 'expense';
+};
+
+type DashboardDebtItem = {
+  id: string;
+  title: string;
+  amount: number;
+  dateLabel: string;
+  kindLabel: string;
+  tone: 'success' | 'warning' | 'danger' | 'info' | 'muted';
+};
+
 type NetWorthLinePoint = {
   key: string;
   x: number;
@@ -80,6 +103,17 @@ type NetWorthLinePoint = {
   isCurrentMonth: boolean;
 };
 
+type CashFlowLinePoint = {
+  key: string;
+  x: number;
+  label: string;
+  income: number;
+  expense: number;
+  incomeY: number;
+  expenseY: number;
+  isCurrentMonth: boolean;
+};
+
 type NetWorthAxisTick = {
   y: number;
   value: number;
@@ -87,6 +121,9 @@ type NetWorthAxisTick = {
 };
 
 type PatrimonioChartSeries = 'income' | 'expense' | 'netWorth';
+
+const DASHBOARD_UPCOMING_DUE_DAYS = 7;
+const CONTROLE_FLOW_MONTHS = 6;
 
 @Component({
   selector: 'app-home',
@@ -120,6 +157,8 @@ export class HomeComponent implements OnInit {
   private subRiskAssessment?: Subscription;
   private subInsights?: Subscription;
   private subRecommendations?: Subscription;
+  private subBudgetSummary?: Subscription;
+  private subInvestmentPositions?: Subscription;
   private latestRobotInsight: NotificationItem | null = null;
   private expensesLoaded = false;
   private incomesLoaded = false;
@@ -150,6 +189,8 @@ export class HomeComponent implements OnInit {
   riskAssessment: RiskBotAssessmentResponse | null = null;
   insightEngine: InsightEngineResponse | null = null;
   recommendationEngine: RecommendationEngineResponse | null = null;
+  budgetSummary: BudgetResponse | null = null;
+  investmentPositions: InvestmentPosition[] = [];
   expenseCategorySlices: CategorySlice[] = [];
   expenseCategoryTotal = 0;
   incomeSourceSlices: CategorySlice[] = [];
@@ -268,6 +309,8 @@ export class HomeComponent implements OnInit {
     private profileService: ProfileService,
     private notificationsService: NotificationsService,
     private financialAssistantService: FinancialAssistantService,
+    private budgetService: BudgetService,
+    private investmentsService: InvestmentsService,
     private router: Router,
     private readonly destroyRef: DestroyRef
   ) {}
@@ -403,6 +446,8 @@ export class HomeComponent implements OnInit {
         this.riskAssessment = null;
         this.insightEngine = null;
         this.recommendationEngine = null;
+        this.budgetSummary = null;
+        this.investmentPositions = [];
         this.registerLoadError('resumo de contas');
       }
     });
@@ -712,12 +757,190 @@ export class HomeComponent implements OnInit {
     return this.netWorthSummary?.liabilities.totalLiabilities ?? this.debtSummary?.totalDebt ?? this.totalDividaCartoes;
   }
 
+  get dashboardAccountsDebtAvailable(): boolean {
+    return !!this.realBalanceSummary || this.accountBalances.length > 0 || this.dashboardDebtTotal > 0 || this.dashboardDebtItems.length > 0;
+  }
+
+  get dashboardAccountsBalance(): number {
+    return this.realBalanceSummary?.activeAccountsBalance ?? this.totalSaldoContas;
+  }
+
+  get dashboardRealAvailableBalance(): number {
+    return this.realBalanceSummary?.realAvailableBalance ?? this.saldoDisponivelReal;
+  }
+
+  get dashboardDebtTotal(): number {
+    return this.debtSummary?.totalDebt ?? this.totalDividaCartoes;
+  }
+
+  get dashboardDebtOverdueTotal(): number {
+    return this.debtSummary?.overdueDebt ?? 0;
+  }
+
+  get dashboardDebtDueSoonTotal(): number {
+    return this.debtSummary?.dueSoonDebt ?? 0;
+  }
+
+  get dashboardDebtOpenItemsCount(): number {
+    return this.debtSummary?.openItemsCount ?? (this.totalDividaCartoes > 0 ? 1 : 0);
+  }
+
+  get dashboardDebtItems(): DashboardDebtItem[] {
+    return (this.debtSummary?.nextItems || []).slice(0, 3).map((item): DashboardDebtItem => ({
+      id: item.installmentId || item.planId,
+      title: item.title || 'Compromisso em aberto',
+      amount: item.openAmount || item.originalAmount || 0,
+      dateLabel: this.formatCompactIsoDate(item.dueDate),
+      kindLabel: item.family === 'card' ? (item.relatedName ? `Cartão · ${item.relatedName}` : 'Cartão') : 'Dívida',
+      tone: this.debtItemTone(item.status)
+    }));
+  }
+
+  get dashboardTopAccounts(): AccountResponse[] {
+    return [...this.accountBalances]
+      .sort((a, b) => Math.abs(b.currentBalance || 0) - Math.abs(a.currentBalance || 0))
+      .slice(0, 3);
+  }
+
+  get investmentsOverview(): InvestmentsOverview {
+    return buildInvestmentsOverview(this.investmentPositions, this.dataAtual);
+  }
+
+  get hasInvestmentDashboardData(): boolean {
+    return this.investmentsOverview.marketValue > 0 || this.investmentsOverview.activeCount > 0;
+  }
+
+  get investmentTopDistribution() {
+    return this.investmentsOverview.distribution.slice(0, 3);
+  }
+
+  get investmentResultTone(): 'success' | 'warning' | 'danger' | 'muted' {
+    const result = this.investmentsOverview.growth;
+    if (result > 0) return 'success';
+    if (result < 0) return 'danger';
+    return 'muted';
+  }
+
+  get hasAiHealthAreas(): boolean {
+    return Array.isArray(this.aiHealth?.areas) && this.aiHealth.areas.length > 0;
+  }
+
   get patrimonioHistoryPoints() {
     return this.netWorthHistory?.points || [];
   }
 
   get patrimonioChartMonthsCount(): number {
     return this.patrimonioLinePoints.length;
+  }
+
+  get hasPatrimonioEvolutionData(): boolean {
+    return this.patrimonioChartMonthsCount >= 2;
+  }
+
+  get controleFlowSeries(): MonthlyFlowPoint[] {
+    return buildMonthlyFlowSeries(this.expensesRaw, this.incomesRaw, this.dataAtual, CONTROLE_FLOW_MONTHS);
+  }
+
+  get controleFlowActiveMonthsCount(): number {
+    return this.controleFlowSeries.filter((point) => point.income > 0 || point.expense > 0).length;
+  }
+
+  get hasControleEvolutionData(): boolean {
+    return this.controleFlowActiveMonthsCount >= 2;
+  }
+
+  get hasControleEvolutionSeed(): boolean {
+    return this.controleFlowActiveMonthsCount > 0;
+  }
+
+  get controleEvolutionDescription(): string {
+    return `Receitas recebidas e despesas dos últimos ${CONTROLE_FLOW_MONTHS} meses.`;
+  }
+
+  get budgetOverview(): BudgetOverview {
+    return buildBudgetOverview(this.budgetSummary);
+  }
+
+  get budgetItemHighlights(): BudgetItemView[] {
+    return buildBudgetItemViews(this.budgetSummary)
+      .filter((view) => view.item.realizedAmount > 0 || view.overBudget)
+      .sort((a, b) => {
+        if (a.overBudget !== b.overBudget) return a.overBudget ? -1 : 1;
+        return b.usagePercent - a.usagePercent;
+      })
+      .slice(0, 3);
+  }
+
+  get recurrenceItems(): DashboardRecurrenceItem[] {
+    return this.allRecurrenceItems.slice(0, 6);
+  }
+
+  get allRecurrenceItems(): DashboardRecurrenceItem[] {
+    const currentMonthKey = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
+    const expenseItems: DashboardRecurrenceItem[] = this.expensesRaw
+      .filter((expense) => monthKeyFromLocaleDate(expense.vencimento) === currentMonthKey)
+      .filter((expense) => this.isRecurringExpense(expense))
+      .map((expense): DashboardRecurrenceItem => ({
+        id: `expense-${expense.id}`,
+        title: expense.nome || 'Despesa recorrente',
+        amount: expense.valor || 0,
+        dateLabel: this.formatCompactLocaleDate(expense.vencimento),
+        kindLabel: this.recurringExpenseKindLabel(expense),
+        tone: isExpenseOpen(expense.status) ? 'warning' : 'muted',
+        direction: 'expense' as const
+      }));
+    const incomeItems: DashboardRecurrenceItem[] = this.incomesRaw
+      .filter((income) => monthKeyFromLocaleDate(income.recebimento) === currentMonthKey)
+      .filter((income) => !!income.fixa)
+      .map((income): DashboardRecurrenceItem => ({
+        id: `income-${income.id}`,
+        title: income.fonte || 'Receita recorrente',
+        amount: income.valor || 0,
+        dateLabel: this.formatCompactLocaleDate(income.recebimento),
+        kindLabel: 'Receita fixa',
+        tone: isIncomeReceived(income.status) ? 'success' : 'info',
+        direction: 'income' as const
+      }));
+
+    return [...expenseItems, ...incomeItems]
+      .sort((a, b) => {
+        const directionOrder = a.direction === b.direction ? 0 : a.direction === 'expense' ? -1 : 1;
+        if (directionOrder !== 0) return directionOrder;
+        return b.amount - a.amount;
+      });
+  }
+
+  get recurrenceOutflowTotal(): number {
+    return this.allRecurrenceItems
+      .filter((item) => item.direction === 'expense')
+      .reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  get recurrenceIncomeTotal(): number {
+    return this.allRecurrenceItems
+      .filter((item) => item.direction === 'income')
+      .reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  get recurrenceExpenseCount(): number {
+    return this.allRecurrenceItems.filter((item) => item.direction === 'expense').length;
+  }
+
+  get recurrenceIncomeCount(): number {
+    return this.allRecurrenceItems.filter((item) => item.direction === 'income').length;
+  }
+
+  private isRecurringExpense(expense: StoredExpense): boolean {
+    return !!expense.fixa || !!expense.serieId || (!!expense.parcelasTotal && expense.parcelasTotal > 1);
+  }
+
+  private recurringExpenseKindLabel(expense: StoredExpense): string {
+    const category = (expense.categoria || '').toLowerCase();
+    if (category.includes('assinatura')) return 'Assinatura';
+    if (expense.parcelasTotal && expense.parcelasTotal > 1) {
+      return `Parcela ${expense.parcelaNumero || 1}/${expense.parcelasTotal}`;
+    }
+    return 'Conta fixa';
   }
 
   get patrimonioChartYearLabel(): string {
@@ -824,6 +1047,67 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  get controleFlowLinePoints(): CashFlowLinePoint[] {
+    const points = this.controleFlowSeries;
+    if (!points.length) return [];
+
+    const width = 640;
+    const top = 22;
+    const right = 20;
+    const bottom = 102;
+    const left = 64;
+    const { minValue, maxValue } = this.controleFlowChartDomain();
+    const range = maxValue - minValue || 1;
+    const plotWidth = width - left - right;
+    const plotHeight = bottom - top;
+    const currentMonthKey = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
+
+    return points.map((point, index) => {
+      const x = points.length === 1 ? left + plotWidth / 2 : left + (plotWidth / (points.length - 1)) * index;
+      const toY = (value: number) => (maxValue === minValue ? bottom : top + ((maxValue - value) / range) * plotHeight);
+      return {
+        key: point.key,
+        x,
+        label: point.label,
+        income: point.income,
+        expense: point.expense,
+        incomeY: toY(point.income),
+        expenseY: toY(point.expense),
+        isCurrentMonth: point.key === currentMonthKey
+      };
+    });
+  }
+
+  get controleIncomeLinePath(): string {
+    return this.buildControleFlowLinePath('incomeY');
+  }
+
+  get controleExpenseLinePath(): string {
+    return this.buildControleFlowLinePath('expenseY');
+  }
+
+  get controleAxisTicks(): NetWorthAxisTick[] {
+    const { minValue, maxValue } = this.controleFlowChartDomain();
+    if (minValue === maxValue) {
+      return [{ value: 0, y: 102, isZero: true }];
+    }
+
+    const range = maxValue - minValue || 1;
+    const top = 22;
+    const bottom = 102;
+    const plotHeight = bottom - top;
+    const values = maxValue <= 0
+      ? [0, minValue / 2, minValue]
+      : minValue >= 0
+        ? [maxValue, maxValue / 2, 0]
+        : [maxValue, 0, minValue];
+    return values.map((value) => ({
+      value,
+      y: top + ((maxValue - value) / range) * plotHeight,
+      isZero: value === 0
+    }));
+  }
+
   get patrimonioIncomeLinePath(): string {
     if (!this.isPatrimonioSeriesVisible('income')) return '';
     return this.buildPatrimonioLinePath('incomeY');
@@ -894,6 +1178,20 @@ export class HomeComponent implements OnInit {
       return min > 0 ? { minValue: 0, maxValue: max } : { minValue: min, maxValue: 0 };
     }
     return { minValue: Math.min(0, min), maxValue: Math.max(0, max) };
+  }
+
+  private controleFlowChartDomain(): { minValue: number; maxValue: number } {
+    const values = this.controleFlowSeries.flatMap((point) => [point.income, point.expense]);
+    if (!values.length) return { minValue: 0, maxValue: 0 };
+
+    const max = Math.max(...values);
+    return max <= 0 ? { minValue: 0, maxValue: 0 } : { minValue: 0, maxValue: max };
+  }
+
+  private buildControleFlowLinePath(axisKey: 'incomeY' | 'expenseY'): string {
+    return this.controleFlowLinePoints
+      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(1)} ${point[axisKey].toFixed(1)}`)
+      .join(' ');
   }
 
   private buildPatrimonioLinePath(axisKey: 'incomeY' | 'expenseY' | 'netWorthY'): string {
@@ -1175,7 +1473,7 @@ export class HomeComponent implements OnInit {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const windowEnd = new Date(today);
-    windowEnd.setDate(windowEnd.getDate() + 14);
+    windowEnd.setDate(windowEnd.getDate() + DASHBOARD_UPCOMING_DUE_DAYS);
 
     const items = this.expensesRaw
       .filter((expense) => isExpenseOpen(expense.status))
@@ -1203,6 +1501,21 @@ export class HomeComponent implements OnInit {
   private formatCompactLocaleDate(value: string): string {
     const parsed = parseLocaleDate(value);
     return parsed ? parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : value;
+  }
+
+  private formatCompactIsoDate(value: string): string {
+    const parsed = value ? new Date(`${value.slice(0, 10)}T00:00:00`) : null;
+    return parsed && !Number.isNaN(parsed.getTime())
+      ? parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+      : value;
+  }
+
+  private debtItemTone(status: string): 'success' | 'warning' | 'danger' | 'info' | 'muted' {
+    const normalized = (status || '').toLowerCase();
+    if (normalized.includes('overdue') || normalized.includes('atras')) return 'danger';
+    if (normalized.includes('open') || normalized.includes('pending') || normalized.includes('abert')) return 'warning';
+    if (normalized.includes('paid') || normalized.includes('pago')) return 'muted';
+    return 'info';
   }
 
   /**
@@ -1445,6 +1758,8 @@ export class HomeComponent implements OnInit {
     this.loadRiskAssessment();
     this.loadInsights();
     this.loadRecommendations();
+    this.loadBudgetSummary();
+    this.loadInvestmentPositions();
   }
 
   private loadRealAvailableBalance(): void {
@@ -1514,7 +1829,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadAiHealth(): void {
-    if (!this.isLogged || !this.hasAccess('Intermediate')) {
+    if (!this.isLogged || !this.hasAccess('Advanced')) {
       this.aiHealth = null;
       return;
     }
@@ -1525,7 +1840,9 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (health) => {
-          this.aiHealth = health;
+          this.aiHealth = this.isAiHealthResponse(health)
+            ? { ...health, areas: Array.isArray(health.areas) ? health.areas : [] }
+            : null;
         },
         error: () => {
           this.aiHealth = null;
@@ -1545,6 +1862,11 @@ export class HomeComponent implements OnInit {
 
   aiHealthTone(status: AiHealthStatus): 'success' | 'warning' | 'danger' {
     return status === 'critical' ? 'danger' : status === 'warning' ? 'warning' : 'success';
+  }
+
+  private isAiHealthResponse(value: unknown): value is AiFinancialHealthResponse {
+    if (!value || Array.isArray(value) || typeof value !== 'object') return false;
+    return typeof (value as Partial<AiFinancialHealthResponse>).overallStatus === 'string';
   }
 
   metaStatusTone(status: GoalStatus): 'success' | 'warning' | 'danger' | 'muted' {
@@ -1697,6 +2019,47 @@ export class HomeComponent implements OnInit {
           this.recommendationEngine = null;
           this.registerLoadError('recomendações');
           this.updateInsight();
+        }
+      });
+  }
+
+  private loadBudgetSummary(): void {
+    if (!this.isLogged || !this.hasAccess('Intermediate')) {
+      this.budgetSummary = null;
+      return;
+    }
+
+    this.subBudgetSummary?.unsubscribe();
+    this.subBudgetSummary = this.budgetService
+      .get(this.dataAtual.getFullYear(), this.dataAtual.getMonth() + 1)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (budget) => {
+          this.budgetSummary = budget;
+        },
+        error: () => {
+          this.budgetSummary = null;
+        }
+      });
+  }
+
+  private loadInvestmentPositions(): void {
+    if (!this.isLogged || !this.hasAccess('Advanced')) {
+      this.investmentPositions = [];
+      return;
+    }
+
+    this.subInvestmentPositions?.unsubscribe();
+    this.subInvestmentPositions = this.investmentsService
+      .listPositions()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (positions) => {
+          this.investmentPositions = positions || [];
+        },
+        error: () => {
+          this.investmentPositions = [];
+          this.registerLoadError('investimentos');
         }
       });
   }
@@ -2033,7 +2396,7 @@ export class HomeComponent implements OnInit {
     const today = new Date();
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const dueSoonLimit = new Date(startOfToday);
-    dueSoonLimit.setDate(dueSoonLimit.getDate() + 5);
+    dueSoonLimit.setDate(dueSoonLimit.getDate() + DASHBOARD_UPCOMING_DUE_DAYS);
     const range = this.getPeriodRange();
 
     const openExpenses = this.expensesRaw.filter((expense) => {
@@ -2165,7 +2528,7 @@ export class HomeComponent implements OnInit {
       return;
     }
     if (dueSoonExpenseAmount > 0) {
-      this.insightShortGoal = `Meta de curto prazo: reservar ${formatCurrency(dueSoonExpenseAmount)} para os próximos 5 dias.`;
+      this.insightShortGoal = `Meta de curto prazo: reservar ${formatCurrency(dueSoonExpenseAmount)} para os próximos ${DASHBOARD_UPCOMING_DUE_DAYS} dias.`;
       return;
     }
     this.insightShortGoal = `Meta de curto prazo: manter saúde financeira acima de 70/100 até o fim do mês.`;

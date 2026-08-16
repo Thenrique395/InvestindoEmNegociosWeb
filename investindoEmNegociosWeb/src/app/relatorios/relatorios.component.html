@@ -73,7 +73,19 @@
     <article class="card">
       <h2>Despesas por categoria</h2>
       @if (report.expensesByCategory.length) {
-        <app-donut-chart [items]="expensesDonutItems" emptyMessage="Sem despesas para exibir." />
+        <div class="category-bars" aria-label="Distribuição de despesas por categoria em barras">
+          @for (cat of expenseCategoryBars; track cat.categoryName) {
+            <div class="category-bar">
+              <div class="category-bar__head">
+                <span class="category-bar__name">{{ cat.categoryName }}</span>
+                <span class="category-bar__meta">{{ cat.amount | appCurrency }} · {{ cat.percentageOfTotal | number:'1.1-1' }}%</span>
+              </div>
+              <div class="category-bar__track" aria-hidden="true">
+                <span class="category-bar__fill" [style.width.%]="cat.percentageOfTotal" [style.background]="cat.color"></span>
+              </div>
+            </div>
+          }
+        </div>
       }
       <app-responsive-list
         [columns]="expenseCategoryColumns"

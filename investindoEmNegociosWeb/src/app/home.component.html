@@ -20,7 +20,7 @@
         [periodoLabel]="mesAtualLabel"
         [loading]="isLoadingDashboard"
         (periodoChange)="setPeriodo($event)" />
-    @if (hasAccess('Advanced') && patrimonioChartMonthsCount) {
+    @if (hasAccess('Advanced') && hasPatrimonioEvolutionData) {
       <app-section-card
         title="Evolução patrimonial"
         [description]="patrimonioChartDescription">
@@ -147,16 +147,129 @@
           </p>
         }
       </app-section-card>
+    } @else if (hasAccess('Advanced') && patrimonioChartMonthsCount) {
+      <app-section-card
+        title="Evolução patrimonial"
+        description="O histórico começa a aparecer quando houver pelo menos dois meses de movimentação.">
+        <div class="history-start">
+          <strong>Histórico começando</strong>
+          <p>
+            Já existe movimentação no período, mas ainda não há base suficiente para desenhar uma tendência.
+            Continue registrando receitas, despesas e saldos para comparar a evolução no próximo mês.
+          </p>
+        </div>
+      </app-section-card>
     }
-  @if (hasAccess('Intermediate') && subscriptionsSummary && subscriptionsSummary.count) {
+    @if (hasAccess('Intermediate') && !hasAccess('Advanced') && hasControleEvolutionData) {
+      <app-section-card
+        title="Evolução do caixa"
+        [description]="controleEvolutionDescription">
+        <div class="networth-chart">
+          <svg
+            class="networth-chart__svg"
+            viewBox="0 0 640 130"
+            role="img"
+            [attr.aria-label]="controleEvolutionDescription">
+            @for (tick of controleAxisTicks; track trackByIndex($index, tick)) {
+              <g class="networth-chart__grid" [class.networth-chart__grid--zero]="tick.isZero">
+                <line x1="64" x2="620" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+                <text x="8" [attr.y]="tick.y + 3">{{ formatChartAxisValue(tick.value) }}</text>
+              </g>
+            }
+            @for (point of controleFlowLinePoints; track trackByIndex($index, point)) {
+              <g class="networth-chart__month-tick" [class.networth-chart__month-tick--current]="point.isCurrentMonth">
+                <line [attr.x1]="point.x" [attr.x2]="point.x" y1="102" y2="108" />
+              </g>
+            }
+            <path class="networth-chart__line networth-chart__line--income" [attr.d]="controleIncomeLinePath"></path>
+            <path class="networth-chart__line networth-chart__line--expense" [attr.d]="controleExpenseLinePath"></path>
+            @for (point of controleFlowLinePoints; track trackByIndex($index, point)) {
+              <g class="networth-chart__point networth-chart__point--income" [attr.transform]="'translate(' + point.x + ' ' + point.incomeY + ')'">
+                <circle r="2"></circle>
+                <title>{{ point.label }} — Receitas: {{ point.income | appCurrency }}</title>
+              </g>
+              <g class="networth-chart__point networth-chart__point--expense" [attr.transform]="'translate(' + point.x + ' ' + point.expenseY + ')'">
+                <circle r="2"></circle>
+                <title>{{ point.label }} — Despesas: {{ point.expense | appCurrency }}</title>
+              </g>
+            }
+          </svg>
+          <div class="networth-chart__legend">
+            <span class="networth-chart__legend-item">
+              <span class="networth-chart__dot networth-chart__dot--income" aria-hidden="true"></span>
+              Receitas
+            </span>
+            <span class="networth-chart__legend-item">
+              <span class="networth-chart__dot networth-chart__dot--expense" aria-hidden="true"></span>
+              Despesas
+            </span>
+          </div>
+          <div class="networth-chart__labels" aria-hidden="true">
+            @for (point of controleFlowLinePoints; track trackByIndex($index, point)) {
+              <span class="networth-chart__label" [class.networth-chart__label--current]="point.isCurrentMonth">{{ point.label }}</span>
+            }
+          </div>
+        </div>
+      </app-section-card>
+    } @else if (hasAccess('Intermediate') && !hasAccess('Advanced') && hasControleEvolutionSeed) {
+      <app-section-card
+        title="Evolução do caixa"
+        description="O histórico começa a aparecer quando houver pelo menos dois meses de movimentação.">
+        <div class="history-start">
+          <strong>Histórico começando</strong>
+          <p>
+            Já existe movimentação no período, mas ainda não há base suficiente para comparar receitas e despesas.
+            Continue registrando lançamentos para ver a evolução de 6 meses.
+          </p>
+        </div>
+      </app-section-card>
+    }
+  @if (hasAccess('Intermediate') && recurrenceItems.length) {
     <app-section-card
-      title="Assinaturas"
-      description="Recorrências categorizadas como Assinaturas.">
+      title="Recorrências do mês"
+      description="Assinaturas, contas fixas, parcelas e receitas recorrentes.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge tone="muted" [label]="'Saídas fixas: ' + (recurrenceOutflowTotal | appCurrency)"></app-status-badge>
+        @if (recurrenceIncomeTotal > 0) {
+          <app-status-badge tone="success" [label]="'Entradas fixas: ' + (recurrenceIncomeTotal | appCurrency)"></app-status-badge>
+        }
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="grid gap-2">
+          @for (item of recurrenceItems; track item.id) {
+            <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+              <div class="min-w-0">
+                <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">{{ item.kindLabel }} · {{ item.dateLabel }}</p>
+              </div>
+              <div class="grid justify-items-end gap-1">
+                <strong
+                  class="text-[0.875rem]"
+                  [ngClass]="item.direction === 'income' ? 'text-[var(--income-text)]' : 'text-[var(--text)]'">
+                  {{ item.amount | appCurrency }}
+                </strong>
+                <app-status-badge [tone]="item.tone" [label]="item.direction === 'income' ? 'Entrada' : 'Saída'" size="sm"></app-status-badge>
+              </div>
+            </article>
+          }
+        </div>
+        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3 text-[0.75rem] text-[var(--text-tertiary)]">
+          <span>{{ recurrenceExpenseCount }} saída(s) fixa(s)</span>
+          @if (recurrenceIncomeCount > 0) {
+            <span>{{ recurrenceIncomeCount }} entrada(s) fixa(s)</span>
+          }
+        </footer>
+      </div>
+    </app-section-card>
+  } @else if (hasAccess('Intermediate') && subscriptionsSummary && subscriptionsSummary.count) {
+    <app-section-card
+      title="Recorrências do mês"
+      description="Assinaturas categorizadas no resumo financeiro.">
       <div card-actions>
-        <app-status-badge tone="muted" [label]="'Total: ' + (subscriptionsSummary.monthlyTotal | appCurrency) + '/mês'"></app-status-badge>
+        <app-status-badge tone="muted" [label]="'Saídas fixas: ' + (subscriptionsSummary.monthlyTotal | appCurrency)"></app-status-badge>
       </div>
       <div class="grid gap-2">
-        @for (item of subscriptionsSummary.items; track trackByIndex($index, item)) {
+        @for (item of subscriptionsSummary.items; track item.planId) {
           <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
             <div class="flex flex-wrap items-start justify-between gap-2">
               <div class="min-w-0">
@@ -172,13 +285,190 @@
       </div>
     </app-section-card>
   }
-  @if (hasAccess('Intermediate') && aiHealth) {
+  @if (hasAccess('Intermediate') && budgetSummary && budgetOverview.itemsCount) {
+    <app-section-card
+      title="Orçamento do mês"
+      description="Planejado contra realizado nas categorias acompanhadas.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge
+          [tone]="budgetOverview.usagePercent > 100 ? 'danger' : budgetOverview.usagePercent > 80 ? 'warning' : 'success'"
+          [label]="budgetOverview.usagePercent + '% usado'"></app-status-badge>
+        <a
+          class="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)] no-underline transition hover:border-[var(--primary)] hover:text-[var(--text)]"
+          routerLink="/orcamento">
+          Ver orçamento
+        </a>
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Planejado</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ budgetOverview.totalPlanned | appCurrency }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Realizado</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ budgetOverview.totalRealized | appCurrency }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Variação</p>
+            <strong
+              class="mt-1 block text-[1rem]"
+              [ngClass]="budgetOverview.totalVariance < 0 ? 'text-[var(--expense-text)]' : 'text-[var(--income-text)]'">
+              {{ budgetOverview.totalVariance | appCurrency }}
+            </strong>
+          </div>
+        </div>
+        @if (budgetItemHighlights.length) {
+          <div class="grid gap-2">
+            @for (view of budgetItemHighlights; track view.item.id) {
+              <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ view.item.categoryName }}</strong>
+                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">
+                    {{ view.item.realizedAmount | appCurrency }} de {{ view.item.plannedAmount | appCurrency }}
+                  </p>
+                </div>
+                <app-status-badge
+                  [tone]="view.overBudget ? 'danger' : view.usagePercent > 80 ? 'warning' : 'success'"
+                  [label]="view.overBudget ? 'Estourou' : view.usagePercent + '%'"></app-status-badge>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="m-0 text-[0.8125rem] text-[var(--text-tertiary)]">Nenhuma categoria planejada teve gasto registrado neste mês.</p>
+        }
+      </div>
+    </app-section-card>
+  }
+  @if (hasAccess('Intermediate') && dashboardAccountsDebtAvailable) {
+    <app-section-card
+      title="Dívidas e contas"
+      description="Saldo em contas, disponibilidade real e compromissos em aberto.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge tone="muted" [label]="dashboardDebtOpenItemsCount + ' compromisso(s)'"></app-status-badge>
+        @if (dashboardDebtOverdueTotal > 0) {
+          <app-status-badge tone="danger" [label]="'Atrasado: ' + (dashboardDebtOverdueTotal | appCurrency)"></app-status-badge>
+        } @else if (dashboardDebtDueSoonTotal > 0) {
+          <app-status-badge tone="warning" [label]="'Próximo: ' + (dashboardDebtDueSoonTotal | appCurrency)"></app-status-badge>
+        }
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="flex flex-wrap gap-2">
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Saldo em contas</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ dashboardAccountsBalance | appCurrency }}</strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Disponível real</p>
+            <strong
+              class="mt-1 block text-[1rem]"
+              [ngClass]="dashboardRealAvailableBalance < 0 ? 'text-[var(--expense-text)]' : 'text-[var(--income-text)]'">
+              {{ dashboardRealAvailableBalance | appCurrency }}
+            </strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Dívida aberta</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ dashboardDebtTotal | appCurrency }}</strong>
+          </div>
+        </div>
+        @if (dashboardDebtItems.length) {
+          <div class="grid gap-2">
+            @for (item of dashboardDebtItems; track item.id) {
+              <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">{{ item.kindLabel }} · vence {{ item.dateLabel }}</p>
+                </div>
+                <div class="grid justify-items-end gap-1">
+                  <strong class="text-[0.875rem] text-[var(--text)]">{{ item.amount | appCurrency }}</strong>
+                  <app-status-badge [tone]="item.tone" label="Aberto" size="sm"></app-status-badge>
+                </div>
+              </article>
+            }
+          </div>
+        }
+        @if (dashboardTopAccounts.length) {
+          <footer class="flex flex-wrap gap-2 border-t border-[var(--border)] pt-3">
+            @for (account of dashboardTopAccounts; track account.id) {
+              <span class="inline-flex max-w-full items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)]">
+                <span class="truncate">{{ account.name }}</span>
+                <strong class="text-[var(--text)]">{{ account.currentBalance | appCurrency }}</strong>
+              </span>
+            }
+          </footer>
+        }
+      </div>
+    </app-section-card>
+  }
+  @if (hasAccess('Advanced') && hasInvestmentDashboardData) {
+    <app-section-card
+      title="Investimentos"
+      description="Carteira consolidada por valor atual, resultado e alocação principal.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge [tone]="investmentResultTone" [label]="'Resultado: ' + (investmentsOverview.growth | appCurrency)"></app-status-badge>
+        <a
+          class="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)] no-underline transition hover:border-[var(--primary)] hover:text-[var(--text)]"
+          routerLink="/investimentos">
+          Ver carteira
+        </a>
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="flex flex-wrap gap-2">
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Valor atual</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ investmentsOverview.marketValue | appCurrency }}</strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Aportado</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ investmentsOverview.invested | appCurrency }}</strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Rentabilidade</p>
+            <strong
+              class="mt-1 block text-[1rem]"
+              [ngClass]="investmentsOverview.growth < 0 ? 'text-[var(--expense-text)]' : investmentsOverview.growth > 0 ? 'text-[var(--income-text)]' : 'text-[var(--text)]'">
+              {{ investmentsOverview.profitPercent | number:'1.1-1' }}%
+            </strong>
+          </div>
+        </div>
+        @if (investmentTopDistribution.length) {
+          <div class="grid gap-2">
+            @for (slice of investmentTopDistribution; track slice.key) {
+              <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ slice.label }}</strong>
+                  <div class="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-inset)]">
+                    <span
+                      class="block h-full rounded-full"
+                      [style.background]="slice.color"
+                      [style.width.%]="slice.percent"></span>
+                  </div>
+                </div>
+                <div class="grid justify-items-end gap-1">
+                  <strong class="text-[0.875rem] text-[var(--text)]">{{ slice.value | appCurrency }}</strong>
+                  <span class="text-[0.75rem] font-semibold text-[var(--text-tertiary)]">{{ slice.percent | number:'1.0-0' }}%</span>
+                </div>
+              </article>
+            }
+          </div>
+        }
+        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3 text-[0.75rem] text-[var(--text-tertiary)]">
+          <span>{{ investmentsOverview.activeCount }} posição(ões) ativa(s)</span>
+          @if (investmentsOverview.proventos > 0) {
+            <span>Proventos: {{ investmentsOverview.proventos | appCurrency }}</span>
+          }
+        </footer>
+      </div>
+    </app-section-card>
+  }
+  @if (hasAccess('Advanced') && aiHealth) {
     <app-section-card
       title="Saúde financeira (IA)"
       [description]="aiHealth.overallSummary">
       <div card-actions>
         <app-status-badge [tone]="aiHealthTone(aiHealth.overallStatus)" [label]="aiHealth.overallStatus === 'critical' ? 'Crítico' : aiHealth.overallStatus === 'warning' ? 'Atenção' : 'Estável'"></app-status-badge>
       </div>
+      @if (hasAiHealthAreas) {
       <div class="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2">
         @for (area of aiHealth.areas; track area.area) {
           <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
@@ -190,6 +480,11 @@
           </article>
         }
       </div>
+      } @else {
+        <div class="rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+          <p class="m-0 text-[0.875rem] text-[var(--text-secondary)]">{{ aiHealth.overallSummary }}</p>
+        </div>
+      }
     </app-section-card>
   }
   @if (!isLoadingDashboard) {
@@ -248,13 +543,13 @@
   }
   @if (!isLoadingDashboard && isBasicProfile) {
     <app-upgrade-cta
-      planLabel="Intermediate"
+      planLabel="Controle"
       title="Desbloqueie análises que antecipam problemas de caixa"
       [features]="['Projeção e análise de risco', 'Assinaturas recorrentes', 'Saúde financeira com IA']" />
   }
   @if (!isLoadingDashboard && !isBasicProfile && !hasAccess('Advanced')) {
     <app-upgrade-cta
-      planLabel="Advanced"
+      planLabel="Patrimônio"
       title="Vá além: patrimônio consolidado e visão de longo prazo"
       [features]="['Evolução patrimonial', 'Visão consolidada de ativos e passivos', 'Investimentos integrados ao patrimônio']" />
   }
@@ -288,137 +583,139 @@
             }
           </div>
         }
-        <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)] shadow-[var(--shadow-card-hover)]">
-          <div class="flex items-center justify-between gap-2">
-            <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">Painel de risco</p>
-            <span class="text-[0.75rem] text-[var(--text-tertiary)]">Atualização automática</span>
-          </div>
-          <div class="grid grid-cols-1 gap-2 grid-cols-[1.15fr_1fr]">
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
-              <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Saúde financeira</p>
-              <div class="mt-2 flex items-center justify-between gap-2">
-                <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.875rem] font-semibold" [ngClass]="insightHealthToneClass">
-                  {{ insightDiagnostics.healthScore }}/100
-                </strong>
-                <span class="text-[0.75rem] text-[var(--text-tertiary)]">Score mensal</span>
-              </div>
-              <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-inset)]">
-                <div class="h-full rounded-full transition-all duration-300"
-                  [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
-                [style.width.%]="insightScoreGaugeWidth"></div>
-              </div>
-              @if (robotScoreBreakdown.length) {
-                <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] p-2">
-                  <p class="m-0 text-[0.75rem] text-[var(--text-tertiary)]">Como chegamos nesse score:</p>
-                  <ul class="m-0 mt-1 list-disc pl-4 text-[0.75rem] text-[var(--text-secondary)]">
-                    @for (item of robotScoreBreakdown; track trackByIndex($index, item)) {
-                      <li>{{ item }}</li>
-                    }
-                  </ul>
-                </div>
-              }
-            </article>
-            <div class="grid gap-2">
-              <article class="rounded-[12px] border p-[var(--space-3)]" [ngClass]="insightRiskToneClass">
-                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
-                <strong class="mt-2 block text-[0.9375rem] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
-              </article>
+        @if (hasAccess('Intermediate')) {
+          <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)] shadow-[var(--shadow-card-hover)]">
+            <div class="flex items-center justify-between gap-2">
+              <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">Painel de risco</p>
+              <span class="text-[0.75rem] text-[var(--text-tertiary)]">Atualização automática</span>
+            </div>
+            <div class="grid grid-cols-1 gap-2 grid-cols-[1.15fr_1fr]">
               <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
-                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Próximos 5 dias</p>
-                <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | appCurrency }}</strong>
-                <p class="mt-1 text-[0.75rem] text-[var(--text-tertiary)]">Despesas com vencimento próximo.</p>
-              </article>
-            </div>
-          </div>
-          <article class="rounded-[12px] border p-[var(--space-3)]" [ngClass]="insightOverdueToneClass">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
-                <strong class="mt-1 block text-[0.9375rem] font-semibold">
-                  {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
-                </strong>
-              </div>
-            </div>
-            @if (insightTodoItems.length) {
-              <div class="mt-2 grid gap-2">
-                @for (todo of insightTodoItems; track trackByIndex($index, todo)) {
-                  <article
-                    class="rounded-[10px] border px-2 py-2 text-[0.8125rem]"
-              [ngClass]="todo.severity === 'danger'
-                ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
-                : todo.severity === 'warn'
-                  ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
-                  : 'border-sky-300/60 bg-sky-500/10 text-[var(--primary-text)]'">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                      <p class="m-0 flex-1">{{ todo.text }}</p>
-                      <a
-                        class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[0.75rem] font-semibold text-[var(--text)]"
-                        [routerLink]="todo.route"
-                        [queryParams]="todo.queryParams">
-                        {{ todo.actionLabel }}
-                      </a>
-                    </div>
-                  </article>
+                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Saúde financeira</p>
+                <div class="mt-2 flex items-center justify-between gap-2">
+                  <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.875rem] font-semibold" [ngClass]="insightHealthToneClass">
+                    {{ insightDiagnostics.healthScore }}/100
+                  </strong>
+                  <span class="text-[0.75rem] text-[var(--text-tertiary)]">Score mensal</span>
+                </div>
+                <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-inset)]">
+                  <div class="h-full rounded-full transition-all duration-300"
+                    [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
+                  [style.width.%]="insightScoreGaugeWidth"></div>
+                </div>
+                @if (robotScoreBreakdown.length) {
+                  <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] p-2">
+                    <p class="m-0 text-[0.75rem] text-[var(--text-tertiary)]">Como chegamos nesse score:</p>
+                    <ul class="m-0 mt-1 list-disc pl-4 text-[0.75rem] text-[var(--text-secondary)]">
+                      @for (item of robotScoreBreakdown; track trackByIndex($index, item)) {
+                        <li>{{ item }}</li>
+                      }
+                    </ul>
+                  </div>
                 }
+              </article>
+              <div class="grid gap-2">
+                <article class="rounded-[12px] border p-[var(--space-3)]" [ngClass]="insightRiskToneClass">
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
+                  <strong class="mt-2 block text-[0.9375rem] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
+                </article>
+                <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Próximos 7 dias</p>
+                  <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | appCurrency }}</strong>
+                  <p class="mt-1 text-[0.75rem] text-[var(--text-tertiary)]">Despesas com vencimento próximo.</p>
+                </article>
               </div>
-            } @else {
-              <p class="mt-2 text-[0.8125rem] text-[var(--text-tertiary)]">Sem pendências acionáveis no momento.</p>
-            }
-          </article>
-          @if (cashflowProjection) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
+            </div>
+            <article class="rounded-[12px] border p-[var(--space-3)]" [ngClass]="insightOverdueToneClass">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Simulação diária</p>
-                  <strong class="mt-1 block text-[0.9375rem] font-semibold text-[var(--text)]">
-                    Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | appCurrency }}
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
+                  <strong class="mt-1 block text-[0.9375rem] font-semibold">
+                    {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
                   </strong>
                 </div>
-                <span class="text-[0.75rem] text-[var(--text-tertiary)]">
-                  Menor saldo:
-                  {{ cashflowProjection.lowestBalance | appCurrency }}
-                </span>
               </div>
-              @if (projectionHighlights.length) {
+              @if (insightTodoItems.length) {
                 <div class="mt-2 grid gap-2">
-                  @for (point of projectionHighlights; track trackByIndex($index, point)) {
-                    <div
-                      class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[0.8125rem]"
-              [ngClass]="point.tone === 'danger'
-                ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
-                : point.tone === 'warn'
-                  ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
-                  : 'border-emerald-300/60 bg-emerald-500/10 text-[var(--income-text)]'">
-                      <strong>{{ point.dateLabel }}</strong>
-                      <span>+{{ point.incomesAmount | appCurrency }} / -{{ point.expensesAmount | appCurrency }}</span>
-                      <strong>{{ point.closingBalance | appCurrency }}</strong>
-                    </div>
+                  @for (todo of insightTodoItems; track trackByIndex($index, todo)) {
+                    <article
+                      class="rounded-[10px] border px-2 py-2 text-[0.8125rem]"
+                [ngClass]="todo.severity === 'danger'
+                  ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
+                  : todo.severity === 'warn'
+                    ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
+                    : 'border-sky-300/60 bg-sky-500/10 text-[var(--primary-text)]'">
+                      <div class="flex flex-wrap items-center justify-between gap-2">
+                        <p class="m-0 flex-1">{{ todo.text }}</p>
+                        <a
+                          class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[0.75rem] font-semibold text-[var(--text)]"
+                          [routerLink]="todo.route"
+                          [queryParams]="todo.queryParams">
+                          {{ todo.actionLabel }}
+                        </a>
+                      </div>
+                    </article>
                   }
                 </div>
               } @else {
-                <p class="mt-2 text-[0.8125rem] text-[var(--text-tertiary)]">Sem eventos futuros no período selecionado.</p>
+                <p class="mt-2 text-[0.8125rem] text-[var(--text-tertiary)]">Sem pendências acionáveis no momento.</p>
               }
             </article>
-          }
-        </div>
-        <div class="grid grid-cols-1 gap-2 grid-cols-2">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-3)]">
-            <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Comparação com mês anterior</p>
-            <ul class="m-0 mt-2 list-disc pl-[var(--space-6)] text-[0.8125rem] text-[var(--text-secondary)]">
-              @for (item of insightComparison; track trackByIndex($index, item)) {
-                <li>{{ item }}</li>
-              }
-            </ul>
+            @if (cashflowProjection) {
+              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Simulação diária</p>
+                    <strong class="mt-1 block text-[0.9375rem] font-semibold text-[var(--text)]">
+                      Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | appCurrency }}
+                    </strong>
+                  </div>
+                  <span class="text-[0.75rem] text-[var(--text-tertiary)]">
+                    Menor saldo:
+                    {{ cashflowProjection.lowestBalance | appCurrency }}
+                  </span>
+                </div>
+                @if (projectionHighlights.length) {
+                  <div class="mt-2 grid gap-2">
+                    @for (point of projectionHighlights; track trackByIndex($index, point)) {
+                      <div
+                        class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[0.8125rem]"
+                [ngClass]="point.tone === 'danger'
+                  ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
+                  : point.tone === 'warn'
+                    ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
+                    : 'border-emerald-300/60 bg-emerald-500/10 text-[var(--income-text)]'">
+                        <strong>{{ point.dateLabel }}</strong>
+                        <span>+{{ point.incomesAmount | appCurrency }} / -{{ point.expensesAmount | appCurrency }}</span>
+                        <strong>{{ point.closingBalance | appCurrency }}</strong>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="mt-2 text-[0.8125rem] text-[var(--text-tertiary)]">Sem eventos futuros no período selecionado.</p>
+                }
+              </article>
+            }
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-3)]">
-            <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">O que mudou hoje</p>
-            <ul class="m-0 mt-2 list-disc pl-[var(--space-6)] text-[0.8125rem] text-[var(--text-secondary)]">
-              @for (item of insightChangesToday; track trackByIndex($index, item)) {
-                <li>{{ item }}</li>
-              }
-            </ul>
+          <div class="grid grid-cols-1 gap-2 grid-cols-2">
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-3)]">
+              <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Comparação com mês anterior</p>
+              <ul class="m-0 mt-2 list-disc pl-[var(--space-6)] text-[0.8125rem] text-[var(--text-secondary)]">
+                @for (item of insightComparison; track trackByIndex($index, item)) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-3)]">
+              <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">O que mudou hoje</p>
+              <ul class="m-0 mt-2 list-disc pl-[var(--space-6)] text-[0.8125rem] text-[var(--text-secondary)]">
+                @for (item of insightChangesToday; track trackByIndex($index, item)) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
           </div>
-        </div>
+        }
         <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
           <p class="text-[var(--fs-meta)] text-[var(--text-tertiary)]">Sugestões rápidas</p>
           <ul class="mt-2 list-disc pl-[var(--space-6)] text-[var(--fs-meta)] text-[var(--text-tertiary)]">
@@ -440,7 +737,7 @@
       </div>
     </div>
   }
-  @if (metasResumo.total) {
+  @if (hasAccess('Intermediate') && metasResumo.total) {
     <app-section-card
       title="Metas"
       description="Resumo rápido das metas anuais cadastradas.">
@@ -551,32 +848,34 @@
   @if (!isLoadingDashboard) {
     <div class="dashboard-secondary">
       <app-dashboard-activity-board [activities]="recentTransactions" [reminders]="upcomingDueItems" />
-      <div class="dashboard-secondary__categories">
-        <app-category-breakdown-card
-          variant="expense"
-          title="Despesas por categoria"
-          subtitle="Veja onde seu dinheiro foi gasto no período."
-          [total]="expenseCategoryTotal"
-          [slices]="expenseCategorySlices"
-          [showInsights]="hasAccess('Intermediate')"
-          emptyText="Você ainda não possui despesas categorizadas neste período."
-          emptyCtaLabel="Cadastrar despesa"
-          emptyCtaLink="/despesas"
-          detailsRoute="/despesas"
-          detailsLabel="Ver detalhes" />
-        <app-category-breakdown-card
-          variant="income"
-          title="Receitas por categoria"
-          subtitle="Entenda de onde veio sua renda no período."
-          [total]="incomeSourceTotal"
-          [slices]="incomeSourceSlices"
-          [showInsights]="hasAccess('Intermediate')"
-          emptyText="Você ainda não possui receitas categorizadas neste período."
-          emptyCtaLabel="Cadastrar receita"
-          emptyCtaLink="/receitas"
-          detailsRoute="/receitas"
-          detailsLabel="Ver detalhes" />
-      </div>
+      @if (hasAccess('Intermediate')) {
+        <div class="dashboard-secondary__categories">
+          <app-category-breakdown-card
+            variant="expense"
+            title="Despesas por categoria"
+            subtitle="Veja onde seu dinheiro foi gasto no período."
+            [total]="expenseCategoryTotal"
+            [slices]="expenseCategorySlices"
+            [showInsights]="true"
+            emptyText="Você ainda não possui despesas categorizadas neste período."
+            emptyCtaLabel="Cadastrar despesa"
+            emptyCtaLink="/despesas"
+            detailsRoute="/despesas"
+            detailsLabel="Ver detalhes" />
+          <app-category-breakdown-card
+            variant="income"
+            title="Receitas por categoria"
+            subtitle="Entenda de onde veio sua renda no período."
+            [total]="incomeSourceTotal"
+            [slices]="incomeSourceSlices"
+            [showInsights]="true"
+            emptyText="Você ainda não possui receitas categorizadas neste período."
+            emptyCtaLabel="Cadastrar receita"
+            emptyCtaLink="/receitas"
+            detailsRoute="/receitas"
+            detailsLabel="Ver detalhes" />
+        </div>
+      }
     </div>
   }
 </section>

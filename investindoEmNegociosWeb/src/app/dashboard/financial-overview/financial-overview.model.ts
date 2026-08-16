@@ -70,9 +70,9 @@ export type CurrencyFormatter = (value: number) => string;
 
 const PLAN_LABELS: Record<UserRole, string> = {
   Basic: 'Essencial',
-  Intermediate: 'Inteligente',
-  Advanced: 'Completo',
-  Admin: 'Completo'
+  Intermediate: 'Controle',
+  Advanced: 'Patrimônio',
+  Admin: 'Patrimônio'
 };
 
 const DELTA_PERIOD_LABELS: Record<OverviewPeriodo, string> = {

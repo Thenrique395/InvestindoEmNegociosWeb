@@ -88,17 +88,11 @@
               <td class="py-2 px-3">{{ signedAmount(item) }}</td>
               <td class="py-2 px-3">{{ categorySuggestionLabel(item) }}</td>
               <td class="py-2 px-3">
-                <select
-                  class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
-                  [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
-                  (ngModelChange)="onCategoryChange(item, $event, 'OFX')">
-                  <option [ngValue]="null">Sem categoria</option>
-                  @for (category of categoriesForItem(item); track category.id) {
-                    <option [ngValue]="category.id">
-                      {{ category.name }}
-                    </option>
-                  }
-                </select>
+                <app-select-menu
+                  ariaLabel="Categoria da transação OFX"
+                  [options]="categoryOptionsForItem(item)"
+                  [ngModel]="selectedCategoryValue(item)"
+                  (ngModelChange)="onCategorySelectionChange(item, $event, 'OFX')" />
               </td>
               <td class="py-2 px-3">
             <span [ngClass]="{
@@ -158,17 +152,11 @@
               <td class="py-2 px-3">{{ signedAmount(item) }}</td>
               <td class="py-2 px-3">{{ categorySuggestionLabel(item) }}</td>
               <td class="py-2 px-3">
-                <select
-                  class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--text)]"
-                  [ngModel]="item.categoryId ?? item.suggestedCategory?.categoryId ?? null"
-                  (ngModelChange)="onCategoryChange(item, $event, 'CSV')">
-                  <option [ngValue]="null">Sem categoria</option>
-                  @for (category of categoriesForItem(item); track category.id) {
-                    <option [ngValue]="category.id">
-                      {{ category.name }}
-                    </option>
-                  }
-                </select>
+                <app-select-menu
+                  ariaLabel="Categoria da transação CSV"
+                  [options]="categoryOptionsForItem(item)"
+                  [ngModel]="selectedCategoryValue(item)"
+                  (ngModelChange)="onCategorySelectionChange(item, $event, 'CSV')" />
               </td>
               <td class="py-2 px-3">
             <span [ngClass]="{

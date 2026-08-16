@@ -7,7 +7,8 @@ import { buildConicGradient } from '../../utils/home-insight.utils';
 import {
   categoryCountLabel,
   CategorySlice,
-  CategoryVariant
+  CategoryVariant,
+  hasSufficientCategoryDistribution
 } from './category-breakdown.model';
 
 @Component({
@@ -26,7 +27,7 @@ export class CategoryBreakdownCardComponent {
   readonly subtitle = input.required<string>();
   readonly total = input.required<number>();
   readonly slices = input.required<CategorySlice[]>();
-  /** Libera insight textual e comparação (planos Inteligente/Completo). */
+  /** Libera insight textual e comparação (planos Controle/Patrimônio). */
   readonly showInsights = input(false);
   readonly emptyText = input.required<string>();
   readonly emptyCtaLabel = input.required<string>();
@@ -35,8 +36,13 @@ export class CategoryBreakdownCardComponent {
   readonly detailsLabel = input.required<string>();
 
   readonly hasData = computed(() => this.slices().length > 0);
+  readonly hasDistributionData = computed(() => hasSufficientCategoryDistribution(this.slices()));
   readonly categoryCount = computed(() => this.slices().length);
   readonly countLabel = computed(() => categoryCountLabel(this.categoryCount()));
+  readonly insufficientText = computed(() => {
+    const noun = this.variant() === 'expense' ? 'despesas' : 'receitas';
+    return `A distribuição começa a aparecer quando houver pelo menos 3 categorias de ${noun} movimentadas no período.`;
+  });
   readonly chartBackground = computed(() => buildConicGradient(this.slices()));
   readonly totalLabel = computed(() => this.format(this.total()));
   readonly compactTotalLabel = computed(() => this.compactFormat(this.total()));

@@ -7,13 +7,12 @@ import { ReportsService, CategoryExpenseResponse, MonthlySummaryReportResponse }
 import { formatCurrencyValue } from '../utils/locale-utils';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
-import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut-chart.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
-import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.model';
+import { CategoryExpenseBar, buildExpenseCategoryBars, buildTopExpenses } from './reports-overview.model';
 
 @Component({
   selector: 'app-relatorios',
@@ -22,7 +21,6 @@ import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.mod
     CommonModule,
     AppCurrencyPipe,
     UiStateComponent,
-    DonutChartComponent,
     PageHeaderComponent,
     TransactionSummaryCardComponent,
     UsageBarComponent,
@@ -61,8 +59,8 @@ export class RelatoriosComponent implements OnInit {
 
   get monthName(): string { return this.months[this.month - 1]; }
 
-  get expensesDonutItems(): DonutChartItem[] {
-    return buildExpenseDonutItems(this.report()?.expensesByCategory);
+  get expenseCategoryBars(): CategoryExpenseBar[] {
+    return buildExpenseCategoryBars(this.report()?.expensesByCategory);
   }
 
   get topExpenses(): CategoryExpenseResponse[] {

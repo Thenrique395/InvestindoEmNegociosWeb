@@ -29,6 +29,10 @@
   gap: var(--stack-gap);
 }
 
+.mobile-bottom-nav {
+  display: none;
+}
+
 .shell__backdrop {
   position: fixed;
   inset: 0;
@@ -43,7 +47,88 @@
   }
 
   .main {
-    padding: var(--space-9) var(--space-9) var(--space-12);
+    padding: var(--space-9) var(--space-9) calc(var(--space-12) + 76px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-bottom-nav {
+    position: fixed;
+    right: var(--space-5);
+    bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+    left: var(--space-5);
+    z-index: 1300;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) 58px;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 64px;
+    padding: var(--space-3);
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: var(--shadow-dropdown);
+    backdrop-filter: blur(18px);
+  }
+
+  .mobile-bottom-nav__item,
+  .mobile-bottom-nav__fab {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    min-width: 0;
+    height: 52px;
+    border-radius: var(--radius-control);
+    color: var(--text-tertiary);
+    font: inherit;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .mobile-bottom-nav__item {
+    border: 1px solid transparent;
+    background: transparent;
+    transition: background var(--dur-hover) ease, border-color var(--dur-hover) ease, color var(--dur-hover) ease;
+
+    &:hover,
+    &.is-active {
+      border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+      background: var(--primary-tint);
+      color: var(--primary-text);
+    }
+  }
+
+  .mobile-bottom-nav__icon {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .mobile-bottom-nav__label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-bottom-nav__fab {
+    border: none;
+    background: var(--primary);
+    color: var(--on-primary);
+    cursor: pointer;
+    box-shadow: var(--shadow-dropdown);
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 

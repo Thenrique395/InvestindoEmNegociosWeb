@@ -34,9 +34,9 @@ describe('financial-overview.model', () => {
   describe('planoComercialLabel', () => {
     it('mapeia roles internos para nomes comerciais', () => {
       expect(planoComercialLabel('Basic')).toBe('Essencial');
-      expect(planoComercialLabel('Intermediate')).toBe('Inteligente');
-      expect(planoComercialLabel('Advanced')).toBe('Completo');
-      expect(planoComercialLabel('Admin')).toBe('Completo');
+      expect(planoComercialLabel('Intermediate')).toBe('Controle');
+      expect(planoComercialLabel('Advanced')).toBe('Patrimônio');
+      expect(planoComercialLabel('Admin')).toBe('Patrimônio');
       expect(planoComercialLabel(null)).toBe('Essencial');
     });
   });

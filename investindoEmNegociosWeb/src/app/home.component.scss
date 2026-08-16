@@ -15,6 +15,29 @@
   gap: 0.875rem;
 }
 
+.history-start {
+  display: grid;
+  gap: 0.35rem;
+  padding: var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+}
+
+.history-start strong {
+  color: var(--text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+}
+
+.history-start p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-control);
+}
+
 .networth-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

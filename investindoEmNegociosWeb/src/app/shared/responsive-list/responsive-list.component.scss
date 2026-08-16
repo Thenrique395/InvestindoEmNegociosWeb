@@ -107,6 +107,28 @@
   white-space: nowrap;
 }
 
+.responsive-list__cell:last-child,
+.responsive-list__item:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: inherit;
+  box-shadow: -12px 0 18px -18px color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.responsive-list__head .responsive-list__cell:last-child {
+  z-index: 3;
+  background: var(--surface-sunken);
+}
+
+.responsive-list__body .responsive-list__item:last-child {
+  background: var(--surface);
+}
+
+.responsive-list__row:hover .responsive-list__item:last-child {
+  background: var(--surface-sunken);
+}
+
 .responsive-list__check {
   inline-size: 15px;
   block-size: 15px;
@@ -183,6 +205,12 @@
 
   .responsive-list__body tr + tr td {
     border-top: none;
+  }
+
+  .responsive-list__cell:last-child,
+  .responsive-list__item:last-child {
+    position: static;
+    box-shadow: none;
   }
 
   .responsive-list__item {

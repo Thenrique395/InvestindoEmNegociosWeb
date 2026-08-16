@@ -13,19 +13,18 @@
     </app-form-field>
 
     <app-form-field label="Tipo" [error]="typeError">
-      <select [(ngModel)]="form.type" (blur)="onTouch('type')">
-        @for (t of accountTypes; track t) {
-          <option [value]="t">{{ t }}</option>
-        }
-      </select>
+      <app-select-menu
+        [options]="accountTypeOptions"
+        [(ngModel)]="form.type"
+        ariaLabel="Tipo da conta"
+        (valueChange)="onTouch('type')" />
     </app-form-field>
 
     <app-form-field label="Moeda">
-      <select [(ngModel)]="form.currency">
-        @for (c of currencies; track c) {
-          <option [value]="c">{{ c }}</option>
-        }
-      </select>
+      <app-select-menu
+        [options]="currencyOptions"
+        [(ngModel)]="form.currency"
+        ariaLabel="Moeda da conta" />
     </app-form-field>
 
     <app-form-field label="Saldo inicial" [error]="balanceError">

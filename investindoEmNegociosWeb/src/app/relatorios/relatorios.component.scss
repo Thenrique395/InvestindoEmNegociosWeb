@@ -52,6 +52,58 @@
   font-weight: var(--fw-semibold);
 }
 
+.category-bars {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.category-bar {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+}
+
+.category-bar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.category-bar__name {
+  min-width: 0;
+  color: var(--text);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-bar__meta {
+  flex: none;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.category-bar__track {
+  height: 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  overflow: hidden;
+}
+
+.category-bar__fill {
+  display: block;
+  height: 100%;
+  min-width: 0.35rem;
+  border-radius: inherit;
+}
+
 :host ::ng-deep .relatorios-share-column {
   width: 32%;
   min-width: 11rem;
@@ -114,6 +166,22 @@
 }
 
 @media (max-width: 640px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category-bar__head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .category-bar__meta {
+    flex: initial;
+  }
+}
+
+@media (max-width: 360px) {
   .summary-grid {
     grid-template-columns: minmax(0, 1fr);
   }

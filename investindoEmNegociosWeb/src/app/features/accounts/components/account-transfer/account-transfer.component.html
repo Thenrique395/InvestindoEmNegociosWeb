@@ -14,29 +14,21 @@
     <div class="grid gap-3 grid-cols-5">
       <label class="grid gap-1 text-sm text-[var(--text)]">
         Conta origem
-        <select
+        <app-select-menu
+          ariaLabel="Conta de origem"
+          placeholder="Selecione"
+          [options]="fromAccountOptions"
           [ngModel]="value.fromAccountId"
-          (ngModelChange)="update('fromAccountId', $event)"
-          class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] px-3 text-sm">
-          @for (account of accounts; track account.id) {
-            <option [ngValue]="account.id" [disabled]="!account.isActive">
-              {{ account.name }}
-            </option>
-          }
-        </select>
+          (ngModelChange)="update('fromAccountId', $event)" />
       </label>
       <label class="grid gap-1 text-sm text-[var(--text)]">
         Conta destino
-        <select
+        <app-select-menu
+          ariaLabel="Conta de destino"
+          placeholder="Selecione"
+          [options]="toAccountOptions"
           [ngModel]="value.toAccountId"
-          (ngModelChange)="update('toAccountId', $event)"
-          class="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] px-3 text-sm">
-          @for (account of accounts; track account.id) {
-            <option [ngValue]="account.id" [disabled]="!account.isActive || account.id === value.fromAccountId">
-              {{ account.name }}
-            </option>
-          }
-        </select>
+          (ngModelChange)="update('toAccountId', $event)" />
       </label>
       <label class="grid gap-1 text-sm text-[var(--text)]">
         Valor

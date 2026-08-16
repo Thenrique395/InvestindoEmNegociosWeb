@@ -1,5 +1,4 @@
 import { CategoryExpenseResponse } from '../reports.service';
-import { DonutChartItem } from '../shared/donut-chart/donut-chart.component';
 
 /**
  * Derivações puras do relatório mensal. Não inventa valores: tudo vem do
@@ -14,12 +13,19 @@ export const CATEGORY_PALETTE = [
   'var(--chart-5)'
 ];
 
-/** Monta os itens do donut de despesas por categoria com a cor da paleta. */
-export function buildExpenseDonutItems(categories: CategoryExpenseResponse[] | null | undefined): DonutChartItem[] {
+export interface CategoryExpenseBar {
+  categoryName: string;
+  amount: number;
+  percentageOfTotal: number;
+  color: string;
+}
+
+/** Monta barras de despesas por categoria, conforme handoff: lista longa lê melhor em barra. */
+export function buildExpenseCategoryBars(categories: CategoryExpenseResponse[] | null | undefined): CategoryExpenseBar[] {
   return (categories || []).map((cat, index) => ({
-    label: cat.categoryName,
-    value: cat.amount,
-    percent: cat.percentageOfTotal,
+    categoryName: cat.categoryName,
+    amount: cat.amount,
+    percentageOfTotal: Math.max(0, Math.min(100, Number(cat.percentageOfTotal || 0))),
     color: CATEGORY_PALETTE[index % CATEGORY_PALETTE.length]
   }));
 }

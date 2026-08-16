@@ -67,6 +67,15 @@ describe('RelatoriosComponent', () => {
     expect(component.topExpenses.map((c) => c.categoryName)).toEqual(['Mercado', 'Moradia']);
   });
 
+  it('deriva barras de categorias a partir do relatório', () => {
+    const { component } = createComponent();
+
+    component.ngOnInit();
+
+    expect(component.expenseCategoryBars[0].categoryName).toBe('Moradia');
+    expect(component.expenseCategoryBars[0].percentageOfTotal).toBe(50);
+  });
+
   it('limpa o erro ao recarregar com sucesso', () => {
     const { component, reportsService } = createComponent();
     reportsService.getMonthlySummary.and.returnValue(throwError(() => new Error('falhou')));

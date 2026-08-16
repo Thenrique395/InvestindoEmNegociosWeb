@@ -23,7 +23,7 @@ import { SelectMenuComponent } from '../shared/select-menu/select-menu.component
 import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
 import { KpiStripComponent } from '../shared/kpi-strip/kpi-strip.component';
 import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
-import { DataTableComponent, DataTableCellDirective } from '../shared/data-table/data-table.component';
+import { DataTableComponent } from '../shared/data-table/data-table.component';
 import { ChartBarsComponent } from '../shared/charts/chart-bars/chart-bars.component';
 import { ChartLineComponent } from '../shared/charts/chart-line/chart-line.component';
 import { MoneyComponent } from '../shared/money/money.component';
@@ -82,7 +82,6 @@ interface DemoListItem {
     KpiStripComponent,
     ProgressBarComponent,
     DataTableComponent,
-    DataTableCellDirective,
     ChartBarsComponent,
     ChartLineComponent,
     MoneyComponent,

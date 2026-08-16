@@ -23,6 +23,7 @@ import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
+import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { installmentStatusTone, InstallmentStatusTone } from '../utils/status';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import {
@@ -56,6 +57,7 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
     FormFieldComponent,
     StatusBadgeComponent,
     FilterBarComponent,
+    SelectMenuComponent,
     ConfirmSheetComponent,
 ],
   templateUrl: './cartoes.component.html',
@@ -125,6 +127,31 @@ export class CartoesComponent implements OnInit {
     return this.uiPermissions.canViewCardStatements();
   }
 
+  get statementCardOptions(): SelectMenuOption[] {
+    return this.cards().map((card) => ({
+      value: card.id,
+      label: `${card.nome} •••• ${this.finalCartao(card.numero)}`,
+    }));
+  }
+
+  get statementMonthValue(): string {
+    return this.statementMonth == null ? '' : String(this.statementMonth);
+  }
+
+  get statementMonthOptions(): SelectMenuOption[] {
+    return [
+      { value: '', label: 'Todos' },
+      ...Array.from({ length: 12 }, (_, index) => {
+        const month = index + 1;
+        return { value: String(month), label: this.statementMonthLabel(month) };
+      }),
+    ];
+  }
+
+  get brandOptions(): SelectMenuOption[] {
+    return this.brands.map((brand) => ({ value: String(brand.id), label: brand.name }));
+  }
+
   get totalOpenStatements(): number {
     return this.statementCycles.reduce((sum, cycle) => sum + (cycle.totalOpen || 0), 0);
   }
@@ -157,6 +184,10 @@ export class CartoesComponent implements OnInit {
 
   statementStatus(cycle: CardStatementCycleDto): StatementStatus {
     return statementStatusFor(cycle, new Date());
+  }
+
+  onStatementMonthChange(value: string): void {
+    this.statementMonth = value ? Number(value) : null;
   }
 
   statementStatusLabel(status: StatementStatus): string {
