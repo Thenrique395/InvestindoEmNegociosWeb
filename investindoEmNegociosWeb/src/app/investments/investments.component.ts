@@ -12,7 +12,7 @@ import {
 } from '../investments.service';
 import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
-import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
+import { formatCurrencyValue, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { SUPPORTED_CURRENCIES } from '../utils/locale-settings';
 import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -74,7 +74,6 @@ type RentabilidadeMonthPoint = ProfitabilityPoint;
 })
 export class InvestmentsComponent implements OnInit {
   private readonly tabStorageKey = 'investments.activeTab';
-  private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   // A9: estado assíncrono via signal, exposto por getter/setter para manter as leituras
   // e escritas existentes intactas (o setter dirige o signal → re-render OnPush headless).
@@ -429,7 +428,7 @@ export class InvestmentsComponent implements OnInit {
     if (this.metaPatrimonio > 0 && this.progressoMeta < 100) {
       return {
         titulo: 'Progresso da meta de patrimônio',
-        descricao: `Faltam ${this.currencyFormatter.format(this.faltaMeta)} para a meta que você definiu.`,
+        descricao: `Faltam ${formatCurrencyValue(this.faltaMeta)} para a meta que você definiu.`,
         cta: 'Ver evolução',
         targetId: 'sec-evolucao'
       };
@@ -1099,10 +1098,10 @@ export class InvestmentsComponent implements OnInit {
   tooltipMes(item: ChartBucket): string {
     return [
       `${item.label}`,
-      `Aportes: ${this.currencyFormatter.format(item.aporte)}`,
-      `Resgates: ${this.currencyFormatter.format(item.resgate)}`,
-      `Proventos: ${this.currencyFormatter.format(item.proventos)}`,
-      `Saldo: ${this.currencyFormatter.format(item.saldo)}`
+      `Aportes: ${formatCurrencyValue(item.aporte)}`,
+      `Resgates: ${formatCurrencyValue(item.resgate)}`,
+      `Proventos: ${formatCurrencyValue(item.proventos)}`,
+      `Saldo: ${formatCurrencyValue(item.saldo)}`
     ].join('\n');
   }
 
@@ -1174,7 +1173,7 @@ export class InvestmentsComponent implements OnInit {
     }
 
     const custos = this.cadastroCustos > 0 ? this.cadastroCustos : 0;
-    const noteParts = [this.venda.note?.trim(), custos > 0 ? `Custos: ${this.currencyFormatter.format(custos)}` : ''].filter(Boolean);
+    const noteParts = [this.venda.note?.trim(), custos > 0 ? `Custos: ${formatCurrencyValue(custos)}` : ''].filter(Boolean);
 
     try {
       await firstValueFrom(this.investments.addMovement(this.vendaPositionId, {
@@ -1203,7 +1202,7 @@ export class InvestmentsComponent implements OnInit {
   salvarMovimento(): void {
     if (!this.selectedId || this.movimento.quantity <= 0 || this.movimento.price <= 0) return;
     const custos = this.movimentoCustos > 0 ? this.movimentoCustos : 0;
-    const noteParts = [this.movimento.note?.trim(), custos > 0 ? `Custos: ${this.currencyFormatter.format(custos)}` : ''].filter(Boolean);
+    const noteParts = [this.movimento.note?.trim(), custos > 0 ? `Custos: ${formatCurrencyValue(custos)}` : ''].filter(Boolean);
     this.investments.addMovement(this.selectedId, { ...this.movimento, note: noteParts.join(' | ') || undefined }).subscribe({
       next: () => {
         this.mode = 'create';

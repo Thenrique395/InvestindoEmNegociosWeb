@@ -102,11 +102,13 @@
   height: 18px;
 }
 
-/* Faixa unida de indicadores — COMPONENTES.md §3.1(b).
-   `flex` com quebra, NUNCA `grid` com `auto-fit`: com 5 KPIs o grid deixava
-   célula vazia à direita sempre que a contagem não dividia pelas colunas.
-   Com flex, a última linha cresce e preenche. */
-.overview__grid {
+/* Poppins com tracking negativo e `tabular-nums`: numa faixa de 5 valores,
+   dígitos de largura variável fazem as colunas dançarem a cada atualização. */
+/* A primeira célula é a resposta principal da tela — ganha destaque de
+   tamanho e um gradiente sutil, como no protótipo. */
+/* Esqueleto da faixa: repete a moldura do app-kpi-strip sem instanciá-lo —
+   o primitivo exige `items`, e não há dados ainda. */
+.overview__skeleton-strip {
   display: flex;
   flex-wrap: wrap;
   background: var(--surface);
@@ -115,190 +117,13 @@
   overflow: hidden;
 }
 
-.overview-card {
-  --tone: var(--primary);
-  --tone-text: var(--primary-text);
-  --tone-soft: var(--primary-tint);
-  --tone-weak: var(--primary-tint);
-
+.overview-skeleton-cell {
   flex: 1 1 200px;
   min-width: 0;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
   gap: var(--space-4);
   padding: var(--card-padding);
-  border: none;
-  border-radius: 0;
-  /* Divisor à direita E abaixo numa só declaração: cobre a quebra de linha
-     sem borda solta na última célula. */
   box-shadow: var(--shadow-cell-divider);
-  background: var(--surface);
-}
-
-.overview-card[data-tone='success'] {
-  --tone: var(--income);
-  --tone-text: var(--income-text);
-  --tone-soft: var(--income-tint);
-  --tone-weak: var(--income-tint);
-}
-
-.overview-card[data-tone='danger'] {
-  --tone: var(--expense);
-  --tone-text: var(--expense-text);
-  --tone-soft: var(--expense-tint);
-  --tone-weak: var(--expense-tint);
-}
-
-.overview-card[data-tone='warning'] {
-  --tone: var(--warning);
-  --tone-text: var(--warning-text);
-  --tone-soft: var(--warning-tint);
-  --tone-weak: var(--warning-tint);
-}
-
-.overview-card[data-tone='info'] {
-  --tone: var(--primary);
-  --tone-text: var(--primary-text);
-  --tone-soft: var(--primary-tint);
-  --tone-weak: var(--primary-tint);
-}
-
-.overview-card[data-tone='neutral'] {
-  --tone: var(--text-tertiary);
-  --tone-text: var(--text-secondary);
-  --tone-soft: var(--border-strong);
-  --tone-weak: var(--surface-sunken);
-}
-
-.overview-card__head {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.7rem;
-}
-
-.overview-card__icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--tone-soft);
-  border-radius: var(--radius-control);
-  background: var(--tone-weak);
-  color: var(--tone-text);
-}
-
-.overview-card__icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.overview-card__titles {
-  flex: 1;
-  min-width: 0;
-}
-
-.overview-card__title {
-  margin: 0;
-  color: var(--text);
-  font-size: var(--fs-meta);
-  font-weight: var(--fw-semibold);
-  line-height: var(--lh-tight);
-}
-
-.overview-card__question {
-  margin: 0.2rem 0 0;
-  color: var(--text-tertiary);
-  font-size: var(--fs-caption);
-  line-height: var(--lh-tight);
-}
-
-.overview-card__value-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-/* Poppins com tracking negativo e `tabular-nums`: numa faixa de 5 valores,
-   dígitos de largura variável fazem as colunas dançarem a cada atualização. */
-.overview-card__value {
-  color: var(--text);
-  font-family: var(--font-display);
-  font-size: var(--fs-kpi-strip);
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--ls-tighter);
-  line-height: var(--lh-tight);
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-/* A primeira célula é a resposta principal da tela — ganha destaque de
-   tamanho e um gradiente sutil, como no protótipo. */
-.overview-card:first-child {
-  background: linear-gradient(180deg, rgba(0, 46, 62, 0.04), transparent);
-}
-
-.overview-card:first-child .overview-card__value {
-  font-size: var(--fs-kpi);
-}
-
-.overview-card__delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-pill);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-semibold);
-  line-height: var(--lh-tight);
-}
-
-.overview-card__delta--favorable {
-  background: var(--income-tint);
-  color: var(--income-text);
-}
-
-.overview-card__delta--unfavorable {
-  background: var(--expense-tint);
-  color: var(--expense-text);
-}
-
-.overview-card__note {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  margin: 0;
-  color: var(--text-tertiary);
-  font-size: var(--fs-caption);
-  line-height: var(--lh-control);
-}
-
-.overview-card__note-line {
-  display: block;
-}
-
-.overview-card__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  justify-self: start;
-  color: var(--tone-text);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-semibold);
-  line-height: var(--lh-tight);
-  text-decoration: none;
-  transition: gap 160ms ease;
-}
-
-.overview-card__link:hover {
-  gap: 0.45rem;
-  text-decoration: underline;
-}
-
-.overview-card--skeleton {
-  grid-template-rows: none;
-  align-content: start;
 }
 
 .overview-skeleton {

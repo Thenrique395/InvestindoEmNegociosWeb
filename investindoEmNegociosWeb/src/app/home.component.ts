@@ -8,7 +8,7 @@ import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { Router, RouterModule } from '@angular/router';
 import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone } from './utils/status';
 import { OnboardingService } from './onboarding.service';
-import { formatMonthLabel, formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
+import { formatCompactCurrency, formatCurrencyValue, formatMonthLabel, formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 import {
   calculateInsightHealthScore,
   dateKey,
@@ -1212,14 +1212,8 @@ export class HomeComponent implements OnInit {
   }
 
   formatChartAxisValue(value: number): string {
-    if (Math.abs(value) < 1) return 'R$ 0';
-
-    const sign = value < 0 ? '-' : '';
-    const abs = Math.abs(value);
-    const compact = abs >= 1000
-      ? `${(abs / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mil`
-      : abs.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
-    return `${sign}R$ ${compact}`;
+    if (Math.abs(value) < 1) return formatCurrencyValue(0);
+    return formatCompactCurrency(value);
   }
 
   get saldoDelta(): number {

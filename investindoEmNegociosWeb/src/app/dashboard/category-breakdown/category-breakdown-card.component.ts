@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FinancialPrivacyService } from '../../financial-privacy.service';
-import { formatCurrencyValue } from '../../utils/locale-utils';
+import { formatCompactCurrency, formatCurrencyValue } from '../../utils/locale-utils';
 import { buildConicGradient } from '../../utils/home-insight.utils';
 import {
   categoryCountLabel,
@@ -58,9 +58,6 @@ export class CategoryBreakdownCardComponent {
 
   private compactFormat(value: number): string {
     if (this.financialPrivacy.hidden()) return '••••••';
-    const abs = Math.abs(value || 0);
-    if (abs < 1000) return formatCurrencyValue(value);
-    const sign = value < 0 ? '-' : '';
-    return `${sign}R$ ${(abs / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mil`;
+    return formatCompactCurrency(value);
   }
 }

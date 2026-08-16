@@ -38,6 +38,9 @@
 
   --border:            #123544;
   --border-inner:      #0E3948;
+
+  /* No escuro a lavagem clareia, em vez de escurecer sobre fundo já escuro. */
+  --kpi-feature-wash:  rgba(255, 255, 255, 0.035);
   --border-row:        #0E3948;
   --border-strong:     #123544;
   --border-hover:      #1B4A5C;

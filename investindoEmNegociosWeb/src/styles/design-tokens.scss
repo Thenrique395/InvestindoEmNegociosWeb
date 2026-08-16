@@ -162,6 +162,9 @@
   --shadow-focus:      0 0 0 4px var(--primary-ring);
   /* divisor de faixa que quebra em várias linhas: */
   --shadow-cell-divider: 1px 0 0 var(--border-inner), 0 1px 0 var(--border-inner);
+  /* Lavagem da primeira célula da faixa unida (COMPONENTES.md §3.1(b)). Token,
+     e não `rgba(0,46,62,.04)` fixo: no tema escuro aquele valor some. */
+  --kpi-feature-wash:    rgba(0, 46, 62, 0.04);
 
   /* ---------- ALTURAS FIXAS -------------------------------------------- */
   --h-topbar:        56px;

@@ -1,25 +1,54 @@
-@for (item of items(); track item.label; let first = $first) {
-  <div class="kpi" [class.kpi--feature]="first && featureFirst()">
+@for (item of items(); track item.key; let first = $first) {
+  <article class="kpi" [attr.data-tone]="item.tone || 'primary'" [class.kpi--feature]="first && featureFirst()">
     <div class="kpi__head">
-      @if (item.icon) {
-        <span class="kpi__icon" [attr.data-tone]="item.tone || 'neutral'" aria-hidden="true">
-          {{ item.icon }}
+      @if (iconTemplate()) {
+        <span class="kpi__icon" aria-hidden="true">
+          <ng-container [ngTemplateOutlet]="iconTemplate()!" [ngTemplateOutletContext]="{ $implicit: item.key }" />
         </span>
       }
-      <span class="kpi__label">{{ item.label }}</span>
-      <button
-        type="button"
-        class="kpi__help"
-        [attr.title]="item.tooltip"
-        [attr.aria-label]="'Como ' + item.label + ' é calculado'">
-        ?
-      </button>
+      <div class="kpi__titles">
+        <h3 class="kpi__label">{{ item.label }}</h3>
+        @if (item.question) {
+          <p class="kpi__question">{{ item.question }}</p>
+        }
+      </div>
+      <app-tooltip [label]="'Como ' + item.label + ' é calculado'" [text]="item.tooltip" />
     </div>
 
-    <p class="kpi__value tabular" [attr.data-tone]="item.tone || 'neutral'">{{ item.value }}</p>
+    <div class="kpi__value-row">
+      <strong class="kpi__value">{{ item.value }}</strong>
+      @if (item.delta; as delta) {
+        <span
+          class="kpi__delta"
+          [class.kpi__delta--favorable]="delta.favorable"
+          [class.kpi__delta--unfavorable]="!delta.favorable">
+          <svg viewBox="0 0 24 24" width="12" height="12" role="presentation" focusable="false" aria-hidden="true">
+            @if (delta.direction === 'up') {
+              <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            } @else {
+              <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            }
+          </svg>
+          {{ delta.text }}
+        </span>
+      }
+    </div>
 
     @if (item.note) {
-      <p class="kpi__note">{{ item.note }}</p>
+      <p class="kpi__note">
+        @for (linha of notaEmLinhas(item.note); track $index) {
+          <span class="kpi__note-line">{{ linha }}</span>
+        }
+      </p>
     }
-  </div>
+
+    @if (item.link; as link) {
+      <a class="kpi__link" [routerLink]="link.route">
+        {{ link.label || 'Ver detalhes' }}
+        <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    }
+  </article>
 }

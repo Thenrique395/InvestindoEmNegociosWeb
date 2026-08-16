@@ -21,7 +21,7 @@ import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.compon
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
-import { KpiStripComponent } from '../shared/kpi-strip/kpi-strip.component';
+import { KpiItem, KpiStripComponent } from '../shared/kpi-strip/kpi-strip.component';
 import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { ChartBarsComponent } from '../shared/charts/chart-bars/chart-bars.component';
 import { ChartLineComponent } from '../shared/charts/chart-line/chart-line.component';
@@ -370,11 +370,21 @@ if (!confirmed) return;`,
   demoCategoria = 'moradia';
   demoParcelas = 12;
 
-  readonly demoKpis = [
-    { label: 'Saldo disponível', value: 'R$ 12.480,35', note: 'Já descontado o comprometido', tooltip: 'Quanto sobrou até hoje.', tone: 'neutral' as const },
-    { label: 'Receitas', value: 'R$ 18.900,00', tooltip: 'Tudo que entrou no período.', tone: 'income' as const },
-    { label: 'Despesas', value: 'R$ 9.842,17', tooltip: 'Tudo que saiu ou vai sair.', tone: 'expense' as const },
-    { label: 'Comprometido', value: 'R$ 2.421,65', tooltip: 'Cartões, parcelas e contas futuras.', tone: 'warning' as const }
+  readonly demoKpis: KpiItem[] = [
+    {
+      key: 'saldo',
+      label: 'Saldo disponível',
+      question: 'Quanto posso gastar hoje?',
+      value: 'R$ 12.480,35',
+      note: 'Já descontado o comprometido',
+      tooltip: 'Saldo das contas menos as despesas em aberto.',
+      tone: 'neutral',
+      delta: { direction: 'up', favorable: true, text: '+8,2%' },
+      link: { route: '/contas', label: 'Ver contas' }
+    },
+    { key: 'receitas', label: 'Receitas', value: 'R$ 18.900,00', tooltip: 'Tudo que entrou no período.', tone: 'success' },
+    { key: 'despesas', label: 'Despesas', value: 'R$ 9.842,17', tooltip: 'Tudo que saiu ou vai sair.', tone: 'danger' },
+    { key: 'comprometido', label: 'Comprometido', value: 'R$ 2.421,65', tooltip: 'Cartões, parcelas e contas futuras.', tone: 'warning' }
   ];
 
   readonly demoSeries = [

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 import { RouterLink } from '@angular/router';
 import { FinancialPrivacyService } from '../../financial-privacy.service';
 import { UserRole } from '../../roles';
+import { KpiItem, KpiStripComponent } from '../../shared/kpi-strip/kpi-strip.component';
 import { TooltipComponent } from '../../shared/tooltip/tooltip.component';
 import { formatCurrencyValue } from '../../utils/locale-utils';
 import {
@@ -20,12 +21,30 @@ const PERIODO_OPTIONS: { value: OverviewPeriodo; label: string }[] = [
 @Component({
   selector: 'app-financial-overview',
   standalone: true,
-  imports: [RouterLink, TooltipComponent],
+  imports: [KpiStripComponent],
   templateUrl: './financial-overview.component.html',
   styleUrls: ['./financial-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FinancialOverviewComponent {
+  /**
+   * Adapta os cards do modelo para o contrato da faixa. O modelo continua sendo a fonte
+   * da semântica (tom, delta, rota); o primitivo só sabe desenhar.
+   */
+  readonly kpiItems = computed<KpiItem[]>(() =>
+    this.cards().map((card) => ({
+      key: card.id,
+      label: card.title,
+      question: card.question,
+      value: card.value,
+      note: card.note,
+      tooltip: card.tooltip ?? '',
+      tone: card.tone,
+      delta: card.delta,
+      link: card.detailsRoute ? { route: card.detailsRoute, label: card.detailsLabel } : undefined,
+    })),
+  );
+
   private readonly financialPrivacy = inject(FinancialPrivacyService);
 
   readonly data = input.required<FinancialOverviewInput>();

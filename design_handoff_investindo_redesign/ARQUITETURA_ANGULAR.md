@@ -166,6 +166,30 @@ O componente de tabela deriva `grid-template-columns` de `columns.map(c => c.wid
 
 ---
 
+### Emenda E2 — contrato real do `app-kpi-strip` (2026-08-16)
+
+Decidida na Fase 8.1 do `PLANO_REDESIGN.md`, durante a implementação.
+
+A seção 7 listava o `app-kpi-strip` como `items: KpiItem[]`, e `COMPONENTES.md` §3.1
+descrevia o tooltip da faixa como um `?` com atributo `title`. As duas coisas mudaram, por
+motivos encontrados na implementação:
+
+1. **O contrato era fino demais para as telas que o handoff atribui ao formato (b).** O
+   Dashboard precisa de `delta` (variação com direção e sinal), link "Ver detalhes", linha de
+   pergunta e **ícone SVG por indicador** — `KpiItem.icon` era uma string. Investimentos e
+   Calendário também usam ícone SVG. O `KpiItem` agora tem `key`, `question?`, `delta?` e
+   `link?`, e o ícone entra por `ng-template` com o `key` no contexto.
+
+2. **O `title` nativo saiu, em favor do `app-tooltip`.** `title` não abre em toque, não é
+   estilizável e não é anunciado de forma confiável por leitor de tela. O README §8 exige que
+   todo indicador explique seu cálculo — em celular, com `title`, essa explicação
+   simplesmente não existe. O `app-tooltip` cumpre o mesmo requisito em todos os dispositivos.
+
+A implementação veio da faixa que o Dashboard já tinha inline, que era a versão correta do
+§3.1(b) e mais completa que o primitivo original.
+
+---
+
 ### Emenda E1 — `app-responsive-list` no lugar do `app-data-table` (2026-08-16)
 
 Decidida na Fase 8.1 do `PLANO_REDESIGN.md`, durante a implementação.
