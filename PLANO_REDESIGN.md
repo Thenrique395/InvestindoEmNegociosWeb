@@ -1102,7 +1102,7 @@ reverter o commit da migração daquele par, não refazer tudo.
 |---|---|---|
 | `app-data-table` × `app-responsive-list` | **legado** | O legado dá a mesma garantia de coluna única **e** vira lista de cards no mobile, que o primitivo do handoff não cobria. 9 telas já dependiam dele. `app-data-table` **apagado**; handoff emendado (E1) |
 | `app-progress-bar` × `app-usage-bar` | **handoff** | ✅ feito. O legado só sabia consumo |
-| `app-kpi-strip` × `app-transaction-summary-card` | **handoff** | pendente |
+| `app-kpi-strip` × `app-transaction-summary-card` | **nenhum: não são um par** | ver correção abaixo |
 | `app-money` × formatação na tela | **handoff** | pendente |
 | `app-chart-line`/`bars` × SVG na feature | **handoff** | pendente — é a 8.4 |
 | `app-number-stepper` × `<input type=number>` | **handoff** | pendente |
@@ -1129,7 +1129,44 @@ Resultado: `app-usage-bar` apagado, barra à mão de Metas apagada, `toneFor` do
 `onTrack`) e o primitivo decide a cor. O limiar inline que sobrava no template do orçamento
 (`> 100 ? 'danger' : > 80 ? 'warning' : ...`) virou `budgetUsageCardTone`, com teste.
 
-- [ ] Próximo par: `app-kpi-strip` × `app-transaction-summary-card` (18 telas — o maior).
+#### Correção: `app-kpi-strip` × `app-transaction-summary-card` **não são um par**
+
+Registrado porque eu recomendei migrar 18 telas para o `app-kpi-strip`, e a recomendação
+estava **errada**. `COMPONENTES.md` §3.1 define **dois formatos** de KPI e atribui telas a
+cada um:
+
+| Formato | Telas | Componente |
+|---|---|---|
+| (a) cards soltos com gap, `flex: 1 1 210px` | Metas, Contas, Orçamento, Cartões | `app-transaction-summary-card` ✅ correto hoje |
+| (b) faixa unida com divisor por `box-shadow` | Investimentos, Calendário, Dashboard | `app-kpi-strip` — não usado |
+
+Os dois devem existir. Os próprios tokens provam: `--fs-kpi` 26px é "faixa isolada",
+`--fs-kpi-strip` 20px é "faixa unida de 5".
+
+**O problema real é outro**: o `app-kpi-strip` como foi construído não atende **nenhuma** das
+três telas do formato (b) sem perder função.
+
+| Tela | Precisa | `KpiItem` oferece |
+|---|---|---|
+| Dashboard | `delta` com direção e sinal, link "Ver detalhes", linha de pergunta, ícone SVG por indicador, skeleton | `label, value, note?, tooltip, tone?, icon?` — **string**, não SVG |
+| Investimentos | 5 ícones SVG em slot | idem |
+| Calendário | 5 ícones SVG em slot | idem |
+
+E o Dashboard **já implementa o formato (b) corretamente à mão**, citando §3.1(b) no
+comentário do SCSS: faixa unida, `flex: 1 1 200px`, divisor por `box-shadow`. É uma cópia
+inline do primitivo — a duplicação que §13.1 descreve — só que **mais rica** que ele, e já
+usando o `app-tooltip` em vez do `title` nativo que §3.1 especifica (o `title` não abre em
+toque e não é anunciado de forma confiável por leitor de tela).
+
+**Recomendação, e desta vez com a evidência antes**: promover a implementação do Dashboard
+para `shared/`, adotá-la em Investimentos e Calendário, e apagar o `app-kpi-strip` — com
+emenda no handoff, como foi feito na E1. O caminho inverso (engrossar o `app-kpi-strip` até
+cobrir delta, link e ícone SVG) é reconstruir o que já existe e está em produção.
+
+**Não executado**: eu errei este par uma vez e prometi avisar antes de mexer. A decisão está
+aberta.
+
+- [ ] Decidir o formato (b): promover a do Dashboard, ou engrossar o `app-kpi-strip`.
 - [ ] Depois: `app-money`, `app-number-stepper`, e a 8.4 para os gráficos.
 
 ### 8.2 — Faixa de indicadores em flex · R2: ~~6~~ ✅ CONCLUÍDA
