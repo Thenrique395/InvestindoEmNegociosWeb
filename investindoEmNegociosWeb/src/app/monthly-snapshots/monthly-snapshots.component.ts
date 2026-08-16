@@ -10,7 +10,7 @@ import { UsageBarComponent, UsageBarTone } from '../shared/usage-bar/usage-bar.c
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
-import { riskBadgeTone, riskLevel, riskUsageTone } from './snapshots-overview.model';
+import { riskBadgeTone, riskLevel, riskPercent, riskUsageTone } from './snapshots-overview.model';
 
 @Component({
   selector: 'app-monthly-snapshots',
@@ -84,6 +84,11 @@ export class MonthlySnapshotsComponent implements OnInit {
 
   riskBadgeTone(snapshot: MonthlyFinancialSnapshotResponse): StatusBadgeTone {
     return riskBadgeTone(riskLevel(snapshot.riskClassification, snapshot.riskScore));
+  }
+
+  /** O score é saúde; a barra de risco mostra o que falta para 100. */
+  riskPercent(score: number): number {
+    return riskPercent(score);
   }
 
   riskUsageTone(snapshot: MonthlyFinancialSnapshotResponse): UsageBarTone {
