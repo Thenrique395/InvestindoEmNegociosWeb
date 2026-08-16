@@ -1069,7 +1069,7 @@ não dispara e a página sai em branco.
 
 | Etapa | Regra | Estado |
 |---|---|---|
-| 8.1 Adotar primitivos | R1 | 🔶 5 · decisão tomada; 1 par de 6 migrado |
+| 8.1 Adotar primitivos | R1 | 🔶 4 · 4 pares de 6 resolvidos; faltam gráficos e stepper |
 | 8.2 Faixa em flex | R2 | ✅ 0 |
 | 8.3 Tooltip | R3 | ✅ 0 |
 | 8.4 Gráficos | R4 | 🔴 10 · depende da 8.1 |
@@ -1102,8 +1102,8 @@ reverter o commit da migração daquele par, não refazer tudo.
 |---|---|---|
 | `app-data-table` × `app-responsive-list` | **legado** | O legado dá a mesma garantia de coluna única **e** vira lista de cards no mobile, que o primitivo do handoff não cobria. 9 telas já dependiam dele. `app-data-table` **apagado**; handoff emendado (E1) |
 | `app-progress-bar` × `app-usage-bar` | **handoff** | ✅ feito. O legado só sabia consumo |
-| `app-kpi-strip` × `app-transaction-summary-card` | **nenhum: não são um par** | ver correção abaixo |
-| `app-money` × formatação na tela | **handoff** | pendente |
+| `app-kpi-strip` × `app-transaction-summary-card` | **os dois** — formatos (a) e (b) do §3.1 | ✅ feito |
+| `app-money` × `AppCurrencyPipe` | **os dois** — o pipe interpola, o componente colore | ✅ a violação real era outra, ver abaixo |
 | `app-chart-line`/`bars` × SVG na feature | **handoff** | pendente — é a 8.4 |
 | `app-number-stepper` × `<input type=number>` | **handoff** | pendente |
 
@@ -1129,7 +1129,7 @@ Resultado: `app-usage-bar` apagado, barra à mão de Metas apagada, `toneFor` do
 `onTrack`) e o primitivo decide a cor. O limiar inline que sobrava no template do orçamento
 (`> 100 ? 'danger' : > 80 ? 'warning' : ...`) virou `budgetUsageCardTone`, com teste.
 
-#### Correção: `app-kpi-strip` × `app-transaction-summary-card` **não são um par**
+#### `app-kpi-strip` × `app-transaction-summary-card` **não eram um par** ✅ resolvido
 
 Registrado porque eu recomendei migrar 18 telas para o `app-kpi-strip`, e a recomendação
 estava **errada**. `COMPONENTES.md` §3.1 define **dois formatos** de KPI e atribui telas a
@@ -1137,36 +1137,42 @@ cada um:
 
 | Formato | Telas | Componente |
 |---|---|---|
-| (a) cards soltos com gap, `flex: 1 1 210px` | Metas, Contas, Orçamento, Cartões | `app-transaction-summary-card` ✅ correto hoje |
-| (b) faixa unida com divisor por `box-shadow` | Investimentos, Calendário, Dashboard | `app-kpi-strip` — não usado |
+| (a) cards soltos com gap, `flex: 1 1 210px` | Metas, Contas, Orçamento, Cartões | `app-transaction-summary-card` |
+| (b) faixa unida com divisor por `box-shadow` | Investimentos, Calendário, Dashboard | `app-kpi-strip` |
 
-Os dois devem existir. Os próprios tokens provam: `--fs-kpi` 26px é "faixa isolada",
+Os dois devem existir, e os tokens já diziam: `--fs-kpi` 26px é "faixa isolada",
 `--fs-kpi-strip` 20px é "faixa unida de 5".
 
-**O problema real é outro**: o `app-kpi-strip` como foi construído não atende **nenhuma** das
-três telas do formato (b) sem perder função.
+**O problema era o primitivo, não a escolha.** O `KpiItem` original não atendia nenhuma das
+três telas do formato (b) sem perder função: o Dashboard precisa de `delta`, link
+"Ver detalhes", linha de pergunta e ícone SVG por indicador; Investimentos e Calendário
+precisam de ícone SVG. `KpiItem.icon` era uma string.
 
-| Tela | Precisa | `KpiItem` oferece |
-|---|---|---|
-| Dashboard | `delta` com direção e sinal, link "Ver detalhes", linha de pergunta, ícone SVG por indicador, skeleton | `label, value, note?, tooltip, tone?, icon?` — **string**, não SVG |
-| Investimentos | 5 ícones SVG em slot | idem |
-| Calendário | 5 ícones SVG em slot | idem |
+E o Dashboard **já tinha a faixa unida implementada inline**, citando §3.1(b) no SCSS — a
+duplicação do §13.1, só que a cópia era **mais completa que o primitivo** e já usava
+`app-tooltip` em vez do `title` nativo.
 
-E o Dashboard **já implementa o formato (b) corretamente à mão**, citando §3.1(b) no
-comentário do SCSS: faixa unida, `flex: 1 1 200px`, divisor por `box-shadow`. É uma cópia
-inline do primitivo — a duplicação que §13.1 descreve — só que **mais rica** que ele, e já
-usando o `app-tooltip` em vez do `title` nativo que §3.1 especifica (o `title` não abre em
-toque e não é anunciado de forma confiável por leitor de tela).
+**Resolução**: a implementação do Dashboard foi promovida para o `app-kpi-strip`, em vez de
+reconstruí-la. O ícone entra por `ng-template` com a chave no contexto. Dashboard, Calendário
+e Investimentos adotados. Emenda **E2** no handoff registra o contrato novo e a troca do
+`title` pelo `app-tooltip` — `title` não abre em toque, então em celular a explicação do
+indicador simplesmente não existia, contrariando o §8.
 
-**Recomendação, e desta vez com a evidência antes**: promover a implementação do Dashboard
-para `shared/`, adotá-la em Investimentos e Calendário, e apagar o `app-kpi-strip` — com
-emenda no handoff, como foi feito na E1. O caminho inverso (engrossar o `app-kpi-strip` até
-cobrir delta, link e ícone SVG) é reconstruir o que já existe e está em produção.
+O Calendário estava com `density="compact"` desde a 8.2, remendo para caber 5 cards soltos
+numa linha. Ele nunca deveria ter sido cards soltos.
 
-**Não executado**: eu errei este par uma vez e prometi avisar antes de mexer. A decisão está
-aberta.
+#### `app-money` × `AppCurrencyPipe` **também não eram um par** ✅ resolvido
 
-- [ ] Decidir o formato (b): promover a do Dashboard, ou engrossar o `app-kpi-strip`.
+O próprio autor do primitivo documentou no código que os dois coexistem: o pipe para
+interpolação, o componente para quando cor e tamanho importam. Ambos chamam
+`formatCurrencyValue` — não há duplicação de lógica.
+
+**A violação do §7 estava em outro lugar**, e era pior: três telas formatavam moeda à mão com
+`'pt-BR'` e `'BRL'` **fixos**, ignorando as preferências salvas em Configurações (§9.4).
+Investimentos tinha o próprio `Intl.NumberFormat`; `home` e `category-breakdown` duplicavam a
+forma abreviada `R$ 12,3 mil`. Um usuário com outra moeda via o símbolo errado no eixo do
+gráfico. Virou `formatCompactCurrency` no `locale-utils`, com teste que troca a moeda.
+
 - [ ] Depois: `app-money`, `app-number-stepper`, e a 8.4 para os gráficos.
 
 ### 8.2 — Faixa de indicadores em flex · R2: ~~6~~ ✅ CONCLUÍDA
