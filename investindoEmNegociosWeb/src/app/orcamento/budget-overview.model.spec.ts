@@ -1,5 +1,5 @@
 import { BudgetItemResponse, BudgetResponse } from '../budget.service';
-import { buildBudgetComposition, buildBudgetItemView, buildBudgetItemViews, buildBudgetListTotals, buildBudgetOverruns, buildBudgetOverview, buildBudgetPace, filterBudgetItemViews } from './budget-overview.model';
+import { buildBudgetComposition, buildBudgetItemView, buildBudgetItemViews, buildBudgetListTotals, buildBudgetOverruns, buildBudgetOverview, buildBudgetPace, filterBudgetItemViews , budgetUsageCardTone } from './budget-overview.model';
 
 function item(p: Partial<BudgetItemResponse> & { id: string }): BudgetItemResponse {
   return {
@@ -25,19 +25,25 @@ function budget(items: BudgetItemResponse[], totals?: Partial<BudgetResponse>): 
 }
 
 describe('budget-overview.model', () => {
-  it('calcula uso e tom por item', () => {
-    expect(buildBudgetItemView(item({ id: '1', plannedAmount: 100, realizedAmount: 40 })).tone).toBe('ok');
-    expect(buildBudgetItemView(item({ id: '2', plannedAmount: 100, realizedAmount: 90 })).tone).toBe('warning');
+  it('calcula uso por item', () => {
+    // O TOM saiu daqui: quem decide a cor é o limiar de consumo do app-progress-bar
+    // (ARQUITETURA_ANGULAR.md §9.1). O modelo só entrega o percentual e o estouro.
+    expect(buildBudgetItemView(item({ id: '1', plannedAmount: 100, realizedAmount: 40 })).usagePercent).toBe(40);
+    expect(buildBudgetItemView(item({ id: '2', plannedAmount: 100, realizedAmount: 90 })).usagePercent).toBe(90);
     const over = buildBudgetItemView(item({ id: '3', plannedAmount: 100, realizedAmount: 130 }));
-    expect(over.tone).toBe('critical');
     expect(over.usagePercent).toBe(130);
     expect(over.overBudget).toBeTrue();
+  });
+
+  it('deriva o tom do card de uso a partir do limiar compartilhado', () => {
+    expect(budgetUsageCardTone(40)).toBe('success');
+    expect(budgetUsageCardTone(80)).toBe('warning');
+    expect(budgetUsageCardTone(101)).toBe('danger');
   });
 
   it('trata planejado zero sem dividir por zero', () => {
     const view = buildBudgetItemView(item({ id: '1', plannedAmount: 0, realizedAmount: 50 }));
     expect(view.usagePercent).toBe(0);
-    expect(view.tone).toBe('ok');
     expect(view.overBudget).toBeFalse();
   });
 
@@ -84,7 +90,6 @@ describe('budget-overview.model', () => {
     expect(totals.totalRealized).toBe(340);
     expect(totals.totalVariance).toBe(-40);
     expect(totals.usagePercent).toBe(113);
-    expect(totals.tone).toBe('critical');
   });
 
   it('calcula ritmo proporcional ao dia do mês', () => {

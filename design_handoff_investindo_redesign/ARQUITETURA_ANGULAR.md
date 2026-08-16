@@ -141,7 +141,7 @@ Estes são os componentes que **não** podem ser reimplementados por feature. Ca
 | `app-select-menu` | `options`, `value`, `placeholder?`, `searchable?`, `createLabel?`; `valueChange` | **todo campo de valor múltiplo usa isto.** Chips em linha são proibidos — não escalam com 20 categorias. |
 | `app-number-stepper` | `value`, `min`, `max`, `step?`; `valueChange` | o campo do meio é `<input>` digitável. Stepper só com botões não passa. |
 | `app-segmented` | `options`, `value`; `valueChange` | já existe como `app-segmented-selector`; ajustar, não duplicar. |
-| `app-data-table` | `columns: ColumnDef[]`, `rows`, `selectable?`, `sort?`, `page?`; `sortChange`, `pageChange`, `selectionChange` | **uma única definição de coluna** alimenta cabeçalho e linha. Nunca dois `grid-template-columns` escritos separadamente. Sempre dentro de scroller com `min-width`. |
+| ~~`app-data-table`~~ → `app-responsive-list` | `columns: ResponsiveListColumn[]`, `rows` | **uma única definição de coluna** alimenta cabeçalho e linha. Nunca dois `grid-template-columns` escritos separadamente. Sempre dentro de scroller com `min-width`. **Ver emenda E1.** |
 | `app-modal` | `open`, `title`, `eyebrow?`, `subtitle?`, `width?`; slots `body`, `footer`; `close` | três faixas: cabeçalho `flex:none`, corpo `flex:1; min-height:0; overflow-y:auto`, rodapé `flex:none`. Sem isso a rolagem quebra o layout. |
 | `app-confirm-dialog` | `title`, `message`, `confirmLabel`, `destructive?`, `requirePhrase?` | toda exclusão passa por aqui. |
 | `app-toast` / `UiFeedbackService` | `message`, `undo?` | toda mutação confirmada oferece "Desfazer". |
@@ -162,7 +162,25 @@ export interface ColumnDef<T> {
   cell: (row: T) => unknown;
 }
 ```
-O `app-data-table` deriva `grid-template-columns` de `columns.map(c => c.width).join(' ')` e o usa **no cabeçalho e em cada linha**. É a única forma de garantir alinhamento.
+O componente de tabela deriva `grid-template-columns` de `columns.map(c => c.width).join(' ')` e o usa **no cabeçalho e em cada linha**. É a única forma de garantir alinhamento.
+
+---
+
+### Emenda E1 — `app-responsive-list` no lugar do `app-data-table` (2026-08-16)
+
+Decidida na Fase 8.1 do `PLANO_REDESIGN.md`, durante a implementação.
+
+O repositório já tinha o `app-responsive-list`, com a mesma garantia que motivou o
+`app-data-table` — **definição única de coluna**, via `columns: ResponsiveListColumn[]` — e
+com um comportamento que o primitivo especificado aqui não cobria: **a tabela vira lista de
+cards no mobile**. Nove telas já dependiam dele.
+
+Manter os dois seria a duplicação que a seção 7 existe para impedir, então o
+`app-data-table` foi apagado. O contrato acima passa a valer para o `app-responsive-list`.
+
+Seleção em lote e paginação, que estavam no contrato original, não existem hoje no
+`app-responsive-list`: quando alguma tela precisar, elas nascem nele — não num segundo
+componente de tabela.
 
 ---
 

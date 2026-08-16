@@ -1,3 +1,4 @@
+import { ProgressMode } from '../shared/progress-bar/progress-thresholds';
 import { Goal, GoalKind, GoalProgress, GoalStatus, RecurrenceType } from '../goals.service';
 import { StatusBadgeTone } from '../shared/status-badge/status-badge.component';
 
@@ -16,7 +17,12 @@ export type GoalDisplayState =
   | 'active' | 'attention' | 'exceeded' | 'overdue' | 'achieved'
   | 'paused' | 'completed' | 'archived' | 'canceled' | 'draft' | 'scheduled';
 
-export type GoalProgressTone = 'neutral' | 'ok' | 'warning' | 'critical' | 'success';
+/**
+ * A cor da barra NÃO mora mais aqui: os limiares de consumo × conquista são de
+ * `shared/progress-bar/progress-thresholds` (ARQUITETURA_ANGULAR.md §9.1, "duas
+ * funções, um lugar"). A meta só declara qual das duas semânticas ela tem e se
+ * está no ritmo; o primitivo decide o tom.
+ */
 
 export interface GoalTypeConfig {
   kind: GoalKind;
@@ -57,7 +63,9 @@ export interface GoalView {
   state: GoalDisplayState;
   stateLabel: string;
   stateTone: StatusBadgeTone;
-  progressTone: GoalProgressTone;
+  progressMode: ProgressMode;
+  /** Só para conquista: o ritmo alcança o prazo? */
+  onTrack: boolean;
   recurrenceLabel: string;
 }
 
@@ -119,16 +127,6 @@ function persistedState(status: GoalStatus): GoalDisplayState | null {
   }
 }
 
-function progressTone(config: GoalTypeConfig, percent: number, state: GoalDisplayState, warning: number): GoalProgressTone {
-  if (config.isConsumption) {
-    if (percent > 100) return 'critical';
-    if (percent >= warning) return 'warning';
-    return 'ok';
-  }
-  if (state === 'achieved' || percent >= 100) return 'success';
-  return 'neutral';
-}
-
 function monthlyRequired(config: GoalTypeConfig, remaining: number, daysRemaining: number | null): number | null {
   if (config.isConsumption || remaining <= 0 || daysRemaining == null || daysRemaining <= 0) return null;
 
@@ -187,7 +185,8 @@ export function buildGoalView(goal: Goal, progress?: GoalProgress | null): GoalV
     state,
     stateLabel: meta.label,
     stateTone: meta.tone,
-    progressTone: progressTone(config, percent, state, warning),
+    progressMode: config.isConsumption ? 'consumo' : 'conquista',
+    onTrack: state !== 'attention' && state !== 'overdue' && state !== 'exceeded',
     recurrenceLabel: recurrenceLabelFor(goal.recurrence)
   };
 }

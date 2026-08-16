@@ -23,7 +23,6 @@ import { SelectMenuComponent } from '../shared/select-menu/select-menu.component
 import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
 import { KpiStripComponent } from '../shared/kpi-strip/kpi-strip.component';
 import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
-import { DataTableComponent } from '../shared/data-table/data-table.component';
 import { ChartBarsComponent } from '../shared/charts/chart-bars/chart-bars.component';
 import { ChartLineComponent } from '../shared/charts/chart-line/chart-line.component';
 import { MoneyComponent } from '../shared/money/money.component';
@@ -81,7 +80,6 @@ interface DemoListItem {
     NumberStepperComponent,
     KpiStripComponent,
     ProgressBarComponent,
-    DataTableComponent,
     ChartBarsComponent,
     ChartLineComponent,
     MoneyComponent,
@@ -377,17 +375,6 @@ if (!confirmed) return;`,
     { label: 'Receitas', value: 'R$ 18.900,00', tooltip: 'Tudo que entrou no período.', tone: 'income' as const },
     { label: 'Despesas', value: 'R$ 9.842,17', tooltip: 'Tudo que saiu ou vai sair.', tone: 'expense' as const },
     { label: 'Comprometido', value: 'R$ 2.421,65', tooltip: 'Cartões, parcelas e contas futuras.', tone: 'warning' as const }
-  ];
-
-  readonly demoColunas = [
-    { key: 'nome', label: 'Nome', width: 'minmax(180px,2.1fr)', sortable: true },
-    { key: 'categoria', label: 'Categoria', width: 'minmax(110px,1fr)' },
-    { key: 'valor', label: 'Valor', width: '112px', align: 'right' as const }
-  ];
-  readonly demoLinhas = [
-    { id: '1', nome: 'Aluguel', categoria: 'Moradia', valor: 'R$ 2.400,00' },
-    { id: '2', nome: 'Energia elétrica', categoria: 'Moradia', valor: 'R$ 318,42' },
-    { id: '3', nome: 'Plano de saúde', categoria: 'Saúde', valor: 'R$ 892,00' }
   ];
 
   readonly demoSeries = [

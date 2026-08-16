@@ -1,6 +1,7 @@
 import { BudgetItemResponse, BudgetResponse } from '../budget.service';
 import { DonutChartItem } from '../shared/donut-chart/donut-chart.component';
-import { UsageBarTone } from '../shared/usage-bar/usage-bar.component';
+import { toneForConsumo } from '../shared/progress-bar/progress-thresholds';
+import { TransactionSummaryTone } from '../shared/transactions/transaction-summary-card.component';
 
 /**
  * Derivações puras do orçamento mensal. Não inventa valores: usa planejado e
@@ -11,7 +12,6 @@ export interface BudgetItemView {
   item: BudgetItemResponse;
   /** Uso = realizado / planejado (0–100+, sem teto quando estoura). */
   usagePercent: number;
-  tone: UsageBarTone;
   overBudget: boolean;
 }
 
@@ -32,7 +32,6 @@ export interface BudgetListTotals {
   totalRealized: number;
   totalVariance: number;
   usagePercent: number;
-  tone: UsageBarTone;
 }
 
 export interface BudgetPace {
@@ -66,12 +65,6 @@ function usage(realized: number, planned: number): number {
   return Math.round((realized / planned) * 100);
 }
 
-function toneFor(percent: number): UsageBarTone {
-  if (percent > 100) return 'critical';
-  if (percent > 80) return 'warning';
-  return 'ok';
-}
-
 export function buildBudgetItemView(item: BudgetItemResponse): BudgetItemView {
   const planned = Number(item.plannedAmount || 0);
   const realized = Number(item.realizedAmount || 0);
@@ -79,7 +72,6 @@ export function buildBudgetItemView(item: BudgetItemResponse): BudgetItemView {
   return {
     item,
     usagePercent,
-    tone: toneFor(usagePercent),
     overBudget: planned > 0 && realized > planned
   };
 }
@@ -109,8 +101,7 @@ export function buildBudgetListTotals(views: BudgetItemView[]): BudgetListTotals
     totalPlanned,
     totalRealized,
     totalVariance,
-    usagePercent,
-    tone: toneFor(usagePercent)
+    usagePercent
   };
 }
 
@@ -193,4 +184,16 @@ export function buildBudgetOverview(budget: BudgetResponse | null): BudgetOvervi
     itemsCount: items.length,
     overBudgetCount
   };
+}
+
+/**
+ * Tom do CARD de indicador "Uso do orçamento". Reaproveita o limiar de consumo do
+ * primitivo em vez de repetir `> 100 ? ... : > 80 ? ...` no template — era a quarta
+ * cópia dos mesmos números (ARQUITETURA_ANGULAR.md §9.1).
+ */
+export function budgetUsageCardTone(usagePercent: number): TransactionSummaryTone {
+  const tone = toneForConsumo(usagePercent);
+  if (tone === 'expense') return 'danger';
+  if (tone === 'warning') return 'warning';
+  return 'success';
 }

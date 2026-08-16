@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { BudgetService, BudgetResponse, BudgetItemResponse } from '../budget.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
-import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
@@ -18,7 +18,7 @@ import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut
 import { ModalComponent } from '../shared/modal/modal.component';
 import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
-import { BudgetFilter, BudgetItemView, BudgetListTotals, BudgetOverrun, BudgetOverview, BudgetPace, buildBudgetComposition, buildBudgetItemViews, buildBudgetListTotals, buildBudgetOverruns, buildBudgetOverview, buildBudgetPace, filterBudgetItemViews } from './budget-overview.model';
+import { BudgetFilter, BudgetItemView, BudgetListTotals, BudgetOverrun, BudgetOverview, BudgetPace, buildBudgetComposition, buildBudgetItemViews, buildBudgetListTotals, buildBudgetOverruns, buildBudgetOverview, buildBudgetPace, filterBudgetItemViews , budgetUsageCardTone } from './budget-overview.model';
 
 @Component({
   selector: 'app-orcamento',
@@ -30,7 +30,7 @@ import { BudgetFilter, BudgetItemView, BudgetListTotals, BudgetOverrun, BudgetOv
     UiStateComponent,
     PageHeaderComponent,
     TransactionSummaryCardComponent,
-    UsageBarComponent,
+    ProgressBarComponent,
     ConfirmSheetComponent,
     ResponsiveListComponent,
     ResponsiveListCellDirective,
@@ -44,6 +44,9 @@ import { BudgetFilter, BudgetItemView, BudgetListTotals, BudgetOverrun, BudgetOv
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrcamentoComponent implements OnInit {
+  /** Tom do card 'Uso do orçamento' — limiar do primitivo, não do template. */
+  readonly usageCardTone = budgetUsageCardTone;
+
   // Estado de exibição assíncrono por signal (A9). Campos ngModel (newCategory/newAmount/
   // editingAmount) e sync-only (editingId/pendingDelete) ficam plain: refletem via o CD
   // disparado pelos signals co-setados no mesmo callback.

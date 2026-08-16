@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { canCompleteGoalView, GoalView } from './goal-view.model';
 
@@ -12,7 +13,7 @@ import { canCompleteGoalView, GoalView } from './goal-view.model';
 @Component({
   selector: 'app-goal-card',
   standalone: true,
-  imports: [DecimalPipe, AppCurrencyPipe, StatusBadgeComponent],
+  imports: [DecimalPipe, AppCurrencyPipe, ProgressBarComponent, StatusBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="gc" [attr.data-kind]="view().goal.kind">
@@ -67,11 +68,11 @@ import { canCompleteGoalView, GoalView } from './goal-view.model';
       </div>
 
       <div class="gc__progress">
-        <div class="gc__bar" role="progressbar" [attr.data-tone]="view().progressTone"
-          [attr.aria-valuenow]="view().percent" aria-valuemin="0" aria-valuemax="100"
-          [attr.aria-label]="view().config.percentLabel + ': ' + (view().percent | number:'1.0-0') + '%'">
-          <span class="gc__bar-fill" [style.width.%]="view().barPercent"></span>
-        </div>
+        <app-progress-bar
+          [value]="view().percent"
+          [mode]="view().progressMode"
+          [onTrack]="view().onTrack"
+          [ariaLabel]="view().config.percentLabel + ': ' + (view().percent | number:'1.0-0') + '%'" />
         <div class="gc__progress-meta">
           <span>{{ view().percent | number:'1.0-0' }}% · {{ view().config.percentLabel }}</span>
           @if (view().daysRemaining != null) {
@@ -124,13 +125,6 @@ import { canCompleteGoalView, GoalView } from './goal-view.model';
     .gc__value { font-size: var(--fs-meta, 0.95rem); color: var(--text); }
 
     .gc__progress { display: grid; gap: 5px; }
-    .gc__bar { height: 8px; border-radius: 6px; background: var(--surface-inset); overflow: hidden; }
-    .gc__bar-fill { display: block; height: 100%; border-radius: 6px; background: var(--text-tertiary); transition: width 0.3s ease; }
-    .gc__bar[data-tone='ok'] .gc__bar-fill { background: var(--income); }
-    .gc__bar[data-tone='warning'] .gc__bar-fill { background: var(--warning); }
-    .gc__bar[data-tone='critical'] .gc__bar-fill { background: var(--expense); }
-    .gc__bar[data-tone='success'] .gc__bar-fill { background: var(--income); }
-    .gc__bar[data-tone='neutral'] .gc__bar-fill { background: var(--primary); }
     .gc__progress-meta { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-caption, 0.72rem); color: var(--text-tertiary); }
 
     .gc__hint { margin: 0; font-size: var(--fs-caption, 0.72rem); color: var(--text-tertiary); }

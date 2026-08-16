@@ -111,10 +111,10 @@
                 <span class="muted text--sm">{{ view.paidCount }} de {{ view.totalCount }} parcelas quitadas</span>
                 <strong>{{ view.paidPercent }}%</strong>
               </div>
-              <app-usage-bar
-                [percent]="view.paidPercent"
-                tone="ok"
-                [label]="view.paidPercent + '% das parcelas quitadas'" />
+              <app-progress-bar
+                [value]="view.paidPercent"
+                mode="conquista"
+                [ariaLabel]="view.paidPercent + '% das parcelas quitadas'" />
               @if (view.nextInstallment) {
                 <p class="muted text--sm contract__next">
                   Próxima parcela {{ view.nextInstallment.installmentNo }} em

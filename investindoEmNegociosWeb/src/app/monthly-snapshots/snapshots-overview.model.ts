@@ -1,5 +1,5 @@
 import { StatusBadgeTone } from '../shared/status-badge/status-badge.component';
-import { UsageBarTone } from '../shared/usage-bar/usage-bar.component';
+import { ProgressTone } from '../shared/progress-bar/progress-thresholds';
 
 /**
  * Derivações puras do histórico mensal (snapshots). Mapeia o risco real
@@ -64,8 +64,9 @@ export function riskBadgeTone(level: RiskLevel): StatusBadgeTone {
   return 'success';
 }
 
-export function riskUsageTone(level: RiskLevel): UsageBarTone {
-  if (level === 'high') return 'critical';
+/** Risco não é consumo nem conquista: o tom vem do nível, não de um limiar. */
+export function riskProgressTone(level: RiskLevel): ProgressTone {
+  if (level === 'high') return 'expense';
   if (level === 'moderate') return 'warning';
-  return 'ok';
+  return 'income';
 }

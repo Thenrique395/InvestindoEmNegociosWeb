@@ -32,14 +32,16 @@ describe('goal-view.model', () => {
       const progress: GoalProgress = { goalId: '1', kind: 'Expense', mode: 'Limit', target: 1000, realized: 1100, pending: 0, percent: 110, remaining: 0, state: 'Exceeded' };
       const v = buildGoalView(goal({ id: '1', kind: 'Expense' }), progress);
       expect(v.state).toBe('exceeded');
-      expect(v.progressTone).toBe('critical');
+      expect(v.progressMode).toBe('consumo');
+      expect(v.onTrack).toBe(false);
       expect(v.barPercent).toBe(100);
     });
     it('receita atingida fica success', () => {
       const progress: GoalProgress = { goalId: '1', kind: 'Income', mode: 'Target', target: 1000, realized: 1000, pending: 0, percent: 100, remaining: 0, state: 'Achieved' };
       const v = buildGoalView(goal({ id: '1', kind: 'Income' }), progress);
       expect(v.state).toBe('achieved');
-      expect(v.progressTone).toBe('success');
+      expect(v.progressMode).toBe('conquista');
+      expect(v.onTrack).toBe(true);
     });
     it('pending fica separado do realizado', () => {
       const progress: GoalProgress = { goalId: '1', kind: 'Income', mode: 'Target', target: 10000, realized: 7500, pending: 2000, percent: 75, remaining: 2500, state: 'OnTrack' };

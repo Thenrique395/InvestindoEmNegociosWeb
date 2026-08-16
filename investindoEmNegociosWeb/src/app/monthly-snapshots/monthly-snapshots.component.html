@@ -116,10 +116,10 @@
 
           <div class="snapshot__risk">
             <span class="muted text--sm">Nível de risco</span>
-            <app-usage-bar
-              [percent]="riskPercent(item.riskScore)"
-              [tone]="riskUsageTone(item)"
-              [label]="'Risco ' + riskPercent(item.riskScore) + ' de 100 · saúde ' + item.riskScore" />
+            <app-progress-bar
+              [value]="riskPercent(item.riskScore)"
+              [tone]="riskProgressTone(item)"
+              [ariaLabel]="'Risco ' + riskPercent(item.riskScore) + ' de 100 · saúde ' + item.riskScore" />
           </div>
 
           <div class="grid">

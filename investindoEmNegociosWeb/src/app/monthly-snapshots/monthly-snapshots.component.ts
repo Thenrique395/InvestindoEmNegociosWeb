@@ -2,15 +2,16 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MonthlyFinancialSnapshotResponse, MonthlySnapshotsService } from '../monthly-snapshots.service';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
+import { ProgressTone } from '../shared/progress-bar/progress-thresholds';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent, TransactionSummaryTone } from '../shared/transactions/transaction-summary-card.component';
 import { StatusBadgeComponent, StatusBadgeTone } from '../shared/status-badge/status-badge.component';
-import { UsageBarComponent, UsageBarTone } from '../shared/usage-bar/usage-bar.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
-import { riskBadgeTone, riskLevel, riskPercent, riskUsageTone } from './snapshots-overview.model';
+import { riskBadgeTone, riskLevel, riskPercent, riskProgressTone } from './snapshots-overview.model';
 
 @Component({
   selector: 'app-monthly-snapshots',
@@ -21,7 +22,7 @@ import { riskBadgeTone, riskLevel, riskPercent, riskUsageTone } from './snapshot
     PageHeaderComponent,
     TransactionSummaryCardComponent,
     StatusBadgeComponent,
-    UsageBarComponent,
+    ProgressBarComponent,
     UiStateComponent,
     EmptyStateComponent
   ],
@@ -91,8 +92,8 @@ export class MonthlySnapshotsComponent implements OnInit {
     return riskPercent(score);
   }
 
-  riskUsageTone(snapshot: MonthlyFinancialSnapshotResponse): UsageBarTone {
-    return riskUsageTone(riskLevel(snapshot.riskClassification, snapshot.riskScore));
+  riskProgressTone(snapshot: MonthlyFinancialSnapshotResponse): ProgressTone {
+    return riskProgressTone(riskLevel(snapshot.riskClassification, snapshot.riskScore));
   }
 
   load(): void {

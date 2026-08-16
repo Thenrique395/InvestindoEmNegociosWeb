@@ -46,7 +46,7 @@
               <span class="cards-list__usage-label">Limite utilizado</span>
               <strong class="cards-list__usage-percent" [attr.data-tone]="m.usageTone">{{ m.usagePercent | number: '1.0-0' }}%</strong>
             </div>
-            <app-usage-bar [percent]="m.usagePercent" [tone]="m.usageTone" [label]="'Limite utilizado: ' + (m.usagePercent | number: '1.0-0') + '%'" />
+            <app-progress-bar [value]="m.usagePercent" mode="consumo" [ariaLabel]="'Limite utilizado: ' + (m.usagePercent | number: '1.0-0') + '%'" />
             <div class="cards-list__usage-values">
               <span>Usado <strong>{{ m.usedAmount | appCurrency }}</strong></span>
               <span>Disponível <strong>{{ m.availableAmount | appCurrency }}</strong></span>

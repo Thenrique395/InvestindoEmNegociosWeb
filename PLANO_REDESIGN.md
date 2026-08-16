@@ -1069,7 +1069,7 @@ não dispara e a página sai em branco.
 
 | Etapa | Regra | Estado |
 |---|---|---|
-| 8.1 Adotar primitivos | R1 | 🔴 **7 · bloqueada na decisão dos pares** |
+| 8.1 Adotar primitivos | R1 | 🔶 5 · decisão tomada; 1 par de 6 migrado |
 | 8.2 Faixa em flex | R2 | ✅ 0 |
 | 8.3 Tooltip | R3 | ✅ 0 |
 | 8.4 Gráficos | R4 | 🔴 10 · depende da 8.1 |
@@ -1092,29 +1092,45 @@ Regra para todas as etapas: **uma etapa por commit**, com o `BASELINE` do
 `scripts/check-handoff-fidelity.mjs` baixado no mesmo commit, e captura Playwright
 desktop/mobile da tela afetada em `docs/ai-reports/`.
 
-### 8.1 — Adotar os primitivos ou apagá-los · R1: 7 → 0
+### 8.1 — Adotar os primitivos ou apagá-los · R1: 7 → 5 🔶 EM ANDAMENTO
 
-Para cada par, a decisão é binária: **o primitivo do handoff substitui o legado**, ou o
-primitivo é apagado e o plano registra por que o legado venceu. Não existe manter os dois —
-é isso que R1 mede.
+**Decisão tomada em 2026-08-16**, na ausência de contraindicação e com a recomendação
+registrada três vezes. Ela está aqui para ser contestada: se algum par estiver errado, é
+reverter o commit da migração daquele par, não refazer tudo.
 
-| Primitivo do handoff | Legado que ele substitui | Telas afetadas |
+| Par | Vence | Motivo |
 |---|---|---|
-| `app-kpi-strip` + `app-metric-card` | `app-transaction-summary-card` solto em grid | 16 telas |
-| `app-money` | `formatCurrency`/`toLocaleString` no `.ts` da tela | home, relatórios, cartões, investimentos |
-| `app-progress-bar` | `app-usage-bar` | orçamento, metas, cartões, empréstimos |
-| `app-chart-line` / `app-chart-bars` | SVG próprio da feature | home, investimentos, empréstimos |
-| `app-data-table` | `app-responsive-list` | 9 telas |
-| `app-number-stepper` | `<input type="number">` | formulários de parcela |
+| `app-data-table` × `app-responsive-list` | **legado** | O legado dá a mesma garantia de coluna única **e** vira lista de cards no mobile, que o primitivo do handoff não cobria. 9 telas já dependiam dele. `app-data-table` **apagado**; handoff emendado (E1) |
+| `app-progress-bar` × `app-usage-bar` | **handoff** | ✅ feito. O legado só sabia consumo |
+| `app-kpi-strip` × `app-transaction-summary-card` | **handoff** | pendente |
+| `app-money` × formatação na tela | **handoff** | pendente |
+| `app-chart-line`/`bars` × SVG na feature | **handoff** | pendente — é a 8.4 |
+| `app-number-stepper` × `<input type=number>` | **handoff** | pendente |
 
-- [ ] Decidir par a par e **registrar a decisão nesta tabela** antes de escrever código.
-      `app-responsive-list` tem argumento real a favor — ele já resolve tabela→cards no
-      mobile, que o `app-data-table` do handoff não cobre. Se ele vencer, o `app-data-table`
-      é apagado e `ARQUITETURA_ANGULAR.md` §7 recebe a emenda.
-- [ ] Migrar tela por tela, começando por Metas (a menor).
-- [ ] Apagar o primitivo perdedor de cada par. **Código morto em `shared/` é o problema**,
-      não o sintoma — enquanto os dois existirem, a próxima tela escolhe o errado.
-- [ ] `/styleguide` passa a listar só o que está em uso.
+#### Feito: `app-progress-bar` substitui `app-usage-bar`
+
+A migração encontrou **quatro cópias dos mesmos limiares**, que é exatamente o que
+ARQUITETURA_ANGULAR.md §9.1 manda ter em um lugar só:
+
+1. `shared/progress-bar/progress-thresholds.ts` — a correta, e a única sem uso;
+2. `orcamento/budget-overview.model.ts` — `>100 critical, >80 warning`;
+3. `metas/goal-view.model.ts` — com `warning` configurável;
+4. `shared/usage-bar` — **`>80 critical, >50 warning`**, valores que não são os do handoff.
+
+A quarta é a que importa: as seis telas passavam `tone` explícito, então a divergência não
+aparecia — mas quem adicionasse uma barra sem `tone` ganhava atenção em 50% em vez de 80%.
+
+O `app-usage-bar` também **não sabia expressar conquista**. Metas resolveu isso com uma
+barra própria, feita à mão no `goal-card` com sete regras de cor — a terceira implementação
+de barra do repositório.
+
+Resultado: `app-usage-bar` apagado, barra à mão de Metas apagada, `toneFor` do orçamento e
+`progressTone` das metas removidos. `GoalView` passa a declarar **semântica** (`progressMode`,
+`onTrack`) e o primitivo decide a cor. O limiar inline que sobrava no template do orçamento
+(`> 100 ? 'danger' : > 80 ? 'warning' : ...`) virou `budgetUsageCardTone`, com teste.
+
+- [ ] Próximo par: `app-kpi-strip` × `app-transaction-summary-card` (18 telas — o maior).
+- [ ] Depois: `app-money`, `app-number-stepper`, e a 8.4 para os gráficos.
 
 ### 8.2 — Faixa de indicadores em flex · R2: ~~6~~ ✅ CONCLUÍDA
 

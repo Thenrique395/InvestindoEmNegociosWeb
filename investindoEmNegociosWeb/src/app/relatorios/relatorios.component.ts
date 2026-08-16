@@ -6,11 +6,11 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ReportsService, CategoryExpenseResponse, MonthlySummaryReportResponse } from '../reports.service';
 import { formatCurrencyValue } from '../utils/locale-utils';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
-import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import {
@@ -34,7 +34,7 @@ type ReportViewType = 'summary' | 'comparison';
     UiStateComponent,
     PageHeaderComponent,
     TransactionSummaryCardComponent,
-    UsageBarComponent,
+    ProgressBarComponent,
     ResponsiveListComponent,
     ResponsiveListCellDirective
   ],

@@ -68,13 +68,6 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     description: 'Barra de progresso. A cor vem do modo: consumo (passar é ruim) ou conquista (chegar é bom).'
   },
   {
-    slug: 'data-table',
-    name: 'DataTable',
-    selector: 'app-data-table',
-    category: 'data',
-    description: 'Tabela com uma única definição de coluna para cabeçalho e linhas, scroller com min-width e seleção em lote.'
-  },
-  {
     slug: 'chart-bars',
     name: 'ChartBars',
     selector: 'app-chart-bars',

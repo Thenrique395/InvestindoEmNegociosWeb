@@ -1,4 +1,4 @@
-import { riskBadgeTone, riskLevel, riskPercent, riskUsageTone } from './snapshots-overview.model';
+import { riskBadgeTone, riskLevel, riskPercent, riskProgressTone } from './snapshots-overview.model';
 
 describe('snapshots-overview.model', () => {
   describe('riskLevel', () => {
@@ -59,9 +59,9 @@ describe('snapshots-overview.model', () => {
     expect(riskBadgeTone('low')).toBe('success');
   });
 
-  it('mapeia nível para tom de UsageBar', () => {
-    expect(riskUsageTone('high')).toBe('critical');
-    expect(riskUsageTone('moderate')).toBe('warning');
-    expect(riskUsageTone('low')).toBe('ok');
+  it('mapeia nível para tom da barra de progresso', () => {
+    expect(riskProgressTone('high')).toBe('expense');
+    expect(riskProgressTone('moderate')).toBe('warning');
+    expect(riskProgressTone('low')).toBe('income');
   });
 });

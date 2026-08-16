@@ -207,10 +207,10 @@
         </ng-template>
 
         <ng-template appResponsiveListCell="share" let-cat>
-          <app-usage-bar
-            [percent]="cat.percentageOfTotal"
-            tone="ok"
-            [label]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
+          <app-progress-bar
+            [value]="cat.percentageOfTotal"
+            tone="primary"
+            [ariaLabel]="cat.categoryName + ': ' + (cat.percentageOfTotal | number:'1.1-1') + '% do total'" />
         </ng-template>
       </app-responsive-list>
       </article>

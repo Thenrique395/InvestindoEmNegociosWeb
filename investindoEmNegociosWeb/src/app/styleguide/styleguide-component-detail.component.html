@@ -59,14 +59,6 @@
         <p>Conquista 32% fora de ritmo</p>
         <app-progress-bar [value]="32" mode="conquista" [onTrack]="false" ariaLabel="Progresso da meta" />
       }
-      @case ('data-table') {
-        <app-data-table
-          [columns]="demoColunas"
-          [rows]="demoLinhas"
-          [selectable]="true"
-          [page]="{ index: 0, size: 10, total: 3 }"
-          emptyMessage="Nenhuma despesa no período." />
-      }
       @case ('chart-bars') {
         <app-chart-bars [series]="demoSeries" [labels]="demoMeses" [format]="formatarReal" />
       }

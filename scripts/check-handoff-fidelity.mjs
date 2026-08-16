@@ -77,10 +77,12 @@ rules.push({
   titulo: 'Primitivo de shared/ usado só no /styleguide',
   ref: 'ARQUITETURA_ANGULAR.md §7 · §13.1',
   run() {
+    // `app-data-table` saiu da lista porque foi APAGADO na 8.1: o
+    // `app-responsive-list` venceu o par (resolve tabela→cards no mobile, que o
+    // primitivo do handoff não cobria). Ver PLANO_REDESIGN §8.1.
     const primitivos = [
       'app-kpi-strip',
       'app-money',
-      'app-data-table',
       'app-number-stepper',
       'app-progress-bar',
       'app-chart-bars',
@@ -339,7 +341,7 @@ rules.push({
  * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
  * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
  */
-export const BASELINE = { R1: 7, R4: 10, R8: 49, R9: 14 };
+export const BASELINE = { R1: 5, R4: 10, R8: 49, R9: 14 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing

@@ -64,7 +64,7 @@
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
-        [tone]="overview.usagePercent > 100 ? 'danger' : overview.usagePercent > 80 ? 'warning' : 'success'"
+        [tone]="usageCardTone(overview.usagePercent)"
         eyebrow="Uso do orçamento"
         [value]="overview.usagePercent + '%'"
         [note]="overview.overBudgetCount ? (overview.overBudgetCount + ' categoria(s) estourada(s).') : 'Nenhuma categoria estourada.'"
@@ -129,7 +129,7 @@
 
             <ng-template appResponsiveListCell="usage" let-view>
               <div class="usage-cell">
-                <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
+                <app-progress-bar [value]="view.usagePercent" mode="consumo" [ariaLabel]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
                 <span class="usage-cell__pct" [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
               </div>
             </ng-template>
@@ -157,10 +157,10 @@
                 {{ filteredTotals.totalVariance | appCurrency }}
               </span>
               <span class="budget-total-row__usage">
-                <app-usage-bar
-                  [percent]="filteredTotals.usagePercent"
-                  [tone]="filteredTotals.tone"
-                  [label]="'Total exibido: ' + filteredTotals.usagePercent + '% do planejado'" />
+                <app-progress-bar
+                  [value]="filteredTotals.usagePercent"
+                  mode="consumo"
+                  [ariaLabel]="'Total exibido: ' + filteredTotals.usagePercent + '% do planejado'" />
                 <span class="usage-cell__pct" [class.over-budget]="filteredTotals.usagePercent > 100">
                   {{ filteredTotals.usagePercent }}%
                 </span>
