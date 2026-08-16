@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 import { DashboardPage } from './support/page-objects/dashboard.page';
 
@@ -26,7 +26,7 @@ test.describe('authenticated home fallback', () => {
     await dashboardPage.expectRealBalanceVisible();
     await dashboardPage.expectNetWorthVisible();
     await dashboardPage.expectAccountBalancesVisible();
-    await expect(page.getByText('Mapa de dívidas')).toHaveCount(0);
+    await dashboardPage.expectDebtMapVisible();
   });
 
   test('home segue utilizável (saldo e patrimônio locais) mesmo em fallback', async ({ page }) => {

@@ -15,8 +15,7 @@ test.describe('authenticated app shell', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Visão Geral Financeira/i })).toBeVisible();
     await expect(page.getByText('Saldo disponível').first()).toBeVisible();
     await expect(page.getByText('Patrimônio líquido', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('Mapa de dívidas').first()).toBeVisible();
-    await expect(page.getByText('Saúde financeira').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dívidas e contas' }).first()).toBeVisible();
   });
 
   test('oculta e restaura valores financeiros pelo topbar', async ({ page }) => {
@@ -33,6 +32,28 @@ test.describe('authenticated app shell', () => {
 
     await expect(page.getByRole('button', { name: 'Ocultar valores financeiros' })).toBeVisible();
     await expect(page.getByText('••••••')).toHaveCount(0);
+  });
+
+  test('exibe bottom nav mobile com atalhos e menu completo', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+
+    const bottomNav = page.getByRole('navigation', { name: 'Navegação principal mobile' });
+    await expect(bottomNav).toBeVisible();
+    await expect(bottomNav.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+    await expect(bottomNav.getByRole('link', { name: 'Despesas' })).toBeVisible();
+    await expect(bottomNav.getByRole('link', { name: 'Receitas' })).toBeVisible();
+    await expect(bottomNav.getByRole('link', { name: 'Calendário' })).toBeVisible();
+    const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+
+    await bottomNav.getByRole('link', { name: 'Receitas' }).click();
+    await expect(page.getByRole('heading', { level: 2, name: /Receitas de/i })).toBeVisible();
+
+    const menuButton = bottomNav.getByRole('button', { name: 'Abrir menu completo' });
+    await menuButton.click();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#app-sidebar')).toHaveClass(/sidebar--mobile-open/);
   });
 
   test('mantem fallback local na home quando resumos oficiais falham', async ({ page }) => {

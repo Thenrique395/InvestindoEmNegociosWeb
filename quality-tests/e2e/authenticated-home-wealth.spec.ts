@@ -18,11 +18,27 @@ test.describe('authenticated home wealth', () => {
     await dashboardPage.expectDebtMapVisible();
   });
 
-  test('dashboard avançado exibe saúde financeira e mapa de dívidas', async ({ page }) => {
+  test('dashboard avançado exibe saúde financeira e dívidas/contas', async ({ page }) => {
     const dashboardPage = new DashboardPage(page);
 
     await dashboardPage.goto();
     await dashboardPage.expectHealthVisible();
     await dashboardPage.expectDebtMapVisible();
+  });
+
+  test('dashboard avançado mantém blocos rebrandados sem overflow', async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
+
+    for (const viewport of [
+      { width: 1440, height: 1200 },
+      { width: 390, height: 900 }
+    ]) {
+      await page.setViewportSize(viewport);
+      await dashboardPage.goto();
+      await dashboardPage.expectInvestmentsVisible();
+      await dashboardPage.expectDebtMapVisible();
+      await dashboardPage.expectHealthVisible();
+      await dashboardPage.expectNoHorizontalOverflow();
+    }
   });
 });

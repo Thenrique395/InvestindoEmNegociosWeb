@@ -372,7 +372,9 @@ const initialInvestmentPositions: InvestmentPosition[] = [
     account: 'Corretora Alpha',
     category: 'Renda Fixa',
     movements: [
-      { id: 'mov-1', type: 'APORTE', quantity: 2, price: 600, date: '2026-01-15' }
+      { id: 'mov-1', type: 'APORTE', quantity: 2, price: 600, date: '2026-01-15' },
+      { id: 'mov-2', type: 'RENDIMENTO', quantity: 1, price: 42.5, date: '2026-05-10' },
+      { id: 'mov-3', type: 'RENDIMENTO', quantity: 1, price: 45, date: '2026-06-10' }
     ],
     marketSymbol: null,
     marketPrice: null,
@@ -381,6 +383,28 @@ const initialInvestmentPositions: InvestmentPosition[] = [
     marketLogoUrl: null,
     marketSource: null,
     marketProvider: null
+  },
+  {
+    id: 'pos-2',
+    type: 'ACOES',
+    asset: 'IVVB11',
+    quantity: 5,
+    avgPrice: 250,
+    openedAt: '2026-02-08T10:00:00Z',
+    account: 'Corretora Alpha',
+    category: 'ETF',
+    movements: [
+      { id: 'mov-4', type: 'COMPRA', quantity: 5, price: 250, date: '2026-02-08' },
+      { id: 'mov-5', type: 'JCP', quantity: 1, price: 84.2, date: '2026-08-08' },
+      { id: 'mov-6', type: 'DIVIDENDO', quantity: 1, price: 31.6, date: '2026-07-08' }
+    ],
+    marketSymbol: 'IVVB11',
+    marketPrice: 268,
+    marketChangePercent: 1.2,
+    marketName: 'IVVB11',
+    marketLogoUrl: null,
+    marketSource: 'quote',
+    marketProvider: 'E2E'
   }
 ];
 
@@ -1409,6 +1433,17 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  if (method === 'GET' && path.match(/^\/api\/v1\/loans\/[^/]+$/)) {
+    const loanId = path.split('/')[4];
+    const loan = state.loans.find((item) => item.id === loanId);
+    if (!loan) {
+      await json(route, { title: 'Contrato não encontrado', detail: 'O contrato informado não existe ou não pertence ao usuário.' }, 404);
+      return;
+    }
+    await json(route, loan);
+    return;
+  }
+
   if (method === 'DELETE' && path.match(/^\/api\/v1\/loans\/[^/]+$/)) {
     const loanId = path.split('/')[4];
     const idx = state.loans.findIndex((item) => item.id === loanId);
@@ -1962,10 +1997,12 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
-  if (method === 'POST' && path.match(/^\/api\/v1\/loans\/[^/]+\/installments\/[^/]+\/pay$/)) {
+  if (method === 'POST' && path.match(/^\/api\/v1\/loans\/[^/]+\/installments\/[^/]+\/(pay|payments)$/)) {
     const parts = path.split('/');
     const contractId = parts[4];
     const installmentId = parts[6];
+    const isIntegratedPayment = parts[7] === 'payments';
+    const payload = JSON.parse(route.request().postData() || '{}');
     const loan = state.loans.find((item) => item.id === contractId);
     if (!loan) {
       await json(route, { title: 'Contrato não encontrado', detail: 'O contrato informado não existe.' }, 404);
@@ -1981,9 +2018,41 @@ async function fulfillApi(route: Route, state: {
       return;
     }
     installment.status = 'Paid';
-    installment.paidAt = new Date().toISOString();
+    installment.paidAt = payload.paidAt || new Date().toISOString();
     loan.openInstallments = Math.max(0, loan.openInstallments - 1);
-    await json(route, installment);
+    loan.openBalance = installment.endingBalance;
+    loan.status = loan.openInstallments === 0 ? 'Closed' : loan.status;
+
+    if (!isIntegratedPayment) {
+      await json(route, installment);
+      return;
+    }
+
+    await json(route, {
+      paymentId: crypto.randomUUID(),
+      contractId: loan.id,
+      installmentId: installment.id,
+      amount: installment.totalAmount,
+      principalAmount: installment.principalAmount,
+      interestAmount: installment.interestAmount,
+      penaltyAmount: Number(payload.penaltyAmount || 0),
+      discountAmount: Number(payload.discountAmount || 0),
+      paidAt: installment.paidAt,
+      accountTransactionId: payload.accountId ? crypto.randomUUID() : null,
+      receiptUrl: null,
+      installment,
+      contract: {
+        id: loan.id,
+        status: loan.status,
+        openBalance: loan.openBalance,
+        paidAmount: loan.totalCost - loan.openBalance,
+        paidPrincipal: loan.principalAmount - loan.openBalance,
+        paidInterest: installment.interestAmount,
+        openInstallments: loan.openInstallments,
+        nextDueDate: loan.installments.find((item) => item.status === 'Open')?.dueDate ?? null,
+        monthlyPayment: loan.monthlyPayment
+      }
+    });
     return;
   }
 
@@ -2359,6 +2428,21 @@ async function fulfillApi(route: Route, state: {
 
   if (path === '/api/v1/financial-assistant/context') {
     await json(route, state.assistantContext);
+    return;
+  }
+
+  if (path === '/api/v1/financial-assistant/health') {
+    await json(route, {
+      referenceDate: '2026-03-14',
+      overallStatus: 'ok',
+      overallSummary: 'Fluxo saudável, dívida sob controle e patrimônio em crescimento.',
+      areas: [
+        { area: 'cashflow', status: 'ok', explanation: 'Saldo disponível cobre as obrigações do período.' },
+        { area: 'divida', status: 'ok', explanation: 'Compromissos abertos seguem dentro da cobertura de caixa.' },
+        { area: 'patrimonio', status: 'ok', explanation: 'Patrimônio líquido permanece positivo no mês.' }
+      ],
+      generatedByAi: true
+    });
     return;
   }
 

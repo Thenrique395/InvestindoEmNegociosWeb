@@ -10,9 +10,10 @@ test.describe('authenticated finance modules', () => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByText('Planejamento de passivos')).toBeVisible();
+    await page.getByRole('button', { name: 'Novo contrato' }).click();
     await page.getByLabel('Título').fill('Empréstimo E2E');
     await page.getByRole('button', { name: 'Simular', exact: true }).click();
-    await expect(page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Simulação' })).toBeVisible();
     await expect(page.getByText('Parcela inicial')).toBeVisible();
 
     await page.getByRole('button', { name: 'Criar contrato' }).click();
