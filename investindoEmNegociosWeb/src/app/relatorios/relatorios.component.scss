@@ -25,6 +25,11 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+:host ::ng-deep .summary-grid app-transaction-summary-card .tsc__value {
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -168,6 +173,40 @@
 @media (max-width: 640px) {
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc {
+    padding: 0.9rem;
+    gap: 0.75rem;
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc__head {
+    gap: 0.55rem;
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc__icon {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc__icon svg {
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc__eyebrow {
+    font-size: 0.61rem;
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc__value {
+    font-size: clamp(1.15rem, 4.7vw, 1.45rem);
+    line-height: 1.05;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  :host ::ng-deep .summary-grid app-transaction-summary-card .tsc__note {
+    font-size: 0.69rem;
   }
 
   .category-bar__head {
