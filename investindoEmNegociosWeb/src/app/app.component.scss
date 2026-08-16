@@ -153,6 +153,14 @@
   padding: 0;
 }
 
+/* A tela de autenticação desenha de ponta a ponta: o padding da área de
+   conteúdo deixaria uma faixa do fundo aparecendo em volta, como se a tela
+   fosse um cartão. Ela não é. */
+.page--login .main {
+  padding: 0;
+  gap: 0;
+}
+
 /* O site traz o próprio cabeçalho sticky e desenha faixas de ponta a ponta:
    nada de padding lateral nem de reserva para o header do shell. */
 .page--site {

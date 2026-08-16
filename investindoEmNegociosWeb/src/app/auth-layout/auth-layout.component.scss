@@ -1,21 +1,17 @@
+/* A tela de autenticação ocupa a viewport inteira, dividida em dois painéis.
+   Não é um cartão flutuante sobre um fundo: o protótipo é a tela cheia, e o
+   fundo escuro que aparecia atrás dele era a moldura da página de protótipo. */
 :host {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   min-height: 100vh;
-  padding: var(--space-12) var(--space-10);
-  background: var(--auth-stage-bg);
+  background: var(--surface);
 }
 
 .auth-card {
   display: grid;
   grid-template-columns: 0.86fr 1fr;
-  width: 100%;
-  max-width: var(--auth-card-max);
+  min-height: 100vh;
   background: var(--surface);
-  border-radius: var(--auth-card-radius);
-  overflow: hidden;
-  box-shadow: var(--auth-card-shadow);
 }
 
 /* ---------- Painel esquerdo ---------------------------------------------- */
@@ -27,7 +23,7 @@
   flex-direction: column;
   justify-content: space-between;
   gap: var(--space-12);
-  min-height: var(--auth-min-height);
+  min-height: 100vh;
   padding: var(--auth-pad-y) var(--auth-aside-pad-x);
   background: var(--brand-navy);
   /* Cor fixa, não `--surface`: o painel não muda com o tema, então o texto
@@ -128,7 +124,7 @@
 .auth-main {
   display: flex;
   flex-direction: column;
-  min-height: var(--auth-min-height);
+  min-height: 100vh;
   padding: var(--auth-pad-y) var(--auth-pad-x);
   color: var(--text);
 }
@@ -204,15 +200,8 @@
 /* ---------- Responsivo ---------------------------------------------------- */
 
 @media (max-width: 900px) {
-  :host {
-    padding: 0;
-    align-items: stretch;
-  }
-
   .auth-card {
     grid-template-columns: minmax(0, 1fr);
-    border-radius: 0;
-    box-shadow: none;
   }
 
   /* O painel é apoio, não conteúdo: em tela estreita ele empurraria o
