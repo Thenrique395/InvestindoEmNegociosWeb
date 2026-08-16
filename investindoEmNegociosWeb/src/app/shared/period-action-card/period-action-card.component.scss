@@ -8,7 +8,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   background: linear-gradient(135deg, color-mix(in srgb, var(--surface-sunken) 80%, white), color-mix(in srgb, var(--surface) 90%, white));
-  box-shadow: var(--shadow-card-hover);
   padding: 1.45rem 1.4rem 1.3rem;
   display: grid;
   gap: 0.95rem;

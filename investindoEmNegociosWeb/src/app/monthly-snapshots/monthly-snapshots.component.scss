@@ -51,10 +51,18 @@
   text-transform: uppercase;
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .snapshots-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.snapshots-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .muted {
@@ -140,9 +148,6 @@
 }
 
 @media (max-width: 1180px) {
-  .snapshots-summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -152,10 +157,6 @@
 @media (max-width: 720px) {
   .latest-snapshot {
     display: grid;
-  }
-
-  .snapshots-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid {

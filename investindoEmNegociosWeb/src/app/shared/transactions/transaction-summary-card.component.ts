@@ -115,7 +115,11 @@ export type TransactionSummaryDensity = 'default' | 'compact';
       line-height: var(--lh-tight);
       letter-spacing: var(--ls-tighter);
       font-variant-numeric: tabular-nums;
-      overflow-wrap: anywhere;
+      /* Valor não parte no meio: 'R$ 8.580,00' quebrando entre o milhar e os
+         centavos vira dois números na tela. Quando não couber, a faixa usa
+         density="compact", que é o degrau de tamanho previsto no handoff. */
+      overflow-wrap: normal;
+      word-break: keep-all;
     }
 
     .tsc__tooltip { align-self: start; }
@@ -128,17 +132,20 @@ export type TransactionSummaryDensity = 'default' | 'compact';
     }
 
     /* ---- densidade compacta ------------------------------------------------
-       Valor monetário longo não quebra no meio: em faixa de 4+ indicadores o
-       'R$ 12.345,67' partia entre linhas e o card virava duas alturas. */
+       Para faixa unida de 4+ indicadores, onde cada card fica estreito demais
+       para o valor a 26px. É a distinção que o próprio handoff tokeniza:
+       --fs-kpi (26px) é "faixa isolada", --fs-kpi-strip (20px) é "faixa unida
+       de 5". Vale em toda largura, porque depende da contagem de cards e não
+       da viewport. */
     .tsc[data-density='compact'] .tsc__value {
-      overflow-wrap: normal;
-      word-break: keep-all;
+      font-size: var(--fs-kpi-strip);
+      letter-spacing: var(--ls-tighter);
+      white-space: nowrap;
     }
 
-    /* Abaixo de 720px a faixa cai para duas colunas e o card fica estreito:
-       a densidade desce um degrau em vez de deixar o valor encolher sozinho.
-       Os valores vêm dos tokens do handoff — --fs-micro é literalmente o token
-       de eyebrow, e --fs-kpi-strip o de faixa unida. */
+    /* Abaixo de 720px a faixa cai para duas colunas e o card fica ainda mais
+       estreito: a densidade desce outro degrau. --fs-micro é literalmente o
+       token de eyebrow. */
     @media (max-width: 720px) {
       .tsc[data-density='compact'] {
         gap: var(--space-5);
@@ -158,12 +165,6 @@ export type TransactionSummaryDensity = 'default' | 'compact';
       }
 
       .tsc[data-density='compact'] .tsc__eyebrow { font-size: var(--fs-micro); }
-
-      .tsc[data-density='compact'] .tsc__value {
-        font-size: var(--fs-kpi-strip);
-        letter-spacing: 0;
-        white-space: nowrap;
-      }
 
       .tsc[data-density='compact'] .tsc__note { font-size: var(--fs-caption); }
     }

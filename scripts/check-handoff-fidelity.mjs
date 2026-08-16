@@ -196,15 +196,24 @@ rules.push({
   ref: 'README.md §3',
   run() {
     const flutuante = /(modal|dropdown|toast|menu|popover|tooltip|sheet|overlay)/i;
+    // O site público tem linguagem visual própria (decisão D8 do PLANO_REDESIGN):
+    // no protótipo o plano recomendado sobe e ganha sombra de propósito.
+    const foraDoApp = /\/site\//;
+    // A regra é sobre CARD em repouso. Controle elevado não é card: o knob de um
+    // switch e a aba ativa do segmented têm sombra por especificação — a própria
+    // Fase 4.3 pede "aba ativa branca com sombra".
+    const controle = /(thumb|knob|--active|--selected)/;
     const hits = [];
     for (const file of scss) {
-      if (isStyleguide(file) || flutuante.test(rel(file))) continue;
+      if (isStyleguide(file) || flutuante.test(rel(file)) || foraDoApp.test(rel(file))) continue;
       const ls = lines(file);
       let emHover = false;
+      let seletor = '';
       ls.forEach((line, i) => {
+        if (/\{\s*$/.test(line)) seletor = line;
         if (/:hover|:focus|:active|\.is-|\[open\]/.test(line)) emHover = true;
         else if (line.trim() === '}') emHover = false;
-        if (!emHover && /box-shadow:\s*var\(--shadow-card-hover\)/.test(line)) {
+        if (!emHover && !controle.test(seletor) && /box-shadow:\s*var\(--shadow-card-hover\)/.test(line)) {
           hits.push({ file: rel(file), line: i + 1, text: line.trim() });
         }
       });
@@ -297,7 +306,7 @@ rules.push({
  * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
  * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
  */
-export const BASELINE = { R1: 7, R2: 6, R4: 10, R5: 27, R6: 4, R8: 49, R9: 19 };
+export const BASELINE = { R1: 7, R4: 10, R6: 4, R8: 49, R9: 19 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing

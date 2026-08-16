@@ -87,10 +87,18 @@
 
 // ---- Cards de resumo --------------------------------------------------------
 
+/* README §4: faixa de indicadores é flex com quebra, nunca `grid auto-fit`.
+   Com grid, quando a contagem de cards não divide pelo número de colunas sobra
+   célula vazia à direita; com flex a última linha cresce e preenche. */
 .cal-summary {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.cal-summary > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 // ---- Controles (visão + navegação de mês) -----------------------------------
@@ -218,7 +226,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-card-hover);
   min-width: 0;
 }
 

@@ -11,7 +11,7 @@
         </button>
       }
       @if (canTransfer) {
-        <button type="button" class="btn-secondary sm" (click)="focusTransfer()">Nova transferência</button>
+        <button type="button" class="btn-ghost sm" (click)="focusTransfer()">Nova transferência</button>
       }
       <button type="button" class="btn-ghost sm" (click)="refreshBalances()" aria-label="Atualizar saldos das contas">Atualizar saldos</button>
     </div>
@@ -51,7 +51,7 @@
   @if (hasAccounts) {
     <!-- Cards de resumo -->
     <section class="accounts-summary" aria-label="Resumo financeiro das contas">
-      <app-transaction-summary-card tone="primary" eyebrow="Saldo total" [value]="overview.totalBalance | appCurrency"
+      <app-transaction-summary-card density="compact" tone="primary" eyebrow="Saldo total" [value]="overview.totalBalance | appCurrency"
         note="Soma das contas ativas."
         tooltipText="Soma do saldo das contas ativas. Contas arquivadas ficam de fora, e o valor não desconta despesas ainda em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -60,7 +60,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
+      <app-transaction-summary-card density="compact" [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
         [note]="availableNote"
         tooltipText="Saldo total menos as despesas já lançadas e ainda não pagas. É o que sobra de fato depois de honrar os compromissos em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -68,7 +68,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
+      <app-transaction-summary-card density="compact" tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
         [note]="'Receitas reais ' + periodLabel + '.'"
         tooltipText="Receitas efetivamente recebidas no período, não as previstas. Transferências entre contas suas não contam como entrada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -76,7 +76,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
+      <app-transaction-summary-card density="compact" tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
         [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'"
         tooltipText="Despesas efetivamente pagas no período. Transferência entre contas suas não é saída — só muda o dinheiro de lugar.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -84,7 +84,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card tone="primary" eyebrow="Contas ativas" [value]="overview.activeCount.toString()"
+      <app-transaction-summary-card density="compact" tone="primary" eyebrow="Contas ativas" [value]="overview.activeCount.toString()"
         [note]="activeAccountsNote"
         tooltipText="Contas em uso hoje, que entram no saldo total. Arquivar uma conta a tira desta contagem sem apagar o histórico dela.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">

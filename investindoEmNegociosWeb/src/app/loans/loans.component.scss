@@ -12,10 +12,18 @@
   font-weight: var(--fw-semibold);
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .loans-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.loans-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .card {
@@ -23,7 +31,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-card-hover);
   min-width: 0;
 }
 
@@ -242,9 +249,6 @@ select {
 }
 
 @media (max-width: 900px) {
-  .loans-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 
   .contract-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -256,9 +260,6 @@ select {
 }
 
 @media (max-width: 560px) {
-  .loans-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 
   .contract__head {
     flex-direction: column;
@@ -275,9 +276,6 @@ select {
 }
 
 @media (max-width: 360px) {
-  .loans-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 
   .contract-metrics {
     grid-template-columns: minmax(0, 1fr);

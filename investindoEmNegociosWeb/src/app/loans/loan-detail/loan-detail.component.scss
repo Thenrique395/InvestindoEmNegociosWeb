@@ -13,10 +13,18 @@
   &:hover { text-decoration: underline; }
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca `grid auto-fit`.
+   Com grid, quando a contagem de cards não divide pelo número de colunas sobra
+   célula vazia à direita; com flex a última linha cresce e preenche. */
 .loans-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
+}
+
+.loans-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .card {

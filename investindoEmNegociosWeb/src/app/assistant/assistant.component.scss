@@ -3,10 +3,18 @@
   gap: 1.5rem;
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .assistant-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.assistant-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .header-meta {
@@ -79,14 +87,3 @@ textarea {
   font-size: var(--fs-meta);
 }
 
-@media (max-width: 900px) {
-  .assistant-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .assistant-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}

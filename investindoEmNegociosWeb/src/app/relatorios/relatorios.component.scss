@@ -73,10 +73,18 @@
   box-shadow: var(--shadow-card);
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .card {
@@ -84,7 +92,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-card-hover);
   min-width: 0;
   display: grid;
   gap: 0.9rem;
@@ -357,12 +364,6 @@
   color: var(--text);
 }
 
-@media (max-width: 900px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 640px) {
   .report-controls,
   .report-control,
@@ -373,10 +374,6 @@
   .segmented-control__option {
     flex: 1 1 0;
     padding-inline: 0.45rem;
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .comparison-bars,
@@ -413,8 +410,3 @@
   }
 }
 
-@media (max-width: 360px) {
-  .summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}

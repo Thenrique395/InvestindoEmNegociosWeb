@@ -21,8 +21,15 @@
   border-radius: var(--radius-panel);
   border: 1px solid var(--border);
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), var(--surface) 58%);
-  box-shadow: var(--shadow-card-hover);
   max-width: 100%;
+}
+
+/* README §3: card em repouso tem só a borda; a elevação de 2px é do hover.
+   Estes são clicáveis — sem o hover, ficavam sem nenhum retorno visual. */
+.cards-list__card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 .cards-list__top {
@@ -366,5 +373,4 @@
   color: white;
   font-size: var(--fs-subhead);
   font-weight: var(--fw-semibold);
-  box-shadow: var(--shadow-card-hover);
 }
