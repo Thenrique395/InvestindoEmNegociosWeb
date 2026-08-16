@@ -291,7 +291,24 @@
   --auth-pad-x:         48px;
   --auth-aside-pad-x:   40px;
 
+  /* Larguras de conteúdo do protótipo. O card dele tem max-width 1080px com
+     grid 0.85fr/1fr, o que dá painéis de 496 e 584; descontando o padding,
+     sobram 416 e 488 de conteúdo. A tela do app ocupa a viewport inteira, então
+     o conteúdo mantém essas medidas e fica centralizado em cada painel — sem
+     isso os campos esticam e a tela deixa de bater com o protótipo em janela
+     larga. Em 1080 os dois coincidem exatamente.                             */
+  --auth-aside-content-w: 416px;
+  --auth-main-content-w:  488px;
+
+  /* Tamanhos fixos, como no protótipo: o `clamp()` que existia encolhia os
+     títulos abaixo de ~1300px, e a tela deixava de bater com o design. */
+  --fs-auth-title:       30px;  /* "Acesse sua conta"                     */
+  --fs-auth-aside-title: 34px;  /* "Controle seu dinheiro com clareza."   */
+  --auth-desc-w:        370px;  /* largura da descrição sob o título      */
+
   --auth-field-h:       46px;
+  --auth-submit-h:      50px;  /* o botão é 4px mais alto que o campo      */
+  --auth-submit-radius: 12px;
   --auth-field-radius:  11px;
 
   /* O painel esquerdo é SEMPRE navy, nos dois temas. Por isso estas cores são

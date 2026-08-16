@@ -9,9 +9,25 @@
 
 .auth-card {
   display: grid;
-  grid-template-columns: 0.86fr 1fr;
+  grid-template-columns: 0.85fr 1fr;
   min-height: 100vh;
   background: var(--surface);
+}
+
+/* O conteúdo de cada painel mantém a largura do protótipo e fica centralizado.
+   Sem isto ele estica com a viewport: em 1440 os campos passavam de 488 para
+   678px e a tela deixava de bater com o design. Em 1080 — a largura do card do
+   protótipo — os dois coincidem exatamente. */
+.auth-aside > * {
+  width: 100%;
+  max-width: var(--auth-aside-content-w);
+  margin-inline: auto;
+}
+
+.auth-main > * {
+  width: 100%;
+  max-width: var(--auth-main-content-w);
+  margin-inline: auto;
 }
 
 /* ---------- Painel esquerdo ---------------------------------------------- */
@@ -81,7 +97,7 @@
   margin: var(--space-6) 0 var(--space-5);
   max-width: 16ch;
   font-family: var(--font-display);
-  font-size: clamp(26px, 2.6vw, 34px);
+  font-size: var(--fs-auth-aside-title);
   font-weight: var(--fw-semibold);
   line-height: 1.12;
   letter-spacing: var(--ls-tighter);
@@ -167,15 +183,17 @@
 .auth-main__title {
   margin: var(--space-3) 0 var(--space-2);
   font-family: var(--font-display);
-  font-size: clamp(24px, 2.4vw, 30px);
+  /* Fixo, como no protótipo. O clamp encolhia o título abaixo de ~1300px e a
+     tela deixava de bater com o design em janela média. */
+  font-size: var(--fs-auth-title);
   font-weight: var(--fw-semibold);
-  line-height: 1.18;
+  line-height: normal;
   letter-spacing: var(--ls-tighter);
 }
 
 .auth-main__description {
   margin: 0;
-  max-width: 46ch;
+  max-width: var(--auth-desc-w);
   color: var(--text-secondary);
   font-size: var(--fs-subhead);
   line-height: 1.6;

@@ -23,6 +23,9 @@
 .auth-field__label {
   font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
+  /* Entrelinha do protótipo: o 1.6 herdado do corpo somava 5px por rótulo e
+     empurrava campo e botão para baixo. */
+  line-height: normal;
   color: var(--text);
 }
 
@@ -203,13 +206,13 @@
   justify-content: center;
   gap: var(--space-3);
   width: 100%;
-  height: var(--auth-field-h);
+  height: var(--auth-submit-h);
   border: none;
-  border-radius: var(--auth-field-radius);
+  border-radius: var(--auth-submit-radius);
   background: var(--primary);
   color: var(--on-primary);
   font-family: inherit;
-  font-size: var(--fs-subhead);
+  font-size: var(--fs-card-title);
   font-weight: var(--fw-semibold);
   cursor: pointer;
   transition: background var(--dur-hover) ease, transform 100ms ease;
