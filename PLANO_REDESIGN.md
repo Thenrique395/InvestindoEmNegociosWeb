@@ -975,9 +975,9 @@ Contagem do dia, por regra do gate (`npm run handoff:report`):
 | ~~R3~~ | ✅ 0 | Tela com card de indicador sem nenhum tooltip — **quitada, e fora do baseline** |
 | **R4** | 10 | Gráfico desenhado à mão dentro da feature |
 | ~~R5~~ | ✅ 0 | `--shadow-card-hover` aplicada em repouso — **quitada, e fora do baseline** |
-| **R6** | 4 | Hex literal fora do `design-tokens.scss` |
+| ~~R6~~ | ✅ 0 | Hex literal fora do `design-tokens.scss` — **quitada, e fora do baseline** |
 | **R8** | 49 | Componente sem `OnPush` (dívida anterior ao redesign) |
-| **R9** | 19 | Feature repintando primitivo por dentro com `::ng-deep` — parcialmente quitada na 8.6 |
+| **R9** | 14 | Feature repintando primitivo por dentro com `::ng-deep` — 8 quitados; 14 esperam a 8.1 |
 
 **R1 é a que decide o resultado do rebrand.** `app-kpi-strip`, `app-money`, `app-data-table`,
 `app-number-stepper`, `app-progress-bar`, `app-chart-bars` e `app-chart-line` foram
@@ -1063,6 +1063,24 @@ não dispara e a página sai em branco.
 ---
 
 ## 8. FASE 8 — Quitação da dívida de fidelidade
+
+**Placar em 2026-08-16: 143 → 80 violações.** Quatro regras zeradas e fora do `BASELINE`
+(R2, R3, R5, R6) — viraram regra dura, e reincidência quebra o gate na hora.
+
+| Etapa | Regra | Estado |
+|---|---|---|
+| 8.1 Adotar primitivos | R1 | 🔴 **7 · bloqueada na decisão dos pares** |
+| 8.2 Faixa em flex | R2 | ✅ 0 |
+| 8.3 Tooltip | R3 | ✅ 0 |
+| 8.4 Gráficos | R4 | 🔴 10 · depende da 8.1 |
+| 8.5 Sombra | R5 | ✅ 0 |
+| 8.6 `::ng-deep` | R9 | 🔶 14 · 8 quitados; o resto depende da 8.1 |
+| 8.7 Hex · OnPush | R6 · R8 | ✅ 0 · 🔶 49 |
+
+**Tudo que sobra passa pela 8.1.** A 8.4 exige saber se o `app-chart-line` sobrevive antes de
+migrar 10 gráficos para ele; 13 dos 14 `::ng-deep` restantes miram componentes que podem ser
+apagados. Só o `OnPush` é independente, e ele desce sozinho conforme as telas são tocadas.
+
 
 Aberta pela auditoria da seção 5.1. **Precede a Fase 7.2 em diante**: cada tela nova
 construída sobre os componentes legados aumenta o custo de adotar os primitivos depois.
@@ -1190,30 +1208,37 @@ captura: os cards continuam legíveis.
 estilo nenhum: em Contas, "Nova transferência" era texto solto entre dois botões. Trocado por
 `.btn-ghost`.
 
-### 8.6 — Fim do `::ng-deep` em feature · R9: ~~22~~ 19 → 0
+### 8.6 — Fim do `::ng-deep` em feature · R9: ~~22~~ 14 → 0
 
-**Parcialmente quitada em 2026-08-16.** Relatórios, Histórico mensal e Calculadoras tinham o
-**mesmo** bloco de override copiado — sete regras cada, mirando o interior do
-`app-transaction-summary-card`. Pela regra da terceira feature (§2), virou
-`density="compact"` no próprio primitivo. Os valores em `rem` do bloco copiado reinventavam
-tokens que já existiam: `--fs-micro` é literalmente o token de eyebrow e `--fs-kpi-strip` o de
-faixa unida.
+**Duas rodadas feitas, 8 quitados.** As duas seguiram o mesmo caminho, que é o modelo para o
+resto: a variação sobe para o primitivo, não desce para a tela.
 
-É o modelo para o resto desta etapa: a variação sobe para o primitivo, não desce para a tela.
+- **Card de indicador** (−3): Relatórios, Histórico mensal e Calculadoras tinham o **mesmo**
+  bloco de sete regras copiado. Virou `density="compact"`. Os `rem` do bloco reinventavam
+  tokens que já existiam — `--fs-micro` é literalmente o token de eyebrow.
+- **Segmented** (−5): Cenários repintava o controle para ocupar a largura do campo. Virou
+  `stretch`, seguindo o padrão de host attribute que o componente já usava em `data-size`.
+  Não dependia da 8.1 porque a Fase 4.3 já decidiu que este primitivo fica.
 
-- [ ] Cada `::ng-deep` vira `@Input` de variante no primitivo, ou uma classe utilitária.
-- [ ] Piores casos: `orcamento` (10), `relatorios` (8) — os dois repintam o
-      `app-transaction-summary-card` e o `app-responsive-list` por dentro.
-- [ ] Se três telas precisam da mesma variação, ela vira o padrão do primitivo (§2, regra
-      da terceira feature).
+**Os 14 restantes esperam a 8.1**: 13 miram o `app-responsive-list` e o `app-donut-chart`,
+1 é uma largura de coluna. Dar `@Input` de variante a um componente que pode ser apagado é
+trabalho jogado fora — por isso param aqui.
 
-### 8.7 — Hex literal e `OnPush` · R6: 4 → 0 · R8: 51 → 0
+### 8.7 — Hex literal e `OnPush` · R6: ~~4~~ ✅ CONCLUÍDA · R8: 49 → 0
 
-- [ ] `cartoes-listagem.component.scss` — gradientes de Visa, Elo e Amex viram
-      `--brand-visa` e companhia. São cores de marca de terceiros: viram token, não sumem.
-      A Fase 1 já previa isso para a 5.4 e ficou pendente.
-- [ ] `OnPush`: dívida anterior ao redesign, 51 componentes. Não abrir frente própria —
-      cada tela que a Fase 8 tocar sai com `OnPush`, e o baseline desce junto.
+**Hex quitado em 2026-08-16.** Eram os gradientes de Visa, Elo e Amex, pendentes desde a
+Fase 1 — que os previa para a 5.4 e não fechou. São marcas de terceiros e não seguem a paleta
+do handoff, mas §6 não abre exceção por origem da cor: literal não mora em SCSS de
+componente. Viraram `--brand-visa-from` e companhia, em seção própria do `design-tokens.scss`
+que diz o que são e onde podem ser usadas. Selo conferido no navegador, sem mudança visual.
+
+O quarto achado era **falso positivo do gate**: ele testava comentário só pelo começo da
+linha, e um hex citado no meio de um bloco `/* */` contava como violação. Corrigido com
+remoção de comentários antes da busca, e teste de mesa cobrindo bloco, linha e inline.
+
+- [ ] `OnPush`: dívida anterior ao redesign, 49 componentes. Segue a regra de não abrir
+      frente própria — cada tela que a Fase 8 tocar sai com `OnPush`, e o baseline desce
+      junto. Já caiu de 51 para 49 sem esforço dirigido.
 
 ### Encerramento da Fase 8
 
