@@ -31,6 +31,7 @@
       <div class="field">
         <span class="field__label">Período</span>
         <app-segmented-selector
+          [stretch]="true"
           ariaLabel="Período da projeção"
           [options]="periodOptions"
           [value]="params.period"

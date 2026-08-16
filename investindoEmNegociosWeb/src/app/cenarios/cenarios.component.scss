@@ -92,14 +92,6 @@ label {
   font-weight: var(--fw-semibold);
 }
 
-:host ::ng-deep .field app-segmented-selector {
-  width: 100%;
-}
-
-:host ::ng-deep .field app-segmented-selector .seg {
-  width: 100%;
-}
-
 input[type='number'] {
   border: 1px solid var(--border);
   background-color: var(--surface-sunken);
@@ -294,24 +286,6 @@ td {
 
   .scenario-chart__point {
     scroll-snap-align: start;
-  }
-
-  :host ::ng-deep .field app-segmented-selector .seg {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow: visible;
-  }
-
-  :host ::ng-deep .field app-segmented-selector .seg__item {
-    justify-content: center;
-    min-width: 0;
-    padding-inline: 0.45rem;
-  }
-
-  :host ::ng-deep .field app-segmented-selector .seg__label {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .projection-table {

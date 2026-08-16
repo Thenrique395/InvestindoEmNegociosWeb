@@ -19,6 +19,7 @@ export interface SegmentOption {
   standalone: true,
   imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[attr.data-stretch]': "stretch() ? '' : null" },
   template: `
     <div class="seg" role="radiogroup" [attr.aria-label]="ariaLabel()">
       @for (option of visibleOptions(); track option.value) {
@@ -88,12 +89,42 @@ export interface SegmentOption {
     @media (max-width: 640px) {
       .seg { width: 100%; overflow-x: auto; }
     }
+
+    /* Variante stretch: o controle ocupa a largura do campo e os segmentos
+       dividem o espaço em partes iguais. Usada quando o segmented é um campo de
+       formulário, e não um seletor de visão no cabeçalho. Nasceu como override
+       ::ng-deep em Cenários; a variação é do controle, não da tela. */
+    :host([data-stretch]) { display: block; width: 100%; }
+    :host([data-stretch]) .seg { display: flex; width: 100%; }
+    :host([data-stretch]) .seg__item {
+      flex: 1 1 0;
+      justify-content: center;
+      min-width: 0;
+      padding-inline: var(--space-4);
+    }
+    :host([data-stretch]) .seg__label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Estreito: em vez de rolar na horizontal, quebra em duas colunas — o
+       rótulo continua legível e o controle não vira uma régua deslizante. */
+    @media (max-width: 640px) {
+      :host([data-stretch]) .seg {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow: visible;
+      }
+    }
   `
 })
 export class SegmentedSelectorComponent {
   readonly options = input.required<SegmentOption[]>();
   readonly value = input.required<string>();
   readonly ariaLabel = input<string>('Selecionar visualização');
+  /** Ocupa a largura do campo, com os segmentos divididos por igual. */
+  readonly stretch = input(false);
   readonly valueChange = output<string>();
 
   visibleOptions(): SegmentOption[] {
