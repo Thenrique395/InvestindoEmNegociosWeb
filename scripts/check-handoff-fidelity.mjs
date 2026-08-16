@@ -17,7 +17,7 @@
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const APP = join(ROOT, 'investindoEmNegociosWeb', 'src', 'app');
@@ -297,78 +297,97 @@ rules.push({
  * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
  * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
  */
-const BASELINE = { R1: 7, R2: 6, R3: 16, R4: 10, R5: 27, R6: 4, R8: 51, R9: 22 };
+export const BASELINE = { R1: 7, R2: 6, R3: 16, R4: 10, R5: 27, R6: 4, R8: 51, R9: 22 };
 
-const VERDE = '\x1b[32m';
-const VERMELHO = '\x1b[31m';
-const AMARELO = '\x1b[33m';
-const FRACO = '\x1b[2m';
-const FIM = '\x1b[0m';
-
-let regrediu = false;
-let dividaAberta = 0;
-let melhorou = [];
-const resumo = [];
-
-for (const rule of rules) {
-  const hits = rule.run();
-  const teto = BASELINE[rule.id] ?? 0;
-  // 'regressao' = pior que o baseline. 'divida' = dentro do baseline, mas ainda não zerado.
-  const estado = hits.length > teto ? 'regressao' : hits.length > 0 ? 'divida' : 'ok';
-  if (estado === 'regressao') regrediu = true;
-  if (estado === 'divida') dividaAberta += hits.length;
-  if (teto > 0 && hits.length < teto) melhorou.push(`${rule.id} ${teto}→${hits.length}`);
-  resumo.push({ rule, hits, teto, estado });
+/**
+ * Roda todas as regras e classifica cada uma. Exportado para o briefing
+ * (`briefing-redesign.mjs`) mostrar números vivos em vez de um texto que envelhece.
+ */
+export function avaliar() {
+  return rules.map((rule) => {
+    const hits = rule.run();
+    const teto = BASELINE[rule.id] ?? 0;
+    // 'regressao' = pior que o baseline. 'divida' = dentro do baseline, mas ainda não zerado.
+    const estado = hits.length > teto ? 'regressao' : hits.length > 0 ? 'divida' : 'ok';
+    return { rule, hits, teto, estado };
+  });
 }
 
-console.log(`\n  Fidelidade ao handoff de design\n  ${'─'.repeat(64)}\n`);
+/* ----------------------------------------------------------------------- CLI */
 
-for (const { rule, hits, teto, estado } of resumo) {
-  const marca = { ok: `${VERDE}✓${FIM}`, divida: `${AMARELO}⚠${FIM}`, regressao: `${VERMELHO}✗${FIM}` }[estado];
-  const placar =
-    estado === 'regressao'
-      ? `— ${VERMELHO}REGREDIU: ${hits.length}, o teto é ${teto}${FIM}`
-      : estado === 'divida'
-        ? `— ${AMARELO}${hits.length} de dívida herdada (teto ${teto})${FIM}`
-        : '';
-  console.log(`  ${marca} ${rule.id}  ${rule.titulo}  ${placar}`);
-  console.log(`       ${FRACO}${rule.ref}${FIM}`);
-  if ((estado === 'regressao' || REPORT_ONLY) && hits.length) {
-    for (const h of hits.slice(0, 12)) {
-      console.log(`       ${h.file}${h.line ? `:${h.line}` : ''}  ${h.text.slice(0, 96)}`);
+export const CORES = {
+  verde: '\x1b[32m',
+  vermelho: '\x1b[31m',
+  amarelo: '\x1b[33m',
+  fraco: '\x1b[2m',
+  fim: '\x1b[0m',
+};
+
+function relatorioCli() {
+  const { verde, vermelho, amarelo, fraco, fim } = CORES;
+
+  const resumo = avaliar();
+  const regrediu = resumo.some((r) => r.estado === 'regressao');
+  const dividaAberta = resumo.filter((r) => r.estado === 'divida').reduce((n, r) => n + r.hits.length, 0);
+  const melhorou = resumo
+    .filter(({ hits, teto }) => teto > 0 && hits.length < teto)
+    .map(({ rule, hits, teto }) => `${rule.id} ${teto}\u2192${hits.length}`);
+
+  console.log(`\n  Fidelidade ao handoff de design\n  ${'\u2500'.repeat(64)}\n`);
+
+  for (const { rule, hits, teto, estado } of resumo) {
+    const marca = { ok: `${verde}\u2713${fim}`, divida: `${amarelo}\u26a0${fim}`, regressao: `${vermelho}\u2717${fim}` }[estado];
+    const placar =
+      estado === 'regressao'
+        ? `\u2014 ${vermelho}REGREDIU: ${hits.length}, o teto \u00e9 ${teto}${fim}`
+        : estado === 'divida'
+          ? `\u2014 ${amarelo}${hits.length} de d\u00edvida herdada (teto ${teto})${fim}`
+          : '';
+    console.log(`  ${marca} ${rule.id}  ${rule.titulo}  ${placar}`);
+    console.log(`       ${fraco}${rule.ref}${fim}`);
+    if ((estado === 'regressao' || REPORT_ONLY) && hits.length) {
+      for (const h of hits.slice(0, 12)) {
+        console.log(`       ${h.file}${h.line ? `:${h.line}` : ''}  ${h.text.slice(0, 96)}`);
+      }
+      if (hits.length > 12) console.log(`       ${fraco}\u2026 e mais ${hits.length - 12} (use --report)${fim}`);
     }
-    if (hits.length > 12) console.log(`       ${FRACO}… e mais ${hits.length - 12} (use --report)${FIM}`);
+    console.log('');
   }
-  console.log('');
+
+  if (melhorou.length) {
+    console.log(`  ${verde}D\u00edvida quitada nesta rodada: ${melhorou.join(', ')}.${fim}`);
+    console.log(`  ${fraco}Baixe o BASELINE deste script no mesmo commit, sen\u00e3o ela pode voltar.${fim}\n`);
+  }
+
+  if (REPORT_ONLY) {
+    console.log(`  ${fraco}modo --report: nada \u00e9 bloqueado.${fim}\n`);
+    return 0;
+  }
+
+  if (regrediu) {
+    console.error(
+      `  ${vermelho}O c\u00f3digo divergiu do handoff.${fim} O handoff \u00e9 a especifica\u00e7\u00e3o: a tela precisa ficar\n` +
+        `  igual ao prot\u00f3tipo, n\u00e3o parecida. Corrija o c\u00f3digo \u2014 n\u00e3o afrouxe a regra nem suba o\n` +
+        `  baseline. Se a regra estiver errada, ela muda em design_handoff_investindo_redesign/\n` +
+        `  primeiro, e s\u00f3 depois aqui.\n`,
+    );
+    return 1;
+  }
+
+  if (dividaAberta) {
+    console.log(
+      `  ${amarelo}Sem regress\u00e3o${fim}, mas ainda h\u00e1 ${dividaAberta} viola\u00e7\u00f5es de d\u00edvida herdada.\n` +
+        `  ${fraco}O plano de quita\u00e7\u00e3o \u00e9 a Fase 8 do PLANO_REDESIGN.md. Enquanto houver d\u00edvida, a tela\n` +
+        `  est\u00e1 parecida com o handoff, n\u00e3o igual.${fim}\n`,
+    );
+    return 0;
+  }
+
+  console.log(`  ${verde}Tudo conforme o handoff, sem d\u00edvida aberta.${fim}\n`);
+  return 0;
 }
 
-if (melhorou.length) {
-  console.log(`  ${VERDE}Dívida quitada nesta rodada: ${melhorou.join(', ')}.${FIM}`);
-  console.log(`  ${FRACO}Baixe o BASELINE deste script no mesmo commit, senão ela pode voltar.${FIM}\n`);
+// Importado (pelo briefing), o m\u00f3dulo entrega s\u00f3 `avaliar()` e n\u00e3o imprime nada.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  process.exit(relatorioCli());
 }
-
-if (REPORT_ONLY) {
-  console.log(`  ${FRACO}modo --report: nada é bloqueado.${FIM}\n`);
-  process.exit(0);
-}
-
-if (regrediu) {
-  console.error(
-    `  ${VERMELHO}O código divergiu do handoff.${FIM} O handoff é a especificação: a tela precisa ficar\n` +
-      `  igual ao protótipo, não parecida. Corrija o código — não afrouxe a regra nem suba o\n` +
-      `  baseline. Se a regra estiver errada, ela muda em design_handoff_investindo_redesign/\n` +
-      `  primeiro, e só depois aqui.\n`,
-  );
-  process.exit(1);
-}
-
-if (dividaAberta) {
-  console.log(
-    `  ${AMARELO}Sem regressão${FIM}, mas ainda há ${dividaAberta} violações de dívida herdada.\n` +
-      `  ${FRACO}O plano de quitação é a Fase 8 do PLANO_REDESIGN.md. Enquanto houver dívida, a tela\n` +
-      `  está parecida com o handoff, não igual.${FIM}\n`,
-  );
-  process.exit(0);
-}
-
-console.log(`  ${VERDE}Tudo conforme o handoff, sem dívida aberta.${FIM}\n`);

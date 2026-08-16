@@ -941,9 +941,15 @@ sintoma na tela em que ele foi visto não fecha a regra. É por isso que existe 
 ### O gate
 
 ```bash
+npm run handoff:briefing # o que precisa estar na cabeça antes de tocar em tela
 npm run handoff:check    # bloqueia regressão · roda dentro de quality:frontend
 npm run handoff:report   # lista tudo que está aberto, com arquivo:linha
 ```
+
+`briefing-redesign.mjs` existe porque documento longo não é lido no meio da tarefa. Ele cabe
+em uma tela, tira os números do gate ao vivo — nunca de texto fixo, que envelheceria no
+commit seguinte — e repete as cinco coisas que não se faz. **Rodar ao iniciar qualquer tarefa
+de tela do redesign.**
 
 Nove regras do handoff viraram verificação executável em `scripts/check-handoff-fidelity.mjs`,
 cada uma citando a seção que a define. Funciona por **baseline**: a dívida de hoje está
@@ -982,7 +988,8 @@ senão ela volta sem ninguém perceber.
 ## 7. Verificação
 
 ```bash
-npm run typecheck      # tsc --noEmit
+npm run typecheck        # tsc --noEmit
+npm run handoff:briefing # briefing do redesign — rodar ao iniciar tarefa de tela
 npm run handoff:check  # fidelidade ao handoff — bloqueia regressão
 npm run handoff:report # fidelidade — lista o que está aberto, com arquivo:linha
 npm run test:ci        # karma headless + cobertura

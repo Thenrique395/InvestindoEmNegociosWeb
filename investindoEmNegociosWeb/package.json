@@ -11,6 +11,7 @@
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage --code-coverage-exclude=src/app/styleguide/**",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "legal:ready": "node ../scripts/check-legal-placeholders.mjs",
+    "handoff:briefing": "node ../scripts/briefing-redesign.mjs",
     "handoff:check": "node ../scripts/check-handoff-fidelity.mjs",
     "handoff:report": "node ../scripts/check-handoff-fidelity.mjs --report",
     "quality:frontend": "npm run typecheck && npm run handoff:check && npm run test:ci && npm run build:prod",
