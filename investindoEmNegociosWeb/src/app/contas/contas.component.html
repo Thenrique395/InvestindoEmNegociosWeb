@@ -52,7 +52,8 @@
     <!-- Cards de resumo -->
     <section class="accounts-summary" aria-label="Resumo financeiro das contas">
       <app-transaction-summary-card tone="primary" eyebrow="Saldo total" [value]="overview.totalBalance | appCurrency"
-        note="Soma das contas ativas.">
+        note="Soma das contas ativas."
+        tooltipText="Soma do saldo das contas ativas. Contas arquivadas ficam de fora, e o valor não desconta despesas ainda em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
           <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
@@ -60,28 +61,32 @@
       </app-transaction-summary-card>
 
       <app-transaction-summary-card [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
-        [note]="availableNote">
+        [note]="availableNote"
+        tooltipText="Saldo total menos as despesas já lançadas e ainda não pagas. É o que sobra de fato depois de honrar os compromissos em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 7h16v10H4zM4 10h16M8 14h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
 
       <app-transaction-summary-card tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
-        [note]="'Receitas reais ' + periodLabel + '.'">
+        [note]="'Receitas reais ' + periodLabel + '.'"
+        tooltipText="Receitas efetivamente recebidas no período, não as previstas. Transferências entre contas suas não contam como entrada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
 
       <app-transaction-summary-card tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
-        [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'">
+        [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'"
+        tooltipText="Despesas efetivamente pagas no período. Transferência entre contas suas não é saída — só muda o dinheiro de lugar.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
 
       <app-transaction-summary-card tone="primary" eyebrow="Contas ativas" [value]="overview.activeCount.toString()"
-        [note]="activeAccountsNote">
+        [note]="activeAccountsNote"
+        tooltipText="Contas em uso hoje, que entram no saldo total. Arquivar uma conta a tira desta contagem sem apagar o histórico dela.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

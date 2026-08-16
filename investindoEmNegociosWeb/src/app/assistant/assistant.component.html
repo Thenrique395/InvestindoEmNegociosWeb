@@ -14,7 +14,8 @@
         tone="primary"
         eyebrow="SDR"
         [value]="c.realBalance.realAvailableBalance | appCurrency"
-        note="Saldo disponível real usado no contexto da conversa.">
+        note="Saldo disponível real usado no contexto da conversa."
+        tooltipText="Saldo Disponível Real: saldo das contas menos as despesas em aberto. É um dos números que o assistente usa para responder.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 4v16M6 10h10a3 3 0 0 0 0-6H8a3 3 0 0 0 0 6h8a3 3 0 0 1 0 6H6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -23,7 +24,8 @@
         tone="warning"
         eyebrow="Dívida"
         [value]="c.debts.totalDebt | appCurrency"
-        note="Compromissos considerados nas recomendações.">
+        note="Compromissos considerados nas recomendações."
+        tooltipText="Total devido em empréstimos, financiamentos e faturas em aberto, considerado nas recomendações.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -32,7 +34,8 @@
         tone="info"
         eyebrow="Patrimônio"
         [value]="c.netWorth.netWorth | appCurrency"
-        note="Base patrimonial consolidada para análise.">
+        note="Base patrimonial consolidada para análise."
+        tooltipText="Patrimônio líquido: o que você tem em contas e investimentos menos o que deve.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -41,7 +44,8 @@
         [tone]="riskTone"
         eyebrow="Risco"
         [value]="c.risk.score + '/100'"
-        note="Pontuação usada para priorizar alertas.">
+        note="Pontuação usada para priorizar alertas."
+        tooltipText="Índice de saúde financeira de 0 a 100, que perde pontos por conta vencida, receita atrasada, cobertura baixa e projeção negativa. Quanto MAIOR, melhor.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

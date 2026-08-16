@@ -71,7 +71,8 @@
         tone="success"
         eyebrow="Receitas"
         [value]="report.totalIncome | appCurrency"
-        note="Total de entradas registradas no mês.">
+        note="Total de entradas registradas no mês."
+        tooltipText="Soma das receitas com data no mês selecionado. Transferência entre contas suas não conta como entrada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -81,7 +82,8 @@
         tone="danger"
         eyebrow="Despesas"
         [value]="report.totalExpenses | appCurrency"
-        note="Total de saídas pagas no mês.">
+        note="Total de saídas pagas no mês."
+        tooltipText="Soma das despesas pagas no mês selecionado. Despesa lançada e ainda em aberto não entra aqui.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -91,7 +93,8 @@
         [tone]="report.netBalance < 0 ? 'warning' : 'info'"
         eyebrow="Saldo líquido"
         [value]="report.netBalance | appCurrency"
-        [note]="report.netBalance < 0 ? 'Você gastou mais do que recebeu neste mês.' : 'Receitas menos despesas do mês.'">
+        [note]="report.netBalance < 0 ? 'Você gastou mais do que recebeu neste mês.' : 'Receitas menos despesas do mês.'"
+        tooltipText="Receitas menos despesas do mês. É o resultado do período isolado; não considera o saldo acumulado das suas contas.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -101,7 +104,8 @@
         tone="primary"
         eyebrow="Taxa de poupança"
         [value]="(report.savingsRate | number:'1.1-1') + '%'"
-        note="Parte das receitas que sobrou no mês.">
+        note="Parte das receitas que sobrou no mês."
+        tooltipText="Quanto sobrou dividido pelo quanto entrou: (receitas − despesas) ÷ receitas. Mês sem receita não tem taxa, e o valor fica em zero.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3v18M5 10a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

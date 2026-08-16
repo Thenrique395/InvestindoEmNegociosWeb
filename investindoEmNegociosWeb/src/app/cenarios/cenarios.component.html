@@ -63,7 +63,8 @@
         tone="info"
         eyebrow="Saldo projetado (base)"
         [value]="result.baseProjectedClosingBalance | appCurrency"
-        note="Sem alterações no comportamento atual.">
+        note="Sem alterações no comportamento atual."
+        tooltipText="Saldo que você fecharia no fim do período mantendo o comportamento de hoje. É a régua de comparação, não uma meta.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -71,7 +72,8 @@
       <app-transaction-summary-card
         [tone]="scenarioTone"
         eyebrow="Saldo projetado (cenário)"
-        [value]="result.scenarioProjectedClosingBalance | appCurrency">
+        [value]="result.scenarioProjectedClosingBalance | appCurrency"
+        tooltipText="Saldo projetado aplicando os parâmetros que você ajustou acima. A diferença para o saldo base é o efeito da mudança simulada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -85,7 +87,8 @@
         tone="primary"
         eyebrow="Potencial de poupança mensal"
         [value]="result.monthlySavingsPotential | appCurrency"
-        note="Com os parâmetros informados.">
+        note="Com os parâmetros informados."
+        tooltipText="Quanto sobraria por mês com os parâmetros simulados: receitas menos despesas do cenário. É uma projeção, não um valor já reservado.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3v18M5 10a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

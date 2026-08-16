@@ -22,18 +22,22 @@
 
       @if (activeTab === 'resumo') {
         <section class="loans-summary-grid">
-          <app-transaction-summary-card tone="warning" eyebrow="Saldo devedor" [value]="c.openBalance | appCurrency" note="Valor ainda pendente." />
-          <app-transaction-summary-card tone="primary" eyebrow="Parcela" [value]="c.monthlyPayment | appCurrency" note="Compromisso mensal." />
+          <app-transaction-summary-card tone="warning" eyebrow="Saldo devedor" [value]="c.openBalance | appCurrency" note="Valor ainda pendente."
+            tooltipText="Principal que falta quitar neste contrato. Não inclui os juros das parcelas que ainda vão vencer." />
+          <app-transaction-summary-card tone="primary" eyebrow="Parcela" [value]="c.monthlyPayment | appCurrency" note="Compromisso mensal."
+            tooltipText="Valor da parcela mensal contratada, já com juros e encargos. Em contratos PRICE ele é fixo; em SAC diminui ao longo do tempo." />
           <app-transaction-summary-card
             tone="info"
             eyebrow="Próximo vencimento"
             [value]="v.nextInstallment ? (v.nextInstallment.dueDate | date:'dd/MM/yyyy')! : 'Sem vencimento'"
-            [note]="v.nextInstallment ? ('Parcela de ' + (v.nextInstallment.totalAmount | appCurrency)) : 'Sem parcelas em aberto.'" />
+            [note]="v.nextInstallment ? ('Parcela de ' + (v.nextInstallment.totalAmount | appCurrency)) : 'Sem parcelas em aberto.'"
+            tooltipText="Data da próxima parcela em aberto deste contrato, com o valor dela ao lado." />
           <app-transaction-summary-card
             tone="success"
             eyebrow="Quitação prevista"
             [value]="expectedPayoffDate ? (expectedPayoffDate | date:'dd/MM/yyyy')! : 'Sem previsão'"
-            [note]="v.paidCount + '/' + v.totalCount + ' parcelas quitadas · ' + v.paidPercent + '% amortizado.'" />
+            [note]="v.paidCount + '/' + v.totalCount + ' parcelas quitadas · ' + v.paidPercent + '% amortizado.'"
+            tooltipText="Vencimento da última parcela em aberto do cronograma. É a data contratada, não uma projeção — amortizar antecipado antecipa essa data." />
         </section>
 
         <article class="card">

@@ -66,7 +66,8 @@
         [tone]="vm.current.isTrial ? 'warning' : 'primary'"
         [eyebrow]="vm.current.isTrial ? 'Plano (trial)' : 'Plano atual'"
         [value]="vm.current.planName"
-        note="Plano que define os recursos liberados.">
+        note="Plano que define os recursos liberados."
+        tooltipText="Plano contratado hoje. É ele que define quais telas e recursos aparecem no seu menu.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -75,7 +76,8 @@
         tone="info"
         eyebrow="Role efetiva"
         [value]="vm.current.role"
-        note="Nível de acesso aplicado à conta.">
+        note="Nível de acesso aplicado à conta."
+        tooltipText="Nível de permissão aplicado de fato à conta. Normalmente acompanha o plano, mas pode ser ajustado por um administrador.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -84,7 +86,8 @@
         [tone]="vm.current.autoRenew ? 'success' : 'warning'"
         eyebrow="Renovação"
         [value]="vm.current.autoRenew ? 'Ativa' : 'Cancelada'"
-        note="Renovação automática do plano.">
+        note="Renovação automática do plano."
+        tooltipText="Se o plano se renova sozinho ao fim do ciclo. Cancelada, o acesso continua até a data ao lado e não é cobrado de novo.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M20 12a8 8 0 0 1-13.7 5.7M4 12A8 8 0 0 1 17.7 6.3M20 6v5h-5M4 18v-5h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -93,7 +96,8 @@
         [tone]="isPastDue ? 'danger' : 'primary'"
         [eyebrow]="(isPastDue && gracePeriodEndsAtLabel) ? 'Prazo para regularizar' : (vm.current.autoRenew ? 'Próxima virada' : 'Acesso ativo até')"
         [value]="(isPastDue && gracePeriodEndsAtLabel) ? gracePeriodEndsAtLabel : ((vm.current.renewsAt | date:'dd/MM/yyyy') || '—')"
-        note="Data relevante do ciclo atual.">
+        note="Data relevante do ciclo atual."
+        tooltipText="A data que importa no ciclo atual: a próxima cobrança se a renovação está ativa, o fim do acesso se foi cancelada, ou o prazo para regularizar se há pagamento em atraso.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

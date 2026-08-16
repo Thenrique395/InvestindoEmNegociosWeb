@@ -11,16 +11,20 @@
 
   @if (views().length) {
     <section class="metas-summary" aria-label="Resumo das metas">
-      <app-transaction-summary-card tone="primary" eyebrow="Metas ativas" [value]="summary().active.toString()" note="Em acompanhamento agora.">
+      <app-transaction-summary-card tone="primary" eyebrow="Metas ativas" [value]="summary().active.toString()" note="Em acompanhamento agora."
+        tooltipText="Metas em andamento, atrasadas, fora do ritmo ou ainda por começar. Não conta as já atingidas, nem as arquivadas e canceladas.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M12 3v4m0 10v4M3 12h4m10 0h4M6 6l2.5 2.5M18 18l-2.5-2.5M6 18l2.5-2.5M18 6l-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </app-transaction-summary-card>
-      <app-transaction-summary-card tone="success" eyebrow="Atingidas" [value]="summary().achieved.toString()" note="Objetivo alcançado.">
+      <app-transaction-summary-card tone="success" eyebrow="Atingidas" [value]="summary().achieved.toString()" note="Objetivo alcançado."
+        tooltipText="Metas que bateram o objetivo, incluindo as que você já arquivou — o número é acumulado, não some quando a meta sai da lista.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </app-transaction-summary-card>
-      <app-transaction-summary-card tone="warning" eyebrow="Precisam de atenção" [value]="summary().attention.toString()" note="Atrasadas, excedidas ou fora do ritmo.">
+      <app-transaction-summary-card tone="warning" eyebrow="Precisam de atenção" [value]="summary().attention.toString()" note="Atrasadas, excedidas ou fora do ritmo."
+        tooltipText="Metas passadas do prazo, com limite estourado ou atrás do ritmo necessário para chegar na data. É um subconjunto das metas ativas.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </app-transaction-summary-card>
-      <app-transaction-summary-card tone="info" eyebrow="Progresso médio" [value]="summary().avgProgress + '%'" note="Média das metas em andamento.">
+      <app-transaction-summary-card tone="info" eyebrow="Progresso médio" [value]="summary().avgProgress + '%'" note="Média das metas em andamento."
+        tooltipText="Média simples do progresso das metas ativas e atingidas, cada uma limitada a 100%: uma meta superada não puxa a média para cima. Arquivadas e canceladas ficam de fora.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false"><path d="M4 18V9m5 9V5m5 13v-7m5 7V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       </app-transaction-summary-card>
     </section>

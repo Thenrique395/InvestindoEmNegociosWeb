@@ -18,7 +18,8 @@
       tone="warning"
       eyebrow="Saldo devedor"
       [value]="overview.totalOpenBalance | appCurrency"
-      note="Valor ainda pendente nos contratos cadastrados.">
+      note="Valor ainda pendente nos contratos cadastrados."
+      tooltipText="Soma do saldo em aberto de todos os contratos, ativos ou não. É o principal que falta, sem os juros das parcelas futuras.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M5 7h14M7 12h10M9 17h6M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -27,7 +28,8 @@
       tone="primary"
       eyebrow="Parcela mensal"
       [value]="overview.totalMonthly | appCurrency"
-      note="Compromisso mensal dos contratos ativos.">
+      note="Compromisso mensal dos contratos ativos."
+      tooltipText="Soma da parcela mensal apenas dos contratos com status Ativo. Contrato quitado ou suspenso não entra, por isso este valor pode não bater com o saldo devedor acima.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -36,7 +38,8 @@
       tone="info"
       eyebrow="Próximo vencimento"
       [value]="overview.nextDueDate ? (overview.nextDueDate | date:'dd/MM/yyyy')! : 'Sem vencimento'"
-      [note]="overview.nextDueDate ? ('Parcela de ' + (overview.nextDueAmount | appCurrency)) : 'Nenhuma parcela aberta.'">
+      [note]="overview.nextDueDate ? ('Parcela de ' + (overview.nextDueAmount | appCurrency)) : 'Nenhuma parcela aberta.'"
+      tooltipText="A parcela em aberto mais próxima entre todos os contratos. O valor ao lado é o dessa parcela, não a soma do mês.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -45,7 +48,8 @@
       tone="success"
       eyebrow="Quitação prevista"
       [value]="overview.expectedPayoffDate ? (overview.expectedPayoffDate | date:'dd/MM/yyyy')! : 'Sem previsão'"
-      [note]="overview.totalOpenInstallments + ' parcela(s) abertas no conjunto.'">
+      [note]="overview.totalOpenInstallments + ' parcela(s) abertas no conjunto.'"
+      tooltipText="Vencimento da última parcela em aberto no cronograma. É a data que já está contratada, não uma projeção — amortizar antecipado antecipa essa data.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
       </svg>

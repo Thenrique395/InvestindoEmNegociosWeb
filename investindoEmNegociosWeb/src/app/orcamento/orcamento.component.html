@@ -37,7 +37,8 @@
         tone="primary"
         eyebrow="Planejado"
         [value]="overview.totalPlanned | appCurrency"
-        [note]="overview.itemsCount + ' categoria(s) no orçamento.'">
+        [note]="overview.itemsCount + ' categoria(s) no orçamento.'"
+        tooltipText="Soma do valor planejado de todas as categorias do mês. Categoria sem valor definido não entra na conta.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -46,7 +47,8 @@
         tone="info"
         eyebrow="Realizado"
         [value]="overview.totalRealized | appCurrency"
-        note="Total já gasto nas categorias planejadas.">
+        note="Total já gasto nas categorias planejadas."
+        tooltipText="Soma das despesas do mês lançadas nas categorias que têm orçamento. Gasto em categoria fora do orçamento não aparece aqui.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -55,7 +57,8 @@
         [tone]="overview.totalVariance < 0 ? 'danger' : 'success'"
         eyebrow="Variação"
         [value]="overview.totalVariance | appCurrency"
-        [note]="overview.totalVariance < 0 ? 'Gasto acima do planejado.' : 'Dentro do planejado.'">
+        [note]="overview.totalVariance < 0 ? 'Gasto acima do planejado.' : 'Dentro do planejado.'"
+        tooltipText="Planejado menos realizado. Positivo é folga que ainda resta; negativo é quanto o gasto passou do previsto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M3 12h4l3 8 4-16 3 8h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -64,7 +67,8 @@
         [tone]="overview.usagePercent > 100 ? 'danger' : overview.usagePercent > 80 ? 'warning' : 'success'"
         eyebrow="Uso do orçamento"
         [value]="overview.usagePercent + '%'"
-        [note]="overview.overBudgetCount ? (overview.overBudgetCount + ' categoria(s) estourada(s).') : 'Nenhuma categoria estourada.'">
+        [note]="overview.overBudgetCount ? (overview.overBudgetCount + ' categoria(s) estourada(s).') : 'Nenhuma categoria estourada.'"
+        tooltipText="Realizado dividido pelo planejado, no total do mês. Passar de 100% significa que o conjunto estourou, mesmo que algumas categorias individuais estejam dentro.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3a9 9 0 1 0 9 9h-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

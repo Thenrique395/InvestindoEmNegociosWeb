@@ -24,7 +24,8 @@
         tone="primary"
         eyebrow="Execuções (24h)"
         [value]="summary24h.totalRuns.toString()"
-        [note]="'Sucesso: ' + summary24h.successRuns + ' | Falha: ' + summary24h.failedRuns">
+        [note]="'Sucesso: ' + summary24h.successRuns + ' | Falha: ' + summary24h.failedRuns"
+        tooltipText="Execuções de robôs disparadas nas últimas 24 horas, somando as agendadas e as manuais.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -33,7 +34,8 @@
         [tone]="successRateTone"
         eyebrow="Taxa de sucesso (24h)"
         [value]="summary24h.successRatePercent + '%'"
-        note="Com base nas últimas 24 horas.">
+        note="Com base nas últimas 24 horas."
+        tooltipText="Execuções bem-sucedidas dividido pelo total das últimas 24 horas. Uma execução sem itens a processar conta como sucesso.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -42,7 +44,8 @@
         tone="info"
         eyebrow="Itens gerados (24h)"
         [value]="summary24h.itemsGenerated.toString()"
-        note="Novos lembretes/ações criados.">
+        note="Novos lembretes/ações criados."
+        tooltipText="Lembretes e recomendações criados pelos robôs nas últimas 24 horas. Uma execução pode gerar vários itens ou nenhum.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -51,7 +54,8 @@
         tone="info"
         eyebrow="E-mails (24h)"
         [value]="summary24h.emailsSent + '/' + summary24h.emailsAttempted"
-        [note]="'Falhas: ' + summary24h.emailsFailed">
+        [note]="'Falhas: ' + summary24h.emailsFailed"
+        tooltipText="E-mails entregues sobre o total de tentativas nas últimas 24 horas. A diferença entre os dois números é o que falhou no envio.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 6h16v12H4zM4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
