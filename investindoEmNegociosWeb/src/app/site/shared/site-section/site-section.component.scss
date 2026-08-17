@@ -1,0 +1,103 @@
+:host {
+  display: block;
+  padding: var(--site-section-y) var(--site-section-x);
+  background: transparent;
+}
+
+:host(.site-section--surface) {
+  background: var(--surface);
+}
+
+:host(.site-section--navy) {
+  background: var(--brand-navy);
+  color: var(--brand-offwhite);
+}
+
+.site-section__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: var(--site-max-width);
+  margin: 0 auto;
+}
+
+.site-section__inner--centered {
+  align-items: center;
+  text-align: center;
+}
+
+.site-section__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.site-section__inner--centered .site-section__top {
+  justify-content: center;
+}
+
+.site-section__head {
+  min-width: 0;
+}
+
+.site-section__aside {
+  flex: none;
+}
+
+.site-section__aside:empty {
+  display: none;
+}
+
+.site-section__eyebrow {
+  margin: 0;
+  color: var(--income-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+:host(.site-section--navy) .site-section__eyebrow {
+  color: var(--brand-green-light);
+}
+
+.site-section__title {
+  margin: var(--space-5) 0 0;
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: var(--fw-semibold);
+  line-height: 1.12;
+  letter-spacing: var(--ls-tighter);
+  text-wrap: pretty;
+}
+
+.site-section__inner--centered .site-section__title {
+  max-width: none;
+}
+
+.site-section__description {
+  margin: var(--space-6) 0 0;
+  max-width: 60ch;
+  color: var(--text-secondary);
+  font-size: var(--fs-card-title);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+:host(.site-section--navy) .site-section__description {
+  color: var(--nav-item);
+}
+
+/* Abaixo de 900px o padding lateral de 56px come metade da tela. */
+@media (max-width: 900px) {
+  :host {
+    padding: var(--space-12) var(--space-10);
+  }
+
+  .site-section__title {
+    max-width: none;
+  }
+}

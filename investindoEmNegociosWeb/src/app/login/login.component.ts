@@ -8,19 +8,23 @@ import { AuthService, AuthSessionResponse } from '../auth.service';
 import { ProfileService } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
+import { AuthLayoutComponent } from '../auth-layout/auth-layout.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, AuthLayoutComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
   email = '';
   password = '';
   loading = false;
   showPassword = false;
+  /* A duração da sessão é decidida pelo backend (cookies httpOnly), então por
+     enquanto esta escolha não encurta a sessão de quem desmarca: falta o
+     `rememberMe` na API de login para o cookie nascer só de sessão. */
+  manterConectado = true;
   emailNotConfirmed = false;
   resending = false;
 

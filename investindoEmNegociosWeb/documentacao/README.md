@@ -127,6 +127,9 @@ Frontend:
 
 - unit tests: `npm run test:ci`
 - E2E padrão: `npm run test:e2e`
+- fidelidade ao design: `npm run handoff:check` (bloqueia regressão) e `npm run handoff:report`
+  (lista o que está aberto). Enquanto o rebrand estiver em andamento, nenhuma tela é dada
+  como concluída sem passar nele — ver seção 5.1 e Fase 8 do `../../PLANO_REDESIGN.md`
 
 Backend relacionado:
 
@@ -166,6 +169,7 @@ Leitura prática:
 - Status do produto e backlog central: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
 - Design system e padrões visuais: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
 - Auditoria de divergências e próximos ajustes do frontend: [AUDITORIA_FRONTEND_PADROES_2026-08-05.md](./AUDITORIA_FRONTEND_PADROES_2026-08-05.md)
+- Checklist de validação visual com Playwright: [CHECKLIST_VALIDACAO_VISUAL_PLAYWRIGHT.md](./CHECKLIST_VALIDACAO_VISUAL_PLAYWRIGHT.md)
 - Padrão visual aprovado de onboarding, cards, tooltips e CTA: ver seção `Padrão aprovado do onboarding` em [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
 - Exploração visual e comparação de componentes: [systemDesigner.md](./systemDesigner.md)
 

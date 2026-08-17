@@ -2,7 +2,40 @@
   <p class="sr-only" aria-live="polite" role="status">{{ liveMessage }}</p>
 
   <div class="onboarding-layout" [attr.data-step]="step">
-    <app-onboarding-rail [step]="step" [focusLabel]="focusLabel" [modeLabel]="modeLabel" />
+    <app-onboarding-rail
+      [step]="step"
+      [totalSteps]="totalSteps"
+      [progressPercent]="progressPercent"
+      [userInitials]="userInitials"
+      [displayName]="displayName"
+      (logout)="logout()" />
+
+    <div class="onboarding-column">
+    <!-- Barra própria do onboarding: aqui não há menu do app, então ela só
+         situa (plano + etapa), oferece ajuda e dá saída pela conta. -->
+    <header class="onboarding-topbar">
+      <div class="onboarding-topbar__context">
+        <span class="onboarding-topbar__stage">Configuração inicial · seu progresso fica salvo</span>
+      </div>
+
+      <div class="onboarding-topbar__actions">
+        <a class="onboarding-topbar__help" href="mailto:contato@investindoemnegocios.com.br">Preciso de ajuda</a>
+        <div class="onboarding-topbar__user">
+          <span class="onboarding-topbar__avatar" aria-hidden="true">{{ userInitials }}</span>
+          <span class="onboarding-topbar__name">{{ firstName }}</span>
+          <button
+            type="button"
+            class="onboarding-topbar__logout"
+            [attr.aria-label]="'Sair da conta de ' + displayName"
+            (click)="logout()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 17l-1.4-1.4L16.2 13H9v-2h7.2L13.6 8.4 15 7l5 5-5 5Z" fill="currentColor" stroke="none" />
+              <path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
 
     <main class="onboarding-main">
       <div class="onboarding-main__hero">
@@ -29,7 +62,7 @@
               </p>
             }
             @default {
-              <h2>Ative sua conta<br />e seus primeiros movimentos</h2>
+              <h2>Ative sua conta e seus primeiros movimentos</h2>
               <p>
                 Crie sua conta principal e registre os primeiros lançamentos para começar com o dashboard pronto para uso.
               </p>
@@ -182,5 +215,6 @@
         (cancel)="closeExpenseModal()">
       </app-despesas-form>
     </main>
+    </div>
   </div>
 </section>

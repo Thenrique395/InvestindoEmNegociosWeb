@@ -13,7 +13,7 @@
     </div>
   </app-page-header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-muted)]">
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-3 text-sm text-[var(--text-tertiary)]">
     <strong class="text-[var(--text)]">Como ler:</strong>
     <span> "Itens gerados" é a quantidade de novos lembretes/ações geradas. Se for 0, veja o "motivo do zero" para entender por que não houve geração.</span>
   </div>
@@ -24,7 +24,8 @@
         tone="primary"
         eyebrow="Execuções (24h)"
         [value]="summary24h.totalRuns.toString()"
-        [note]="'Sucesso: ' + summary24h.successRuns + ' | Falha: ' + summary24h.failedRuns">
+        [note]="'Sucesso: ' + summary24h.successRuns + ' | Falha: ' + summary24h.failedRuns"
+        tooltipText="Execuções de robôs disparadas nas últimas 24 horas, somando as agendadas e as manuais.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -33,7 +34,8 @@
         [tone]="successRateTone"
         eyebrow="Taxa de sucesso (24h)"
         [value]="summary24h.successRatePercent + '%'"
-        note="Com base nas últimas 24 horas.">
+        note="Com base nas últimas 24 horas."
+        tooltipText="Execuções bem-sucedidas dividido pelo total das últimas 24 horas. Uma execução sem itens a processar conta como sucesso.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 14l4-4 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -42,7 +44,8 @@
         tone="info"
         eyebrow="Itens gerados (24h)"
         [value]="summary24h.itemsGenerated.toString()"
-        note="Novos lembretes/ações criados.">
+        note="Novos lembretes/ações criados."
+        tooltipText="Lembretes e recomendações criados pelos robôs nas últimas 24 horas. Uma execução pode gerar vários itens ou nenhum.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -51,7 +54,8 @@
         tone="info"
         eyebrow="E-mails (24h)"
         [value]="summary24h.emailsSent + '/' + summary24h.emailsAttempted"
-        [note]="'Falhas: ' + summary24h.emailsFailed">
+        [note]="'Falhas: ' + summary24h.emailsFailed"
+        tooltipText="E-mails entregues sobre o total de tentativas nas últimas 24 horas. A diferença entre os dois números é o que falhou no envio.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 6h16v12H4zM4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -59,41 +63,41 @@
     </section>
   }
 
-  <div class="filter-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)]">
+  <div class="filter-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-dropdown)]">
     <div class="mb-4 flex flex-col gap-1 border-b border-[var(--border)] pb-3">
-      <h3 class="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Filtros de execução</h3>
-      <p class="text-sm text-[var(--text-muted)]">Refine histórico, controle janela segura e dispare execução manual.</p>
+      <h3 class="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--text-tertiary)]">Filtros de execução</h3>
+      <p class="text-sm text-[var(--text-tertiary)]">Refine histórico, controle janela segura e dispare execução manual.</p>
     </div>
 
     <div class="filters-grid grid gap-3 grid-cols-2 grid-cols-5">
-      <label class="filter-label filter-item text-xs text-[var(--text-muted)]">
+      <label class="filter-label filter-item text-xs text-[var(--text-tertiary)]">
         <span class="filter-item__label">Robô</span>
-        <input class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.robotName" />
+        <input class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]" [(ngModel)]="filters.robotName" />
       </label>
-      <label class="filter-label filter-item text-xs text-[var(--text-muted)]">
+      <label class="filter-label filter-item text-xs text-[var(--text-tertiary)]">
         <span class="filter-item__label">Status</span>
-        <select class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.status">
+        <select class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]" [(ngModel)]="filters.status">
           <option value="all">Todos</option>
           <option value="success">Sucesso</option>
           <option value="failed">Falha</option>
         </select>
       </label>
-      <label class="filter-label filter-item text-xs text-[var(--text-muted)]">
+      <label class="filter-label filter-item text-xs text-[var(--text-tertiary)]">
         <span class="filter-item__label">De</span>
-        <input type="datetime-local" class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.from" />
+        <input type="datetime-local" class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]" [(ngModel)]="filters.from" />
       </label>
-      <label class="filter-label filter-item text-xs text-[var(--text-muted)]">
+      <label class="filter-label filter-item text-xs text-[var(--text-tertiary)]">
         <span class="filter-item__label">Até</span>
-        <input type="datetime-local" class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.to" />
+        <input type="datetime-local" class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]" [(ngModel)]="filters.to" />
       </label>
-      <label class="filter-label filter-item text-xs text-[var(--text-muted)]">
+      <label class="filter-label filter-item text-xs text-[var(--text-tertiary)]">
         <span class="filter-item__label">Buscar erro/texto</span>
-        <input class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-2)]" [(ngModel)]="filters.search" />
+        <input class="filter-control mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]" [(ngModel)]="filters.search" />
       </label>
     </div>
 
     <div class="filters-footer mt-4 flex flex-col gap-3 border-t border-[var(--border)] pt-3 flex-row items-center justify-between">
-      <div class="filter-options flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)]">
+      <div class="filter-options flex flex-wrap items-center gap-4 text-xs text-[var(--text-tertiary)]">
         <label class="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
           <input type="checkbox" [(ngModel)]="forceRun" />
           Ignorar proteção anti-duplicidade
@@ -104,11 +108,11 @@
             type="number"
             min="1"
             max="120"
-            class="filter-control w-24 rounded-lg border border-[var(--border)] bg-[var(--surface-2)]"
+            class="filter-control w-24 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]"
             [(ngModel)]="cooldownMinutes"
             [disabled]="forceRun" />
         </label>
-        <span class="filter-hint text-[var(--text-muted)]">
+        <span class="filter-hint text-[var(--text-tertiary)]">
           Quando ativa, a proteção evita nova execução automática/manual no intervalo definido.
         </span>
       </div>
@@ -125,13 +129,13 @@
   }
 
   @if (!loading && recentRuns.length) {
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-dropdown)]">
       <div class="border-b border-[var(--border)] px-4 py-3">
         <h3 class="text-base font-semibold">Histórico recente</h3>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-          <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
+          <thead class="bg-[var(--surface-sunken)] text-left text-[var(--text)]">
             <tr class="border-b border-[var(--border)]">
               <th class="px-4 py-3 font-semibold">Robô</th>
               <th class="px-4 py-3 font-semibold">Início</th>
@@ -148,15 +152,15 @@
             @for (row of recentRuns; track row) {
               <tr>
                 <td class="px-4 py-3 font-medium">{{ row.robotName }}</td>
-                <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.startedAt | date: 'short' }}</td>
-                <td class="px-4 py-3 text-[var(--text-muted)]">{{ row.finishedAt | date: 'short' }}</td>
+                <td class="px-4 py-3 text-[var(--text-tertiary)]">{{ row.startedAt | date: 'short' }}</td>
+                <td class="px-4 py-3 text-[var(--text-tertiary)]">{{ row.finishedAt | date: 'short' }}</td>
                 <td class="px-4 py-3">
                   <app-status-badge [tone]="runTone(row.success, row.wasSkipped)" [label]="runLabel(row.success, row.wasSkipped)" />
                 </td>
                 <td class="px-4 py-3">{{ row.metrics.itemsGenerated }}</td>
-                <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-muted)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
-                <td class="px-4 py-3 text-[var(--text-muted)]">{{ zeroItemsReasonLabel(row.metrics.zeroItemsReasonCode) }}</td>
-                <td class="px-4 py-3 text-[var(--danger-text)]">{{ row.error || '-' }}</td>
+                <td class="px-4 py-3">{{ row.metrics.emailsSent }}/{{ row.metrics.emailsAttempted }} <span class="text-[var(--text-tertiary)]">(falhas: {{ row.metrics.emailsFailed }})</span></td>
+                <td class="px-4 py-3 text-[var(--text-tertiary)]">{{ zeroItemsReasonLabel(row.metrics.zeroItemsReasonCode) }}</td>
+                <td class="px-4 py-3 text-[var(--expense-text)]">{{ row.error || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-2">
                     <button
@@ -186,12 +190,12 @@
 
   @if (selectedRun) {
     <div class="fixed inset-0 z-50 grid place-items-center bg-[rgba(15,23,42,0.55)] p-4">
-      <div class="robot-run-modal w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-md)]">
+      <div class="robot-run-modal w-full max-w-4xl rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-dropdown)]">
         <div class="flex flex-col gap-3 border-b border-[var(--border)] pb-4 flex-row items-start justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Execução</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Execução</p>
             <h3 class="mt-1 text-2xl font-semibold text-[var(--text)]">{{ selectedRun.robotName }}</h3>
-            <p class="mt-1 text-sm text-[var(--text-muted)]">
+            <p class="mt-1 text-sm text-[var(--text-tertiary)]">
               {{ selectedRun.startedAt | date: 'dd/MM/yyyy HH:mm:ss' }} - {{ selectedRun.finishedAt | date: 'HH:mm:ss' }}
             </p>
           </div>
@@ -252,7 +256,7 @@
               </div>
               <div class="modal-dl__row">
                 <dt>Erro</dt>
-                <dd [ngClass]="selectedRun.error ? 'text-[var(--danger-text)]' : 'text-[var(--text-muted)]'">{{ selectedRun.error || '-' }}</dd>
+                <dd [ngClass]="selectedRun.error ? 'text-[var(--expense-text)]' : 'text-[var(--text-tertiary)]'">{{ selectedRun.error || '-' }}</dd>
               </div>
             </dl>
           </section>

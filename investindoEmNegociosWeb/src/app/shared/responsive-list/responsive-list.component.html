@@ -71,7 +71,10 @@
                 </td>
               }
               @for (column of columns; track column.key) {
-                <td class="responsive-list__item" [class.responsive-list__item--value]="column.align === 'end'">
+                <td
+                  class="responsive-list__item"
+                  [class.responsive-list__item--value]="column.align === 'end'"
+                  [attr.data-label]="column.label">
                   <ng-container *ngTemplateOutlet="cellTemplate(column.key); context: { $implicit: item }"></ng-container>
                 </td>
               }

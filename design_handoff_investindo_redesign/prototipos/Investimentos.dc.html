@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/styles.css">
+<script src="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #F4F7F9; font-family: Inter, system-ui, sans-serif; color: #0A2430; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  .ffx { font-variant-numeric: tabular-nums; }
+  button { transition: background .14s ease, border-color .14s ease, color .14s ease, box-shadow .14s ease, transform .1s ease; }
+  button:active { transform: scale(.985); }
+  button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,.35); }
+  .navitem:hover { background: rgba(255,255,255,.06) !important; color: #fff !important; }
+  .row { transition: background .14s ease; }
+  .row:hover { background: #F8FAFB; }
+  .ico:hover { background: #EDF2F5; color: #0A2430; }
+  .mi:hover { background: #F4F7F9; }
+  .bar > i { transition: width .5s cubic-bezier(.2,.7,.3,1); }
+  .fade { animation: fadeIn .2s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex">
+
+  <aside style="width:212px; flex:none; background:#002E3E; color:#fff; display:flex; flex-direction:column; position:sticky; top:0; height:100vh">
+    <div style="display:flex; align-items:center; gap:10px; padding:18px 18px 16px">
+      <img src="assets/logo-header.png" alt="" style="height:26px; width:auto; display:block">
+      <span style="font-family:Poppins,sans-serif; font-size:12px; font-weight:700; letter-spacing:-.01em; white-space:nowrap">Investindo em Negócios</span>
+    </div>
+    <nav style="flex:1; display:grid; gap:2px; padding:4px 10px; align-content:start; overflow:auto">
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Visão geral</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Dashboard</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Calendário</button>
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Movimentações</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg>Despesas</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 19V5m0 0l-5 5m5-5l5 5"/></svg>Receitas</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 7h18a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20"/></svg>Cartões</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg>Contas</button>
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Planejamento</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Metas</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Orçamento</button>
+      <span style="position:relative; display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; background:rgba(255,255,255,.10); color:#fff; font-size:12px; font-weight:600"><i style="position:absolute; left:0; top:50%; width:3px; height:16px; margin-top:-8px; border-radius:999px; background:#4FB783"></i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 18h16M7 15l4-4 3 3 4-6"/></svg>Investimentos</span>
+    </nav>
+    <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; padding:14px 16px; border:none; border-top:1px solid rgba(255,255,255,.08); background:transparent; text-align:left; cursor:pointer; font-family:inherit">
+      <span style="display:grid; place-items:center; width:30px; height:30px; border-radius:999px; background:rgba(255,255,255,.12); font-size:11px; font-weight:700; color:#fff">HS</span>
+      <div><div style="font-size:11px; font-weight:600; color:#fff">Henrique Santos</div><div style="font-size:10px; color:#7E9CA6">Plano Completo</div></div>
+    </button>
+  </aside>
+
+  <main style="flex:1; min-width:0; display:flex; flex-direction:column">
+
+    <header style="position:sticky; top:0; z-index:4; display:flex; align-items:center; gap:14px; height:56px; padding:0 28px; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid #E4EBEF">
+      <button onClick="{{ irOutra }}" style="flex:1; max-width:360px; display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; color:#9FB2BB; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer" style-hover="border-color:#C3D2DA; background:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Buscar ativo, corretora, movimento...<span class="ffx" style="margin-left:auto; padding:2px 6px; border-radius:5px; background:#EDF2F5; font-size:10px; color:#7A929E">⌘K</span></button>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:10px">
+        <button onClick="{{ irOutra }}" style="display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border:none; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:rgba(52,144,99,.20)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z"/></svg>Assistente</button>
+        <button onClick="{{ irOutra }}" style="position:relative; display:grid; place-items:center; width:30px; height:30px; border:none; border-radius:9px; background:transparent; color:#7A929E; cursor:pointer" style-hover="background:#F1F5F7; color:#0A2430"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20h4" stroke-linecap="round"/></svg><i style="position:absolute; top:3px; right:3px; width:6px; height:6px; border-radius:999px; background:#D9483F"></i></button>
+      </div>
+    </header>
+
+    <div style="flex:1; padding:26px 28px 40px; display:flex; flex-direction:column; gap:16px">
+
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap">
+        <div>
+          <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Investimentos</span>
+          <h1 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:26px; font-weight:600; letter-spacing:-.025em">Carteira e evolução</h1>
+          <p style="margin:0; max-width:74ch; font-size:13px; color:#46606C">Acompanhe patrimônio, posições, rentabilidade e proventos — gestão e registro, sem recomendação de ativos.</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex:none">
+          <button onClick="{{ abrirImport }}" style="display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 14px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#0A2430; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10m0 0-4-4m4 4 4-4M4 19h16"/></svg>Importar B3</button>
+          <button onClick="{{ abrirCadastro }}" style="display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 16px; border:none; border-radius:10px; background:#2563EB; color:#fff; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo lançamento</button>
+        </div>
+      </div>
+
+      <div style="display:inline-flex; align-self:flex-start; padding:3px; border-radius:10px; background:#EDF2F5; flex-wrap:wrap">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.pick }}" style="padding:7px 14px; border:none; border-radius:8px; background:{{ t.bg }}; color:{{ t.cor }}; box-shadow:{{ t.shadow }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ t.label }}</button>
+        </sc-for>
+      </div>
+
+      <section style="display:flex; flex-wrap:wrap; background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+          <div style="flex:1 1 200px; padding:18px 20px; box-shadow:1px 0 0 #EEF3F5, 0 1px 0 #EEF3F5; min-width:0">
+            <div style="display:flex; align-items:center; gap:8px">
+              <span style="font-size:11px; font-weight:600; color:#46606C">{{ k.label }}</span>
+              <span title="{{ k.tooltip }}" style="margin-left:auto; display:grid; place-items:center; width:17px; height:17px; border-radius:999px; border:1px solid #D6E0E6; color:#9FB2BB; font-size:9px; font-weight:700; cursor:help">?</span>
+            </div>
+            <div class="ffx" style="font-family:Poppins,sans-serif; font-size:20px; font-weight:600; letter-spacing:-.03em; margin-top:7px; color:{{ k.cor }}">{{ k.valor }}</div>
+            <div style="font-size:11px; color:#9FB2BB; margin-top:5px">{{ k.nota }}</div>
+          </div>
+        </sc-for>
+      </section>
+
+      <sc-if value="{{ ehResumo }}" hint-placeholder-val="{{ true }}">
+        <div class="fade" style="display:flex; flex-direction:column; gap:16px">
+
+          <div style="display:grid; grid-template-columns:minmax(0,1.55fr) minmax(260px,1fr); gap:16px; align-items:stretch">
+            <section style="display:flex; flex-direction:column; background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap">
+                <div>
+                  <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Evolução do patrimônio</h2>
+                  <p style="margin:0; font-size:12px; color:#7A929E">Aporte acumulado contra valor de mercado, mês a mês.</p>
+                </div>
+                <div style="display:inline-flex; padding:3px; border-radius:9px; background:#EDF2F5">
+                  <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="3">
+                    <button onClick="{{ r.pick }}" style="padding:5px 11px; border:none; border-radius:7px; background:{{ r.bg }}; color:{{ r.cor }}; box-shadow:{{ r.shadow }}; font:600 11px Inter,sans-serif; cursor:pointer">{{ r.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <svg viewBox="0 0 660 220" preserveAspectRatio="none" style="width:100%; height:212px; display:block">
+                <defs><linearGradient id="fillMercado" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#349063" stop-opacity=".18"></stop><stop offset="100%" stop-color="#349063" stop-opacity="0"></stop></linearGradient></defs>
+                <g stroke="#EEF3F5" stroke-width="1"><line x1="0" x2="660" y1="30" y2="30"></line><line x1="0" x2="660" y1="76" y2="76"></line><line x1="0" x2="660" y1="122" y2="122"></line><line x1="0" x2="660" y1="168" y2="168"></line></g>
+                <path d="{{ areaMercado }}" fill="url(#fillMercado)"></path>
+                <path d="{{ linhaMercado }}" fill="none" stroke="#349063" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="{{ linhaAporte }}" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="5 5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <div style="display:flex; align-items:center; gap:18px; margin-top:14px; padding-top:14px; border-top:1px solid #F2F6F8; font-size:12px; color:#46606C; flex-wrap:wrap">
+                <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:16px; height:3px; border-radius:2px; background:#349063; display:inline-block"></i>Valor de mercado</span>
+                <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:16px; height:0; border-top:2px dashed #2563EB; display:inline-block"></i>Aporte acumulado</span>
+                <span class="ffx" style="margin-left:auto; color:#9FB2BB">{{ eixoLabels }}</span>
+              </div>
+            </section>
+
+            <section style="display:flex; flex-direction:column; background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+              <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Distribuição da carteira</h2>
+              <p style="margin:0 0 16px; font-size:12px; color:#7A929E">Por tipo de ativo, sobre o valor de mercado.</p>
+              <div style="display:grid; place-items:center; margin-bottom:18px">
+                <div style="position:relative; width:158px; height:158px; border-radius:999px; background:{{ donut }}">
+                  <div style="position:absolute; inset:28px; border-radius:999px; background:#fff; display:grid; place-items:center; text-align:center">
+                    <div><div style="font-size:10px; color:#9FB2BB">Patrimônio</div><div class="ffx" style="font-size:14px; font-weight:600; letter-spacing:-.02em">{{ patrimonioCurto }}</div></div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px">
+                <sc-for list="{{ distribuicao }}" as="d" hint-placeholder-count="5">
+                  <div style="display:flex; align-items:center; gap:9px">
+                    <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ d.cor }}"></i>
+                    <span style="flex:1; min-width:0; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ d.label }}</span>
+                    <span class="ffx" style="flex:none; font-size:12px; color:#7A929E">{{ d.valor }}</span>
+                    <span class="ffx" style="flex:none; width:44px; text-align:right; font-size:12px; font-weight:600">{{ d.pct }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:18px; overflow:hidden">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; padding:20px 22px 16px; border-bottom:1px solid #EEF3F5; flex-wrap:wrap">
+              <div>
+                <h2 style="margin:0 0 3px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em">Posições</h2>
+                <p style="margin:0; font-size:12px; color:#46606C">Sem cotação de mercado, o valor cai para o preço médio — nunca inventamos preço.</p>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                <sc-for list="{{ tipoChips }}" as="c" hint-placeholder-count="4">
+                  <button onClick="{{ c.pick }}" style="height:30px; padding:0 12px; border:1px solid {{ c.border }}; border-radius:999px; background:{{ c.bg }}; color:{{ c.cor }}; font:600 11px Inter,sans-serif; cursor:pointer">{{ c.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto">
+              <div style="min-width:880px">
+                <div style="display:grid; grid-template-columns:minmax(170px,1.7fr) 108px 96px 96px 116px 116px 84px; gap:14px; align-items:center; padding:10px 22px; background:#F8FAFB; border-bottom:1px solid #EEF3F5; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7A929E">
+                  <span>Ativo</span><span style="text-align:right">Qtd.</span><span style="text-align:right">Preço médio</span><span style="text-align:right">Atual</span><span style="text-align:right">Investido</span><span style="text-align:right">Mercado</span><span style="text-align:right">Result.</span>
+                </div>
+                <sc-for list="{{ posicoes }}" as="p" hint-placeholder-count="6">
+                  <div class="row" style="display:grid; grid-template-columns:minmax(170px,1.7fr) 108px 96px 96px 116px 116px 84px; gap:14px; align-items:center; padding:12px 22px; border-bottom:1px solid #F2F6F8">
+                    <div style="display:flex; align-items:center; gap:10px; min-width:0">
+                      <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ p.cor }}"></i>
+                      <div style="min-width:0">
+                        <div style="font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ p.nome }}</div>
+                        <div style="font-size:11px; color:#9FB2BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ p.meta }}</div>
+                      </div>
+                    </div>
+                    <span class="ffx" style="text-align:right; font-size:12px; color:#46606C">{{ p.qtd }}</span>
+                    <span class="ffx" style="text-align:right; font-size:12px; color:#46606C">{{ p.medio }}</span>
+                    <span style="text-align:right"><span class="ffx" style="display:block; font-size:12px; color:{{ p.atualCor }}">{{ p.atual }}</span><small style="font-size:9px; color:#9FB2BB">{{ p.fonte }}</small></span>
+                    <span class="ffx" style="text-align:right; font-size:12px; color:#46606C">{{ p.investido }}</span>
+                    <strong class="ffx" style="text-align:right; font-size:13px; font-weight:600">{{ p.mercado }}</strong>
+                    <span style="text-align:right"><strong class="ffx" style="display:block; font-size:12px; font-weight:600; color:{{ p.resultCor }}">{{ p.resultPct }}</strong><small class="ffx" style="font-size:10px; color:{{ p.resultCor }}">{{ p.result }}</small></span>
+                  </div>
+                </sc-for>
+                <div style="display:grid; grid-template-columns:minmax(170px,1.7fr) 108px 96px 96px 116px 116px 84px; gap:14px; align-items:center; padding:14px 22px; background:#FBFCFD; border-top:1px solid #EEF3F5">
+                  <span style="font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#7A929E">Total</span>
+                  <span></span><span></span><span></span>
+                  <strong class="ffx" style="text-align:right; font-size:13px">{{ totInvestido }}</strong>
+                  <strong class="ffx" style="text-align:right; font-size:13px">{{ totMercado }}</strong>
+                  <strong class="ffx" style="text-align:right; font-size:12px; color:{{ totResultCor }}">{{ totResultPct }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 22px; flex-wrap:wrap">
+              <span style="font-size:12px; color:#7A929E">{{ posicoesNota }}</span>
+              <button onClick="{{ abrirCadastro }}" style="height:32px; padding:0 13px; border:1px solid #D6E0E6; border-radius:9px; background:#fff; color:#0A2430; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Registrar movimento</button>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ehRentabilidade }}" hint-placeholder-val="{{ false }}">
+        <div class="fade" style="display:flex; flex-direction:column; gap:16px">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:18px; flex-wrap:wrap">
+              <div>
+                <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Carteira contra índice</h2>
+                <p style="margin:0; font-size:12px; color:#7A929E">Rentabilidade acumulada sobre o valor investido.</p>
+              </div>
+              <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap">
+                <sc-for list="{{ benchmarks }}" as="b" hint-placeholder-count="7">
+                  <button onClick="{{ b.pick }}" style="display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 11px; border:1px solid {{ b.border }}; border-radius:999px; background:{{ b.bg }}; color:{{ b.cor }}; font:600 11px Inter,sans-serif; cursor:pointer"><i style="width:7px; height:7px; border-radius:999px; background:{{ b.dot }}"></i>{{ b.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:20px">
+              <sc-for list="{{ rentCards }}" as="r" hint-placeholder-count="3">
+                <div style="flex:1 1 180px; min-width:0; padding:15px 17px; border:1px solid #EEF3F5; border-radius:13px; background:#FBFCFD">
+                  <div style="font-size:11px; font-weight:600; color:#46606C">{{ r.label }}</div>
+                  <div class="ffx" style="font-family:Poppins,sans-serif; font-size:22px; font-weight:600; letter-spacing:-.03em; margin-top:6px; color:{{ r.cor }}">{{ r.valor }}</div>
+                  <div class="ffx" style="font-size:11px; color:#9FB2BB; margin-top:5px">{{ r.bench }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <svg viewBox="0 0 660 200" preserveAspectRatio="none" style="width:100%; height:196px; display:block">
+              <g stroke="#EEF3F5" stroke-width="1"><line x1="0" x2="660" y1="26" y2="26"></line><line x1="0" x2="660" y1="70" y2="70"></line><line x1="0" x2="660" y1="114" y2="114"></line><line x1="0" x2="660" y1="158" y2="158"></line></g>
+              <path d="{{ linhaCarteira }}" fill="none" stroke="#349063" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="{{ linhaBenchmark }}" fill="none" stroke="{{ benchCor }}" stroke-width="2" stroke-dasharray="5 5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <div style="display:flex; align-items:center; gap:18px; margin-top:12px; padding-top:14px; border-top:1px solid #F2F6F8; font-size:12px; color:#46606C">
+              <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:16px; height:3px; border-radius:2px; background:#349063; display:inline-block"></i>Sua carteira</span>
+              <span style="display:inline-flex; align-items:center; gap:7px"><i style="width:16px; height:0; border-top:2px dashed {{ benchCor }}; display:inline-block"></i>{{ benchLabel }}</span>
+            </div>
+          </section>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+            <div style="padding:18px 22px 14px; border-bottom:1px solid #EEF3F5"><h2 style="margin:0; font-size:15px; font-weight:600">Por ano</h2></div>
+            <div style="display:grid; grid-template-columns:100px minmax(0,1fr) 100px 100px; gap:14px; align-items:center; padding:10px 22px; background:#F8FAFB; border-bottom:1px solid #EEF3F5; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7A929E">
+              <span>Ano</span><span>Carteira</span><span style="text-align:right">Carteira</span><span style="text-align:right">{{ benchLabel }}</span>
+            </div>
+            <sc-for list="{{ anos }}" as="a" hint-placeholder-count="4">
+              <div class="row" style="display:grid; grid-template-columns:100px minmax(0,1fr) 100px 100px; gap:14px; align-items:center; padding:12px 22px; border-bottom:1px solid #F2F6F8">
+                <span class="ffx" style="font-size:13px; font-weight:600">{{ a.ano }}</span>
+                <div class="bar" style="height:7px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:{{ a.barra }}; height:100%; border-radius:999px; background:{{ a.cor }}"></i></div>
+                <strong class="ffx" style="text-align:right; font-size:13px; color:{{ a.cor }}">{{ a.carteira }}</strong>
+                <span class="ffx" style="text-align:right; font-size:12px; color:#7A929E">{{ a.bench }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ehProventos }}" hint-placeholder-val="{{ false }}">
+        <div class="fade" style="display:grid; grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr); gap:16px; align-items:start">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+            <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Proventos por mês</h2>
+            <p style="margin:0 0 18px; font-size:12px; color:#7A929E">Dividendos, JCP e rendimentos recebidos nos últimos 12 meses.</p>
+            <div style="display:flex; align-items:stretch; gap:8px; height:190px">
+              <sc-for list="{{ proventosMes }}" as="m" hint-placeholder-count="12">
+                <div style="flex:1; height:100%; display:flex; flex-direction:column; align-items:center; gap:7px; min-width:0">
+                  <span class="ffx" style="flex:none; font-size:9px; color:#9FB2BB; white-space:nowrap">{{ m.valor }}</span>
+                  <div style="flex:1; min-height:0; width:100%; display:flex; align-items:flex-end">
+                    <div title="{{ m.tooltip }}" style="width:100%; height:{{ m.altura }}; min-height:2px; border-radius:5px 5px 2px 2px; background:{{ m.cor }}"></div>
+                  </div>
+                  <span style="flex:none; font-size:9px; color:#9FB2BB">{{ m.mes }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; align-items:center; gap:20px; margin-top:16px; padding-top:14px; border-top:1px solid #F2F6F8; flex-wrap:wrap">
+              <div><div style="font-size:11px; color:#7A929E">Total em 12 meses</div><strong class="ffx" style="display:block; margin-top:3px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600; color:#2A7551">{{ prov12 }}</strong></div>
+              <div><div style="font-size:11px; color:#7A929E">Média mensal</div><strong class="ffx" style="display:block; margin-top:3px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600">{{ provMedia }}</strong></div>
+              <div><div style="font-size:11px; color:#7A929E">Ativos pagadores</div><strong class="ffx" style="display:block; margin-top:3px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600">{{ provAtivos }}</strong></div>
+            </div>
+          </section>
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+            <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Por ativo</h2>
+            <p style="margin:0 0 16px; font-size:12px; color:#7A929E">Acumulado de 12 meses.</p>
+            <div style="display:flex; flex-direction:column; gap:13px">
+              <sc-for list="{{ proventosAtivo }}" as="a" hint-placeholder-count="5">
+                <div>
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px">
+                    <span style="font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ a.nome }}</span>
+                    <span class="ffx" style="flex:none; font-size:12px; font-weight:600; color:#2A7551">{{ a.valor }}</span>
+                  </div>
+                  <div class="bar" style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:{{ a.barra }}; height:100%; border-radius:999px; background:#349063"></i></div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ehConsolidacao }}" hint-placeholder-val="{{ false }}">
+        <div class="fade" style="display:flex; flex-direction:column; gap:16px">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:18px; flex-wrap:wrap">
+              <div>
+                <h2 style="margin:0 0 3px; font-size:15px; font-weight:600">Projeção de vencimentos</h2>
+                <p style="margin:0; font-size:12px; color:#7A929E">Quanto do patrimônio vence em cada horizonte, pelos títulos com data definida.</p>
+              </div>
+              <div style="display:flex; align-items:center; gap:9px">
+                <span style="font-size:11px; color:#46606C">Horizonte</span>
+                <div style="display:flex; align-items:center; height:34px; border:1px solid #E4EBEF; border-radius:9px; background:#fff; overflow:hidden">
+                  <button onClick="{{ menosAnos }}" style="width:30px; height:100%; border:none; border-right:1px solid #EEF3F5; background:transparent; color:#46606C; font-size:15px; cursor:pointer">−</button>
+                  <span class="ffx" style="width:56px; text-align:center; font-size:12px; font-weight:600">{{ horizonte }}</span>
+                  <button onClick="{{ maisAnos }}" style="width:30px; height:100%; border:none; border-left:1px solid #EEF3F5; background:transparent; color:#46606C; font-size:15px; cursor:pointer">+</button>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:stretch; gap:12px; height:180px">
+              <sc-for list="{{ consolidacao }}" as="c" hint-placeholder-count="6">
+                <div style="flex:1; height:100%; display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0">
+                  <span class="ffx" style="flex:none; font-size:10px; font-weight:600; color:#46606C; white-space:nowrap">{{ c.valor }}</span>
+                  <div style="flex:1; min-height:0; width:100%; display:flex; align-items:flex-end">
+                    <div style="width:100%; height:{{ c.altura }}; min-height:2px; border-radius:6px 6px 2px 2px; background:{{ c.cor }}"></div>
+                  </div>
+                  <span style="flex:none; font-size:10px; color:#9FB2BB; white-space:nowrap">{{ c.ano }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+            <div style="padding:18px 22px 14px; border-bottom:1px solid #EEF3F5"><h2 style="margin:0; font-size:15px; font-weight:600">Títulos com vencimento</h2></div>
+            <div style="display:grid; grid-template-columns:minmax(160px,1.6fr) 110px 110px minmax(120px,1fr); gap:14px; align-items:center; padding:10px 22px; background:#F8FAFB; border-bottom:1px solid #EEF3F5; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7A929E">
+              <span>Título</span><span style="text-align:right">Vencimento</span><span style="text-align:right">Valor</span><span>Tipo</span>
+            </div>
+            <sc-for list="{{ vencimentos }}" as="v" hint-placeholder-count="4">
+              <div class="row" style="display:grid; grid-template-columns:minmax(160px,1.6fr) 110px 110px minmax(120px,1fr); gap:14px; align-items:center; padding:12px 22px; border-bottom:1px solid #F2F6F8">
+                <span style="font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ v.nome }}</span>
+                <span class="ffx" style="text-align:right; font-size:12px; color:#46606C">{{ v.data }}</span>
+                <strong class="ffx" style="text-align:right; font-size:13px">{{ v.valor }}</strong>
+                <span style="display:flex; align-items:center; gap:8px; font-size:12px; color:#46606C"><i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ v.cor }}"></i>{{ v.tipo }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ehAnalise }}" hint-placeholder-val="{{ false }}">
+        <div class="fade" style="display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,340px); gap:16px; align-items:start">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; overflow:hidden">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:14px; padding:20px 22px 16px; border-bottom:1px solid #EEF3F5; flex-wrap:wrap">
+              <div>
+                <h2 style="margin:0 0 3px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em">Alocação alvo</h2>
+                <p style="margin:0; font-size:12px; color:#46606C">Defina a distribuição desejada. A soma precisa fechar em 100%.</p>
+              </div>
+              <span style="padding:4px 11px; border-radius:999px; background:{{ somaBg }}; color:{{ somaCor }}; font-size:11px; font-weight:600; white-space:nowrap">Soma: {{ somaAlvo }}</span>
+            </div>
+            <div style="overflow-x:auto">
+            <div style="min-width:520px">
+            <sc-for list="{{ alvos }}" as="a" hint-placeholder-count="5">
+              <div style="display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1.4fr) 112px 76px; gap:12px; align-items:center; padding:13px 22px; border-bottom:1px solid #F2F6F8">
+                <span style="display:flex; align-items:center; gap:9px; min-width:0; font-size:13px; font-weight:600"><i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ a.cor }}"></i><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ a.label }}</span></span>
+                <div style="display:flex; align-items:center; gap:10px; min-width:0">
+                  <div class="bar" style="flex:1; min-width:0; height:7px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:{{ a.barraAtual }}; height:100%; border-radius:999px; background:{{ a.cor }}"></i></div>
+                  <span class="ffx" style="flex:none; width:42px; text-align:right; font-size:12px; color:#7A929E">{{ a.atual }}</span>
+                </div>
+                <div style="display:flex; align-items:center; height:34px; border:1px solid #E4EBEF; border-radius:9px; background:#fff; overflow:hidden">
+                  <button onClick="{{ a.menos }}" style="width:28px; flex:none; height:100%; border:none; border-right:1px solid #EEF3F5; background:transparent; color:#46606C; font-size:15px; cursor:pointer">−</button>
+                  <input value="{{ a.alvo }}" onChange="{{ a.set }}" class="ffx" style="flex:1; min-width:0; height:100%; border:none; background:transparent; text-align:center; font:600 12px Inter,sans-serif; color:#0A2430; outline:none">
+                  <button onClick="{{ a.mais }}" style="width:28px; flex:none; height:100%; border:none; border-left:1px solid #EEF3F5; background:transparent; color:#46606C; font-size:15px; cursor:pointer">+</button>
+                </div>
+                <span class="ffx" style="text-align:right; font-size:12px; font-weight:600; color:{{ a.desvioCor }}; white-space:nowrap">{{ a.desvio }}</span>
+              </div>
+            </sc-for>
+            </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 22px; background:#FBFCFD; flex-wrap:wrap">
+              <span style="font-size:11px; color:#9FB2BB">O desvio mostra quanto falta ou sobra frente ao alvo.</span>
+              <div style="display:flex; gap:9px">
+                <button onClick="{{ resetAlvo }}" style="height:34px; padding:0 13px; border:1px solid #D6E0E6; border-radius:9px; background:#fff; color:#46606C; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Restaurar</button>
+                <button onClick="{{ salvarAlvo }}" style="height:34px; padding:0 15px; border:none; border-radius:9px; background:{{ salvarAlvoBg }}; color:{{ salvarAlvoCor }}; font:600 12px Inter,sans-serif; cursor:pointer">Salvar alocação</button>
+              </div>
+            </div>
+          </section>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:20px 22px">
+            <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Próxima ação</span>
+            <h2 style="margin:7px 0 6px; font-family:Poppins,sans-serif; font-size:17px; font-weight:600; letter-spacing:-.02em">{{ acaoTitulo }}</h2>
+            <p style="margin:0 0 16px; font-size:13px; line-height:1.6; color:#46606C">{{ acaoTexto }}</p>
+            <div style="display:flex; flex-direction:column; gap:9px; padding:14px 16px; border-radius:12px; background:#F8FAFB; margin-bottom:16px">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; font-size:12px"><span style="color:#46606C">Tipo mais distante do alvo</span><strong style="font-size:12px">{{ acaoTipo }}</strong></div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; font-size:12px"><span style="color:#46606C">Valor sugerido</span><strong class="ffx" style="font-size:13px">{{ acaoValor }}</strong></div>
+            </div>
+            <button onClick="{{ executarAcao }}" style="width:100%; height:40px; border:none; border-radius:10px; background:#2563EB; color:#fff; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8">Registrar esse aporte</button>
+            <p style="margin:14px 0 0; font-size:11px; line-height:1.55; color:#9FB2BB">Cálculo de reequilíbrio sobre a sua própria alocação alvo. Não é recomendação de ativos.</p>
+          </section>
+        </div>
+      </sc-if>
+
+    </div>
+  </main>
+
+  <sc-if value="{{ cadastroAberto }}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:32px; background:rgba(0,20,28,.45); backdrop-filter:blur(2px)">
+      <div style="width:min(560px, 100%); max-height:90vh; display:flex; flex-direction:column; background:#fff; border-radius:18px; box-shadow:0 40px 90px -30px rgba(0,20,28,.6)">
+        <div style="flex:none; display:flex; align-items:flex-start; gap:16px; padding:22px 26px 18px; border-bottom:1px solid #EEF3F5">
+          <div style="flex:1">
+            <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Novo lançamento</span>
+            <h2 style="margin:6px 0 3px; font-family:Poppins,sans-serif; font-size:20px; font-weight:600; letter-spacing:-.02em">{{ opTitulo }}</h2>
+            <p style="margin:0; font-size:12px; color:#46606C">{{ opSub }}</p>
+          </div>
+          <button onClick="{{ fecharCadastro }}" style="flex:none; display:grid; place-items:center; width:32px; height:32px; border:none; border-radius:9px; background:transparent; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:22px 26px; display:flex; flex-direction:column; gap:18px">
+          <div style="display:flex; gap:8px">
+            <sc-for list="{{ operacoes }}" as="o" hint-placeholder-count="2">
+              <button onClick="{{ o.pick }}" style="flex:1; height:38px; border:1px solid {{ o.border }}; border-radius:10px; background:{{ o.bg }}; color:{{ o.cor }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ o.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px; position:relative">
+            <label style="font-size:12px; font-weight:600">Tipo de ativo</label>
+            <button onClick="{{ toggleTipoMenu }}" style="display:flex; align-items:center; justify-content:space-between; gap:10px; height:42px; border:1px solid {{ tipoBorder }}; border-radius:10px; background:{{ tipoBg }}; padding:0 12px; font:400 13px Inter,sans-serif; color:{{ tipoCor }}; text-align:left; cursor:pointer; box-shadow:{{ tipoShadow }}">
+              <span style="display:flex; align-items:center; gap:9px; min-width:0"><i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ tipoDot }}"></i><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ tipoLabel }}</span></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="2.2" stroke-linecap="round" style="flex:none; transform:{{ tipoChevron }}; transition:transform .16s ease"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <sc-if value="{{ tipoMenuAberto }}" hint-placeholder-val="{{ false }}">
+              <div class="fade" style="position:absolute; top:100%; left:0; right:0; z-index:6; margin-top:6px; max-height:210px; overflow-y:auto; background:#fff; border:1px solid #E4EBEF; border-radius:12px; box-shadow:0 20px 44px -18px rgba(3,32,44,.45); padding:5px">
+                <sc-for list="{{ tiposAtivo }}" as="t" hint-placeholder-count="6">
+                  <button class="mi" onClick="{{ t.pick }}" style="width:100%; display:flex; align-items:center; gap:10px; padding:9px 10px; border:none; border-radius:9px; background:{{ t.bg }}; color:{{ t.cor }}; font:{{ t.peso }} 13px Inter,sans-serif; text-align:left; cursor:pointer">
+                    <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ t.dot }}"></i>
+                    <span style="flex:1; min-width:0">{{ t.label }}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; opacity:{{ t.check }}"><path d="M20 6 9 17l-5-5"/></svg>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <label style="font-size:12px; font-weight:600">Ativo</label>
+            <input value="{{ fAtivo }}" onChange="{{ setAtivo }}" placeholder="{{ ativoPlaceholder }}" style="height:42px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px; font:400 13px Inter,sans-serif; color:#0A2430; outline:none" style-focus="border-color:#2563EB; background:#fff; box-shadow:0 0 0 4px rgba(37,99,235,.12)">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <label style="font-size:12px; font-weight:600">Quantidade</label>
+              <input value="{{ fQtd }}" onChange="{{ setQtd }}" placeholder="0" class="ffx" style="height:42px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px; font:600 14px Inter,sans-serif; color:#0A2430; outline:none" style-focus="border-color:#2563EB; background:#fff; box-shadow:0 0 0 4px rgba(37,99,235,.12)">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <label style="font-size:12px; font-weight:600">{{ labelPreco }}</label>
+              <div style="display:flex; align-items:center; gap:8px; height:42px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ fPreco }}" onChange="{{ setPreco }}" placeholder="0,00" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; font:600 14px Inter,sans-serif; color:#0A2430; outline:none"></div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <label style="font-size:12px; font-weight:600">Data</label>
+              <div style="display:flex; align-items:center; justify-content:space-between; height:42px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span class="ffx" style="font-size:13px">11/08/2026</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.8" stroke-linejoin="round"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <label style="font-size:12px; font-weight:600">Custos (taxas)</label>
+              <div style="display:flex; align-items:center; gap:8px; height:42px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ fCustos }}" onChange="{{ setCustos }}" placeholder="0,00" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; font:600 14px Inter,sans-serif; color:#0A2430; outline:none"></div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <label style="font-size:12px; font-weight:600">Corretora</label>
+            <div style="display:flex; align-items:center; justify-content:space-between; height:42px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px; font-size:13px; color:#46606C">XP Investimentos<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; border-radius:11px; background:#F8FAFB">
+            <span style="font-size:12px; color:#46606C">{{ labelTotal }}</span>
+            <strong class="ffx" style="font-family:Poppins,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em">{{ valorTotal }}</strong>
+          </div>
+        </div>
+        <div style="flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 26px; border-top:1px solid #EEF3F5; background:#FBFCFD">
+          <span style="font-size:11px; color:#9FB2BB">{{ opRodape }}</span>
+          <div style="display:flex; gap:10px">
+            <button onClick="{{ fecharCadastro }}" style="height:40px; padding:0 16px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#46606C; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Cancelar</button>
+            <button onClick="{{ salvarLancamento }}" style="height:40px; padding:0 20px; border:none; border-radius:10px; background:{{ salvarBg }}; color:{{ salvarCor }}; font:600 13px Inter,sans-serif; cursor:pointer">{{ salvarLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ importAberto }}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="position:fixed; inset:0; z-index:22; display:grid; place-items:center; padding:32px; background:rgba(0,20,28,.45); backdrop-filter:blur(2px)">
+      <div style="width:min(500px, 100%); background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 40px 90px -30px rgba(0,20,28,.6)">
+        <div style="display:flex; align-items:flex-start; gap:16px; padding:20px 24px 16px; border-bottom:1px solid #EEF3F5">
+          <div style="flex:1">
+            <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Importação</span>
+            <h2 style="margin:6px 0 3px; font-family:Poppins,sans-serif; font-size:19px; font-weight:600; letter-spacing:-.02em">Importar posições da B3</h2>
+            <p style="margin:0; font-size:12px; color:#46606C">Envie o extrato de negociação em CSV baixado do portal da B3.</p>
+          </div>
+          <button onClick="{{ fecharImport }}" style="flex:none; display:grid; place-items:center; width:30px; height:30px; border:none; border-radius:9px; background:transparent; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px">
+          <sc-if value="{{ importPronto }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ simularUpload }}" style="display:flex; flex-direction:column; align-items:center; gap:9px; padding:30px 20px; border:1.5px dashed #C3D2DA; border-radius:13px; background:#FBFCFD; cursor:pointer; font-family:inherit" style-hover="border-color:#2563EB; background:rgba(37,99,235,.04)">
+              <span style="display:grid; place-items:center; width:42px; height:42px; border-radius:13px; background:#EDF2F5; color:#46606C"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 20h16"/></svg></span>
+              <span style="font-size:13px; font-weight:600">Escolher arquivo CSV</span>
+              <span style="font-size:11px; color:#9FB2BB">Até 5 MB · negociações e movimentações</span>
+            </button>
+          </sc-if>
+          <sc-if value="{{ importCarregando }}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="padding:26px 20px; border:1px solid #EEF3F5; border-radius:13px; background:#FBFCFD; text-align:center">
+              <div class="bar" style="height:7px; border-radius:999px; background:#EAF0F3; overflow:hidden; margin-bottom:13px"><i style="display:block; width:{{ importPct }}; height:100%; border-radius:999px; background:#2563EB"></i></div>
+              <span style="font-size:12px; color:#46606C">Lendo o extrato… {{ importPct }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ importFeito }}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="display:flex; flex-direction:column; gap:12px">
+              <div style="display:flex; align-items:center; gap:11px; padding:14px 16px; border:1px solid rgba(52,144,99,.24); border-radius:12px; background:rgba(52,144,99,.07)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2A7551" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 6 9 17l-5-5"/></svg>
+                <span style="font-size:13px; font-weight:600; color:#2A7551">4 negociações identificadas</span>
+              </div>
+              <sc-for list="{{ importLinhas }}" as="l" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:12px; padding:11px 14px; border:1px solid #EEF3F5; border-radius:11px">
+                  <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ l.cor }}"></i>
+                  <div style="flex:1; min-width:0"><div style="font-size:12px; font-weight:600">{{ l.nome }}</div><div class="ffx" style="font-size:11px; color:#9FB2BB">{{ l.meta }}</div></div>
+                  <strong class="ffx" style="flex:none; font-size:12px; font-weight:600">{{ l.valor }}</strong>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <p style="margin:0; font-size:11px; line-height:1.55; color:#9FB2BB">Nada é enviado para a corretora. O arquivo é lido para registrar as posições na sua carteira.</p>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; padding:14px 24px; border-top:1px solid #EEF3F5; background:#FBFCFD">
+          <button onClick="{{ fecharImport }}" style="height:40px; padding:0 16px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#46606C; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Cancelar</button>
+          <button onClick="{{ confirmarImport }}" style="height:40px; padding:0 18px; border:none; border-radius:10px; background:{{ importBg }}; color:{{ importCor }}; font:600 13px Inter,sans-serif; cursor:pointer">Importar posições</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ temToast }}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:30; display:flex; align-items:center; gap:10px; padding:13px 18px; border-radius:12px; background:#002E3E; color:#fff; box-shadow:0 20px 44px -18px rgba(0,20,28,.7)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FB783" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 6 9 17l-5-5"/></svg>
+      <span style="font-size:13px; font-weight:600">{{ toast }}</span>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+const TIPOS = [
+  { key: 'RF', label: 'Renda Fixa', cor: '#2563EB' },
+  { key: 'ACOES', label: 'Ações', cor: '#349063' },
+  { key: 'FUNDOS', label: 'Fundos', cor: '#B7377A' },
+  { key: 'CRIPTO', label: 'Cripto', cor: '#C97A15' },
+  { key: 'IMOVEL', label: 'Imóveis', cor: '#0A4A5C' },
+  { key: 'VEICULO', label: 'Veículos', cor: '#D9483F' }
+];
+
+const BENCHMARKS = [
+  { key: 'CDI', label: 'CDI', cor: '#C97A15' },
+  { key: 'IPCA', label: 'IPCA', cor: '#7A4FB7' },
+  { key: 'IFIX', label: 'IFIX', cor: '#9A5C0E' },
+  { key: 'IBOV', label: 'IBOV', cor: '#D9483F' },
+  { key: 'SMLL', label: 'SMLL', cor: '#B7377A' },
+  { key: 'IDIV', label: 'IDIV', cor: '#349063' },
+  { key: 'IVVB11', label: 'IVVB11', cor: '#0A4A5C' }
+];
+
+const POSICOES = [
+  { nome: 'Tesouro Selic 2029', tipo: 'RF', corretora: 'Tesouro Direto', qtd: 18, medio: 3245.80, atual: 3412.50, cotado: true },
+  { nome: 'CDB Banco Inter 118% CDI', tipo: 'RF', corretora: 'Inter', qtd: 1, medio: 15000.00, atual: 16240.00, cotado: true },
+  { nome: 'ITSA4', tipo: 'ACOES', corretora: 'XP Investimentos', qtd: 1200, medio: 9.42, atual: 11.08, cotado: true },
+  { nome: 'BBAS3', tipo: 'ACOES', corretora: 'XP Investimentos', qtd: 340, medio: 27.10, atual: 25.84, cotado: true },
+  { nome: 'IVVB11', tipo: 'FUNDOS', corretora: 'XP Investimentos', qtd: 42, medio: 329.40, atual: 312.30, cotado: true },
+  { nome: 'HGLG11', tipo: 'FUNDOS', corretora: 'Rico', qtd: 90, medio: 158.20, atual: 164.70, cotado: true },
+  { nome: 'Bitcoin', tipo: 'CRIPTO', corretora: 'Binance', qtd: 0.042, medio: 289400.00, atual: 289400.00, cotado: false },
+  { nome: 'Kitnet centro', tipo: 'IMOVEL', corretora: 'Registro próprio', qtd: 1, medio: 148000.00, atual: 148000.00, cotado: false }
+];
+
+const PROVENTOS = [
+  { mes: 'set', v: 218.40 }, { mes: 'out', v: 306.80 }, { mes: 'nov', v: 264.10 }, { mes: 'dez', v: 512.90 },
+  { mes: 'jan', v: 289.30 }, { mes: 'fev', v: 341.60 }, { mes: 'mar', v: 298.70 }, { mes: 'abr', v: 402.10 },
+  { mes: 'mai', v: 356.40 }, { mes: 'jun', v: 388.20 }, { mes: 'jul', v: 421.50 }, { mes: 'ago', v: 312.40 }
+];
+
+const PROV_ATIVO = [
+  { nome: 'ITSA4', v: 1284.60 }, { nome: 'HGLG11', v: 1142.30 }, { nome: 'BBAS3', v: 782.40 },
+  { nome: 'IVVB11', v: 218.90 }, { nome: 'CDB Inter', v: 184.20 }
+];
+
+const VENCIMENTOS = [
+  { nome: 'Tesouro Selic 2029', tipo: 'RF', data: '01/03/2029', valor: 61425.00 },
+  { nome: 'CDB Banco Inter 118% CDI', tipo: 'RF', data: '14/09/2027', valor: 16240.00 },
+  { nome: 'LCI Bradesco 96% CDI', tipo: 'RF', data: '20/05/2028', valor: 12800.00 },
+  { nome: 'CRA Agro 2031', tipo: 'RF', data: '10/07/2031', valor: 9400.00 }
+];
+
+class Component extends DCLogic {
+  state = {
+    tab: 'RESUMO', range: 12, tipoFiltro: 'all', bench: 'CDI', horizonte: 5,
+    alvos: { RF: 40, ACOES: 25, FUNDOS: 20, CRIPTO: 5, IMOVEL: 10, VEICULO: 0 },
+    cadastro: false, operacao: 'COMPRA', tipo: 'ACOES', tipoMenu: false,
+    ativo: '', qtd: '', preco: '', custos: '', salvando: false,
+    importOpen: false, importState: 'idle', importPct: 0, toast: ''
+  };
+
+  brl(v) {
+    const s = Math.abs(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (v < 0 ? '− R$ ' : 'R$ ') + s;
+  }
+
+  brlCurto(v) {
+    if (Math.abs(v) >= 1000) return 'R$ ' + (v / 1000).toFixed(1).replace('.', ',') + ' mil';
+    return this.brl(v);
+  }
+
+  pct(v) {
+    return (v > 0 ? '+ ' : (v < 0 ? '− ' : '')) + Math.abs(v).toFixed(1).replace('.', ',') + '%';
+  }
+
+  flash(msg) {
+    clearTimeout(this.t);
+    this.setState({ toast: msg });
+    this.t = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+
+  componentWillUnmount() { clearTimeout(this.t); clearInterval(this.imp); }
+
+  linha(vals, max, h, w) {
+    const step = w / Math.max(vals.length - 1, 1);
+    return vals.map((v, i) => (i === 0 ? 'M' : 'L') + (i * step).toFixed(1) + ' ' + (h - (v / max) * (h - 20)).toFixed(1)).join(' ');
+  }
+
+  renderVals() {
+    const s = this.state;
+    const tipoDe = k => TIPOS.find(t => t.key === k) || TIPOS[0];
+
+    const enriquecidas = POSICOES.map(p => {
+      const investido = p.qtd * p.medio;
+      const mercado = p.qtd * p.atual;
+      return { ...p, investido, mercado, result: mercado - investido, resultPct: investido > 0 ? ((mercado - investido) / investido) * 100 : 0 };
+    });
+
+    const totInvest = enriquecidas.reduce((t, p) => t + p.investido, 0);
+    const totMerc = enriquecidas.reduce((t, p) => t + p.mercado, 0);
+    const valorizacao = totMerc - totInvest;
+    const rentTotal = totInvest > 0 ? (valorizacao / totInvest) * 100 : 0;
+    const prov12 = PROVENTOS.reduce((t, m) => t + m.v, 0);
+
+    const porTipo = TIPOS.map(t => {
+      const val = enriquecidas.filter(p => p.tipo === t.key).reduce((a, p) => a + p.mercado, 0);
+      return { ...t, valor: val, pct: totMerc > 0 ? (val / totMerc) * 100 : 0 };
+    }).filter(t => t.valor > 0);
+
+    let acc = 0;
+    const segs = porTipo.map(t => {
+      const seg = t.cor + ' ' + acc.toFixed(2) + '% ' + (acc + t.pct).toFixed(2) + '%';
+      acc += t.pct;
+      return seg;
+    });
+
+    const filtradas = s.tipoFiltro === 'all' ? enriquecidas : enriquecidas.filter(p => p.tipo === s.tipoFiltro);
+
+    const n = s.range;
+    const mercadoSerie = Array.from({ length: n }, (_, i) => totMerc * (0.58 + (0.42 * (i + 1)) / n));
+    const aporteSerie = Array.from({ length: n }, (_, i) => totInvest * (0.62 + (0.38 * (i + 1)) / n));
+    const maxSerie = Math.max(...mercadoSerie, ...aporteSerie) * 1.06;
+
+    const benchSel = BENCHMARKS.find(b => b.key === s.bench) || BENCHMARKS[0];
+    const benchFator = { CDI: 0.72, IPCA: 0.41, IFIX: 0.63, IBOV: 0.88, SMLL: 0.55, IDIV: 0.94, IVVB11: 1.12 }[s.bench];
+    const carteiraPts = Array.from({ length: 12 }, (_, i) => 2 + (rentTotal - 2) * ((i + 1) / 12));
+    const benchPts = carteiraPts.map(v => v * benchFator);
+    const maxRent = Math.max(...carteiraPts, ...benchPts) * 1.15;
+
+    const maxProv = Math.max(...PROVENTOS.map(m => m.v));
+    const maxProvAtivo = Math.max(...PROV_ATIVO.map(a => a.v));
+
+    const consolid = Array.from({ length: Math.min(s.horizonte, 8) }, (_, i) => {
+      const ano = 2026 + i;
+      const val = VENCIMENTOS.filter(v => parseInt(v.data.slice(6), 10) === ano).reduce((a, v) => a + v.valor, 0);
+      return { ano, valor: val };
+    });
+    const maxCons = Math.max(...consolid.map(c => c.valor), 1);
+
+    const somaAlvo = Object.values(s.alvos).reduce((a, b) => a + (b || 0), 0);
+    const alvoOk = somaAlvo === 100;
+
+    const desvios = TIPOS.map(t => {
+      const atual = totMerc > 0 ? (enriquecidas.filter(p => p.tipo === t.key).reduce((a, p) => a + p.mercado, 0) / totMerc) * 100 : 0;
+      return { ...t, atual, alvo: s.alvos[t.key] || 0, desvio: (s.alvos[t.key] || 0) - atual };
+    });
+    const maiorFalta = desvios.slice().sort((a, b) => b.desvio - a.desvio)[0];
+
+    const qtdNum = parseFloat((s.qtd || '0').replace(',', '.')) || 0;
+    const precoNum = parseFloat((s.preco || '0').replace(/\./g, '').replace(',', '.')) || 0;
+    const custosNum = parseFloat((s.custos || '0').replace(/\./g, '').replace(',', '.')) || 0;
+    const compra = s.operacao === 'COMPRA';
+    const totalOp = compra ? qtdNum * precoNum + custosNum : qtdNum * precoNum - custosNum;
+    const tipoAtual = tipoDe(s.tipo);
+
+    return {
+      irOutra: () => this.flash('Esta tela é o protótipo de Investimentos'),
+      toast: s.toast,
+      temToast: s.toast.length > 0,
+
+      tabs: [['RESUMO', 'Resumo'], ['CONSOLIDACAO', 'Consolidação'], ['PROVENTOS', 'Proventos'], ['RENTABILIDADE', 'Rentabilidade'], ['ANALISE', 'Análise']].map(([k, label]) => ({
+        label,
+        pick: () => this.setState({ tab: k }),
+        bg: s.tab === k ? '#fff' : 'transparent',
+        cor: s.tab === k ? '#0A2430' : '#7A929E',
+        shadow: s.tab === k ? '0 1px 2px rgba(3,32,44,.08)' : 'none'
+      })),
+      ehResumo: s.tab === 'RESUMO',
+      ehConsolidacao: s.tab === 'CONSOLIDACAO',
+      ehProventos: s.tab === 'PROVENTOS',
+      ehRentabilidade: s.tab === 'RENTABILIDADE',
+      ehAnalise: s.tab === 'ANALISE',
+
+      kpis: [
+        { label: 'Valor de mercado', valor: this.brl(totMerc), nota: enriquecidas.length + ' posições ativas', cor: '#0A2430', tooltip: 'Valor atual da carteira. Usa cotação quando existe; sem cotação, cai para o preço médio — nunca inventamos preço.' },
+        { label: 'Total investido', valor: this.brl(totInvest), nota: 'Aporte líquido, a custo', cor: '#0A2430', tooltip: 'Quanto você efetivamente aportou, já descontando resgates. É o custo da carteira, sem valorização.' },
+        { label: 'Valorização', valor: this.brl(valorizacao), nota: this.pct(rentTotal) + ' sobre o investido', cor: valorizacao >= 0 ? '#2A7551' : '#B3372F', tooltip: 'Mercado menos investido. Nunca é somado como se fosse aporte seu — é resultado, e pode ser negativo.' },
+        { label: 'Proventos (12m)', valor: this.brl(prov12), nota: 'Média de ' + this.brl(prov12 / 12) + '/mês', cor: '#2A7551', tooltip: 'Dividendos, JCP e rendimentos recebidos nos últimos 12 meses. Contabilizados separadamente da valorização.' },
+        { label: 'Aporte do mês', valor: this.brl(4200), nota: 'Resgates: ' + this.brl(0), cor: '#0A2430', tooltip: 'Quanto entrou na carteira neste mês, e quanto foi resgatado.' }
+      ],
+
+      ranges: [[6, '6 meses'], [12, '12 meses'], [24, '24 meses']].map(([v, label]) => ({
+        label,
+        pick: () => this.setState({ range: v }),
+        bg: s.range === v ? '#fff' : 'transparent',
+        cor: s.range === v ? '#0A2430' : '#7A929E',
+        shadow: s.range === v ? '0 1px 2px rgba(3,32,44,.08)' : 'none'
+      })),
+      linhaMercado: this.linha(mercadoSerie, maxSerie, 200, 660),
+      areaMercado: this.linha(mercadoSerie, maxSerie, 200, 660) + ' L660 220 L0 220 Z',
+      linhaAporte: this.linha(aporteSerie, maxSerie, 200, 660),
+      eixoLabels: 'até ' + this.brlCurto(maxSerie),
+
+      donut: 'conic-gradient(' + segs.join(', ') + ')',
+      patrimonioCurto: this.brlCurto(totMerc),
+      distribuicao: porTipo.map(t => ({ label: t.label, cor: t.cor, valor: this.brlCurto(t.valor), pct: t.pct.toFixed(1).replace('.', ',') + '%' })),
+
+      tipoChips: [{ key: 'all', label: 'Todos' }, ...porTipo.map(t => ({ key: t.key, label: t.label }))].map(c => ({
+        label: c.label,
+        pick: () => this.setState({ tipoFiltro: c.key }),
+        bg: s.tipoFiltro === c.key ? '#002E3E' : '#fff',
+        cor: s.tipoFiltro === c.key ? '#fff' : '#46606C',
+        border: s.tipoFiltro === c.key ? '#002E3E' : '#D6E0E6'
+      })),
+      posicoes: filtradas.map(p => {
+        const t = tipoDe(p.tipo);
+        return {
+          nome: p.nome, cor: t.cor, meta: t.label + ' · ' + p.corretora,
+          qtd: p.qtd < 1 ? p.qtd.toFixed(4).replace('.', ',') : p.qtd.toLocaleString('pt-BR'),
+          medio: this.brl(p.medio),
+          atual: this.brl(p.atual),
+          atualCor: p.cotado ? '#46606C' : '#9FB2BB',
+          fonte: p.cotado ? 'cotação' : 'preço médio',
+          investido: this.brl(p.investido),
+          mercado: this.brl(p.mercado),
+          result: this.brl(p.result),
+          resultPct: this.pct(p.resultPct),
+          resultCor: p.result >= 0 ? '#2A7551' : '#B3372F'
+        };
+      }),
+      totInvestido: this.brl(totInvest),
+      totMercado: this.brl(totMerc),
+      totResultPct: this.pct(rentTotal),
+      totResultCor: valorizacao >= 0 ? '#2A7551' : '#B3372F',
+      posicoesNota: filtradas.length + ' de ' + enriquecidas.length + ' posições · nenhuma zerada',
+
+      benchmarks: BENCHMARKS.map(b => ({
+        label: b.label, dot: b.cor,
+        pick: () => this.setState({ bench: b.key }),
+        bg: s.bench === b.key ? 'rgba(37,99,235,.08)' : '#fff',
+        cor: s.bench === b.key ? '#1D4ED8' : '#46606C',
+        border: s.bench === b.key ? '#2563EB' : '#D6E0E6'
+      })),
+      benchLabel: benchSel.label,
+      benchCor: benchSel.cor,
+      rentCards: [
+        { label: 'Desde o início', valor: this.pct(rentTotal), bench: benchSel.label + ': ' + this.pct(rentTotal * benchFator), cor: rentTotal >= 0 ? '#2A7551' : '#B3372F' },
+        { label: 'Últimos 12 meses', valor: this.pct(rentTotal * 0.68), bench: benchSel.label + ': ' + this.pct(rentTotal * 0.68 * benchFator), cor: '#2A7551' },
+        { label: 'Último mês', valor: this.pct(1.4), bench: benchSel.label + ': ' + this.pct(1.4 * benchFator), cor: '#2A7551' }
+      ],
+      linhaCarteira: this.linha(carteiraPts, maxRent, 180, 660),
+      linhaBenchmark: this.linha(benchPts, maxRent, 180, 660),
+      anos: [2023, 2024, 2025, 2026].map((ano, i) => {
+        const v = [8.2, 12.6, 9.4, rentTotal][i];
+        return {
+          ano: String(ano),
+          carteira: this.pct(v),
+          bench: this.pct(v * benchFator),
+          barra: Math.min(Math.abs(v) * 5, 100) + '%',
+          cor: v >= 0 ? '#2A7551' : '#B3372F'
+        };
+      }),
+
+      proventosMes: PROVENTOS.map(m => ({
+        mes: m.mes,
+        valor: Math.round(m.v),
+        altura: ((m.v / maxProv) * 100).toFixed(1) + '%',
+        cor: m.v >= prov12 / 12 ? '#349063' : 'rgba(52,144,99,.45)',
+        tooltip: m.mes + ': ' + this.brl(m.v)
+      })),
+      prov12: this.brl(prov12),
+      provMedia: this.brl(prov12 / 12),
+      provAtivos: String(PROV_ATIVO.length),
+      proventosAtivo: PROV_ATIVO.map(a => ({ nome: a.nome, valor: this.brl(a.v), barra: ((a.v / maxProvAtivo) * 100).toFixed(1) + '%' })),
+
+      horizonte: s.horizonte + ' anos',
+      menosAnos: () => this.setState(p => ({ horizonte: Math.max(2, p.horizonte - 1) })),
+      maisAnos: () => this.setState(p => ({ horizonte: Math.min(8, p.horizonte + 1) })),
+      consolidacao: consolid.map(c => ({
+        ano: String(c.ano),
+        valor: c.valor > 0 ? this.brlCurto(c.valor) : '—',
+        altura: ((c.valor / maxCons) * 100).toFixed(1) + '%',
+        cor: c.valor > 0 ? '#2563EB' : '#EAF0F3'
+      })),
+      vencimentos: VENCIMENTOS.map(v => ({
+        nome: v.nome, data: v.data, valor: this.brl(v.valor),
+        tipo: tipoDe(v.tipo).label, cor: tipoDe(v.tipo).cor
+      })),
+
+      somaAlvo: somaAlvo + '%',
+      somaBg: alvoOk ? 'rgba(52,144,99,.12)' : 'rgba(201,122,21,.14)',
+      somaCor: alvoOk ? '#2A7551' : '#9A5C0E',
+      alvos: desvios.map(d => ({
+        label: d.label, cor: d.cor,
+        atual: d.atual.toFixed(0) + '%',
+        barraAtual: Math.min(d.atual, 100).toFixed(1) + '%',
+        alvo: String(d.alvo),
+        desvio: (d.desvio > 0 ? '+' : '') + d.desvio.toFixed(0) + ' p.p.',
+        desvioCor: Math.abs(d.desvio) < 3 ? '#7A929E' : (d.desvio > 0 ? '#1D4ED8' : '#B3372F'),
+        set: e => {
+          const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
+          this.setState(p => ({ alvos: { ...p.alvos, [d.key]: isNaN(v) ? 0 : Math.min(v, 100) } }));
+        },
+        menos: () => this.setState(p => ({ alvos: { ...p.alvos, [d.key]: Math.max(0, (p.alvos[d.key] || 0) - 5) } })),
+        mais: () => this.setState(p => ({ alvos: { ...p.alvos, [d.key]: Math.min(100, (p.alvos[d.key] || 0) + 5) } }))
+      })),
+      resetAlvo: () => { this.setState({ alvos: { RF: 40, ACOES: 25, FUNDOS: 20, CRIPTO: 5, IMOVEL: 10, VEICULO: 0 } }); this.flash('Alocação alvo restaurada'); },
+      salvarAlvoBg: alvoOk ? '#2563EB' : '#DCE4E8',
+      salvarAlvoCor: alvoOk ? '#fff' : '#9FB2BB',
+      salvarAlvo: () => { if (alvoOk) this.flash('Alocação alvo salva'); },
+      acaoTitulo: maiorFalta.desvio > 0 ? 'Aportar em ' + maiorFalta.label : 'Carteira alinhada ao alvo',
+      acaoTexto: maiorFalta.desvio > 0
+        ? 'Essa classe está ' + Math.abs(maiorFalta.desvio).toFixed(0) + ' pontos abaixo do seu alvo. Um aporte aqui aproxima a carteira da distribuição que você definiu.'
+        : 'Nenhuma classe está significativamente fora do alvo. Siga com o aporte planejado.',
+      acaoTipo: maiorFalta.label,
+      acaoValor: this.brl(Math.max(totMerc * (maiorFalta.desvio / 100), 0)),
+      executarAcao: () => this.setState({ cadastro: true, operacao: 'COMPRA', tipo: maiorFalta.key, ativo: '', qtd: '', preco: '', custos: '' }),
+
+      cadastroAberto: s.cadastro,
+      abrirCadastro: () => this.setState({ cadastro: true, operacao: 'COMPRA', ativo: '', qtd: '', preco: '', custos: '', tipoMenu: false, salvando: false }),
+      fecharCadastro: () => this.setState({ cadastro: false, tipoMenu: false }),
+      operacoes: [['COMPRA', 'Compra'], ['VENDA', 'Venda']].map(([k, label]) => ({
+        label,
+        pick: () => this.setState({ operacao: k }),
+        border: s.operacao === k ? '#2563EB' : '#E4EBEF',
+        bg: s.operacao === k ? 'rgba(37,99,235,.08)' : '#fff',
+        cor: s.operacao === k ? '#1D4ED8' : '#46606C'
+      })),
+      opTitulo: compra ? 'Registrar compra' : 'Registrar venda',
+      opSub: compra ? 'A compra entra no preço médio da posição.' : 'A venda reduz a quantidade e apura o resultado.',
+      opRodape: compra ? 'Custos entram no valor total pago.' : 'Custos são descontados do valor recebido.',
+      labelPreco: compra ? 'Preço de compra' : 'Preço de venda',
+      labelTotal: compra ? 'Valor total pago' : 'Valor total recebido',
+      valorTotal: this.brl(totalOp),
+      ativoPlaceholder: s.tipo === 'ACOES' ? 'Ex.: ITSA4' : (s.tipo === 'RF' ? 'Ex.: Tesouro Selic 2029' : 'Nome do ativo'),
+
+      tipoLabel: tipoAtual.label,
+      tipoCor: '#0A2430',
+      tipoDot: tipoAtual.cor,
+      tipoMenuAberto: s.tipoMenu,
+      toggleTipoMenu: () => this.setState(p => ({ tipoMenu: !p.tipoMenu })),
+      tipoBorder: s.tipoMenu ? '#2563EB' : '#E4EBEF',
+      tipoBg: s.tipoMenu ? '#fff' : '#F8FAFB',
+      tipoShadow: s.tipoMenu ? '0 0 0 4px rgba(37,99,235,.12)' : 'none',
+      tipoChevron: s.tipoMenu ? 'rotate(180deg)' : 'none',
+      tiposAtivo: TIPOS.map(t => ({
+        label: t.label, dot: t.cor,
+        pick: () => this.setState({ tipo: t.key, tipoMenu: false }),
+        bg: s.tipo === t.key ? 'rgba(37,99,235,.08)' : 'transparent',
+        cor: s.tipo === t.key ? '#1D4ED8' : '#46606C',
+        peso: s.tipo === t.key ? '600' : '400',
+        check: s.tipo === t.key ? '1' : '0'
+      })),
+      fAtivo: s.ativo,
+      setAtivo: e => this.setState({ ativo: e.target.value }),
+      fQtd: s.qtd,
+      setQtd: e => this.setState({ qtd: e.target.value }),
+      fPreco: s.preco,
+      setPreco: e => this.setState({ preco: e.target.value }),
+      fCustos: s.custos,
+      setCustos: e => this.setState({ custos: e.target.value }),
+      salvarLabel: s.salvando ? 'Salvando…' : (compra ? 'Salvar compra' : 'Salvar venda'),
+      salvarBg: s.salvando || !s.ativo || !qtdNum || !precoNum ? '#DCE4E8' : '#2563EB',
+      salvarCor: s.salvando || !s.ativo || !qtdNum || !precoNum ? '#9FB2BB' : '#fff',
+      salvarLancamento: () => {
+        if (s.salvando || !s.ativo || !qtdNum || !precoNum) return;
+        this.setState({ salvando: true });
+        setTimeout(() => {
+          this.setState({ salvando: false, cadastro: false });
+          this.flash((compra ? 'Compra' : 'Venda') + ' de ' + s.ativo + ' registrada');
+        }, 700);
+      },
+
+      importAberto: s.importOpen,
+      abrirImport: () => this.setState({ importOpen: true, importState: 'idle', importPct: 0 }),
+      fecharImport: () => { clearInterval(this.imp); this.setState({ importOpen: false, importState: 'idle' }); },
+      importPronto: s.importState === 'idle',
+      importCarregando: s.importState === 'loading',
+      importFeito: s.importState === 'done',
+      importPct: s.importPct + '%',
+      simularUpload: () => {
+        clearInterval(this.imp);
+        this.setState({ importState: 'loading', importPct: 0 });
+        this.imp = setInterval(() => {
+          this.setState(p => {
+            const n = p.importPct + 12;
+            if (n >= 100) { clearInterval(this.imp); return { importPct: 100, importState: 'done' }; }
+            return { importPct: n };
+          });
+        }, 120);
+      },
+      importLinhas: [
+        { nome: 'ITSA4', meta: 'Compra · 200 cotas · 04/08', valor: this.brl(2216.00), cor: '#349063' },
+        { nome: 'HGLG11', meta: 'Compra · 12 cotas · 05/08', valor: this.brl(1976.40), cor: '#B7377A' },
+        { nome: 'BBAS3', meta: 'Venda · 40 ações · 07/08', valor: this.brl(1033.60), cor: '#349063' },
+        { nome: 'IVVB11', meta: 'Provento · JCP · 08/08', valor: this.brl(84.20), cor: '#B7377A' }
+      ],
+      importBg: s.importState === 'done' ? '#2563EB' : '#DCE4E8',
+      importCor: s.importState === 'done' ? '#fff' : '#9FB2BB',
+      confirmarImport: () => {
+        if (s.importState !== 'done') return;
+        this.setState({ importOpen: false, importState: 'idle' });
+        this.flash('4 lançamentos importados da B3');
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

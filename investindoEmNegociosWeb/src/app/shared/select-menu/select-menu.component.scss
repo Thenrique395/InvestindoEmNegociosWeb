@@ -1,0 +1,231 @@
+/* Dropdown — COMPONENTES.md §5.3. */
+
+:host {
+  position: relative;
+  display: block;
+}
+
+/* ---------- Gatilho -------------------------------------------------------- */
+
+.select-menu__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-control) ease,
+    box-shadow var(--dur-control) ease,
+    background var(--dur-control) ease;
+
+  &:disabled {
+    opacity: var(--control-disabled-opacity);
+    cursor: not-allowed;
+  }
+}
+
+:host(.select-menu--open) .select-menu__trigger {
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: var(--shadow-focus);
+}
+
+.select-menu__value {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* Transparente quando não há seleção: o espaço fica reservado, então o rótulo
+   não pula de posição ao escolher a primeira opção. */
+.select-menu__dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.select-menu__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-menu__label--placeholder {
+  color: var(--text-muted);
+}
+
+.select-menu__chevron {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--text-tertiary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-control) ease;
+}
+
+:host(.select-menu--open) .select-menu__chevron {
+  transform: rotate(180deg);
+}
+
+/* ---------- Painel --------------------------------------------------------- */
+
+.select-menu__panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  margin-top: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  box-shadow: var(--shadow-dropdown);
+  overflow: hidden;
+  animation: selectMenuIn var(--dur-fade) ease both;
+}
+
+@keyframes selectMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.select-menu__search {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-inner);
+}
+
+.select-menu__search-input {
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  outline: none;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.select-menu__list {
+  max-height: 210px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+}
+
+.select-menu__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 9px var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-body);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-app);
+  }
+}
+
+/* `--active` é a navegação por teclado; `--selected` é o valor atual. São
+   estados diferentes e podem coexistir. */
+.select-menu__option--active {
+  background: var(--bg-app);
+}
+
+.select-menu__option--selected {
+  background: var(--primary-tint-soft);
+  color: var(--primary-text);
+  font-weight: var(--fw-semibold);
+}
+
+.select-menu__option--disabled {
+  opacity: var(--control-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.select-menu__option-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-menu__option-meta {
+  flex: none;
+  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+}
+
+.select-menu__check {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.select-menu__empty {
+  padding: var(--space-6) var(--space-4);
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  text-align: center;
+}
+
+.select-menu__create {
+  display: block;
+  width: 100%;
+  padding: var(--space-4) var(--space-5);
+  border: none;
+  border-top: 1px solid var(--border-inner);
+  background: var(--surface-subtle);
+  color: var(--primary-text);
+  font-family: inherit;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-inset);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-menu__panel {
+    animation: none;
+  }
+
+  .select-menu__chevron {
+    transition: none;
+  }
+}

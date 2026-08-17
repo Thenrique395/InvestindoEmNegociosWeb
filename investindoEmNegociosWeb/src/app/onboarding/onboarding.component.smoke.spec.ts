@@ -58,6 +58,12 @@ class RouterMock {
   navigateByUrl = jasmine.createSpy().and.resolveTo(true);
 }
 
+class UserContextFacadeServiceMock {
+  state$ = of({ profile: null, displayName: 'Tiago Cadastro', avatarUrl: '', userInitials: 'TC' });
+  loadProfile = jasmine.createSpy();
+  reset = jasmine.createSpy();
+}
+
 function createComponent() {
   const profile = new ProfileServiceMock();
   const onboarding = new OnboardingServiceMock();
@@ -70,6 +76,7 @@ function createComponent() {
   const uiPermissions = new UiPermissionsServiceMock();
   const onboardingDraft = new OnboardingDraftServiceMock();
   const router = new RouterMock();
+  const userContext = new UserContextFacadeServiceMock();
 
   const component = new OnboardingComponent(
     new FormBuilder(),
@@ -83,10 +90,11 @@ function createComponent() {
     plans as any,
     categories as any,
     uiPermissions as any,
-    onboardingDraft as any
+    onboardingDraft as any,
+    userContext as any
   );
 
-  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, uiPermissions, onboardingDraft, router };
+  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, uiPermissions, onboardingDraft, router, userContext };
 }
 
 describe('OnboardingComponent smoke', () => {

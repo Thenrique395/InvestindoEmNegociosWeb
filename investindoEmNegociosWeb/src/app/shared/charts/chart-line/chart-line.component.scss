@@ -1,0 +1,72 @@
+/* Gráfico de linha — COMPONENTES.md §9. */
+
+:host {
+  display: block;
+}
+
+/* `preserveAspectRatio: none` + largura 100%: a série ocupa o card inteiro em
+   qualquer largura, sem recalcular pontos no TypeScript. */
+.line {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.line__grid {
+  stroke: var(--border-inner);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.line__series {
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Sem isto o `preserveAspectRatio: none` esticaria a espessura do traço
+     junto com o desenho, e a linha ficaria mais grossa em cards largos. */
+  vector-effect: non-scaling-stroke;
+}
+
+/* Comparação: aporte, benchmark, planejado. */
+.line__series--dashed {
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+
+.line__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-4);
+}
+
+.line__label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-micro);
+}
+
+.line__legend {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-row);
+}
+
+.line__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+}
+
+.line__marker {
+  width: 16px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+}
+
+.line__marker--dashed {
+  background-image: linear-gradient(90deg, currentColor 60%, transparent 0);
+  background-size: 6px 3px;
+}

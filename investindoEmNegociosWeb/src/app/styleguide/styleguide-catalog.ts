@@ -19,6 +19,69 @@ export const STYLEGUIDE_CATEGORY_LABELS: Record<StyleguideCategory, string> = {
 
 export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
   {
+    slug: 'segmented-selector',
+    name: 'SegmentedSelector',
+    selector: 'app-segmented-selector',
+    category: 'forms',
+    description: 'Alternador de visão. Trilho afundado, aba ativa branca com sombra de 1px.'
+  },
+  {
+    slug: 'money',
+    name: 'Money',
+    selector: 'app-money',
+    category: 'data',
+    description: 'Valor monetário: formata BRL, aplica tabular-nums, colore por sinal e respeita o modo ocultar valores.'
+  },
+  {
+    slug: 'chart-line',
+    name: 'ChartLine',
+    selector: 'app-chart-line',
+    category: 'data',
+    description: 'Gráfico de linha com área em gradiente e série de comparação tracejada. Nenhuma feature escreve SVG.'
+  },
+  {
+    slug: 'select-menu',
+    name: 'SelectMenu',
+    selector: 'app-select-menu',
+    category: 'forms',
+    description: 'Dropdown padrão. Todo campo de valor múltiplo usa este componente — chips em linha são proibidos.'
+  },
+  {
+    slug: 'number-stepper',
+    name: 'NumberStepper',
+    selector: 'app-number-stepper',
+    category: 'forms',
+    description: 'Stepper numérico com campo digitável. Os botões são atalho, não a única entrada.'
+  },
+  {
+    slug: 'kpi-strip',
+    name: 'KpiStrip',
+    selector: 'app-kpi-strip',
+    category: 'data',
+    description: 'Faixa de indicadores em flex com quebra. Cada item exige tooltip explicando o cálculo.'
+  },
+  {
+    slug: 'progress-bar',
+    name: 'ProgressBar',
+    selector: 'app-progress-bar',
+    category: 'data',
+    description: 'Barra de progresso. A cor vem do modo: consumo (passar é ruim) ou conquista (chegar é bom).'
+  },
+  {
+    slug: 'chart-bars',
+    name: 'ChartBars',
+    selector: 'app-chart-bars',
+    category: 'data',
+    description: 'Gráfico de barras. Encapsula a armadilha da altura percentual — nenhuma feature desenha barra à mão.'
+  },
+  {
+    slug: 'installment-scope-modal',
+    name: 'InstallmentScopeModal',
+    selector: 'app-installment-scope-modal',
+    category: 'overlay',
+    description: 'Pergunta se a ação vale para esta parcela ou todas as seguintes. Usado por Despesas, Cartões e Calendário.'
+  },
+  {
     slug: 'page-header',
     name: 'PageHeader',
     selector: 'app-page-header',

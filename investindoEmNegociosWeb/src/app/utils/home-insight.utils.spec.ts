@@ -185,8 +185,8 @@ describe('home-insight.utils', () => {
 
   describe('buildConicGradient', () => {
     it('retorna gradiente neutro quando nao ha fatias com percentual positivo', () => {
-      expect(buildConicGradient([])).toBe('conic-gradient(var(--surface-3) 0deg 360deg)');
-      expect(buildConicGradient([{ percent: 0, color: '#fff' }])).toBe('conic-gradient(var(--surface-3) 0deg 360deg)');
+      expect(buildConicGradient([])).toBe('conic-gradient(var(--surface-inset) 0deg 360deg)');
+      expect(buildConicGradient([{ percent: 0, color: '#fff' }])).toBe('conic-gradient(var(--surface-inset) 0deg 360deg)');
     });
 
     it('monta os segmentos proporcionais ao percentual de cada fatia', () => {

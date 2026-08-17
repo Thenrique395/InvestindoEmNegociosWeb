@@ -68,9 +68,9 @@ import { BodyPortalDirective } from '../body-portal.directive';
       gap: 1.4rem;
       padding: 1.7rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
+      border-radius: var(--radius-panel);
       background: var(--surface);
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-modal);
     }
 
     .confirm-sheet__head {
@@ -87,24 +87,24 @@ import { BodyPortalDirective } from '../body-portal.directive';
 
     .confirm-sheet__eyebrow {
       margin: 0;
-      color: var(--text-muted);
-      font-size: var(--font-size-caption);
-      font-weight: var(--font-weight-bold);
-      letter-spacing: var(--letter-spacing-eyebrow);
+      color: var(--text-tertiary);
+      font-size: var(--fs-caption);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
     }
 
     .confirm-sheet__title {
       margin: 0;
       color: var(--text);
-      font-size: var(--font-size-title);
-      font-weight: var(--font-weight-bold);
+      font-size: var(--fs-modal-title);
+      font-weight: var(--fw-bold);
     }
 
     .confirm-sheet__text {
       color: var(--text-secondary);
-      font-size: var(--font-size-body-sm);
-      line-height: var(--line-height-body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
     }
 
     .confirm-sheet__text ::ng-deep p {
@@ -120,7 +120,7 @@ import { BodyPortalDirective } from '../body-portal.directive';
       block-size: 42px;
       border: 1px solid var(--border);
       border-radius: var(--radius-pill);
-      color: var(--text-muted);
+      color: var(--text-tertiary);
       cursor: pointer;
       transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
     }
@@ -128,7 +128,7 @@ import { BodyPortalDirective } from '../body-portal.directive';
     .confirm-sheet__close:hover {
       border-color: var(--border-strong);
       color: var(--text);
-      background: var(--surface-2);
+      background: var(--surface-sunken);
     }
 
     .confirm-sheet__actions {

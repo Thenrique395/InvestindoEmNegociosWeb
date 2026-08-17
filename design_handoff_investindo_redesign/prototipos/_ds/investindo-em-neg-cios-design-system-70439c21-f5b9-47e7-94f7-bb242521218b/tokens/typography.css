@@ -1,0 +1,27 @@
+/* Investindo em Negócios — typography tokens
+   Brand font: Visby CF (Thin–Heavy). Binaries not provided;
+   Poppins is the closest Google Fonts substitute (geometric, round). */
+:root {
+  --font-sans: 'Poppins', 'Visby CF', -apple-system, 'Segoe UI', sans-serif;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-demibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+
+  --text-display: 56px;   /* hero headlines */
+  --text-h1: 40px;
+  --text-h2: 32px;
+  --text-h3: 24px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-small: 14px;
+  --text-caption: 12px;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-body: 1.6;
+
+  --tracking-wide: 0.08em; /* uppercase CTAs, eyebrow labels */
+}

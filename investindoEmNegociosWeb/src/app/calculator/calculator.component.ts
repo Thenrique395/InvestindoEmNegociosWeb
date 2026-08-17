@@ -1,8 +1,8 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
@@ -59,11 +59,11 @@ interface CalcItem {
   standalone: true,
   imports: [FormsModule, DecimalPipe, RouterLink, AppCurrencyPipe, PageHeaderComponent, TransactionSummaryCardComponent, StatusBadgeComponent],
   templateUrl: './calculator.component.html',
-  styleUrls: ['./calculator.component.scss']
+  styleUrls: ['./calculator.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CalculatorComponent implements OnDestroy {
+export class CalculatorComponent {
   selected: CalculatorType | null = null;
-  sub: Subscription;
 
   calculators: CalcItem[] = [
     { id: 'aposentadoria', title: 'Aposentadoria', subtitle: 'Planeje quanto poupar até aposentar', category: 'financeiras', implemented: true, icon: 'home' },
@@ -259,14 +259,20 @@ export class CalculatorComponent implements OnDestroy {
   reflexoDsrResultado = 0;
   totalComReflexoResultado = 0;
 
-  constructor(private route: ActivatedRoute, private router: Router) {
-    this.sub = this.route.paramMap.subscribe((params) => {
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private destroyRef: DestroyRef,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const id = params.get('id') as CalculatorType | null;
       if (id && this.calculators.find((c) => c.id === id)) {
         this.selected = id;
       } else {
         this.selected = null;
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -353,10 +359,6 @@ export class CalculatorComponent implements OnDestroy {
     this.resultadoPrefixado = this.calculaSerie(this.valorAplicado, 0, this.taxaPrefixado, n);
     const taxaIpcaTotal = this.taxaIpca + this.taxaIpcaSpread;
     this.resultadoIpca = this.calculaSerie(this.valorAplicado, 0, taxaIpcaTotal, n);
-  }
-
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
   }
 
   goTo(id: CalculatorType): void {

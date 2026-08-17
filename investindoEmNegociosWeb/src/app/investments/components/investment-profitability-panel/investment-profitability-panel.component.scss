@@ -1,56 +1,54 @@
 :host {
   display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .card {
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
   min-width: 0;
 }
 
 .chart-card {
   display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .rentabilidade-grid {
   display: grid;
-  grid-template-columns: minmax(240px, 290px) minmax(0, 1fr);
-  gap: var(--spacing-2);
-  align-items: start;
-}
-
-.rentabilidade-side {
-  display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .executive-card {
-  min-height: 160px;
   display: grid;
   gap: 0.45rem;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-subtle);
+  padding: 0.95rem 1rem;
 }
 
 .executive-card strong {
   display: block;
-  font-size: var(--text-3xl);
-  line-height: var(--line-height-heading);
+  font-size: var(--fs-page-title);
+  line-height: var(--lh-tight);
 }
 
 .executive-card small {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .rent-card strong {
-  font-size: 1.75rem;
+  font-size: var(--fs-title-md);
 }
 
-.rentabilidade-main {
-  min-height: 460px;
+.rent-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
 }
 
 .rentabilidade-chart {
@@ -64,8 +62,8 @@
   grid-template-rows: repeat(6, 1fr);
   align-items: center;
   text-align: right;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
   padding-bottom: 1.35rem;
 }
 
@@ -136,16 +134,16 @@
 
 .rentabilidade-x-axis small {
   text-align: center;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-1);
-  margin-bottom: var(--spacing-1);
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .section-head h3 {
@@ -153,9 +151,16 @@
 }
 
 .section-head__title {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.section-head__title p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body);
 }
 
 .chart-filters {
@@ -169,6 +174,42 @@
   max-width: 180px;
 }
 
+.benchmark-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.benchmark-pill {
+  --benchmark-color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 30px;
+  border: 1px solid color-mix(in srgb, var(--benchmark-color) 28%, var(--border));
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-control);
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+}
+
+.benchmark-pill i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--benchmark-color);
+}
+
+.benchmark-pill.active {
+  background: color-mix(in srgb, var(--benchmark-color) 12%, var(--surface));
+  color: var(--benchmark-color);
+}
+
 .chart-hover-tip {
   position: absolute;
   left: 50%;
@@ -177,14 +218,14 @@
   min-width: 170px;
   max-width: 220px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: var(--surface);
   color: var(--text);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   padding: 0.45rem 0.55rem;
   text-align: left;
-  font-size: var(--text-xs);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-control);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -199,9 +240,9 @@
 .legend-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-1);
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  gap: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
 }
 
 .chip {
@@ -220,29 +261,61 @@
   background: color-mix(in srgb, var(--warning) 85%, white);
 }
 
-.table-wrap {
-  overflow-x: auto;
+.yearly-list {
+  display: grid;
 }
 
-.table-wrap table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table-wrap th,
-.table-wrap td {
-  padding: 0.7rem 0.8rem;
+.yearly-row {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr) 100px 100px;
+  gap: var(--space-3);
+  align-items: center;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--border);
-  text-align: left;
-  white-space: nowrap;
+}
+
+.yearly-row--head {
+  padding-top: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.yearly-row > :nth-child(3),
+.yearly-row > :nth-child(4) {
+  text-align: right;
+}
+
+.yearly-row > span:last-child {
+  color: var(--text-tertiary);
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--income);
+}
+
+.progress-bar span.negative {
+  background: var(--expense);
 }
 
 .success {
-  color: var(--success-text);
+  color: var(--income-text);
 }
 
 .danger {
-  color: var(--danger);
+  color: var(--expense);
 }
 
 @media (max-width: 960px) {
@@ -252,6 +325,11 @@
 }
 
 @media (max-width: 720px) {
+  .section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .rentabilidade-chart {
     grid-template-columns: 48px minmax(0, 1fr);
   }
@@ -266,7 +344,16 @@
     flex: 1 1 140px;
   }
 
+  .rent-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .rentabilidade-x-axis small:not(:nth-child(3n + 1)) {
     display: none;
+  }
+
+  .yearly-row {
+    grid-template-columns: 64px minmax(0, 1fr) 72px 72px;
+    gap: var(--space-2);
   }
 }

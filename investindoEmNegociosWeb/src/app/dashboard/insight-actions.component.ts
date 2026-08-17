@@ -51,31 +51,31 @@ export interface InsightActionItem {
   styles: `
     :host { display: block; }
     .insight-actions {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--spacing-2);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6);
     }
     .insight-actions__column {
-      display: grid; align-content: start; gap: var(--spacing-1);
-      border: 1px solid var(--border); border-radius: var(--radius-md);
-      background: var(--surface-2); padding: var(--spacing-2);
+      display: grid; align-content: start; gap: var(--space-3);
+      border: 1px solid var(--border); border-radius: var(--radius-control);
+      background: var(--surface-sunken); padding: var(--space-6);
     }
-    .insight-actions__title { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--text); }
+    .insight-actions__title { margin: 0; font-size: var(--fs-meta); font-weight: 600; color: var(--text); }
     .insight-actions__observations {
       margin: 0; padding-left: 1.1rem; display: grid; gap: 6px;
-      font-size: var(--text-xs); color: var(--text-secondary);
+      font-size: var(--fs-caption); color: var(--text-secondary);
     }
     .insight-actions__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
     .insight-actions__item {
       display: flex; align-items: center; gap: 10px;
-      border: 1px solid var(--border); border-radius: var(--radius-md);
+      border: 1px solid var(--border); border-radius: var(--radius-control);
       background: var(--surface); padding: 8px 10px;
     }
-    .insight-actions__marker { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; background: var(--info); }
-    .insight-actions__item[data-severity='danger'] .insight-actions__marker { background: var(--danger); }
+    .insight-actions__marker { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; background: var(--primary); }
+    .insight-actions__item[data-severity='danger'] .insight-actions__marker { background: var(--expense); }
     .insight-actions__item[data-severity='warn'] .insight-actions__marker { background: var(--warning); }
-    .insight-actions__text { flex: 1 1 auto; min-width: 0; font-size: var(--text-xs); color: var(--text-secondary); }
+    .insight-actions__text { flex: 1 1 auto; min-width: 0; font-size: var(--fs-caption); color: var(--text-secondary); }
     .insight-actions__cta {
-      flex: 0 0 auto; font-size: var(--text-xs); font-weight: 600;
-      color: var(--color-primary-text); text-decoration: none; white-space: nowrap;
+      flex: 0 0 auto; font-size: var(--fs-caption); font-weight: 600;
+      color: var(--primary-text); text-decoration: none; white-space: nowrap;
     }
     .insight-actions__cta:hover { text-decoration: underline; }
   `

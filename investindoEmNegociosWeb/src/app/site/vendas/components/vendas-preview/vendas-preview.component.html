@@ -1,0 +1,39 @@
+<div class="chrome">
+  <i class="chrome__dot chrome__dot--red"></i>
+  <i class="chrome__dot chrome__dot--amber"></i>
+  <i class="chrome__dot chrome__dot--green"></i>
+  <span class="chrome__url tabular">{{ url }}</span>
+</div>
+
+<div class="body">
+  <div class="body__head">
+    <div>
+      <span class="body__eyebrow">Visão geral</span>
+      <p class="body__period">{{ period }}</p>
+    </div>
+    <span class="body__variation tabular">{{ variation }}</span>
+  </div>
+
+  <div class="kpis">
+    @for (kpi of kpis; track kpi.label) {
+      <div class="kpi" [class.kpi--wide]="kpi.wide">
+        <p class="kpi__label">{{ kpi.label }}</p>
+        <p
+          class="kpi__value tabular"
+          [class.kpi__value--income]="kpi.tone === 'income'"
+          [class.kpi__value--expense]="kpi.tone === 'expense'">
+          {{ kpi.value }}
+        </p>
+      </div>
+    }
+  </div>
+
+  <div class="rows">
+    @for (row of rows; track row.label) {
+      <div class="row">
+        <p class="row__label">{{ row.label }}</p>
+        <p class="row__value tabular">{{ row.value }}</p>
+      </div>
+    }
+  </div>
+</div>

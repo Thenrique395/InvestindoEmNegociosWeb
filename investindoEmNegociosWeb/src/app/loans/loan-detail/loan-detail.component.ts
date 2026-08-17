@@ -116,6 +116,15 @@ export class LoanDetailComponent implements OnInit {
     return c ? buildContractView(c) : null;
   }
 
+  get expectedPayoffDate(): string | null {
+    const c = this.contract();
+    if (!c) return null;
+    const openInstallments = c.installments
+      .filter((installment) => installment.status === 'Open')
+      .sort((a, b) => this.parseDate(a.dueDate) - this.parseDate(b.dueDate));
+    return openInstallments.at(-1)?.dueDate ?? null;
+  }
+
   readonly trackInstallment = (installment: LoanInstallmentResponse): string => installment.id;
 
   load(): void {
@@ -346,6 +355,13 @@ export class LoanDetailComponent implements OnInit {
 
   private today(): string {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  private parseDate(value: string): number {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+    if (match) return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])).getTime();
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
   }
 
   private newKey(): string {

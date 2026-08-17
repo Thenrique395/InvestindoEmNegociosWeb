@@ -3,19 +3,27 @@
   gap: 1.5rem;
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .assistant-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.assistant-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .header-meta {
   padding: 0.35rem 0.7rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-weight: var(--font-weight-semibold);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
 }
 
 .sr-only {
@@ -39,8 +47,8 @@
 textarea {
   width: 100%;
   border: 1px solid var(--border);
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-inner);
   padding: 0.9rem 1rem;
   color: var(--text);
   resize: vertical;
@@ -55,38 +63,27 @@ textarea {
 
 .bubble {
   border: 1px solid var(--border);
-  background: var(--surface-2);
-  border-radius: var(--radius-xl);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-panel);
   padding: 1rem;
 }
 
 .bubble__q {
   color: var(--text);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   margin: 0 0 0.45rem;
 }
 
 .bubble__a {
   color: var(--text-secondary);
-  line-height: var(--line-height-body);
+  line-height: var(--lh-body);
   margin: 0 0 0.45rem;
   white-space: pre-wrap;
 }
 
 .bubble__d {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   margin: 0;
-  font-size: var(--font-size-label);
+  font-size: var(--fs-meta);
 }
 
-@media (max-width: 900px) {
-  .assistant-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .assistant-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}

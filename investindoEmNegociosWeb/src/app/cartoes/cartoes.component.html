@@ -105,11 +105,12 @@
           <div filter-left class="cards-statements__filters">
             <label class="tx-filter">
               <span class="tx-filter__label">Cartão</span>
-              <select [(ngModel)]="statementCardId" (ngModelChange)="loadStatementCycles()">
-                @for (c of cards(); track trackByIndex($index, c)) {
-                  <option [ngValue]="c.id">{{ c.nome }} •••• {{ finalCartao(c.numero) }}</option>
-                }
-              </select>
+              <app-select-menu
+                ariaLabel="Cartão para faturas"
+                placeholder="Selecione"
+                [options]="statementCardOptions"
+                [(ngModel)]="statementCardId"
+                (ngModelChange)="loadStatementCycles()" />
             </label>
             <label class="tx-filter">
               <span class="tx-filter__label">Ano</span>
@@ -117,12 +118,11 @@
             </label>
             <label class="tx-filter">
               <span class="tx-filter__label">Mês</span>
-              <select [(ngModel)]="statementMonth">
-                <option [ngValue]="null">Todos</option>
-                @for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
-                  <option [ngValue]="m">{{ statementMonthLabel(m) }}</option>
-                }
-              </select>
+              <app-select-menu
+                ariaLabel="Mês da fatura"
+                [options]="statementMonthOptions"
+                [ngModel]="statementMonthValue"
+                (ngModelChange)="onStatementMonthChange($event)" />
             </label>
           </div>
           <button filter-right type="button" class="cards-statements__apply" (click)="loadStatementCycles()">Aplicar filtros</button>
@@ -238,11 +238,11 @@
           </div>
           <div class="cards-form__grid cards-form__grid--identity">
             <app-form-field label="Bandeira">
-              <select class="cards-form__control" [(ngModel)]="bandeira" name="bandeira">
-                @for (b of brands; track trackByIndex($index, b)) {
-                  <option [ngValue]="b.id.toString()">{{ b.name }}</option>
-                }
-              </select>
+              <app-select-menu
+                ariaLabel="Bandeira do cartão"
+                [options]="brandOptions"
+                [(ngModel)]="bandeira"
+                name="bandeira" />
             </app-form-field>
             <app-form-field label="Número do cartão" class="cards-form__field--full">
               <div class="cards-form__control--inline">

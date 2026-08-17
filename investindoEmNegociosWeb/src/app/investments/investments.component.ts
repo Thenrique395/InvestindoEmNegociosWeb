@@ -12,7 +12,7 @@ import {
 } from '../investments.service';
 import { LookupsService, InstitutionLookup } from '../lookups.service';
 import { maskMoneyInput } from '../utils/input-mask';
-import { formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
+import { formatCurrencyValue, formatNumberValue, parseLocalizedNumber } from '../utils/locale-utils';
 import { SUPPORTED_CURRENCIES } from '../utils/locale-settings';
 import { resolveApiErrorMessage } from '../utils/api-error.mapper';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -74,7 +74,6 @@ type RentabilidadeMonthPoint = ProfitabilityPoint;
 })
 export class InvestmentsComponent implements OnInit {
   private readonly tabStorageKey = 'investments.activeTab';
-  private readonly currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   // A9: estado assíncrono via signal, exposto por getter/setter para manter as leituras
   // e escritas existentes intactas (o setter dirige o signal → re-render OnPush headless).
@@ -153,13 +152,13 @@ export class InvestmentsComponent implements OnInit {
     { key: 'ANALISE', label: 'Análise' }
   ];
   benchmarkOptions: Array<{ key: BenchmarkKey; label: string; color: string }> = [
-    { key: 'CDI', label: 'CDI', color: 'var(--color-chart-series-3)' },
-    { key: 'IPCA', label: 'IPCA', color: 'var(--color-chart-series-2)' },
-    { key: 'IFIX', label: 'IFIX', color: 'var(--color-warning-text)' },
-    { key: 'IBOV', label: 'IBOV', color: 'var(--color-chart-expense)' },
-    { key: 'SMLL', label: 'SMLL', color: 'var(--color-chart-series-5)' },
-    { key: 'IDIV', label: 'IDIV', color: 'var(--color-chart-income)' },
-    { key: 'IVVB11', label: 'IVVB11', color: 'var(--color-chart-series-4)' }
+    { key: 'CDI', label: 'CDI', color: 'var(--chart-3)' },
+    { key: 'IPCA', label: 'IPCA', color: 'var(--chart-2)' },
+    { key: 'IFIX', label: 'IFIX', color: 'var(--warning-text)' },
+    { key: 'IBOV', label: 'IBOV', color: 'var(--expense)' },
+    { key: 'SMLL', label: 'SMLL', color: 'var(--chart-5)' },
+    { key: 'IDIV', label: 'IDIV', color: 'var(--income)' },
+    { key: 'IVVB11', label: 'IVVB11', color: 'var(--chart-4)' }
   ];
 
   // Prioridade 7: importação CSV
@@ -315,34 +314,20 @@ export class InvestmentsComponent implements OnInit {
     const list = [...this.filteredPositions];
     const direction = this.sortDir === 'asc' ? 1 : -1;
     list.sort((a, b) => {
-      const statusA = a.quantity > 0 ? 1 : 0;
-      const statusB = b.quantity > 0 ? 1 : 0;
       const valueA = positionCurrentValue(a);
       const valueB = positionCurrentValue(b);
       const resultA = this.resultadoPosicao(a);
       const resultB = this.resultadoPosicao(b);
-      const portfolioA = this.percentualNaCarteira(a);
-      const portfolioB = this.percentualNaCarteira(b);
-      const currentReturnA = this.rentabilidadeAtualPercent(a);
-      const currentReturnB = this.rentabilidadeAtualPercent(b);
-      const paperTypeA = this.tipoPapel(a);
-      const paperTypeB = this.tipoPapel(b);
 
       switch (this.sortBy) {
-        case 'paperType':
-          return paperTypeA.localeCompare(paperTypeB, 'pt-BR') * direction;
-        case 'status':
-          return (statusA - statusB) * direction;
         case 'quantity':
           return ((a.quantity || 0) - (b.quantity || 0)) * direction;
         case 'avgPrice':
           return ((a.avgPrice || 0) - (b.avgPrice || 0)) * direction;
+        case 'invested':
+          return (positionNetContributed(a) - positionNetContributed(b)) * direction;
         case 'currentValue':
           return (valueA - valueB) * direction;
-        case 'portfolioPercent':
-          return (portfolioA - portfolioB) * direction;
-        case 'currentReturn':
-          return (currentReturnA - currentReturnB) * direction;
         case 'estimatedResult':
           return (resultA - resultB) * direction;
         case 'asset':
@@ -443,7 +428,7 @@ export class InvestmentsComponent implements OnInit {
     if (this.metaPatrimonio > 0 && this.progressoMeta < 100) {
       return {
         titulo: 'Progresso da meta de patrimônio',
-        descricao: `Faltam ${this.currencyFormatter.format(this.faltaMeta)} para a meta que você definiu.`,
+        descricao: `Faltam ${formatCurrencyValue(this.faltaMeta)} para a meta que você definiu.`,
         cta: 'Ver evolução',
         targetId: 'sec-evolucao'
       };
@@ -470,12 +455,12 @@ export class InvestmentsComponent implements OnInit {
 
   get distribuicaoPorTipoComCor(): { key: InvestmentType; label: string; value: number; percent: number; color: string }[] {
     const palette: Record<InvestmentType, string> = {
-      RF: 'var(--color-chart-series-1)',
-      ACOES: 'var(--color-chart-income)',
-      FUNDOS: 'var(--color-chart-series-5)',
-      CRIPTO: 'var(--color-chart-series-3)',
-      IMOVEL: 'var(--color-chart-investment)',
-      VEICULO: 'var(--color-chart-expense)'
+      RF: 'var(--chart-1)',
+      ACOES: 'var(--income)',
+      FUNDOS: 'var(--chart-5)',
+      CRIPTO: 'var(--chart-3)',
+      IMOVEL: 'var(--chart-6)',
+      VEICULO: 'var(--expense)'
     };
     return this.distribuicaoPorTipo.map((item) => ({ ...item, color: palette[item.key] }));
   }
@@ -528,7 +513,7 @@ export class InvestmentsComponent implements OnInit {
   }
 
   get patrimonioEvolucaoSeries(): PatrimonioBucket[] {
-    const months = this.patrimonioRangeMonths === 6 ? 6 : 12;
+    const months = [6, 12, 24].includes(this.patrimonioRangeMonths) ? this.patrimonioRangeMonths : 12;
     const now = new Date();
     const timeline: { key: string; label: string }[] = [];
 
@@ -883,8 +868,10 @@ export class InvestmentsComponent implements OnInit {
         const months: Array<number | null> = Array.from({ length: 12 }, () => null);
         for (const point of points) months[point.month - 1] = point.carteiraMes;
         const yearValue = points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.carteiraMes / 100) - 1) * 100, 0);
+        const benchmarkYearValue = points.reduce((acc, p) => ((1 + acc / 100) * (1 + p.benchmarkMes / 100) - 1) * 100, 0);
         const acumulado = points[points.length - 1]?.carteiraAc || 0;
-        return { year, months, yearValue, acumulado };
+        const benchmarkAcumulado = points[points.length - 1]?.benchmarkAc || 0;
+        return { year, months, yearValue, benchmarkYearValue, acumulado, benchmarkAcumulado };
       });
   }
 
@@ -948,7 +935,7 @@ export class InvestmentsComponent implements OnInit {
     for (const pos of this.positions) {
       if (this.consolidacaoTipoFiltro !== 'ALL' && pos.type !== this.consolidacaoTipoFiltro) continue;
       const relevant = (pos.movements || [])
-        .filter((mov) => mov.type === 'COMPRA' || mov.type === 'VENDA')
+        .filter((mov) => this.isConsolidacaoMovement(mov.type))
         .map((mov, idx) => ({ mov, idx }))
         .sort((a, b) => new Date(a.mov.date).getTime() - new Date(b.mov.date).getTime());
 
@@ -956,7 +943,7 @@ export class InvestmentsComponent implements OnInit {
       for (const entry of relevant) {
         const date = new Date(entry.mov.date);
         if (Number.isNaN(date.getTime())) continue;
-        runningQty += entry.mov.type === 'COMPRA' ? entry.mov.quantity : -entry.mov.quantity;
+        runningQty += this.isConsolidacaoEntrada(entry.mov.type) ? entry.mov.quantity : -entry.mov.quantity;
 
         if (date < horizonStart) continue;
         const source: 'B3' | 'Manual' = (entry.mov.note || '').toUpperCase().includes('B3') ? 'B3' : 'Manual';
@@ -966,7 +953,7 @@ export class InvestmentsComponent implements OnInit {
           id: `${pos.id}-${entry.idx}`,
           asset: pos.asset,
           investmentType: pos.type,
-          ordem: entry.mov.type === 'COMPRA' ? 'Compra' : 'Venda',
+          ordem: this.isConsolidacaoEntrada(entry.mov.type) ? 'Compra' : 'Venda',
           quantity: entry.mov.quantity,
           unitPrice: entry.mov.price,
           total: entry.mov.quantity * entry.mov.price,
@@ -980,17 +967,50 @@ export class InvestmentsComponent implements OnInit {
     return rows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
+  private isConsolidacaoMovement(type: MovementType): boolean {
+    return this.isConsolidacaoEntrada(type) || this.isConsolidacaoSaida(type);
+  }
+
+  private isConsolidacaoEntrada(type: MovementType): boolean {
+    return type === 'COMPRA' || type === 'APORTE';
+  }
+
+  private isConsolidacaoSaida(type: MovementType): boolean {
+    return type === 'VENDA' || type === 'RESGATE';
+  }
+
   get mesesComparativo(): number {
     return Math.max(this.evolucaoMensalSeries.length, 1);
   }
 
-  get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; alerta: boolean }[] {
-    const atualMap = new Map(this.distribuicaoPorTipo.map((i) => [i.key, i.percent]));
+  get alvoAlocacao(): { key: InvestmentType; label: string; alvo: number; atual: number; desvio: number; suggestedAmount: number; alerta: boolean }[] {
+    const distribution = this.distribuicaoPorTipo;
+    const atualMap = new Map(distribution.map((i) => [i.key, i.percent]));
+    const valueMap = new Map(distribution.map((i) => [i.key, i.value]));
+    const total = distribution.reduce((sum, item) => sum + item.value, 0);
     return this.allocationTypes.map((t) => {
       const atual = atualMap.get(t.value) || 0;
+      const currentValue = valueMap.get(t.value) || 0;
       const desvio = atual - this.targetAllocation[t.value];
-      return { key: t.value, label: t.label, alvo: this.targetAllocation[t.value], atual, desvio, alerta: Math.abs(desvio) >= 7 };
+      return {
+        key: t.value,
+        label: t.label,
+        alvo: this.targetAllocation[t.value],
+        atual,
+        desvio,
+        suggestedAmount: this.allocationSuggestedAmount(currentValue, total, this.targetAllocation[t.value]),
+        alerta: Math.abs(desvio) >= 7
+      };
     });
+  }
+
+  private allocationSuggestedAmount(currentValue: number, totalValue: number, targetPercent: number): number {
+    if (totalValue <= 0) return 0;
+    const target = Math.max(0, Math.min(targetPercent, 100)) / 100;
+    const targetValue = totalValue * target;
+    if (currentValue > targetValue) return currentValue - targetValue;
+    if (target >= 1) return Math.max(totalValue - currentValue, 0);
+    return Math.max((targetValue - currentValue) / (1 - target), 0);
   }
 
   get allocationTypes(): Array<{ value: AllocationInvestmentType; label: string }> {
@@ -1078,10 +1098,10 @@ export class InvestmentsComponent implements OnInit {
   tooltipMes(item: ChartBucket): string {
     return [
       `${item.label}`,
-      `Aportes: ${this.currencyFormatter.format(item.aporte)}`,
-      `Resgates: ${this.currencyFormatter.format(item.resgate)}`,
-      `Proventos: ${this.currencyFormatter.format(item.proventos)}`,
-      `Saldo: ${this.currencyFormatter.format(item.saldo)}`
+      `Aportes: ${formatCurrencyValue(item.aporte)}`,
+      `Resgates: ${formatCurrencyValue(item.resgate)}`,
+      `Proventos: ${formatCurrencyValue(item.proventos)}`,
+      `Saldo: ${formatCurrencyValue(item.saldo)}`
     ].join('\n');
   }
 
@@ -1153,7 +1173,7 @@ export class InvestmentsComponent implements OnInit {
     }
 
     const custos = this.cadastroCustos > 0 ? this.cadastroCustos : 0;
-    const noteParts = [this.venda.note?.trim(), custos > 0 ? `Custos: ${this.currencyFormatter.format(custos)}` : ''].filter(Boolean);
+    const noteParts = [this.venda.note?.trim(), custos > 0 ? `Custos: ${formatCurrencyValue(custos)}` : ''].filter(Boolean);
 
     try {
       await firstValueFrom(this.investments.addMovement(this.vendaPositionId, {
@@ -1182,7 +1202,7 @@ export class InvestmentsComponent implements OnInit {
   salvarMovimento(): void {
     if (!this.selectedId || this.movimento.quantity <= 0 || this.movimento.price <= 0) return;
     const custos = this.movimentoCustos > 0 ? this.movimentoCustos : 0;
-    const noteParts = [this.movimento.note?.trim(), custos > 0 ? `Custos: ${this.currencyFormatter.format(custos)}` : ''].filter(Boolean);
+    const noteParts = [this.movimento.note?.trim(), custos > 0 ? `Custos: ${formatCurrencyValue(custos)}` : ''].filter(Boolean);
     this.investments.addMovement(this.selectedId, { ...this.movimento, note: noteParts.join(' | ') || undefined }).subscribe({
       next: () => {
         this.mode = 'create';

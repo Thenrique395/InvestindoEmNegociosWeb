@@ -58,6 +58,7 @@ describe('LoanDetailComponent', () => {
     expect(ctx.loansService.get).toHaveBeenCalledWith('c1');
     expect(ctx.component.contract()?.id).toBe('c1');
     expect(ctx.component.view?.paidCount).toBe(1);
+    expect(ctx.component.expectedPayoffDate).toBe('2026-03-10');
   });
 
   it('togglePayments carrega o histórico da parcela paga', () => {

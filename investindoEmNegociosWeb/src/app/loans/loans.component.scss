@@ -7,28 +7,35 @@
   padding: 0.35rem 0.7rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-weight: var(--font-weight-semibold);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .loans-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.loans-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
   min-width: 0;
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .grid {
@@ -56,15 +63,15 @@
 .card h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 
 label {
   display: grid;
   gap: 0.4rem;
   color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .field {
@@ -74,14 +81,14 @@ label {
 
 .field__label {
   color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 input,
 select {
   border: 1px solid var(--border);
-  background-color: var(--surface-2);
-  border-radius: var(--radius-lg);
+  background-color: var(--surface-sunken);
+  border-radius: var(--radius-inner);
   min-height: 48px;
   padding: 0.7rem 0.9rem;
   color: var(--text);
@@ -102,24 +109,24 @@ select {
 
 .kpis > div {
   padding: 0.85rem;
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
 }
 
 .kpis span {
   display: block;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-label);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
   margin-bottom: 0.25rem;
   text-transform: uppercase;
 }
 
 .kpis strong {
   color: var(--text);
-  font-size: var(--font-size-body-lg);
+  font-size: var(--fs-card-title);
 }
 
 .contracts-head {
@@ -139,9 +146,9 @@ select {
 
 .contract {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   padding: 1rem;
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   display: grid;
   gap: 0.85rem;
 }
@@ -187,20 +194,53 @@ select {
 
 .contract__progress-head strong {
   color: var(--text);
-  font-size: var(--font-size-body);
+  font-size: var(--fs-subhead);
 }
 
 .contract__next {
   margin: 0.1rem 0 0;
 }
 
+.contract-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.contract-metrics > div {
+  min-width: 0;
+  padding: 0.8rem;
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.contract-metrics span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
+  text-transform: uppercase;
+}
+
+.contract-metrics strong {
+  display: block;
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .text--sm {
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
 .installment-number {
   color: var(--text);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   font-variant-numeric: tabular-nums;
 }
 
@@ -209,7 +249,8 @@ select {
 }
 
 @media (max-width: 900px) {
-  .loans-summary-grid {
+
+  .contract-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -219,9 +260,6 @@ select {
 }
 
 @media (max-width: 560px) {
-  .loans-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 
   .contract__head {
     flex-direction: column;
@@ -237,6 +275,13 @@ select {
   }
 }
 
+@media (max-width: 360px) {
+
+  .contract-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .compare-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -244,7 +289,7 @@ select {
 }
 
 .compare-col {
-  border: 1px solid var(--color-border, #e2e8f0);
+  border: 1px solid var(--border);
   border-radius: 0.75rem;
   padding: 0.85rem;
   display: flex;
@@ -254,7 +299,7 @@ select {
   h3 { margin: 0; }
   dl { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
   dl div { display: flex; justify-content: space-between; gap: 0.5rem; }
-  dt { color: var(--color-text-muted, #64748b); font-size: 0.85rem; }
+  dt { color: var(--text-tertiary); font-size: 0.85rem; }
   dd { margin: 0; font-weight: 600; }
 }
 
@@ -272,8 +317,8 @@ select {
 .contracts-head h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 .contracts-head p { margin: 0.2rem 0 0; }
 
@@ -299,8 +344,8 @@ select {
 .loan-form__section-head h4 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-subhead);
+  letter-spacing: var(--ls-tight);
 }
 .loan-form__section-head p { margin: 0.15rem 0 0; }
 .loan-form__grid {
@@ -312,9 +357,9 @@ select {
 .loan-form__control { width: 100%; box-sizing: border-box; }
 .loan-form__error {
   margin: 0;
-  color: var(--color-danger-text, #dc2626);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
+  color: var(--expense-text);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
 }
 .loan-form__footer {
   display: flex;

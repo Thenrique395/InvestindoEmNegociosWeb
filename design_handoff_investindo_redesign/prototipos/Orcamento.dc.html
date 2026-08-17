@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/styles.css">
+<script src="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #F4F7F9; font-family: Inter, system-ui, sans-serif; color: #0A2430; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  .ffx { font-variant-numeric: tabular-nums; }
+  button { transition: background .14s ease, border-color .14s ease, color .14s ease, box-shadow .14s ease, transform .1s ease; }
+  button:active { transform: scale(.985); }
+  button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,.35); }
+  .navitem:hover { background: rgba(255,255,255,.06) !important; color: #fff !important; }
+  .row { transition: background .14s ease; }
+  .row:hover { background: #F8FAFB; }
+  .ico:hover { background: #EDF2F5; color: #0A2430; }
+  .ico--danger:hover { background: rgba(217,72,63,.10) !important; color: #B3372F !important; }
+  .mi:hover { background: #F4F7F9; }
+  .bar > i { transition: width .5s cubic-bezier(.2,.7,.3,1); }
+  .fade { animation: fadeIn .2s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex">
+
+  <aside style="width:212px; flex:none; background:#002E3E; color:#fff; display:flex; flex-direction:column; position:sticky; top:0; height:100vh">
+    <div style="display:flex; align-items:center; gap:10px; padding:18px 18px 16px">
+      <img src="assets/logo-header.png" alt="" style="height:26px; width:auto; display:block">
+      <span style="font-family:Poppins,sans-serif; font-size:12px; font-weight:700; letter-spacing:-.01em; white-space:nowrap">Investindo em Negócios</span>
+    </div>
+    <nav style="flex:1; display:grid; gap:2px; padding:4px 10px; align-content:start; overflow:auto">
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Visão geral</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Dashboard</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Calendário</button>
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Movimentações</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg>Despesas</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 19V5m0 0l-5 5m5-5l5 5"/></svg>Receitas</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 7h18a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm0 3h20"/></svg>Cartões</button>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg>Contas</button>
+      <span style="padding:12px 11px 5px; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#5E7F8B">Planejamento</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Metas</button>
+      <span style="position:relative; display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border-radius:9px; background:rgba(255,255,255,.10); color:#fff; font-size:12px; font-weight:600"><i style="position:absolute; left:0; top:50%; width:3px; height:16px; margin-top:-8px; border-radius:999px; background:#4FB783"></i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Orçamento</span>
+      <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; height:34px; padding:0 11px; border:none; border-radius:9px; background:transparent; color:#9FBAC3; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 18h16M7 15l4-4 3 3 4-6"/></svg>Investimentos</button>
+    </nav>
+    <button class="navitem" onClick="{{ irOutra }}" style="display:flex; align-items:center; gap:10px; padding:14px 16px; border:none; border-top:1px solid rgba(255,255,255,.08); background:transparent; text-align:left; cursor:pointer; font-family:inherit">
+      <span style="display:grid; place-items:center; width:30px; height:30px; border-radius:999px; background:rgba(255,255,255,.12); font-size:11px; font-weight:700; color:#fff">HS</span>
+      <div><div style="font-size:11px; font-weight:600; color:#fff">Henrique Santos</div><div style="font-size:10px; color:#7E9CA6">Plano Completo</div></div>
+    </button>
+  </aside>
+
+  <main style="flex:1; min-width:0; display:flex; flex-direction:column">
+
+    <header style="position:sticky; top:0; z-index:4; display:flex; align-items:center; gap:14px; height:56px; padding:0 28px; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid #E4EBEF">
+      <button onClick="{{ irOutra }}" style="flex:1; max-width:360px; display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; color:#9FB2BB; font:400 12px Inter,sans-serif; text-align:left; cursor:pointer" style-hover="border-color:#C3D2DA; background:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Buscar lançamento, categoria, conta...<span class="ffx" style="margin-left:auto; padding:2px 6px; border-radius:5px; background:#EDF2F5; font-size:10px; color:#7A929E">⌘K</span></button>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:10px">
+        <button onClick="{{ irOutra }}" style="display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border:none; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:rgba(52,144,99,.20)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4c4.4 0 8 2.9 8 6.5S16.4 17 12 17c-.7 0-1.5-.1-2.2-.3L5 19l1.1-3.3C4.8 14.6 4 12.7 4 10.5 4 6.9 7.6 4 12 4z"/></svg>Assistente</button>
+        <button onClick="{{ irOutra }}" style="position:relative; display:grid; place-items:center; width:30px; height:30px; border:none; border-radius:9px; background:transparent; color:#7A929E; cursor:pointer" style-hover="background:#F1F5F7; color:#0A2430"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20h4" stroke-linecap="round"/></svg><i style="position:absolute; top:3px; right:3px; width:6px; height:6px; border-radius:999px; background:#D9483F"></i></button>
+      </div>
+    </header>
+
+    <div style="flex:1; padding:26px 28px 40px; display:flex; flex-direction:column; gap:16px">
+
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap">
+        <div>
+          <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Planejamento mensal</span>
+          <h1 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:26px; font-weight:600; letter-spacing:-.025em">Orçamento · {{ mesLabel }}</h1>
+          <p style="margin:0; font-size:13px; color:#46606C">Defina o quanto planeja gastar por categoria e acompanhe o realizado do mês.</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex:none">
+          <div style="display:flex; align-items:center; gap:6px">
+            <button onClick="{{ prevMes }}" style="display:grid; place-items:center; width:32px; height:32px; border:1px solid #D6E0E6; border-radius:9px; background:#fff; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button>
+            <button onClick="{{ nextMes }}" style="display:grid; place-items:center; width:32px; height:32px; border:1px solid #D6E0E6; border-radius:9px; background:#fff; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button>
+          </div>
+          <button onClick="{{ copiarMes }}" style="height:36px; padding:0 14px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#0A2430; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Copiar do mês anterior</button>
+          <button onClick="{{ exportar }}" style="height:36px; padding:0 14px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#0A2430; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Exportar CSV</button>
+          <button onClick="{{ abrirNova }}" style="display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 16px; border:none; border-radius:10px; background:#2563EB; color:#fff; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Adicionar categoria</button>
+        </div>
+      </div>
+
+      <section style="display:flex; flex-wrap:wrap; gap:16px">
+        <sc-for list="{{ resumo }}" as="c" hint-placeholder-count="4">
+          <div style="flex:1 1 210px; min-width:0; background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:18px 20px">
+            <div style="display:flex; align-items:center; gap:9px">
+              <span style="display:grid; place-items:center; width:30px; height:30px; flex:none; border-radius:9px; background:{{ c.iconBg }}; color:{{ c.iconCor }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ c.icone }}"/></svg></span>
+              <span style="font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#7A929E">{{ c.eyebrow }}</span>
+              <span title="{{ c.tooltip }}" style="margin-left:auto; display:grid; place-items:center; width:18px; height:18px; border-radius:999px; border:1px solid #D6E0E6; color:#9FB2BB; font-size:10px; font-weight:700; cursor:help">?</span>
+            </div>
+            <div class="ffx" style="font-family:Poppins,sans-serif; font-size:24px; font-weight:600; letter-spacing:-.03em; margin-top:10px; color:{{ c.valorCor }}; white-space:nowrap">{{ c.valor }}</div>
+            <p style="margin:6px 0 0; font-size:12px; color:#7A929E">{{ c.nota }}</p>
+          </div>
+        </sc-for>
+      </section>
+
+      <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,320px); gap:18px; align-items:start">
+
+        <section style="background:#fff; border:1px solid #E4EBEF; border-radius:18px; overflow:hidden">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; padding:20px 22px 16px; border-bottom:1px solid #EEF3F5; flex-wrap:wrap">
+            <div>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Distribuição do plano</span>
+              <h2 style="margin:6px 0 4px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em">Categorias</h2>
+              <p style="margin:0; font-size:12px; color:#46606C">Clique no valor planejado para editar direto na linha.</p>
+            </div>
+            <div style="display:inline-flex; padding:3px; border-radius:9px; background:#EDF2F5">
+              <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="3">
+                <button onClick="{{ f.pick }}" style="padding:6px 12px; border:none; border-radius:7px; background:{{ f.bg }}; color:{{ f.cor }}; box-shadow:{{ f.shadow }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ f.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="overflow-x:auto">
+            <div style="min-width:660px">
+              <div style="display:grid; grid-template-columns:minmax(150px,1.5fr) 112px 112px 112px minmax(140px,1fr) 84px; gap:14px; align-items:center; padding:10px 22px; background:#F8FAFB; border-bottom:1px solid #EEF3F5; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7A929E">
+                <span>Categoria</span><span style="text-align:right">Planejado</span><span style="text-align:right">Realizado</span><span style="text-align:right">Variação</span><span>Uso</span><span style="text-align:right">Ações</span>
+              </div>
+
+              <sc-for list="{{ linhas }}" as="l" hint-placeholder-count="7">
+                <div class="row" style="display:grid; grid-template-columns:minmax(150px,1.5fr) 112px 112px 112px minmax(140px,1fr) 84px; gap:14px; align-items:center; padding:11px 22px; border-bottom:1px solid #F2F6F8">
+                  <div style="display:flex; align-items:center; gap:9px; min-width:0">
+                    <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ l.cor }}"></i>
+                    <span style="font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ l.nome }}</span>
+                  </div>
+
+                  <sc-if value="{{ l.editando }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; align-items:center; gap:5px; height:32px; border:1px solid #2563EB; border-radius:8px; background:#fff; box-shadow:0 0 0 3px rgba(37,99,235,.12); padding:0 8px">
+                      <span style="font-size:11px; color:#7A929E">R$</span>
+                      <input value="{{ editValor }}" onChange="{{ setEditValor }}" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; text-align:right; font:600 12px Inter,sans-serif; color:#0A2430; outline:none">
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ l.naoEditando }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ l.editar }}" class="ffx" style="height:32px; padding:0 8px; border:1px dashed transparent; border-radius:8px; background:transparent; color:#1D4ED8; font:600 13px Inter,sans-serif; text-align:right; cursor:pointer" style-hover="border-color:#C3D2DA; background:#F8FAFB">{{ l.planejado }}</button>
+                  </sc-if>
+
+                  <span class="ffx" style="text-align:right; font-size:13px; color:#0A2430">{{ l.realizado }}</span>
+                  <span class="ffx" style="text-align:right; font-size:13px; font-weight:600; color:{{ l.variacaoCor }}">{{ l.variacao }}</span>
+
+                  <div style="display:flex; align-items:center; gap:10px; min-width:0">
+                    <div class="bar" style="flex:1; min-width:0; height:7px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:{{ l.barra }}; height:100%; border-radius:999px; background:{{ l.barraCor }}"></i></div>
+                    <span class="ffx" style="flex:none; width:44px; text-align:right; font-size:12px; font-weight:600; color:{{ l.pctCor }}">{{ l.pct }}</span>
+                  </div>
+
+                  <div style="display:flex; align-items:center; justify-content:flex-end; gap:4px">
+                    <sc-if value="{{ l.editando }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ l.confirmar }}" style="height:30px; padding:0 11px; border:none; border-radius:8px; background:#2563EB; color:#fff; font:600 11px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8">Salvar</button>
+                      <button onClick="{{ l.cancelar }}" style="height:30px; padding:0 9px; border:none; border-radius:8px; background:transparent; color:#7A929E; font:600 11px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Sair</button>
+                    </sc-if>
+                    <sc-if value="{{ l.naoEditando }}" hint-placeholder-val="{{ true }}">
+                      <button class="ico" onClick="{{ l.editar }}" title="Editar planejado" style="display:grid; place-items:center; width:28px; height:28px; border:none; border-radius:8px; background:transparent; color:#9FB2BB; cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m12 6 4 4"/></svg></button>
+                      <button class="ico ico--danger" onClick="{{ l.remover }}" title="Remover do orçamento" style="display:grid; place-items:center; width:28px; height:28px; border:none; border-radius:8px; background:transparent; color:#C99; cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M8 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7"/></svg></button>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+
+              <sc-if value="{{ semLinhas }}" hint-placeholder-val="{{ false }}">
+                <div class="fade" style="display:flex; flex-direction:column; align-items:center; gap:12px; padding:52px 24px; text-align:center">
+                  <span style="display:grid; place-items:center; width:46px; height:46px; border-radius:14px; background:#F1F5F7; color:#9FB2BB"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+                  <div><h3 style="margin:0 0 4px; font-size:15px; font-weight:600">{{ vazioTitulo }}</h3><p style="margin:0; font-size:13px; color:#7A929E">{{ vazioTexto }}</p></div>
+                  <button onClick="{{ abrirNova }}" style="height:36px; padding:0 15px; border:none; border-radius:10px; background:#2563EB; color:#fff; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8">Adicionar categoria</button>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:minmax(150px,1.5fr) 112px 112px 112px minmax(140px,1fr) 84px; gap:14px; align-items:center; padding:14px 22px; background:#FBFCFD; border-top:1px solid #EEF3F5; min-width:660px">
+            <span style="font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#7A929E">Total</span>
+            <strong class="ffx" style="text-align:right; font-size:13px">{{ totPlanejado }}</strong>
+            <strong class="ffx" style="text-align:right; font-size:13px">{{ totRealizado }}</strong>
+            <strong class="ffx" style="text-align:right; font-size:13px; color:{{ totVariacaoCor }}">{{ totVariacao }}</strong>
+            <span class="ffx" style="font-size:12px; color:#7A929E">{{ totUso }} do planejado</span>
+            <span></span>
+          </div>
+        </section>
+
+        <div style="display:flex; flex-direction:column; gap:16px">
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:18px 20px">
+            <h3 style="margin:0 0 4px; font-size:14px; font-weight:600">Ritmo do mês</h3>
+            <p style="margin:0 0 14px; font-size:12px; color:#7A929E">{{ ritmoNota }}</p>
+            <div style="display:flex; flex-direction:column">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:9px 0; font-size:12px"><span style="color:#46606C">Já se passaram</span><strong class="ffx" style="font-size:13px">{{ diasPassados }}</strong></div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:9px 0; font-size:12px"><span style="color:#46606C">Ideal gasto até hoje</span><strong class="ffx" style="font-size:13px">{{ idealHoje }}</strong></div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:12px 0; margin-top:4px; border-top:1px solid #EEF3F5; border-bottom:1px solid #EEF3F5"><span style="font-size:12px; font-weight:600">{{ ritmoLabel }}</span><strong class="ffx" style="font-size:15px; font-weight:600; color:{{ ritmoCor }}">{{ ritmoValor }}</strong></div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:9px 0; font-size:12px"><span style="color:#46606C">Sobra por dia restante</span><strong class="ffx" style="font-size:13px">{{ porDia }}</strong></div>
+            </div>
+          </section>
+
+          <section style="background:#fff; border:1px solid #E4EBEF; border-radius:16px; padding:18px 20px">
+            <h3 style="margin:0 0 14px; font-size:14px; font-weight:600">Composição planejada</h3>
+            <div style="display:grid; place-items:center; margin-bottom:16px">
+              <div style="position:relative; width:148px; height:148px; border-radius:999px; background:{{ donut }}">
+                <div style="position:absolute; inset:26px; border-radius:999px; background:#fff; display:grid; place-items:center; text-align:center">
+                  <div><div style="font-size:10px; color:#9FB2BB">Planejado</div><div class="ffx" style="font-size:13px; font-weight:600; letter-spacing:-.02em">{{ totPlanejado }}</div></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:9px">
+              <sc-for list="{{ composicao }}" as="d" hint-placeholder-count="5">
+                <div style="display:flex; align-items:center; gap:9px">
+                  <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ d.cor }}"></i>
+                  <span style="flex:1; min-width:0; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ d.label }}</span>
+                  <span class="ffx" style="flex:none; font-size:12px; font-weight:600; color:#46606C">{{ d.pct }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <sc-if value="{{ temEstouro }}" hint-placeholder-val="{{ true }}">
+            <section style="background:#fff; border:1px solid rgba(217,72,63,.24); border-radius:16px; padding:18px 20px">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B3372F" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5m0 3h.01M10.2 4.8 3.7 16a2 2 0 0 0 1.73 3h13.14A2 2 0 0 0 20.3 16L13.8 4.8a2 2 0 0 0-3.46 0Z"/></svg>
+                <h3 style="margin:0; font-size:14px; font-weight:600">Estouraram o planejado</h3>
+              </div>
+              <p style="margin:0 0 12px; font-size:12px; color:#7A929E">Reveja o valor ou corte o gasto no que resta do mês.</p>
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <sc-for list="{{ estouros }}" as="e" hint-placeholder-count="2">
+                  <div style="padding:11px 13px; border:1px solid rgba(217,72,63,.18); border-radius:11px; background:rgba(217,72,63,.05)">
+                    <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+                      <span style="font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ e.nome }}</span>
+                      <span class="ffx" style="flex:none; font-size:12px; font-weight:600; color:#B3372F">{{ e.excedente }}</span>
+                    </div>
+                    <div class="ffx" style="margin-top:3px; font-size:11px; color:#B3372F">{{ e.detalhe }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </sc-if>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <sc-if value="{{ modalAberto }}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:32px; background:rgba(0,20,28,.45); backdrop-filter:blur(2px)">
+      <div style="width:min(480px, 100%); background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 40px 90px -30px rgba(0,20,28,.6)">
+        <div style="display:flex; align-items:flex-start; gap:16px; padding:20px 24px 16px; border-bottom:1px solid #EEF3F5">
+          <div style="flex:1">
+            <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Orçamento de {{ mesCurto }}</span>
+            <h2 style="margin:6px 0 3px; font-family:Poppins,sans-serif; font-size:19px; font-weight:600; letter-spacing:-.02em">Adicionar categoria</h2>
+            <p style="margin:0; font-size:12px; color:#46606C">Escolha a categoria e quanto você planeja gastar nela neste mês.</p>
+          </div>
+          <button onClick="{{ fecharModal }}" style="flex:none; display:grid; place-items:center; width:30px; height:30px; border:none; border-radius:9px; background:transparent; color:#46606C; cursor:pointer" style-hover="background:#F1F5F7"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px">
+          <div style="display:flex; flex-direction:column; gap:6px; position:relative">
+            <label style="font-size:12px; font-weight:600">Categoria</label>
+            <button onClick="{{ toggleCatMenu }}" style="display:flex; align-items:center; justify-content:space-between; gap:10px; height:42px; border:1px solid {{ catBorder }}; border-radius:10px; background:{{ catBg }}; padding:0 12px; font:400 13px Inter,sans-serif; color:{{ catCor }}; text-align:left; cursor:pointer; box-shadow:{{ catShadow }}">
+              <span style="display:flex; align-items:center; gap:9px; min-width:0"><i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ catDot }}"></i><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ catLabel }}</span></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="2.2" stroke-linecap="round" style="flex:none; transform:{{ catChevron }}; transition:transform .16s ease"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <sc-if value="{{ catMenuAberto }}" hint-placeholder-val="{{ false }}">
+              <div class="fade" style="position:absolute; top:100%; left:0; right:0; z-index:6; margin-top:6px; max-height:210px; overflow-y:auto; background:#fff; border:1px solid #E4EBEF; border-radius:12px; box-shadow:0 20px 44px -18px rgba(3,32,44,.45); padding:5px">
+                <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="6">
+                  <button class="mi" onClick="{{ c.pick }}" style="width:100%; display:flex; align-items:center; gap:10px; padding:9px 10px; border:none; border-radius:9px; background:{{ c.bg }}; color:{{ c.cor }}; font:{{ c.peso }} 13px Inter,sans-serif; text-align:left; cursor:pointer">
+                    <i style="width:9px; height:9px; flex:none; border-radius:3px; background:{{ c.dot }}"></i>
+                    <span style="flex:1; min-width:0">{{ c.nome }}</span>
+                    <span class="ffx" style="flex:none; font-size:11px; color:#9FB2BB">{{ c.media }}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; opacity:{{ c.check }}"><path d="M20 6 9 17l-5-5"/></svg>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <span style="font-size:11px; color:#9FB2BB">A média dos últimos 3 meses aparece ao lado de cada categoria.</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <label style="font-size:12px; font-weight:600">Valor planejado</label>
+            <div style="display:flex; align-items:center; gap:8px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:13px; color:#7A929E">R$</span><input value="{{ novoValor }}" onChange="{{ setNovoValor }}" placeholder="0,00" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; font:600 16px Inter,sans-serif; color:#0A2430; outline:none"></div>
+            <sc-if value="{{ temSugestao }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ usarSugestao }}" class="ffx" style="align-self:flex-start; height:30px; padding:0 11px; border:1px solid #D6E0E6; border-radius:8px; background:#fff; color:#1D4ED8; font:600 11px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Usar a média: {{ sugestao }}</button>
+            </sc-if>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 15px; border-radius:11px; background:#F8FAFB; font-size:12px; color:#46606C">
+            <span>Planejado do mês depois de adicionar</span>
+            <strong class="ffx" style="font-size:13px; color:#0A2430">{{ previewTotal }}</strong>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; padding:14px 24px; border-top:1px solid #EEF3F5; background:#FBFCFD">
+          <button onClick="{{ fecharModal }}" style="height:40px; padding:0 16px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#46606C; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Cancelar</button>
+          <button onClick="{{ adicionar }}" style="height:40px; padding:0 18px; border:none; border-radius:10px; background:{{ addBg }}; color:{{ addCor }}; font:600 13px Inter,sans-serif; cursor:pointer">{{ addLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ confirmarAberto }}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="position:fixed; inset:0; z-index:24; display:grid; place-items:center; padding:32px; background:rgba(0,20,28,.45); backdrop-filter:blur(2px)">
+      <div style="width:min(430px, 100%); background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 40px 90px -30px rgba(0,20,28,.6)">
+        <div style="padding:24px 26px 20px">
+          <span style="display:grid; place-items:center; width:44px; height:44px; border-radius:13px; background:rgba(217,72,63,.10); color:#B3372F"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M8 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7"/></svg></span>
+          <h2 style="margin:16px 0 6px; font-family:Poppins,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em">Remover “{{ confirmarNome }}” do orçamento?</h2>
+          <p style="margin:0; font-size:13px; line-height:1.6; color:#46606C">A categoria e seu valor planejado serão removidos deste mês. Os lançamentos realizados não são afetados.</p>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; padding:14px 26px; border-top:1px solid #EEF3F5; background:#FBFCFD">
+          <button onClick="{{ cancelarRemocao }}" style="height:40px; padding:0 16px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#46606C; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Cancelar</button>
+          <button onClick="{{ confirmarRemocao }}" style="height:40px; padding:0 18px; border:none; border-radius:10px; background:#D9483F; color:#fff; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#B3372F">Remover</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ temToast }}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:30; display:flex; align-items:center; gap:10px; padding:13px 18px; border-radius:12px; background:#002E3E; color:#fff; box-shadow:0 20px 44px -18px rgba(0,20,28,.7)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FB783" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 6 9 17l-5-5"/></svg>
+      <span style="font-size:13px; font-weight:600">{{ toast }}</span>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1100}}">
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+const CORES = {
+  'Moradia': '#2563EB', 'Alimentação': '#D9483F', 'Transporte': '#349063', 'Educação': '#C97A15',
+  'Saúde': '#0A4A5C', 'Lazer': '#7A4FB7', 'Assinaturas': '#B7377A', 'Vestuário': '#46606C', 'Pets': '#8A05BE', 'Outros': '#9FB2BB'
+};
+
+const ITENS = [
+  { nome: 'Moradia', planejado: 3600, realizado: 3140.00 },
+  { nome: 'Alimentação', planejado: 1200, realizado: 1410.20 },
+  { nome: 'Transporte', planejado: 1500, realizado: 962.80 },
+  { nome: 'Educação', planejado: 1000, realizado: 720.00 },
+  { nome: 'Saúde', planejado: 1100, realizado: 892.00 },
+  { nome: 'Lazer', planejado: 600, realizado: 618.40 },
+  { nome: 'Assinaturas', planejado: 250, realizado: 189.70 }
+];
+
+const DISPONIVEIS = [
+  { nome: 'Vestuário', media: 320 },
+  { nome: 'Pets', media: 180 },
+  { nome: 'Outros', media: 240 }
+];
+
+class Component extends DCLogic {
+  state = {
+    itens: ITENS.map(i => ({ ...i })),
+    mes: 7, filtro: 'all',
+    editIdx: null, editValor: '',
+    modal: false, novaCat: '', catMenu: false, novoValor: '', salvando: false,
+    confirmar: null, toast: ''
+  };
+
+  brl(v) {
+    const s = Math.abs(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (v < 0 ? '− R$ ' : 'R$ ') + s;
+  }
+
+  flash(msg) {
+    clearTimeout(this.t);
+    this.setState({ toast: msg });
+    this.t = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+
+  componentWillUnmount() { clearTimeout(this.t); }
+
+  toneFor(pct) {
+    if (pct > 100) return { barra: '#D9483F', texto: '#B3372F' };
+    if (pct > 80) return { barra: '#C97A15', texto: '#9A5C0E' };
+    return { barra: '#349063', texto: '#2A7551' };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const itens = s.itens;
+    const totPlan = itens.reduce((t, i) => t + i.planejado, 0);
+    const totReal = itens.reduce((t, i) => t + i.realizado, 0);
+    const variacao = totPlan - totReal;
+    const uso = totPlan > 0 ? Math.round((totReal / totPlan) * 100) : 0;
+    const estourados = itens.filter(i => i.planejado > 0 && i.realizado > i.planejado);
+
+    const filtradas = itens.filter(i => {
+      const pct = i.planejado > 0 ? (i.realizado / i.planejado) * 100 : 0;
+      if (s.filtro === 'over') return pct > 100;
+      if (s.filtro === 'near') return pct > 80 && pct <= 100;
+      return true;
+    });
+
+    const diasPassados = 11;
+    const diasMes = 31;
+    const idealHoje = totPlan * (diasPassados / diasMes);
+    const desvio = totReal - idealHoje;
+    const restante = Math.max(totPlan - totReal, 0);
+    const porDia = restante / Math.max(diasMes - diasPassados, 1);
+
+    let acc = 0;
+    const fatias = itens.filter(i => i.planejado > 0).map(i => {
+      const pct = (i.planejado / (totPlan || 1)) * 100;
+      const cor = CORES[i.nome] || '#9FB2BB';
+      const seg = cor + ' ' + acc.toFixed(2) + '% ' + (acc + pct).toFixed(2) + '%';
+      acc += pct;
+      return { seg, label: i.nome, pct: pct.toFixed(1) + '%', cor };
+    });
+
+    const catSel = DISPONIVEIS.find(c => c.nome === s.novaCat);
+    const novoNum = parseFloat((s.novoValor || '0').replace(/\./g, '').replace(',', '.')) || 0;
+
+    return {
+      irOutra: () => this.flash('Esta tela é o protótipo de Orçamento'),
+      toast: s.toast,
+      temToast: s.toast.length > 0,
+
+      mesLabel: MESES[s.mes] + ' 2026',
+      mesCurto: MESES[s.mes],
+      prevMes: () => this.setState(p => ({ mes: (p.mes + 11) % 12 })),
+      nextMes: () => this.setState(p => ({ mes: (p.mes + 1) % 12 })),
+      copiarMes: () => this.flash('Valores de julho copiados para ' + MESES[s.mes]),
+      exportar: () => this.flash('Orçamento de ' + MESES[s.mes] + ' exportado em CSV'),
+
+      resumo: [
+        { eyebrow: 'Planejado', valor: this.brl(totPlan), nota: itens.length + ' categoria(s) no orçamento.', tooltip: 'Soma dos valores que você planejou gastar em cada categoria neste mês.', iconBg: 'rgba(37,99,235,.10)', iconCor: '#1D4ED8', valorCor: '#0A2430', icone: 'M4 6h16M4 12h16M4 18h10' },
+        { eyebrow: 'Realizado', valor: this.brl(totReal), nota: 'Total já gasto nas categorias planejadas.', tooltip: 'Soma das despesas já lançadas nas categorias que fazem parte do orçamento.', iconBg: 'rgba(37,99,235,.10)', iconCor: '#1D4ED8', valorCor: '#0A2430', icone: 'M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8' },
+        { eyebrow: 'Variação', valor: this.brl(variacao), nota: variacao < 0 ? 'Gasto acima do planejado.' : 'Dentro do planejado.', tooltip: 'Planejado menos realizado. Positivo é folga; negativo significa que o gasto passou do plano.', iconBg: variacao < 0 ? 'rgba(217,72,63,.12)' : 'rgba(52,144,99,.12)', iconCor: variacao < 0 ? '#B3372F' : '#2A7551', valorCor: variacao < 0 ? '#B3372F' : '#2A7551', icone: 'M3 12h4l3 8 4-16 3 8h4' },
+        { eyebrow: 'Uso do orçamento', valor: uso + '%', nota: estourados.length ? estourados.length + ' categoria(s) estourada(s).' : 'Nenhuma categoria estourada.', tooltip: 'Realizado dividido pelo planejado. Acima de 80% entra em atenção; acima de 100% o orçamento estourou.', iconBg: uso > 100 ? 'rgba(217,72,63,.12)' : (uso > 80 ? 'rgba(201,122,21,.14)' : 'rgba(52,144,99,.12)'), iconCor: uso > 100 ? '#B3372F' : (uso > 80 ? '#9A5C0E' : '#2A7551'), valorCor: uso > 100 ? '#B3372F' : (uso > 80 ? '#9A5C0E' : '#2A7551'), icone: 'M12 3a9 9 0 1 0 9 9h-9z' }
+      ],
+
+      filtros: [['all', 'Todas'], ['near', 'Em atenção'], ['over', 'Estouradas']].map(([k, label]) => ({
+        label,
+        pick: () => this.setState({ filtro: k, editIdx: null }),
+        bg: s.filtro === k ? '#fff' : 'transparent',
+        cor: s.filtro === k ? '#0A2430' : '#7A929E',
+        shadow: s.filtro === k ? '0 1px 2px rgba(3,32,44,.08)' : 'none'
+      })),
+
+      linhas: filtradas.map(i => {
+        const idx = itens.indexOf(i);
+        const pct = i.planejado > 0 ? Math.round((i.realizado / i.planejado) * 100) : 0;
+        const tone = this.toneFor(pct);
+        const varItem = i.planejado - i.realizado;
+        return {
+          nome: i.nome,
+          cor: CORES[i.nome] || '#9FB2BB',
+          planejado: this.brl(i.planejado),
+          realizado: this.brl(i.realizado),
+          variacao: this.brl(varItem),
+          variacaoCor: varItem < 0 ? '#B3372F' : '#0A2430',
+          barra: Math.min(pct, 100) + '%',
+          barraCor: tone.barra,
+          pct: pct + '%',
+          pctCor: tone.texto,
+          editando: s.editIdx === idx,
+          naoEditando: s.editIdx !== idx,
+          editar: () => this.setState({ editIdx: idx, editValor: i.planejado.toFixed(2).replace('.', ',') }),
+          cancelar: () => this.setState({ editIdx: null }),
+          confirmar: () => {
+            const n = parseFloat((s.editValor || '0').replace(/\./g, '').replace(',', '.')) || 0;
+            if (!n) { this.setState({ editIdx: null }); return; }
+            this.setState(p => ({ itens: p.itens.map((x, k) => k === idx ? { ...x, planejado: n } : x), editIdx: null }));
+            this.flash('Planejado de ' + i.nome + ' atualizado');
+          },
+          remover: () => this.setState({ confirmar: { idx, nome: i.nome } })
+        };
+      }),
+      semLinhas: filtradas.length === 0,
+      vazioTitulo: itens.length ? 'Nenhuma categoria neste filtro' : 'Nenhuma categoria no orçamento',
+      vazioTexto: itens.length ? 'Troque o filtro para ver as demais categorias.' : 'Adicione categorias e defina valores planejados para o mês.',
+
+      editValor: s.editValor,
+      setEditValor: e => this.setState({ editValor: e.target.value }),
+
+      totPlanejado: this.brl(totPlan),
+      totRealizado: this.brl(totReal),
+      totVariacao: this.brl(variacao),
+      totVariacaoCor: variacao < 0 ? '#B3372F' : '#2A7551',
+      totUso: uso + '%',
+
+      ritmoNota: 'Compara o gasto de hoje com o que seria proporcional ao dia do mês.',
+      diasPassados: diasPassados + ' de ' + diasMes + ' dias',
+      idealHoje: this.brl(idealHoje),
+      ritmoLabel: desvio > 0 ? 'Acima do ritmo' : 'Abaixo do ritmo',
+      ritmoValor: this.brl(Math.abs(desvio)),
+      ritmoCor: desvio > 0 ? '#B3372F' : '#2A7551',
+      porDia: this.brl(porDia),
+
+      donut: 'conic-gradient(' + fatias.map(f => f.seg).join(', ') + ')',
+      composicao: fatias.map(f => ({ label: f.label, pct: f.pct, cor: f.cor })),
+
+      temEstouro: estourados.length > 0,
+      estouros: estourados.map(i => ({
+        nome: i.nome,
+        excedente: '+ ' + this.brl(i.realizado - i.planejado),
+        detalhe: this.brl(i.realizado) + ' de ' + this.brl(i.planejado) + ' · ' + Math.round((i.realizado / i.planejado) * 100) + '%'
+      })),
+
+      modalAberto: s.modal,
+      abrirNova: () => this.setState({ modal: true, novaCat: '', novoValor: '', catMenu: false, salvando: false }),
+      fecharModal: () => this.setState({ modal: false, catMenu: false }),
+      catLabel: s.novaCat || 'Selecione uma categoria',
+      catCor: s.novaCat ? '#0A2430' : '#9FB2BB',
+      catDot: s.novaCat ? (CORES[s.novaCat] || '#9FB2BB') : 'transparent',
+      catMenuAberto: s.catMenu,
+      toggleCatMenu: () => this.setState(p => ({ catMenu: !p.catMenu })),
+      catBorder: s.catMenu ? '#2563EB' : '#E4EBEF',
+      catBg: s.catMenu ? '#fff' : '#F8FAFB',
+      catShadow: s.catMenu ? '0 0 0 4px rgba(37,99,235,.12)' : 'none',
+      catChevron: s.catMenu ? 'rotate(180deg)' : 'none',
+      categorias: DISPONIVEIS.filter(c => !itens.some(i => i.nome === c.nome)).map(c => ({
+        nome: c.nome,
+        dot: CORES[c.nome] || '#9FB2BB',
+        media: 'média ' + this.brl(c.media),
+        pick: () => this.setState({ novaCat: c.nome, catMenu: false }),
+        bg: s.novaCat === c.nome ? 'rgba(37,99,235,.08)' : 'transparent',
+        cor: s.novaCat === c.nome ? '#1D4ED8' : '#46606C',
+        peso: s.novaCat === c.nome ? '600' : '400',
+        check: s.novaCat === c.nome ? '1' : '0'
+      })),
+      novoValor: s.novoValor,
+      setNovoValor: e => this.setState({ novoValor: e.target.value }),
+      temSugestao: !!catSel,
+      sugestao: catSel ? this.brl(catSel.media) : '',
+      usarSugestao: () => { if (catSel) this.setState({ novoValor: catSel.media.toFixed(2).replace('.', ',') }); },
+      previewTotal: this.brl(totPlan + novoNum),
+      addLabel: s.salvando ? 'Salvando…' : 'Adicionar',
+      addBg: s.salvando || !s.novaCat || !novoNum ? '#DCE4E8' : '#2563EB',
+      addCor: s.salvando || !s.novaCat || !novoNum ? '#9FB2BB' : '#fff',
+      adicionar: () => {
+        if (s.salvando || !s.novaCat || !novoNum) return;
+        this.setState({ salvando: true });
+        setTimeout(() => {
+          this.setState(p => ({
+            itens: [...p.itens, { nome: p.novaCat, planejado: novoNum, realizado: 0 }],
+            salvando: false, modal: false
+          }));
+          this.flash(s.novaCat + ' adicionada ao orçamento');
+        }, 650);
+      },
+
+      confirmarAberto: !!s.confirmar,
+      confirmarNome: s.confirmar ? s.confirmar.nome : '',
+      cancelarRemocao: () => this.setState({ confirmar: null }),
+      confirmarRemocao: () => {
+        const { idx, nome } = s.confirmar;
+        this.setState(p => ({ itens: p.itens.filter((_, i) => i !== idx), confirmar: null, editIdx: null }));
+        this.flash('“' + nome + '” removida do orçamento');
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

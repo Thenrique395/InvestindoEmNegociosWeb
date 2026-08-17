@@ -3,12 +3,34 @@
 
   display: block;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-app);
   min-height: 100vh;
 }
 
 .shell {
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: var(--w-sidebar) minmax(0, 1fr);
+  background: var(--bg-app);
+}
+
+/* `align-content: start` é obrigatório aqui: `.content` é um grid com
+   `min-height` e três linhas automáticas (topbar, banner, conteúdo). Sem isto o
+   grid reparte a altura sobrante entre as três — a linha da topbar de 56px
+   inflava para 209px e empurrava a tela inteira para o meio da janela. Só
+   aparecia em telas com pouco conteúdo, como Metas sem metas cadastradas. */
+.content {
+  align-content: start;
+}
+
+/* Área de conteúdo — COMPONENTES.md §1.3. */
+.main {
+  padding: var(--page-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap);
+}
+
+.mobile-bottom-nav {
+  display: none;
 }
 
 .shell__backdrop {
@@ -18,9 +40,95 @@
   background: rgba(8, 15, 24, 0.5);
 }
 
-@media (max-width: 960px) {
+/* Alinhado ao ponto em que a sidebar vira gaveta. */
+@media (max-width: 900px) {
   .shell {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .main {
+    padding: var(--space-9) var(--space-9) calc(var(--space-12) + 76px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-bottom-nav {
+    position: fixed;
+    right: var(--space-5);
+    bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+    left: var(--space-5);
+    z-index: 1300;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) 58px;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 64px;
+    padding: var(--space-3);
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    border-radius: var(--radius-card);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: var(--shadow-dropdown);
+    backdrop-filter: blur(18px);
+  }
+
+  .mobile-bottom-nav__item,
+  .mobile-bottom-nav__fab {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    min-width: 0;
+    height: 52px;
+    border-radius: var(--radius-control);
+    color: var(--text-tertiary);
+    font: inherit;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .mobile-bottom-nav__item {
+    border: 1px solid transparent;
+    background: transparent;
+    transition: background var(--dur-hover) ease, border-color var(--dur-hover) ease, color var(--dur-hover) ease;
+
+    &:hover,
+    &.is-active {
+      border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+      background: var(--primary-tint);
+      color: var(--primary-text);
+    }
+  }
+
+  .mobile-bottom-nav__icon {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .mobile-bottom-nav__label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-bottom-nav__fab {
+    border: none;
+    background: var(--primary);
+    color: var(--on-primary);
+    cursor: pointer;
+    box-shadow: var(--shadow-dropdown);
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 }
 
@@ -28,7 +136,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--bg-app);
 }
 
 .onboarding-route-main {
@@ -38,11 +146,29 @@
 .page {
   position: relative;
   isolation: isolate;
-  padding: calc(var(--header-h) + var(--spacing-3)) clamp(var(--spacing-3), 2.5vw, var(--spacing-6)) var(--spacing-3);
+  padding: calc(var(--header-h) + var(--space-10)) clamp(var(--space-10), 2.5vw, var(--space-12)) var(--space-10);
 }
 
 .page--login {
   padding: 0;
+}
+
+/* A tela de autenticação desenha de ponta a ponta: o padding da área de
+   conteúdo deixaria uma faixa do fundo aparecendo em volta, como se a tela
+   fosse um cartão. Ela não é. */
+.page--login .main {
+  padding: 0;
+  gap: 0;
+}
+
+/* O site traz o próprio cabeçalho sticky e desenha faixas de ponta a ponta:
+   nada de padding lateral nem de reserva para o header do shell. */
+.page--site {
+  padding: 0;
+}
+
+.page--site::after {
+  content: none;
 }
 
 .page--logged {
@@ -79,44 +205,44 @@
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  padding: var(--spacing-2) var(--spacing-2);
-  border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
-  background: color-mix(in srgb, var(--success) 8%, transparent);
+  padding: var(--space-6) var(--space-6);
+  border-radius: var(--radius-control);
+  border: 1px solid color-mix(in srgb, var(--income) 30%, transparent);
+  background: color-mix(in srgb, var(--income) 8%, transparent);
   color: var(--text);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
 
   &.success {
-    border-color: color-mix(in srgb, var(--success) 45%, transparent);
-    background: var(--success-10);
+    border-color: color-mix(in srgb, var(--income) 45%, transparent);
+    background: var(--income-tint);
   }
 
   &.error {
-    border-color: color-mix(in srgb, var(--danger) 45%, transparent);
-    background: var(--danger-10);
+    border-color: color-mix(in srgb, var(--expense) 45%, transparent);
+    background: var(--expense-tint);
   }
 
   &.info {
-    border-color: color-mix(in srgb, var(--info) 45%, transparent);
-    background: var(--info-10);
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    background: var(--primary-tint);
   }
 
   &.warning {
     border-color: color-mix(in srgb, var(--warning) 55%, transparent);
-    background: var(--warning-10);
+    background: var(--warning-tint);
   }
 
   button {
-    background: var(--surface-2);
+    background: var(--surface-sunken);
     border: 1px solid var(--border);
     color: var(--text);
-    border-radius: var(--radius-sm);
-    padding: var(--spacing-1) var(--spacing-1);
+    border-radius: var(--radius-xs);
+    padding: var(--space-3) var(--space-3);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.2s ease;
 
     &:hover {
-      background: var(--surface-3);
+      background: var(--surface-inset);
       transform: translateY(-1px);
     }
   }
@@ -164,21 +290,21 @@
 
 .lead {
   color: var(--text-secondary);
-  font-size: var(--text-lg);
-  line-height: var(--line-height-body);
-  margin-bottom: var(--spacing-3);
+  font-size: var(--fs-card-title);
+  line-height: var(--lh-body);
+  margin-bottom: var(--space-10);
 }
 
 .muted {
-  color: var(--text-muted);
-  line-height: var(--line-height-body);
+  color: var(--text-tertiary);
+  line-height: var(--lh-body);
 }
 
 .eyebrow {
   text-transform: none;
-  letter-spacing: var(--letter-spacing-label);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
+  letter-spacing: var(--ls-column);
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
   margin: 0 0 0.25rem 0;
 }
 
@@ -187,17 +313,17 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  margin: calc(-1 * var(--spacing-3)) calc(-1 * var(--spacing-4));
+  border-radius: var(--radius-inner);
+  margin: calc(-1 * var(--space-10)) calc(-1 * var(--space-12));
 }
 
 .signup-modal__left {
   background: var(--text);
-  padding: clamp(var(--spacing-3), 3vw, var(--spacing-4));
+  padding: clamp(var(--space-10), 3vw, var(--space-12));
   color: white;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .signup-modal__left h2 {
@@ -219,7 +345,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: var(--text-sm);
+  font-size: var(--fs-meta);
 }
 
 .signup-modal__benefits .dot {
@@ -238,10 +364,10 @@
 
 .signup-modal__right {
   position: relative;
-  padding: clamp(var(--spacing-2), 2.8vw, var(--spacing-4));
+  padding: clamp(var(--space-6), 2.8vw, var(--space-12));
   background: var(--surface);
   display: grid;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .signup-modal__right .close {
@@ -249,18 +375,18 @@
   top: 14px;
   right: 14px;
   border: 1px solid var(--border);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
   width: 32px;
   height: 32px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: var(--text-md);
+  font-size: var(--fs-subhead);
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .signup-modal__right .close:hover {
-  background: var(--surface-3);
+  background: var(--surface-inset);
   border-color: var(--border-strong);
   transform: translateY(-1px);
 }
@@ -271,9 +397,9 @@
 
 .signup-modal__right-header h3 {
   margin: 0.25rem 0 0.25rem 0;
-  font-size: var(--text-xl);
+  font-size: var(--fs-section);
 }
 
 .signup-modal__right-header .muted {
-  margin-bottom: var(--spacing-1);
+  margin-bottom: var(--space-3);
 }

@@ -12,28 +12,34 @@
 
   <section class="calculator-summary-grid">
     <app-transaction-summary-card
+      density="compact"
       tone="primary"
       eyebrow="Modelos"
       [value]="calculators.length.toString()"
-      note="Simuladores financeiros e trabalhistas no catálogo.">
+      note="Simuladores financeiros e trabalhistas no catálogo."
+      tooltipText="Total de calculadoras previstas no catálogo, somando as que já funcionam e as ainda em desenvolvimento.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 8h8M8 12h3M13 12h3M8 16h3M13 16h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
     <app-transaction-summary-card
+      density="compact"
       tone="success"
       eyebrow="Ativos"
       [value]="implementedCount.toString()"
-      note="Calculadoras prontas para uso agora.">
+      note="Calculadoras prontas para uso agora."
+      tooltipText="Calculadoras com fórmula implementada e disponíveis para uso imediato.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
     <app-transaction-summary-card
+      density="compact"
       tone="info"
       eyebrow="Em breve"
       [value]="pendingCount.toString()"
-      note="Modelos mapeados para evolução do produto.">
+      note="Modelos mapeados para evolução do produto."
+      tooltipText="Calculadoras já mapeadas e ainda sem fórmula implementada. Aparecem no catálogo para você saber o que vem, mas não abrem.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 6v6l4 2M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>

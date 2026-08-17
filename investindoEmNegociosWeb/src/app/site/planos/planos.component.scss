@@ -1,0 +1,154 @@
+:host {
+  display: block;
+  background: var(--bg-app);
+}
+
+/* ---------- Hero --------------------------------------------------------- */
+
+.hero {
+  padding: var(--site-hero-pt) var(--site-section-x) var(--site-hero-pb);
+}
+
+.hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: clamp(var(--space-12), 5vw, 72px);
+  align-items: end;
+  max-width: var(--site-max-width);
+  margin: 0 auto;
+}
+
+.hero__eyebrow {
+  margin: 0;
+  color: var(--income-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.hero__title {
+  margin: var(--space-5) 0 var(--space-7);
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: var(--fw-semibold);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tighter);
+  text-wrap: pretty;
+}
+
+.hero__description {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text-secondary);
+  font-size: var(--fs-card-title);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.hero__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-7);
+}
+
+.hero__hint {
+  padding: var(--space-8) var(--space-9);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.hero__hint-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+}
+
+.hero__hint-note {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  line-height: 1.55;
+}
+
+/* ---------- Alternador de ciclo ------------------------------------------ */
+
+.cycle__switch {
+  display: inline-flex;
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+}
+
+.cycle__option {
+  padding: var(--space-3) var(--space-9);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background var(--dur-hover) ease, color var(--dur-hover) ease;
+}
+
+.cycle__option--active {
+  background: var(--brand-green);
+  color: var(--site-cta-fg);
+}
+
+/* ---------- Nota e fechamento -------------------------------------------- */
+
+.planos__note {
+  margin: var(--space-9) 0 0;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+  margin-top: var(--space-12);
+  padding: var(--space-12);
+  text-align: center;
+  border: 1px solid var(--income-tint);
+  border-radius: var(--radius-panel);
+  background: linear-gradient(135deg, var(--income-tint-soft), transparent 62%);
+}
+
+.closing__title {
+  margin: 0;
+  max-width: 26ch;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: var(--fw-semibold);
+  line-height: 1.18;
+  letter-spacing: var(--ls-tighter);
+  text-wrap: pretty;
+}
+
+.closing__actions {
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 1080px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: var(--space-12) var(--space-10);
+  }
+}

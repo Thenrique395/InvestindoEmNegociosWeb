@@ -8,13 +8,13 @@ import { AccountsService, AccountResponse } from '../accounts.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { UiStateComponent } from '../ui-state/ui-state.component';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
-import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
@@ -40,7 +40,7 @@ type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
     TransactionSummaryCardComponent,
     SegmentedSelectorComponent,
     StatusBadgeComponent,
-    UsageBarComponent,
+    ProgressBarComponent,
     ConfirmSheetComponent,
     ModalComponent,
     FormFieldComponent,

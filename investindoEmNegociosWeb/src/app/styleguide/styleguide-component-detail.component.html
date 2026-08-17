@@ -12,6 +12,68 @@
   <h2>Demo</h2>
   <div class="styleguide-demo">
     @switch (slug) {
+      @case ('segmented-selector') {
+        <app-segmented-selector
+          [options]="demoVisoes"
+          [value]="demoVisao"
+          ariaLabel="Período"
+          (valueChange)="demoVisao = $event" />
+        <p>Visão: {{ demoVisao }}</p>
+      }
+      @case ('money') {
+        <p>Neutro: <app-money [value]="12480.35" size="lg" /></p>
+        <p>Receita: <app-money [value]="18900" sign="auto" size="lg" /></p>
+        <p>Despesa: <app-money [value]="-9842.17" sign="auto" size="lg" /></p>
+        <p>KPI: <app-money [value]="12480.35" size="kpi" /></p>
+      }
+      @case ('chart-line') {
+        <app-chart-line [series]="demoLinha" [labels]="demoMeses" />
+      }
+      @case ('select-menu') {
+        <div style="max-width: 320px">
+          <app-select-menu
+            [options]="demoCategorias"
+            [(ngModel)]="demoCategoria"
+            [searchable]="true"
+            createLabel="Criar nova categoria…"
+            ariaLabel="Categoria" />
+          <p>Valor: {{ demoCategoria }}</p>
+        </div>
+      }
+      @case ('number-stepper') {
+        <app-number-stepper [(ngModel)]="demoParcelas" [min]="1" [max]="48" ariaLabel="Parcelas" suffix="x" />
+        <p>Parcelas: {{ demoParcelas }}</p>
+      }
+      @case ('kpi-strip') {
+        <app-kpi-strip [items]="demoKpis" [featureFirst]="true" />
+      }
+      @case ('progress-bar') {
+        <p>Consumo 64% — dentro do previsto</p>
+        <app-progress-bar [value]="64" mode="consumo" ariaLabel="Uso do orçamento" />
+        <p>Consumo 88% — atenção</p>
+        <app-progress-bar [value]="88" mode="consumo" ariaLabel="Uso do orçamento" />
+        <p>Consumo 118% — estourou</p>
+        <app-progress-bar [value]="118" mode="consumo" ariaLabel="Uso do orçamento" />
+        <p>Conquista 67% em ritmo</p>
+        <app-progress-bar [value]="67" mode="conquista" ariaLabel="Progresso da meta" />
+        <p>Conquista 32% fora de ritmo</p>
+        <app-progress-bar [value]="32" mode="conquista" [onTrack]="false" ariaLabel="Progresso da meta" />
+      }
+      @case ('chart-bars') {
+        <app-chart-bars [series]="demoSeries" [labels]="demoMeses" [format]="formatarReal" />
+      }
+      @case ('installment-scope-modal') {
+        <button type="button" class="btn-primary" (click)="demoScopeOpen = true">Dar baixa na parcela</button>
+        @if (demoScopeEscolha) {
+          <p>Escolha: {{ demoScopeEscolha }}</p>
+        }
+        <app-installment-scope-modal
+          [open]="demoScopeOpen"
+          [context]="demoParcelaContexto"
+          actionLabel="Dar baixa"
+          (confirmed)="demoScopeEscolha = $event; demoScopeOpen = false"
+          (cancelled)="demoScopeOpen = false" />
+      }
       @case ('page-header') {
         <app-page-header eyebrow="Financeiro" title="Contas" description="Gerencie suas contas e saldos">
           <span page-meta>3 contas ativas</span>
@@ -33,7 +95,7 @@
       @case ('filter-bar') {
         <app-filter-bar>
           <div filter-left>
-            <input placeholder="Buscar..." class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+            <input placeholder="Buscar..." class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />
           </div>
           <div filter-right>
             <button class="btn-primary sm">Novo</button>
@@ -168,23 +230,23 @@
       }
       @case ('form-field') {
         <app-form-field label="Nome" [required]="true" hint="Como aparece nos relatórios" [error]="formFieldHasError() ? 'Informe um nome válido.' : ''" [submitted]="formFieldHasError()">
-          <input type="text" placeholder="Digite um nome" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+          <input type="text" placeholder="Digite um nome" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />
         </app-form-field>
         <div class="styleguide-demo__row">
           <button type="button" class="btn-ghost sm" (click)="formFieldHasError.set(!formFieldHasError())">Alternar estado de erro</button>
         </div>
         <app-form-field label="E-mail" description="Usado para receber notificações de cobrança." tone="success">
-          <input type="email" placeholder="voce@exemplo.com" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+          <input type="email" placeholder="voce@exemplo.com" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />
         </app-form-field>
         <app-form-field label="Categoria">
-          <select class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]">
+          <select class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]">
             <option>Moradia</option>
             <option>Transporte</option>
             <option>Lazer</option>
           </select>
         </app-form-field>
         <app-form-field label="Observações" hint="Opcional">
-          <textarea rows="3" placeholder="Notas internas..." class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]"></textarea>
+          <textarea rows="3" placeholder="Notas internas..." class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]"></textarea>
         </app-form-field>
       }
       @case ('toggle-field') {

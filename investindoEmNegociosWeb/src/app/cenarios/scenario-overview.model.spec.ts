@@ -1,5 +1,6 @@
 import { ScenarioProjectionPoint } from '../cenarios.service';
 import {
+  buildScenarioChartPoints,
   buildScenarioPointViews,
   impactSign,
   impactTone,
@@ -36,6 +37,17 @@ describe('scenario-overview.model', () => {
   it('lida com lista vazia/ausente', () => {
     expect(buildScenarioPointViews(null)).toEqual([]);
     expect(buildScenarioPointViews(undefined)).toEqual([]);
+  });
+
+  it('monta pontos do gráfico com escala compartilhada', () => {
+    const chart = buildScenarioChartPoints([
+      point(100, 120),
+      point(150, 300)
+    ]);
+
+    expect(chart[0].basePercent).toBeCloseTo(33.33, 1);
+    expect(chart[0].scenarioPercent).toBe(40);
+    expect(chart[1].scenarioPercent).toBe(100);
   });
 
   it('traduz o rótulo do período', () => {

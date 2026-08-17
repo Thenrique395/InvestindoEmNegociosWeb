@@ -30,9 +30,9 @@ export interface InitialExpenseSummary {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [':host { display: contents; }'],
   template: `
-    <div class="onboarding-step-shell">
-      <section class="onboarding-panel">
-        <div class="onboarding-panel__header">
+    <div class="onboarding-choice-block">
+      <section class="onboarding-block">
+        <div class="onboarding-block__head">
           <strong>Sua conta principal</strong>
           <span>Crie a conta que será usada como base para acompanhar saldo, receitas e despesas.</span>
         </div>
@@ -69,28 +69,19 @@ export interface InitialExpenseSummary {
         }
       </section>
       @if (showContextPanels()) {
-        <div class="onboarding-split onboarding-split--narrow">
-          <section class="onboarding-panel">
-            <div class="onboarding-panel__header">
-              <strong>Por que isso importa</strong>
-              <span>A conta principal ativa a base operacional do sistema e melhora a leitura do saldo real.</span>
-            </div>
-            <div class="onboarding-bullet-list">
-              <div class="onboarding-bullet">Permite registrar receitas e despesas com impacto real no caixa.</div>
-              <div class="onboarding-bullet">Dá contexto para análises futuras sem depender de ajustes manuais.</div>
-              <div class="onboarding-bullet">Cria uma base mínima consistente para o dashboard e os relatórios.</div>
-            </div>
-          </section>
-          <section class="onboarding-panel">
-            <div class="onboarding-panel__header">
-              <strong>Pronto para avançar</strong>
-              <span>Depois da conta criada, seguimos para receita e despesa inicial.</span>
-            </div>
-          </section>
-        </div>
+        <p class="onboarding-insight">
+          <svg class="onboarding-insight__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7" />
+            <path d="M12 11v5.2M12 7.9v.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+          </svg>
+          <span>
+            A conta principal é o que dá saldo real ao dashboard: sem ela, receitas e despesas não têm
+            onde entrar nem sair.
+          </span>
+        </p>
       }
-      <section class="onboarding-panel">
-        <div class="onboarding-panel__header">
+      <section class="onboarding-block">
+        <div class="onboarding-block__head">
           <strong>Primeiros lançamentos (opcional)</strong>
           <span>Adicione uma receita e uma despesa para o dashboard já começar refletindo sua realidade — mas você pode fazer isso depois.</span>
         </div>
@@ -112,10 +103,6 @@ export interface InitialExpenseSummary {
               </div>
               <div class="onboarding-entry-card__header-meta">
                 <span class="onboarding-entry-card__status">{{ hasInitialIncome() ? 'Configurada' : 'Opcional' }}</span>
-                <span class="onboarding-entry-card__tooltip-anchor">
-                  <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma entrada real do mês, como salário, comissão ou recebimento recorrente.">?</span>
-                  <span class="onboarding-entry-card__tooltip">Registre uma entrada real do mês, como salário, comissão ou recebimento recorrente.</span>
-                </span>
               </div>
             </div>
             @if (!hasInitialIncome()) {
@@ -147,10 +134,6 @@ export interface InitialExpenseSummary {
               </div>
               <div class="onboarding-entry-card__header-meta">
                 <span class="onboarding-entry-card__status">{{ hasInitialExpense() ? 'Registrada' : 'Opcional' }}</span>
-                <span class="onboarding-entry-card__tooltip-anchor">
-                  <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.">?</span>
-                  <span class="onboarding-entry-card__tooltip">Registre uma saída que já faz parte da sua rotina, como aluguel, assinatura ou conta fixa.</span>
-                </span>
               </div>
             </div>
             @if (!hasInitialExpense()) {
@@ -181,10 +164,6 @@ export interface InitialExpenseSummary {
                 </div>
                 <div class="onboarding-entry-card__header-meta">
                   <span class="onboarding-entry-card__status">{{ hasInitialCard() ? 'Configurado' : 'Opcional' }}</span>
-                  <span class="onboarding-entry-card__tooltip-anchor">
-                    <span class="onboarding-entry-card__tooltip-trigger" tabindex="0" aria-label="Cadastre quando quiser acompanhar compras no crédito.">?</span>
-                    <span class="onboarding-entry-card__tooltip">Cadastre quando quiser acompanhar compras no crédito.</span>
-                  </span>
                 </div>
               </div>
               @if (!hasInitialCard()) {
@@ -201,23 +180,23 @@ export interface InitialExpenseSummary {
           }
         </div>
       </section>
-      <div class="onboarding-actions onboarding-actions--footer">
-        <div class="onboarding-actions__meta">
-          <strong>Último passo</strong>
-          <span>Basta ter sua conta principal para concluir. Os primeiros lançamentos são opcionais — adicione agora ou depois.</span>
+      <div class="onboarding-footer">
+        <div class="onboarding-footer__meta">
+          <strong>Falta só a conta principal</strong>
+          <span>Os primeiros lançamentos são opcionais — dá para adicionar agora ou depois.</span>
           @if (showValidationMessage()) {
-            <span class="onboarding-actions__validation">{{ validationMessage() }}</span>
+            <span class="onboarding-footer__validation">{{ validationMessage() }}</span>
           }
         </div>
-        <div class="onboarding-actions__group onboarding-actions__group--footer">
-          <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="back.emit()">Voltar</button>
+        <div class="onboarding-footer__actions">
+          <button class="onboarding-back" type="button" (click)="back.emit()">Voltar</button>
           @if (!accountReady()) {
-            <button class="ghost onboarding-btn" type="button" [disabled]="creatingAccount()" (click)="createAccount.emit()">
-              {{ creatingAccount() ? 'Criando conta...' : 'Criar conta' }}
+            <button class="onboarding-back" type="button" [disabled]="creatingAccount()" (click)="createAccount.emit()">
+              {{ creatingAccount() ? 'Criando conta…' : 'Criar conta' }}
             </button>
           }
-          <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" [disabled]="savingEntries()" (click)="finish.emit()">
-            {{ savingEntries() ? 'Salvando...' : 'Concluir onboarding' }}
+          <button class="onboarding-cta" type="button" [disabled]="savingEntries()" (click)="finish.emit()">
+            {{ savingEntries() ? 'Salvando…' : 'Concluir' }}
           </button>
         </div>
       </div>

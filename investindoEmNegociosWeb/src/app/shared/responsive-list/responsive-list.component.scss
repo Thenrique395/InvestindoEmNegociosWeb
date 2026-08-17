@@ -1,8 +1,10 @@
+/* Tabela — COMPONENTES.md §4. Alcança as 9 telas que usam este componente.
+   O primitivo `app-data-table` é o destino para telas refeitas do zero; aqui a
+   aparência é a mesma, sem exigir migração de cada tela. */
 .responsive-list {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
   overflow: hidden;
 }
 
@@ -18,21 +20,26 @@
   min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: var(--font-size-body-sm);
+  font-size: var(--fs-body);
 }
 
 .responsive-list__head {
-  background: color-mix(in srgb, var(--surface-2) 70%, white);
-  color: var(--text);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
 
   tr {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-inner);
   }
 }
 
+/* Cabeçalho em 10px/700 uppercase com tracking — o peso vem da caixa alta,
+   não do tamanho. */
 .responsive-list__cell {
-  padding: 1rem 1.15rem;
-  font-weight: var(--font-weight-bold);
+  padding: var(--space-4) var(--table-padding-x);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
+  text-transform: uppercase;
   text-align: left;
   white-space: nowrap;
 }
@@ -45,21 +52,32 @@
   text-align: right;
 }
 
+/* O botão de ordenar é um `<button>`, e o reset do Tailwind zera fonte e caixa
+   herdadas do `<th>` — sem repetir aqui, a coluna ordenável ficava em caixa
+   normal ao lado de "AÇÕES" em caixa alta. */
 .responsive-list__sort {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  color: var(--text);
+  gap: var(--space-1);
+  color: inherit;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
+  text-transform: uppercase;
+}
+
+.responsive-list__sort:hover {
+  color: var(--text-secondary);
 }
 
 .responsive-list__sort-dir {
-  font-size: var(--font-size-caption);
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
 }
 
 .responsive-list__body {
   tr + tr td {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-row);
   }
 }
 
@@ -67,12 +85,14 @@
   transition: background 160ms ease;
 }
 
+/* Sem sombra por linha: em tabela, sombra por linha vira ruído. */
 .responsive-list__row:hover {
-  background: color-mix(in srgb, var(--surface-2) 62%, white);
+  background: var(--surface-sunken);
 }
 
 .responsive-list__item {
-  padding: 1rem 1.15rem;
+  height: var(--h-table-row);
+  padding: var(--space-5) var(--table-padding-x);
   vertical-align: middle;
 }
 
@@ -82,13 +102,37 @@
 
 .responsive-list__item--value {
   text-align: right;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.responsive-list__cell:last-child,
+.responsive-list__item:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: inherit;
+  box-shadow: -12px 0 18px -18px color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.responsive-list__head .responsive-list__cell:last-child {
+  z-index: 3;
+  background: var(--surface-sunken);
+}
+
+.responsive-list__body .responsive-list__item:last-child {
+  background: var(--surface);
+}
+
+.responsive-list__row:hover .responsive-list__item:last-child {
+  background: var(--surface-sunken);
 }
 
 .responsive-list__check {
-  inline-size: 16px;
-  block-size: 16px;
-  accent-color: var(--primary-text);
+  inline-size: 15px;
+  block-size: 15px;
+  accent-color: var(--primary);
 }
 
 .responsive-list__empty {
@@ -100,8 +144,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-label);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
 }
 
 .responsive-list__spinner {
@@ -116,5 +160,94 @@
 @keyframes responsive-list-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ---------- Mobile: a tabela vira lista de cards --------------------------
+   COMPONENTES.md §4: "a tabela vira lista de cards (...) Nunca scroll
+   horizontal infinito."
+
+   A tabela continua sendo `<table>` no HTML — a semântica e o leitor de tela
+   seguem intactos. Só a apresentação muda para blocos. O rótulo de cada coluna
+   volta como etiqueta via `data-label`, porque sem o cabeçalho o valor sozinho
+   perde o significado ("R$ 318,42" de quê?). */
+@media (max-width: 720px) {
+  .responsive-list__scroll {
+    overflow-x: visible;
+  }
+
+  .responsive-list__table,
+  .responsive-list__body,
+  .responsive-list__row,
+  .responsive-list__item {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-list__head {
+    /* `clip` em vez de `display:none`: some da tela sem sair da árvore de
+       acessibilidade, então o `<th>` continua nomeando as células. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .responsive-list__row {
+    padding: var(--space-6) var(--space-7);
+    margin: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-inner);
+    background: var(--surface);
+  }
+
+  .responsive-list__body tr + tr td {
+    border-top: none;
+  }
+
+  .responsive-list__cell:last-child,
+  .responsive-list__item:last-child {
+    position: static;
+    box-shadow: none;
+  }
+
+  .responsive-list__item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-5);
+    height: auto;
+    padding: var(--space-2) 0;
+    text-align: left;
+  }
+
+  /* A etiqueta só existe no card; no desktop quem nomeia é o cabeçalho. */
+  .responsive-list__item[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--text-tertiary);
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+  }
+
+  .responsive-list__item--value {
+    text-align: right;
+    font-size: var(--fs-card-title);
+  }
+
+  .responsive-list__item--checkbox {
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-inner);
+  }
+
+  .responsive-list__item--checkbox::before {
+    content: none;
+  }
+
+  .responsive-list__empty {
+    display: block;
+    padding: 0;
   }
 }

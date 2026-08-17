@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/colors.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/typography.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/styles.css">
+<script src="_ds/investindo-em-neg-cios-design-system-70439c21-f5b9-47e7-94f7-bb242521218b/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #001620; font-family: Inter, system-ui, sans-serif; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  .ffx { font-variant-numeric: tabular-nums; }
+  .view { animation: viewIn .3s cubic-bezier(.16,.8,.3,1) both; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .fld { height: 44px; border: 1px solid #E4EBEF; border-radius: 10px; background: #F8FAFB; padding: 0 12px; font: 400 14px Inter, sans-serif; color: #0A2430; outline: none; width: 100%; box-sizing: border-box; transition: border-color .16s ease, box-shadow .16s ease, background .16s ease; }
+  .fld:focus { border-color: #2563EB; background: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
+  .fld::placeholder { color: #9FB2BB; }
+  .opt { transition: border-color .16s ease, background .16s ease, transform .14s ease; cursor: pointer; }
+  .opt:hover { border-color: #C3D2DA; transform: translateY(-1px); }
+  .btn { transition: background .14s ease, transform .1s ease, color .14s ease; }
+  .btn:active { transform: scale(.99); }
+  .lnk { color: #2563EB; font-weight: 600; cursor: pointer; }
+  .lnk:hover { color: #1D4ED8; }
+</style>
+</helmet>
+
+<div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:24px; padding:40px 40px 60px">
+
+  <div style="width:100%; max-width:1220px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; color:#E6EEF1">
+    <div>
+      <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Protótipo navegável</span>
+      <h1 style="margin:8px 0 5px; font-family:Poppins,sans-serif; font-size:26px; font-weight:600; letter-spacing:-.02em; color:#fff">Onboarding completo</h1>
+      <p style="margin:0; font-size:14px; color:#9FB2BB">Quatro passos até o dashboard pronto. Tudo selecionável — o progresso e o resumo acompanham suas escolhas.</p>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; flex:none">
+      <span style="font-size:12px; color:#5E7F8B; margin-right:4px">Perfil</span>
+      <sc-for list="{{ planos }}" as="pl" hint-placeholder-count="3">
+        <button class="btn" onClick="{{ pl.pick }}" style="height:34px; padding:0 14px; border:1px solid {{ pl.border }}; border-radius:999px; background:{{ pl.bg }}; color:{{ pl.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ pl.label }}</button>
+      </sc-for>
+      <span style="width:1px; height:22px; background:#1E4353; margin:0 4px"></span>
+      <button class="btn" onClick="{{ reiniciar }}" style="height:34px; padding:0 15px; border:1px solid #1E4353; border-radius:999px; background:transparent; color:#9FB2BB; font:600 12px Inter,sans-serif; cursor:pointer" style-hover="background:#062B39; color:#fff">Reiniciar</button>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1220px; display:grid; grid-template-columns:minmax(0,314px) minmax(0,1fr); background:#F4F7F9; border-radius:22px; overflow:hidden; box-shadow:0 40px 100px -50px rgba(0,0,0,.8)">
+
+    <aside style="position:relative; overflow:hidden; background:#002E3E; color:#fff; padding:36px 32px; display:flex; flex-direction:column; min-height:720px">
+      <div style="position:absolute; top:-180px; right:-140px; width:440px; height:440px; background:radial-gradient(circle at center, rgba(52,144,99,.26), transparent 62%); pointer-events:none"></div>
+      <img src="assets/lockup-horizontal-light.png" alt="Investindo em Negócios" style="position:relative; width:184px; height:auto; display:block; margin-bottom:38px">
+
+      <div style="position:relative; display:flex; flex-direction:column; gap:2px">
+        <sc-for list="{{ trilha }}" as="t" hint-placeholder-count="4">
+          <div style="display:flex; gap:14px; padding:2px 0">
+            <div style="display:flex; flex-direction:column; align-items:center; flex:none">
+              <span style="display:grid; place-items:center; width:30px; height:30px; border-radius:999px; border:1px solid {{ t.dotBorder }}; background:{{ t.dotBg }}; color:{{ t.dotColor }}; font-size:12px; font-weight:700; transition:all .3s ease">{{ t.numero }}</span>
+              <span style="flex:1; width:1px; min-height:{{ t.linhaH }}; background:{{ t.linhaCor }}; transition:background .3s ease"></span>
+            </div>
+            <div style="padding-bottom:16px">
+              <div style="font-size:14px; font-weight:600; color:{{ t.tituloCor }}; transition:color .3s ease">{{ t.titulo }}</div>
+              <p style="margin:3px 0 0; font-size:12px; line-height:1.55; color:{{ t.descCor }}">{{ t.desc }}</p>
+              <sc-if value="{{ t.temResumo }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:3px 10px; border-radius:999px; background:rgba(52,144,99,.16); color:#7FD3A8; font-size:11px; font-weight:600">{{ t.resumo }}</span>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="position:relative; margin-top:auto; padding-top:24px; border-top:1px solid rgba(237,235,236,.14)">
+        <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#6E8B96">Leva cerca de 3 minutos</div>
+        <p style="margin:9px 0 0; font-size:13px; line-height:1.6; color:#BBD3DA">Você pode sair e retomar depois. O que já foi preenchido fica salvo.</p>
+      </div>
+    </aside>
+
+    <main style="position:relative; display:flex; flex-direction:column; color:#0A2430; min-height:720px; min-width:0">
+
+      <header style="display:flex; align-items:center; justify-content:space-between; gap:20px; padding:0 44px; height:64px; border-bottom:1px solid #E4EBEF; background:#fff; flex:none">
+        <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:#7A929E; min-width:0; overflow:hidden">
+          <span style="flex:none; display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font-size:11px; font-weight:700; letter-spacing:.06em">Plano {{ planoLabel }}</span>
+          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Configuração inicial · seu progresso fica salvo</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:14px; flex:none">
+          <span class="lnk" style="font-size:13px; font-weight:600; white-space:nowrap">Preciso de ajuda</span>
+          <span style="width:1px; height:20px; background:#E4EBEF"></span>
+          <div style="position:relative">
+            <button class="btn" onClick="{{ toggleMenu }}" style="display:flex; align-items:center; gap:9px; height:38px; padding:0 10px 0 6px; border:1px solid {{ menuBorder }}; border-radius:999px; background:{{ menuBg }}; cursor:pointer">
+              <span style="display:grid; place-items:center; width:26px; height:26px; border-radius:999px; background:rgba(37,99,235,.12); color:#1D4ED8; font-size:11px; font-weight:700">{{ iniciais }}</span>
+              <span style="font-size:13px; font-weight:600; color:#0A2430">{{ primeiroNome }}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <sc-if value="{{ menuAberto }}" hint-placeholder-val="{{ false }}">
+              <div class="view" style="position:absolute; top:46px; right:0; z-index:10; width:236px; background:#fff; border:1px solid #E4EBEF; border-radius:13px; overflow:hidden; box-shadow:0 20px 44px -20px rgba(3,32,44,.35)">
+                <div style="padding:14px 16px; border-bottom:1px solid #F2F6F8">
+                  <div style="font-size:13px; font-weight:600">{{ nome }}</div>
+                  <div style="font-size:12px; color:#9FB2BB; margin-top:2px">henrique@investindo.com.br</div>
+                </div>
+                <div style="padding:6px">
+                  <span style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; font-size:13px; color:#46606C; cursor:pointer" style-hover="background:#F4F7F9"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/></svg>Meu perfil</span>
+                  <span style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; font-size:13px; color:#46606C; cursor:pointer" style-hover="background:#F4F7F9"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg>Configurações</span>
+                </div>
+                <div style="padding:6px; border-top:1px solid #F2F6F8">
+                  <span style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; font-size:13px; font-weight:600; color:#B3372F; cursor:pointer" style-hover="background:rgba(217,72,63,.07)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17l5-5-5-5"/><path d="M20 12H9"/><path d="M12 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/></svg>Sair da conta</span>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </header>
+
+      <div style="flex:1; display:flex; flex-direction:column; padding:32px 44px 40px">
+
+      <sc-if value="{{ emAndamento }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:28px; align-items:start; padding-bottom:26px; border-bottom:1px solid #E4EBEF">
+          <div>
+            <span style="font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">Passo {{ passoAtual }} de 4</span>
+            <h2 style="margin:9px 0 7px; font-family:Poppins,sans-serif; font-size:28px; font-weight:600; letter-spacing:-.03em; line-height:1.15">{{ tituloPasso }}</h2>
+            <p style="margin:0; font-size:14px; line-height:1.6; color:#46606C; max-width:56ch">{{ descPasso }}</p>
+          </div>
+          <div style="padding:16px 18px; border:1px solid #E4EBEF; border-radius:14px; background:#fff">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px">
+              <strong style="font-size:12px; font-weight:600">Progresso atual</strong>
+              <span class="ffx" style="font-size:13px; font-weight:600; color:#2563EB">{{ progressoLabel }}</span>
+            </div>
+            <div style="height:6px; border-radius:999px; background:#EAF0F3; overflow:hidden"><i style="display:block; width:{{ progressoW }}; height:100%; background:#2563EB; border-radius:999px; transition:width .5s cubic-bezier(.2,.7,.3,1)"></i></div>
+            <p style="margin:10px 0 0; font-size:12px; line-height:1.55; color:#7A929E">{{ dicaProgresso }}</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFoco }}" hint-placeholder-val="{{ true }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; padding-top:26px">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+            <sc-for list="{{ focos }}" as="f" hint-placeholder-count="4">
+              <div class="opt" onClick="{{ f.pick }}" style="padding:20px; border:1px solid {{ f.border }}; border-radius:14px; background:{{ f.bg }}">
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px">
+                  <span style="display:grid; place-items:center; width:38px; height:38px; border-radius:11px; background:{{ f.iconBg }}; color:{{ f.iconColor }}; transition:all .16s ease"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" dangerouslySetInnerHTML="{{ f.icone }}"></svg></span>
+                  <span style="display:grid; place-items:center; width:20px; height:20px; border-radius:999px; border:1px solid {{ f.radioBorder }}; background:{{ f.radioBg }}; flex:none"><i style="width:8px; height:8px; border-radius:999px; background:#fff; opacity:{{ f.radioOn }}"></i></span>
+                </div>
+                <h3 style="margin:14px 0 5px; font-size:15px; font-weight:600">{{ f.titulo }}</h3>
+                <p style="margin:0; font-size:13px; line-height:1.6; color:#46606C">{{ f.desc }}</p>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ temFoco }}" hint-placeholder-val="{{ false }}">
+            <div class="view" style="display:flex; gap:11px; margin-top:16px; padding:14px 16px; border:1px solid #E4EBEF; border-radius:12px; background:#fff">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.9" stroke-linecap="round" style="flex:none; margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg>
+              <p style="margin:0; font-size:13px; line-height:1.6; color:#46606C">{{ focoTooltip }}</p>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPreferencias }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; padding-top:26px; gap:26px">
+          <sc-if value="{{ semInsights }}" hint-placeholder-val="{{ false }}">
+            <section style="display:flex; align-items:center; gap:16px; padding:20px 22px; border:1px solid #E4EBEF; border-radius:14px; background:#fff">
+              <span style="flex:none; display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:#F1F5F7; color:#7A929E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+              <div style="flex:1">
+                <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E">Disponível no plano Inteligente</div>
+                <h3 style="margin:6px 0 3px; font-size:15px; font-weight:600">Estilo dos insights</h3>
+                <p style="margin:0; font-size:13px; line-height:1.6; color:#46606C; max-width:56ch">No plano Essencial o painel mostra saldo, receitas e despesas sem análise automática. A partir do Inteligente você escolhe o tom das recomendações.</p>
+              </div>
+              <span class="lnk" style="font-size:13px; flex:none">Conhecer planos</span>
+            </section>
+          </sc-if>
+
+          <section style="display:{{ insightsDisplay }}">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:14px">Estilo dos insights</div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px">
+              <sc-for list="{{ modos }}" as="m" hint-placeholder-count="4">
+                <div class="opt" onClick="{{ m.pick }}" style="padding:18px; border:1px solid {{ m.border }}; border-radius:14px; background:{{ m.bg }}">
+                  <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px">
+                    <span style="display:grid; place-items:center; width:36px; height:36px; border-radius:11px; background:{{ m.iconBg }}; color:{{ m.iconColor }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" dangerouslySetInnerHTML="{{ m.icone }}"></svg></span>
+                    <span style="display:grid; place-items:center; width:19px; height:19px; border-radius:999px; border:1px solid {{ m.radioBorder }}; background:{{ m.radioBg }}; flex:none"><i style="width:7px; height:7px; border-radius:999px; background:#fff; opacity:{{ m.radioOn }}"></i></span>
+                  </div>
+                  <h3 style="margin:13px 0 5px; font-size:14px; font-weight:600">{{ m.titulo }}</h3>
+                  <p style="margin:0; font-size:12px; line-height:1.6; color:#46606C">{{ m.desc }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+          <section>
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:14px">Início da competência mensal</div>
+            <div style="padding:20px; border:1px solid #E4EBEF; border-radius:14px; background:#fff">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:24px">
+                <div style="max-width:46ch">
+                  <h3 style="margin:0 0 5px; font-size:15px; font-weight:600">Dia de virada do mês</h3>
+                  <p style="margin:0; font-size:13px; line-height:1.6; color:#46606C">Se seu salário cai no dia 5, escolher 5 faz o mês financeiro começar aí — e não no dia 1º.</p>
+                </div>
+                <div style="display:flex; gap:7px; flex:none; flex-wrap:wrap; max-width:290px; justify-content:flex-end">
+                  <sc-for list="{{ dias }}" as="d" hint-placeholder-count="6">
+                    <button class="btn" onClick="{{ d.pick }}" style="width:42px; height:38px; border:1px solid {{ d.border }}; border-radius:10px; background:{{ d.bg }}; color:{{ d.color }}; font:600 13px Inter,sans-serif; cursor:pointer" class="ffx">{{ d.n }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:9px; margin-top:16px; padding-top:14px; border-top:1px solid #F2F6F8; font-size:13px; color:#46606C">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.9" stroke-linejoin="round" style="flex:none"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>
+                Seu mês financeiro vai de <strong class="ffx" style="color:#0A2430; margin:0 3px">{{ competenciaInicio }}</strong> a <strong class="ffx" style="color:#0A2430; margin-left:3px">{{ competenciaFim }}</strong>.
+              </div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPerfil }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; padding-top:26px; gap:24px">
+          <section>
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:14px">Identificação</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+              <div style="grid-column:1 / -1; display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Nome completo</label><input class="fld" value="{{ nome }}" onChange="{{ setNome }}" placeholder="Seu nome completo"></div>
+              <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">CPF <span style="font-weight:400; color:#9FB2BB">· não editável</span></label><input class="fld ffx" value="847.219.330-05" style="color:#7A929E" readonly></div>
+              <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Telefone</label><input class="fld ffx" value="{{ telefone }}" onChange="{{ setTelefone }}" placeholder="(81) 91234-1234" inputmode="numeric"></div>
+              <div style="grid-column:1 / -1; display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Data de nascimento</label><div style="position:relative"><input class="fld ffx" value="{{ nascimento }}" onChange="{{ setNascimento }}" placeholder="dd/mm/aaaa" inputmode="numeric" style="padding-right:40px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.8" stroke-linejoin="round" style="position:absolute; right:13px; top:50%; transform:translateY(-50%)"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div></div>
+            </div>
+          </section>
+          <section>
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:14px">Localização</div>
+            <div style="display:grid; grid-template-columns:1.6fr .7fr 1.2fr; gap:16px">
+              <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Cidade</label><input class="fld" value="{{ cidade }}" onChange="{{ setCidade }}" placeholder="Ex: Recife"></div>
+              <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Estado</label><input class="fld" value="{{ uf }}" onChange="{{ setUf }}" placeholder="PE" maxlength="2"></div>
+              <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">País</label><input class="fld" value="{{ pais }}" onChange="{{ setPais }}" placeholder="Ex: Brasil"></div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isConta }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; padding-top:26px; gap:20px">
+          <section style="padding:22px 24px; border:1px solid {{ contaBorder }}; border-radius:14px; background:#fff">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:20px">
+              <div>
+                <div style="display:flex; align-items:center; gap:9px"><h3 style="margin:0; font-size:15px; font-weight:600">Conta principal</h3><sc-if value="{{ contaPronta }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 9px; border-radius:999px; background:rgba(52,144,99,.12); color:#2A7551; font-size:11px; font-weight:600">Criada</span></sc-if></div>
+                <p style="margin:5px 0 0; font-size:13px; line-height:1.6; color:#46606C; max-width:52ch">É onde o saldo do dia a dia vive. Você pode adicionar outras contas e cartões depois, dentro do sistema.</p>
+              </div>
+            </div>
+            <sc-if value="{{ contaAberta }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:16px; margin-top:18px">
+                <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Nome da conta</label><input class="fld" value="{{ contaNome }}" onChange="{{ setContaNome }}" placeholder="Ex: Itaú — Corrente"></div>
+                <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Tipo</label>
+                  <div style="display:flex; gap:6px">
+                    <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3">
+                      <button class="btn" onClick="{{ tp.pick }}" style="flex:1; height:44px; border:1px solid {{ tp.border }}; border-radius:10px; background:{{ tp.bg }}; color:{{ tp.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ tp.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:7px"><label style="font-size:13px; font-weight:600">Saldo atual</label><div style="display:flex; align-items:center; gap:7px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ contaSaldo }}" onChange="{{ setContaSaldo }}" placeholder="0,00" inputmode="decimal" class="ffx" style="flex:1; border:none; background:transparent; outline:none; font:600 14px Inter,sans-serif; color:#0A2430; width:100%"></div></div>
+              </div>
+              <button class="btn" onClick="{{ criarConta }}" style="display:inline-flex; align-items:center; gap:8px; height:42px; margin-top:16px; padding:0 18px; border:none; border-radius:10px; background:{{ criarContaBg }}; color:{{ criarContaColor }}; font:600 13px Inter,sans-serif; cursor:pointer">{{ criarContaLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ contaPronta }}" hint-placeholder-val="{{ false }}">
+              <div class="view" style="display:flex; align-items:center; gap:14px; margin-top:16px; padding:14px 16px; border:1px solid #E4EBEF; border-radius:12px; background:#F8FAFB">
+                <span style="display:grid; place-items:center; width:38px; height:38px; border-radius:11px; background:rgba(37,99,235,.10); color:#1D4ED8; flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/></svg></span>
+                <div style="flex:1"><div style="font-size:13px; font-weight:600">{{ contaNomeFinal }}</div><div style="font-size:12px; color:#7A929E">{{ contaTipoLabel }}</div></div>
+                <span class="ffx" style="font-size:15px; font-weight:600">{{ contaSaldoLabel }}</span>
+              </div>
+            </sc-if>
+          </section>
+
+          <section style="opacity:{{ lancOpacidade }}; pointer-events:{{ lancPointer }}; transition:opacity .3s ease">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E; margin-bottom:14px">Primeiros lançamentos <span style="font-weight:400; text-transform:none; letter-spacing:0; color:#9FB2BB">· opcional</span></div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px">
+              <div class="opt" onClick="{{ toggleReceita }}" style="padding:18px; border:1px solid {{ recBorder }}; border-radius:14px; background:{{ recBg }}">
+                <span style="display:grid; place-items:center; width:36px; height:36px; border-radius:11px; background:rgba(52,144,99,.12); color:#2A7551"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 19V5m0 0l-5 5m5-5l5 5"/></svg></span>
+                <h3 style="margin:13px 0 4px; font-size:14px; font-weight:600">Uma receita</h3>
+                <p style="margin:0 0 10px; font-size:12px; line-height:1.55; color:#7A929E">{{ recTexto }}</p>
+                <span style="font-size:12px; font-weight:600; color:{{ recCtaColor }}">{{ recCta }}</span>
+              </div>
+              <div class="opt" onClick="{{ toggleDespesa }}" style="padding:18px; border:1px solid {{ despBorder }}; border-radius:14px; background:{{ despBg }}">
+                <span style="display:grid; place-items:center; width:36px; height:36px; border-radius:11px; background:rgba(217,72,63,.12); color:#B3372F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg></span>
+                <h3 style="margin:13px 0 4px; font-size:14px; font-weight:600">Uma despesa</h3>
+                <p style="margin:0 0 10px; font-size:12px; line-height:1.55; color:#7A929E">{{ despTexto }}</p>
+                <span style="font-size:12px; font-weight:600; color:{{ despCtaColor }}">{{ despCta }}</span>
+              </div>
+              <div class="opt" onClick="{{ toggleCartao }}" style="padding:18px; border:1px solid {{ cartBorder }}; border-radius:14px; background:{{ cartBg }}; opacity:{{ cartOpacidade }}; pointer-events:{{ cartPointer }}">
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px">
+                  <span style="display:grid; place-items:center; width:36px; height:36px; border-radius:11px; background:{{ cartIconBg }}; color:{{ cartIconColor }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg></span>
+                  <sc-if value="{{ cartBloqueado }}" hint-placeholder-val="{{ false }}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9FB2BB" stroke-width="1.8" stroke-linejoin="round" style="flex:none; margin-top:4px"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                  </sc-if>
+                </div>
+                <h3 style="margin:13px 0 4px; font-size:14px; font-weight:600">Um cartão</h3>
+                <p style="margin:0 0 10px; font-size:12px; line-height:1.55; color:#7A929E">{{ cartTexto }}</p>
+                <span style="font-size:12px; font-weight:600; color:{{ cartCtaColor }}">{{ cartCta }}</span>
+              </div>
+            </div>
+            <p style="margin:14px 0 0; font-size:13px; color:#7A929E">{{ lancDica }}</p>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFim }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="display:flex; flex-direction:column; flex:1; justify-content:center; align-items:center; text-align:center; padding:24px 0">
+          <span style="display:grid; place-items:center; width:58px; height:58px; border-radius:18px; background:rgba(52,144,99,.12); color:#2A7551"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <h2 style="margin:22px 0 8px; font-family:Poppins,sans-serif; font-size:34px; font-weight:600; letter-spacing:-.035em">Tudo pronto, {{ primeiroNome }}</h2>
+          <p style="margin:0 0 30px; max-width:52ch; font-size:15px; line-height:1.65; color:#46606C">Seu painel já abre com a base configurada. Daqui em diante é só registrar o dia a dia — o resto o sistema calcula.</p>
+
+          <div style="width:100%; max-width:660px; text-align:left; border:1px solid #E4EBEF; border-radius:16px; background:#fff; overflow:hidden; margin-bottom:16px">
+            <div style="padding:12px 20px; background:#F8FAFB; border-bottom:1px solid #EEF3F5; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E">O que ficou configurado</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr">
+              <div style="padding:16px 20px; border-right:1px solid #F2F6F8; border-bottom:1px solid #F2F6F8"><div style="font-size:12px; color:#7A929E">Foco inicial</div><div style="font-size:14px; font-weight:600; margin-top:4px">{{ resumoFoco }}</div></div>
+              <div style="padding:16px 20px; border-bottom:1px solid #F2F6F8"><div style="font-size:12px; color:#7A929E">Estilo dos insights</div><div style="font-size:14px; font-weight:600; margin-top:4px; color:{{ resumoModoCor }}">{{ resumoModo }}</div></div>
+              <div style="padding:16px 20px; border-right:1px solid #F2F6F8; border-bottom:1px solid #F2F6F8"><div style="font-size:12px; color:#7A929E">Mês financeiro</div><div class="ffx" style="font-size:14px; font-weight:600; margin-top:4px">{{ competenciaInicio }} a {{ competenciaFim }}</div></div>
+              <div style="padding:16px 20px; border-bottom:1px solid #F2F6F8"><div style="font-size:12px; color:#7A929E">Conta principal</div><div style="font-size:14px; font-weight:600; margin-top:4px">{{ resumoConta }}</div></div>
+              <div style="grid-column:1 / -1; padding:16px 20px">
+                <div style="font-size:12px; color:#7A929E; margin-bottom:10px">Primeiros lançamentos</div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px">
+                  <sc-for list="{{ resumoLancamentos }}" as="l" hint-placeholder-count="3">
+                    <span style="display:inline-flex; align-items:center; gap:7px; padding:5px 12px; border-radius:999px; background:{{ l.bg }}; color:{{ l.color }}; font-size:12px; font-weight:600">{{ l.texto }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="width:100%; max-width:660px; text-align:left; border:1px solid #E4EBEF; border-radius:16px; background:#fff; overflow:hidden; margin-bottom:28px">
+            <div style="padding:12px 20px; background:#F8FAFB; border-bottom:1px solid #EEF3F5; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#7A929E">Sugestões para os próximos dias</div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 20px; border-bottom:1px solid #F2F6F8; opacity:{{ sugCatOpacidade }}">
+              <span style="flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:{{ sugCatIconBg }}; color:{{ sugCatIconColor }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span>
+              <div style="flex:1"><div style="font-size:13px; font-weight:600">Ajuste suas categorias</div><p style="margin:2px 0 0; font-size:12px; color:#7A929E">{{ textoCategorias }}</p></div>
+              <span onClick="{{ abrirCategorias }}" style="font-size:12px; font-weight:600; flex:none; color:{{ sugCatCor }}; cursor:{{ sugCatCursor }}">{{ ctaCategorias }}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 20px; border-bottom:1px solid #F2F6F8">
+              <span style="flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:rgba(201,122,21,.14); color:#9A5C0E"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>
+              <div style="flex:1"><div style="font-size:13px; font-weight:600">Defina sua primeira meta</div><p style="margin:2px 0 0; font-size:12px; color:#7A929E">{{ dicaMeta }}</p></div>
+              <span onClick="{{ abrirMeta }}" class="lnk" style="font-size:12px; flex:none">{{ ctaMeta }}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 20px; opacity:{{ sugOrcOpacidade }}">
+              <span style="flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:{{ sugOrcIconBg }}; color:{{ sugOrcIconColor }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+              <div style="flex:1"><div style="font-size:13px; font-weight:600">Monte o orçamento do mês</div><p style="margin:2px 0 0; font-size:12px; color:#7A929E">{{ textoOrcamento }}</p></div>
+              <span onClick="{{ abrirOrcamento }}" style="font-size:12px; font-weight:600; flex:none; color:{{ sugOrcCor }}; cursor:{{ sugOrcCursor }}">{{ ctaOrcamento }}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px">
+            <button class="btn" style="height:48px; padding:0 24px; border:none; border-radius:11px; background:#2563EB; color:#fff; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#1D4ED8">Ir para o dashboard</button>
+            <button class="btn" onClick="{{ reiniciar }}" style="height:48px; padding:0 18px; border:1px solid #D6E0E6; border-radius:11px; background:#fff; color:#46606C; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Rever o onboarding</button>
+          </div>
+          <p style="margin:16px 0 0; font-size:12px; color:#9FB2BB">Tudo isso pode ser mudado depois em Configurações.</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ emAndamento }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:24px; margin-top:auto; padding-top:24px; border-top:1px solid #E4EBEF">
+          <div style="max-width:44ch"><strong style="font-size:13px; font-weight:600">{{ rodapeTitulo }}</strong><p style="margin:3px 0 0; font-size:13px; line-height:1.55; color:#7A929E">{{ rodapeTexto }}</p></div>
+          <div style="display:flex; gap:10px; flex:none">
+            <sc-if value="{{ podeVoltar }}" hint-placeholder-val="{{ false }}">
+              <button class="btn" onClick="{{ voltar }}" style="height:44px; padding:0 18px; border:1px solid #D6E0E6; border-radius:11px; background:#fff; color:#46606C; font:600 14px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Voltar</button>
+            </sc-if>
+            <button class="btn" onClick="{{ avancar }}" style="height:44px; padding:0 22px; border:none; border-radius:11px; background:{{ avancarBg }}; color:{{ avancarColor }}; font:600 14px Inter,sans-serif; cursor:pointer">{{ avancarLabel }}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      </div>
+
+      <sc-if value="{{ modalAberto }}" hint-placeholder-val="{{ false }}">
+        <div class="view" style="position:fixed; inset:0; z-index:60; display:grid; place-items:center; padding:32px; background:rgba(0,20,28,.42); backdrop-filter:blur(2px)">
+          <div style="width:100%; max-width:520px; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 40px 90px -30px rgba(0,20,28,.6)">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:20px 24px 16px; border-bottom:1px solid #EEF3F5">
+              <div>
+                <span style="font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7A929E">{{ modalEyebrow }}</span>
+                <h3 style="margin:6px 0 3px; font-family:Poppins,sans-serif; font-size:19px; font-weight:600; letter-spacing:-.02em">{{ modalTitulo }}</h3>
+                <p style="margin:0; font-size:12px; color:#46606C">{{ modalSub }}</p>
+              </div>
+              <button class="btn" onClick="{{ fecharModal }}" style="display:grid; place-items:center; width:32px; height:32px; flex:none; border:none; border-radius:9px; background:transparent; color:#7A929E; cursor:pointer" style-hover="background:#F1F5F7"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </div>
+
+            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:14px; max-height:70vh; overflow:auto">
+              <sc-if value="{{ modalMeta }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:8px">
+                  <label style="font-size:12px; font-weight:600">Tipo de meta</label>
+                  <div style="display:flex; gap:6px; padding:4px; border-radius:11px; background:#F1F5F7">
+                    <sc-for list="{{ tiposMeta }}" as="k" hint-placeholder-count="3">
+                      <button class="btn" onClick="{{ k.pick }}" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:7px; height:36px; border:none; border-radius:8px; background:{{ k.bg }}; color:{{ k.color }}; font:600 13px Inter,sans-serif; cursor:pointer; box-shadow:{{ k.shadow }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" dangerouslySetInnerHTML="{{ k.icone }}"></svg>{{ k.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ temCampoNome }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; flex-direction:column; gap:6px">
+                  <label style="font-size:12px; font-weight:600">{{ campoNomeLabel }}</label>
+                  <input class="fld" value="{{ mDesc }}" onChange="{{ setMDesc }}" placeholder="{{ campoNomePlaceholder }}">
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ modalFinanceiro }}" hint-placeholder-val="{{ true }}">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Valor</label>
+                    <div style="display:flex; align-items:center; gap:7px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ mValor }}" onChange="{{ setMValor }}" placeholder="0,00" inputmode="decimal" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; outline:none; font:600 14px Inter,sans-serif; color:{{ mValorCor }}"></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">{{ campoDataLabel }}</label>
+                    <div style="position:relative"><input class="fld ffx" value="{{ mData }}" onChange="{{ setMData }}" placeholder="dd/mm/aaaa" inputmode="numeric" style="padding-right:38px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.8" stroke-linejoin="round" style="position:absolute; right:12px; top:50%; transform:translateY(-50%)"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px">
+                  <label style="font-size:12px; font-weight:600">Categoria</label>
+                  <div style="display:flex; flex-wrap:wrap; gap:7px">
+                    <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="5">
+                      <button class="btn" onClick="{{ c.pick }}" style="height:34px; padding:0 13px; border:1px solid {{ c.border }}; border-radius:999px; background:{{ c.bg }}; color:{{ c.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ c.nome }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:13px 15px; border:1px solid #E4EBEF; border-radius:11px; background:#F8FAFB">
+                  <div><div style="font-size:13px; font-weight:600">{{ fixaTitulo }}</div><p style="margin:2px 0 0; font-size:12px; color:#7A929E">{{ fixaTexto }}</p></div>
+                  <button class="btn" onClick="{{ toggleFixa }}" style="flex:none; width:42px; height:24px; border:none; border-radius:999px; background:{{ fixaBg }}; position:relative; cursor:pointer; padding:0"><i style="position:absolute; top:3px; left:{{ fixaLeft }}; width:18px; height:18px; border-radius:999px; background:#fff; transition:left .18s ease"></i></button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ modalMeta }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">{{ metaValorLabel }}</label>
+                    <div style="display:flex; align-items:center; gap:7px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ mValor }}" onChange="{{ setMValor }}" placeholder="0,00" inputmode="decimal" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; outline:none; font:600 14px Inter,sans-serif; color:{{ metaValorCor }}"></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Recorrência</label>
+                    <div style="display:flex; align-items:center; justify-content:space-between; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:13px; color:#46606C">{{ metaRecorrencia }}</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap">
+                  <sc-for list="{{ recorrencias }}" as="r" hint-placeholder-count="5">
+                    <button class="btn" onClick="{{ r.pick }}" style="height:32px; padding:0 12px; border:1px solid {{ r.border }}; border-radius:999px; background:{{ r.bg }}; color:{{ r.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ r.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Início</label>
+                    <div style="position:relative"><input class="fld ffx" value="{{ mInicio }}" onChange="{{ setMInicio }}" placeholder="dd/mm/aaaa" inputmode="numeric" style="padding-right:38px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.8" stroke-linejoin="round" style="position:absolute; right:12px; top:50%; transform:translateY(-50%)"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Término</label>
+                    <div style="position:relative"><input class="fld ffx" value="{{ mData }}" onChange="{{ setMData }}" placeholder="dd/mm/aaaa" inputmode="numeric" style="padding-right:38px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.8" stroke-linejoin="round" style="position:absolute; right:12px; top:50%; transform:translateY(-50%)"><path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>
+                  </div>
+                </div>
+
+                <sc-if value="{{ metaTemCategoria }}" hint-placeholder-val="{{ true }}">
+                  <div class="view" style="display:flex; flex-direction:column; gap:9px; padding-top:14px; border-top:1px solid #F2F6F8">
+                    <label style="font-size:12px; font-weight:600">Categoria <span style="font-weight:400; color:#9FB2BB">· opcional</span></label>
+                    <div style="display:flex; flex-wrap:wrap; gap:7px">
+                      <sc-for list="{{ metaCategorias }}" as="c" hint-placeholder-count="4">
+                        <button class="btn" onClick="{{ c.pick }}" style="height:34px; padding:0 13px; border:1px solid {{ c.border }}; border-radius:999px; background:{{ c.bg }}; color:{{ c.color }}; font:600 12px Inter,sans-serif; cursor:pointer">{{ c.nome }}</button>
+                      </sc-for>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px">
+                      <div style="display:flex; flex-direction:column; gap:6px">
+                        <label style="font-size:12px; font-weight:600">Alerta de atenção</label>
+                        <div style="display:flex; align-items:center; gap:6px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><input value="{{ mAtencao }}" onChange="{{ setMAtencao }}" placeholder="80" inputmode="numeric" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; outline:none; font:600 14px Inter,sans-serif; color:#9A5C0E"><span style="font-size:12px; color:#7A929E">%</span></div>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px">
+                        <label style="font-size:12px; font-weight:600">Alerta crítico</label>
+                        <div style="display:flex; align-items:center; gap:6px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><input value="{{ mCritico }}" onChange="{{ setMCritico }}" placeholder="100" inputmode="numeric" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; outline:none; font:600 14px Inter,sans-serif; color:#B3372F"><span style="font-size:12px; color:#7A929E">%</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <div style="display:flex; align-items:center; gap:10px; padding:13px 15px; border:1px solid #E4EBEF; border-radius:11px; background:#F8FAFB; font-size:13px; color:#46606C">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.9" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg>
+                  {{ metaDica }}
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ modalCategorias }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:9px; max-height:300px; overflow:auto">
+                  <sc-for list="{{ listaCategorias }}" as="c" hint-placeholder-count="6">
+                    <div onClick="{{ c.pick }}" class="opt" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid {{ c.border }}; border-radius:11px; background:{{ c.bg }}">
+                      <span style="flex:none; width:10px; height:10px; border-radius:3px; background:{{ c.cor }}"></span>
+                      <span style="flex:1; font-size:13px; font-weight:600">{{ c.nome }}</span>
+                      <span style="display:grid; place-items:center; width:19px; height:19px; border-radius:5px; border:1px solid {{ c.checkBorder }}; background:{{ c.checkBg }}; flex:none"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:{{ c.checkOn }}"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ modalOrcamento }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:11px">
+                  <sc-for list="{{ tetos }}" as="t" hint-placeholder-count="4">
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid #E4EBEF; border-radius:11px; background:#F8FAFB">
+                      <span style="flex:none; width:10px; height:10px; border-radius:3px; background:{{ t.cor }}"></span>
+                      <span style="flex:1; font-size:13px; font-weight:600">{{ t.nome }}</span>
+                      <div style="display:flex; align-items:center; gap:6px; flex:none; height:36px; border:1px solid #E4EBEF; border-radius:9px; background:#fff; padding:0 11px; width:132px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ t.valor }}" onChange="{{ t.set }}" placeholder="0,00" inputmode="decimal" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; outline:none; font:600 13px Inter,sans-serif; color:#0A2430"></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 15px; border:1px solid #E4EBEF; border-radius:11px; background:#F8FAFB; font-size:13px">
+                  <span style="color:#46606C">Total planejado</span>
+                  <strong class="ffx" style="font-size:15px">R$ {{ totalOrcamento }}</strong>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ modalCartao }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px">
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Limite</label>
+                    <div style="display:flex; align-items:center; gap:7px; height:44px; border:1px solid #E4EBEF; border-radius:10px; background:#F8FAFB; padding:0 12px"><span style="font-size:12px; color:#7A929E">R$</span><input value="{{ mLimite }}" onChange="{{ setMLimite }}" placeholder="0,00" inputmode="decimal" class="ffx" style="flex:1; min-width:0; border:none; background:transparent; outline:none; font:600 14px Inter,sans-serif; color:#0A2430"></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Fecha dia</label>
+                    <input class="fld ffx" value="{{ mFecha }}" onChange="{{ setMFecha }}" placeholder="3" inputmode="numeric">
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600">Vence dia</label>
+                    <input class="fld ffx" value="{{ mVence }}" onChange="{{ setMVence }}" placeholder="10" inputmode="numeric">
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; padding:13px 15px; border:1px solid #E4EBEF; border-radius:11px; background:#F8FAFB; font-size:12px; line-height:1.55; color:#46606C">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A929E" stroke-width="1.9" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg>
+                  Com o fechamento certo, cada compra cai no mês de competência correto — inclusive as parceladas.
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 24px; border-top:1px solid #EEF3F5; background:#FBFCFD">
+              <button class="btn" onClick="{{ fecharModal }}" style="height:40px; padding:0 16px; border:1px solid #D6E0E6; border-radius:10px; background:#fff; color:#46606C; font:600 13px Inter,sans-serif; cursor:pointer" style-hover="background:#F1F5F7">Cancelar</button>
+              <button class="btn" onClick="{{ salvarModal }}" style="height:40px; padding:0 20px; border:none; border-radius:10px; background:{{ salvarBg }}; color:{{ salvarColor }}; font:600 13px Inter,sans-serif; cursor:pointer">{{ salvarLabel }}</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const FOCOS = [
+  { id: 'vida-financeira', titulo: 'Melhorar vida financeira', desc: 'Criar rotina para gastar melhor e ter mais controle no mês.', tooltip: 'Essa direção ajuda a organizar a rotina financeira do mês, com mais clareza sobre entradas, saídas, orçamento e previsibilidade.', icone: '<path d="M4 18h16M7 15l4-4 3 3 4-6"/>' },
+  { id: 'sair-dividas', titulo: 'Sair das dívidas', desc: 'Priorizar pagamentos e reduzir pressão financeira.', tooltip: 'Essa escolha prioriza quitar dívidas com mais estratégia, acompanhando juros, parcelas e evolução da quitação.', icone: '<path d="M12 4v13m0 0l-4-4m4 4l4-4"/><path d="M5 20h14"/>' },
+  { id: 'comecar-investir', titulo: 'Começar a investir', desc: 'Organizar sobra mensal para iniciar aportes com consistência.', tooltip: 'Essa direção ajuda a gerar sobra recorrente no mês para transformar parte do dinheiro em aportes com constância.', icone: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>' },
+  { id: 'reserva-emergencia', titulo: 'Criar reserva de emergência', desc: 'Montar segurança para imprevistos antes de assumir mais risco.', tooltip: 'Essa opção foca em construir uma proteção financeira para imprevistos, reduzindo a dependência de crédito em momentos de aperto.', icone: '<path d="M12 3l8 3v6c0 4.4-3.2 7.9-8 9-4.8-1.1-8-4.6-8-9V6z"/>' }
+];
+
+const MODOS = [
+  { id: 'B', titulo: 'Balanceado', desc: 'Orientações objetivas para manter equilíbrio entre controle, organização e crescimento.', icone: '<path d="M12 4v16M5 8h14"/><path d="M5 8l-2.5 6h5z"/><path d="M19 8l-2.5 6h5z"/><path d="M9 20h6"/>' },
+  { id: 'C', titulo: 'Conservador', desc: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.', icone: '<path d="M12 3l8 3v6c0 4.4-3.2 7.9-8 9-4.8-1.1-8-4.6-8-9V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/>' },
+  { id: 'M', titulo: 'Moderado', desc: 'Aceita algum risco em troca de crescimento, mantendo uma reserva de proteção.', icone: '<path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>' },
+  { id: 'A', titulo: 'Arrojado', desc: 'Prioriza crescimento e aportes maiores, tolerando oscilações no caminho.', icone: '<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>' }
+];
+
+const TIPOS = [
+  { id: 'corrente', label: 'Corrente' },
+  { id: 'poupanca', label: 'Poupança' },
+  { id: 'carteira', label: 'Carteira' }
+];
+
+const PASSOS = [
+  { titulo: 'Vamos definir seu foco inicial', desc: 'Escolha o objetivo que melhor representa sua situação atual para começar a configuração com clareza.', dica: 'Escolha um objetivo para liberar a próxima etapa.', rodapeT: 'Isso orienta o resto', rodapeX: 'O foco define quais insights e alertas você vê primeiro no painel.' },
+  { titulo: 'Escolha suas preferências', desc: 'Defina o estilo inicial dos insights e o dia que marca o início da sua competência mensal.', dica: 'Ajuste as preferências para liberar os dados do perfil.', rodapeT: 'Dá para mudar depois', rodapeX: 'Tudo aqui fica em Configurações e pode ser ajustado a qualquer momento.' },
+  { titulo: 'Dados básicos', desc: 'Essas informações fecham a base do seu perfil e preparam a conta principal e os primeiros lançamentos.', dica: 'Preencha seu perfil para seguir para conta e lançamentos.', rodapeT: 'Quase pronto', rodapeX: 'Salve seus dados para avançar para conta e primeiros lançamentos.' },
+  { titulo: 'Ative sua conta e seus primeiros movimentos', desc: 'Crie sua conta principal e registre os primeiros lançamentos para começar com o dashboard pronto para uso.', dica: 'Último passo: criar a conta principal e registrar os primeiros lançamentos.', rodapeT: 'Falta só isso', rodapeX: 'Os lançamentos são opcionais — dá para começar só com a conta.' }
+];
+
+const TRILHA = [
+  { titulo: 'Objetivo inicial', desc: 'Definir a prioridade que vai orientar seus próximos passos.' },
+  { titulo: 'Preferências iniciais', desc: 'Escolher como o sistema apresenta insights e organiza sua rotina.' },
+  { titulo: 'Dados básicos', desc: 'Salvar os dados essenciais para personalizar seu perfil.' },
+  { titulo: 'Conta e lançamentos', desc: 'Criar a conta principal e registrar os primeiros lançamentos.' }
+];
+
+class Component extends DCLogic {
+  state = {
+    passo: 0, foco: '', modo: '', dia: 1,
+    nome: 'Henrique Santos', telefone: '', nascimento: '', cidade: '', uf: '', pais: 'Brasil',
+    plano: 'Advanced',
+    contaNome: '', contaTipo: 'corrente', contaSaldo: '', contaPronta: false, criandoConta: false,
+    receita: null, despesa: null, cartao: null, menu: false,
+    modal: null, mDesc: '', mValor: '', mData: '', mCat: '', mFixa: false, mLimite: '', mFecha: '', mVence: '', salvando: false,
+    meta: null, mKind: 'Investment', mRec: 'Monthly', mInicio: '', mAtencao: '80', mCritico: '100',
+    cats: ['Moradia', 'Alimentação', 'Transporte', 'Saúde'], catsSalvas: false,
+    tetos: { Moradia: '', 'Alimentação': '', Transporte: '', Lazer: '' }, orcamentoSalvo: false
+  };
+
+  abrirModal(tipo) {
+    const atual = this.state[tipo];
+    this.setState({
+      modal: tipo,
+      mDesc: atual ? atual.desc : '',
+      mValor: atual ? atual.valor : '',
+      mData: atual ? atual.data : '',
+      mCat: atual ? atual.cat : '',
+      mFixa: atual ? !!atual.fixa : (tipo === 'receita'),
+      mLimite: atual ? atual.limite : '',
+      mFecha: atual ? atual.fecha : '',
+      mVence: atual ? atual.vence : ''
+    });
+  }
+
+  fone(v) {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2) return d;
+    if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  }
+
+  data(v) {
+    const d = v.replace(/\D/g, '').slice(0, 8);
+    if (d.length <= 2) return d;
+    if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+    return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const p = s.passo;
+    const PLANOS = [
+      { id: 'Basic', label: 'Essencial' },
+      { id: 'Intermediate', label: 'Inteligente' },
+      { id: 'Advanced', label: 'Completo' }
+    ];
+    const basico = s.plano === 'Basic';
+    const planoLabel = (PLANOS.find(x => x.id === s.plano) || PLANOS[2]).label;
+    const perfilOk = s.nome.trim().length >= 2 && s.telefone.replace(/\D/g, '').length >= 10 && s.nascimento.length === 10 && s.cidade.trim() && s.uf.trim().length === 2;
+    const liberado = [!!s.foco, basico || !!s.modo, perfilOk, s.contaPronta][p];
+    const pct = p >= 4 ? 100 : Math.round(((p + (liberado ? 1 : 0)) / 4) * 100);
+    const info = PASSOS[Math.min(p, 3)];
+    const focoSel = FOCOS.find(f => f.id === s.foco);
+    const modoSel = MODOS.find(m => m.id === s.modo);
+    const tipoSel = TIPOS.find(t => t.id === s.contaTipo);
+    const resumos = [focoSel && focoSel.titulo, modoSel && modoSel.titulo, s.nome.split(' ')[0], s.contaPronta ? (s.contaNome || 'Conta principal') : ''];
+    const marcados = [s.receita, s.despesa, s.cartao].filter(Boolean).length;
+    const CATS = {
+      receita: ['Salário', 'Pró-labore', 'Freelance', 'Aluguel', 'Outros'],
+      despesa: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer']
+    };
+    const MODAIS = {
+      receita: { eyebrow: 'Nova receita', titulo: 'Registrar uma entrada', sub: 'A principal fonte do mês já basta para o painel fazer sentido.', nomeLabel: 'Descrição', nomePh: 'Ex.: Salário', dataLabel: 'Recebimento', fixaT: 'Recebo todo mês', fixaX: 'Repete automaticamente nos próximos meses.', cta: 'Salvar receita' },
+      despesa: { eyebrow: 'Nova despesa', titulo: 'Registrar uma saída', sub: 'Comece pela conta fixa mais pesada do seu mês.', nomeLabel: 'Descrição', nomePh: 'Ex.: Aluguel', dataLabel: 'Vencimento', fixaT: 'Repete todo mês', fixaX: 'Cria o lançamento nos meses seguintes.', cta: 'Salvar despesa' },
+      cartao: { eyebrow: 'Novo cartão', titulo: 'Cadastrar um cartão', sub: 'Informe o fechamento e o vencimento para as faturas caírem certo.', nomeLabel: 'Nome do cartão', nomePh: 'Ex.: Nubank', cta: 'Salvar cartão' },
+      meta: { eyebrow: 'Planejamento', titulo: 'Nova meta', sub: 'Os campos mudam conforme o tipo escolhido.', nomeLabel: 'Nome', nomePh: 'Ex.: Alimentação, Renda extra, Reserva', cta: 'Criar meta' },
+      categorias: { eyebrow: 'Categorias', titulo: 'Escolha o que usar', sub: 'Marque as que combinam com seus gastos. Dá para criar outras depois.', cta: 'Salvar categorias' },
+      orcamento: { eyebrow: 'Orçamento', titulo: 'Teto por categoria', sub: 'Defina um limite mensal e o painel avisa quando você se aproximar dele.', cta: 'Salvar orçamento' }
+    };
+    const md = MODAIS[s.modal] || MODAIS.receita;
+    const TODAS_CATS = [
+      { nome: 'Moradia', cor: '#2563EB' }, { nome: 'Alimentação', cor: '#D9483F' },
+      { nome: 'Transporte', cor: '#349063' }, { nome: 'Saúde', cor: '#C97A15' },
+      { nome: 'Educação', cor: '#7C3AED' }, { nome: 'Lazer', cor: '#0891B2' },
+      { nome: 'Assinaturas', cor: '#DB2777' }, { nome: 'Impostos', cor: '#46606C' }
+    ];
+    const brl = (v) => (parseFloat(String(v).replace(/\./g, '').replace(',', '.')) || 0);
+    const totalOrc = Object.values(s.tetos).reduce((a, v) => a + brl(v), 0);
+    const modalOk = s.modal === 'cartao'
+      ? !!(s.mDesc.trim() && s.mFecha && s.mVence)
+      : (s.modal === 'meta'
+        ? !!(s.mDesc.trim() && s.mValor.trim())
+        : (s.modal === 'categorias'
+          ? s.cats.length > 0
+          : (s.modal === 'orcamento'
+            ? totalOrc > 0
+            : !!(s.mDesc.trim() && s.mValor.trim() && s.mCat))));
+    const fim = (d) => d === 1 ? '31/08' : String(d - 1).padStart(2, '0') + '/09';
+
+    const sel = (ativo) => ({
+      border: ativo ? '#2563EB' : '#E4EBEF',
+      bg: ativo ? 'rgba(37,99,235,.045)' : '#fff',
+      iconBg: ativo ? 'rgba(37,99,235,.12)' : '#F1F5F7',
+      iconColor: ativo ? '#1D4ED8' : '#46606C',
+      radioBorder: ativo ? '#2563EB' : '#D6E0E6',
+      radioBg: ativo ? '#2563EB' : '#fff',
+      radioOn: ativo ? 1 : 0
+    });
+
+    return {
+      menuAberto: s.menu,
+      menuBg: s.menu ? '#F4F7F9' : '#fff',
+      menuBorder: s.menu ? '#C3D2DA' : '#E4EBEF',
+      toggleMenu: () => this.setState(x => ({ menu: !x.menu })),
+      iniciais: (s.nome.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('') || 'HS').toUpperCase(),
+      passoAtual: Math.min(p + 1, 4),
+      tituloPasso: info.titulo,
+      descPasso: info.desc,
+      dicaProgresso: info.dica,
+      progressoLabel: pct + '%',
+      progressoW: pct + '%',
+      emAndamento: p < 4,
+      isFoco: p === 0,
+      isPreferencias: p === 1,
+      isPerfil: p === 2,
+      isConta: p === 3,
+      isFim: p === 4,
+
+      trilha: TRILHA.map((t, i) => ({
+        numero: i + 1,
+        titulo: t.titulo,
+        desc: t.desc,
+        linhaH: i === 3 ? '0px' : '30px',
+        linhaCor: p > i ? '#4FB783' : 'rgba(237,235,236,.14)',
+        dotBg: p > i ? '#349063' : (p === i ? 'rgba(52,144,99,.18)' : 'transparent'),
+        dotBorder: p >= i ? 'rgba(79,183,131,.55)' : 'rgba(237,235,236,.20)',
+        dotColor: p > i ? '#fff' : (p === i ? '#7FD3A8' : '#5E7F8B'),
+        tituloCor: p >= i ? '#fff' : '#7E9CA6',
+        descCor: p === i ? '#BBD3DA' : '#5E7F8B',
+        temResumo: p > i && !!resumos[i],
+        resumo: resumos[i] || ''
+      })),
+
+      focos: FOCOS.map(f => ({ ...f, icone: { __html: f.icone }, ...sel(s.foco === f.id), pick: () => this.setState({ foco: f.id }) })),
+      temFoco: !!focoSel,
+      focoTooltip: focoSel ? focoSel.tooltip : '',
+
+      modos: MODOS.map(m => ({ ...m, icone: { __html: m.icone }, ...sel(s.modo === m.id), pick: () => this.setState({ modo: m.id }) })),
+      dias: [1, 5, 10, 15, 20, 25].map(n => ({
+        n,
+        border: s.dia === n ? '#2563EB' : '#E4EBEF',
+        bg: s.dia === n ? 'rgba(37,99,235,.08)' : '#F8FAFB',
+        color: s.dia === n ? '#1D4ED8' : '#46606C',
+        pick: () => this.setState({ dia: n })
+      })),
+      competenciaInicio: String(s.dia).padStart(2, '0') + '/08',
+      competenciaFim: fim(s.dia),
+
+      nome: s.nome, telefone: s.telefone, nascimento: s.nascimento, cidade: s.cidade, uf: s.uf, pais: s.pais,
+      setNome: e => this.setState({ nome: e.target.value }),
+      setTelefone: e => this.setState({ telefone: this.fone(e.target.value) }),
+      setNascimento: e => this.setState({ nascimento: this.data(e.target.value) }),
+      setCidade: e => this.setState({ cidade: e.target.value }),
+      setUf: e => this.setState({ uf: e.target.value.toUpperCase().slice(0, 2) }),
+      setPais: e => this.setState({ pais: e.target.value }),
+
+      contaNome: s.contaNome, contaSaldo: s.contaSaldo,
+      setContaNome: e => this.setState({ contaNome: e.target.value }),
+      setContaSaldo: e => this.setState({ contaSaldo: e.target.value }),
+      tipos: TIPOS.map(t => ({
+        label: t.label,
+        border: s.contaTipo === t.id ? '#2563EB' : '#E4EBEF',
+        bg: s.contaTipo === t.id ? 'rgba(37,99,235,.08)' : '#F8FAFB',
+        color: s.contaTipo === t.id ? '#1D4ED8' : '#46606C',
+        pick: () => this.setState({ contaTipo: t.id })
+      })),
+      contaAberta: !s.contaPronta,
+      contaPronta: s.contaPronta,
+      contaBorder: s.contaPronta ? 'rgba(52,144,99,.32)' : '#E4EBEF',
+      contaNomeFinal: s.contaNome || 'Conta principal',
+      contaTipoLabel: tipoSel ? tipoSel.label : 'Corrente',
+      contaSaldoLabel: 'R$ ' + (s.contaSaldo || '0,00'),
+      criarContaBg: s.criandoConta ? '#93AFDF' : (s.contaNome.trim() ? '#2563EB' : '#DCE4E8'),
+      criarContaColor: s.contaNome.trim() || s.criandoConta ? '#fff' : '#9FB2BB',
+      criarContaLabel: s.criandoConta ? 'Criando…' : 'Criar conta principal',
+      criarConta: () => {
+        if (!s.contaNome.trim() || s.criandoConta) return;
+        this.setState({ criandoConta: true });
+        setTimeout(() => this.setState({ criandoConta: false, contaPronta: true }), 700);
+      },
+
+      lancOpacidade: s.contaPronta ? 1 : .45,
+      lancPointer: s.contaPronta ? 'auto' : 'none',
+      lancDica: s.contaPronta
+        ? (marcados ? `${marcados} de 3 marcados. Você pode concluir agora e registrar o resto depois.` : 'Marque o que quiser já deixar cadastrado — ou pule e faça isso pelo painel.')
+        : 'Crie a conta principal para liberar os primeiros lançamentos.',
+      recBorder: s.receita ? '#349063' : '#E4EBEF', recBg: s.receita ? 'rgba(52,144,99,.05)' : '#fff',
+      recTexto: s.receita ? `${s.receita.desc} · R$ ${s.receita.valor}` : 'Salário, pró-labore ou outra entrada fixa.',
+      recCta: s.receita ? 'Editar' : 'Adicionar receita',
+      recCtaColor: s.receita ? '#2A7551' : '#2563EB',
+      toggleReceita: () => this.abrirModal('receita'),
+      despBorder: s.despesa ? '#D9483F' : '#E4EBEF', despBg: s.despesa ? 'rgba(217,72,63,.04)' : '#fff',
+      despTexto: s.despesa ? `${s.despesa.desc} · R$ ${s.despesa.valor}` : 'Aluguel, energia ou outra conta do mês.',
+      despCta: s.despesa ? 'Editar' : 'Adicionar despesa',
+      despCtaColor: s.despesa ? '#B3372F' : '#2563EB',
+      toggleDespesa: () => this.abrirModal('despesa'),
+      cartBorder: s.cartao ? '#2563EB' : '#E4EBEF', cartBg: s.cartao ? 'rgba(37,99,235,.045)' : '#fff',
+      cartTexto: basico
+        ? 'Controle de faturas e parcelamento entra a partir do plano Inteligente.'
+        : (s.cartao ? `${s.cartao.desc} · fecha ${s.cartao.fecha} · vence ${s.cartao.vence}` : 'Para que compras parceladas caiam no mês certo.'),
+      cartCta: basico ? 'Disponível no Inteligente' : (s.cartao ? 'Editar' : 'Adicionar cartão'),
+      cartCtaColor: basico ? '#9FB2BB' : (s.cartao ? '#1D4ED8' : '#2563EB'),
+      cartOpacidade: basico ? .55 : 1,
+      cartPointer: basico ? 'none' : 'auto',
+      cartBloqueado: basico,
+      cartIconBg: basico ? '#F1F5F7' : 'rgba(37,99,235,.10)',
+      cartIconColor: basico ? '#9FB2BB' : '#1D4ED8',
+      toggleCartao: () => this.abrirModal('cartao'),
+
+      planos: PLANOS.map(x => ({
+        label: x.label,
+        border: s.plano === x.id ? 'rgba(79,183,131,.45)' : 'rgba(237,235,236,.16)',
+        bg: s.plano === x.id ? 'rgba(52,144,99,.14)' : 'transparent',
+        color: s.plano === x.id ? '#fff' : '#9FBAC3',
+        pick: () => this.setState({ plano: x.id, cartao: x.id === 'Basic' ? null : s.cartao })
+      })),
+      semInsights: basico,
+      insightsDisplay: basico ? 'none' : 'block',
+      resumoModo: basico ? 'Sem análise automática' : (modoSel ? modoSel.titulo : '—'),
+      resumoModoCor: basico ? '#9FB2BB' : '#0A2430',
+
+      modalAberto: !!s.modal,
+      modalFinanceiro: s.modal === 'receita' || s.modal === 'despesa',
+      modalCartao: s.modal === 'cartao',
+      modalMeta: s.modal === 'meta',
+      modalCategorias: s.modal === 'categorias',
+      modalOrcamento: s.modal === 'orcamento',
+      temCampoNome: s.modal !== 'categorias' && s.modal !== 'orcamento',
+      tiposMeta: [
+        { id: 'Expense', label: 'Despesa', icone: '<path d="M12 5v14m0 0l-5-5m5 5l5-5"/>' },
+        { id: 'Income', label: 'Receita', icone: '<path d="M12 19V5m0 0l-5 5m5-5l5 5"/>' },
+        { id: 'Investment', label: 'Investimento', icone: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>' }
+      ].map(k => ({
+        label: k.label,
+        icone: { __html: k.icone },
+        bg: s.mKind === k.id ? '#fff' : 'transparent',
+        color: s.mKind === k.id ? '#0A2430' : '#7A929E',
+        shadow: s.mKind === k.id ? '0 1px 3px rgba(3,32,44,.12)' : 'none',
+        pick: () => this.setState({ mKind: k.id, mCat: '' })
+      })),
+      metaValorLabel: s.mKind === 'Expense' ? 'Limite (R$)' : (s.mKind === 'Income' ? 'Objetivo (R$)' : 'Meta de aporte (R$)'),
+      metaValorCor: s.mKind === 'Expense' ? '#B3372F' : (s.mKind === 'Income' ? '#2A7551' : '#0A2430'),
+      metaTemCategoria: s.mKind !== 'Investment',
+      metaCategorias: (s.mKind === 'Income'
+        ? ['Todas as receitas', 'Salário', 'Freelance', 'Aluguel']
+        : ['Todas as despesas', 'Moradia', 'Alimentação', 'Transporte', 'Lazer']
+      ).map(nome => ({
+        nome,
+        border: s.mCat === nome ? '#2563EB' : '#E4EBEF',
+        bg: s.mCat === nome ? 'rgba(37,99,235,.08)' : '#fff',
+        color: s.mCat === nome ? '#1D4ED8' : '#46606C',
+        pick: () => this.setState({ mCat: nome })
+      })),
+      recorrencias: [
+        { id: 'None', label: 'Período único' }, { id: 'Monthly', label: 'Mensal' },
+        { id: 'Quarterly', label: 'Trimestral' }, { id: 'Semiannual', label: 'Semestral' },
+        { id: 'Annual', label: 'Anual' }
+      ].map(r => ({
+        label: r.label,
+        border: s.mRec === r.id ? '#2563EB' : '#E4EBEF',
+        bg: s.mRec === r.id ? 'rgba(37,99,235,.08)' : '#fff',
+        color: s.mRec === r.id ? '#1D4ED8' : '#46606C',
+        pick: () => this.setState({ mRec: r.id })
+      })),
+      metaRecorrencia: ({ None: 'Período único', Monthly: 'Mensal', Quarterly: 'Trimestral', Semiannual: 'Semestral', Annual: 'Anual' })[s.mRec],
+      mInicio: s.mInicio, mAtencao: s.mAtencao, mCritico: s.mCritico,
+      setMInicio: e => this.setState({ mInicio: this.data(e.target.value) }),
+      setMAtencao: e => this.setState({ mAtencao: e.target.value.replace(/\D/g, '').slice(0, 3) }),
+      setMCritico: e => this.setState({ mCritico: e.target.value.replace(/\D/g, '').slice(0, 3) }),
+      metaDica: s.mKind === 'Expense'
+        ? 'Meta de despesa é um teto: o painel avisa ao atingir os percentuais de alerta.'
+        : (s.mKind === 'Income'
+          ? 'Meta de receita acompanha quanto você já recebeu contra o objetivo do período.'
+          : 'Meta de investimento acompanha seus aportes — sem categoria e sem alertas de estouro.'),
+      listaCategorias: TODAS_CATS.map(c => {
+        const on = s.cats.includes(c.nome);
+        return {
+          nome: c.nome, cor: c.cor,
+          border: on ? '#2563EB' : '#E4EBEF',
+          bg: on ? 'rgba(37,99,235,.045)' : '#fff',
+          checkBorder: on ? '#2563EB' : '#D6E0E6',
+          checkBg: on ? '#2563EB' : '#fff',
+          checkOn: on ? 1 : 0,
+          pick: () => this.setState(x => ({ cats: on ? x.cats.filter(n => n !== c.nome) : [...x.cats, c.nome] }))
+        };
+      }),
+      tetos: Object.keys(s.tetos).map(nome => ({
+        nome,
+        cor: (TODAS_CATS.find(c => c.nome === nome) || {}).cor || '#46606C',
+        valor: s.tetos[nome],
+        set: e => { const v = e.target.value; this.setState(x => ({ tetos: { ...x.tetos, [nome]: v } })); }
+      })),
+      totalOrcamento: totalOrc.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
+      abrirCategorias: () => { if (!basico) this.setState({ modal: 'categorias' }); },
+      abrirMeta: () => this.abrirModal('meta'),
+      abrirOrcamento: () => { if (!basico) this.setState({ modal: 'orcamento' }); },
+      ctaCategorias: basico ? 'Plano Inteligente' : (s.catsSalvas ? `${s.cats.length} ativas` : 'Abrir'),
+      ctaMeta: s.meta ? 'Editar' : 'Abrir',
+      ctaOrcamento: basico ? 'Plano Inteligente' : (s.orcamentoSalvo ? 'Editar' : 'Abrir'),
+      textoCategorias: basico
+        ? 'Personalizar categorias entra a partir do plano Inteligente — o Essencial usa o conjunto padrão.'
+        : 'Renomeie ou crie categorias que combinem com seus gastos reais.',
+      textoOrcamento: basico
+        ? 'O orçamento por categoria entra a partir do plano Inteligente.'
+        : (s.orcamentoSalvo
+          ? `Teto de R$ ${totalOrc.toFixed(2).replace('.', ',')} definido para o mês.`
+          : 'Um teto por categoria e o painel passa a avisar quando estourar.'),
+      sugCatOpacidade: basico ? .6 : 1,
+      sugCatIconBg: basico ? '#F1F5F7' : 'rgba(37,99,235,.10)',
+      sugCatIconColor: basico ? '#9FB2BB' : '#1D4ED8',
+      sugCatCor: basico ? '#9FB2BB' : '#2563EB',
+      sugCatCursor: basico ? 'default' : 'pointer',
+      sugOrcOpacidade: basico ? .6 : 1,
+      sugOrcIconBg: basico ? '#F1F5F7' : 'rgba(52,144,99,.12)',
+      sugOrcIconColor: basico ? '#9FB2BB' : '#2A7551',
+      sugOrcCor: basico ? '#9FB2BB' : '#2563EB',
+      sugOrcCursor: basico ? 'default' : 'pointer',
+      modalEyebrow: md.eyebrow, modalTitulo: md.titulo, modalSub: md.sub,
+      campoNomeLabel: md.nomeLabel, campoNomePlaceholder: md.nomePh, campoDataLabel: md.dataLabel || 'Data',
+      fixaTitulo: md.fixaT || '', fixaTexto: md.fixaX || '',
+      mDesc: s.mDesc, mValor: s.mValor, mData: s.mData, mLimite: s.mLimite, mFecha: s.mFecha, mVence: s.mVence,
+      mValorCor: s.modal === 'despesa' ? '#B3372F' : (s.modal === 'receita' ? '#2A7551' : '#0A2430'),
+      setMDesc: e => this.setState({ mDesc: e.target.value }),
+      setMValor: e => this.setState({ mValor: e.target.value }),
+      setMData: e => this.setState({ mData: this.data(e.target.value) }),
+      setMLimite: e => this.setState({ mLimite: e.target.value }),
+      setMFecha: e => this.setState({ mFecha: e.target.value.replace(/\D/g, '').slice(0, 2) }),
+      setMVence: e => this.setState({ mVence: e.target.value.replace(/\D/g, '').slice(0, 2) }),
+      categorias: (CATS[s.modal] || []).map(nome => ({
+        nome,
+        border: s.mCat === nome ? '#2563EB' : '#E4EBEF',
+        bg: s.mCat === nome ? 'rgba(37,99,235,.08)' : '#fff',
+        color: s.mCat === nome ? '#1D4ED8' : '#46606C',
+        pick: () => this.setState({ mCat: nome })
+      })),
+      fixaBg: s.mFixa ? '#2563EB' : '#DCE4E8',
+      fixaLeft: s.mFixa ? '21px' : '3px',
+      toggleFixa: () => this.setState(x => ({ mFixa: !x.mFixa })),
+      fecharModal: () => this.setState({ modal: null }),
+      salvarBg: s.salvando ? '#93AFDF' : (modalOk ? '#2563EB' : '#DCE4E8'),
+      salvarColor: modalOk || s.salvando ? '#fff' : '#9FB2BB',
+      salvarLabel: s.salvando ? 'Salvando…' : md.cta,
+      salvarModal: () => {
+        if (!modalOk || s.salvando) return;
+        this.setState({ salvando: true });
+        setTimeout(() => {
+          if (s.modal === 'categorias') this.setState({ salvando: false, modal: null, catsSalvas: true });
+          else if (s.modal === 'orcamento') this.setState({ salvando: false, modal: null, orcamentoSalvo: true });
+          else this.setState({
+            salvando: false,
+            modal: null,
+            [s.modal]: { desc: s.mDesc, valor: s.mValor, data: s.mData, cat: s.mCat, fixa: s.mFixa, limite: s.mLimite, fecha: s.mFecha, vence: s.mVence, kind: s.mKind }
+          });
+        }, 650);
+      },
+
+      rodapeTitulo: info.rodapeT,
+      rodapeTexto: info.rodapeX,
+      podeVoltar: p > 0,
+      avancarBg: liberado ? '#2563EB' : '#DCE4E8',
+      avancarColor: liberado ? '#fff' : '#9FB2BB',
+      avancarLabel: p === 3 ? 'Concluir e abrir o painel' : (p === 2 ? 'Salvar e continuar' : 'Continuar'),
+      avancar: () => { if (liberado) this.setState({ passo: p + 1 }); },
+      voltar: () => this.setState({ passo: Math.max(p - 1, 0) }),
+
+      primeiroNome: s.nome.split(' ')[0] || 'tudo certo',
+      resumoFoco: focoSel ? focoSel.titulo : '—',
+      diaVirada: s.dia,
+      planoLabel,
+      resumoConta: (s.contaNome || 'Conta principal') + ' · ' + (tipoSel ? tipoSel.label : ''),
+      resumoLancamentos: (() => {
+        const itens = [];
+        if (s.receita) itens.push({ texto: `${s.receita.desc} · R$ ${s.receita.valor}`, bg: 'rgba(52,144,99,.12)', color: '#2A7551' });
+        if (s.despesa) itens.push({ texto: `${s.despesa.desc} · R$ ${s.despesa.valor}`, bg: 'rgba(217,72,63,.10)', color: '#B3372F' });
+        if (s.cartao) itens.push({ texto: `${s.cartao.desc} · vence dia ${s.cartao.vence}`, bg: 'rgba(37,99,235,.10)', color: '#1D4ED8' });
+        if (!itens.length) itens.push({ texto: 'Nenhum por enquanto — dá para registrar pelo painel', bg: '#F1F5F7', color: '#7A929E' });
+        return itens;
+      })(),
+      dicaMeta: s.meta
+        ? `${({ Expense: 'Despesa', Income: 'Receita', Investment: 'Investimento' })[s.meta.kind]} · ${s.meta.desc} · R$ ${s.meta.valor}`
+        : s.foco === 'reserva-emergencia'
+        ? 'Seu foco é reserva de emergência: comece por três meses de despesa fixa.'
+        : (s.foco === 'sair-dividas'
+          ? 'Seu foco é sair das dívidas: defina a data em que quer estar quitado.'
+          : (s.foco === 'comecar-investir'
+            ? 'Seu foco é investir: defina quanto quer aportar por mês.'
+            : 'Um objetivo com prazo faz o painel mostrar se você está no ritmo.')),
+      reiniciar: () => this.setState({
+        passo: 0, foco: '', modo: '', dia: 1, telefone: '', nascimento: '', cidade: '', uf: '',
+        contaNome: '', contaTipo: 'corrente', contaSaldo: '', contaPronta: false, receita: null, despesa: null, cartao: null, modal: null
+      })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

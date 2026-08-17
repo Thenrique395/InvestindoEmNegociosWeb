@@ -7,21 +7,31 @@
   <article class="card">
     <h2>Parâmetros</h2>
     <div class="params-grid">
-      <label>
-        Receita extra mensal
-        <input type="number" min="0" step="100" [(ngModel)]="params.extraMonthlyIncome" />
+      <label class="range-field">
+        <span class="range-field__head">
+          <span>Receita extra mensal</span>
+          <strong>{{ params.extraMonthlyIncome | appCurrency }}</strong>
+        </span>
+        <input type="range" min="0" max="10000" step="100" [(ngModel)]="params.extraMonthlyIncome" />
       </label>
-      <label>
-        Despesa extra mensal
-        <input type="number" min="0" step="100" [(ngModel)]="params.extraMonthlyExpense" />
+      <label class="range-field">
+        <span class="range-field__head">
+          <span>Despesa extra mensal</span>
+          <strong>{{ params.extraMonthlyExpense | appCurrency }}</strong>
+        </span>
+        <input type="range" min="0" max="10000" step="100" [(ngModel)]="params.extraMonthlyExpense" />
       </label>
-      <label>
-        Taxa de poupança (%)
-        <input type="number" min="0" max="100" step="1" [(ngModel)]="params.savingsRatePercent" />
+      <label class="range-field">
+        <span class="range-field__head">
+          <span>Taxa de poupança (%)</span>
+          <strong>{{ params.savingsRatePercent | number:'1.0-0' }}%</strong>
+        </span>
+        <input type="range" min="0" max="100" step="1" [(ngModel)]="params.savingsRatePercent" />
       </label>
       <div class="field">
         <span class="field__label">Período</span>
         <app-segmented-selector
+          [stretch]="true"
           ariaLabel="Período da projeção"
           [options]="periodOptions"
           [value]="params.period"
@@ -54,7 +64,8 @@
         tone="info"
         eyebrow="Saldo projetado (base)"
         [value]="result.baseProjectedClosingBalance | appCurrency"
-        note="Sem alterações no comportamento atual.">
+        note="Sem alterações no comportamento atual."
+        tooltipText="Saldo que você fecharia no fim do período mantendo o comportamento de hoje. É a régua de comparação, não uma meta.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -62,7 +73,8 @@
       <app-transaction-summary-card
         [tone]="scenarioTone"
         eyebrow="Saldo projetado (cenário)"
-        [value]="result.scenarioProjectedClosingBalance | appCurrency">
+        [value]="result.scenarioProjectedClosingBalance | appCurrency"
+        tooltipText="Saldo projetado aplicando os parâmetros que você ajustou acima. A diferença para o saldo base é o efeito da mudança simulada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -76,7 +88,8 @@
         tone="primary"
         eyebrow="Potencial de poupança mensal"
         [value]="result.monthlySavingsPotential | appCurrency"
-        note="Com os parâmetros informados.">
+        note="Com os parâmetros informados."
+        tooltipText="Quanto sobraria por mês com os parâmetros simulados: receitas menos despesas do cenário. É uma projeção, não um valor já reservado.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3v18M5 10a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -85,7 +98,31 @@
 
     @if (pointViews.length) {
       <article class="card">
-        <h2>Projeção diária</h2>
+        <div class="card__head">
+          <div>
+            <h2>Projeção comparada</h2>
+            <p class="muted">Saldo base e saldo do cenário no mesmo gráfico, usando os pontos retornados pela simulação.</p>
+          </div>
+        </div>
+
+        <div class="scenario-chart" aria-label="Gráfico comparativo de saldo base e saldo cenário">
+          @for (view of chartPoints; track view.point.date) {
+            <div class="scenario-chart__point">
+              <div class="scenario-chart__bars" aria-hidden="true">
+                <span class="scenario-chart__bar scenario-chart__bar--base" [style.height.%]="view.basePercent"></span>
+                <span class="scenario-chart__bar scenario-chart__bar--scenario" [style.height.%]="view.scenarioPercent"></span>
+              </div>
+              <span class="scenario-chart__label">{{ view.point.date | date:'dd/MM' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="scenario-legend" aria-label="Legenda do gráfico">
+          <span><i class="legend-dot legend-dot--base" aria-hidden="true"></i>Base</span>
+          <span><i class="legend-dot legend-dot--scenario" aria-hidden="true"></i>Cenário</span>
+        </div>
+
+        <h2>Detalhamento da projeção</h2>
 
         <div class="projection-table">
           <table>

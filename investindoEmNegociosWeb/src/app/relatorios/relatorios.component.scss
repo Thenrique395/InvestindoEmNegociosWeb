@@ -19,18 +19,79 @@
   gap: 0.5rem;
 }
 
-.summary-grid {
+.report-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: end;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.report-control {
   display: grid;
+  gap: 0.45rem;
+}
+
+.report-control__label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.14em;
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+}
+
+.segmented-control {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+}
+
+.segmented-control__option {
+  min-block-size: 2rem;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+
+.segmented-control__option.is-active {
+  background: var(--surface);
+  color: var(--primary-text);
+  box-shadow: var(--shadow-card);
+}
+
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
+.summary-grid {
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
   min-width: 0;
   display: grid;
   gap: 0.9rem;
@@ -39,17 +100,213 @@
 .card h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
+}
+
+.card__head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card__head p {
+  margin: 0.35rem 0 0;
+  line-height: var(--lh-control);
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
+}
+
+.comparison-card {
+  gap: 1rem;
+}
+
+.comparison-bars {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.7rem;
+  min-height: 14rem;
+  padding-block-start: 0.5rem;
+}
+
+.comparison-bars.is-twelve {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.comparison-month {
+  display: grid;
+  grid-template-rows: minmax(9rem, 1fr) auto;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.comparison-month__bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0.45rem, 1fr));
+  align-items: end;
+  gap: 0.22rem;
+  min-height: 9rem;
+  padding: 0.45rem;
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+}
+
+.comparison-month__bar {
+  display: block;
+  min-height: 0.35rem;
+  border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+}
+
+.comparison-month__bar--income {
+  background: var(--income);
+}
+
+.comparison-month__bar--expense {
+  background: var(--expense);
+}
+
+.comparison-month__label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.comparison-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+}
+
+.comparison-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-dot {
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: var(--radius-pill);
+}
+
+.legend-dot--income {
+  background: var(--income);
+}
+
+.legend-dot--expense {
+  background: var(--expense);
+}
+
+.balance-evolution {
+  display: grid;
+  gap: 0.55rem;
+  padding-block-start: 0.25rem;
+}
+
+.balance-row {
+  display: grid;
+  grid-template-columns: 4.2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.balance-row__label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+}
+
+.balance-row__track {
+  height: 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  overflow: hidden;
+}
+
+.balance-row__fill {
+  display: block;
+  height: 100%;
+  min-width: 0.35rem;
+  border-radius: inherit;
+  background: var(--primary);
+}
+
+.balance-row__fill.is-negative {
+  background: var(--warning);
+}
+
+.balance-row__value {
+  color: var(--text);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
 }
 
 .category-name {
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
+}
+
+.category-bars {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.category-bar {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+}
+
+.category-bar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.category-bar__name {
+  min-width: 0;
+  color: var(--text);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-bar__meta {
+  flex: none;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.category-bar__track {
+  height: 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+  overflow: hidden;
+}
+
+.category-bar__fill {
+  display: block;
+  height: 100%;
+  min-width: 0.35rem;
+  border-radius: inherit;
 }
 
 :host ::ng-deep .relatorios-share-column {
@@ -73,8 +330,8 @@
   gap: 0.75rem;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
 }
 
 .top-expense__rank {
@@ -84,37 +341,72 @@
   inline-size: 1.6rem;
   block-size: 1.6rem;
   border-radius: var(--radius-pill);
-  background: var(--surface-3);
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
+  background: var(--surface-inset);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
 }
 
 .top-expense__name {
   min-width: 0;
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .top-expense__percent {
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
 .top-expense__value {
   color: var(--text);
 }
 
-@media (max-width: 900px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 640px) {
+  .report-controls,
+  .report-control,
+  .segmented-control {
+    width: 100%;
+  }
+
+  .segmented-control__option {
+    flex: 1 1 0;
+    padding-inline: 0.45rem;
+  }
+
+  .comparison-bars,
+  .comparison-bars.is-twelve {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(3.4rem, 1fr);
+    grid-template-columns: none;
+    overflow-x: auto;
+    padding-block-end: 0.35rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .comparison-month {
+    scroll-snap-align: start;
+  }
+
+  .balance-row {
+    grid-template-columns: 3.7rem minmax(0, 1fr);
+  }
+
+  .balance-row__value {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .category-bar__head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .category-bar__meta {
+    flex: initial;
   }
 }
 
-@media (max-width: 640px) {
-  .summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}

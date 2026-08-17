@@ -67,6 +67,42 @@ describe('RelatoriosComponent', () => {
     expect(component.topExpenses.map((c) => c.categoryName)).toEqual(['Mercado', 'Moradia']);
   });
 
+  it('deriva barras de categorias a partir do relatório', () => {
+    const { component } = createComponent();
+
+    component.ngOnInit();
+
+    expect(component.expenseCategoryBars[0].categoryName).toBe('Moradia');
+    expect(component.expenseCategoryBars[0].percentageOfTotal).toBe(50);
+  });
+
+  it('carrega o comparativo junto do relatório mensal', () => {
+    const { component, reportsService } = createComponent();
+    component.year = 2026;
+    component.month = 8;
+
+    component.ngOnInit();
+
+    expect(reportsService.getMonthlySummary).toHaveBeenCalledWith(2026, 3);
+    expect(reportsService.getMonthlySummary).toHaveBeenCalledWith(2026, 8);
+    expect(component.comparisonPoints.length).toBe(6);
+    expect(component.comparisonLoading()).toBeFalse();
+  });
+
+  it('recarrega o comparativo ao trocar para 12 meses', () => {
+    const { component, reportsService } = createComponent();
+    component.year = 2026;
+    component.month = 8;
+    component.ngOnInit();
+    reportsService.getMonthlySummary.calls.reset();
+
+    component.setComparisonPeriod(12);
+
+    expect(component.comparisonPeriod).toBe(12);
+    expect(reportsService.getMonthlySummary).toHaveBeenCalledWith(2025, 9);
+    expect(component.comparisonPoints.length).toBe(12);
+  });
+
   it('limpa o erro ao recarregar com sucesso', () => {
     const { component, reportsService } = createComponent();
     reportsService.getMonthlySummary.and.returnValue(throwError(() => new Error('falhou')));

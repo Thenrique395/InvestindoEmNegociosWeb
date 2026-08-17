@@ -44,9 +44,9 @@
   min-width: 220px;
   padding: 6px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 14px);
+  border-radius: var(--radius-inner, 14px);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-md, 0 12px 32px rgba(0, 0, 0, 0.16));
+  box-shadow: var(--shadow-dropdown, 0 12px 32px rgba(0, 0, 0, 0.16));
 
   button {
     display: flex;
@@ -54,15 +54,15 @@
     gap: 0.6rem;
     padding: 0.6rem 0.7rem;
     border: 0;
-    border-radius: var(--radius-md, 10px);
+    border-radius: var(--radius-control, 10px);
     background: transparent;
     color: var(--text);
-    font-size: var(--font-size-body-sm, 0.85rem);
+    font-size: var(--fs-body, 0.85rem);
     text-align: left;
     cursor: pointer;
 
     &:hover {
-      background: var(--surface-2);
+      background: var(--surface-sunken);
     }
 
     &:focus-visible {
@@ -76,21 +76,29 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--info);
+  background: var(--primary);
 
-  &[data-group='income'] { background: var(--success); }
-  &[data-group='expense'] { background: var(--danger); }
+  &[data-group='income'] { background: var(--income); }
+  &[data-group='expense'] { background: var(--expense); }
   &[data-group='card'] { background: var(--warning); }
   &[data-group='loan'] { background: var(--warning); }
-  &[data-group='goal'] { background: var(--info); }
+  &[data-group='goal'] { background: var(--primary); }
 }
 
 // ---- Cards de resumo --------------------------------------------------------
 
+/* README §4: faixa de indicadores é flex com quebra, nunca `grid auto-fit`.
+   Com grid, quando a contagem de cards não divide pelo número de colunas sobra
+   célula vazia à direita; com flex a última linha cresce e preenche. */
 .cal-summary {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.cal-summary > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 // ---- Controles (visão + navegação de mês) -----------------------------------
@@ -115,7 +123,7 @@
   width: 38px;
   height: 38px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-inner, 12px);
   background: var(--surface);
   color: var(--text);
   font-size: 1.1rem;
@@ -123,7 +131,7 @@
   transition: background 0.15s ease, border-color 0.15s ease;
 
   &:hover {
-    background: var(--surface-2);
+    background: var(--surface-sunken);
     border-color: var(--border-strong, var(--primary));
   }
 
@@ -136,8 +144,8 @@
 .cal-monthnav__label {
   min-width: 9.5rem;
   text-align: center;
-  font-size: var(--font-size-body, 0.95rem);
-  font-weight: var(--font-weight-bold, 600);
+  font-size: var(--fs-subhead, 0.95rem);
+  font-weight: var(--fw-bold, 600);
   color: var(--text);
   text-transform: capitalize;
 }
@@ -159,19 +167,19 @@
     min-height: 42px;
     padding: 0 0.9rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg, 12px);
+    border-radius: var(--radius-inner, 12px);
     background: var(--surface);
     color: var(--text);
-    font-size: var(--font-size-body-sm, 0.85rem);
+    font-size: var(--fs-body, 0.85rem);
   }
 }
 
 .cal-select__label {
-  font-size: var(--text-xs, 0.68rem);
+  font-size: var(--fs-caption, 0.68rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cal-legend {
@@ -184,8 +192,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: var(--text-xs, 0.72rem);
-  color: var(--text-muted);
+  font-size: var(--fs-caption, 0.72rem);
+  color: var(--text-tertiary);
   cursor: help;
 }
 
@@ -193,13 +201,13 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--info);
+  background: var(--primary);
 
-  &[data-group='income'] { background: var(--success); }
-  &[data-group='expense'] { background: var(--danger); }
+  &[data-group='income'] { background: var(--income); }
+  &[data-group='expense'] { background: var(--expense); }
   &[data-group='card'] { background: var(--warning); }
   &[data-group='loan'] { background: var(--warning); }
-  &[data-group='goal'] { background: var(--info); }
+  &[data-group='goal'] { background: var(--primary); }
 }
 
 // ---- Layout principal (visão + painel lateral) ------------------------------
@@ -216,9 +224,8 @@
   gap: 1.25rem;
   padding: 1.4rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
   min-width: 0;
 }
 
@@ -244,16 +251,16 @@
 
 .cal-day__eyebrow {
   margin: 0;
-  font-size: var(--text-xs, 0.68rem);
+  font-size: var(--fs-caption, 0.68rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cal-day__title {
   margin: 2px 0 0;
-  font-size: var(--font-size-lg, 1.05rem);
+  font-size: var(--fs-card-title, 1.05rem);
   font-weight: 700;
   color: var(--text);
   text-transform: capitalize;
@@ -268,10 +275,10 @@
   margin: 0;
   padding: 1rem;
   border: 1px dashed var(--border-strong, var(--border));
-  border-radius: var(--radius-lg, 12px);
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  border-radius: var(--radius-inner, 12px);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
+  font-size: var(--fs-body, 0.85rem);
   text-align: center;
 }
 

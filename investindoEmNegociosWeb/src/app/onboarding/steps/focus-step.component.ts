@@ -1,11 +1,16 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FocusArea, FocusOption } from '../onboarding.types';
 
 /**
  * Passo 1 do onboarding: escolha do objetivo inicial (foco).
- * Componente presentacional — recebe as opções e a seleção atual, e emite
- * a escolha e o avanço. Toda a orquestração continua no OnboardingComponent.
+ *
+ * Componente presentacional — recebe as opções e a seleção atual, e emite a
+ * escolha e o avanço. Toda a orquestração continua no OnboardingComponent.
+ *
+ * A explicação de cada opção aparece como uma faixa abaixo da grade, e só
+ * depois da escolha: antes disso ela seria um texto sobre nada. Era um tooltip
+ * no "?" de cada card, que escondia justamente o texto que ajuda a decidir.
  */
 @Component({
   selector: 'app-onboarding-focus-step',
@@ -14,95 +19,82 @@ import { FocusArea, FocusOption } from '../onboarding.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [':host { display: contents; }'],
   template: `
-    <div class="onboarding-step-shell">
-      <section class="onboarding-panel onboarding-panel--accent">
-        <div class="onboarding-panel__header">
-          <strong>Qual seu objetivo principal agora?</strong>
-          <span>Escolha a direção que melhor representa seu momento atual.</span>
-        </div>
-        <div class="onboarding-focus-grid">
-          @for (item of options(); track item.id) {
-            <label
-              class="onboarding-focus-card"
-              [class.onboarding-focus-card--selected]="selected() === item.id"
-              (click)="select.emit(item.id)">
-              @if (selected() === item.id) {
-                <span class="onboarding-focus-card__tick" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                    <path d="M5 12l4 4 10-10" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-              } @else {
-                <span class="onboarding-focus-card__tooltip-anchor">
-                  <span
-                    class="onboarding-focus-card__tooltip-trigger"
-                    tabindex="0"
-                    [attr.aria-label]="item.tooltip">
-                    ?
-                  </span>
-                  <span class="onboarding-focus-card__tooltip">{{ item.tooltip }}</span>
-                </span>
-              }
-              <input
-                class="sr-only"
-                type="radio"
-                name="focusGoal"
-                [value]="item.id"
-                [ngModel]="selected()"
-                (ngModelChange)="select.emit($event)"
-                [ngModelOptions]="{ standalone: true }" />
-              <div class="onboarding-focus-card__head">
-                <span class="onboarding-focus-card__icon" aria-hidden="true">
-                  @switch (item.icon) {
-                    @case ('growth') {
-                      <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                        <path d="M4.5 9.5h11a2 2 0 0 1 2 2v5.5H6.5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                        <path d="M15.5 9.5V8.4a1.9 1.9 0 0 0-1.9-1.9H8.9A1.9 1.9 0 0 0 7 8.4v1.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                        <path d="M8 13h4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      </svg>
-                    }
-                    @case ('debt') {
-                      <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" />
-                        <path d="M8.5 12h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                        <path d="M12 8.5v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".35" />
-                      </svg>
-                    }
-                    @case ('invest') {
-                      <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                        <path d="M5 17.5V7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                        <path d="M5 17.5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                        <path d="M7.5 14.5 11 11l2.8 2.8L18.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M15.8 9H18.5v2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    }
-                    @case ('shield') {
-                      <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                        <path d="M12 3l7 3v5c0 4.4-2.8 7.6-7 10-4.2-2.4-7-5.6-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                        <path d="M12 8.2v6.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                        <path d="M9.3 11.3h5.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      </svg>
-                    }
+    <div class="onboarding-choice-block">
+      <div class="onboarding-choice-grid">
+        @for (item of options(); track item.id) {
+          <label
+            class="onboarding-choice"
+            [class.onboarding-choice--selected]="selected() === item.id">
+            <input
+              class="sr-only"
+              type="radio"
+              name="focusGoal"
+              [value]="item.id"
+              [ngModel]="selected()"
+              (ngModelChange)="select.emit($event)"
+              [ngModelOptions]="{ standalone: true }" />
+
+            <span class="onboarding-choice__top">
+              <span class="onboarding-choice__icon" aria-hidden="true">
+                @switch (item.icon) {
+                  @case ('growth') {
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M4 17.5 9.5 12l3.2 3.2L20 7.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M15.4 7.6H20v4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                   }
-                </span>
-                <strong>{{ item.title }}</strong>
-              </div>
-              <p>{{ item.description }}</p>
-            </label>
-          }
+                  @case ('debt') {
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M12 4v10m0 0 3.8-3.8M12 14l-3.8-3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M5 17v1.6A1.4 1.4 0 0 0 6.4 20h11.2a1.4 1.4 0 0 0 1.4-1.4V17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  }
+                  @case ('invest') {
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" />
+                      <circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+                    </svg>
+                  }
+                  @case ('shield') {
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                      <path d="M12 3.4 5.4 6.2v5.2c0 4.1 2.7 7.8 6.6 9.2 3.9-1.4 6.6-5.1 6.6-9.2V6.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    </svg>
+                  }
+                }
+              </span>
+              <span class="onboarding-choice__radio" aria-hidden="true"></span>
+            </span>
+
+            <strong class="onboarding-choice__title">{{ item.title }}</strong>
+            <span class="onboarding-choice__desc">{{ item.description }}</span>
+          </label>
+        }
+      </div>
+
+      @if (selectedOption(); as option) {
+        <p class="onboarding-insight">
+          <svg class="onboarding-insight__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7" />
+            <path d="M12 11v5.2M12 7.9v.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+          </svg>
+          <span>{{ option.tooltip }}</span>
+        </p>
+      }
+
+      <div class="onboarding-footer">
+        <div class="onboarding-footer__meta">
+          <strong>Isso orienta o resto</strong>
+          <span>O foco define quais insights e alertas você vê primeiro no painel.</span>
         </div>
-        <div class="onboarding-actions onboarding-actions--footer">
-          <div class="onboarding-actions__meta">
-            <strong>Escolha uma direção</strong>
-            <span>Selecione o objetivo que melhor representa seu momento para seguir para preferências.</span>
-          </div>
-          <div class="onboarding-actions__group onboarding-actions__group--footer">
-            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="button" [disabled]="!selected()" (click)="next.emit()">
-              Continuar para preferências
-            </button>
-          </div>
-        </div>
-      </section>
+        <button
+          class="onboarding-cta"
+          type="button"
+          [disabled]="!selected()"
+          (click)="next.emit()">
+          Continuar
+        </button>
+      </div>
     </div>
   `
 })
@@ -112,4 +104,6 @@ export class FocusStepComponent {
 
   readonly select = output<FocusArea>();
   readonly next = output<void>();
+
+  readonly selectedOption = computed(() => this.options().find((o) => o.id === this.selected()) ?? null);
 }

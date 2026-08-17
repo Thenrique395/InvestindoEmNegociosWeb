@@ -1,5 +1,6 @@
-<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isStandaloneAuthRoute">
-  @if (showPublicExperience && !isStandaloneAuthRoute) {
+<div class="page" [class.page--logged]="isLogged" [class.page--login]="!isLogged && isStandaloneAuthRoute"
+  [class.page--site]="isSiteRoute">
+  @if (showPublicExperience && !isStandaloneAuthRoute && !isSiteRoute) {
     <app-public-header
       [brandName]="brandName"
       [isLightTheme]="isLightTheme"
@@ -11,14 +12,18 @@
 
   @if (isLogged && !isOnboardingRoute && !isStyleguideRoute) {
     <!-- overflow-clip (e não hidden): ancestral com overflow hidden desabilita o position: sticky da sidebar -->
-    <div class="shell relative grid min-h-screen overflow-clip border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+    <div class="shell relative grid min-h-screen overflow-clip">
       <app-sidebar
         [isLightTheme]="isLightTheme"
         [brandName]="brandName"
         [currentRole]="currentRole"
         [mobileOpen]="mobileSidebarOpen"
+        [displayName]="displayName"
+        [userInitials]="userInitials"
+        [avatarUrl]="avatarUrl"
         (routeReload)="reloadIfSame($event.path, $event.event)"
-        (preferencesOpen)="goToPreferences($event)" />
+        (preferencesOpen)="goToPreferences($event)"
+        (profileOpen)="goToProfile($event)" />
       @if (mobileSidebarOpen) {
         <div class="shell__backdrop" (click)="closeMobileSidebar()"></div>
       }
@@ -47,39 +52,61 @@
           (routeReload)="reloadIfSame($event.path, $event.event)"
           (logoutRequested)="logout()" />
         <app-billing-alert-banner />
-        <main class="main relative z-0 flex min-w-0 flex-col gap-8 p-[var(--spacing-3)]">
+        <main class="main relative z-0 min-w-0">
           <div class="route-view" [class.route-view--enter]="routeTransitionActive">
             <router-outlet />
           </div>
         </main>
+        <nav class="mobile-bottom-nav" aria-label="Navegação principal mobile">
+          @for (item of mobileBottomItems; track item.path) {
+            <a
+              class="mobile-bottom-nav__item"
+              [class.is-active]="isActiveRoute(item.path)"
+              [attr.aria-current]="isActiveRoute(item.path) ? 'page' : null"
+              [routerLink]="item.path"
+              (click)="reloadIfSame(item.path, $event)">
+              <span class="mobile-bottom-nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                  @switch (item.icon) {
+                    @case ('dashboard') {
+                      <path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    }
+                    @case ('expense') {
+                      <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    }
+                    @case ('income') {
+                      <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    }
+                    @case ('calendar') {
+                      <path d="M7 2v3M17 2v3M4 7h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    }
+                  }
+                </svg>
+              </span>
+              <span class="mobile-bottom-nav__label">{{ item.label }}</span>
+            </a>
+          }
+          <button
+            type="button"
+            class="mobile-bottom-nav__fab menu-toggle"
+            [attr.aria-expanded]="mobileSidebarOpen"
+            aria-controls="app-sidebar"
+            aria-label="Abrir menu completo"
+            (click)="toggleMobileSidebar()">
+            <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+              <path d="M5 7h14M5 12h14M5 17h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+            </svg>
+            <span>Menu</span>
+          </button>
+        </nav>
       </div>
     </div>
   }
 
   @if (isOnboardingRoute) {
+    <!-- Sem a topbar do app: o onboarding desenha a própria barra (plano, etapa,
+         ajuda e saída) dentro da coluna direita, ao lado do trilho navy. -->
     <div class="onboarding-route-shell">
-      <app-topbar
-        [minimal]="true"
-        [notificationsOpen]="notificationsOpen"
-        [notificationsLoading]="notificationsLoading"
-        [notificationsError]="notificationsError"
-        [notifications]="notifications"
-        [unreadCount]="unreadCount"
-        [userMenuOpen]="userMenuOpen"
-        [avatarUrl]="avatarUrl"
-        [userInitials]="userInitials"
-        [displayName]="displayName"
-        [currentRole]="currentRole"
-        [isLightTheme]="isLightTheme"
-        [financialValuesHidden]="financialValuesHidden"
-        (themeToggle)="toggleTheme()"
-        (financialValuesToggle)="toggleFinancialValues()"
-        (notificationsToggle)="toggleNotifications()"
-        (notificationsRefresh)="refreshNotifications()"
-        (notificationRead)="markNotificationRead($event.item, $event.event)"
-        (userMenuToggle)="toggleUserMenu()"
-        (routeReload)="reloadIfSame($event.path, $event.event)"
-        (logoutRequested)="logout()" />
       <main class="onboarding-route-main">
         <div class="route-view" [class.route-view--enter]="routeTransitionActive">
           <router-outlet />
@@ -100,7 +127,7 @@
     </main>
   }
 
-  @if (showPublicExperience && !isStandaloneAuthRoute) {
+  @if (showPublicExperience && !isStandaloneAuthRoute && !isSiteRoute) {
     <app-public-footer
       [brandName]="brandName"
       [brandSlogan]="brandSlogan"

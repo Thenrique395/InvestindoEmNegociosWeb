@@ -2,18 +2,19 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, RegisterPayload } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { cpfValidator, maskCpf } from '../utils/cpf.utils';
 import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
+import { AuthLayoutComponent } from '../auth-layout/auth-layout.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss']
+  imports: [ReactiveFormsModule, RouterLink, NgTemplateOutlet, AuthLayoutComponent],
+  templateUrl: './signup.component.html'
 })
 export class SignupComponent implements OnInit, OnDestroy {
   @Output() signedUp = new EventEmitter<void>();
@@ -64,6 +65,23 @@ export class SignupComponent implements OnInit, OnDestroy {
 
     this.title.setTitle(DEFAULT_TITLE);
     this.meta.updateTag({ name: 'description', content: DEFAULT_META_DESCRIPTION });
+  }
+
+  /**
+   * Força da senha em 3 níveis, para o medidor de barras.
+   * 1 = só comprimento · 2 = letras e números · 3 = + maiúscula ou símbolo.
+   */
+  get passwordStrength(): number {
+    const value: string = this.form.get('senha')?.value ?? '';
+    if (value.length < 6) return value.length > 0 ? 1 : 0;
+
+    const hasLetter = /[a-zA-Z]/.test(value);
+    const hasNumber = /\d/.test(value);
+    const hasStrong = /[A-Z]/.test(value) || /[^a-zA-Z0-9]/.test(value);
+
+    if (hasLetter && hasNumber && hasStrong && value.length >= 8) return 3;
+    if (hasLetter && hasNumber) return 2;
+    return 1;
   }
 
   onSubmit(): void {

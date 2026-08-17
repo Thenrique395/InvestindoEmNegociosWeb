@@ -1,4 +1,5 @@
-import { Goal, GoalKind, GoalProgress, GoalStatus } from '../goals.service';
+import { ProgressMode } from '../shared/progress-bar/progress-thresholds';
+import { Goal, GoalKind, GoalProgress, GoalStatus, RecurrenceType } from '../goals.service';
 import { StatusBadgeTone } from '../shared/status-badge/status-badge.component';
 
 /**
@@ -16,7 +17,12 @@ export type GoalDisplayState =
   | 'active' | 'attention' | 'exceeded' | 'overdue' | 'achieved'
   | 'paused' | 'completed' | 'archived' | 'canceled' | 'draft' | 'scheduled';
 
-export type GoalProgressTone = 'neutral' | 'ok' | 'warning' | 'critical' | 'success';
+/**
+ * A cor da barra NÃO mora mais aqui: os limiares de consumo × conquista são de
+ * `shared/progress-bar/progress-thresholds` (ARQUITETURA_ANGULAR.md §9.1, "duas
+ * funções, um lugar"). A meta só declara qual das duas semânticas ela tem e se
+ * está no ritmo; o primitivo decide o tom.
+ */
 
 export interface GoalTypeConfig {
   kind: GoalKind;
@@ -51,12 +57,16 @@ export interface GoalView {
   /** Percentual limitado a 100 para a barra. */
   barPercent: number;
   remaining: number;
+  monthlyRequired: number | null;
   forecast: number | null;
   daysRemaining: number | null;
   state: GoalDisplayState;
   stateLabel: string;
   stateTone: StatusBadgeTone;
-  progressTone: GoalProgressTone;
+  progressMode: ProgressMode;
+  /** Só para conquista: o ritmo alcança o prazo? */
+  onTrack: boolean;
+  recurrenceLabel: string;
 }
 
 export function configFor(kind: GoalKind): GoalTypeConfig {
@@ -117,14 +127,30 @@ function persistedState(status: GoalStatus): GoalDisplayState | null {
   }
 }
 
-function progressTone(config: GoalTypeConfig, percent: number, state: GoalDisplayState, warning: number): GoalProgressTone {
-  if (config.isConsumption) {
-    if (percent > 100) return 'critical';
-    if (percent >= warning) return 'warning';
-    return 'ok';
-  }
-  if (state === 'achieved' || percent >= 100) return 'success';
-  return 'neutral';
+function monthlyRequired(config: GoalTypeConfig, remaining: number, daysRemaining: number | null): number | null {
+  if (config.isConsumption || remaining <= 0 || daysRemaining == null || daysRemaining <= 0) return null;
+
+  const monthsRemaining = Math.max(1, Math.ceil(daysRemaining / 30));
+  return Math.round((remaining / monthsRemaining) * 100) / 100;
+}
+
+const RECURRENCE_LABELS: Record<RecurrenceType, string> = {
+  None: 'Período único',
+  Weekly: 'Semanal',
+  Monthly: 'Mensal',
+  Quarterly: 'Trimestral',
+  Semiannual: 'Semestral',
+  Annual: 'Anual',
+  Custom: 'Personalizada'
+};
+
+export function recurrenceLabelFor(recurrence?: RecurrenceType | null): string {
+  return recurrence ? RECURRENCE_LABELS[recurrence] ?? 'Período único' : 'Período único';
+}
+
+export function canCompleteGoalView(view: GoalView): boolean {
+  if (view.config.isConsumption || view.percent < 100) return false;
+  return !['completed', 'archived', 'canceled'].includes(view.state);
 }
 
 export function buildGoalView(goal: Goal, progress?: GoalProgress | null): GoalView {
@@ -153,12 +179,15 @@ export function buildGoalView(goal: Goal, progress?: GoalProgress | null): GoalV
     percent,
     barPercent: Math.max(0, Math.min(100, percent)),
     remaining,
+    monthlyRequired: monthlyRequired(config, remaining, daysRemaining),
     forecast,
     daysRemaining,
     state,
     stateLabel: meta.label,
     stateTone: meta.tone,
-    progressTone: progressTone(config, percent, state, warning)
+    progressMode: config.isConsumption ? 'consumo' : 'conquista',
+    onTrack: state !== 'attention' && state !== 'overdue' && state !== 'exceeded',
+    recurrenceLabel: recurrenceLabelFor(goal.recurrence)
   };
 }
 

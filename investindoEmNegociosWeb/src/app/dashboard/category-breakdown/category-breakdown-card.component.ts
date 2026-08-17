@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FinancialPrivacyService } from '../../financial-privacy.service';
-import { formatCurrencyValue } from '../../utils/locale-utils';
+import { formatCompactCurrency, formatCurrencyValue } from '../../utils/locale-utils';
 import { buildConicGradient } from '../../utils/home-insight.utils';
 import {
   categoryCountLabel,
   CategorySlice,
-  CategoryVariant
+  CategoryVariant,
+  hasSufficientCategoryDistribution
 } from './category-breakdown.model';
 
 @Component({
@@ -26,7 +27,7 @@ export class CategoryBreakdownCardComponent {
   readonly subtitle = input.required<string>();
   readonly total = input.required<number>();
   readonly slices = input.required<CategorySlice[]>();
-  /** Libera insight textual e comparação (planos Inteligente/Completo). */
+  /** Libera insight textual e comparação (planos Controle/Patrimônio). */
   readonly showInsights = input(false);
   readonly emptyText = input.required<string>();
   readonly emptyCtaLabel = input.required<string>();
@@ -35,8 +36,13 @@ export class CategoryBreakdownCardComponent {
   readonly detailsLabel = input.required<string>();
 
   readonly hasData = computed(() => this.slices().length > 0);
+  readonly hasDistributionData = computed(() => hasSufficientCategoryDistribution(this.slices()));
   readonly categoryCount = computed(() => this.slices().length);
   readonly countLabel = computed(() => categoryCountLabel(this.categoryCount()));
+  readonly insufficientText = computed(() => {
+    const noun = this.variant() === 'expense' ? 'despesas' : 'receitas';
+    return `A distribuição começa a aparecer quando houver pelo menos 3 categorias de ${noun} movimentadas no período.`;
+  });
   readonly chartBackground = computed(() => buildConicGradient(this.slices()));
   readonly totalLabel = computed(() => this.format(this.total()));
   readonly compactTotalLabel = computed(() => this.compactFormat(this.total()));
@@ -52,9 +58,6 @@ export class CategoryBreakdownCardComponent {
 
   private compactFormat(value: number): string {
     if (this.financialPrivacy.hidden()) return '••••••';
-    const abs = Math.abs(value || 0);
-    if (abs < 1000) return formatCurrencyValue(value);
-    const sign = value < 0 ? '-' : '';
-    return `${sign}R$ ${(abs / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mil`;
+    return formatCompactCurrency(value);
   }
 }

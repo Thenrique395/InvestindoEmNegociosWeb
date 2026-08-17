@@ -16,7 +16,7 @@
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: var(--surface-3);
+  background-color: var(--surface-inset);
   transition: 0.2s;
   border-radius: var(--radius-pill);
 }
@@ -34,7 +34,7 @@
 }
 
 .switch input:checked + .slider {
-  background-color: color-mix(in srgb, var(--primary) 60%, var(--surface-3));
+  background-color: color-mix(in srgb, var(--primary) 60%, var(--surface-inset));
 }
 
 .switch input:checked + .slider:before {

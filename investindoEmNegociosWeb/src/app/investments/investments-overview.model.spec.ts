@@ -38,6 +38,18 @@ describe('investments-overview.model', () => {
     expect(o.growth).toBe(0); // dividendo não vira valorização
   });
 
+  it('proventos do overview consideram apenas os últimos 12 meses', () => {
+    const o = buildInvestmentsOverview([
+      pos({ id: 'p1', movements: [
+        mov({ type: 'DIVIDENDO', quantity: 1, price: 30, date: '2026-07-10' }),
+        mov({ type: 'JCP', quantity: 1, price: 20, date: '2025-08-01' }),
+        mov({ type: 'RENDIMENTO', quantity: 1, price: 999, date: '2025-06-30' })
+      ] })
+    ], today);
+
+    expect(o.proventos).toBe(50);
+  });
+
   it('aporte e resgate do mês', () => {
     const o = buildInvestmentsOverview([
       pos({ id: 'p1', movements: [

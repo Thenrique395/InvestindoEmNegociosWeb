@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SectionCardComponent } from '../../../../shared/section-card/section-card.component';
+import { SelectMenuComponent, SelectMenuOption } from '../../../../shared/select-menu/select-menu.component';
 import { CsvExtractResponse, OfxExtractResponse, OfxTransactionPreview } from '../../../accounts/data-access/accounts.service';
 import { CategoryDto } from '../../../../categories.service';
 
@@ -22,7 +23,7 @@ export interface CategoryLearningCandidate {
 @Component({
   selector: 'app-account-import',
   standalone: true,
-  imports: [CommonModule, FormsModule, SectionCardComponent],
+  imports: [CommonModule, FormsModule, SectionCardComponent, SelectMenuComponent],
   templateUrl: './account-import.component.html'
 })
 export class AccountImportComponent {
@@ -84,9 +85,27 @@ export class AccountImportComponent {
     });
   }
 
+  onCategorySelectionChange(item: OfxTransactionPreview, selectedCategoryId: string, source: ImportSource): void {
+    this.onCategoryChange(item, selectedCategoryId || null, source);
+  }
+
   categoriesForItem(item: OfxTransactionPreview): CategoryDto[] {
     const appliesTo = item.kind === 'Credit' ? 'Income' : 'Expense';
     return this.categories.filter((category) => category.appliesTo === appliesTo || category.appliesTo === null);
+  }
+
+  categoryOptionsForItem(item: OfxTransactionPreview): SelectMenuOption[] {
+    return [
+      { value: '', label: 'Sem categoria' },
+      ...this.categoriesForItem(item).map((category) => ({
+        value: category.id,
+        label: category.name,
+      })),
+    ];
+  }
+
+  selectedCategoryValue(item: OfxTransactionPreview): string {
+    return item.categoryId ?? item.suggestedCategory?.categoryId ?? '';
   }
 
   categorySuggestionLabel(item: OfxTransactionPreview): string {

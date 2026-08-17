@@ -20,7 +20,7 @@
   min-height: 44px;
   padding: 0.3rem 0.55rem;
   border: 1px solid transparent;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background: transparent;
   color: var(--text);
   cursor: pointer;
@@ -29,7 +29,7 @@
 
 .user-trigger:hover {
   border-color: var(--border);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
 }
 
 .user-trigger__avatar {
@@ -39,12 +39,12 @@
   width: 34px;
   height: 34px;
   overflow: hidden;
-  border: 1px solid var(--color-primary-soft);
+  border: 1px solid var(--primary-tint);
   border-radius: var(--radius-pill);
-  background: var(--color-primary-weak);
+  background: var(--primary-tint);
   color: var(--primary-text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.02em;
 }
 
@@ -63,19 +63,19 @@
 .user-trigger__name {
   overflow: hidden;
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .user-trigger__role {
   overflow: hidden;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-tight);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -84,7 +84,7 @@
   flex: none;
   width: 16px;
   height: 16px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   transition: transform 160ms ease;
 }
 
@@ -102,9 +102,9 @@
   margin-top: 0.6rem;
   padding: 0.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   transform-origin: top right;
   animation: user-dropdown-in 150ms ease;
 }
@@ -121,9 +121,9 @@
   align-items: center;
   gap: 0.7rem;
   padding: 0.65rem 0.7rem;
-  border: 1px solid var(--color-primary-soft);
-  border-radius: var(--radius-lg);
-  background: var(--color-primary-weak);
+  border: 1px solid var(--primary-tint);
+  border-radius: var(--radius-inner);
+  background: var(--primary-tint);
 }
 
 .user-dropdown__avatar {
@@ -133,12 +133,12 @@
   width: 40px;
   height: 40px;
   overflow: hidden;
-  border: 1px solid var(--color-primary-soft);
+  border: 1px solid var(--primary-tint);
   border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--primary-text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .user-dropdown__avatar img {
@@ -158,22 +158,22 @@
   overflow: hidden;
   max-width: 100%;
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .user-dropdown__role {
   padding: 0.1rem 0.5rem;
-  border: 1px solid var(--color-primary-soft);
+  border: 1px solid var(--primary-tint);
   border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--primary-text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-control);
 }
 
 .user-dropdown__actions {
@@ -189,7 +189,7 @@
   min-height: 44px;
   padding: 0.45rem 0.6rem;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--text);
   text-align: left;
@@ -198,11 +198,11 @@
 }
 
 .user-dropdown__item:hover {
-  background: var(--surface-2);
+  background: var(--surface-sunken);
 }
 
 .user-dropdown__item.is-active {
-  background: var(--color-primary-weak);
+  background: var(--primary-tint);
 }
 
 .user-dropdown__icon {
@@ -211,7 +211,7 @@
   place-items: center;
   width: 20px;
   height: 20px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   transition: color 160ms ease;
 }
 
@@ -236,16 +236,16 @@
 }
 
 .user-dropdown__text strong {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
 }
 
 .user-dropdown__text small {
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-tight);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
 }
 
 .user-dropdown__footer {
@@ -254,19 +254,19 @@
 }
 
 .user-dropdown__item--danger {
-  color: var(--danger-text);
+  color: var(--expense-text);
 }
 
 .user-dropdown__item--danger .user-dropdown__icon {
-  color: var(--danger-text);
+  color: var(--expense-text);
 }
 
 .user-dropdown__item--danger:hover {
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  background: color-mix(in srgb, var(--expense) 8%, transparent);
 }
 
 .user-dropdown__item--danger:hover .user-dropdown__icon {
-  color: var(--danger-text);
+  color: var(--expense-text);
 }
 
 @media (prefers-reduced-motion: reduce) {

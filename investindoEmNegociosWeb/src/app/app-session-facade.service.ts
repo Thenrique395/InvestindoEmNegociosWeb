@@ -86,6 +86,9 @@ export class AppSessionFacadeService {
 
   private isPublicLayoutRoutePath(current: string): boolean {
     return current === '/'
+      || current.startsWith('/produto')
+      || current.startsWith('/termos')
+      || current.startsWith('/privacidade')
       || current.startsWith('/planos')
       || current.startsWith('/checkout')
       || current.startsWith('/login')

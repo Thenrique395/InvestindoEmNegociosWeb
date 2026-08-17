@@ -1,0 +1,29 @@
+<div class="chart" [style.height.px]="height()">
+  @for (label of labels(); track label; let i = $index) {
+    <div class="chart__group">
+      <!-- A pista existe para a altura percentual das barras resolver contra
+           ela, e não contra a coluna inteira (que inclui o rótulo). -->
+      <div class="chart__track">
+        @for (s of series(); track s.label) {
+          <div
+            class="chart__bar"
+            [style.height.%]="percentOf(s.points[i])"
+            [style.background]="s.color"
+            [attr.title]="titleFor(s, i)"></div>
+        }
+      </div>
+      <span class="chart__label">{{ label }}</span>
+    </div>
+  }
+</div>
+
+@if (showLegend()) {
+  <div class="chart__legend">
+    @for (s of series(); track s.label) {
+      <span class="chart__legend-item">
+        <i class="chart__marker" [style.background]="s.color" aria-hidden="true"></i>
+        {{ s.label }}
+      </span>
+    }
+  </div>
+}

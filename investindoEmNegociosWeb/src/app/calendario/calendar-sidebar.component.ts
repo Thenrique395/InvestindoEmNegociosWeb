@@ -103,47 +103,47 @@ interface DigestRow {
     .side__block {
       display: grid; gap: 0.7rem;
       padding: 1.05rem 1.1rem;
-      border: 1px solid var(--border); border-radius: var(--radius-xl);
-      background: var(--surface); box-shadow: var(--shadow-elevation-sm);
+      border: 1px solid var(--border); border-radius: var(--radius-panel);
+      background: var(--surface); box-shadow: var(--shadow-card-hover);
     }
-    .side__block--alert { border-color: var(--color-danger-soft); }
+    .side__block--alert { border-color: var(--expense-tint); }
     .side__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .side__title { margin: 0; font-size: var(--text-sm, 0.9rem); font-weight: 700; color: var(--text); }
+    .side__title { margin: 0; font-size: var(--fs-meta, 0.9rem); font-weight: 700; color: var(--text); }
     .side__badge {
       display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 7px;
-      border-radius: 11px; background: var(--surface-3); color: var(--text-muted);
+      border-radius: 11px; background: var(--surface-inset); color: var(--text-tertiary);
       font-size: 0.72rem; font-weight: 700;
     }
-    .side__badge--danger { background: var(--color-danger-weak); color: var(--color-danger-text); }
+    .side__badge--danger { background: var(--expense-tint); color: var(--expense-text); }
 
     .side__digest { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
     .side__digest-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
-    .side__digest-label { font-size: var(--text-sm, 0.82rem); color: var(--text); }
-    .side__digest-value { font-size: var(--text-sm, 0.82rem); font-weight: 700; color: var(--text); }
+    .side__digest-label { font-size: var(--fs-meta, 0.82rem); color: var(--text); }
+    .side__digest-value { font-size: var(--fs-meta, 0.82rem); font-weight: 700; color: var(--text); }
 
     .side__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
     .side__row {
       width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px;
-      border: 0; border-radius: var(--radius-md, 10px); padding: 8px; background: transparent;
+      border: 0; border-radius: var(--radius-control, 10px); padding: 8px; background: transparent;
       text-align: left; cursor: pointer; transition: background 0.15s ease;
     }
-    .side__row:hover { background: var(--surface-2); }
+    .side__row:hover { background: var(--surface-sunken); }
     .side__row:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
     .side__row-main { min-width: 0; display: grid; gap: 2px; }
-    .side__row-title { font-size: var(--text-sm, 0.82rem); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .side__row-meta { font-size: var(--text-xs, 0.7rem); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .side__row-amount { font-size: var(--text-xs, 0.75rem); font-weight: 600; color: var(--text); white-space: nowrap; }
-    .side__row-amount--danger { color: var(--color-danger-text); }
+    .side__row-title { font-size: var(--fs-meta, 0.82rem); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .side__row-meta { font-size: var(--fs-caption, 0.7rem); color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .side__row-amount { font-size: var(--fs-caption, 0.75rem); font-weight: 600; color: var(--text); white-space: nowrap; }
+    .side__row-amount--danger { color: var(--expense-text); }
 
-    .side__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--info); }
-    .side__dot[data-group='income'] { background: var(--success); }
-    .side__dot[data-group='expense'] { background: var(--danger); }
+    .side__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+    .side__dot[data-group='income'] { background: var(--income); }
+    .side__dot[data-group='expense'] { background: var(--expense); }
     .side__dot[data-group='card'] { background: var(--warning); }
     .side__dot[data-group='loan'] { background: var(--warning); }
-    .side__dot[data-group='goal'] { background: var(--info); }
-    .side__dot[data-group='overdue'] { background: var(--danger); }
+    .side__dot[data-group='goal'] { background: var(--primary); }
+    .side__dot[data-group='overdue'] { background: var(--expense); }
 
-    .side__empty { margin: 0; font-size: var(--text-sm, 0.8rem); color: var(--text-muted); }
+    .side__empty { margin: 0; font-size: var(--fs-meta, 0.8rem); color: var(--text-tertiary); }
   `
 })
 export class CalendarSidebarComponent {

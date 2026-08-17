@@ -41,7 +41,7 @@
   <section class="tx-shell">
     <app-period-hero
       eyebrow="Despesas do período"
-      title="Despesas de {{ mesAtualLabel | titlecase }}"
+      title="Despesas de {{ mesAtualLabel }}"
       description="Veja o que já saiu, compare com o mês anterior e registre novas despesas sem perder o contexto do período."
       (previousMonth)="mesAnterior()"
       (nextMonth)="proximoMes()">
@@ -106,26 +106,18 @@
       <div filter-left class="tx-filters">
         <label class="tx-filter">
           <span class="tx-filter__label">Status</span>
-          <select [(ngModel)]="filtroStatus">
-            <option value="ALL">Todos</option>
-            <option value="OPEN">{{ statusLabel('OPEN') }}</option>
-            <option value="PARTIALLY_PAID">{{ statusLabel('PARTIALLY_PAID') }}</option>
-            <option value="PAID">{{ statusLabel('PAID') }}</option>
-            <option value="ANTICIPATED">{{ statusLabel('ANTICIPATED') }}</option>
-            <option value="CANCELED">{{ statusLabel('CANCELED') }}</option>
-          </select>
+          <app-select-menu
+            [options]="statusOptions"
+            [(ngModel)]="filtroStatus"
+            ariaLabel="Filtrar por status" />
         </label>
         <label class="tx-filter">
           <span class="tx-filter__label">Categoria</span>
-          <select [(ngModel)]="filtroCategoria">
-            <option value="ALL">Todas</option>
-            @if (!categorias().length) {
-              <option value="" disabled>Sem categorias cadastradas</option>
-            }
-            @for (c of categorias(); track trackByIndex($index, c)) {
-              <option [value]="c.id">{{ c.name }}</option>
-            }
-          </select>
+          <app-select-menu
+            [options]="categoriaOptions()"
+            [(ngModel)]="filtroCategoria"
+            [searchable]="true"
+            ariaLabel="Filtrar por categoria" />
         </label>
         <label class="tx-filter tx-filter--search">
           <span class="tx-filter__label">Buscar</span>

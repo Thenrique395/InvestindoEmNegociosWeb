@@ -9,7 +9,11 @@
         <button type="button" class="btn-ghost sm" (click)="nextMonth()">Próximo →</button>
       </div>
       @if (budget()) {
+        <button type="button" class="btn-ghost sm" (click)="copyPreviousMonth()" [disabled]="copyingPrevious()">
+          {{ copyingPrevious() ? 'Copiando...' : 'Copiar do mês anterior' }}
+        </button>
         <button type="button" class="btn-ghost sm" (click)="exportCsv()">Exportar CSV</button>
+        <button type="button" class="btn-primary sm" (click)="openAddModal()">Adicionar categoria</button>
       }
     </div>
   </app-page-header>
@@ -33,7 +37,8 @@
         tone="primary"
         eyebrow="Planejado"
         [value]="overview.totalPlanned | appCurrency"
-        [note]="overview.itemsCount + ' categoria(s) no orçamento.'">
+        [note]="overview.itemsCount + ' categoria(s) no orçamento.'"
+        tooltipText="Soma do valor planejado de todas as categorias do mês. Categoria sem valor definido não entra na conta.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -42,7 +47,8 @@
         tone="info"
         eyebrow="Realizado"
         [value]="overview.totalRealized | appCurrency"
-        note="Total já gasto nas categorias planejadas.">
+        note="Total já gasto nas categorias planejadas."
+        tooltipText="Soma das despesas do mês lançadas nas categorias que têm orçamento. Gasto em categoria fora do orçamento não aparece aqui.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -51,94 +57,220 @@
         [tone]="overview.totalVariance < 0 ? 'danger' : 'success'"
         eyebrow="Variação"
         [value]="overview.totalVariance | appCurrency"
-        [note]="overview.totalVariance < 0 ? 'Gasto acima do planejado.' : 'Dentro do planejado.'">
+        [note]="overview.totalVariance < 0 ? 'Gasto acima do planejado.' : 'Dentro do planejado.'"
+        tooltipText="Planejado menos realizado. Positivo é folga que ainda resta; negativo é quanto o gasto passou do previsto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M3 12h4l3 8 4-16 3 8h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
       <app-transaction-summary-card
-        [tone]="overview.usagePercent > 100 ? 'danger' : overview.usagePercent > 80 ? 'warning' : 'success'"
+        [tone]="usageCardTone(overview.usagePercent)"
         eyebrow="Uso do orçamento"
         [value]="overview.usagePercent + '%'"
-        [note]="overview.overBudgetCount ? (overview.overBudgetCount + ' categoria(s) estourada(s).') : 'Nenhuma categoria estourada.'">
+        [note]="overview.overBudgetCount ? (overview.overBudgetCount + ' categoria(s) estourada(s).') : 'Nenhuma categoria estourada.'"
+        tooltipText="Realizado dividido pelo planejado, no total do mês. Passar de 100% significa que o conjunto estourou, mesmo que algumas categorias individuais estejam dentro.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 3a9 9 0 1 0 9 9h-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
     </section>
 
-    <article class="card">
-      <h2>Adicionar categoria</h2>
-      <div class="inline-form">
-        <input type="text" placeholder="Nome da categoria" [(ngModel)]="newCategory" />
-        <input type="number" placeholder="Valor planejado" [(ngModel)]="newAmount" min="0" step="0.01" />
-        <button type="button" class="btn-primary" (click)="addItem()" [disabled]="saving() || !newCategory || !newAmount">
-          {{ saving() ? 'Salvando...' : 'Adicionar' }}
-        </button>
-      </div>
-    </article>
+    <section class="budget-content">
+      <div class="budget-main">
+        <article class="card">
+          <div class="budget-list-head">
+            <div>
+              <h2>Categorias</h2>
+              <p>{{ filterCountLabel }}</p>
+            </div>
+            <app-segmented-selector
+              data-size="sm"
+              [options]="filterOptions"
+              [value]="filter()"
+              ariaLabel="Filtrar orçamento"
+              (valueChange)="setFilter($event)" />
+          </div>
+          <app-responsive-list
+            class="budget-table"
+            [columns]="categoryColumns"
+            [items]="filteredItemViews"
+            [getId]="trackBudgetItem"
+            emptyIcon="$"
+            emptyTitle="Nenhuma categoria no orçamento"
+            emptyDescription="Adicione categorias e defina valores planejados para o mês.">
+            <ng-template appResponsiveListCell="category" let-view>
+              <span class="category-name">{{ view.item.categoryName }}</span>
+            </ng-template>
 
-    <article class="card">
-      <h2>Categorias</h2>
-      <app-responsive-list
-        [columns]="categoryColumns"
-        [items]="itemViews"
-        [getId]="trackBudgetItem"
-        emptyIcon="$"
-        emptyTitle="Nenhuma categoria no orçamento"
-        emptyDescription="Adicione categorias e defina valores planejados para o mês.">
-        <ng-template appResponsiveListCell="category" let-view>
-          <span class="category-name">{{ view.item.categoryName }}</span>
-        </ng-template>
+            <ng-template appResponsiveListCell="planned" let-view>
+              @if (editingId === view.item.id) {
+                <input
+                  class="edit-input"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  [(ngModel)]="editingAmount"
+                  (keyup.enter)="confirmEdit(view.item)"
+                  (keyup.escape)="cancelEdit()" />
+              } @else {
+                <button type="button" class="link-btn" (click)="startEdit(view.item)" [attr.aria-label]="'Editar valor planejado de ' + view.item.categoryName">
+                  {{ view.item.plannedAmount | appCurrency }}
+                </button>
+              }
+            </ng-template>
 
-        <ng-template appResponsiveListCell="planned" let-view>
-          @if (editingId === view.item.id) {
-            <input
-              class="edit-input"
-              type="number"
-              min="0"
-              step="0.01"
-              [(ngModel)]="editingAmount"
-              (keyup.enter)="confirmEdit(view.item)"
-              (keyup.escape)="cancelEdit()" />
-          } @else {
-            <button type="button" class="link-btn" (click)="startEdit(view.item)" [attr.aria-label]="'Editar valor planejado de ' + view.item.categoryName">
-              {{ view.item.plannedAmount | appCurrency }}
-            </button>
+            <ng-template appResponsiveListCell="realized" let-view>
+              {{ view.item.realizedAmount | appCurrency }}
+            </ng-template>
+
+            <ng-template appResponsiveListCell="variance" let-view>
+              <span [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</span>
+            </ng-template>
+
+            <ng-template appResponsiveListCell="usage" let-view>
+              <div class="usage-cell">
+                <app-progress-bar [value]="view.usagePercent" mode="consumo" [ariaLabel]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
+                <span class="usage-cell__pct" [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
+              </div>
+            </ng-template>
+
+            <ng-template appResponsiveListCell="actions" let-view>
+              <div class="list-actions">
+                @if (editingId === view.item.id) {
+                  <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
+                  <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Sair</button>
+                } @else {
+                  <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
+                    {{ deletingId() === view.item.id ? '...' : 'Remover' }}
+                  </button>
+                }
+              </div>
+            </ng-template>
+          </app-responsive-list>
+
+          @if (filteredItemViews.length) {
+            <div class="budget-total-row" role="group" aria-label="Total exibido no orçamento">
+              <span class="budget-total-row__label">Total exibido</span>
+              <span class="budget-total-row__value">{{ filteredTotals.totalPlanned | appCurrency }}</span>
+              <span class="budget-total-row__value">{{ filteredTotals.totalRealized | appCurrency }}</span>
+              <span class="budget-total-row__value" [class.negative]="filteredTotals.totalVariance < 0">
+                {{ filteredTotals.totalVariance | appCurrency }}
+              </span>
+              <span class="budget-total-row__usage">
+                <app-progress-bar
+                  [value]="filteredTotals.usagePercent"
+                  mode="consumo"
+                  [ariaLabel]="'Total exibido: ' + filteredTotals.usagePercent + '% do planejado'" />
+                <span class="usage-cell__pct" [class.over-budget]="filteredTotals.usagePercent > 100">
+                  {{ filteredTotals.usagePercent }}%
+                </span>
+              </span>
+              <span aria-hidden="true"></span>
+            </div>
           }
-        </ng-template>
+        </article>
+      </div>
 
-        <ng-template appResponsiveListCell="realized" let-view>
-          {{ view.item.realizedAmount | appCurrency }}
-        </ng-template>
+      <aside class="budget-side" aria-label="Análise do orçamento">
+        <article class="side-card">
+          <h2>Ritmo do mês</h2>
+          <p>Compara o gasto de hoje com o que seria proporcional ao dia do mês.</p>
+          <dl class="pace-list">
+            <div>
+              <dt>Já se passaram</dt>
+              <dd>{{ pace.daysElapsed }} de {{ pace.daysInMonth }} dias</dd>
+            </div>
+            <div>
+              <dt>Ideal gasto até hoje</dt>
+              <dd>{{ pace.idealRealizedToday | appCurrency }}</dd>
+            </div>
+            <div class="pace-list__highlight">
+              <dt>{{ pace.isAbovePace ? 'Acima do ritmo' : 'Abaixo do ritmo' }}</dt>
+              <dd [class.negative]="pace.isAbovePace">{{ (pace.deltaFromPace < 0 ? -pace.deltaFromPace : pace.deltaFromPace) | appCurrency }}</dd>
+            </div>
+            <div>
+              <dt>Sobra por dia restante</dt>
+              <dd>{{ pace.remainingPerDay | appCurrency }}</dd>
+            </div>
+          </dl>
+        </article>
 
-        <ng-template appResponsiveListCell="variance" let-view>
-          <span [class.negative]="view.item.variance < 0">{{ view.item.variance | appCurrency }}</span>
-        </ng-template>
+        <article class="side-card side-card--chart">
+          <h2>Composição planejada</h2>
+          <app-donut-chart [items]="compositionItems" emptyMessage="Sem categorias planejadas." />
+        </article>
 
-        <ng-template appResponsiveListCell="usage" let-view>
-          <div class="usage-cell">
-            <app-usage-bar [percent]="view.usagePercent" [tone]="view.tone" [label]="view.item.categoryName + ': ' + view.usagePercent + '% do planejado'" />
-            <span class="usage-cell__pct" [class.over-budget]="view.overBudget">{{ view.usagePercent }}%</span>
-          </div>
-        </ng-template>
-
-        <ng-template appResponsiveListCell="actions" let-view>
-          <div class="list-actions">
-            @if (editingId === view.item.id) {
-              <button type="button" class="btn-primary sm" (click)="confirmEdit(view.item)">Salvar</button>
-              <button type="button" class="btn-ghost sm" (click)="cancelEdit()">Cancelar</button>
-            } @else {
-              <button type="button" class="btn-danger sm" (click)="askRemove(view.item)" [disabled]="deletingId() === view.item.id">
-                {{ deletingId() === view.item.id ? '...' : 'Remover' }}
-              </button>
-            }
-          </div>
-        </ng-template>
-      </app-responsive-list>
-    </article>
+        @if (overrunItems.length) {
+          <article class="side-card side-card--critical">
+            <div class="side-card__title-row">
+              <span class="side-card__warning" aria-hidden="true">!</span>
+              <h2>Estouraram o planejado</h2>
+            </div>
+            <p>Reveja o valor ou corte o gasto no que resta do mês.</p>
+            <div class="overrun-list">
+              @for (overrun of overrunItems; track overrun.id) {
+                <div class="overrun-item">
+                  <span>{{ overrun.categoryName }}</span>
+                  <strong>{{ overrun.excessAmount | appCurrency }}</strong>
+                  <small>{{ overrun.detail }}</small>
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </aside>
+    </section>
   }
 </section>
+
+<app-modal
+  [open]="showAddModal()"
+  [eyebrow]="'Orçamento de ' + monthName"
+  title="Adicionar categoria"
+  subtitle="Escolha a categoria e quanto você planeja gastar nela neste mês."
+  size="sm"
+  (close)="closeAddModal()">
+  <div modal-body class="add-budget-form">
+    <label class="field-block">
+      <span>Categoria</span>
+      <app-select-menu
+        [options]="categoryOptions"
+        [ngModel]="selectedCategoryId"
+        placeholder="Selecione a categoria"
+        ariaLabel="Categoria do orçamento"
+        [searchable]="true"
+        (ngModelChange)="onCategoryChange($event)" />
+      <small>A média dos últimos 3 meses depende de histórico consolidado e ainda não está disponível no contrato atual.</small>
+    </label>
+
+    <label class="field-block">
+      <span>Valor planejado</span>
+      <div class="money-input">
+        <span>R$</span>
+        <input
+          type="number"
+          placeholder="0,00"
+          min="0"
+          step="0.01"
+          [(ngModel)]="newAmount" />
+      </div>
+    </label>
+
+    <button type="button" class="average-shortcut" disabled>Média indisponível</button>
+
+    <div class="budget-preview" aria-label="Planejado do mês depois de adicionar">
+      <span>Planejado do mês depois de adicionar</span>
+      <strong>{{ addPreviewTotal | appCurrency }}</strong>
+    </div>
+  </div>
+
+  <ng-container modal-footer>
+    <button type="button" class="btn-ghost" (click)="closeAddModal()">Cancelar</button>
+    <button type="button" class="btn-primary" (click)="addItem()" [disabled]="saving() || !selectedCategoryId || !newAmount">
+      {{ saving() ? 'Salvando...' : 'Adicionar' }}
+    </button>
+  </ng-container>
+</app-modal>
 
 <app-confirm-sheet
   [open]="!!pendingDelete"

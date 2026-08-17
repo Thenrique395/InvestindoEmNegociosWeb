@@ -31,10 +31,10 @@
     <app-ui-state type="loading" />
   }
   @if (!loading && users.length) {
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-md)]">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-dropdown)]">
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-          <thead class="bg-[var(--surface-2)] text-left text-[var(--text)]">
+          <thead class="bg-[var(--surface-sunken)] text-left text-[var(--text)]">
             <tr class="border-b border-[var(--border)]">
               <th class="px-6 py-4 font-semibold">Nome</th>
               <th class="px-6 py-4 font-semibold">Status</th>
@@ -46,15 +46,15 @@
           </thead>
           <tbody class="divide-y divide-[var(--border)]">
             @for (user of users; track trackByUser($index, user)) {
-              <tr class="hover:bg-[var(--surface-2)]">
+              <tr class="hover:bg-[var(--surface-sunken)]">
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-sunken)] text-sm font-semibold text-[var(--text)]">
                       {{ (user.name || user.email || '?').charAt(0) }}
                     </span>
                     <div>
                       <div class="font-semibold text-[var(--text)]">{{ user.name || 'Sem nome' }}</div>
-                      <div class="text-xs text-[var(--text-muted)]">{{ user.email }}</div>
+                      <div class="text-xs text-[var(--text-tertiary)]">{{ user.email }}</div>
                     </div>
                   </div>
                 </td>
@@ -64,7 +64,7 @@
                     [label]="user.isActive ? 'Ativo' : 'Inativo'"
                     [dot]="true" />
                 </td>
-                <td class="px-6 py-4 text-[var(--text-muted)]">{{ user.createdAt | date: 'short' }}</td>
+                <td class="px-6 py-4 text-[var(--text-tertiary)]">{{ user.createdAt | date: 'short' }}</td>
                 <td class="px-6 py-4">
                   <select
                     class="h-10 w-full min-w-[160px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
@@ -181,11 +181,11 @@
               @if (trialOpenForUserId === user.id) {
                 <tr>
                   <td colspan="6" class="px-6 pb-4">
-                    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+                    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
                       <p class="mb-3 text-sm font-semibold text-[var(--text)]">Conceder trial para {{ user.name || user.email }}</p>
                       <div class="flex flex-wrap items-end gap-3">
                         <div class="flex flex-col gap-1">
-                          <label class="text-xs text-[var(--text-muted)]">Plano</label>
+                          <label class="text-xs text-[var(--text-tertiary)]">Plano</label>
                           <select
                             class="h-9 min-w-[140px] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
                             [(ngModel)]="trialPlanCode"
@@ -195,7 +195,7 @@
                           </select>
                         </div>
                         <div class="flex flex-col gap-1">
-                          <label class="text-xs text-[var(--text-muted)]">Dias (1–365)</label>
+                          <label class="text-xs text-[var(--text-tertiary)]">Dias (1–365)</label>
                           <input
                             type="number"
                             class="h-9 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm text-[var(--text)]"
@@ -226,9 +226,9 @@
               @if (featuresOpenForUserId === user.id) {
                 <tr>
                   <td colspan="6" class="px-6 pb-4">
-                    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+                    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
                       @if (featuresLoadingForUserId === user.id) {
-                        <div class="text-xs text-[var(--text-muted)]">
+                        <div class="text-xs text-[var(--text-tertiary)]">
                           Carregando features...
                         </div>
                       }
@@ -238,7 +238,7 @@
                             <label class="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3">
                               <div>
                                 <div class="text-sm font-semibold text-[var(--text)]">{{ featureLabel(feature.featureKey) }}</div>
-                                <div class="text-xs text-[var(--text-muted)]">
+                                <div class="text-xs text-[var(--text-tertiary)]">
                                   Base perfil: {{ feature.enabledByRole ? 'habilitado' : 'bloqueado' }} ·
                                   Efetivo: {{ feature.effectiveEnabled ? 'habilitado' : 'bloqueado' }}
                                 </div>

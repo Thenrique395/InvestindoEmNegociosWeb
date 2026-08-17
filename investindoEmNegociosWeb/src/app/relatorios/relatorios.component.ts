@@ -1,19 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, NgZone, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ReportsService, CategoryExpenseResponse, MonthlySummaryReportResponse } from '../reports.service';
 import { formatCurrencyValue } from '../utils/locale-utils';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { UiStateComponent } from '../ui-state/ui-state.component';
-import { DonutChartComponent, DonutChartItem } from '../shared/donut-chart/donut-chart.component';
 import { PageHeaderComponent } from '../shared/page-header/page-header.component';
 import { TransactionSummaryCardComponent } from '../shared/transactions/transaction-summary-card.component';
-import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
-import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.model';
+import {
+  CategoryExpenseBar,
+  ReportComparisonPeriod,
+  ReportComparisonPoint,
+  buildComparisonWindow,
+  buildExpenseCategoryBars,
+  buildReportComparison,
+  buildTopExpenses
+} from './reports-overview.model';
+
+type ReportViewType = 'summary' | 'comparison';
 
 @Component({
   selector: 'app-relatorios',
@@ -22,10 +32,9 @@ import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.mod
     CommonModule,
     AppCurrencyPipe,
     UiStateComponent,
-    DonutChartComponent,
     PageHeaderComponent,
     TransactionSummaryCardComponent,
-    UsageBarComponent,
+    ProgressBarComponent,
     ResponsiveListComponent,
     ResponsiveListCellDirective
   ],
@@ -36,13 +45,23 @@ import { buildExpenseDonutItems, buildTopExpenses } from './reports-overview.mod
 export class RelatoriosComponent implements OnInit {
   // Estado por signal (A9): report/loading/error vêm de callback assíncrono (HTTP fora da zona).
   readonly report = signal<MonthlySummaryReportResponse | null>(null);
+  readonly comparisonReports = signal<MonthlySummaryReportResponse[]>([]);
   readonly loading = signal(false);
+  readonly comparisonLoading = signal(false);
   readonly error = signal('');
+  readonly comparisonError = signal('');
 
   year = new Date().getFullYear();
   month = new Date().getMonth() + 1;
+  comparisonPeriod: ReportComparisonPeriod = 6;
+  reportViewType: ReportViewType = 'summary';
 
   readonly months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  readonly comparisonPeriods: ReportComparisonPeriod[] = [6, 12];
+  readonly reportViewTypes: Array<{ value: ReportViewType; label: string }> = [
+    { value: 'summary', label: 'Resumo mensal' },
+    { value: 'comparison', label: 'Comparativo' }
+  ];
   readonly expenseCategoryColumns: ResponsiveListColumn[] = [
     { key: 'category', label: 'Categoria' },
     { key: 'amount', label: 'Valor', align: 'end' },
@@ -61,8 +80,16 @@ export class RelatoriosComponent implements OnInit {
 
   get monthName(): string { return this.months[this.month - 1]; }
 
-  get expensesDonutItems(): DonutChartItem[] {
-    return buildExpenseDonutItems(this.report()?.expensesByCategory);
+  get comparisonWindow() {
+    return buildComparisonWindow(this.year, this.month, this.comparisonPeriod, this.months);
+  }
+
+  get comparisonPoints(): ReportComparisonPoint[] {
+    return buildReportComparison(this.comparisonReports(), this.comparisonWindow);
+  }
+
+  get expenseCategoryBars(): CategoryExpenseBar[] {
+    return buildExpenseCategoryBars(this.report()?.expensesByCategory);
   }
 
   get topExpenses(): CategoryExpenseResponse[] {
@@ -85,6 +112,7 @@ export class RelatoriosComponent implements OnInit {
           this.cdr.markForCheck();
         })
       });
+    this.loadComparison();
   }
 
   prevMonth(): void {
@@ -95,6 +123,38 @@ export class RelatoriosComponent implements OnInit {
   nextMonth(): void {
     if (this.month === 12) { this.month = 1; this.year++; } else { this.month++; }
     this.load();
+  }
+
+  setComparisonPeriod(period: ReportComparisonPeriod): void {
+    if (this.comparisonPeriod === period) return;
+    this.comparisonPeriod = period;
+    this.loadComparison();
+  }
+
+  setReportViewType(type: ReportViewType): void {
+    this.reportViewType = type;
+  }
+
+  loadComparison(): void {
+    const window = this.comparisonWindow;
+    this.comparisonLoading.set(true);
+    this.comparisonError.set('');
+
+    forkJoin(window.map((ref) => this.reportsService.getMonthlySummary(ref.year, ref.month)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (reports) => this.ngZone.run(() => {
+          this.comparisonReports.set(reports);
+          this.comparisonLoading.set(false);
+          this.cdr.markForCheck();
+        }),
+        error: () => this.ngZone.run(() => {
+          this.comparisonReports.set([]);
+          this.comparisonError.set('Não foi possível carregar o comparativo deste período.');
+          this.comparisonLoading.set(false);
+          this.cdr.markForCheck();
+        })
+      });
   }
 
   exportCsv(): void {

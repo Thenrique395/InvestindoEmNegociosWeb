@@ -5,20 +5,22 @@
   min-width: 0;
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
 .dados-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-@media (max-width: 760px) {
-  .dados-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.dados-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .grid {
@@ -29,10 +31,10 @@
 }
 
 .btn {
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   border: 1px solid var(--border);
   padding: 0.65rem 0.9rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   cursor: pointer;
 }
 
@@ -43,7 +45,7 @@
 
 .btn--primary {
   background: var(--primary);
-  color: var(--color-text-inverse);
+  color: var(--on-primary);
   border-color: transparent;
 }
 
@@ -53,8 +55,8 @@
 }
 
 .btn--danger {
-  background: #b42318;
-  color: var(--color-text-inverse);
+  background: var(--expense-text);
+  color: var(--on-primary);
   border-color: transparent;
 }
 
@@ -74,7 +76,7 @@
 .file span {
   display: block;
   border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: var(--surface);
   padding: 0.65rem 0.8rem;
   color: var(--text);
@@ -94,8 +96,8 @@
 }
 
 .danger {
-  color: #b42318;
-  font-size: var(--text-sm);
+  color: var(--expense-text);
+  font-size: var(--fs-meta);
 }
 
 .danger-card {
@@ -109,7 +111,7 @@
 
 .field input {
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   background: var(--surface);
   padding: 0.7rem 0.8rem;
   color: var(--text);
@@ -119,7 +121,7 @@
   display: grid;
   gap: 0.45rem;
   color: var(--text-secondary);
-  font-size: var(--text-sm);
+  font-size: var(--fs-meta);
 }
 
 .scope div {
@@ -137,7 +139,7 @@
 }
 
 .meta {
-  color: var(--text-muted);
-  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
   margin: 0;
 }

@@ -7,10 +7,18 @@
   gap: 1.5rem;
 }
 
+/* README §4: faixa de indicadores é flex com quebra, nunca `grid auto-fit`.
+   Com grid, quando a contagem de cards não divide pelo número de colunas sobra
+   célula vazia à direita; com flex a última linha cresce e preenche. */
 .tx-summary-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.tx-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .tx-shell {
@@ -18,9 +26,8 @@
   gap: 1.3rem;
   padding: 1.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
 }
 
 .tx-list-wrap {
@@ -42,10 +49,10 @@
 }
 
 .tx-filter__label {
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
@@ -53,9 +60,9 @@
 .tx-filter input {
   min-height: 60px;
   padding: 0 1.15rem;
-  border-radius: var(--radius-xl);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-panel);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
 }
 
 @media (max-width: 960px) {

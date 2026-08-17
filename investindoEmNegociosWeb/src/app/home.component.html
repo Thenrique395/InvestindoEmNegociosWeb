@@ -3,7 +3,7 @@
     @if (loadErrorMessage) {
       <div
         role="alert"
-        class="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-300/60 bg-amber-500/10 px-[var(--spacing-2)] py-[var(--spacing-1)] text-[0.8125rem] text-[var(--warning-text)]">
+        class="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-300/60 bg-amber-500/10 px-[var(--space-6)] py-[var(--space-3)] text-[0.8125rem] text-[var(--warning-text)]">
         <span>{{ loadErrorMessage }}</span>
         <button
           type="button"
@@ -20,7 +20,7 @@
         [periodoLabel]="mesAtualLabel"
         [loading]="isLoadingDashboard"
         (periodoChange)="setPeriodo($event)" />
-    @if (hasAccess('Advanced') && patrimonioChartMonthsCount) {
+    @if (hasAccess('Advanced') && hasPatrimonioEvolutionData) {
       <app-section-card
         title="Evolução patrimonial"
         [description]="patrimonioChartDescription">
@@ -138,31 +138,144 @@
           </div>
         </div>
         @if (patrimonioHistoryEstimated) {
-          <p class="m-0 mt-3 text-sm text-[var(--text-muted)]">
+          <p class="m-0 mt-3 text-sm text-[var(--text-tertiary)]">
             Série estimada a partir do histórico disponível de contas, pagamentos e movimentos de investimento.
           </p>
         } @else {
-          <p class="m-0 mt-3 text-sm text-[var(--text-muted)]">
+          <p class="m-0 mt-3 text-sm text-[var(--text-tertiary)]">
             Valores previstos não alteram o saldo disponível até serem confirmados.
           </p>
         }
       </app-section-card>
+    } @else if (hasAccess('Advanced') && patrimonioChartMonthsCount) {
+      <app-section-card
+        title="Evolução patrimonial"
+        description="O histórico começa a aparecer quando houver pelo menos dois meses de movimentação.">
+        <div class="history-start">
+          <strong>Histórico começando</strong>
+          <p>
+            Já existe movimentação no período, mas ainda não há base suficiente para desenhar uma tendência.
+            Continue registrando receitas, despesas e saldos para comparar a evolução no próximo mês.
+          </p>
+        </div>
+      </app-section-card>
     }
-  @if (hasAccess('Intermediate') && subscriptionsSummary && subscriptionsSummary.count) {
+    @if (hasAccess('Intermediate') && !hasAccess('Advanced') && hasControleEvolutionData) {
+      <app-section-card
+        title="Evolução do caixa"
+        [description]="controleEvolutionDescription">
+        <div class="networth-chart">
+          <svg
+            class="networth-chart__svg"
+            viewBox="0 0 640 130"
+            role="img"
+            [attr.aria-label]="controleEvolutionDescription">
+            @for (tick of controleAxisTicks; track trackByIndex($index, tick)) {
+              <g class="networth-chart__grid" [class.networth-chart__grid--zero]="tick.isZero">
+                <line x1="64" x2="620" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+                <text x="8" [attr.y]="tick.y + 3">{{ formatChartAxisValue(tick.value) }}</text>
+              </g>
+            }
+            @for (point of controleFlowLinePoints; track trackByIndex($index, point)) {
+              <g class="networth-chart__month-tick" [class.networth-chart__month-tick--current]="point.isCurrentMonth">
+                <line [attr.x1]="point.x" [attr.x2]="point.x" y1="102" y2="108" />
+              </g>
+            }
+            <path class="networth-chart__line networth-chart__line--income" [attr.d]="controleIncomeLinePath"></path>
+            <path class="networth-chart__line networth-chart__line--expense" [attr.d]="controleExpenseLinePath"></path>
+            @for (point of controleFlowLinePoints; track trackByIndex($index, point)) {
+              <g class="networth-chart__point networth-chart__point--income" [attr.transform]="'translate(' + point.x + ' ' + point.incomeY + ')'">
+                <circle r="2"></circle>
+                <title>{{ point.label }} — Receitas: {{ point.income | appCurrency }}</title>
+              </g>
+              <g class="networth-chart__point networth-chart__point--expense" [attr.transform]="'translate(' + point.x + ' ' + point.expenseY + ')'">
+                <circle r="2"></circle>
+                <title>{{ point.label }} — Despesas: {{ point.expense | appCurrency }}</title>
+              </g>
+            }
+          </svg>
+          <div class="networth-chart__legend">
+            <span class="networth-chart__legend-item">
+              <span class="networth-chart__dot networth-chart__dot--income" aria-hidden="true"></span>
+              Receitas
+            </span>
+            <span class="networth-chart__legend-item">
+              <span class="networth-chart__dot networth-chart__dot--expense" aria-hidden="true"></span>
+              Despesas
+            </span>
+          </div>
+          <div class="networth-chart__labels" aria-hidden="true">
+            @for (point of controleFlowLinePoints; track trackByIndex($index, point)) {
+              <span class="networth-chart__label" [class.networth-chart__label--current]="point.isCurrentMonth">{{ point.label }}</span>
+            }
+          </div>
+        </div>
+      </app-section-card>
+    } @else if (hasAccess('Intermediate') && !hasAccess('Advanced') && hasControleEvolutionSeed) {
+      <app-section-card
+        title="Evolução do caixa"
+        description="O histórico começa a aparecer quando houver pelo menos dois meses de movimentação.">
+        <div class="history-start">
+          <strong>Histórico começando</strong>
+          <p>
+            Já existe movimentação no período, mas ainda não há base suficiente para comparar receitas e despesas.
+            Continue registrando lançamentos para ver a evolução de 6 meses.
+          </p>
+        </div>
+      </app-section-card>
+    }
+  @if (hasAccess('Intermediate') && recurrenceItems.length) {
     <app-section-card
-      title="Assinaturas"
-      description="Recorrências categorizadas como Assinaturas.">
+      title="Recorrências do mês"
+      description="Assinaturas, contas fixas, parcelas e receitas recorrentes.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge tone="muted" [label]="'Saídas fixas: ' + (recurrenceOutflowTotal | appCurrency)"></app-status-badge>
+        @if (recurrenceIncomeTotal > 0) {
+          <app-status-badge tone="success" [label]="'Entradas fixas: ' + (recurrenceIncomeTotal | appCurrency)"></app-status-badge>
+        }
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="grid gap-2">
+          @for (item of recurrenceItems; track item.id) {
+            <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+              <div class="min-w-0">
+                <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">{{ item.kindLabel }} · {{ item.dateLabel }}</p>
+              </div>
+              <div class="grid justify-items-end gap-1">
+                <strong
+                  class="text-[0.875rem]"
+                  [ngClass]="item.direction === 'income' ? 'text-[var(--income-text)]' : 'text-[var(--text)]'">
+                  {{ item.amount | appCurrency }}
+                </strong>
+                <app-status-badge [tone]="item.tone" [label]="item.direction === 'income' ? 'Entrada' : 'Saída'" size="sm"></app-status-badge>
+              </div>
+            </article>
+          }
+        </div>
+        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3 text-[0.75rem] text-[var(--text-tertiary)]">
+          <span>{{ recurrenceExpenseCount }} saída(s) fixa(s)</span>
+          @if (recurrenceIncomeCount > 0) {
+            <span>{{ recurrenceIncomeCount }} entrada(s) fixa(s)</span>
+          }
+        </footer>
+      </div>
+    </app-section-card>
+  } @else if (hasAccess('Intermediate') && subscriptionsSummary && subscriptionsSummary.count) {
+    <app-section-card
+      title="Recorrências do mês"
+      description="Assinaturas categorizadas no resumo financeiro.">
       <div card-actions>
-        <app-status-badge tone="muted" [label]="'Total: ' + (subscriptionsSummary.monthlyTotal | appCurrency) + '/mês'"></app-status-badge>
+        <app-status-badge tone="muted" [label]="'Saídas fixas: ' + (subscriptionsSummary.monthlyTotal | appCurrency)"></app-status-badge>
       </div>
       <div class="grid gap-2">
-        @for (item of subscriptionsSummary.items; track trackByIndex($index, item)) {
-          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        @for (item of subscriptionsSummary.items; track item.planId) {
+          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
             <div class="flex flex-wrap items-start justify-between gap-2">
               <div class="min-w-0">
                 <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
                 @if (item.cardName) {
-                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">Cartão · {{ item.cardName }}</p>
+                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">Cartão · {{ item.cardName }}</p>
                 }
               </div>
               <strong class="block text-[0.875rem] text-[var(--text)]">{{ item.amount | appCurrency }}</strong>
@@ -172,47 +285,229 @@
       </div>
     </app-section-card>
   }
-  @if (hasAccess('Intermediate') && aiHealth) {
+  @if (hasAccess('Intermediate') && budgetSummary && budgetOverview.itemsCount) {
+    <app-section-card
+      title="Orçamento do mês"
+      description="Planejado contra realizado nas categorias acompanhadas.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge
+          [tone]="budgetOverview.usagePercent > 100 ? 'danger' : budgetOverview.usagePercent > 80 ? 'warning' : 'success'"
+          [label]="budgetOverview.usagePercent + '% usado'"></app-status-badge>
+        <a
+          class="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)] no-underline transition hover:border-[var(--primary)] hover:text-[var(--text)]"
+          routerLink="/orcamento">
+          Ver orçamento
+        </a>
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2">
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Planejado</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ budgetOverview.totalPlanned | appCurrency }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Realizado</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ budgetOverview.totalRealized | appCurrency }}</strong>
+          </div>
+          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Variação</p>
+            <strong
+              class="mt-1 block text-[1rem]"
+              [ngClass]="budgetOverview.totalVariance < 0 ? 'text-[var(--expense-text)]' : 'text-[var(--income-text)]'">
+              {{ budgetOverview.totalVariance | appCurrency }}
+            </strong>
+          </div>
+        </div>
+        @if (budgetItemHighlights.length) {
+          <div class="grid gap-2">
+            @for (view of budgetItemHighlights; track view.item.id) {
+              <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ view.item.categoryName }}</strong>
+                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">
+                    {{ view.item.realizedAmount | appCurrency }} de {{ view.item.plannedAmount | appCurrency }}
+                  </p>
+                </div>
+                <app-status-badge
+                  [tone]="view.overBudget ? 'danger' : view.usagePercent > 80 ? 'warning' : 'success'"
+                  [label]="view.overBudget ? 'Estourou' : view.usagePercent + '%'"></app-status-badge>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="m-0 text-[0.8125rem] text-[var(--text-tertiary)]">Nenhuma categoria planejada teve gasto registrado neste mês.</p>
+        }
+      </div>
+    </app-section-card>
+  }
+  @if (hasAccess('Intermediate') && dashboardAccountsDebtAvailable) {
+    <app-section-card
+      title="Dívidas e contas"
+      description="Saldo em contas, disponibilidade real e compromissos em aberto.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge tone="muted" [label]="dashboardDebtOpenItemsCount + ' compromisso(s)'"></app-status-badge>
+        @if (dashboardDebtOverdueTotal > 0) {
+          <app-status-badge tone="danger" [label]="'Atrasado: ' + (dashboardDebtOverdueTotal | appCurrency)"></app-status-badge>
+        } @else if (dashboardDebtDueSoonTotal > 0) {
+          <app-status-badge tone="warning" [label]="'Próximo: ' + (dashboardDebtDueSoonTotal | appCurrency)"></app-status-badge>
+        }
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="flex flex-wrap gap-2">
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Saldo em contas</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ dashboardAccountsBalance | appCurrency }}</strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Disponível real</p>
+            <strong
+              class="mt-1 block text-[1rem]"
+              [ngClass]="dashboardRealAvailableBalance < 0 ? 'text-[var(--expense-text)]' : 'text-[var(--income-text)]'">
+              {{ dashboardRealAvailableBalance | appCurrency }}
+            </strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Dívida aberta</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ dashboardDebtTotal | appCurrency }}</strong>
+          </div>
+        </div>
+        @if (dashboardDebtItems.length) {
+          <div class="grid gap-2">
+            @for (item of dashboardDebtItems; track item.id) {
+              <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ item.title }}</strong>
+                  <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">{{ item.kindLabel }} · vence {{ item.dateLabel }}</p>
+                </div>
+                <div class="grid justify-items-end gap-1">
+                  <strong class="text-[0.875rem] text-[var(--text)]">{{ item.amount | appCurrency }}</strong>
+                  <app-status-badge [tone]="item.tone" label="Aberto" size="sm"></app-status-badge>
+                </div>
+              </article>
+            }
+          </div>
+        }
+        @if (dashboardTopAccounts.length) {
+          <footer class="flex flex-wrap gap-2 border-t border-[var(--border)] pt-3">
+            @for (account of dashboardTopAccounts; track account.id) {
+              <span class="inline-flex max-w-full items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)]">
+                <span class="truncate">{{ account.name }}</span>
+                <strong class="text-[var(--text)]">{{ account.currentBalance | appCurrency }}</strong>
+              </span>
+            }
+          </footer>
+        }
+      </div>
+    </app-section-card>
+  }
+  @if (hasAccess('Advanced') && hasInvestmentDashboardData) {
+    <app-section-card
+      title="Investimentos"
+      description="Carteira consolidada por valor atual, resultado e alocação principal.">
+      <div card-actions class="flex flex-wrap items-center gap-2">
+        <app-status-badge [tone]="investmentResultTone" [label]="'Resultado: ' + (investmentsOverview.growth | appCurrency)"></app-status-badge>
+        <a
+          class="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-[0.75rem] font-semibold text-[var(--text-secondary)] no-underline transition hover:border-[var(--primary)] hover:text-[var(--text)]"
+          routerLink="/investimentos">
+          Ver carteira
+        </a>
+      </div>
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+        <div class="flex flex-wrap gap-2">
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Valor atual</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ investmentsOverview.marketValue | appCurrency }}</strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Aportado</p>
+            <strong class="mt-1 block text-[1rem] text-[var(--text)]">{{ investmentsOverview.invested | appCurrency }}</strong>
+          </div>
+          <div class="min-w-[150px] flex-1 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+            <p class="m-0 text-[0.75rem] uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Rentabilidade</p>
+            <strong
+              class="mt-1 block text-[1rem]"
+              [ngClass]="investmentsOverview.growth < 0 ? 'text-[var(--expense-text)]' : investmentsOverview.growth > 0 ? 'text-[var(--income-text)]' : 'text-[var(--text)]'">
+              {{ investmentsOverview.profitPercent | number:'1.1-1' }}%
+            </strong>
+          </div>
+        </div>
+        @if (investmentTopDistribution.length) {
+          <div class="grid gap-2">
+            @for (slice of investmentTopDistribution; track slice.key) {
+              <article class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-3">
+                <div class="min-w-0">
+                  <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ slice.label }}</strong>
+                  <div class="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-inset)]">
+                    <span
+                      class="block h-full rounded-full"
+                      [style.background]="slice.color"
+                      [style.width.%]="slice.percent"></span>
+                  </div>
+                </div>
+                <div class="grid justify-items-end gap-1">
+                  <strong class="text-[0.875rem] text-[var(--text)]">{{ slice.value | appCurrency }}</strong>
+                  <span class="text-[0.75rem] font-semibold text-[var(--text-tertiary)]">{{ slice.percent | number:'1.0-0' }}%</span>
+                </div>
+              </article>
+            }
+          </div>
+        }
+        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3 text-[0.75rem] text-[var(--text-tertiary)]">
+          <span>{{ investmentsOverview.activeCount }} posição(ões) ativa(s)</span>
+          @if (investmentsOverview.proventos > 0) {
+            <span>Proventos: {{ investmentsOverview.proventos | appCurrency }}</span>
+          }
+        </footer>
+      </div>
+    </app-section-card>
+  }
+  @if (hasAccess('Advanced') && aiHealth) {
     <app-section-card
       title="Saúde financeira (IA)"
       [description]="aiHealth.overallSummary">
       <div card-actions>
         <app-status-badge [tone]="aiHealthTone(aiHealth.overallStatus)" [label]="aiHealth.overallStatus === 'critical' ? 'Crítico' : aiHealth.overallStatus === 'warning' ? 'Atenção' : 'Estável'"></app-status-badge>
       </div>
+      @if (hasAiHealthAreas) {
       <div class="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2">
         @for (area of aiHealth.areas; track area.area) {
-          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+          <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
             <div class="flex items-center justify-between gap-2">
               <strong class="text-[0.875rem] text-[var(--text)]">{{ aiHealthAreaLabel(area.area) }}</strong>
               <app-status-badge [tone]="aiHealthTone(area.status)" [label]="area.status === 'critical' ? 'Crítico' : area.status === 'warning' ? 'Atenção' : 'Estável'"></app-status-badge>
             </div>
-            <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-muted)]">{{ area.explanation }}</p>
+            <p class="m-0 mt-1 text-[0.75rem] text-[var(--text-tertiary)]">{{ area.explanation }}</p>
           </article>
         }
       </div>
+      } @else {
+        <div class="rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+          <p class="m-0 text-[0.875rem] text-[var(--text-secondary)]">{{ aiHealth.overallSummary }}</p>
+        </div>
+      }
     </app-section-card>
   }
   @if (!isLoadingDashboard) {
     <section
-      class="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[1.1rem] shadow-[var(--shadow-elevation-sm)]"
+      class="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-[var(--border)] border-l-4 bg-[var(--surface)] p-[1.1rem] shadow-[var(--shadow-card-hover)]"
     [ngClass]="insight.tone === 'warn'
       ? 'border-[color-mix(in_srgb,var(--warning)_35%,transparent)] border-l-[var(--warning)] bg-[color-mix(in_srgb,var(--warning)_10%,transparent)]'
       : insight.tone === 'danger'
-        ? 'border-[color-mix(in_srgb,var(--danger)_35%,transparent)] border-l-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,transparent)]'
+        ? 'border-[color-mix(in_srgb,var(--expense)_35%,transparent)] border-l-[var(--expense)] bg-[color-mix(in_srgb,var(--expense)_10%,transparent)]'
         : insight.tone === 'info'
-          ? 'border-[color-mix(in_srgb,var(--info)_35%,transparent)] border-l-[var(--info)] bg-[color-mix(in_srgb,var(--info)_10%,transparent)]'
+          ? 'border-[color-mix(in_srgb,var(--primary)_35%,transparent)] border-l-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]'
           : ''"
       >
       <div class="flex items-start gap-3">
-        <div class="grid h-8 w-8 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]">
+        <div class="grid h-8 w-8 place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-sunken)] text-[var(--text)]">
           <svg viewBox="0 0 24 24" class="h-4 w-4" role="presentation" focusable="false">
             <path d="M12 9v4m0 4h.01M10.3 4.8l-7 12.2A2 2 0 0 0 5 20h14a2 2 0 0 0 1.7-3l-7-12.2a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div>
-          <p class="text-[0.75rem] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
-          <h3 class="m-0 text-[var(--text-sm)] font-semibold">{{ insight.title }}</h3>
-          <p class="mt-1 text-[0.8125rem] text-[var(--text-muted)]">{{ insight.message }}</p>
+          <p class="text-[0.75rem] tracking-[0.2em] text-[var(--text-tertiary)]">Insight automático</p>
+          <h3 class="m-0 text-[var(--fs-meta)] font-semibold">{{ insight.title }}</h3>
+          <p class="mt-1 text-[0.8125rem] text-[var(--text-tertiary)]">{{ insight.message }}</p>
           @if (insightAction) {
             <div class="mt-2">
               <a
@@ -248,180 +543,182 @@
   }
   @if (!isLoadingDashboard && isBasicProfile) {
     <app-upgrade-cta
-      planLabel="Intermediate"
+      planLabel="Controle"
       title="Desbloqueie análises que antecipam problemas de caixa"
       [features]="['Projeção e análise de risco', 'Assinaturas recorrentes', 'Saúde financeira com IA']" />
   }
   @if (!isLoadingDashboard && !isBasicProfile && !hasAccess('Advanced')) {
     <app-upgrade-cta
-      planLabel="Advanced"
+      planLabel="Patrimônio"
       title="Vá além: patrimônio consolidado e visão de longo prazo"
       [features]="['Evolução patrimonial', 'Visão consolidada de ativos e passivos', 'Investimentos integrados ao patrimônio']" />
   }
   @if (showInsightDetails) {
-    <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--spacing-3)] backdrop-blur-[2px]">
-      <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-3)] shadow-[var(--shadow-md)] max-h-[88vh] overflow-y-auto pb-24 pb-[var(--spacing-3)]">
-        <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-xl)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
+    <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-10)] backdrop-blur-[2px]">
+      <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-10)] shadow-[var(--shadow-dropdown)] max-h-[88vh] overflow-y-auto pb-24 pb-[var(--space-10)]">
+        <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-sunken)] text-[var(--fs-section)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
           ×
         </button>
         <div class="flex flex-wrap items-center gap-2 pr-10">
-          <p class="text-[var(--text-xs)] tracking-[0.2em] text-[var(--text-muted)]">Insight automático</p>
+          <p class="text-[var(--fs-caption)] tracking-[0.2em] text-[var(--text-tertiary)]">Insight automático</p>
           <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.75rem] font-semibold uppercase tracking-[0.16em]" [ngClass]="insightPriorityClass">
             {{ insightPriority }}
           </span>
         </div>
-        <h3 class="m-0 text-[var(--text-lg)] font-semibold">{{ insight.title }}</h3>
-        <p class="mt-1 text-[var(--text-sm)] text-[var(--text-muted)]">{{ insight.message }}</p>
-        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
+        <h3 class="m-0 text-[var(--fs-card-title)] font-semibold">{{ insight.title }}</h3>
+        <p class="mt-1 text-[var(--fs-meta)] text-[var(--text-tertiary)]">{{ insight.message }}</p>
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2">
           <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">{{ insightActionSentence }}</p>
-          <p class="m-1 text-[0.75rem] text-[var(--text-muted)]">{{ insightDeadlineLabel }}</p>
+          <p class="m-1 text-[0.75rem] text-[var(--text-tertiary)]">{{ insightDeadlineLabel }}</p>
           <p class="m-0 text-[0.75rem] text-[var(--text-secondary)]">{{ insightShortGoal }}</p>
         </div>
         @if (insightHighlights.length) {
           <div class="flex flex-wrap gap-1.5">
             @for (item of insightHighlights; track trackByIndex($index, item)) {
               <span
-                class="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-[2px] text-[0.75rem] font-semibold text-[var(--text-secondary)]"
+                class="rounded-full border border-[var(--border)] bg-[var(--surface-sunken)] px-2 py-[2px] text-[0.75rem] font-semibold text-[var(--text-secondary)]"
                 >
                 {{ item }}
               </span>
             }
           </div>
         }
-        <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-2)] shadow-[var(--shadow-sm)]">
-          <div class="flex items-center justify-between gap-2">
-            <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">Painel de risco</p>
-            <span class="text-[0.75rem] text-[var(--text-muted)]">Atualização automática</span>
-          </div>
-          <div class="grid grid-cols-1 gap-2 grid-cols-[1.15fr_1fr]">
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
-              <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Saúde financeira</p>
-              <div class="mt-2 flex items-center justify-between gap-2">
-                <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.875rem] font-semibold" [ngClass]="insightHealthToneClass">
-                  {{ insightDiagnostics.healthScore }}/100
-                </strong>
-                <span class="text-[0.75rem] text-[var(--text-muted)]">Score mensal</span>
-              </div>
-              <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-                <div class="h-full rounded-full transition-all duration-300"
-                  [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
-                [style.width.%]="insightScoreGaugeWidth"></div>
-              </div>
-              @if (robotScoreBreakdown.length) {
-                <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] p-2">
-                  <p class="m-0 text-[0.75rem] text-[var(--text-muted)]">Como chegamos nesse score:</p>
-                  <ul class="m-0 mt-1 list-disc pl-4 text-[0.75rem] text-[var(--text-secondary)]">
-                    @for (item of robotScoreBreakdown; track trackByIndex($index, item)) {
-                      <li>{{ item }}</li>
-                    }
-                  </ul>
+        @if (hasAccess('Intermediate')) {
+          <div class="grid gap-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)] shadow-[var(--shadow-card-hover)]">
+            <div class="flex items-center justify-between gap-2">
+              <p class="m-0 text-[0.8125rem] font-semibold text-[var(--text)]">Painel de risco</p>
+              <span class="text-[0.75rem] text-[var(--text-tertiary)]">Atualização automática</span>
+            </div>
+            <div class="grid grid-cols-1 gap-2 grid-cols-[1.15fr_1fr]">
+              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
+                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Saúde financeira</p>
+                <div class="mt-2 flex items-center justify-between gap-2">
+                  <strong class="inline-flex items-center rounded-full border px-2.5 py-1 text-[0.875rem] font-semibold" [ngClass]="insightHealthToneClass">
+                    {{ insightDiagnostics.healthScore }}/100
+                  </strong>
+                  <span class="text-[0.75rem] text-[var(--text-tertiary)]">Score mensal</span>
                 </div>
-              }
-            </article>
-            <div class="grid gap-2">
-              <article class="rounded-[12px] border p-[var(--spacing-1)]" [ngClass]="insightRiskToneClass">
-                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
-                <strong class="mt-2 block text-[0.9375rem] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
-              </article>
-              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
-                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Próximos 5 dias</p>
-                <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | appCurrency }}</strong>
-                <p class="mt-1 text-[0.75rem] text-[var(--text-muted)]">Despesas com vencimento próximo.</p>
-              </article>
-            </div>
-          </div>
-          <article class="rounded-[12px] border p-[var(--spacing-1)]" [ngClass]="insightOverdueToneClass">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
-                <strong class="mt-1 block text-[0.9375rem] font-semibold">
-                  {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
-                </strong>
-              </div>
-            </div>
-            @if (insightTodoItems.length) {
-              <div class="mt-2 grid gap-2">
-                @for (todo of insightTodoItems; track trackByIndex($index, todo)) {
-                  <article
-                    class="rounded-[10px] border px-2 py-2 text-[0.8125rem]"
-              [ngClass]="todo.severity === 'danger'
-                ? 'border-rose-300/60 bg-rose-500/10 text-[var(--danger-text)]'
-                : todo.severity === 'warn'
-                  ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
-                  : 'border-sky-300/60 bg-sky-500/10 text-[var(--info-text)]'">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                      <p class="m-0 flex-1">{{ todo.text }}</p>
-                      <a
-                        class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[0.75rem] font-semibold text-[var(--text)]"
-                        [routerLink]="todo.route"
-                        [queryParams]="todo.queryParams">
-                        {{ todo.actionLabel }}
-                      </a>
-                    </div>
-                  </article>
+                <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-inset)]">
+                  <div class="h-full rounded-full transition-all duration-300"
+                    [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
+                  [style.width.%]="insightScoreGaugeWidth"></div>
+                </div>
+                @if (robotScoreBreakdown.length) {
+                  <div class="mt-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] p-2">
+                    <p class="m-0 text-[0.75rem] text-[var(--text-tertiary)]">Como chegamos nesse score:</p>
+                    <ul class="m-0 mt-1 list-disc pl-4 text-[0.75rem] text-[var(--text-secondary)]">
+                      @for (item of robotScoreBreakdown; track trackByIndex($index, item)) {
+                        <li>{{ item }}</li>
+                      }
+                    </ul>
+                  </div>
                 }
+              </article>
+              <div class="grid gap-2">
+                <article class="rounded-[12px] border p-[var(--space-3)]" [ngClass]="insightRiskToneClass">
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Dia de risco</p>
+                  <strong class="mt-2 block text-[0.9375rem] font-semibold">{{ insightDiagnostics.riskDayLabel || 'Sem risco no período' }}</strong>
+                </article>
+                <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Próximos 7 dias</p>
+                  <strong class="mt-2 block text-[1rem] font-semibold text-[var(--text)]">{{ insightDiagnostics.dueSoonExpensesAmount | appCurrency }}</strong>
+                  <p class="mt-1 text-[0.75rem] text-[var(--text-tertiary)]">Despesas com vencimento próximo.</p>
+                </article>
               </div>
-            } @else {
-              <p class="mt-2 text-[0.8125rem] text-[var(--text-muted)]">Sem pendências acionáveis no momento.</p>
-            }
-          </article>
-          @if (cashflowProjection) {
-            <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-1)]">
+            </div>
+            <article class="rounded-[12px] border p-[var(--space-3)]" [ngClass]="insightOverdueToneClass">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">Simulação diária</p>
-                  <strong class="mt-1 block text-[0.9375rem] font-semibold text-[var(--text)]">
-                    Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | appCurrency }}
+                  <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] opacity-80">Atrasos</p>
+                  <strong class="mt-1 block text-[0.9375rem] font-semibold">
+                    {{ insightDiagnostics.overdueExpensesCount }} despesa(s) · {{ insightDiagnostics.overdueIncomesCount }} receita(s)
                   </strong>
                 </div>
-                <span class="text-[0.75rem] text-[var(--text-muted)]">
-                  Menor saldo:
-                  {{ cashflowProjection.lowestBalance | appCurrency }}
-                </span>
               </div>
-              @if (projectionHighlights.length) {
+              @if (insightTodoItems.length) {
                 <div class="mt-2 grid gap-2">
-                  @for (point of projectionHighlights; track trackByIndex($index, point)) {
-                    <div
-                      class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[0.8125rem]"
-              [ngClass]="point.tone === 'danger'
-                ? 'border-rose-300/60 bg-rose-500/10 text-[var(--danger-text)]'
-                : point.tone === 'warn'
-                  ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
-                  : 'border-emerald-300/60 bg-emerald-500/10 text-[var(--success-text)]'">
-                      <strong>{{ point.dateLabel }}</strong>
-                      <span>+{{ point.incomesAmount | appCurrency }} / -{{ point.expensesAmount | appCurrency }}</span>
-                      <strong>{{ point.closingBalance | appCurrency }}</strong>
-                    </div>
+                  @for (todo of insightTodoItems; track trackByIndex($index, todo)) {
+                    <article
+                      class="rounded-[10px] border px-2 py-2 text-[0.8125rem]"
+                [ngClass]="todo.severity === 'danger'
+                  ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
+                  : todo.severity === 'warn'
+                    ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
+                    : 'border-sky-300/60 bg-sky-500/10 text-[var(--primary-text)]'">
+                      <div class="flex flex-wrap items-center justify-between gap-2">
+                        <p class="m-0 flex-1">{{ todo.text }}</p>
+                        <a
+                          class="inline-flex rounded-full border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1 text-[0.75rem] font-semibold text-[var(--text)]"
+                          [routerLink]="todo.route"
+                          [queryParams]="todo.queryParams">
+                          {{ todo.actionLabel }}
+                        </a>
+                      </div>
+                    </article>
                   }
                 </div>
               } @else {
-                <p class="mt-2 text-[0.8125rem] text-[var(--text-muted)]">Sem eventos futuros no período selecionado.</p>
+                <p class="mt-2 text-[0.8125rem] text-[var(--text-tertiary)]">Sem pendências acionáveis no momento.</p>
               }
             </article>
-          }
-        </div>
-        <div class="grid grid-cols-1 gap-2 grid-cols-2">
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
-            <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">Comparação com mês anterior</p>
-            <ul class="m-0 mt-2 list-disc pl-[var(--spacing-2)] text-[0.8125rem] text-[var(--text-secondary)]">
-              @for (item of insightComparison; track trackByIndex($index, item)) {
-                <li>{{ item }}</li>
-              }
-            </ul>
+            @if (cashflowProjection) {
+              <article class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-3)]">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p class="m-0 text-[0.75rem] uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Simulação diária</p>
+                    <strong class="mt-1 block text-[0.9375rem] font-semibold text-[var(--text)]">
+                      Fechamento projetado: {{ cashflowProjection.projectedClosingBalance | appCurrency }}
+                    </strong>
+                  </div>
+                  <span class="text-[0.75rem] text-[var(--text-tertiary)]">
+                    Menor saldo:
+                    {{ cashflowProjection.lowestBalance | appCurrency }}
+                  </span>
+                </div>
+                @if (projectionHighlights.length) {
+                  <div class="mt-2 grid gap-2">
+                    @for (point of projectionHighlights; track trackByIndex($index, point)) {
+                      <div
+                        class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[0.8125rem]"
+                [ngClass]="point.tone === 'danger'
+                  ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
+                  : point.tone === 'warn'
+                    ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
+                    : 'border-emerald-300/60 bg-emerald-500/10 text-[var(--income-text)]'">
+                        <strong>{{ point.dateLabel }}</strong>
+                        <span>+{{ point.incomesAmount | appCurrency }} / -{{ point.expensesAmount | appCurrency }}</span>
+                        <strong>{{ point.closingBalance | appCurrency }}</strong>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="mt-2 text-[0.8125rem] text-[var(--text-tertiary)]">Sem eventos futuros no período selecionado.</p>
+                }
+              </article>
+            }
           </div>
-          <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-1)]">
-            <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">O que mudou hoje</p>
-            <ul class="m-0 mt-2 list-disc pl-[var(--spacing-2)] text-[0.8125rem] text-[var(--text-secondary)]">
-              @for (item of insightChangesToday; track trackByIndex($index, item)) {
-                <li>{{ item }}</li>
-              }
-            </ul>
+          <div class="grid grid-cols-1 gap-2 grid-cols-2">
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-3)]">
+              <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Comparação com mês anterior</p>
+              <ul class="m-0 mt-2 list-disc pl-[var(--space-6)] text-[0.8125rem] text-[var(--text-secondary)]">
+                @for (item of insightComparison; track trackByIndex($index, item)) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-3)]">
+              <p class="m-0 text-[0.75rem] uppercase tracking-[0.2em] text-[var(--text-tertiary)]">O que mudou hoje</p>
+              <ul class="m-0 mt-2 list-disc pl-[var(--space-6)] text-[0.8125rem] text-[var(--text-secondary)]">
+                @for (item of insightChangesToday; track trackByIndex($index, item)) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
           </div>
-        </div>
-        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-2)]">
-          <p class="text-[var(--text-sm)] text-[var(--text-muted)]">Sugestões rápidas</p>
-          <ul class="mt-2 list-disc pl-[var(--spacing-2)] text-[var(--text-sm)] text-[var(--text-muted)]">
+        }
+        <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
+          <p class="text-[var(--fs-meta)] text-[var(--text-tertiary)]">Sugestões rápidas</p>
+          <ul class="mt-2 list-disc pl-[var(--space-6)] text-[var(--fs-meta)] text-[var(--text-tertiary)]">
             @for (tip of insightTips; track trackByIndex($index, tip)) {
               <li>{{ tip }}</li>
             }
@@ -440,7 +737,7 @@
       </div>
     </div>
   }
-  @if (metasResumo.total) {
+  @if (hasAccess('Intermediate') && metasResumo.total) {
     <app-section-card
       title="Metas"
       description="Resumo rápido das metas anuais cadastradas.">
@@ -450,25 +747,25 @@
         <app-status-badge tone="muted" [label]="'Falta: ' + (metasResumo.faltanteTotal | appCurrency)"></app-status-badge>
         <app-status-badge tone="info" [label]="'Progresso médio: ' + (metasResumo.progressoMedio | number : '1.0-0') + '%'"></app-status-badge>
       </div>
-      <div class="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-2)] p-[var(--spacing-2)]">
+      <div class="grid gap-3 rounded-[var(--radius-inner)] border border-[var(--border)] bg-[var(--surface-sunken)] p-[var(--space-6)]">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <p class="text-[var(--text-sm)] font-semibold text-[var(--text)]">Metas ativas</p>
+          <p class="text-[var(--fs-meta)] font-semibold text-[var(--text)]">Metas ativas</p>
           <app-tooltip
             label="Como ler o resumo de metas"
             text="Resumo das metas: mostra quantas metas estão planejadas, em andamento, concluídas ou canceladas no ano."
             size="sm" />
         </div>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
-          <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[rgba(111,117,136,0.35)] bg-[rgba(111,117,136,0.12)] px-[var(--space-3)] py-[var(--space-3)] text-center text-[0.8125rem] text-[var(--text)]">
             Planejadas <strong>{{ metasResumo.planned }}</strong>
           </div>
-          <div class="rounded-[12px] border border-[var(--color-info-soft)] bg-[var(--color-info-weak)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[var(--primary-tint)] bg-[var(--primary-tint)] px-[var(--space-3)] py-[var(--space-3)] text-center text-[0.8125rem] text-[var(--text)]">
             Em andamento <strong>{{ metasResumo.inProgress }}</strong>
           </div>
-          <div class="rounded-[12px] border border-[var(--color-success-soft)] bg-[var(--color-success-weak)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[var(--income-tint)] bg-[var(--income-tint)] px-[var(--space-3)] py-[var(--space-3)] text-center text-[0.8125rem] text-[var(--text)]">
             Concluídas <strong>{{ metasResumo.completed }}</strong>
           </div>
-          <div class="rounded-[12px] border border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] px-[var(--spacing-1)] py-[var(--spacing-1)] text-center text-[0.8125rem] text-[var(--text)]">
+          <div class="rounded-[12px] border border-[var(--expense-tint)] bg-[var(--expense-tint)] px-[var(--space-3)] py-[var(--space-3)] text-center text-[0.8125rem] text-[var(--text)]">
             Canceladas <strong>{{ metasResumo.canceled }}</strong>
           </div>
         </div>
@@ -476,29 +773,29 @@
           <div class="inline-flex w-fit rounded-full border border-[var(--border)] bg-[var(--surface)] p-1">
             <button
               type="button"
-              class="rounded-full px-[var(--spacing-1)] py-[var(--spacing-1)] text-[0.8125rem] font-semibold text-[var(--text-muted)] transition"
+              class="rounded-full px-[var(--space-3)] py-[var(--space-3)] text-[0.8125rem] font-semibold text-[var(--text-tertiary)] transition"
               [ngClass]="metasVisao === 'progresso' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
               (click)="metasVisao = 'progresso'">
               Progresso
             </button>
             <button
               type="button"
-              class="rounded-full px-[var(--spacing-1)] py-[var(--spacing-1)] text-[0.8125rem] font-semibold text-[var(--text-muted)] transition"
+              class="rounded-full px-[var(--space-3)] py-[var(--space-3)] text-[0.8125rem] font-semibold text-[var(--text-tertiary)] transition"
               [ngClass]="metasVisao === 'aporte' ? 'bg-emerald-500/15 text-[var(--text)] shadow-sm' : ''"
               (click)="metasVisao = 'aporte'">
               Por meta
             </button>
           </div>
           @if (metasVisao === 'progresso') {
-            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)]">
-              <div class="mb-2 h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-                <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--info))]" [style.width.%]="metasResumo.progressoMedio"></div>
+            <div class="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-6)]">
+              <div class="mb-2 h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-inset)]">
+                <div class="h-full bg-[linear-gradient(90deg,var(--income),var(--primary))]" [style.width.%]="metasResumo.progressoMedio"></div>
               </div>
-              <p class="text-[0.8125rem] text-[var(--text-muted)]">Progresso médio das metas do ano.</p>
+              <p class="text-[0.8125rem] text-[var(--text-tertiary)]">Progresso médio das metas do ano.</p>
             </div>
           }
           @if (metasVisao === 'aporte') {
-            <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--spacing-2)]">
+            <div class="grid gap-2 rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-[var(--space-6)]">
               @if (metasDetalhe.length) {
                 <div class="grid gap-2">
                   @for (meta of metasDetalhe; track trackByIndex($index, meta)) {
@@ -506,7 +803,7 @@
                       <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="min-w-0">
                           <strong class="block truncate text-[0.875rem] text-[var(--text)]">{{ meta.title }}</strong>
-                          <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-muted)]">
+                          <div class="mt-1 flex flex-wrap items-center gap-2 text-[0.75rem] text-[var(--text-tertiary)]">
                             <app-status-badge [tone]="metaStatusTone(meta.status)" [label]="meta.statusLabel" size="sm"></app-status-badge>
                             @if (meta.targetDateLabel) {
                               <span class="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-[2px]">
@@ -516,22 +813,22 @@
                           </div>
                         </div>
                         <div class="flex items-center gap-2">
-                          <span class="text-[0.8125rem] text-[var(--text-muted)]">{{ meta.progress | number:'1.0-0' }}%</span>
+                          <span class="text-[0.8125rem] text-[var(--text-tertiary)]">{{ meta.progress | number:'1.0-0' }}%</span>
                           <a class="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[0.875rem] text-[var(--text-secondary)] transition hover:text-[var(--text)]" routerLink="/metas" aria-label="Ver detalhes da meta">
                             ↗
                           </a>
                         </div>
                       </div>
-                      <div class="flex h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-3)]">
-                        <div class="h-full bg-[linear-gradient(90deg,var(--success),var(--color-success-soft))]" [style.width.%]="meta.progress"></div>
+                      <div class="flex h-[10px] w-full overflow-hidden rounded-full bg-[var(--surface-inset)]">
+                        <div class="h-full bg-[linear-gradient(90deg,var(--income),var(--income-tint))]" [style.width.%]="meta.progress"></div>
                         <div class="h-full bg-[linear-gradient(90deg,rgba(148,163,184,0.45),rgba(148,163,184,0.2))]" [style.width.%]="100 - meta.progress"></div>
                       </div>
                       @if (meta.expectedMonthly) {
-                        <div class="text-[0.75rem] text-[var(--text-muted)]">
+                        <div class="text-[0.75rem] text-[var(--text-tertiary)]">
                           Ritmo sugerido: <strong>{{ meta.expectedMonthly | appCurrency }}</strong> / mês
                         </div>
                       }
-                      <div class="flex flex-wrap justify-between gap-2 text-[0.8125rem] text-[var(--text-muted)]">
+                      <div class="flex flex-wrap justify-between gap-2 text-[0.8125rem] text-[var(--text-tertiary)]">
                         <span>Aportado: <strong>{{ meta.current | appCurrency }}</strong></span>
                         <span>Falta: <strong>{{ meta.remaining | appCurrency }}</strong></span>
                         <span>Alvo: <strong>{{ meta.target | appCurrency }}</strong></span>
@@ -540,7 +837,7 @@
                   }
                 </div>
               } @else {
-                <p class="text-[0.8125rem] text-[var(--text-muted)]">Nenhuma meta ativa com valor de alvo definido.</p>
+                <p class="text-[0.8125rem] text-[var(--text-tertiary)]">Nenhuma meta ativa com valor de alvo definido.</p>
               }
             </div>
           }
@@ -551,32 +848,34 @@
   @if (!isLoadingDashboard) {
     <div class="dashboard-secondary">
       <app-dashboard-activity-board [activities]="recentTransactions" [reminders]="upcomingDueItems" />
-      <div class="dashboard-secondary__categories">
-        <app-category-breakdown-card
-          variant="expense"
-          title="Despesas por categoria"
-          subtitle="Veja onde seu dinheiro foi gasto no período."
-          [total]="expenseCategoryTotal"
-          [slices]="expenseCategorySlices"
-          [showInsights]="hasAccess('Intermediate')"
-          emptyText="Você ainda não possui despesas categorizadas neste período."
-          emptyCtaLabel="Cadastrar despesa"
-          emptyCtaLink="/despesas"
-          detailsRoute="/despesas"
-          detailsLabel="Ver detalhes" />
-        <app-category-breakdown-card
-          variant="income"
-          title="Receitas por categoria"
-          subtitle="Entenda de onde veio sua renda no período."
-          [total]="incomeSourceTotal"
-          [slices]="incomeSourceSlices"
-          [showInsights]="hasAccess('Intermediate')"
-          emptyText="Você ainda não possui receitas categorizadas neste período."
-          emptyCtaLabel="Cadastrar receita"
-          emptyCtaLink="/receitas"
-          detailsRoute="/receitas"
-          detailsLabel="Ver detalhes" />
-      </div>
+      @if (hasAccess('Intermediate')) {
+        <div class="dashboard-secondary__categories">
+          <app-category-breakdown-card
+            variant="expense"
+            title="Despesas por categoria"
+            subtitle="Veja onde seu dinheiro foi gasto no período."
+            [total]="expenseCategoryTotal"
+            [slices]="expenseCategorySlices"
+            [showInsights]="true"
+            emptyText="Você ainda não possui despesas categorizadas neste período."
+            emptyCtaLabel="Cadastrar despesa"
+            emptyCtaLink="/despesas"
+            detailsRoute="/despesas"
+            detailsLabel="Ver detalhes" />
+          <app-category-breakdown-card
+            variant="income"
+            title="Receitas por categoria"
+            subtitle="Entenda de onde veio sua renda no período."
+            [total]="incomeSourceTotal"
+            [slices]="incomeSourceSlices"
+            [showInsights]="true"
+            emptyText="Você ainda não possui receitas categorizadas neste período."
+            emptyCtaLabel="Cadastrar receita"
+            emptyCtaLink="/receitas"
+            detailsRoute="/receitas"
+            detailsLabel="Ver detalhes" />
+        </div>
+      }
     </div>
   }
 </section>

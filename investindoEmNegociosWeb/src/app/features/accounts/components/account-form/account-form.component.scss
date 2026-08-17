@@ -1,8 +1,7 @@
 .account-panel {
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
   padding: 1.25rem;
   display: grid;
   gap: 1rem;
@@ -17,18 +16,18 @@
 
 .account-panel__eyebrow {
   margin: 0 0 0.35rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
 .account-panel h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
 }
 
 .account-form-grid {
@@ -38,11 +37,10 @@
   align-items: end;
 }
 
-.account-form-grid input,
-.account-form-grid select {
+.account-form-grid input {
   min-height: 48px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background-color: var(--surface);
   color: var(--text);
   padding: 0 0.95rem;
@@ -52,14 +50,14 @@
 .account-checkbox {
   min-height: 48px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background: var(--surface);
   color: var(--text-secondary);
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
   padding: 0 0.95rem;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .account-checkbox input {

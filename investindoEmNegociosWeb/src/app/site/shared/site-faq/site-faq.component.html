@@ -1,0 +1,28 @@
+@for (item of items(); track item.question; let i = $index) {
+  @let open = openIndex() === i;
+
+  <div class="site-faq__item" [class.site-faq__item--open]="open">
+    <h3 class="site-faq__heading">
+      <button
+        type="button"
+        class="site-faq__trigger"
+        [attr.aria-expanded]="open"
+        [attr.aria-controls]="'faq-panel-' + i"
+        [id]="'faq-trigger-' + i"
+        (click)="toggle(i)">
+        <span class="site-faq__question">{{ item.question }}</span>
+        <span class="site-faq__sign" aria-hidden="true"></span>
+      </button>
+    </h3>
+
+    @if (open) {
+      <div
+        class="site-faq__panel"
+        role="region"
+        [id]="'faq-panel-' + i"
+        [attr.aria-labelledby]="'faq-trigger-' + i">
+        <p class="site-faq__answer">{{ item.answer }}</p>
+      </div>
+    }
+  </div>
+}

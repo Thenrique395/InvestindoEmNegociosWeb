@@ -9,6 +9,8 @@ export interface CategorySlice {
   previousTotal?: number | null;
 }
 
+export const MIN_CATEGORY_DISTRIBUTION_SLICES = 3;
+
 const VARIANT_NOUN: Record<CategoryVariant, string> = {
   expense: 'despesas',
   income: 'receitas'
@@ -23,7 +25,7 @@ export function buildCategoryInsight(
   slices: CategorySlice[],
   enabled: boolean
 ): string | null {
-  if (!enabled || slices.length === 0) {
+  if (!enabled || !hasSufficientCategoryDistribution(slices)) {
     return null;
   }
 
@@ -42,7 +44,7 @@ export function buildCategoryInsight(
 }
 
 /**
- * Comparação da maior categoria com o período anterior (planos Inteligente+).
+ * Comparação da maior categoria com o período anterior (planos Controle+).
  * Retorna `null` quando não há base anterior comparável.
  */
 export function buildCategoryComparison(
@@ -50,7 +52,7 @@ export function buildCategoryComparison(
   slices: CategorySlice[],
   enabled: boolean
 ): string | null {
-  if (!enabled || slices.length === 0) {
+  if (!enabled || !hasSufficientCategoryDistribution(slices)) {
     return null;
   }
 
@@ -75,6 +77,10 @@ export function buildCategoryComparison(
 
 export function categoryCountLabel(count: number): string {
   return count === 1 ? '1 categoria' : `${count} categorias`;
+}
+
+export function hasSufficientCategoryDistribution(slices: CategorySlice[]): boolean {
+  return slices.length >= MIN_CATEGORY_DISTRIBUTION_SLICES;
 }
 
 export function variantNoun(variant: CategoryVariant): string {

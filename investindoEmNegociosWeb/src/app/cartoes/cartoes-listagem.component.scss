@@ -1,7 +1,7 @@
 .cards-list {
   display: grid;
   gap: 1rem;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -18,11 +18,18 @@
   display: grid;
   gap: 0.65rem;
   padding: 0.95rem;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   border: 1px solid var(--border);
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), var(--surface) 58%);
-  box-shadow: var(--shadow-elevation-sm);
   max-width: 100%;
+}
+
+/* README §3: card em repouso tem só a borda; a elevação de 2px é do hover.
+   Estes são clicáveis — sem o hover, ficavam sem nenhum retorno visual. */
+.cards-list__card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 .cards-list__top {
@@ -47,16 +54,16 @@
   place-items: center;
   gap: 0.12rem;
   padding: 0.45rem 0.65rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
   text-align: center;
-  line-height: var(--line-height-display);
+  line-height: var(--lh-display);
   overflow: hidden;
 }
 
@@ -67,11 +74,11 @@
   padding: 0.45rem 0.8rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text-secondary);
   font-size: 0.73rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-label);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -104,10 +111,10 @@
 
 .cards-list__mastercard-label {
   font-size: 0.4rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-normal);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-normal);
   text-transform: lowercase;
-  line-height: var(--line-height-display);
+  line-height: var(--lh-display);
   white-space: nowrap;
   color: color-mix(in srgb, var(--text) 78%, transparent);
 }
@@ -122,10 +129,10 @@
 .cards-list__eyebrow {
   margin: 0;
   font-size: 0.67rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cards-list__title-row {
@@ -139,10 +146,10 @@
   margin: 0;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-display);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-body);
+  line-height: var(--lh-display);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
   color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -150,10 +157,10 @@
 
 .cards-list__masked-inline {
   margin: 0.08rem 0 0;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-eyebrow);
+  color: var(--text-tertiary);
 }
 
 .cards-list__actions {
@@ -187,33 +194,33 @@
 
 .cards-list__usage-label {
   font-size: 0.64rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cards-list__usage-percent {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  color: var(--success-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  color: var(--income-text);
 }
 
 .cards-list__usage-percent[data-tone='warning'] { color: var(--warning-text); }
-.cards-list__usage-percent[data-tone='critical'] { color: var(--danger-text); }
+.cards-list__usage-percent[data-tone='critical'] { color: var(--expense-text); }
 
 .cards-list__usage-values {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.35rem 1rem;
-  font-size: var(--font-size-caption);
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
 }
 
 .cards-list__usage-values strong {
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .cards-list__meta {
@@ -232,16 +239,16 @@
 
 .cards-list__meta-label {
   font-size: 0.62rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cards-list__meta-value {
   overflow: hidden;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -254,7 +261,7 @@
 
   .cards-list__brand {
     border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-    background: linear-gradient(135deg, #0f3ea8, var(--primary-text));
+    background: linear-gradient(135deg, var(--brand-visa-from), var(--primary-text));
     color: white;
   }
 }
@@ -276,31 +283,31 @@
 
 .cards-list__card--elo {
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--success) 12%, transparent), transparent 38%),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--income) 12%, transparent), transparent 38%),
     linear-gradient(135deg, rgba(2, 132, 199, 0.04), var(--surface) 60%);
 
   .cards-list__brand {
     border-color: rgba(15, 23, 42, 0.12);
-    background: linear-gradient(135deg, #111827, #334155);
+    background: linear-gradient(135deg, var(--brand-elo-from), var(--brand-elo-to));
     color: white;
   }
 }
 
 .cards-list__card--amex {
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--info) 16%, transparent), transparent 36%),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 16%, transparent), transparent 36%),
     linear-gradient(135deg, rgba(6, 182, 212, 0.05), var(--surface) 60%);
 
   .cards-list__brand {
     border-color: rgba(8, 145, 178, 0.18);
-    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    background: linear-gradient(135deg, var(--brand-amex-from), var(--brand-amex-to));
     color: white;
   }
 }
 
 .cards-list__card--default {
   .cards-list__brand {
-    background: var(--surface-2);
+    background: var(--surface-sunken);
   }
 }
 
@@ -310,9 +317,9 @@
   justify-items: center;
   text-align: center;
   padding: 2rem;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   border: 1px dashed var(--border-strong);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
 }
 
 .cards-list__empty-icon {
@@ -321,9 +328,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-primary-soft);
-  background: var(--color-primary-weak);
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--primary-tint);
+  background: var(--primary-tint);
   color: var(--primary-text);
 
   svg {
@@ -339,17 +346,17 @@
 
   h3 {
     margin: 0;
-    font-size: var(--font-size-title);
-    line-height: var(--line-height-display);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-title);
+    font-size: var(--fs-modal-title);
+    line-height: var(--lh-display);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-tight);
     color: var(--text);
   }
 
   p {
     margin: 0;
-    font-size: var(--font-size-body);
-    line-height: var(--line-height-body);
+    font-size: var(--fs-subhead);
+    line-height: var(--lh-body);
     color: var(--text-secondary);
   }
 }
@@ -360,11 +367,10 @@
   justify-content: center;
   min-height: 3rem;
   padding: 0.85rem 1.3rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   border: 1px solid transparent;
   background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 72%, white));
   color: white;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-semibold);
-  box-shadow: var(--shadow-sm);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
 }

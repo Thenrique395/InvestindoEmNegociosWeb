@@ -1,8 +1,9 @@
 export type FocusArea = 'vida-financeira' | 'sair-dividas' | 'comecar-investir' | 'reserva-emergencia';
-export type IntelligenceMode = 'B' | 'C';
+// A = agressivo, B = balanceado, C = conservador (o backend guarda a letra).
+export type IntelligenceMode = 'A' | 'B' | 'C';
 
 export type FocusIcon = 'growth' | 'debt' | 'invest' | 'shield';
-export type ModeIcon = 'balance' | 'shield';
+export type ModeIcon = 'balance' | 'shield' | 'accelerate';
 
 export interface FocusOption {
   id: FocusArea;

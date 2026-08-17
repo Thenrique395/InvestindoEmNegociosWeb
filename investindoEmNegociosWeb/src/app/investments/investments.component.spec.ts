@@ -95,8 +95,8 @@ describe('InvestmentsComponent', () => {
 
     const chart = component.distribuicaoPorTipoComCor;
 
-    expect(chart.find((item) => item.key === 'IMOVEL')?.color).toBe('var(--color-chart-investment)');
-    expect(chart.find((item) => item.key === 'VEICULO')?.color).toBe('var(--color-chart-expense)');
+    expect(chart.find((item) => item.key === 'IMOVEL')?.color).toBe('var(--chart-6)');
+    expect(chart.find((item) => item.key === 'VEICULO')?.color).toBe('var(--expense)');
   });
 
   it('deve limitar updateTargetAllocation entre 0 e 100', () => {
@@ -273,5 +273,30 @@ describe('InvestmentsComponent', () => {
     (component as any).ensureTabForTarget('sec-evolucao');
 
     expect(component.setActiveTab).toHaveBeenCalledWith('RENTABILIDADE');
+  });
+
+  it('deve consolidar APORTE como compra e RESGATE como venda', () => {
+    const { component } = createComponent();
+    component.consolidacaoHorizonteAnos = 3;
+    component.positions = [
+      position({
+        id: 'tesouro',
+        type: 'RF',
+        asset: 'Tesouro IPCA+ 2029',
+        movements: [
+          { id: 'm1', type: 'APORTE', quantity: 2, price: 600, date: '2026-01-15' },
+          { id: 'm2', type: 'RESGATE', quantity: 0.5, price: 620, date: '2026-02-10' },
+          { id: 'm3', type: 'DIVIDENDO', quantity: 1, price: 30, date: '2026-03-10' }
+        ]
+      })
+    ];
+
+    const rows = component.consolidacaoRows;
+
+    expect(rows.map((row) => row.ordem)).toEqual(['Venda', 'Compra']);
+    expect(rows.map((row) => row.total)).toEqual([310, 1200]);
+    expect(rows.find((row) => row.ordem === 'Venda')?.quantityAfter).toBe(1.5);
+    expect(component.consolidacaoSeries.some((item) => item.compras === 1200)).toBeTrue();
+    expect(component.consolidacaoSeries.some((item) => item.vendas === 310)).toBeTrue();
   });
 });

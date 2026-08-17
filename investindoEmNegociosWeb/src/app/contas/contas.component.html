@@ -11,7 +11,7 @@
         </button>
       }
       @if (canTransfer) {
-        <button type="button" class="btn-secondary sm" (click)="focusTransfer()">Nova transferência</button>
+        <button type="button" class="btn-ghost sm" (click)="focusTransfer()">Nova transferência</button>
       }
       <button type="button" class="btn-ghost sm" (click)="refreshBalances()" aria-label="Atualizar saldos das contas">Atualizar saldos</button>
     </div>
@@ -51,37 +51,42 @@
   @if (hasAccounts) {
     <!-- Cards de resumo -->
     <section class="accounts-summary" aria-label="Resumo financeiro das contas">
-      <app-transaction-summary-card tone="primary" eyebrow="Saldo total" [value]="overview.totalBalance | appCurrency"
-        note="Soma das contas ativas.">
+      <app-transaction-summary-card density="compact" tone="primary" eyebrow="Saldo total" [value]="overview.totalBalance | appCurrency"
+        note="Soma das contas ativas."
+        tooltipText="Soma do saldo das contas ativas. Contas arquivadas ficam de fora, e o valor não desconta despesas ainda em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
           <path d="M9 21v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
-        [note]="availableNote">
+      <app-transaction-summary-card density="compact" [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
+        [note]="availableNote"
+        tooltipText="Saldo total menos as despesas já lançadas e ainda não pagas. É o que sobra de fato depois de honrar os compromissos em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 7h16v10H4zM4 10h16M8 14h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
-        [note]="'Receitas reais ' + periodLabel + '.'">
+      <app-transaction-summary-card density="compact" tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
+        [note]="'Receitas reais ' + periodLabel + '.'"
+        tooltipText="Receitas efetivamente recebidas no período, não as previstas. Transferências entre contas suas não contam como entrada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
-        [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'">
+      <app-transaction-summary-card density="compact" tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
+        [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'"
+        tooltipText="Despesas efetivamente pagas no período. Transferência entre contas suas não é saída — só muda o dinheiro de lugar.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card tone="primary" eyebrow="Contas ativas" [value]="overview.activeCount.toString()"
-        [note]="activeAccountsNote">
+      <app-transaction-summary-card density="compact" tone="primary" eyebrow="Contas ativas" [value]="overview.activeCount.toString()"
+        [note]="activeAccountsNote"
+        tooltipText="Contas em uso hoje, que entram no saldo total. Arquivar uma conta a tira desta contagem sem apagar o histórico dela.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -112,35 +117,31 @@
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Tipo</span>
-          <select [(ngModel)]="filters.type" aria-label="Filtrar por tipo de conta">
-            @for (opt of typeFilterOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
+          <app-select-menu
+            [options]="typeFilterOptions"
+            [(ngModel)]="filters.type"
+            ariaLabel="Filtrar por tipo de conta" />
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Status</span>
-          <select [(ngModel)]="filters.status" aria-label="Filtrar por status">
-            <option value="all">Todos</option>
-            <option value="active">Ativas</option>
-            <option value="inactive">Inativas</option>
-          </select>
+          <app-select-menu
+            [options]="statusFilterOptions"
+            [(ngModel)]="filters.status"
+            ariaLabel="Filtrar por status" />
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Saldo</span>
-          <select [(ngModel)]="filters.balance" aria-label="Filtrar por saldo">
-            <option value="all">Todos</option>
-            <option value="positive">Positivo</option>
-            <option value="negative">Negativo</option>
-          </select>
+          <app-select-menu
+            [options]="balanceFilterOptions"
+            [(ngModel)]="filters.balance"
+            ariaLabel="Filtrar por saldo" />
         </label>
         <label class="accounts-filter">
           <span class="accounts-filter__label">Ordenar</span>
-          <select [(ngModel)]="sort" aria-label="Ordenar contas">
-            @for (opt of sortOptions; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
+          <app-select-menu
+            [options]="sortOptions"
+            [(ngModel)]="sort"
+            ariaLabel="Ordenar contas" />
         </label>
       </div>
     }

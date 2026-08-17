@@ -38,23 +38,23 @@ export class StatusBadgeComponent {
 
   private toneClass(): string {
     switch (this.tone()) {
-      case 'success': return 'border-[var(--color-success-soft)] bg-[var(--color-success-weak)] text-[var(--color-success-text)]';
-      case 'danger': return 'border-[var(--color-danger-soft)] bg-[var(--color-danger-weak)] text-[var(--color-danger-text)]';
-      case 'warning': return 'border-[var(--color-warning-soft)] bg-[var(--color-warning-weak)] text-[var(--color-warning-text)]';
-      case 'info': return 'border-[var(--color-info-soft)] bg-[var(--color-info-weak)] text-[var(--color-info-text)]';
-      case 'muted': return 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]';
-      default: return 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]';
+      case 'success': return 'border-[var(--income-tint)] bg-[var(--income-tint)] text-[var(--income-text)]';
+      case 'danger': return 'border-[var(--expense-tint)] bg-[var(--expense-tint)] text-[var(--expense-text)]';
+      case 'warning': return 'border-[var(--warning-tint)] bg-[var(--warning-tint)] text-[var(--warning-text)]';
+      case 'info': return 'border-[var(--primary-tint)] bg-[var(--primary-tint)] text-[var(--primary-text)]';
+      case 'muted': return 'border-[var(--border)] bg-[var(--surface-sunken)] text-[var(--text-tertiary)]';
+      default: return 'border-[var(--border)] bg-[var(--surface-sunken)] text-[var(--text-tertiary)]';
     }
   }
 
   private dotToneClass(): string {
     switch (this.tone()) {
-      case 'success': return 'bg-[var(--color-success)]';
-      case 'danger': return 'bg-[var(--color-danger)]';
-      case 'warning': return 'bg-[var(--color-warning)]';
-      case 'info': return 'bg-[var(--color-info)]';
-      case 'muted': return 'bg-[var(--color-text-muted)]';
-      default: return 'bg-[var(--color-text-muted)]';
+      case 'success': return 'bg-[var(--income)]';
+      case 'danger': return 'bg-[var(--expense)]';
+      case 'warning': return 'bg-[var(--warning)]';
+      case 'info': return 'bg-[var(--primary)]';
+      case 'muted': return 'bg-[var(--text-tertiary)]';
+      default: return 'bg-[var(--text-tertiary)]';
     }
   }
 }

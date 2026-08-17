@@ -52,10 +52,10 @@ import { CalendarEvent, TimelineBucket } from './calendar-agenda.model';
     .tl__bucket:last-child .tl__line { display: none; }
     .tl__content { padding-bottom: 1.4rem; display: grid; gap: 0.7rem; }
     .tl__head { display: flex; align-items: center; gap: 8px; }
-    .tl__label { margin: 0; font-size: var(--text-sm, 0.9rem); font-weight: 700; color: var(--text); }
+    .tl__label { margin: 0; font-size: var(--fs-meta, 0.9rem); font-weight: 700; color: var(--text); }
     .tl__count {
       display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px;
-      border-radius: 10px; background: var(--surface-3); color: var(--text-muted);
+      border-radius: 10px; background: var(--surface-inset); color: var(--text-tertiary);
       font-size: 0.68rem; font-weight: 700;
     }
     .tl__events { display: grid; gap: 8px; }

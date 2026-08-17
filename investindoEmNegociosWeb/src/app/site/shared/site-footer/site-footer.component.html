@@ -1,0 +1,64 @@
+<div class="site-footer__inner">
+  @if (variant() === 'full') {
+    <div class="site-footer__top">
+      <div class="site-footer__brand-block">
+        <a class="site-footer__brand" routerLink="/">
+          <img class="site-footer__logo" [src]="logoSrc()" alt="" width="28" height="28" />
+          <span class="site-footer__wordmark">{{ brandName() }}</span>
+        </a>
+        <p class="site-footer__slogan">{{ brandSlogan() }}</p>
+      </div>
+
+      @if (columns().length) {
+        <div class="site-footer__columns">
+          @for (column of columns(); track column.title) {
+            <nav class="site-footer__column" [attr.aria-label]="column.title">
+              <p class="site-footer__column-title">{{ column.title }}</p>
+              @for (link of column.links; track link.label) {
+                <ng-container [ngTemplateOutlet]="linkTpl" [ngTemplateOutletContext]="{ $implicit: link }" />
+              }
+            </nav>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="site-footer__compact">
+      <a class="site-footer__brand" routerLink="/">
+        <img class="site-footer__logo" [src]="logoSrc()" alt="" width="24" height="24" />
+        <span class="site-footer__wordmark">{{ brandName() }}</span>
+      </a>
+
+      @if (inlineLinks().length) {
+        <nav class="site-footer__inline" aria-label="Rodapé">
+          @for (link of inlineLinks(); track link.label) {
+            <ng-container [ngTemplateOutlet]="linkTpl" [ngTemplateOutletContext]="{ $implicit: link }" />
+          }
+        </nav>
+      }
+
+      <span class="site-footer__copy">© {{ year() }}</span>
+    </div>
+  }
+
+  @if (variant() === 'full') {
+    <div class="site-footer__bar">
+      <span>© {{ year() }} {{ brandName() }}</span>
+      @if (note(); as text) {
+        <span>{{ text }}</span>
+      }
+    </div>
+  }
+</div>
+
+<ng-template #linkTpl let-link>
+  @if (link.route) {
+    <a class="site-footer__link" [routerLink]="link.route">{{ link.label }}</a>
+  } @else if (link.href) {
+    <a class="site-footer__link" [href]="link.href" target="_blank" rel="noopener noreferrer">{{
+      link.label
+    }}</a>
+  } @else {
+    <a class="site-footer__link" [href]="'#' + link.anchor">{{ link.label }}</a>
+  }
+</ng-template>

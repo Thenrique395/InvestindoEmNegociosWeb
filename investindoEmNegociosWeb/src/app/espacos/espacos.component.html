@@ -1,4 +1,4 @@
-<div class="grid gap-[var(--spacing-2)] p-[var(--spacing-2)]">
+<div class="grid gap-[var(--space-6)] p-[var(--space-6)]">
   <app-page-header
     eyebrow="Organização"
     title="Espaços"
@@ -8,10 +8,10 @@
   <app-section-card title="Novo espaço" [hasHeaderActions]="false">
     <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
       <app-form-field label="Nome">
-        <input type="text" [(ngModel)]="novoNome" placeholder="Ex.: Negócio" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+        <input type="text" [(ngModel)]="novoNome" placeholder="Ex.: Negócio" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />
       </app-form-field>
       <app-form-field label="Senha" hint="opcional">
-        <input type="password" [(ngModel)]="novaSenha" placeholder="Deixe em branco para não proteger" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+        <input type="password" [(ngModel)]="novaSenha" placeholder="Deixe em branco para não proteger" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />
       </app-form-field>
     </div>
     <button type="button" class="btn-primary mt-3" [disabled]="saving" (click)="criar()">
@@ -34,7 +34,7 @@
     @if (!loading && spaces.length) {
       <div class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-3">
         @for (space of spaces; track space.id) {
-          <article class="rounded-[14px] border border-[var(--border)] bg-[var(--surface-2)] p-3">
+          <article class="rounded-[14px] border border-[var(--border)] bg-[var(--surface-sunken)] p-3">
             @if (editingId === space.id) {
               <div class="grid gap-2">
                 <app-form-field label="Nome">
@@ -66,7 +66,7 @@
               @if (passwordPromptId === space.id) {
                 <div class="mt-3 grid gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-2">
                   <app-form-field [label]="passwordPromptLabel" [error]="passwordPromptError">
-                    <input type="password" [(ngModel)]="passwordPromptValue" (keyup.enter)="confirmarSenhaPrompt()" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[var(--text)]" />
+                    <input type="password" [(ngModel)]="passwordPromptValue" (keyup.enter)="confirmarSenhaPrompt()" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />
                   </app-form-field>
                   <div class="flex gap-2">
                     <button type="button" class="btn-primary sm" [disabled]="enteringId === space.id" (click)="confirmarSenhaPrompt()">

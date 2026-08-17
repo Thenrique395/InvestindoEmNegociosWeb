@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-3);
-  padding: 0 clamp(var(--spacing-3), 2.5vw, var(--spacing-6));
+  gap: var(--space-10);
+  padding: 0 clamp(var(--space-10), 2.5vw, var(--space-12));
   background: var(--surface);
   border-radius: 0;
   border-bottom: 1px solid var(--border);
@@ -21,7 +21,7 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
 }
 
 .brand__logo {
@@ -39,7 +39,7 @@
 
 .menu {
   display: flex;
-  gap: var(--spacing-2);
+  gap: var(--space-6);
   align-items: center;
   justify-content: center;
 }
@@ -48,14 +48,14 @@
   position: relative;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-normal);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-normal);
   display: inline-flex;
   align-items: center;
   height: 36px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -95,7 +95,7 @@
   height: 36px;
   flex: none;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
@@ -104,27 +104,27 @@
 
 .menu-toggle:hover {
   border-color: var(--border-strong);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
 }
 
 .header__actions {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--spacing-1);
+  gap: var(--space-3);
 }
 
 .login-link {
   color: var(--text-secondary);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 36px;
   padding: 0 14px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   border: 1px solid transparent;
   background: transparent;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -135,21 +135,21 @@
 .login-link:hover {
   color: var(--text);
   border-color: var(--border);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
 }
 
 .signup-link {
   color: var(--on-primary);
   background: var(--primary);
   border: 1px solid transparent;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   height: 36px;
   padding: 0 14px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
@@ -181,7 +181,7 @@
     overflow: hidden;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-dropdown);
     transition: max-height 0.22s ease;
   }
 
@@ -191,7 +191,7 @@
 
   .menu a {
     height: 48px;
-    padding: 0 clamp(var(--spacing-3), 6vw, var(--spacing-6));
+    padding: 0 clamp(var(--space-10), 6vw, var(--space-12));
     border-bottom: 1px solid var(--border);
     border-radius: 0;
   }
@@ -202,20 +202,20 @@
 
   .menu a:hover,
   .menu a.active {
-    background: var(--surface-2);
+    background: var(--surface-sunken);
   }
 
   .menu__mobile-login {
     display: block;
     height: 48px;
-    padding: 0 clamp(var(--spacing-3), 6vw, var(--spacing-6));
+    padding: 0 clamp(var(--space-10), 6vw, var(--space-12));
     border: 0;
     border-top: 1px solid var(--border);
     background: transparent;
     color: var(--text);
     font-family: inherit;
-    font-size: var(--font-size-label);
-    font-weight: var(--font-weight-semibold);
+    font-size: var(--fs-meta);
+    font-weight: var(--fw-semibold);
     text-align: left;
     cursor: pointer;
   }

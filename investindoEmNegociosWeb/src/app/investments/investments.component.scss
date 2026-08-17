@@ -1,13 +1,18 @@
 .investments {
   display: grid;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .investments-shell {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   background: color-mix(in srgb, var(--surface) 96%, white);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   padding: 1.6rem;
   display: grid;
   gap: 1.3rem;
@@ -25,6 +30,17 @@
   margin-bottom: 0.25rem;
 }
 
+app-page-header,
+app-investment-overview-panel,
+app-investment-assets-list,
+app-investment-analysis-panel,
+app-investment-consolidation-panel,
+app-investment-profitability-panel,
+app-investment-dividends-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
 @media (max-width: 640px) {
   .investments-shell {
     padding: 1rem;
@@ -32,7 +48,7 @@
 
   .invest-actions,
   .invest-actions .btn-primary,
-  .invest-actions .btn-secondary {
+  .invest-actions .btn-ghost {
     width: 100%;
   }
 }

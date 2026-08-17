@@ -34,12 +34,15 @@ import {
   parseLocaleDate,
   parseLocalizedNumber
 } from '../utils/locale-utils';
+import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, BulkActionBarComponent, AppCurrencyPipe],
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, BulkActionBarComponent, AppCurrencyPipe,
+    SelectMenuComponent
+  ],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -86,6 +89,19 @@ export class ReceitasComponent implements OnInit {
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
   filtroStatus: 'all' | 'paid' | 'pending' = 'all';
+
+  /** Opções dos filtros. Rótulos iguais aos que já existiam nos selects. */
+  readonly tipoOptions = [
+    { value: 'all', label: 'Todos os tipos' },
+    { value: 'recurring', label: 'Recorrente' },
+    { value: 'oneTime', label: 'Avulsa' }
+  ];
+
+  readonly statusOptions = [
+    { value: 'all', label: 'Todos os status' },
+    { value: 'paid', label: 'Recebida' },
+    { value: 'pending', label: 'Pendente' }
+  ];
   focusMode: 'none' | 'pending' = 'none';
   sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
   sortDir: 1 | -1 = 1;

@@ -31,3 +31,15 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ruído de sistema
+.DS_Store
+
+# Skills locais de agente, específicas da máquina
+.claude/skills/
+investindoEmNegociosWeb/.claude/
+
+# Evidência visual do redesign: PNG é binário grande (8,9 MB e crescendo a cada
+# fase) e fica obsoleto no commit seguinte. Os relatórios .md ficam versionados;
+# as capturas se regeneram com as specs de quality-tests/e2e/*-visual.spec.ts.
+docs/ai-reports/*.png

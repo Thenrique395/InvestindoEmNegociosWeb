@@ -7,6 +7,8 @@ export interface UiFeedbackMessage {
   id: number;
   type: UiFeedbackType;
   text: string;
+  /** Ação de desfazer. Presente, o toast mostra o botão e vive mais tempo. */
+  undo?: () => void;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,12 +24,12 @@ export class UiFeedbackService {
 
   private idCounter = 0;
 
-  show(type: UiFeedbackType, text: string, durationMs = 3500): void {
+  show(type: UiFeedbackType, text: string, durationMs = 3500, undo?: () => void): void {
     const normalizedText = text?.trim();
     if (!normalizedText) return;
 
     const id = ++this.idCounter;
-    const message: UiFeedbackMessage = { id, type, text: normalizedText };
+    const message: UiFeedbackMessage = { id, type, text: normalizedText, undo };
 
     const current = this.messagesSubject.value;
     this.messagesSubject.next([...current, message].slice(-4));
@@ -39,6 +41,24 @@ export class UiFeedbackService {
 
   success(text: string, durationMs = 3000): void {
     this.show('success', text, durationMs);
+  }
+
+  /**
+   * Confirmação com desfazer — COMPONENTES.md §8.
+   *
+   * "Toda confirmação destrutiva ou irreversível carrega Desfazer. Sem isso o
+   * toast só informa, não protege."
+   *
+   * Vive 4s em vez de 3: é o tempo de ler a mensagem e decidir voltar atrás.
+   */
+  successWithUndo(text: string, undo: () => void, durationMs = 4000): void {
+    this.show('success', text, durationMs, undo);
+  }
+
+  /** Executa o desfazer e tira o toast da tela. */
+  runUndo(message: UiFeedbackMessage): void {
+    message.undo?.();
+    this.dismiss(message.id);
   }
 
   error(text: string, durationMs = 4500): void {

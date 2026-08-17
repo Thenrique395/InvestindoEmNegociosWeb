@@ -22,6 +22,25 @@ export const formatCurrencyValue = (value: number, currency?: string): string =>
   return new Intl.NumberFormat(locale, { style: 'currency', currency: targetCurrency }).format(value);
 };
 
+/**
+ * Moeda em forma curta, para eixo de gráfico e card estreito: `R$ 12,3 mil`.
+ *
+ * Existe aqui, e não em cada tela, por ARQUITETURA_ANGULAR.md §9.4 — a formatação
+ * respeita a moeda e o locale salvos em Configurações. Estava duplicada no
+ * `home.component` e no `category-breakdown`, as duas com `'pt-BR'` fixo, então um
+ * usuário com outra moeda via o símbolo errado.
+ */
+export const formatCompactCurrency = (value: number, currency?: string): string => {
+  const abs = Math.abs(value || 0);
+  if (abs < 1000) return formatCurrencyValue(value, currency);
+
+  const locale = getActiveLocale();
+  const symbol = formatCurrencyValue(0, currency).replace(/[\d.,\s]/g, '');
+  const sign = value < 0 ? '-' : '';
+  const milhares = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(abs / 1000);
+  return `${sign}${symbol} ${milhares} mil`;
+};
+
 export const parseLocalizedNumber = (value: string | number): number => {
   if (typeof value === 'number') return value;
   const raw = (value || '').toString().trim();

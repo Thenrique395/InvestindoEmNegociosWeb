@@ -16,9 +16,8 @@
   min-width: 0;
   min-height: 142px;
   border: 1px solid color-mix(in srgb, var(--border) 86%, transparent);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
   overflow: hidden;
 }
 
@@ -34,8 +33,8 @@
 .activity-panel__head h3 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
   line-height: 1.2;
 }
 
@@ -47,8 +46,8 @@
   padding: 0.2rem 0.35rem;
   border-radius: var(--radius-pill);
   color: var(--primary-text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
@@ -56,7 +55,7 @@
 }
 
 .activity-panel__details:hover {
-  background: var(--color-primary-weak);
+  background: var(--primary-tint);
 }
 
 .activity-list {
@@ -83,7 +82,7 @@
 }
 
 .activity-row:hover .activity-row__copy strong {
-  color: var(--color-primary-text);
+  color: var(--primary-text);
 }
 
 .activity-row__icon {
@@ -92,19 +91,19 @@
   width: 1.55rem;
   height: 1.55rem;
   border-radius: var(--radius-pill);
-  color: var(--info);
-  background: color-mix(in srgb, var(--info) 12%, transparent);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .activity-row__icon[data-kind='income'] {
-  color: var(--success);
-  background: color-mix(in srgb, var(--success) 13%, transparent);
+  color: var(--income);
+  background: color-mix(in srgb, var(--income) 13%, transparent);
 }
 
 .activity-row__icon[data-kind='expense'],
 .activity-row__icon[data-kind='danger'] {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 11%, transparent);
+  color: var(--expense);
+  background: color-mix(in srgb, var(--expense) 11%, transparent);
 }
 
 .activity-row__icon[data-kind='warning'] {
@@ -133,27 +132,27 @@
 
 .activity-row__copy strong {
   color: var(--text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   line-height: 1.2;
 }
 
 .activity-row__copy span {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: 0.71875rem;
   line-height: 1.25;
 }
 
 .activity-row__copy .activity-row__amount--income {
-  color: var(--success-text);
-  font-weight: var(--font-weight-medium);
+  color: var(--income-text);
+  font-weight: var(--fw-medium);
 }
 
 .activity-row__time {
   max-width: 5.6rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: 0.6875rem;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--fw-medium);
   text-align: right;
 }
 
@@ -163,8 +162,8 @@
   margin: 0 0.95rem 0.8rem;
   padding: 0.78rem;
   border: 1px dashed color-mix(in srgb, var(--border-strong) 72%, transparent);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--surface-sunken) 70%, transparent);
   text-align: center;
 }
 
@@ -174,7 +173,7 @@
 }
 
 .activity-empty span {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: 0.75rem;
 }
 

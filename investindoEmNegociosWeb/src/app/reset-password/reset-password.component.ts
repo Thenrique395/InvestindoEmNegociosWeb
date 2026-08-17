@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
+import { AuthLayoutComponent } from '../auth-layout/auth-layout.component';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [FormsModule, RouterModule],
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss']
+  imports: [FormsModule, RouterModule, AuthLayoutComponent],
+  templateUrl: './reset-password.component.html'
 })
 export class ResetPasswordComponent implements OnInit {
   token = '';
@@ -22,9 +22,10 @@ export class ResetPasswordComponent implements OnInit {
   formError = '';
   success = false;
 
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   constructor(
     private route: ActivatedRoute,
-    private location: Location,
     private auth: AuthService,
     private uiFeedback: UiFeedbackService
   ) {}
@@ -33,8 +34,13 @@ export class ResetPasswordComponent implements OnInit {
     this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
 
     // Remove o token da barra de endereço após ler o valor, reduzindo exposição em histórico/referer.
-    if (this.token) {
-      this.location.replaceState('/reset-password');
+    //
+    // `history.replaceState` nativo, e não `Location.replaceState` do Angular: o segundo
+    // notifica o Router, que recria este componente — e a instância recriada lê a URL já
+    // sem o token, caindo em "link inválido" mesmo com um link válido. Isso quebrava a
+    // redefinição de senha por completo.
+    if (this.token && this.isBrowser) {
+      window.history.replaceState(window.history.state, '', '/reset-password');
     }
   }
 

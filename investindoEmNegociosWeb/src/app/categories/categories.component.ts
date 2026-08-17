@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, computed, signal } from '@angular/core';
+import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { FormsModule } from '@angular/forms';
 import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
 import { AdminCategoriesService, AdminCategory } from '../admin-categories.service';
@@ -40,7 +41,8 @@ type CategoryFormField = 'name' | 'scope' | 'type';
     SegmentedSelectorComponent,
     ConfirmDialogComponent,
     EmptyStateComponent,
-    CategoryListComponent
+    CategoryListComponent,
+    SelectMenuComponent
   ],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.scss'],
@@ -73,6 +75,18 @@ export class CategoriesComponent implements OnInit {
   readonly overview = computed<CategoriesOverview>(() => buildOverview(this.categoryViews()));
 
   filters: CategoriesFilters = { search: '', tab: 'all', origin: 'all', status: 'all' };
+
+  readonly originFilterOptions = [
+    { value: 'all', label: 'Todas as origens' },
+    { value: 'default', label: 'Sistema' },
+    { value: 'custom', label: 'Minhas' }
+  ];
+
+  readonly statusFilterOptions = [
+    { value: 'all', label: 'Todos os status' },
+    { value: 'active', label: 'Ativas' },
+    { value: 'inactive', label: 'Inativas' }
+  ];
 
   nome = '';
   tipo: CategoryType = 'Expense';

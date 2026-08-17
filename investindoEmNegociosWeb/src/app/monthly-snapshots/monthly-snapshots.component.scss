@@ -4,27 +4,82 @@
   gap: 1.5rem;
 }
 
-.snapshots-summary-grid {
-  display: grid;
+.snapshots-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.latest-snapshot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.latest-snapshot h2,
+.latest-snapshot p {
+  margin: 0;
+}
+
+.latest-snapshot h2 {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-section-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
+}
+
+.latest-snapshot p {
+  margin-top: 0.35rem;
+  color: var(--text-secondary);
+  line-height: var(--lh-control);
+}
+
+.latest-snapshot__eyebrow {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.14em;
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+}
+
+/* README §4: faixa de indicadores é flex com quebra, nunca grid de N colunas.
+   O flex dispensa os breakpoints — a faixa reflui sozinha e a última linha
+   cresce para preencher, em vez de deixar célula vazia à direita. */
+.snapshots-summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.snapshots-summary-grid > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .text--sm {
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
 .snapshot {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 1rem;
-  background: var(--surface-2);
+  border-radius: var(--radius-panel);
+  padding: 1.25rem;
+  background: var(--surface);
   display: grid;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .snapshot__head {
@@ -38,7 +93,7 @@
 .snapshot__head h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
+  font-size: var(--fs-card-title);
 }
 
 .snapshot__risk {
@@ -49,6 +104,7 @@
 .snapshot__insight {
   margin: 0;
   color: var(--text-secondary);
+  line-height: var(--lh-control);
 }
 
 .snapshot__recs {
@@ -56,40 +112,51 @@
   padding-left: 1.1rem;
   display: grid;
   gap: 0.3rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
 }
 
 .grid {
   display: grid;
   gap: 0.8rem;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .grid > div {
-  background: var(--surface);
+  background: var(--surface-sunken);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   padding: 0.85rem;
+  min-width: 0;
 }
 
 .grid span {
   display: block;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-label);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-column);
   margin-bottom: 0.25rem;
   text-transform: uppercase;
 }
 
 .grid strong {
   color: var(--text);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 
-@media (max-width: 900px) {
-  .snapshots-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 1180px) {
+
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .latest-snapshot {
+    display: grid;
   }
 
   .grid {
@@ -97,7 +164,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 360px) {
   .snapshots-summary-grid,
   .grid {
     grid-template-columns: minmax(0, 1fr);

@@ -7,7 +7,7 @@
 .status-card {
   width: min(100%, 760px);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background: var(--surface);
   padding: clamp(1.2rem, 2vw, 2rem);
   display: grid;
@@ -15,7 +15,7 @@
 }
 
 .status-page--success .status-card {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--success) 10%, var(--surface)), var(--surface));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--income) 10%, var(--surface)), var(--surface));
 }
 
 .status-page--pending .status-card {
@@ -23,7 +23,7 @@
 }
 
 .status-page--failure .status-card {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--danger) 8%, var(--surface)), var(--surface));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--expense) 8%, var(--surface)), var(--surface));
 }
 
 .status-card h1,
@@ -38,8 +38,8 @@
 
 .status-panel {
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
   padding: 1rem;
   display: grid;
   gap: 0.6rem;
@@ -64,16 +64,16 @@
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   padding: 0.9rem 1rem;
   border: 1px solid var(--border);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
 }
 
 .btn--primary {
   background: var(--primary);
   border-color: transparent;
-  color: var(--color-text-inverse);
+  color: var(--on-primary);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
@@ -83,6 +83,6 @@
 }
 
 .btn--ghost {
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
 }

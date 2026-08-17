@@ -6,15 +6,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   standalone: true,
   imports: [],
   template: `
-    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-4 text-sm text-[var(--text)]">
+    <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-4 text-sm text-[var(--text)]">
       <div class="flex items-start gap-3">
-        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--surface-3)]" aria-hidden="true">
+        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--surface-inset)]" aria-hidden="true">
           {{ iconToShow }}
         </div>
         <div class="min-w-0 flex-1 space-y-1">
           <p class="m-0 font-semibold">{{ titleToShow }}</p>
           @if (description) {
-            <p class="m-0 text-[var(--text-muted)]">{{ description }}</p>
+            <p class="m-0 text-[var(--text-tertiary)]">{{ description }}</p>
           }
         </div>
         @if (retryLabel) {

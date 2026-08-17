@@ -13,6 +13,11 @@ export interface ScenarioPointView {
   tone: ScenarioTone;
 }
 
+export interface ScenarioChartPoint extends ScenarioPointView {
+  basePercent: number;
+  scenarioPercent: number;
+}
+
 export function impactTone(impactAmount: number): ScenarioTone {
   if (impactAmount > 0) return 'positive';
   if (impactAmount < 0) return 'negative';
@@ -35,6 +40,26 @@ export function buildScenarioPointViews(
       tone: difference > 0 ? 'positive' : difference < 0 ? 'negative' : 'flat'
     };
   });
+}
+
+export function buildScenarioChartPoints(
+  points: ScenarioProjectionPoint[] | null | undefined,
+  limit = 12
+): ScenarioChartPoint[] {
+  const views = buildScenarioPointViews(points, limit);
+  const maxBalance = Math.max(
+    1,
+    ...views.flatMap((view) => [
+      Math.abs(Number(view.point.baseClosingBalance || 0)),
+      Math.abs(Number(view.point.scenarioClosingBalance || 0))
+    ])
+  );
+
+  return views.map((view) => ({
+    ...view,
+    basePercent: Math.max(0, Math.min(100, (Math.abs(Number(view.point.baseClosingBalance || 0)) / maxBalance) * 100)),
+    scenarioPercent: Math.max(0, Math.min(100, (Math.abs(Number(view.point.scenarioClosingBalance || 0)) / maxBalance) * 100))
+  }));
 }
 
 /** Rótulo amigável do período simulado. */

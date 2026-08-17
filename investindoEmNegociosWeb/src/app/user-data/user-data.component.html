@@ -10,7 +10,8 @@
         tone="info"
         eyebrow="Sessões ativas"
         [value]="privacy.activeSessions.toString()"
-        note="Dispositivos atualmente conectados.">
+        note="Dispositivos atualmente conectados."
+        tooltipText="Sessões abertas na sua conta agora, em qualquer navegador ou dispositivo. Cada login novo cria uma sessão.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 5h16v10H4zM8 19h8M12 15v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -19,7 +20,8 @@
         [tone]="privacy.pendingPasswordResetRequests > 0 ? 'warning' : 'success'"
         eyebrow="Resets pendentes"
         [value]="privacy.pendingPasswordResetRequests.toString()"
-        note="Pedidos de redefinição de senha em aberto.">
+        note="Pedidos de redefinição de senha em aberto."
+        tooltipText="Pedidos de redefinição de senha ainda não usados e dentro do prazo de validade. Se você não pediu nenhum, um número acima de zero merece atenção.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M7 11V8a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
           <rect x="5" y="11" width="14" height="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.7" />
@@ -29,7 +31,8 @@
         tone="primary"
         eyebrow="Eventos auditados"
         [value]="privacy.auditEntries.toString()"
-        note="Registros no histórico de auditoria.">
+        note="Registros no histórico de auditoria."
+        tooltipText="Ações registradas no histórico da sua conta — login, alteração de dados e de configurações. É o rastro que permite auditar o que aconteceu.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>

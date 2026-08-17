@@ -12,10 +12,18 @@
 
 // ---- Cards de resumo --------------------------------------------------------
 
+/* README §4: faixa de indicadores é flex com quebra, nunca `grid auto-fit`.
+   Com grid, quando a contagem de cards não divide pelo número de colunas sobra
+   célula vazia à direita; com flex a última linha cresce e preenche. */
 .cat-summary {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+}
+
+.cat-summary > * {
+  flex: 1 1 210px;
+  min-width: 0;
 }
 
 // ---- Controles / filtros ----------------------------------------------------
@@ -28,7 +36,7 @@
 
 .cat-filterbar {
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
   padding: 1rem;
 }
@@ -51,11 +59,11 @@
 }
 
 .cat-filter__label {
-  font-size: var(--text-xs, 0.68rem);
+  font-size: var(--fs-caption, 0.68rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .cat-filter input,
@@ -63,10 +71,10 @@
   min-height: 42px;
   padding: 0 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-inner, 12px);
   background: var(--surface);
   color: var(--text);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 .cat-filter input:focus-visible,
@@ -82,18 +90,25 @@
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-elevation-sm);
+}
+
+/* README §3: card em repouso tem só a borda; a elevação de 2px é do hover.
+   Estes são clicáveis — sem o hover, ficavam sem nenhum retorno visual. */
+.cat-list-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 .cat-hint {
   padding: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  color: var(--text-muted);
-  font-size: var(--font-size-body-sm, 0.85rem);
+  color: var(--text-tertiary);
+  font-size: var(--fs-body, 0.85rem);
 }
 
 // ---- Form (modal) -----------------------------------------------------------

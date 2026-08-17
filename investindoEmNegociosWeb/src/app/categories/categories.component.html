@@ -15,25 +15,29 @@
 
   <!-- Cards de resumo -->
   <section class="cat-summary" aria-label="Resumo de categorias">
-    <app-transaction-summary-card tone="primary" eyebrow="Total de categorias" [value]="overview().total.toString()" [note]="overview().activeCount + ' ativa(s)'">
+    <app-transaction-summary-card tone="primary" eyebrow="Total de categorias" [value]="overview().total.toString()" [note]="overview().activeCount + ' ativa(s)'"
+      tooltipText="Todas as categorias visíveis para você: as padrão do sistema mais as que você criou. O número ao lado conta só as ativas.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M4 7h7v7H4zM13 4h7v7h-7zM13 14h7v6h-7zM4 16h7v4H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="danger" eyebrow="Categorias de despesas" [value]="overview().expenseCount.toString()" note="Classifique suas saídas.">
+    <app-transaction-summary-card tone="danger" eyebrow="Categorias de despesas" [value]="overview().expenseCount.toString()" note="Classifique suas saídas."
+      tooltipText="Categorias disponíveis para classificar despesas. São elas que alimentam o orçamento e a distribuição por categoria do dashboard.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 19V5M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="success" eyebrow="Categorias de receitas" [value]="overview().incomeCount.toString()" note="Classifique suas entradas.">
+    <app-transaction-summary-card tone="success" eyebrow="Categorias de receitas" [value]="overview().incomeCount.toString()" note="Classifique suas entradas."
+      tooltipText="Categorias disponíveis para classificar receitas. Uma categoria serve a despesa ou a receita, nunca às duas.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 5v14M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </app-transaction-summary-card>
 
-    <app-transaction-summary-card tone="info" [eyebrow]="isAdmin ? 'Minhas categorias' : 'Personalizadas'" [value]="overview().customCount.toString()" note="Criadas por você.">
+    <app-transaction-summary-card tone="info" [eyebrow]="isAdmin ? 'Minhas categorias' : 'Personalizadas'" [value]="overview().customCount.toString()" note="Criadas por você."
+      tooltipText="Categorias que você criou, fora as padrão do sistema. Só estas podem ser renomeadas ou excluídas.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       </svg>
@@ -54,19 +58,19 @@
       </label>
       <label class="cat-filter">
         <span class="cat-filter__label">Origem</span>
-        <select [(ngModel)]="filters.origin" (ngModelChange)="onFilterChange()" aria-label="Filtrar por origem">
-          <option value="all">Todas</option>
-          <option value="default">Sistema</option>
-          <option value="custom">Minhas</option>
-        </select>
+        <app-select-menu
+          [options]="originFilterOptions"
+          [(ngModel)]="filters.origin"
+          (valueChange)="onFilterChange()"
+          ariaLabel="Filtrar por origem" />
       </label>
       <label class="cat-filter">
         <span class="cat-filter__label">Status</span>
-        <select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()" aria-label="Filtrar por status">
-          <option value="all">Todos</option>
-          <option value="active">Ativas</option>
-          <option value="inactive">Inativas</option>
-        </select>
+        <app-select-menu
+          [options]="statusFilterOptions"
+          [(ngModel)]="filters.status"
+          (valueChange)="onFilterChange()"
+          ariaLabel="Filtrar por status" />
       </label>
     </div>
   </div>

@@ -16,12 +16,8 @@ import { OnboardingProfileField, onboardingProfileFieldError } from '../onboardi
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [':host { display: contents; }'],
   template: `
-    <div class="onboarding-step-shell">
-      <form class="onboarding-panel onboarding-form-panel" [formGroup]="form()" (ngSubmit)="submit.emit()">
-        <div class="onboarding-panel__header">
-          <strong>Informações do perfil</strong>
-          <span>Preencha os campos essenciais para continuar.</span>
-        </div>
+    <form class="onboarding-choice-block" [formGroup]="form()" (ngSubmit)="submit.emit()">
+      <section class="onboarding-block">
         <div class="onboarding-form-section">
           <p class="onboarding-form-section__title">Identificação</p>
           <div class="onboarding-form-grid">
@@ -90,20 +86,21 @@ import { OnboardingProfileField, onboardingProfileFieldError } from '../onboardi
             </app-form-field>
           </div>
         </div>
-        <div class="onboarding-actions onboarding-actions--footer">
-          <div class="onboarding-actions__meta">
-            <strong>Quase pronto</strong>
-            <span>Salve seus dados para avançar para conta e primeiros lançamentos.</span>
-          </div>
-          <div class="onboarding-actions__group onboarding-actions__group--footer">
-            <button class="ghost onboarding-btn onboarding-btn--secondary" type="button" (click)="back.emit()">Voltar</button>
-            <button class="btn-primary onboarding-btn onboarding-btn--primary onboarding-btn--confirm" type="submit" [disabled]="loading()">
-              {{ loading() ? 'Salvando...' : 'Salvar e continuar' }}
-            </button>
-          </div>
+      </section>
+
+      <div class="onboarding-footer">
+        <div class="onboarding-footer__meta">
+          <strong>Isso personaliza sua conta</strong>
+          <span>Seus dados ficam no perfil e podem ser editados quando quiser.</span>
         </div>
-      </form>
-    </div>
+        <div class="onboarding-footer__actions">
+          <button class="onboarding-back" type="button" (click)="back.emit()">Voltar</button>
+          <button class="onboarding-cta" type="submit" [disabled]="loading()">
+            {{ loading() ? 'Salvando…' : 'Salvar e continuar' }}
+          </button>
+        </div>
+      </div>
+    </form>
   `
 })
 export class ProfileStepComponent {

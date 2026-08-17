@@ -78,6 +78,13 @@
                         <path d="M4 12h4M10 8h4M16 6h4M4 12l3-3M10 8l3-1M16 6l3-2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M3 20h18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                       }
+                      @case ('profile') {
+                        <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-6 1.9-6 4.2V20h12v-1.8c0-2.3-2.7-4.2-6-4.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                      }
+                      @case ('settings') {
+                        <path d="M12 8.5a3.5 3.5 0 1 0 3.5 3.5A3.5 3.5 0 0 0 12 8.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M19.4 15a7.9 7.9 0 0 0 .1-2l2-1.2-2-3.5-2.2.6a7.7 7.7 0 0 0-1.7-1l-.3-2.3H9.7l-.3 2.3a7.7 7.7 0 0 0-1.7 1l-2.2-.6-2 3.5 2 1.2a7.9 7.9 0 0 0 .1 2l-2 1.2 2 3.5 2.2-.6a7.7 7.7 0 0 0 1.7 1l.3 2.3h4.6l.3-2.3a7.7 7.7 0 0 0 1.7-1l2.2.6 2-3.5-2-1.2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+                      }
                       @case ('report') {
                         <path d="M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -105,15 +112,15 @@
       </section>
     }
   </nav>
-  <div class="sidebar__footer">
-    <button type="button" class="sidebar__link" (click)="goToPreferences($event)">
-      <span class="sidebar__link-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-          <path d="M12 8.5a3.5 3.5 0 1 0 3.5 3.5A3.5 3.5 0 0 0 12 8.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M19.4 15a7.9 7.9 0 0 0 .1-2l2-1.2-2-3.5-2.2.6a7.7 7.7 0 0 0-1.7-1l-.3-2.3H9.7l-.3 2.3a7.7 7.7 0 0 0-1.7 1l-2.2-.6-2 3.5 2 1.2a7.9 7.9 0 0 0 .1 2l-2 1.2 2 3.5 2.2-.6a7.7 7.7 0 0 0 1.7 1l.3 2.3h4.6l.3-2.3a7.7 7.7 0 0 0 1.7-1l2.2.6 2-3.5-2-1.2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      <span class="sidebar__link-label">Configurações</span>
-    </button>
-  </div>
+  <button type="button" class="sidebar__profile" (click)="goToProfile($event)">
+    @if (avatarUrl()) {
+      <img class="sidebar__avatar-img" [src]="avatarUrl()" alt="" width="30" height="30" />
+    } @else {
+      <span class="sidebar__avatar" aria-hidden="true">{{ userInitials() }}</span>
+    }
+    <span class="sidebar__profile-block">
+      <span class="sidebar__profile-name">{{ displayName() }}</span>
+      <span class="sidebar__profile-plan">{{ planLabel() }}</span>
+    </span>
+  </button>
 </aside>

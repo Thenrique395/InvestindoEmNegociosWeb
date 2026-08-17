@@ -19,7 +19,7 @@
   height: 40px;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
@@ -27,7 +27,7 @@
 }
 
 .notif-trigger:hover {
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
 }
 
@@ -47,10 +47,10 @@
   padding: 0 4px;
   border: 1px solid var(--surface);
   border-radius: var(--radius-pill);
-  background: var(--danger);
+  background: var(--expense);
   color: var(--on-primary);
   font-size: 0.65rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--fw-bold);
   line-height: 1;
 }
 
@@ -64,9 +64,9 @@
   margin-top: 0.6rem;
   padding: 0.75rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
   transform-origin: top right;
   animation: notif-dropdown-in 150ms ease;
 }
@@ -93,25 +93,25 @@
 
 .notif-dropdown__title {
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .notif-dropdown__refresh {
   padding: 0.3rem 0.6rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
   color: var(--text);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   transition: border-color 160ms ease, background-color 160ms ease;
 }
 
 .notif-dropdown__refresh:hover {
   border-color: var(--border-strong);
-  background: var(--surface-3);
+  background: var(--surface-inset);
 }
 
 .notif-dropdown__list {
@@ -126,12 +126,12 @@
 .notif-dropdown__empty {
   margin: 0;
   padding: 0.5rem 0.25rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-label);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
 }
 
 .notif-dropdown__empty--error {
-  color: var(--danger-text);
+  color: var(--expense-text);
 }
 
 .notif-item {
@@ -142,8 +142,8 @@
   width: 100%;
   padding: 0.6rem 0.7rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
   color: var(--text);
   text-align: left;
   cursor: pointer;
@@ -152,12 +152,12 @@
 
 .notif-item:hover {
   border-color: var(--border-strong);
-  background: var(--surface-3);
+  background: var(--surface-inset);
 }
 
 .notif-item--unread {
-  border-color: var(--color-primary-soft);
-  background: var(--color-primary-weak);
+  border-color: var(--primary-tint);
+  background: var(--primary-tint);
 }
 
 .notif-item__dot {
@@ -176,13 +176,13 @@
 }
 
 .notif-item__title {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
 }
 
 .notif-item__message {
   color: var(--text-secondary);
-  font-size: var(--font-size-caption);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-control);
 }

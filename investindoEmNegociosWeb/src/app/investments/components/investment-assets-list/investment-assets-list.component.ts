@@ -6,18 +6,15 @@ import { AppCurrencyPipe } from '../../../shared/app-currency.pipe';
 import { FilterBarComponent } from '../../../shared/filter-bar/filter-bar.component';
 import { ResponsiveListCellDirective } from '../../../shared/responsive-list/responsive-list-cell.directive';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../../../shared/responsive-list/responsive-list.component';
-import { StatusBadgeComponent } from '../../../shared/status-badge/status-badge.component';
+import { StatusBadgeComponent, StatusBadgeTone } from '../../../shared/status-badge/status-badge.component';
 import { positionCurrentValue, positionNetContributed } from '../../../utils/investments.utils';
 
 export type InvestmentPositionSortKey =
   | 'asset'
-  | 'paperType'
-  | 'status'
   | 'quantity'
   | 'avgPrice'
+  | 'invested'
   | 'currentValue'
-  | 'portfolioPercent'
-  | 'currentReturn'
   | 'estimatedResult';
 
 @Component({
@@ -65,16 +62,12 @@ export class InvestmentAssetsListComponent {
 
   readonly columns: ResponsiveListColumn[] = [
     { key: 'asset', label: 'Ativo', sortable: true },
-    { key: 'paperType', label: 'Classe', sortable: true },
-    { key: 'status', label: 'Status', sortable: true },
-    { key: 'quantity', label: 'Quantidade', sortable: true, align: 'end' },
+    { key: 'quantity', label: 'Qtd.', sortable: true, align: 'end' },
     { key: 'avgPrice', label: 'Preço médio', sortable: true, align: 'end' },
-    { key: 'marketPrice', label: 'Preço mercado', align: 'end' },
-    { key: 'priceChange', label: 'Variação', align: 'end' },
-    { key: 'currentValue', label: 'Valor atual', sortable: true, align: 'end' },
-    { key: 'portfolioPercent', label: '% carteira', sortable: true, align: 'end' },
-    { key: 'currentReturn', label: 'Rent. atual', sortable: true, align: 'end' },
-    { key: 'estimatedResult', label: 'Resultado', sortable: true, align: 'end' },
+    { key: 'marketPrice', label: 'Atual', align: 'end' },
+    { key: 'invested', label: 'Investido', sortable: true, align: 'end' },
+    { key: 'currentValue', label: 'Mercado', sortable: true, align: 'end' },
+    { key: 'estimatedResult', label: 'Result.', sortable: true, align: 'end' },
     { key: 'actions', label: 'Ações', align: 'end' }
   ];
 
@@ -94,6 +87,15 @@ export class InvestmentAssetsListComponent {
     this.filtersChanged.emit();
   }
 
+  typeChipLabel(type: 'ALL' | InvestmentType): string {
+    if (type === 'ALL') return 'Todos';
+    return this.tipos.find((item) => item.value === type)?.label ?? type;
+  }
+
+  get typeFilterChips(): ('ALL' | InvestmentType)[] {
+    return ['ALL', ...this.tipos.map((item) => item.value)];
+  }
+
   updateFilterAccount(value: string): void {
     this.filterAccountChange.emit(value);
     this.filtersChanged.emit();
@@ -110,6 +112,14 @@ export class InvestmentAssetsListComponent {
 
   marketPrice(position: InvestmentPosition): number | null {
     return position.marketPrice ?? null;
+  }
+
+  priceSourceLabel(position: InvestmentPosition): string {
+    return this.marketPrice(position) !== null ? 'Cotação' : 'Preço médio';
+  }
+
+  priceSourceTone(position: InvestmentPosition): StatusBadgeTone {
+    return this.marketPrice(position) !== null ? 'success' : 'muted';
   }
 
   marketLogo(position: InvestmentPosition): string | null {
@@ -140,6 +150,10 @@ export class InvestmentAssetsListComponent {
     return positionCurrentValue(position);
   }
 
+  valorInvestidoPosicao(position: InvestmentPosition): number {
+    return positionNetContributed(position);
+  }
+
   resultadoPosicao(position: InvestmentPosition): number {
     return positionCurrentValue(position) - positionNetContributed(position);
   }
@@ -158,5 +172,29 @@ export class InvestmentAssetsListComponent {
     const avg = position.avgPrice || 0;
     if (market === null || avg <= 0) return null;
     return ((market / avg) - 1) * 100;
+  }
+
+  get totalInvested(): number {
+    return this.positions.reduce((sum, position) => sum + positionNetContributed(position), 0);
+  }
+
+  get totalMarketValue(): number {
+    return this.positions.reduce((sum, position) => sum + positionCurrentValue(position), 0);
+  }
+
+  get totalResult(): number {
+    return this.totalMarketValue - this.totalInvested;
+  }
+
+  get quotedPositionsCount(): number {
+    return this.positions.filter((position) => this.marketPrice(position) !== null).length;
+  }
+
+  get averagePriceFallbackCount(): number {
+    return Math.max(this.positions.length - this.quotedPositionsCount, 0);
+  }
+
+  get positionsNote(): string {
+    return `${this.positions.length} posição(ões) neste filtro · ${this.totalZeroed} zerada(s)`;
   }
 }

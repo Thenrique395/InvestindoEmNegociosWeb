@@ -7,25 +7,35 @@ import { Component, input, output } from '@angular/core';
     <div class="app-period-hero">
       <div class="app-period-hero__main">
         <p class="app-period-hero__eyebrow">{{ eyebrow() }}</p>
-        <h2 class="app-period-hero__title">{{ title() }}</h2>
+
+        <!-- Setas ao lado do título, não abaixo: o alvo da navegação é o
+             período, e ficar junto dele encurta o percurso do olhar. -->
+        <div class="app-period-hero__heading">
+          @if (showNavigation()) {
+            <button
+              type="button"
+              class="app-period-hero__arrow"
+              aria-label="Mês anterior"
+              (click)="previousMonth.emit()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+            </button>
+          }
+          <h2 class="app-period-hero__title">{{ title() }}</h2>
+          @if (showNavigation()) {
+            <button
+              type="button"
+              class="app-period-hero__arrow"
+              aria-label="Próximo mês"
+              (click)="nextMonth.emit()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+            </button>
+          }
+        </div>
+
         <p class="app-period-hero__text">{{ description() }}</p>
 
         <div class="app-period-hero__toolbar">
           <ng-content select="[hero-toolbar-start]"></ng-content>
-
-          @if (showNavigation()) {
-            <div class="app-period-hero__nav">
-              <button type="button" class="app-period-hero__nav-btn" (click)="previousMonth.emit()">
-                <span aria-hidden="true">←</span>
-                <span>Mês anterior</span>
-              </button>
-              <button type="button" class="app-period-hero__nav-btn" (click)="nextMonth.emit()">
-                <span>Próximo mês</span>
-                <span aria-hidden="true">→</span>
-              </button>
-            </div>
-          }
-
           <ng-content select="[hero-toolbar-end]"></ng-content>
         </div>
       </div>
@@ -45,32 +55,69 @@ import { Component, input, output } from '@angular/core';
 
     .app-period-hero__main {
       display: grid;
-      gap: 1rem;
+      gap: var(--space-5);
+      align-content: start;
+    }
+
+    .app-period-hero__heading {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .app-period-hero__arrow {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background var(--dur-hover) ease, color var(--dur-hover) ease;
+    }
+
+    .app-period-hero__arrow svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .app-period-hero__arrow:hover {
+      background: var(--surface-inset);
+      color: var(--text);
     }
 
     .app-period-hero__eyebrow {
       margin: 0;
-      font-size: var(--font-size-caption);
-      font-weight: var(--font-weight-bold);
-      letter-spacing: var(--letter-spacing-eyebrow);
+      font-size: var(--fs-caption);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--text-tertiary);
     }
 
     .app-period-hero__title {
       margin: 0;
-      font-size: var(--font-size-display);
-      line-height: var(--line-height-display);
-      font-weight: var(--font-weight-semibold);
-      letter-spacing: var(--letter-spacing-display);
+      font-family: var(--font-display);
+      font-size: var(--fs-page-title);
+      line-height: var(--lh-display);
+      font-weight: var(--fw-semibold);
+      letter-spacing: var(--ls-tighter);
       color: var(--text);
     }
 
     .app-period-hero__text {
       margin: 0;
       max-inline-size: 62ch;
-      font-size: var(--font-size-body);
-      line-height: var(--line-height-body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
       color: var(--text-secondary);
     }
 
@@ -91,11 +138,11 @@ import { Component, input, output } from '@angular/core';
       min-height: 46px;
       border-radius: var(--radius-pill);
       border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-      background: color-mix(in srgb, var(--surface-2) 74%, white);
+      background: color-mix(in srgb, var(--surface-sunken) 74%, white);
       padding: 0.7rem 1rem;
       color: var(--text);
-      font-size: var(--font-size-body-sm);
-      font-weight: var(--font-weight-semibold);
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;

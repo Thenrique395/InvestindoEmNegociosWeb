@@ -1,0 +1,48 @@
+@for (plan of plans(); track plan.code; let i = $index) {
+  <article
+    class="plan"
+    [class.plan--featured]="plan.recommended"
+    [appReveal]="i * 120">
+    <header class="plan__head">
+      <p class="plan__name">{{ plan.name }}</p>
+      <span class="plan__tag" [class.plan__tag--featured]="plan.recommended">{{ plan.tag }}</span>
+    </header>
+
+    <p class="plan__headline">{{ headlineOf(plan) }}</p>
+    <p class="plan__sub">{{ subOf(plan) }}</p>
+
+    <div class="plan__price-block">
+      <p class="plan__price tabular">
+        {{ priceLabelOf(plan) }}
+        <span class="plan__period">/mês</span>
+      </p>
+      <p class="plan__note">{{ noteOf(plan) }}</p>
+    </div>
+
+    <ul class="plan__list">
+      @for (feature of plan.features; track feature) {
+        <li class="plan__item">
+          <svg class="plan__check" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          {{ feature }}
+        </li>
+      }
+      @for (limit of plan.limits; track limit) {
+        <li class="plan__item plan__item--limit">
+          <span class="plan__dash" aria-hidden="true"></span>
+          {{ limit }}
+        </li>
+      }
+    </ul>
+
+    <button
+      appSiteCta
+      [variant]="plan.recommended ? 'primary' : 'outline'"
+      class="plan__cta"
+      type="button"
+      (click)="planSelected.emit(plan)">
+      {{ plan.ctaLabel }}
+    </button>
+  </article>
+}

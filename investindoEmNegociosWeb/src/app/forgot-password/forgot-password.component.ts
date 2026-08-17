@@ -6,13 +6,13 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
+import { AuthLayoutComponent } from '../auth-layout/auth-layout.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [FormsModule, RouterModule],
-  templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  imports: [FormsModule, RouterModule, AuthLayoutComponent],
+  templateUrl: './forgot-password.component.html'
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
   email = '';

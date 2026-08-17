@@ -1,0 +1,121 @@
+<div class="auth-card">
+  <aside class="auth-aside">
+    <div class="auth-aside__glow" aria-hidden="true"></div>
+
+    <!-- Assinatura em duas linhas, como no design: "em" é a única palavra em
+         verde e peso menor. O texto vive na marcação, não numa imagem, para
+         acompanhar a tipografia do painel. -->
+    <a class="auth-aside__brand" routerLink="/" [attr.aria-label]="brandName()">
+      <img class="auth-aside__logo" [src]="logoSrc()" alt="" width="44" height="44" />
+      <span class="auth-aside__wordmark" aria-hidden="true">
+        <span class="auth-aside__wordmark-line">
+          Investindo <span class="auth-aside__wordmark-soft">em</span>
+        </span>
+        <span class="auth-aside__wordmark-line">Negócios</span>
+      </span>
+    </a>
+
+    <div class="auth-aside__pitch">
+      <p class="auth-aside__eyebrow">{{ asideEyebrow() }}</p>
+      <h2 class="auth-aside__title">{{ asideTitle() }}</h2>
+      <p class="auth-aside__text">{{ asideText() }}</p>
+
+      @if (showcase()) {
+        <!-- Prova visual do produto. Os números são ilustrativos e o bloco fica
+             fora da árvore de acessibilidade: quem usa leitor de tela está aqui
+             para entrar, não para ouvir um extrato fictício. -->
+        <figure class="auth-showcase" aria-hidden="true">
+          <figcaption class="sr-only">Exemplo ilustrativo do painel</figcaption>
+
+          <div class="auth-showcase__head">
+            <span class="auth-showcase__label">Saldo disponível</span>
+            <span class="auth-showcase__delta">↑ 8,2%</span>
+          </div>
+          <p class="auth-showcase__value">R$ 12.480,35</p>
+
+          <div class="auth-showcase__cells">
+            @for (cell of showcaseCells; track cell.label) {
+              <div class="auth-showcase__cell">
+                <span class="auth-showcase__cell-label">{{ cell.label }}</span>
+                <span class="auth-showcase__cell-value" [attr.data-tone]="cell.tone">{{ cell.value }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="auth-showcase__spark">
+            @for (bar of showcaseBars; track $index) {
+              <span
+                class="auth-showcase__bar"
+                [class.auth-showcase__bar--on]="bar.destaque"
+                [style.height.%]="bar.altura"></span>
+            }
+          </div>
+        </figure>
+      }
+    </div>
+
+    @if (proofLabel() || proofText()) {
+      <div class="auth-aside__proof">
+        @if (proofLabel(); as label) {
+          <p class="auth-aside__proof-label">{{ label }}</p>
+        }
+        @if (proofText(); as text) {
+          <p class="auth-aside__proof-text">{{ text }}</p>
+        }
+      </div>
+    }
+  </aside>
+
+  <main class="auth-main">
+    <a class="auth-main__back" [routerLink]="backRoute()">
+      <svg class="auth-main__back-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 6-6 6 6 6" />
+      </svg>
+      {{ backLabel() }}
+    </a>
+
+    <header class="auth-main__head">
+      <p class="auth-main__eyebrow">{{ eyebrow() }}</p>
+      <h1 class="auth-main__title">{{ title() }}</h1>
+      @if (description(); as text) {
+        <p class="auth-main__description">{{ text }}</p>
+      }
+    </header>
+
+    <div class="auth-main__body">
+      <ng-content />
+    </div>
+
+    @if (trustSeals().length) {
+      <!-- Objeções resolvidas no momento em que a pessoa hesita em digitar a senha. -->
+      <ul class="auth-trust">
+        @for (seal of trustSeals(); track seal.label) {
+          <li class="auth-trust__item">
+            <svg class="auth-trust__icon" viewBox="0 0 24 24" aria-hidden="true">
+              @switch (seal.icon) {
+                @case ('shield') {
+                  <path d="M12 3.2 5.5 6v5.3c0 4 2.7 7.7 6.5 9.5 3.8-1.8 6.5-5.5 6.5-9.5V6Z" />
+                  <path d="m9.4 12.1 1.9 1.9 3.4-3.9" />
+                }
+                @case ('lock') {
+                  <rect x="4.8" y="10.4" width="14.4" height="9.4" rx="2.2" />
+                  <path d="M8.4 10.4V7.9a3.6 3.6 0 0 1 7.2 0v2.5" />
+                }
+                @case ('download') {
+                  <path d="M12 4v10m0 0 3.6-3.6M12 14l-3.6-3.6" />
+                  <path d="M5 16.6v1.8a1.8 1.8 0 0 0 1.8 1.8h10.4a1.8 1.8 0 0 0 1.8-1.8v-1.8" />
+                }
+              }
+            </svg>
+            {{ seal.label }}
+          </li>
+        }
+      </ul>
+    }
+
+    <!-- Rodapé do cartão: "Ainda não tem conta?", "Voltar para login"… -->
+    <div class="auth-main__footer">
+      <ng-content select="[auth-footer]" />
+    </div>
+  </main>
+</div>

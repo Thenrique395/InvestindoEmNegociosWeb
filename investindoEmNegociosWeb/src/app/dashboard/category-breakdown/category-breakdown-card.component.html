@@ -3,7 +3,7 @@
     <div class="cat-card__titles">
       <h3 class="cat-card__title">{{ title() }}</h3>
     </div>
-    @if (hasData()) {
+    @if (hasDistributionData()) {
       <a class="cat-card__details" [routerLink]="detailsRoute()">
         {{ detailsLabel() }}
         <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false" aria-hidden="true">
@@ -13,7 +13,7 @@
     }
   </div>
 
-  @if (hasData()) {
+  @if (hasDistributionData()) {
     <div class="cat-card__body">
       <div class="cat-card__chart-wrap">
         <div class="cat-card__chart" [style.background]="chartBackground()" role="img" [attr.aria-label]="chartAriaLabel()">
@@ -40,6 +40,18 @@
           </li>
         }
       </ul>
+    </div>
+  } @else if (hasData()) {
+    <div class="cat-card__empty cat-card__empty--insufficient">
+      <span class="cat-card__empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" role="presentation" focusable="false">
+          <path d="M4 19V5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M8 17v-5m4 5V8m4 9v-7m4 7V6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </span>
+      <p class="cat-card__empty-text">{{ insufficientText() }}</p>
+      <span class="cat-card__empty-meta">{{ countLabel() }} no período</span>
+      <a class="cat-card__empty-cta" [routerLink]="detailsRoute()">{{ detailsLabel() }}</a>
     </div>
   } @else {
     <div class="cat-card__empty">

@@ -2,15 +2,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgClass, DecimalPipe } from '@angular/common';
 import { StoredCard } from '../data/api-data.service';
 import { CardBrandLookup } from '../lookups.service';
+import { ProgressBarComponent } from '../shared/progress-bar/progress-bar.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { StatusBadgeComponent, StatusBadgeTone } from '../shared/status-badge/status-badge.component';
-import { UsageBarComponent } from '../shared/usage-bar/usage-bar.component';
 import { CardMetrics, CardStatus } from './card-metrics.model';
 
 @Component({
   selector: 'app-cartoes-listagem',
   standalone: true,
-  imports: [NgClass, DecimalPipe, AppCurrencyPipe, StatusBadgeComponent, UsageBarComponent],
+  imports: [NgClass, DecimalPipe, AppCurrencyPipe, StatusBadgeComponent, ProgressBarComponent],
   templateUrl: './cartoes-listagem.component.html',
   styleUrls: ['./cartoes-listagem.component.scss']
 })

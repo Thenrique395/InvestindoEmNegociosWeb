@@ -8,9 +8,8 @@
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
   min-width: 0;
   display: grid;
   gap: 0.9rem;
@@ -19,12 +18,24 @@
 .card h2 {
   margin: 0;
   color: var(--text);
-  font-size: var(--font-size-body-lg);
-  letter-spacing: var(--letter-spacing-title);
+  font-size: var(--fs-card-title);
+  letter-spacing: var(--ls-tight);
+}
+
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card__head p {
+  margin: 0.35rem 0 0;
+  line-height: var(--lh-control);
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .params-grid {
@@ -38,7 +49,37 @@ label {
   display: grid;
   gap: 0.4rem;
   color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
+}
+
+.range-field {
+  align-self: stretch;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+}
+
+.range-field__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.range-field__head > span {
+  min-width: 0;
+}
+
+.range-field__head strong {
+  flex: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  font-variant-numeric: tabular-nums;
 }
 
 .field {
@@ -48,16 +89,22 @@ label {
 
 .field__label {
   color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
-input {
+input[type='number'] {
   border: 1px solid var(--border);
-  background-color: var(--surface-2);
-  border-radius: var(--radius-lg);
+  background-color: var(--surface-sunken);
+  border-radius: var(--radius-inner);
   min-height: 48px;
   padding: 0.7rem 0.9rem;
   color: var(--text);
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
 }
 
 .actions {
@@ -75,6 +122,85 @@ input {
 .impact-note {
   display: inline-flex;
   margin-top: 0.35rem;
+}
+
+.scenario-chart {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.55rem;
+  align-items: end;
+  min-height: 14rem;
+  padding-block-start: 0.5rem;
+}
+
+.scenario-chart__point {
+  display: grid;
+  grid-template-rows: minmax(9rem, 1fr) auto;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.scenario-chart__bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0.45rem, 1fr));
+  align-items: end;
+  gap: 0.22rem;
+  min-height: 9rem;
+  padding: 0.45rem;
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+}
+
+.scenario-chart__bar {
+  display: block;
+  min-height: 0.35rem;
+  border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+}
+
+.scenario-chart__bar--base {
+  background: var(--text-tertiary);
+}
+
+.scenario-chart__bar--scenario {
+  background: var(--primary);
+}
+
+.scenario-chart__label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.scenario-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+}
+
+.scenario-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-dot {
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: var(--radius-pill);
+}
+
+.legend-dot--base {
+  background: var(--text-tertiary);
+}
+
+.legend-dot--scenario {
+  background: var(--primary);
 }
 
 /* Projeção diária — tabela (desktop) */
@@ -110,8 +236,8 @@ td {
   gap: 0.4rem;
   padding: 0.8rem 0.9rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
 }
 
 .projection-card__head {
@@ -123,18 +249,18 @@ td {
 
 .projection-card__date {
   color: var(--text);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--fw-semibold);
 }
 
 .projection-card__meta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 0.9rem;
-  font-size: var(--font-size-caption);
+  font-size: var(--fs-caption);
 }
 
-.positive { color: var(--success-text); }
-.negative { color: var(--danger-text); }
+.positive { color: var(--income-text); }
+.negative { color: var(--expense-text); }
 
 @media (max-width: 860px) {
   .results-grid {
@@ -143,6 +269,25 @@ td {
 }
 
 @media (max-width: 640px) {
+  .range-field__head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .scenario-chart {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(3.25rem, 1fr);
+    grid-template-columns: none;
+    overflow-x: auto;
+    padding-block-end: 0.35rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .scenario-chart__point {
+    scroll-snap-align: start;
+  }
+
   .projection-table {
     display: none;
   }

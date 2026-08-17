@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { FormFieldComponent } from '../../../../shared/form-field/form-field.component';
+import { SelectMenuComponent, SelectMenuOption } from '../../../../shared/select-menu/select-menu.component';
 import { AccountRequest, AccountType } from '../../models/account.models';
 import { SUPPORTED_CURRENCIES } from '../../../../utils/locale-settings';
 
@@ -10,7 +11,7 @@ type AccountFormField = 'name' | 'type' | 'initialBalance';
 @Component({
   selector: 'app-account-form',
   standalone: true,
-  imports: [FormsModule, FormFieldComponent],
+  imports: [FormsModule, FormFieldComponent, SelectMenuComponent],
   templateUrl: './account-form.component.html',
   styleUrl: './account-form.component.scss'
 })
@@ -37,6 +38,14 @@ export class AccountFormComponent {
     if (!name) return 'Informe o nome da conta.';
     if (name.length < 2) return 'O nome precisa ter pelo menos 2 caracteres.';
     return '';
+  }
+
+  get accountTypeOptions(): SelectMenuOption[] {
+    return this.accountTypes.map((type) => ({ value: type, label: type }));
+  }
+
+  get currencyOptions(): SelectMenuOption[] {
+    return this.currencies.map((currency) => ({ value: currency, label: currency }));
   }
 
   get typeError(): string {

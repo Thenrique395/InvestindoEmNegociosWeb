@@ -19,7 +19,9 @@ export type ProfitabilityYearRow = {
   year: number;
   months: Array<number | null>;
   yearValue: number;
+  benchmarkYearValue: number;
   acumulado: number;
+  benchmarkAcumulado: number;
 };
 
 @Component({
@@ -55,7 +57,6 @@ export class InvestmentProfitabilityPanelComponent {
   @Output() typeFilterChange = new EventEmitter<'ALL' | InvestmentType>();
 
   readonly gridLines = [1, 2, 3, 4, 5];
-  readonly monthLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
   trackByIndex(index: number): number {
     return index;
@@ -65,5 +66,10 @@ export class InvestmentProfitabilityPanelComponent {
     const diff = carteira - benchmark;
     const prefix = diff >= 0 ? 'acima' : 'abaixo';
     return `${Math.abs(diff).toFixed(2)}% ${prefix} do ${this.benchmarkLabel}`;
+  }
+
+  yearBarWidth(row: ProfitabilityYearRow): number {
+    const max = Math.max(...this.yearlyRows.map((item) => Math.abs(item.yearValue)), 1);
+    return Math.min((Math.abs(row.yearValue) / max) * 100, 100);
   }
 }

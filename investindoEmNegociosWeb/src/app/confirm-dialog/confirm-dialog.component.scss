@@ -15,18 +15,18 @@
 .modal__card {
   position: relative;
   background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
+  border-radius: var(--radius-inner);
+  padding: var(--space-10);
   width: min(420px, 92vw);
   display: grid;
   gap: 1rem;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-dropdown);
 }
 
 .muted {
-  color: var(--text-muted);
-  line-height: var(--line-height-body);
+  color: var(--text-tertiary);
+  line-height: var(--lh-body);
 }
 
 .modal__actions {

@@ -1,0 +1,192 @@
+<app-site-header
+  [links]="nav"
+  [ctaLabel]="hero.primaryCta"
+  (anchorSelected)="scrollTo($event.anchor, $event.event)" />
+
+<!-- 1. Hero -->
+<section class="hero">
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <span class="hero__badge">{{ hero.badge }}</span>
+      <h1 class="hero__title">
+        {{ hero.title }} <span class="hero__title-accent">{{ hero.titleAccent }}</span>
+      </h1>
+      <p class="hero__description">{{ hero.description }}</p>
+
+      <div class="hero__actions">
+        <a appSiteCta href="#planos" (click)="scrollTo('planos', $event)">{{ hero.primaryCta }}</a>
+        <a appSiteCta variant="outline" href="#como" (click)="scrollTo('como', $event)">
+          {{ hero.secondaryCta }}
+          <svg class="hero__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+        </a>
+      </div>
+
+      <ul class="hero__seals">
+        @for (seal of hero.seals; track seal) {
+          <li class="hero__seal">
+            <svg class="hero__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+            {{ seal }}
+          </li>
+        }
+      </ul>
+    </div>
+
+    <app-vendas-preview class="hero__preview" />
+  </div>
+</section>
+
+<!-- 2. Números -->
+<section class="stats">
+  <app-site-stat-strip class="stats__strip" [stats]="stats" [appReveal]="0" />
+</section>
+
+<!-- 3. Antes e depois -->
+<app-site-section
+  tone="surface"
+  [eyebrow]="comparativo.eyebrow"
+  [title]="comparativo.title">
+  <div class="compare">
+    <article class="compare__card compare__card--before" [appReveal]="0">
+      <h3 class="compare__title">{{ comparativo.antes.title }}</h3>
+      <ul class="compare__list">
+        @for (item of comparativo.antes.items; track item) {
+          <li class="compare__item">
+            <svg class="compare__icon compare__icon--x" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+            {{ item }}
+          </li>
+        }
+      </ul>
+    </article>
+
+    <article class="compare__card compare__card--after" [appReveal]="120">
+      <h3 class="compare__title">{{ comparativo.depois.title }}</h3>
+      <ul class="compare__list">
+        @for (item of comparativo.depois.items; track item) {
+          <li class="compare__item">
+            <svg class="compare__icon compare__icon--check" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            {{ item }}
+          </li>
+        }
+      </ul>
+    </article>
+  </div>
+</app-site-section>
+
+<!-- 4. Como funciona -->
+<app-site-section
+  anchor="como"
+  eyebrow="Como funciona"
+  title="Da primeira anotação à leitura do mês, em três passos">
+  <app-site-card-grid [cards]="passos" minWidth="280px" />
+</app-site-section>
+
+<!-- 5. Recursos -->
+<app-site-section
+  anchor="recursos"
+  tone="surface"
+  eyebrow="Recursos"
+  title="Controle financeiro com contexto, não só lançamento"
+  description="Cada módulo existe porque resolve uma dúvida concreta do mês — não para encher a tela de gráfico.">
+  <app-site-card-grid [cards]="recursos" />
+</app-site-section>
+
+<!-- 6. Personas -->
+<app-site-section
+  eyebrow="Benefícios por perfil"
+  title="Feito para rotinas financeiras diferentes">
+  <app-site-card-grid [cards]="personas" minWidth="240px" />
+</app-site-section>
+
+<!-- 7. Segurança -->
+<app-site-section anchor="seguranca" tone="surface">
+  <div class="security">
+    <header class="security__intro" [appReveal]="0">
+      <p class="security__eyebrow">{{ seguranca.eyebrow }}</p>
+      <h2 class="security__title">{{ seguranca.title }}</h2>
+      <p class="security__description">{{ seguranca.description }}</p>
+    </header>
+    <app-site-card-grid class="security__grid" [cards]="seguranca.cards" minWidth="240px" />
+  </div>
+</app-site-section>
+
+<!-- 8. Planos -->
+<app-site-section
+  anchor="planos"
+  eyebrow="Planos"
+  title="Comece simples e avance conforme sua rotina cresce">
+  <div site-section-aside class="cycle">
+    <div class="cycle__switch" role="group" aria-label="Ciclo de cobrança">
+      <button
+        type="button"
+        class="cycle__option"
+        [class.cycle__option--active]="cycle() === 'Monthly'"
+        [attr.aria-pressed]="cycle() === 'Monthly'"
+        (click)="setCycle('Monthly')">
+        Mensal
+      </button>
+      <button
+        type="button"
+        class="cycle__option"
+        [class.cycle__option--active]="cycle() === 'Yearly'"
+        [attr.aria-pressed]="cycle() === 'Yearly'"
+        (click)="setCycle('Yearly')">
+        Anual
+      </button>
+    </div>
+    <span class="cycle__hint">2 meses grátis no anual</span>
+  </div>
+
+  <app-site-plan-cards
+    [plans]="plans"
+    [cycle]="cycle()"
+    (planSelected)="goToCheckout($event)" />
+
+  <p class="plans__note">{{ planosNota }}</p>
+</app-site-section>
+
+<!-- 9. Depoimento -->
+<app-site-section tone="surface">
+  <article class="quote" [appReveal]="0">
+    <div class="quote__body">
+      <p class="quote__eyebrow">{{ depoimento.eyebrow }}</p>
+      <h2 class="quote__title">{{ depoimento.title }}</h2>
+      @for (paragraph of depoimento.paragraphs; track paragraph) {
+        <p class="quote__text">{{ paragraph }}</p>
+      }
+      <div class="quote__author">
+        <span class="quote__avatar" aria-hidden="true">{{ depoimento.authorInitials }}</span>
+        <span class="quote__author-block">
+          <strong class="quote__author-name">{{ depoimento.authorName }}</strong>
+          <span class="quote__author-role">{{ depoimento.authorRole }}</span>
+        </span>
+      </div>
+    </div>
+  </article>
+</app-site-section>
+
+<!-- 10. FAQ -->
+<app-site-section anchor="faq" eyebrow="FAQ" title="Dúvidas comuns antes de começar" [centered]="true">
+  <app-site-faq [items]="faq" />
+</app-site-section>
+
+<!-- 11. Fechamento -->
+<section class="closing">
+  <div class="closing__card" [appReveal]="0">
+    <p class="closing__eyebrow">{{ fechamento.eyebrow }}</p>
+    <h2 class="closing__title">{{ fechamento.title }}</h2>
+    <p class="closing__description">{{ fechamento.description }}</p>
+    <div class="closing__actions">
+      <a appSiteCta href="#planos" (click)="scrollTo('planos', $event)">{{ fechamento.primaryCta }}</a>
+      <a appSiteCta variant="outline" href="#recursos" (click)="scrollTo('recursos', $event)">
+        {{ fechamento.secondaryCta }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<app-site-footer [columns]="footerColumns" />

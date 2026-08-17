@@ -1,0 +1,36 @@
+/* O fundo da grade vira o divisor: `gap: 1px` deixa a cor aparecer entre as
+   células. Sem borda solta quando a faixa quebra em duas linhas. */
+:host {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.site-stat {
+  padding: var(--space-10) var(--space-11);
+  background: var(--surface);
+}
+
+.site-stat__value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.1;
+  letter-spacing: var(--ls-tight);
+}
+
+.site-stat__value--income {
+  color: var(--income-text);
+}
+
+.site-stat__label {
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}

@@ -27,27 +27,27 @@ export type ComparisonPillPolarity = 'higher-is-better' | 'lower-is-better';
       gap: 0.55rem;
       border-radius: var(--radius-pill);
       border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--surface-2) 72%, white);
+      background: color-mix(in srgb, var(--surface-sunken) 72%, white);
       padding: 0.5rem 0.8rem;
-      font-size: var(--font-size-label);
-      font-weight: var(--font-weight-semibold);
+      font-size: var(--fs-meta);
+      font-weight: var(--fw-semibold);
       color: var(--text-secondary);
     }
 
     .app-comparison-pill__label {
-      color: var(--text-muted);
+      color: var(--text-tertiary);
     }
 
     .app-comparison-pill__delta--up {
-      color: var(--success-text);
+      color: var(--income-text);
     }
 
     .app-comparison-pill__delta--down {
-      color: var(--danger-text);
+      color: var(--expense-text);
     }
 
     .app-comparison-pill__delta--flat {
-      color: var(--text-muted);
+      color: var(--text-tertiary);
     }
   `]
 })

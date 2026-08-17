@@ -23,22 +23,22 @@ type FormFieldTone = 'default' | 'danger' | 'success';
     :host ::ng-deep input:focus,
     :host ::ng-deep select:focus,
     :host ::ng-deep textarea:focus {
-      outline: 2px solid var(--color-primary);
+      outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
 
     :host.form-field--invalid ::ng-deep input,
     :host.form-field--invalid ::ng-deep select,
     :host.form-field--invalid ::ng-deep textarea {
-      border-color: var(--color-danger);
-      box-shadow: 0 0 0 3px var(--color-danger-weak);
+      border-color: var(--expense);
+      box-shadow: 0 0 0 3px var(--expense-tint);
     }
 
     :host.form-field--invalid ::ng-deep input:focus,
     :host.form-field--invalid ::ng-deep select:focus,
     :host.form-field--invalid ::ng-deep textarea:focus {
-      border-color: var(--color-danger);
-      box-shadow: 0 0 0 4px var(--color-danger-soft);
+      border-color: var(--expense);
+      box-shadow: 0 0 0 4px var(--expense-tint);
     }
 
     @keyframes form-field-shake {
@@ -55,12 +55,12 @@ type FormFieldTone = 'default' | 'danger' | 'success';
     }
   `],
   template: `
-    <label class="grid gap-2 text-sm font-semibold text-[var(--color-text)]">
+    <label class="grid gap-2 text-sm font-semibold text-[var(--text)]">
       <span class="flex items-center justify-between gap-2">
-        <span class="form-field__label inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--color-danger-text)]' : ''">
+        <span class="form-field__label inline-flex items-center gap-1" [ngClass]="hasError() ? 'text-[var(--expense-text)]' : ''">
           {{ label() }}
           @if (required()) {
-            <span class="text-[var(--color-danger-text)]" aria-hidden="true">*</span>
+            <span class="text-[var(--expense-text)]" aria-hidden="true">*</span>
           }
         </span>
         @if (hint()) {

@@ -66,8 +66,8 @@ export interface BulkAccountOption {
       gap: 1rem;
       padding: 1rem 1.1rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
-      background: color-mix(in srgb, var(--surface-2) 78%, white);
+      border-radius: var(--radius-panel);
+      background: color-mix(in srgb, var(--surface-sunken) 78%, white);
     }
 
     .tx-bulk__meta {
@@ -76,7 +76,7 @@ export interface BulkAccountOption {
       align-items: center;
       gap: 1rem;
       color: var(--text-secondary);
-      font-size: var(--font-size-body-sm);
+      font-size: var(--fs-body);
     }
 
     .tx-bulk__account {
@@ -89,10 +89,10 @@ export interface BulkAccountOption {
       min-height: 38px;
       padding: 0 0.85rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-control);
       background-color: var(--surface);
       color: var(--text);
-      font-size: var(--font-size-label);
+      font-size: var(--fs-meta);
     }
 
     .tx-bulk__actions {
@@ -109,9 +109,9 @@ export interface BulkAccountOption {
       padding: 0.7rem 1.1rem;
       border: 1px solid var(--border);
       border-radius: var(--radius-pill);
-      font-size: var(--font-size-body-sm);
-      font-weight: var(--font-weight-semibold);
-      letter-spacing: var(--letter-spacing-title);
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
+      letter-spacing: var(--ls-tight);
       transition:
         transform 160ms ease,
         border-color 160ms ease,
@@ -152,14 +152,14 @@ export interface BulkAccountOption {
     }
 
     .tx-bulk__button--danger {
-      border-color: color-mix(in srgb, var(--danger) 18%, transparent);
+      border-color: color-mix(in srgb, var(--expense) 18%, transparent);
       background: color-mix(in srgb, var(--surface) 94%, white);
-      color: var(--danger-text);
+      color: var(--expense-text);
     }
 
     .tx-bulk__button--danger:hover:not(:disabled) {
-      border-color: color-mix(in srgb, var(--danger) 30%, transparent);
-      background: color-mix(in srgb, var(--danger) 8%, white);
+      border-color: color-mix(in srgb, var(--expense) 30%, transparent);
+      background: color-mix(in srgb, var(--expense) 8%, white);
     }
   `]
 })

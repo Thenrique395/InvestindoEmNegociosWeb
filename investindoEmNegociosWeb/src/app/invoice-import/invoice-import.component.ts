@@ -353,11 +353,11 @@ type InvoiceExtract = {
       width: min(1120px, 100%);
       max-height: min(92vh, 1100px);
       overflow: auto;
-      font-family: var(--font-sans, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
-      border-radius: var(--radius-2xl);
+      font-family: var(--font-body, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+      border-radius: var(--radius-panel);
       border: 1px solid var(--border);
       background: var(--surface);
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-modal);
     }
 
     .invoice-import-modal__header {
@@ -375,9 +375,9 @@ type InvoiceExtract = {
 
     .invoice-import-modal__eyebrow {
       margin: 0;
-      font-size: var(--font-size-label);
-      font-weight: var(--font-weight-bold);
-      letter-spacing: var(--letter-spacing-eyebrow);
+      font-size: var(--fs-meta);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
       color: var(--text-soft);
     }
@@ -385,18 +385,18 @@ type InvoiceExtract = {
     .invoice-import-modal__title {
       margin: 0;
       font-size: clamp(2rem, 2.5vw, 2.7rem);
-      line-height: var(--line-height-display);
-      letter-spacing: var(--letter-spacing-title);
-      font-weight: var(--font-weight-bold);
+      line-height: var(--lh-display);
+      letter-spacing: var(--ls-tight);
+      font-weight: var(--fw-bold);
       color: var(--text);
     }
 
     .invoice-import-modal__subtitle {
       max-width: 58ch;
       margin: 0;
-      font-size: var(--font-size-body);
-      line-height: var(--line-height-body);
-      color: var(--text-muted);
+      font-size: var(--fs-subhead);
+      line-height: var(--lh-body);
+      color: var(--text-tertiary);
     }
 
     .invoice-import-modal__close {
@@ -444,7 +444,7 @@ type InvoiceExtract = {
     .invoice-import-modal__section,
     .invoice-import-modal__sidecard {
       border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
+      border-radius: var(--radius-panel);
       background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 3%, white), var(--surface));
       padding: 1.25rem;
     }
@@ -464,16 +464,16 @@ type InvoiceExtract = {
 
     .invoice-import-modal__section-title {
       margin: 0;
-      font-size: var(--font-size-body-lg);
-      font-weight: var(--font-weight-bold);
+      font-size: var(--fs-card-title);
+      font-weight: var(--fw-bold);
       color: var(--text);
     }
 
     .invoice-import-modal__section-text {
       margin: 0.35rem 0 0;
-      font-size: var(--font-size-body-sm);
-      line-height: var(--line-height-body);
-      color: var(--text-muted);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      color: var(--text-tertiary);
     }
 
     .invoice-import-modal__actions-inline {
@@ -495,9 +495,9 @@ type InvoiceExtract = {
       justify-content: center;
       gap: 0.5rem;
       font-family: inherit;
-      font-size: var(--font-size-body-sm);
-      font-weight: var(--font-weight-bold);
-      line-height: var(--line-height-display);
+      font-size: var(--fs-body);
+      font-weight: var(--fw-bold);
+      line-height: var(--lh-display);
       text-decoration: none;
       white-space: nowrap;
       cursor: pointer;
@@ -543,33 +543,33 @@ type InvoiceExtract = {
 
     .invoice-import-dropzone {
       border: 1px dashed color-mix(in srgb, var(--brand) 16%, var(--border));
-      border-radius: var(--radius-2xl);
+      border-radius: var(--radius-panel);
       background: var(--surface);
       padding: 2rem 1.25rem;
       text-align: center;
     }
 
     .invoice-import-dropzone--error {
-      border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
-      background: color-mix(in srgb, var(--danger) 5%, white);
+      border-color: color-mix(in srgb, var(--expense) 35%, var(--border));
+      background: color-mix(in srgb, var(--expense) 5%, white);
     }
 
     .invoice-import-dropzone__title {
       margin: 0;
-      font-size: var(--font-size-body);
-      font-weight: var(--font-weight-bold);
+      font-size: var(--fs-subhead);
+      font-weight: var(--fw-bold);
       color: var(--text);
     }
 
     .invoice-import-dropzone__text,
     .invoice-import-dropzone__error {
       margin: 0.45rem 0 0;
-      font-size: var(--font-size-body-sm);
-      color: var(--text-muted);
+      font-size: var(--fs-body);
+      color: var(--text-tertiary);
     }
 
     .invoice-import-dropzone__error {
-      color: var(--danger-text);
+      color: var(--expense-text);
     }
 
     .invoice-import-grid {
@@ -588,16 +588,16 @@ type InvoiceExtract = {
       gap: 0.55rem;
       padding: 1rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
+      border-radius: var(--radius-panel);
       background: var(--surface);
     }
 
     .invoice-field__label,
     .invoice-summary-card__label {
       margin: 0;
-      font-size: var(--font-size-label);
-      font-weight: var(--font-weight-bold);
-      letter-spacing: var(--letter-spacing-eyebrow);
+      font-size: var(--fs-meta);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
       color: var(--text-soft);
     }
@@ -605,36 +605,36 @@ type InvoiceExtract = {
     .invoice-field__control {
       min-height: 56px;
       width: 100%;
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-inner);
       padding: 0 1rem;
-      font-size: var(--font-size-body);
-      font-weight: var(--font-weight-semibold);
+      font-size: var(--fs-subhead);
+      font-weight: var(--fw-semibold);
     }
 
     .invoice-field__control--table {
       min-height: 38px;
-      border-radius: var(--radius-md);
-      font-size: var(--font-size-label);
+      border-radius: var(--radius-control);
+      font-size: var(--fs-meta);
       padding: 0 0.75rem;
       background: var(--surface);
     }
 
     .invoice-summary-card__value {
       margin: 0;
-      font-size: var(--font-size-title);
-      line-height: var(--line-height-display);
-      font-weight: var(--font-weight-bold);
+      font-size: var(--fs-modal-title);
+      line-height: var(--lh-display);
+      font-weight: var(--fw-bold);
       color: var(--text);
     }
 
     .invoice-summary-card__value--small {
-      font-size: var(--font-size-body);
-      line-height: var(--line-height-body);
+      font-size: var(--fs-subhead);
+      line-height: var(--lh-body);
     }
 
     .invoice-table-card {
       border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
+      border-radius: var(--radius-panel);
       background: var(--surface);
       overflow: hidden;
     }
@@ -647,8 +647,8 @@ type InvoiceExtract = {
     .invoice-table-card__footnote {
       margin: 0;
       padding: 0.9rem 1rem 1rem;
-      font-size: var(--font-size-label);
-      color: var(--text-muted);
+      font-size: var(--fs-meta);
+      color: var(--text-tertiary);
       border-top: 1px solid var(--border);
     }
 
@@ -663,14 +663,14 @@ type InvoiceExtract = {
       position: sticky;
       top: 0;
       z-index: 1;
-      background: var(--surface-2);
+      background: var(--surface-sunken);
     }
 
     .invoice-table th {
       padding: 0.9rem 1rem;
-      font-size: var(--font-size-label);
-      font-weight: var(--font-weight-bold);
-      letter-spacing: var(--letter-spacing-label);
+      font-size: var(--fs-meta);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-column);
       text-transform: uppercase;
       color: var(--text-soft);
       white-space: nowrap;
@@ -678,8 +678,8 @@ type InvoiceExtract = {
 
     .invoice-table td {
       padding: 0.95rem 1rem;
-      font-size: var(--font-size-body-sm);
-      line-height: var(--line-height-body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
       color: var(--text);
       vertical-align: top;
       border-top: 1px solid var(--border);
@@ -693,12 +693,12 @@ type InvoiceExtract = {
     .invoice-table__hint {
       display: block;
       margin-top: 0.35rem;
-      font-size: var(--font-size-caption);
-      color: var(--text-muted);
+      font-size: var(--fs-caption);
+      color: var(--text-tertiary);
     }
 
     .invoice-table__empty {
-      color: var(--text-muted);
+      color: var(--text-tertiary);
       text-align: center;
       padding: 1.25rem 1rem;
     }
@@ -706,18 +706,18 @@ type InvoiceExtract = {
     .invoice-import-modal__meta,
     .invoice-import-modal__context-line,
     .invoice-import-note {
-      font-size: var(--font-size-label);
-      line-height: var(--line-height-body);
-      color: var(--text-muted);
+      font-size: var(--fs-meta);
+      line-height: var(--lh-body);
+      color: var(--text-tertiary);
     }
 
     .invoice-import-modal__rawtext {
       margin-top: 1rem;
       max-height: 540px;
       overflow: auto;
-      border-radius: var(--radius-2xl);
+      border-radius: var(--radius-panel);
       border: 1px solid var(--border);
-      background: var(--surface-2);
+      background: var(--surface-sunken);
       padding: 1rem;
     }
 
@@ -725,8 +725,8 @@ type InvoiceExtract = {
       margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
-      font-size: var(--font-size-label);
-      line-height: var(--line-height-body);
+      font-size: var(--fs-meta);
+      line-height: var(--lh-body);
       color: var(--text);
     }
 
@@ -747,16 +747,16 @@ type InvoiceExtract = {
 
     .invoice-import-modal__footer-title {
       margin: 0;
-      font-size: var(--font-size-body);
-      font-weight: var(--font-weight-bold);
+      font-size: var(--fs-subhead);
+      font-weight: var(--fw-bold);
       color: var(--text);
     }
 
     .invoice-import-modal__footer-text {
       margin: 0;
-      font-size: var(--font-size-body-sm);
-      line-height: var(--line-height-body);
-      color: var(--text-muted);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      color: var(--text-tertiary);
       max-width: 52ch;
     }
 

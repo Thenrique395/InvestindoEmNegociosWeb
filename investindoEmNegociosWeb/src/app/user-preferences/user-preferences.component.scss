@@ -11,18 +11,18 @@
 
 .eyebrow {
   margin: 0 0 0.45rem;
-  color: var(--text-muted);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
 }
 
 .muted {
   margin: 0;
   color: var(--text-secondary);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-body);
+  line-height: var(--lh-control);
 }
 
 .settings-grid {
@@ -43,16 +43,16 @@
   gap: 0.9rem;
   padding: 1.1rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-panel);
   background: rgba(255, 255, 255, 0.94);
 }
 
 .settings-card__header h2 {
   margin: 0 0 0.35rem;
   color: var(--text);
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-display);
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tighter);
 }
 
 .form-grid,
@@ -67,15 +67,15 @@ label {
   display: grid;
   gap: 0.45rem;
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 label small {
   color: var(--text-secondary);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-control);
 }
 
 select,
@@ -84,13 +84,13 @@ textarea {
   width: 100%;
   min-height: 44px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background-color: var(--surface-2);
+  border-radius: var(--radius-control);
+  background-color: var(--surface-sunken);
   color: var(--text);
   padding: 0 0.85rem;
   font: inherit;
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
   transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
 }
 
@@ -113,15 +113,15 @@ textarea:focus {
   gap: 0.7rem;
   padding: 0.85rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-inner);
   background: var(--surface);
 }
 
 .preset-panel__title {
   margin: 0 0 0.2rem;
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .preset-row,
@@ -150,10 +150,10 @@ textarea:focus {
   padding: 0.6rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
   color: var(--text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .secondary-action {
@@ -172,8 +172,8 @@ textarea:focus {
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--primary) 8%, transparent);
   color: var(--primary-text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .chip button {
@@ -187,7 +187,7 @@ textarea:focus {
   color: inherit;
   cursor: pointer;
   font: inherit;
-  line-height: var(--line-height-display);
+  line-height: var(--lh-display);
 }
 
 .inline {
@@ -210,20 +210,20 @@ textarea:focus {
   gap: 1rem;
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
 }
 
 .preview-card span {
   color: var(--text-secondary);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
 }
 
 .preview-card strong {
   color: var(--text);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
   text-align: right;
 }
 
@@ -235,8 +235,8 @@ textarea:focus {
   gap: 0.85rem;
   padding: 0.7rem 0.8rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
 }
 
 .toggle-row span {
@@ -246,14 +246,14 @@ textarea:focus {
 
 .toggle-row strong {
   color: var(--text);
-  font-size: var(--font-size-label);
+  font-size: var(--fs-meta);
 }
 
 .toggle-row small {
   color: var(--text-secondary);
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-control);
 }
 
 .toggle-row input[type='checkbox'] {
@@ -272,9 +272,9 @@ textarea:focus {
   grid-column: 1 / -1;
   grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.3fr) auto;
   align-items: center;
-  border-color: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--expense) 18%, transparent);
   background:
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--danger) 4.5%, transparent), transparent 22%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--expense) 4.5%, transparent), transparent 22%),
     rgba(255, 255, 255, 0.94);
 }
 
@@ -283,7 +283,7 @@ textarea:focus {
 }
 
 .danger-card .settings-card__header h2 {
-  font-size: var(--font-size-body);
+  font-size: var(--fs-subhead);
 }
 
 .danger-card .muted {
@@ -302,13 +302,13 @@ textarea:focus {
   justify-content: center;
   gap: 0.65rem;
   padding: 0.58rem 0.85rem;
-  border: 1px solid color-mix(in srgb, var(--danger) 24%, transparent);
-  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--expense) 24%, transparent);
+  border-radius: var(--radius-control);
   background: rgba(255, 255, 255, 0.9);
-  color: var(--danger-text);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-bold);
-  box-shadow: 0 14px 28px color-mix(in srgb, var(--danger) 8%, transparent);
+  color: var(--expense-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--expense) 8%, transparent);
 }
 
 .danger-action__icon {
@@ -317,8 +317,8 @@ textarea:focus {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--expense) 8%, transparent);
 }
 
 .danger-action__icon svg {
@@ -340,9 +340,8 @@ textarea:focus {
   gap: 1rem;
   padding: 1.1rem 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-panel);
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
 }
 
 .settings-footer div {
@@ -352,14 +351,14 @@ textarea:focus {
 
 .settings-footer strong {
   color: var(--text);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
 }
 
 .settings-footer span {
   color: var(--text-secondary);
-  font-size: var(--font-size-label);
-  line-height: var(--line-height-control);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-control);
 }
 
 .primary-action {
@@ -371,9 +370,9 @@ textarea:focus {
   justify-content: center;
   gap: 0.8rem;
   padding: 0.7rem 1rem;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--primary), #5b8cff);
-  color: var(--color-text-inverse);
+  border-radius: var(--radius-inner);
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 62%, white));
+  color: var(--on-primary);
   text-align: left;
   box-shadow: 0 18px 34px color-mix(in srgb, var(--primary) 24%, transparent);
 }
@@ -385,7 +384,7 @@ textarea:focus {
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: rgba(255, 255, 255, 0.16);
 }
 
@@ -395,8 +394,8 @@ textarea:focus {
 }
 
 .primary-action > span:last-child {
-  color: var(--color-text-inverse);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-display);
+  color: var(--on-primary);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-display);
 }

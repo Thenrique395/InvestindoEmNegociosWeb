@@ -31,12 +31,27 @@ export class DashboardPage {
   }
 
   async expectDebtMapVisible() {
-    await expect(this.page.getByText('Mapa de dívidas')).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: 'Dívidas e contas' }).first()).toBeVisible();
+  }
+
+  async expectInvestmentsVisible() {
+    await expect(this.page.getByRole('heading', { name: 'Investimentos' }).first()).toBeVisible();
   }
 
   // O painel de risco detalhado e a troca de período por heading foram removidos no
   // refactor do dashboard; a saúde financeira agora é um card no overview.
   async expectHealthVisible() {
-    await expect(this.page.getByText('Saúde financeira').first()).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: 'Saúde financeira (IA)' }).first()).toBeVisible();
+  }
+
+  async expectNoHorizontalOverflow() {
+    const overflow = await this.page.evaluate(() => {
+      const documentElement = document.documentElement;
+      const body = document.body;
+
+      return Math.max(documentElement.scrollWidth, body.scrollWidth) - window.innerWidth;
+    });
+
+    expect(overflow).toBeLessThanOrEqual(1);
   }
 }

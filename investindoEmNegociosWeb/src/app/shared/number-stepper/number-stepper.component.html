@@ -1,0 +1,36 @@
+<button
+  type="button"
+  class="stepper__button stepper__button--minus"
+  [disabled]="!canDecrease()"
+  [attr.aria-label]="'Diminuir'"
+  (click)="decrease()">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
+</button>
+
+<input
+  class="stepper__input tabular"
+  type="text"
+  inputmode="numeric"
+  role="spinbutton"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-valuenow]="value()"
+  [attr.aria-valuemin]="min()"
+  [attr.aria-valuemax]="max()"
+  [value]="display()"
+  [disabled]="isDisabled()"
+  (input)="onInput($any($event.target).value)"
+  (blur)="onBlur()"
+  (keydown)="onKeydown($event)" />
+
+@if (suffix(); as text) {
+  <span class="stepper__suffix">{{ text }}</span>
+}
+
+<button
+  type="button"
+  class="stepper__button stepper__button--plus"
+  [disabled]="!canIncrease()"
+  [attr.aria-label]="'Aumentar'"
+  (click)="increase()">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+</button>

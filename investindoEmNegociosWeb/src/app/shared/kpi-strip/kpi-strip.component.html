@@ -1,0 +1,54 @@
+@for (item of items(); track item.key; let first = $first) {
+  <article class="kpi" [attr.data-tone]="item.tone || 'primary'" [class.kpi--feature]="first && featureFirst()">
+    <div class="kpi__head">
+      @if (iconTemplate()) {
+        <span class="kpi__icon" aria-hidden="true">
+          <ng-container [ngTemplateOutlet]="iconTemplate()!" [ngTemplateOutletContext]="{ $implicit: item.key }" />
+        </span>
+      }
+      <div class="kpi__titles">
+        <h3 class="kpi__label">{{ item.label }}</h3>
+        @if (item.question) {
+          <p class="kpi__question">{{ item.question }}</p>
+        }
+      </div>
+      <app-tooltip [label]="'Como ' + item.label + ' é calculado'" [text]="item.tooltip" />
+    </div>
+
+    <div class="kpi__value-row">
+      <strong class="kpi__value">{{ item.value }}</strong>
+      @if (item.delta; as delta) {
+        <span
+          class="kpi__delta"
+          [class.kpi__delta--favorable]="delta.favorable"
+          [class.kpi__delta--unfavorable]="!delta.favorable">
+          <svg viewBox="0 0 24 24" width="12" height="12" role="presentation" focusable="false" aria-hidden="true">
+            @if (delta.direction === 'up') {
+              <path d="M12 19V5m0 0l-5 5m5-5l5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            } @else {
+              <path d="M12 5v14m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            }
+          </svg>
+          {{ delta.text }}
+        </span>
+      }
+    </div>
+
+    @if (item.note) {
+      <p class="kpi__note">
+        @for (linha of notaEmLinhas(item.note); track $index) {
+          <span class="kpi__note-line">{{ linha }}</span>
+        }
+      </p>
+    }
+
+    @if (item.link; as link) {
+      <a class="kpi__link" [routerLink]="link.route">
+        {{ link.label || 'Ver detalhes' }}
+        <svg viewBox="0 0 24 24" width="14" height="14" role="presentation" focusable="false" aria-hidden="true">
+          <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    }
+  </article>
+}
