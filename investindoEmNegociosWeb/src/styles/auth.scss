@@ -177,6 +177,12 @@
   line-height: 1.45;
 }
 
+/* Rótulo de uma linha (ex.: "Manter conectado"): aí a caixa centraliza com o
+   texto. O alinhamento no topo é para rótulos longos, que quebram em várias. */
+.auth-check--inline {
+  align-items: center;
+}
+
 /* ---------- Linha de opções (lembrar + esqueci) --------------------------- */
 
 .auth-options {

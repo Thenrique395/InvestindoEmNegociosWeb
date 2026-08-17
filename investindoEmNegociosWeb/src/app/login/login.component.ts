@@ -21,6 +21,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   password = '';
   loading = false;
   showPassword = false;
+  /* A duração da sessão é decidida pelo backend (cookies httpOnly), então por
+     enquanto esta escolha não encurta a sessão de quem desmarca: falta o
+     `rememberMe` na API de login para o cookie nascer só de sessão. */
+  manterConectado = true;
   emailNotConfirmed = false;
   resending = false;
 

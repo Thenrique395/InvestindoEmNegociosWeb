@@ -1,35 +1,27 @@
-/* O cartão cresce com o conteúdo, não com a tela: `min-height`, não `height`.
-   Esticar até 100vh era o que abria o vazio no meio do painel esquerdo, porque
-   o `space-between` afastava os três blocos numa coluna de 1300px.
-
-   O fundo em volta é o do app. O `#001620` que o protótipo tem no `body` é a
-   moldura da página de protótipo — a que mostra "PROTÓTIPO NAVEGÁVEL" e as
-   pílulas de navegação — e não a tela. */
+/* Autenticação é tela cheia, não um cartão no meio da página: os dois painéis
+   sangram até as bordas da janela, sem raio nem sombra. O protótipo desenha um
+   cartão porque ali ele vive dentro da moldura "PROTÓTIPO NAVEGÁVEL"; na tela
+   real essa moldura não existe e o cartão flutuando lia como modal. */
 :host {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--auth-card-min-h);
-  padding: var(--auth-pad-y) var(--auth-aside-pad-x);
-  background: var(--bg-app);
+  display: block;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--brand-navy);
 }
 
 .auth-card {
   display: grid;
   grid-template-columns: 0.85fr 1fr;
   width: 100%;
-  max-width: var(--auth-card-max);
-  min-height: var(--auth-card-min-h);
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--surface);
-  border-radius: var(--auth-card-radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-modal);
 }
 
 /* O conteúdo de cada painel mantém a largura do protótipo e fica centralizado.
    Sem isto ele estica com a viewport: em 1440 os campos passavam de 488 para
-   678px e a tela deixava de bater com o design. Em 1080 — a largura do card do
-   protótipo — os dois coincidem exatamente. */
+   678px e a tela deixava de bater com o design. Em tela cheia os painéis
+   crescem, o conteúdo não. */
 .auth-aside > * {
   width: 100%;
   max-width: var(--auth-aside-content-w);
@@ -49,9 +41,13 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* Marca e promessa ficam juntas no topo; só o rodapé desce para a base (via
+     `margin-top:auto`). Com `space-between` a altura sobrando da janela era
+     dividida entre os três blocos e abria dois vazios no meio do painel. */
+  justify-content: flex-start;
   gap: var(--space-12);
-  min-height: var(--auth-card-min-h);
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--auth-pad-y) var(--auth-aside-pad-x);
   background: var(--brand-navy);
   /* Cor fixa, não `--surface`: o painel não muda com o tema, então o texto
@@ -79,17 +75,28 @@
 }
 
 .auth-aside__logo {
-  height: 34px;
+  height: 44px;
   width: auto;
   display: block;
 }
 
 .auth-aside__wordmark {
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-display);
-  font-size: var(--fs-card-title);
+  font-size: 20px;
   font-weight: var(--fw-bold);
-  letter-spacing: -0.01em;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.auth-aside__wordmark-line {
   white-space: nowrap;
+}
+
+.auth-aside__wordmark-soft {
+  color: var(--brand-green-light);
+  font-weight: var(--fw-medium);
 }
 
 .auth-aside__pitch {
@@ -126,6 +133,7 @@
 
 .auth-aside__proof {
   position: relative;
+  margin-top: auto;
   padding-top: var(--space-10);
   border-top: 1px solid var(--auth-aside-divider);
 }
@@ -290,7 +298,8 @@
 .auth-main {
   display: flex;
   flex-direction: column;
-  min-height: var(--auth-card-min-h);
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--auth-pad-y) var(--auth-pad-x);
   color: var(--text);
 }
@@ -319,6 +328,13 @@
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
+}
+
+/* Em tela cheia a sobra vertical se divide entre este `auto` e o do rodapé: o
+   formulário fica no meio da coluna em vez de grudado no topo. Em janela baixa
+   os dois colapsam para zero e nada se desloca. */
+.auth-main__head {
+  margin-top: auto;
 }
 
 .auth-main__eyebrow {

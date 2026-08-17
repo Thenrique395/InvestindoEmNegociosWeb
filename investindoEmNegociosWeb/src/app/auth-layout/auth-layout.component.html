@@ -2,9 +2,17 @@
   <aside class="auth-aside">
     <div class="auth-aside__glow" aria-hidden="true"></div>
 
-    <a class="auth-aside__brand" routerLink="/">
-      <img class="auth-aside__logo" [src]="logoSrc()" alt="" width="34" height="34" />
-      <span class="auth-aside__wordmark">{{ brandName() }}</span>
+    <!-- Assinatura em duas linhas, como no design: "em" é a única palavra em
+         verde e peso menor. O texto vive na marcação, não numa imagem, para
+         acompanhar a tipografia do painel. -->
+    <a class="auth-aside__brand" routerLink="/" [attr.aria-label]="brandName()">
+      <img class="auth-aside__logo" [src]="logoSrc()" alt="" width="44" height="44" />
+      <span class="auth-aside__wordmark" aria-hidden="true">
+        <span class="auth-aside__wordmark-line">
+          Investindo <span class="auth-aside__wordmark-soft">em</span>
+        </span>
+        <span class="auth-aside__wordmark-line">Negócios</span>
+      </span>
     </a>
 
     <div class="auth-aside__pitch">
