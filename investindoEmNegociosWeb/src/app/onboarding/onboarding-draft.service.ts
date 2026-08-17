@@ -59,7 +59,7 @@ export class OnboardingDraftService {
   }
 
   private resolveIntelligenceMode(value: unknown): IntelligenceMode | null {
-    return value === 'B' || value === 'C' ? value : null;
+    return value === 'A' || value === 'B' || value === 'C' ? value : null;
   }
 
   private resolveCarryOverDay(value: unknown): number {

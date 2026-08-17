@@ -28,7 +28,7 @@ export class UserProfileComponent implements OnInit {
   pais = '';
   carryOverDay = 1;
   readonly carryOverDayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
-  intelligenceMode: 'B' | 'C' = 'B';
+  intelligenceMode: 'A' | 'B' | 'C' = 'B';
 
   senhaAtual = '';
   novaSenha = '';
@@ -52,7 +52,8 @@ export class UserProfileComponent implements OnInit {
       this.carryOverDay = Number.isInteger(p.carryOverDay) && (p.carryOverDay ?? 0) >= 1 && (p.carryOverDay ?? 0) <= 31
         ? (p.carryOverDay as number)
         : 1;
-      this.intelligenceMode = p.intelligenceMode === 'C' ? 'C' : 'B';
+      this.intelligenceMode =
+        p.intelligenceMode === 'C' || p.intelligenceMode === 'A' ? p.intelligenceMode : 'B';
       this.idioma = p.language || 'pt-BR';
       this.email = p.email || '';
     });

@@ -14,6 +14,7 @@ import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
 import { UiPermissionsService } from '../ui-permissions.service';
+import { UserContextFacadeService } from '../user-context-facade.service';
 import { ReceitasFormComponent } from '../receitas/receitas-form.component';
 import { DespesasFormComponent } from '../despesas/despesas-form.component';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
@@ -57,9 +58,26 @@ export class OnboardingComponent implements OnInit {
   get maxBirthDate(): string {
     return todayIso();
   }
-  // Progresso 0→100% distribuído pelos passos: passo 1 = 0%, último = 100%.
+  /**
+   * Um quarto por etapa, e a fração sobe assim que a etapa é atendida — não só
+   * quando ela é deixada. É o que faz a barra reagir ao clique na opção, em vez
+   * de ficar parada até o "Continuar".
+   */
   get progressPercent(): number {
-    return this.totalSteps > 1 ? (this.step / (this.totalSteps - 1)) * 100 : 0;
+    const done = this.step + (this.isCurrentStepSatisfied ? 1 : 0);
+    return Math.min(100, (done / this.totalSteps) * 100);
+  }
+  private get isCurrentStepSatisfied(): boolean {
+    switch (this.step) {
+      case 0:
+        return !!this.focus;
+      case 1:
+        return !!this.intelligenceMode;
+      case 2:
+        return this.form.valid;
+      default:
+        return this.accountReady;
+    }
   }
   // Rótulos das escolhas anteriores, exibidos como resumo no trilho lateral.
   get focusLabel(): string {
@@ -68,12 +86,29 @@ export class OnboardingComponent implements OnInit {
   get modeLabel(): string {
     return this.intelligenceModeOptions.find((o) => o.id === this.intelligenceMode)?.title ?? '';
   }
+  /* Identidade na barra do onboarding (não há sidebar/topbar do app aqui).
+     Sem plano: a configuração inicial é a mesma para todos os perfis, então
+     dizer qual plano a pessoa assinou não ajuda em nada aqui. */
+  displayName = 'Usuário';
+  userInitials = 'U';
+  get firstName(): string {
+    return this.displayName.trim().split(/\s+/)[0] || this.displayName;
+  }
   step = 0;
   focus: FocusArea | null = null;
   intelligenceMode: IntelligenceMode | null = null;
   carryOverDay = 1;
   readonly carryOverDayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
-  readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string; tooltip: string; icon: 'balance' | 'shield' }[] = [
+  /* Ordem do mais cauteloso ao mais exigente: a pessoa lê a régua da esquerda
+     para a direita e se posiciona nela. */
+  readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string; tooltip: string; icon: 'balance' | 'shield' | 'accelerate' }[] = [
+    {
+      id: 'C',
+      title: 'Conservador',
+      description: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.',
+      tooltip: 'Indicado para quem prefere um início mais cauteloso, com atenção maior ao caixa, estabilidade e prevenção de imprevistos.',
+      icon: 'shield'
+    },
     {
       id: 'B',
       title: 'Balanceado',
@@ -82,11 +117,11 @@ export class OnboardingComponent implements OnInit {
       icon: 'balance'
     },
     {
-      id: 'C',
-      title: 'Conservador',
-      description: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.',
-      tooltip: 'Indicado para quem prefere um início mais cauteloso, com atenção maior ao caixa, estabilidade e prevenção de imprevistos.',
-      icon: 'shield'
+      id: 'A',
+      title: 'Agressivo',
+      description: 'Metas mais altas e cobrança maior sobre sobra, aportes e quitação.',
+      tooltip: 'Para quem quer acelerar: o sistema empurra a sobra do mês para aportes ou quitação e avisa mais cedo quando o gasto sai do plano.',
+      icon: 'accelerate'
     }
   ];
   focusOptions: { id: FocusArea; title: string; description: string; tooltip: string; icon: 'growth' | 'debt' | 'invest' | 'shield' }[] = [
@@ -169,7 +204,8 @@ export class OnboardingComponent implements OnInit {
     private plansService: PlansService,
     private categoriesService: CategoriesService,
     private uiPermissions: UiPermissionsService,
-    private onboardingDraft: OnboardingDraftService
+    private onboardingDraft: OnboardingDraftService,
+    private userContext: UserContextFacadeService
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
@@ -185,6 +221,12 @@ export class OnboardingComponent implements OnInit {
 
   ngOnInit(): void {
     this.restoreDraft();
+
+    this.userContext.state$.subscribe((state) => {
+      this.displayName = state.displayName;
+      this.userInitials = state.userInitials;
+    });
+    this.userContext.loadProfile();
 
     this.onboarding.getStatus().subscribe({
       next: (status) => {
@@ -546,6 +588,14 @@ export class OnboardingComponent implements OnInit {
     this.showExpenseModal = true;
   }
 
+  // Saída pela barra do onboarding: o rascunho local continua salvo, então a
+  // pessoa volta no mesmo ponto no próximo login.
+  logout(): void {
+    this.authService.clearSession();
+    this.userContext.reset();
+    this.router.navigateByUrl('/');
+  }
+
   openCardsPage(): void {
     if (!this.canUseCards) return;
     this.router.navigateByUrl('/cartoes');
@@ -828,7 +878,7 @@ export class OnboardingComponent implements OnInit {
           this.saveDraft();
         }
         const savedMode = (data as { intelligenceMode?: string }).intelligenceMode?.toUpperCase();
-        if (savedMode === 'B' || savedMode === 'C') {
+        if (savedMode === 'A' || savedMode === 'B' || savedMode === 'C') {
           this.intelligenceMode = savedMode as IntelligenceMode;
           this.saveDraft();
         }
