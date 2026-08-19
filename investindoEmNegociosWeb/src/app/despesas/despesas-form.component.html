@@ -1,92 +1,88 @@
 <app-modal
   [open]="mostrarForm"
   [eyebrow]="isEdit ? 'Editar despesa' : 'Nova despesa'"
-  [title]="isEdit ? 'Atualize este lançamento' : 'Adicionar lançamento'"
+  [title]="isEdit ? 'Atualize este lançamento' : 'Registrar uma saída'"
   [subtitle]="isEdit
     ? 'Revise as informações da despesa para manter o período atualizado.'
-    : 'Preencha os dados essenciais para registrar a saída no período correto.'"
+    : 'Preencha o essencial. Parcelamento e recorrência só aparecem se você precisar.'"
   size="lg"
   (close)="fechar()">
 
   <form id="expense-form" class="expense-form" (ngSubmit)="salvar()" autocomplete="off" modal-body>
 
-    <section class="expense-form__section">
-      <div class="expense-form__section-head">
-        <h4 class="expense-form__section-title">Dados principais</h4>
-        <p class="expense-form__section-text">Defina identificação, categoria e valor da despesa.</p>
-      </div>
-      <div class="expense-form__grid expense-form__grid--main">
-        <app-form-field label="Nome da despesa" class="expense-form__field--full">
-          <input
-            class="expense-form__control"
-            type="text"
-            [(ngModel)]="novaDespesa.nome"
-            name="nome"
-            placeholder="Ex: aluguel, mercado..."
-            required />
-        </app-form-field>
-        <app-form-field label="Forma de pagamento">
-          <select
-            class="expense-form__control"
-            [(ngModel)]="formaPagamento"
-            name="formaPagamento"
-            (ngModelChange)="onFormaPagamentoChange($event)">
-            <option value="avista">À vista</option>
-            @if (allowCardPayment) {
-              <option value="cartao">Cartão de crédito</option>
-            }
-          </select>
-        </app-form-field>
-        <app-form-field label="Categoria" [error]="erroCategoria">
-          <select
-            class="expense-form__control"
-            [(ngModel)]="novaDespesa.categoryId"
-            name="categoria">
-            <option [ngValue]="null" disabled>Selecione</option>
-            @if (!categorias.length) {
-              <option [ngValue]="null" disabled>Sem categorias cadastradas</option>
-            }
-            @for (cat of categorias; track trackByIndex($index, cat)) {
-              <option [ngValue]="cat.id">{{ cat.name }}</option>
-            }
-          </select>
-        </app-form-field>
-        <app-form-field label="Valor (R$)">
+    <div class="expense-form__grid">
+      <app-form-field label="Descrição" class="expense-form__field--full">
+        <input
+          class="expense-form__control"
+          type="text"
+          [(ngModel)]="novaDespesa.nome"
+          name="nome"
+          placeholder="Ex.: mercado, farmácia, aluguel"
+          required />
+      </app-form-field>
+
+      <app-form-field label="Valor" description="Use vírgula para os centavos.">
+        <span class="expense-form__amount">
+          <span class="expense-form__amount-prefix" aria-hidden="true">R$</span>
           <input
             class="expense-form__control"
             type="text"
             inputmode="decimal"
-            placeholder="R$ 0,00"
+            placeholder="0,00"
             [ngModel]="valorInput"
             digitOnly
             (ngModelChange)="onValorChange($event)"
             (focus)="$any($event.target).select()"
             name="valor"
             required />
-        </app-form-field>
-        <app-form-field label="Primeiro vencimento" [error]="erroData">
-          <app-date-picker
-            [value]="vencimentoInput"
-            [invalid]="!!erroData"
-            placeholder="DD/MM/AAAA"
-            ariaLabel="Primeiro vencimento"
-            (valueChange)="onVencimentoChange($event)" />
-        </app-form-field>
-      </div>
-      @if (!categorias.length) {
-        <div class="expense-form__warning">
-          <p class="expense-form__warning-title">Crie uma categoria antes de continuar.</p>
-          <a class="expense-form__warning-link" routerLink="/categorias" (click)="fechar()">Abrir categorias</a>
-        </div>
-      }
-    </section>
+        </span>
+      </app-form-field>
 
-    <section class="expense-form__section">
-      <div class="expense-form__section-head">
-        <h4 class="expense-form__section-title">Comportamento da despesa</h4>
-        <p class="expense-form__section-text">Defina se a cobrança é fixa, parcelada ou vinculada a um cartão quando disponível no plano.</p>
+      <app-form-field label="Vencimento" [error]="erroData">
+        <app-date-picker
+          [value]="vencimentoInput"
+          [invalid]="!!erroData"
+          placeholder="DD/MM/AAAA"
+          ariaLabel="Vencimento"
+          (valueChange)="onVencimentoChange($event)" />
+      </app-form-field>
+
+      <app-form-field label="Categoria" class="expense-form__field--full" [error]="erroCategoria">
+        <app-select-menu
+          [options]="categoriaOptions"
+          [ngModel]="novaDespesa.categoryId || ''"
+          name="categoria"
+          [searchable]="true"
+          placeholder="Selecione uma categoria"
+          createLabel="Criar nova categoria"
+          ariaLabel="Categoria da despesa"
+          (valueChange)="onCategoriaChange($event)"
+          (createRequested)="irParaCategorias()" />
+      </app-form-field>
+    </div>
+
+    @if (!categorias.length) {
+      <div class="expense-form__warning">
+        <p class="expense-form__warning-title">Crie uma categoria antes de continuar.</p>
+        <a class="expense-form__warning-link" routerLink="/categorias" (click)="fechar()">Abrir categorias</a>
       </div>
-      <div class="expense-form__stack">
+    }
+
+    <div class="expense-form__boxes">
+      <!-- Como paga: o cartão só aparece quando a forma escolhida é crédito. -->
+      <fieldset class="expense-form__box">
+        <app-form-field label="Forma de pagamento">
+          <select
+            class="expense-form__control"
+            [ngModel]="formaPagamentoId"
+            name="formaPagamento"
+            (ngModelChange)="onMetodoPagamentoChange($any($event))">
+            @for (metodo of metodosDisponiveis; track metodo.id) {
+              <option [ngValue]="metodo.id">{{ metodo.name }}</option>
+            }
+          </select>
+        </app-form-field>
+
         @if (formaPagamento === 'cartao') {
           <app-form-field label="Cartão">
             <select
@@ -98,25 +94,17 @@
               @if (!cartoes.length) {
                 <option [ngValue]="null" disabled>Nenhum cartão cadastrado</option>
               }
-              @if (cartoes.length) {
-                @for (c of cartoes; track trackByIndex($index, c)) {
-                  <option [ngValue]="c.id">{{ cartaoLabel(c) }}</option>
-                }
+              @for (c of cartoes; track trackByIndex($index, c)) {
+                <option [ngValue]="c.id">{{ cartaoLabel(c) }}</option>
               }
             </select>
           </app-form-field>
-          @if (cartoes.length) {
-            <small class="expense-form__hint">Selecionado: {{ cartaoSelecionadoLabel }}</small>
-          }
-          @if (!cartoes.length) {
-            <small class="expense-form__hint">Cadastre um cartão para usar aqui.</small>
-          }
         }
+
         @if (semCartaoNoCredito) {
           <div class="expense-form__warning expense-form__warning--amber">
-            <p class="expense-form__warning-title">{{ allowCardPayment ? 'Nenhum cartão cadastrado.' : 'Cartão indisponível no seu plano.' }}</p>
-            <p class="expense-form__warning-text">
-              {{ allowCardPayment ? 'Para lançar esta despesa no cartão de crédito, cadastre um cartão primeiro.' : 'Registre esta despesa à vista ou altere o plano para usar cartão de crédito.' }}
+            <p class="expense-form__warning-title">
+              {{ allowCardPayment ? 'Nenhum cartão cadastrado.' : 'Cartão indisponível no seu plano — registre à vista.' }}
             </p>
             @if (allowCardPayment) {
               <a routerLink="/cartoes" (click)="fechar()"
@@ -126,41 +114,40 @@
             }
           </div>
         }
-        @if (formaPagamento === 'cartao') {
-          <app-toggle-field
-            label="Parcelar compra"
-            description="Ative se este lançamento precisa ser dividido em várias parcelas."
-            [checked]="parcelar"
-            (checkedChange)="parcelar = $event; onParcelarToggle($event)">
-          </app-toggle-field>
+      </fieldset>
+
+      <!-- Um controle só para as duas repetições possíveis: parcelas no cartão e
+           repetição mensal fora dele. O que aparece depois depende da forma de
+           pagamento — no crédito são parcelas; à vista, meses. -->
+      <fieldset class="expense-form__box">
+        <app-toggle-field
+          label="Parcelar ou repetir"
+          description="Divide em parcelas ou repete a despesa nos próximos meses."
+          [checked]="repetir"
+          (checkedChange)="onRepetirToggle($event)">
+        </app-toggle-field>
+
+        @if (repetir && formaPagamento === 'cartao') {
+          <div class="expense-form__grid">
+            <app-form-field label="Parcelas">
+              <app-number-stepper
+                [ngModel]="parcelasCount"
+                name="parcelas"
+                [min]="2"
+                [max]="36"
+                ariaLabel="Número de parcelas"
+                (valueChange)="onParcelasChange($event)" />
+            </app-form-field>
+            <app-form-field label="Valor de cada">
+              <input class="expense-form__control" type="text" [value]="valorParcelaLabel" readonly />
+            </app-form-field>
+          </div>
         }
-        @if (formaPagamento === 'cartao' && parcelar) {
-          <app-form-field label="Número de parcelas">
-            <input
-              class="expense-form__control"
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              min="1"
-              max="36"
-              [(ngModel)]="parcelasCount"
-              name="parcelas"
-              digitOnly
-              (ngModelChange)="onParcelasChange($event)"
-              placeholder="Ex: 10"
-              required />
-          </app-form-field>
-        }
-        @if (formaPagamento !== 'cartao') {
-          <app-toggle-field
-            label="Despesa fixa mensal"
-            description="Use quando o valor deve reaparecer automaticamente todo mês."
-            [checked]="fixa"
-            (checkedChange)="fixa = $event; fixaChange.emit($event)">
-          </app-toggle-field>
-        }
-        @if (fixa && formaPagamento !== 'cartao') {
-          <app-form-field label="Duração (meses)" hint="Deixe em branco para repetir todo mês; ou informe por quantos meses (até 120).">
+
+        @if (repetir && formaPagamento !== 'cartao') {
+          <app-form-field
+            label="Repetir por (meses)"
+            hint="Em branco = todo mês">
             <input
               class="expense-form__control"
               type="number"
@@ -172,32 +159,13 @@
               placeholder="Ex: 12" />
           </app-form-field>
         }
-      </div>
-    </section>
-
-    @if (valorInput) {
-      <section class="expense-form__summary">
-        <p class="expense-form__summary-eyebrow">Resumo</p>
-        @if (fixa) {
-          <p class="expense-form__summary-text">
-            Despesa fixa mensal de <strong>{{ valorInput }}</strong>
-            @if (fixaMeses) { por {{ fixaMeses }} meses }.
-          </p>
-        }
-        @if (!fixa && formaPagamento === 'cartao' && parcelar && parcelasCount > 1) {
-          <p class="expense-form__summary-text">
-            Serão {{ parcelasCount }}x de <strong>{{ valorParcelaLabel }}</strong> no cartão {{ cartaoSelecionadoLabel }}.
-          </p>
-        }
-        @if (!fixa && !(formaPagamento === 'cartao' && parcelar && parcelasCount > 1)) {
-          <p class="expense-form__summary-text">Pagamento único de <strong>{{ valorInput }}</strong>.</p>
-        }
-      </section>
-    }
+      </fieldset>
+    </div>
 
   </form>
 
-  <div modal-footer>
+  <div modal-footer class="expense-form__footer">
+    <small class="expense-form__footer-hint">A despesa entra no mês de vencimento.</small>
     <button type="button" class="btn-ghost sm" [disabled]="saving" (click)="fechar()">Cancelar</button>
     <button
       type="submit"

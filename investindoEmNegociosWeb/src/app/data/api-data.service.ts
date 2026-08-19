@@ -31,6 +31,7 @@ export interface StoredExpense {
   statementCloseDate?: string | null;
   statementDueDate?: string | null;
   statementReference?: string | null;
+  paymentMethodId?: number | null;
 }
 
 export interface StoredCard {
@@ -587,6 +588,7 @@ export class ApiDataService {
         vencimento: this.formatDate(inst.dueDate),
         userId: plan?.userId,
         cartao: plan?.cardId || undefined,
+        paymentMethodId: plan?.defaultPaymentMethodId ?? null,
         parcelaNumero: isSeries ? inst.installmentNo : undefined,
         parcelasTotal: isSeries ? plan?.installmentsCount ?? undefined : undefined,
         serieId: isSeries ? plan?.id : undefined,
@@ -650,7 +652,8 @@ export class ApiDataService {
         categoryId,
         frequency: schedule === 'Recurring' ? 'Monthly' : null,
         installmentsCount: schedule === 'Installments' ? months : null,
-        cardId: expense.cartao || null
+        cardId: expense.cartao || null,
+        defaultPaymentMethodId: expense.paymentMethodId ?? null
       };
     }
 
@@ -667,7 +670,8 @@ export class ApiDataService {
       categoryId,
       frequency: null,
       installmentsCount: schedule === 'Installments' ? parcelas : 1,
-      cardId: expense.cartao || null
+      cardId: expense.cartao || null,
+      defaultPaymentMethodId: expense.paymentMethodId ?? null
     };
   }
 

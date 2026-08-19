@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DecimalPipe, NgClass } from '@angular/common';
+import { Location, DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
@@ -13,7 +13,11 @@ import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { AuthService } from '../auth.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
-import { incomeStatusLabel } from '../utils/status';
+import { colorForCategory } from '../categories/categories-overview.model';
+import { TxMobileHeaderComponent, TxMobileKpi } from '../shared/transactions/tx-mobile-header.component';
+import { TxFilterChipsComponent, TxFilterChip } from '../shared/transactions/tx-filter-chips.component';
+import { TxMobileListComponent, TxMobileItem } from '../shared/transactions/tx-mobile-list.component';
+import { DisplayInstallmentStatus, resolveInstallmentStatus, incomeStatusLabel, installmentStatusTone } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { InstallmentsService } from '../installments.service';
@@ -27,6 +31,7 @@ import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.com
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
 import {
+  formatCurrencyValue,
   formatLocaleDate,
   formatMonthYearLabel,
   formatNumberValue,
@@ -41,8 +46,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
   selector: 'app-receitas',
   standalone: true,
   imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, BulkActionBarComponent, AppCurrencyPipe,
-    SelectMenuComponent
-  ],
+    SelectMenuComponent, TxMobileHeaderComponent, TxFilterChipsComponent, TxMobileListComponent],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -88,7 +92,8 @@ export class ReceitasComponent implements OnInit {
   private carregandoContas = false;
   filtroTexto = '';
   filtroTipo: 'all' | 'recurring' | 'oneTime' = 'all';
-  filtroStatus: 'all' | 'paid' | 'pending' = 'all';
+  filtroStatus: 'ALL' | DisplayInstallmentStatus = 'ALL';
+  filtroCategoria = 'ALL';
 
   /** Opções dos filtros. Rótulos iguais aos que já existiam nos selects. */
   readonly tipoOptions = [
@@ -97,15 +102,106 @@ export class ReceitasComponent implements OnInit {
     { value: 'oneTime', label: 'Avulsa' }
   ];
 
-  readonly statusOptions = [
-    { value: 'all', label: 'Todos os status' },
-    { value: 'paid', label: 'Recebida' },
-    { value: 'pending', label: 'Pendente' }
+  private readonly statusValues: DisplayInstallmentStatus[] = [
+    'OPEN',
+    'PARTIALLY_PAID',
+    'PAID',
+    'ANTICIPATED',
+    'OVERDUE',
+    'CANCELED'
   ];
+
+  private readonly statusColors: Record<string, string> = {
+    OPEN: 'var(--text-muted)',
+    PARTIALLY_PAID: 'var(--warning)',
+    PAID: 'var(--income)',
+    ANTICIPATED: 'var(--primary)',
+    OVERDUE: 'var(--expense)',
+    CANCELED: 'var(--text-faint)'
+  };
+
+  /* Contagem por status, como nas despesas: ignora o filtro de status e
+     respeita categoria e busca. */
+  get statusOptions() {
+    const base = this.rendasMes.filter((r) => this.filtroTextoMatch(r) && this.filtroCategoriaMatch(r));
+    const contar = (valor: DisplayInstallmentStatus) =>
+      base.filter((r) => resolveInstallmentStatus(r.status, r.recebimento) === valor).length;
+
+    return [
+      { value: 'ALL', label: 'Todos os status', color: 'var(--text-muted)', meta: String(base.length) },
+      ...this.statusValues.map((valor) => ({
+        value: valor,
+        label: incomeStatusLabel(valor),
+        color: this.statusColors[valor],
+        meta: String(contar(valor))
+      }))
+    ];
+  }
+
+  /* ---- Mobile: mesmo dado da tabela, na forma que o celular pede ------- */
+
+  get mobileKpis(): TxMobileKpi[] {
+    const resumo = this.statusResumo;
+    return [
+      { label: 'Recebidas', value: formatCurrencyValue(resumo.pagosValor), tone: 'income' },
+      { label: 'Pendentes', value: formatCurrencyValue(resumo.pendentesValor), tone: 'neutral' },
+      { label: 'Lançamentos', value: String(this.rendasMes.length), tone: 'neutral' }
+    ];
+  }
+
+  get statusChips(): TxFilterChip[] {
+    return this.statusOptions.map((o) => ({
+      value: o.value,
+      label: o.value === 'ALL' ? 'Todos' : o.label,
+      meta: o.meta
+    }));
+  }
+
+  get mobileItems(): TxMobileItem[] {
+    return this.rendas.map((r) => {
+      const status = resolveInstallmentStatus(r.status, r.recebimento);
+      return {
+        id: r.id!,
+        titulo: r.fonte || 'Receita',
+        subtitulo: r.fixa ? `Recorrente · todo dia ${(r.recebimento || '').slice(0, 2)}` : '',
+        valor: `+ ${formatCurrencyValue(r.valor || 0)}`,
+        tom: 'income' as const,
+        statusLabel: incomeStatusLabel(status),
+        statusTone: installmentStatusTone(status),
+        data: (r.recebimento || '').slice(0, 5) || '—',
+        meta: r.categoria || 'Sem categoria'
+      };
+    });
+  }
+
+  get filtrosAtivos(): boolean {
+    return this.filtroStatus !== 'ALL' || this.filtroCategoria !== 'ALL' || !!this.filtroTexto;
+  }
+
+  limparFiltros(): void {
+    this.filtroStatus = 'ALL';
+    this.filtroCategoria = 'ALL';
+    this.filtroTexto = '';
+    this.focusMode = 'none';
+  }
   focusMode: 'none' | 'pending' = 'none';
   sortBy: 'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
   readonly categorias = signal<CategoryDto[]>([]);
+  get categoriaOptions() {
+    const base = this.rendasMes.filter((r) => this.filtroTextoMatch(r) && this.filtroStatusMatch(r));
+    const contar = (id: string) => base.filter((r) => r.categoryId === id).length;
+
+    return [
+      { value: 'ALL', label: 'Todas as categorias', color: 'var(--text-muted)', meta: String(base.length) },
+      ...this.categorias().map((c) => ({
+        value: c.id,
+        label: c.name,
+        color: colorForCategory(c.id || c.name),
+        meta: String(contar(c.id))
+      }))
+    ];
+  }
 
   constructor(
     private db: ApiDataService,
@@ -115,6 +211,8 @@ export class ReceitasComponent implements OnInit {
     private accountsService: AccountsService,
     private installments: InstallmentsService,
     private route: ActivatedRoute,
+    private readonly location: Location,
+    private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef
   ) {}
@@ -124,13 +222,18 @@ export class ReceitasComponent implements OnInit {
       const focus = (params.get('focus') || '').toLowerCase();
       if (focus === 'pending') {
         this.focusMode = 'pending';
-        this.filtroStatus = 'pending';
+        this.filtroStatus = 'OPEN';
       } else {
         this.focusMode = 'none';
       }
       // Busca global pode navegar com ?q= para pré-filtrar por texto.
       const q = params.get('q');
       if (q) this.filtroTexto = q;
+      // O botão "+" da barra inferior do mobile chega por aqui.
+      if (params.get('novo') === '1') {
+        this.abrirModal();
+        this.limparParametro('novo');
+      }
       this.cdr.markForCheck();
     });
 
@@ -197,6 +300,7 @@ export class ReceitasComponent implements OnInit {
       .filter((r) => this.mesKeyFromRecebimento(r.recebimento) === key)
       .filter((r) => this.filtroTextoMatch(r))
       .filter((r) => this.filtroTipoMatch(r))
+      .filter((r) => this.filtroCategoriaMatch(r))
       .filter((r) => this.filtroStatusMatch(r));
     if (!this.sortBy) {
       return filtradas.sort((a, b) => this.compareDateDesc(a.recebimento, b.recebimento));
@@ -263,8 +367,9 @@ export class ReceitasComponent implements OnInit {
     let pendentesValor = 0;
 
     for (const renda of this.rendasMes) {
-      const status = incomeStatusLabel(renda.status);
-      if (status === 'Recebido') {
+      // Por código, não por rótulo: comparar com o texto "Recebido" fazia o
+      // resumo zerar assim que a palavra mudasse.
+      if (renda.status === 'PAID') {
         pagos += 1;
         pagosValor += renda.valor || 0;
       } else {
@@ -316,6 +421,22 @@ export class ReceitasComponent implements OnInit {
   get focusBadgeLabel(): string {
     if (this.focusMode === 'pending') return 'Filtro automático: receitas pendentes';
     return '';
+  }
+
+  /* Tira o parâmetro sem navegar: com NoReuseStrategy + onSameUrlNavigation
+     'reload', qualquer navigate() recria a tela e fecharia o modal recém-aberto. */
+  private limparParametro(nome: string): void {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete(nome);
+    this.location.replaceState(url.pathname + url.search);
+  }
+
+  /* Atalho do combo de categoria: fecha o lançamento e leva para o cadastro —
+     sem isto o "Criar nova categoria" não fazia nada. */
+  irParaCategorias(): void {
+    this.fecharModal();
+    this.router.navigateByUrl('/categorias');
   }
 
   abrirModal(): void {
@@ -914,17 +1035,21 @@ export class ReceitasComponent implements OnInit {
     return (renda.fonte || '').toLowerCase().includes(this.filtroTexto.trim().toLowerCase());
   }
 
+  private filtroCategoriaMatch(renda: StoredIncome): boolean {
+    return this.filtroCategoria === 'ALL' ? true : renda.categoryId === this.filtroCategoria;
+  }
+
   private filtroTipoMatch(renda: StoredIncome): boolean {
     if (this.filtroTipo === 'all') return true;
     if (this.filtroTipo === 'recurring') return !!renda.fixa;
     return !renda.fixa;
   }
 
+  /* Compara código com código: antes comparava o RÓTULO ("Recebido"), então
+     qualquer ajuste de texto quebrava o filtro sem ninguém perceber. */
   private filtroStatusMatch(renda: StoredIncome): boolean {
-    if (this.filtroStatus === 'all') return true;
-    const status = incomeStatusLabel(renda.status);
-    if (this.filtroStatus === 'paid') return status === 'Recebido';
-    return status !== 'Recebido';
+    if (this.filtroStatus === 'ALL') return true;
+    return resolveInstallmentStatus(renda.status, renda.recebimento) === this.filtroStatus;
   }
 
   private countDuplicatedSources(): number {

@@ -38,7 +38,25 @@
     </app-transaction-summary-card>
   </section>
 
-  <section class="tx-shell">
+  <!-- Padrão mobile das listagens: cabeçalho navy, chips e cartões. O bloco
+       do desktop continua abaixo e é o CSS que troca um pelo outro. -->
+  <section class="tx-mobile">
+    <app-tx-mobile-header
+      [label]="'Total de ' + mesAtualLabel"
+      [total]="totalMes() | appCurrency"
+      [kpis]="mobileKpis"
+      (previousMonth)="mesAnterior()"
+      (nextMonth)="proximoMes()" />
+
+    <app-tx-filter-chips
+      [chips]="statusChips"
+      [selected]="filtroStatus"
+      (select)="filtroStatus = $any($event)" />
+
+    <app-tx-mobile-list [items]="mobileItems" (open)="editarDespesaPorId($event)" />
+  </section>
+
+  <section class="tx-shell tx-desktop-only">
     <app-period-hero
       eyebrow="Despesas do período"
       title="Despesas de {{ mesAtualLabel }}"
@@ -102,7 +120,7 @@
         [actions]="bulkActions" />
     }
 
-    <app-filter-bar>
+    <app-filter-bar variant="bare">
       <div filter-left class="tx-filters">
         <label class="tx-filter">
           <span class="tx-filter__label">Status</span>
@@ -114,15 +132,24 @@
         <label class="tx-filter">
           <span class="tx-filter__label">Categoria</span>
           <app-select-menu
-            [options]="categoriaOptions()"
+            [options]="categoriaOptions"
             [(ngModel)]="filtroCategoria"
             [searchable]="true"
             ariaLabel="Filtrar por categoria" />
         </label>
         <label class="tx-filter tx-filter--search">
           <span class="tx-filter__label">Buscar</span>
-          <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
+          <span class="tx-filter__search">
+            <svg class="tx-filter__search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+            <input type="text" [(ngModel)]="filtroNome" placeholder="Nome da despesa" />
+          </span>
         </label>
+        @if (filtrosAtivos) {
+          <button type="button" class="tx-filters__clear" (click)="limparFiltros()">Limpar filtros</button>
+        }
       </div>
     </app-filter-bar>
 
@@ -159,6 +186,8 @@
     [erroData]="erroData"
     [erroCategoria]="erroCategoria"
     [formaPagamento]="formaPagamento"
+    [paymentMethods]="paymentMethods()"
+    [formaPagamentoId]="formaPagamentoId"
     [parcelar]="parcelar"
     [parcelasCount]="parcelasCount"
     [saving]="saving"
@@ -171,12 +200,14 @@
     (valorChange)="onValorChange($event)"
     (vencimentoChange)="onVencimentoChange($event)"
     (formaPagamentoChange)="onFormaPagamentoChange($event)"
+    (formaPagamentoIdChange)="formaPagamentoId = $event"
     (parcelarChange)="parcelar = $event"
     (parcelasChange)="parcelasCount = +$event"
     (cartaoChange)="cartaoSelecionadoId = $event"
     (fixaChange)="fixa = $event"
     (fixaMesesChange)="fixaMeses = $event"
     (submitForm)="adicionar()"
+    (categoriasRequested)="irParaCategorias()"
     (cancel)="fecharModal()" />
 
   <app-invoice-import

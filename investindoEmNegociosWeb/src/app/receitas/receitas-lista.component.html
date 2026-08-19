@@ -10,6 +10,8 @@
   [emptyDescription]="emptyDescription"
   [emptyCtaLabel]="emptyCtaLabel"
   emptyIcon="💰"
+  [pageSize]="8"
+  itemsLabel="lançamentos"
   [selectable]="true"
   [selectedIds]="selectedIds"
   [selectableIds]="selectableIds"
@@ -20,6 +22,9 @@
 
   <ng-template appResponsiveListCell="fonte" let-r>
     <span class="receitas-lista__name">{{ r.fonte }}</span>
+    @if (subtitulo(r); as sub) {
+      <small class="receitas-lista__subtitle">{{ sub }}</small>
+    }
   </ng-template>
 
   <ng-template appResponsiveListCell="categoria" let-r>
@@ -27,11 +32,11 @@
   </ng-template>
 
   <ng-template appResponsiveListCell="valor" let-r>
-    <span class="receitas-lista__amount">{{ r.valor | appCurrency }}</span>
+    <span class="receitas-lista__amount">+&nbsp;{{ r.valor | appCurrency }}</span>
   </ng-template>
 
   <ng-template appResponsiveListCell="recebimento" let-r>
-    <span class="receitas-lista__muted">{{ r.recebimento || '—' }}</span>
+    <span class="receitas-lista__muted">{{ dataCurta(r.recebimento) }}</span>
   </ng-template>
 
   <ng-template appResponsiveListCell="tipo" let-r>

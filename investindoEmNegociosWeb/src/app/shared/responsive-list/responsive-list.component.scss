@@ -251,3 +251,67 @@
     padding: 0;
   }
 }
+
+/* ---------- Rodapé com contagem e páginas -------------------------------- */
+.responsive-list__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  padding: var(--space-6) var(--space-7);
+  border-block-start: 1px solid var(--border);
+}
+
+.responsive-list__range {
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+}
+
+.responsive-list__pages {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.responsive-list__page {
+  display: grid;
+  place-items: center;
+  min-inline-size: 34px;
+  block-size: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+.responsive-list__page:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.responsive-list__page.is-active {
+  border-color: var(--brand-navy);
+  background: var(--brand-navy);
+  color: #fff;
+}
+
+.responsive-list__page:disabled {
+  opacity: var(--control-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.responsive-list__page--nav svg {
+  inline-size: 16px;
+  block-size: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

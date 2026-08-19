@@ -482,8 +482,14 @@ export class OnboardingComponent implements OnInit {
     return this.uiPermissions.canReadCards();
   }
 
+  /* Mesmo defeito da tela de despesas: aqui devolvia o total, então o campo
+     "Valor de cada" mostrava o valor cheio em vez da parcela. */
   get modalExpenseParcelValueLabel(): string {
-    return this.modalExpenseAmountInput;
+    const valor = parseLocalizedNumber(this.modalExpenseAmountInput);
+    if (!valor) return this.modalExpenseAmountInput;
+
+    const parcelas = this.modalExpenseParcelar && this.modalExpenseParcelas > 1 ? this.modalExpenseParcelas : 1;
+    return (valor / parcelas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   openIncomeModal(): void {

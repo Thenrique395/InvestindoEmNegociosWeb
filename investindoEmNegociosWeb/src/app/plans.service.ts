@@ -18,6 +18,7 @@ export interface Plan {
   installmentsCount?: number | null;
   startDate: string;
   status: string;
+  defaultPaymentMethodId?: number | null;
 }
 
 export interface CreatePlanPayload {

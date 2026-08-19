@@ -7,12 +7,8 @@
   color: var(--text-tertiary);
 }
 
-.despesas-lista__amount {
-  color: var(--text);
-}
-
 .despesas-lista__recurrence {
-  margin-inline-start: 0.35rem;
+  display: block;
   color: var(--text-tertiary);
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
@@ -24,14 +20,44 @@
   gap: 0.45rem;
 }
 
+/* Ícone solto, sem caixa: três botões emoldurados por linha viravam a coisa
+   mais pesada da tabela, competindo com o valor. */
 .despesas-lista__icon-action {
-  inline-size: 42px;
-  block-size: 42px;
+  inline-size: 32px;
+  block-size: 32px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-tertiary);
 
   svg {
     inline-size: 18px;
     block-size: 18px;
   }
+}
+
+.despesas-lista__icon-action:hover:not(:disabled),
+.despesas-lista__icon-action:focus-visible {
+  transform: none;
+  border-color: transparent;
+  background: var(--surface-inset);
+  color: var(--text);
+}
+
+.despesas-lista__subtitle {
+  display: block;
+  margin-block-start: 2px;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-regular);
+  line-height: 1.35;
+}
+
+/* A parcela desce para baixo do valor, como no design. */
+.despesas-lista__amount {
+  display: block;
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .despesas-lista__icon-action::after {

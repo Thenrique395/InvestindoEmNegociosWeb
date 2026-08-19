@@ -62,7 +62,6 @@ type GroupFilter = 'all' | CalendarEventGroup;
     FinancialTimelineComponent,
     FinancialEventCardComponent,
     CalendarSidebarComponent,
-    AppCurrencyPipe,
     SelectMenuComponent
   ],
   templateUrl: './calendario.component.html',

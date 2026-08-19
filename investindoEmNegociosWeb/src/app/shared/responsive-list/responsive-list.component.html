@@ -57,7 +57,7 @@
           </tr>
         }
         @if (!loading) {
-          @for (item of items; track trackByRow($index, item)) {
+          @for (item of visibleItems; track trackByRow($index, item)) {
             <tr class="responsive-list__row">
               @if (selectable) {
                 <td class="responsive-list__item responsive-list__item--checkbox">
@@ -84,4 +84,43 @@
       </tbody>
     </table>
   </div>
+
+  @if (pageSize > 0 && items.length) {
+    <footer class="responsive-list__footer">
+      <span class="responsive-list__range">{{ rangeLabel }}</span>
+
+      @if (paginado) {
+        <nav class="responsive-list__pages" aria-label="Paginação">
+          <button
+            type="button"
+            class="responsive-list__page responsive-list__page--nav"
+            [disabled]="page === 1"
+            aria-label="Página anterior"
+            (click)="irParaPagina(page - 1)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+          </button>
+
+          @for (n of pages; track n) {
+            <button
+              type="button"
+              class="responsive-list__page"
+              [class.is-active]="n === page"
+              [attr.aria-current]="n === page ? 'page' : null"
+              (click)="irParaPagina(n)">
+              {{ n }}
+            </button>
+          }
+
+          <button
+            type="button"
+            class="responsive-list__page responsive-list__page--nav"
+            [disabled]="page === totalPages"
+            aria-label="Próxima página"
+            (click)="irParaPagina(page + 1)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+          </button>
+        </nav>
+      }
+    </footer>
+  }
 </div>

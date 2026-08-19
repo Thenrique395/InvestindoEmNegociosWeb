@@ -39,8 +39,12 @@
 .tx-filters {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 220px 220px minmax(0, 1fr);
+  grid-template-columns: 220px 220px minmax(0, 1fr) auto;
   align-items: end;
+  /* Ocupa a linha inteira: como item flex do app-filter-bar ela encolhia para
+     o conteúdo e a busca ficava do tamanho do placeholder. */
+  flex: 1 1 100%;
+  width: 100%;
 }
 
 .tx-filter {
@@ -48,21 +52,76 @@
   gap: 0.55rem;
 }
 
+/* Rótulo em caixa normal: eram três eyebrows maiúsculas competindo com o
+   título do período logo acima. */
 .tx-filter__label {
-  color: var(--text-tertiary);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
 }
 
 .tx-filter select,
 .tx-filter input {
-  min-height: 60px;
-  padding: 0 1.15rem;
-  border-radius: var(--radius-panel);
+  min-height: 46px;
+  padding: 0 1rem;
+  border-radius: var(--radius-control);
   font-size: var(--fs-body);
   font-weight: var(--fw-medium);
+}
+
+/* Busca com lupa dentro do campo. */
+.tx-filter__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tx-filter__search input {
+  width: 100%;
+  padding-left: 2.6rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.tx-filter__search input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Só aparece quando há filtro ativo: fica ao lado da busca, alinhado aos
+   campos, não abaixo deles. */
+.tx-filters__clear {
+  align-self: end;
+  height: 46px;
+  padding: 0 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tx-filters__clear:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.tx-filter__search-icon {
+  position: absolute;
+  left: 0.9rem;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  pointer-events: none;
 }
 
 @media (max-width: 960px) {
@@ -72,5 +131,42 @@
 
   .tx-filters {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Troca desktop/mobile das listagens. O visual do bloco mobile mora nos
+   componentes (tx-mobile-header, tx-filter-chips, tx-mobile-list): este SCSS
+   é escopado à tela e não alcançaria a marcação deles.
+   ========================================================================== */
+
+.tx-mobile {
+  display: none;
+}
+
+/* ---------- Troca desktop/mobile ---------------------------------------- */
+
+@media (max-width: 720px) {
+  .tx-mobile {
+    display: block;
+    /* Item de grid tem min-width auto: sem zerar, a faixa de chips (que é
+       rolável) esticava a coluna inteira para 827px. */
+    min-inline-size: 0;
+    margin: calc(-1 * var(--space-10)) calc(-1 * var(--space-7)) 0;
+  }
+
+  /* No celular quem manda é o bloco acima: os cartões de KPI, o painel do
+     período e a tabela saem de cena. */
+  .tx-summary-grid,
+  .tx-shell .tx-hero,
+  .tx-shell app-period-hero,
+  .tx-desktop-only {
+    display: none;
+  }
+
+  .tx-shell {
+    padding: 0;
+    border: none;
+    background: transparent;
   }
 }

@@ -24,7 +24,7 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
         <section [class]="modalClass()">
           @if (eyebrow() || title() || subtitle() || showCloseButton()) {
             <header
-              class="flex flex-none items-start justify-between gap-4 border-b border-[var(--border-inner)] px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-10)]">
+              class="flex flex-none items-start justify-between gap-4 border-b border-[var(--border-inner)] px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-6)]">
               <div class="min-w-0 space-y-1">
                 @if (eyebrow()) {
                   <p class="m-0 text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)]">{{ eyebrow() }}</p>
@@ -53,13 +53,13 @@ type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
               }
             </header>
           }
-          <div class="min-h-0 flex-1 overflow-y-auto px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-10)]">
+          <div class="min-h-0 flex-1 overflow-y-auto px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-8)]">
             <ng-content></ng-content>
             <ng-content select="[modal-body]"></ng-content>
           </div>
           @if (hasFooter()) {
             <footer
-              class="flex flex-none flex-wrap justify-end gap-[var(--space-6)] border-t border-[var(--border-inner)] bg-[var(--surface-subtle)] px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-7)]">
+              class="flex flex-none flex-wrap justify-end gap-[var(--space-6)] border-t border-[var(--border-inner)] bg-[var(--surface-subtle)] px-[var(--modal-pad-x,var(--space-12))] py-[var(--space-6)]">
               <ng-content select="[modal-footer]"></ng-content>
             </footer>
           }

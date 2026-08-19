@@ -341,6 +341,20 @@ body [class*='goal-card__description'] {
   line-height: var(--lh-body);
 }
 
+/* O rodapé do modal projeta um único wrapper (`<div modal-footer>`), então o
+   `gap` do <footer> não alcança os botões: eles são netos, não filhos. Sem
+   isto "Cancelar" e "Salvar" ficam encostados um no outro.
+
+   `:where()` para especificidade zero — os rodapés que já têm layout próprio
+   (metas, empréstimos) continuam mandando. */
+:where([modal-footer]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-6);
+}
+
 :where(.btn, .btn-primary, .btn-ghost, .btn-danger, .btn-cancel, .ghost).sm {
   min-height: var(--h-button-sm);
   padding: 0.375rem 0.75rem;

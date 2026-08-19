@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StoredIncome } from '../data/api-data.service';
-import { incomeStatusLabel, installmentStatusTone } from '../utils/status';
+import { resolveInstallmentStatus, incomeStatusLabel, installmentStatusTone } from '../utils/status';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
@@ -33,16 +33,18 @@ export class ReceitasListaComponent {
   @Output() emptyAction = new EventEmitter<void>();
 
   get columns(): ResponsiveListColumn[] {
+    // Ordem do design: identificação, classificação, situação e só então os
+    // números — o valor fica encostado nas ações, na borda direita.
     const base: ResponsiveListColumn[] = [
       { key: 'fonte', label: 'Fonte', sortable: true },
       { key: 'categoria', label: 'Categoria', sortable: true },
-      { key: 'valor', label: 'Valor', sortable: true, align: 'end' },
-      { key: 'recebimento', label: 'Recebimento', sortable: true },
       { key: 'tipo', label: 'Tipo', sortable: true }
     ];
     if (this.showStatus) {
       base.push({ key: 'status', label: 'Status', sortable: true });
     }
+    base.push({ key: 'recebimento', label: 'Receb.', sortable: true });
+    base.push({ key: 'valor', label: 'Valor', sortable: true, align: 'end' });
     base.push({ key: 'acoes', label: 'Ações', align: 'end' });
     return base;
   }
@@ -77,12 +79,26 @@ export class ReceitasListaComponent {
     return renda.status === 'PAID' || renda.status === 'PARTIALLY_PAID';
   }
 
+  /** Segunda linha da fonte: recorrência, quando houver. */
+  subtitulo(r: StoredIncome): string {
+    if (!r.fixa) return '';
+    const dia = (r.recebimento || '').slice(0, 2);
+    return dia ? `Recorrente · todo dia ${dia}` : 'Recorrente';
+  }
+
+  /** Dentro de um mês, o ano é ruído: a competência já está no título. */
+  dataCurta(valor?: string): string {
+    if (!valor) return '—';
+    const [dia, mes] = valor.split('/');
+    return dia && mes ? `${dia}/${mes}` : valor;
+  }
+
   statusLabel(renda: StoredIncome): string {
-    return incomeStatusLabel(renda.status);
+    return incomeStatusLabel(resolveInstallmentStatus(renda.status, renda.recebimento));
   }
 
   statusTone(renda: StoredIncome) {
-    return installmentStatusTone(renda.status);
+    return installmentStatusTone(resolveInstallmentStatus(renda.status, renda.recebimento));
   }
 
   isSelecionavel(renda: StoredIncome): boolean {

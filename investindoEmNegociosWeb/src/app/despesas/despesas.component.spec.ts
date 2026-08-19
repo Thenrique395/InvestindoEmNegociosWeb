@@ -15,7 +15,9 @@ function createComponent(): DespesasComponent {
     { canImportInvoices: () => true } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
     { onDestroy: () => {} } as any,
-    { queryParamMap: of(convertToParamMap({})) } as any
+    { queryParamMap: of(convertToParamMap({})) } as any,
+    { replaceState: jasmine.createSpy('replaceState') } as any,
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
   );
 }
 
@@ -115,7 +117,9 @@ function createComponentForReceiptTests() {
     { canImportInvoices: () => true } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
     { onDestroy: () => {} } as any,
-    { queryParamMap: of(convertToParamMap({})) } as any
+    { queryParamMap: of(convertToParamMap({})) } as any,
+    { replaceState: jasmine.createSpy('replaceState') } as any,
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
   );
   return { component, installments, uiFeedback };
 }
@@ -142,7 +146,9 @@ describe('DespesasComponent - fechar modal ao salvar', () => {
       { canImportInvoices: () => true } as any,
       { markForCheck: jasmine.createSpy('markForCheck') } as any,
       { onDestroy: () => {} } as any,
-      { queryParamMap: of(convertToParamMap({})) } as any
+      { queryParamMap: of(convertToParamMap({})) } as any,
+    { replaceState: jasmine.createSpy('replaceState') } as any,
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
     );
 
     component.mostrarForm = true;
@@ -245,7 +251,9 @@ function makeDespesas(db: any, ui = new UiFeedbackServiceMock()) {
     { canImportInvoices: () => true } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
     { onDestroy: () => {} } as any,
-    { queryParamMap: of(convertToParamMap({})) } as any
+    { queryParamMap: of(convertToParamMap({})) } as any,
+    { replaceState: jasmine.createSpy('replaceState') } as any,
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
   );
   return { component, ui };
 }

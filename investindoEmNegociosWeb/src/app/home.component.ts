@@ -6,7 +6,7 @@ import { ApiDataService, StoredExpense, StoredIncome, StoredCard } from './data/
 import { CardsService } from './cards.service';
 import { GoalsService, Goal, GoalStatus } from './goals.service';
 import { Router, RouterModule } from '@angular/router';
-import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone } from './utils/status';
+import { expenseStatusLabel, incomeStatusLabel, installmentStatusTone, resolveInstallmentStatus } from './utils/status';
 import { OnboardingService } from './onboarding.service';
 import { formatCompactCurrency, formatCurrencyValue, formatMonthLabel, formatMonthYearLabel, monthKeyFromLocaleDate, parseLocaleDate } from './utils/locale-utils';
 import {
@@ -1625,8 +1625,10 @@ export class HomeComponent implements OnInit {
       date: e.vencimento || '—',
       amount: e.valor || 0,
       type: 'expense' as const,
-      status: expenseStatusLabel(e.status),
-      statusTone: installmentStatusTone(e.status),
+      // Mesmo status derivado das telas de lançamento: sem a data, uma despesa
+      // vencida apareceria como "Em aberto" aqui e "Atrasada" lá.
+      status: expenseStatusLabel(resolveInstallmentStatus(e.status, e.vencimento)),
+      statusTone: installmentStatusTone(resolveInstallmentStatus(e.status, e.vencimento)),
       recurring: !!e.fixa,
       planId: e.planId
     }));
@@ -1636,8 +1638,8 @@ export class HomeComponent implements OnInit {
       date: i.recebimento || '—',
       amount: i.valor || 0,
       type: 'income' as const,
-      status: incomeStatusLabel(i.status),
-      statusTone: installmentStatusTone(i.status),
+      status: incomeStatusLabel(resolveInstallmentStatus(i.status, i.recebimento)),
+      statusTone: installmentStatusTone(resolveInstallmentStatus(i.status, i.recebimento)),
       recurring: !!i.fixa,
       planId: i.planId
     }));

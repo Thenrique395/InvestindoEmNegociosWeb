@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PaymentMethodLookup } from '../lookups.service';
+import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
+import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
+import { colorForCategory } from '../categories/categories-overview.model';
 
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
@@ -13,7 +17,7 @@ import { DatePickerComponent } from '../shared/date-picker/date-picker.component
 @Component({
   selector: 'app-despesas-form',
   standalone: true,
-  imports: [FormsModule, DigitOnlyDirective, RouterLink, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent, SelectMenuComponent, NumberStepperComponent],
   templateUrl: './despesas-form.component.html',
   styleUrls: ['./despesas-form.component.scss']
 })
@@ -44,16 +48,77 @@ export class DespesasFormComponent {
   @Input() cartaoSelecionadoLabel = '';
   @Input() cardBrandMap: Record<string, string> = {};
   @Input() allowCardPayment = true;
+  @Input() paymentMethods: PaymentMethodLookup[] = [];
+  @Input() formaPagamentoId: number | null = null;
   @Input() isEdit = false;
 
   @Output() valorChange = new EventEmitter<string>();
   @Output() vencimentoChange = new EventEmitter<string>();
   @Output() formaPagamentoChange = new EventEmitter<'avista' | 'cartao'>();
+  @Output() formaPagamentoIdChange = new EventEmitter<number | null>();
   @Output() parcelarChange = new EventEmitter<boolean>();
   @Output() parcelasChange = new EventEmitter<number>();
   @Output() cartaoChange = new EventEmitter<string | null>();
   @Output() fixaChange = new EventEmitter<boolean>();
   @Output() fixaMesesChange = new EventEmitter<number | null>();
+  @Output() categoriasRequested = new EventEmitter<void>();
+
+  /** Opções de categoria com o ponto colorido, como no design. */
+  get categoriaOptions(): SelectMenuOption[] {
+    return (this.categorias || []).map((c) => ({
+      value: c.id,
+      label: c.name,
+      color: colorForCategory(c.id || c.name)
+    }));
+  }
+
+  /* "Parcelar ou repetir" é um controle só: no crédito ele liga o parcelamento,
+     fora dele liga a repetição mensal. Quem guarda o estado continua sendo a
+     tela — aqui só traduzimos para o que a forma de pagamento permite. */
+  get repetir(): boolean {
+    return this.formaPagamento === 'cartao' ? this.parcelar : this.fixa;
+  }
+
+  onRepetirToggle(ligado: boolean): void {
+    if (this.formaPagamento === 'cartao') {
+      this.parcelar = ligado;
+      this.parcelarChange.emit(ligado);
+      if (ligado && this.parcelasCount < 2) this.onParcelasChange(2);
+      return;
+    }
+    this.fixa = ligado;
+    this.fixaChange.emit(ligado);
+  }
+
+  /** Só o crédito abre cartão e parcelas; o resto é pagamento direto. */
+  get metodosDisponiveis(): PaymentMethodLookup[] {
+    return this.paymentMethods.filter((m) => this.allowCardPayment || !this.ehCredito(m));
+  }
+
+  onMetodoPagamentoChange(id: number | null): void {
+    this.formaPagamentoId = id;
+    this.formaPagamentoIdChange.emit(id);
+
+    const metodo = this.paymentMethods.find((m) => m.id === id);
+    const modo = metodo && this.ehCredito(metodo) ? 'cartao' : 'avista';
+    if (modo !== this.formaPagamento) {
+      this.formaPagamento = modo;
+      this.formaPagamentoChange.emit(modo);
+    }
+  }
+
+  private ehCredito(metodo: PaymentMethodLookup): boolean {
+    return (metodo.name || '').toLowerCase().includes('crédito');
+  }
+
+  onCategoriaChange(valor: string): void {
+    this.novaDespesa.categoryId = valor || null;
+  }
+
+  irParaCategorias(): void {
+    this.categoriasRequested.emit();
+  }
+
   @Output() submitForm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 

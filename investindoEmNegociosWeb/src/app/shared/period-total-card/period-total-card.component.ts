@@ -17,7 +17,7 @@ import { Component, input } from '@angular/core';
   styleUrl: './period-total-card.component.scss'
 })
 export class PeriodTotalCardComponent {
-  readonly eyebrow = input<string>('Total do mês');
+  readonly eyebrow = input<string>('Total do período');
   readonly value = input.required<string>();
   readonly description = input<string>('');
 }

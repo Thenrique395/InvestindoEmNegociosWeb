@@ -41,7 +41,7 @@
 }
 
 .income-form__control {
-  min-height: 52px;
+  min-height: 42px;
   border-radius: var(--radius-inner);
   padding: 0 1rem;
   font-size: var(--fs-subhead);
@@ -178,4 +178,70 @@
   font-size: var(--fs-body);
   line-height: var(--lh-body);
   color: var(--text);
+}
+
+/* ---------- Estrutura do formulário (alinhada ao design) ------------------ */
+
+.income-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1.25rem;
+}
+
+.income-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.income-form__box {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.85rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface-sunken);
+}
+
+/* "R$" fixo dentro do campo: o valor digitado começa depois dele. */
+.income-form__amount {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.income-form__amount input {
+  width: 100%;
+  padding-left: 2.5rem;
+}
+
+.income-form__amount-prefix {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  pointer-events: none;
+}
+
+.income-form__footer {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.income-form__footer-hint {
+  margin-right: auto;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+@media (max-width: 640px) {
+  .income-form__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Rótulo colado no campo e dica em uma linha: o modal precisa caber sem rolar
+   mesmo com a seção de repetição aberta. */
+.income-form :is(app-form-field) label {
+  gap: 0.35rem;
 }

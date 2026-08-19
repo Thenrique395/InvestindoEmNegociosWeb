@@ -8,6 +8,8 @@
   [emptyDescription]="emptyDescription"
   [emptyCtaLabel]="emptyCtaLabel"
   emptyIcon="🧾"
+  [pageSize]="8"
+  itemsLabel="lançamentos"
   [selectable]="true"
   [selectedIds]="selectedIds"
   [selectableIds]="selectableIds"
@@ -18,6 +20,9 @@
 
   <ng-template appResponsiveListCell="nome" let-d>
     <span class="despesas-lista__name">{{ d.nome }}</span>
+    @if (subtitulo(d); as sub) {
+      <small class="despesas-lista__subtitle">{{ sub }}</small>
+    }
   </ng-template>
 
   <ng-template appResponsiveListCell="categoria" let-d>
@@ -29,15 +34,15 @@
   </ng-template>
 
   <ng-template appResponsiveListCell="status" let-d>
-    <app-status-badge [tone]="statusTone(d.status)" [label]="statusLabel(d.status)"></app-status-badge>
+    <app-status-badge [tone]="statusTone(d)" [label]="statusLabel(d)"></app-status-badge>
   </ng-template>
 
   <ng-template appResponsiveListCell="vencimento" let-d>
-    <span class="despesas-lista__muted">{{ d.vencimento || '—' }}</span>
+    <span class="despesas-lista__muted">{{ dataCurta(d.vencimento) }}</span>
   </ng-template>
 
   <ng-template appResponsiveListCell="valor" let-d>
-    <span class="despesas-lista__amount">{{ d.valor | appCurrency }}</span>
+    <span class="despesas-lista__amount">&minus;&nbsp;{{ d.valor | appCurrency }}</span>
     @if (d.parcelasTotal) {
       <small class="despesas-lista__recurrence">{{ d.parcelaNumero }}/{{ d.parcelasTotal }}</small>
     }

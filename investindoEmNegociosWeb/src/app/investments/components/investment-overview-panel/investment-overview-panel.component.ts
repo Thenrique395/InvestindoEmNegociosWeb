@@ -14,7 +14,7 @@ export type PatrimonyBucket = { key: string; label: string; aplicado: number; ga
 @Component({
   selector: 'app-investment-overview-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe, AppCurrencyPipe, DonutChartComponent, KpiStripComponent],
+  imports: [CommonModule, FormsModule, AppCurrencyPipe, DonutChartComponent, KpiStripComponent],
   templateUrl: './investment-overview-panel.component.html',
   styleUrl: './investment-overview-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,7 +1,7 @@
 import { computed, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -15,9 +15,13 @@ import { CategoriesService, CategoryDto } from '../categories.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { AuthService } from '../auth.service';
 import { hasAtLeastRole, UserRole } from '../roles';
-import { LookupsService } from '../lookups.service';
+import { PaymentMethodLookup, LookupsService } from '../lookups.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
-import { expenseStatusLabel, installmentStatusTone, InstallmentStatusTone } from '../utils/status';
+import { colorForCategory } from '../categories/categories-overview.model';
+import { TxMobileHeaderComponent, TxMobileKpi } from '../shared/transactions/tx-mobile-header.component';
+import { TxFilterChipsComponent, TxFilterChip } from '../shared/transactions/tx-filter-chips.component';
+import { TxMobileListComponent, TxMobileItem } from '../shared/transactions/tx-mobile-list.component';
+import { DisplayInstallmentStatus, resolveInstallmentStatus, expenseStatusLabel, installmentStatusTone, InstallmentStatusTone } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { UiPermissionsService } from '../ui-permissions.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
@@ -33,6 +37,7 @@ import { BodyPortalDirective } from '../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
 import {
+  formatCurrencyValue,
   formatLocaleDate,
   formatMonthYearLabel,
   formatNumberValue,
@@ -63,8 +68,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     PeriodTotalCardComponent,
     PeriodHeroComponent,
     SelectMenuComponent,
-    AppCurrencyPipe
-],
+    AppCurrencyPipe, TxMobileHeaderComponent, TxFilterChipsComponent, TxMobileListComponent],
   templateUrl: './despesas.component.html',
   styleUrls: ['./despesas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -98,6 +102,9 @@ export class DespesasComponent implements OnInit {
   erroData = '';
   erroCategoria = '';
   formaPagamento: 'avista' | 'cartao' = 'avista';
+  /* Id da forma escolhida no catálogo (Pix, Boleto, Débito…). O 'avista'/'cartao'
+     continua existindo porque é ele que decide se há cartão e parcelamento. */
+  formaPagamentoId: number | null = null;
   parcelar = false;
   parcelasCount = 1;
   fixa = false;
@@ -111,14 +118,100 @@ export class DespesasComponent implements OnInit {
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
 
   /** Opções do dropdown de status. Rótulos vêm de `expenseStatusLabel`. */
-  readonly statusOptions = [
-    { value: 'ALL', label: 'Todos os status' },
-    { value: 'OPEN', label: expenseStatusLabel('OPEN') },
-    { value: 'PARTIALLY_PAID', label: expenseStatusLabel('PARTIALLY_PAID') },
-    { value: 'PAID', label: expenseStatusLabel('PAID') },
-    { value: 'ANTICIPATED', label: expenseStatusLabel('ANTICIPATED') },
-    { value: 'CANCELED', label: expenseStatusLabel('CANCELED') }
+  /* Ordem do design: do que ainda vai acontecer para o que já saiu do caminho.
+     "Atrasada" é derivada (OPEN vencida) — ver resolveInstallmentStatus. */
+  private readonly statusValues: DisplayInstallmentStatus[] = [
+    'OPEN',
+    'PARTIALLY_PAID',
+    'PAID',
+    'ANTICIPATED',
+    'OVERDUE',
+    'CANCELED'
   ];
+
+  /** Cor do ponto de cada status no menu — mesma escala das etiquetas. */
+  private readonly statusColors: Record<string, string> = {
+    OPEN: 'var(--text-muted)',
+    PARTIALLY_PAID: 'var(--warning)',
+    PAID: 'var(--income)',
+    ANTICIPATED: 'var(--primary)',
+    OVERDUE: 'var(--expense)',
+    CANCELED: 'var(--text-faint)'
+  };
+
+  /* Contagem por status ao lado de cada opção: mostra onde há o que olhar
+     antes de a pessoa filtrar e descobrir que não há nada. As contagens
+     ignoram o filtro de status (senão o escolhido zeraria os outros) mas
+     respeitam categoria e busca. */
+  get statusOptions() {
+    const base = this.despesas.filter((d) => this.categoriaMatch(d) && this.nomeMatch(d));
+    const contar = (valor: DisplayInstallmentStatus) =>
+      base.filter((d) => resolveInstallmentStatus(d.status, d.vencimento) === valor).length;
+
+    return [
+      { value: 'ALL', label: 'Todos os status', color: 'var(--text-muted)', meta: String(base.length) },
+      ...this.statusValues.map((valor) => ({
+        value: valor,
+        label: expenseStatusLabel(valor),
+        color: this.statusColors[valor],
+        meta: String(contar(valor))
+      }))
+    ];
+  }
+
+  /* ---- Mobile: mesmo dado da tabela, na forma que o celular pede ------- */
+
+  get mobileKpis(): TxMobileKpi[] {
+    return [
+      { label: 'Pendentes', value: formatCurrencyValue(this.totalPendentes), tone: 'expense' },
+      { label: 'Antecipadas', value: formatCurrencyValue(this.totalAntecipadas), tone: 'neutral' },
+      { label: 'Pagas', value: formatCurrencyValue(this.totalPagas), tone: 'income' }
+    ];
+  }
+
+  get statusChips(): TxFilterChip[] {
+    return this.statusOptions.map((o) => ({
+      value: o.value,
+      label: o.value === 'ALL' ? 'Todos' : o.label,
+      meta: o.meta
+    }));
+  }
+
+  get mobileItems(): TxMobileItem[] {
+    return this.despesasFiltradas.map((d) => {
+      const status = resolveInstallmentStatus(d.status, d.vencimento);
+      return {
+        id: d.id!,
+        titulo: d.nome || 'Despesa',
+        subtitulo: this.subtituloDespesa(d),
+        valor: `− ${formatCurrencyValue(d.valor || 0)}`,
+        tom: 'expense' as const,
+        statusLabel: expenseStatusLabel(status),
+        statusTone: installmentStatusTone(status),
+        data: (d.vencimento || '').slice(0, 5) || '—',
+        meta: this.pagamentoLabel(d)
+      };
+    });
+  }
+
+  private subtituloDespesa(d: StoredExpense): string {
+    if (d.fixa) {
+      const dia = (d.vencimento || '').slice(0, 2);
+      return dia ? `Recorrente · todo dia ${dia}` : 'Recorrente';
+    }
+    if (d.parcelasTotal && d.parcelasTotal > 1) return `Parcelamento em ${d.parcelasTotal}x`;
+    return '';
+  }
+
+  get filtrosAtivos(): boolean {
+    return this.filtroStatus !== 'ALL' || this.filtroCategoria !== 'ALL' || !!this.filtroNome;
+  }
+
+  limparFiltros(): void {
+    this.filtroStatus = 'ALL';
+    this.filtroCategoria = 'ALL';
+    this.filtroNome = '';
+  }
 
   /**
    * Categorias como opções do dropdown.
@@ -127,10 +220,28 @@ export class DespesasComponent implements OnInit {
    * índice em `CATEGORY_PALETTE` na tela de Categorias. Trazer a cor para cá
    * exigiria repetir essa derivação e as duas divergiriam.
    */
-  readonly categoriaOptions = computed(() => [
-    { value: 'ALL', label: 'Todas as categorias' },
-    ...this.categorias().map((c) => ({ value: c.id, label: c.name }))
-  ]);
+  /* Categorias com contagem e ponto colorido — a cor vem de colorForCategory,
+     a mesma usada na tela de categorias e no combo do lançamento. */
+  get categoriaOptions() {
+    const base = this.despesas.filter((d) => this.statusMatch(d) && this.nomeMatch(d));
+    const contar = (id: string) => base.filter((d) => d.categoryId === id).length;
+
+    return [
+      { value: 'ALL', label: 'Todas as categorias', color: 'var(--text-muted)', meta: String(base.length) },
+      ...this.categorias().map((c) => ({
+        value: c.id,
+        label: c.name,
+        color: colorForCategory(c.id || c.name),
+        meta: String(contar(c.id))
+      }))
+    ];
+  }
+
+  private statusMatch(d: StoredExpense): boolean {
+    return this.filtroStatus === 'ALL'
+      ? true
+      : resolveInstallmentStatus(d.status, d.vencimento) === this.filtroStatus;
+  }
   filtroCategoria: string = 'ALL';
   filtroNome: string = '';
   readonly loadingPagar = signal(false);
@@ -156,7 +267,9 @@ export class DespesasComponent implements OnInit {
     private uiPermissions: UiPermissionsService,
     private readonly cdr: ChangeDetectorRef,
     private readonly destroyRef: DestroyRef,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly location: Location,
+    private readonly router: Router
   ) {}
 
   get currentRole(): UserRole | null {
@@ -181,6 +294,12 @@ export class DespesasComponent implements OnInit {
       const q = params.get('q');
       if (q) {
         this.filtroNome = q;
+        this.cdr.markForCheck();
+      }
+      // O botão "+" da barra inferior do mobile chega por aqui.
+      if (params.get('novo') === '1') {
+        this.abrirModal();
+        this.limparParametro('novo');
         this.cdr.markForCheck();
       }
     });
@@ -237,6 +356,17 @@ export class DespesasComponent implements OnInit {
         this.contas.set([]);
         this.contaBaixaId = null;
         this.accountsService.setDefaultAccountId(null);
+        this.cdr.markForCheck();
+      }
+    });
+
+    this.lookupsService.paymentMethods().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (methods) => {
+        this.paymentMethods.set(methods || []);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.paymentMethods.set([]);
         this.cdr.markForCheck();
       }
     });
@@ -363,20 +493,27 @@ export class DespesasComponent implements OnInit {
     });
   }
 
+  /* Valor de CADA parcela, não o total: com 1000 em 12x o campo mostra 83,33.
+     Antes devolvia o valor cheio, então o resumo dizia "12x de R$ 1.000,00". */
   get valorParcelaLabel(): string {
     const valor = this.parseValor(this.valorInput);
     if (!valor) return this.valorInput;
-    return formatNumberValue(valor);
+
+    const parcelas = this.parcelar && this.parcelasCount > 1 ? this.parcelasCount : 1;
+    return formatNumberValue(valor / parcelas);
+  }
+
+  private categoriaMatch(d: StoredExpense): boolean {
+    return this.filtroCategoria === 'ALL' ? true : d.categoryId === this.filtroCategoria;
+  }
+
+  private nomeMatch(d: StoredExpense): boolean {
+    return this.filtroNome ? (d.nome || '').toLowerCase().includes(this.filtroNome.toLowerCase()) : true;
   }
 
   get despesasFiltradas(): StoredExpense[] {
     const base = this.despesas.filter((d) => {
-      const statusOk = this.filtroStatus === 'ALL' ? true : (d.status || 'OPEN') === this.filtroStatus;
-      const categoriaOk = this.filtroCategoria === 'ALL' ? true : d.categoryId === this.filtroCategoria;
-      const nomeOk = this.filtroNome
-        ? (d.nome || '').toLowerCase().includes(this.filtroNome.toLowerCase())
-        : true;
-      return statusOk && categoriaOk && nomeOk;
+      return this.statusMatch(d) && this.categoriaMatch(d) && this.nomeMatch(d);
     });
     if (!this.sortBy) return base;
     const compare = (a: StoredExpense, b: StoredExpense) => {
@@ -413,8 +550,20 @@ export class DespesasComponent implements OnInit {
     return id;
   }
 
+  /**
+   * Como foi pago: nome da forma escolhida no cadastro (Pix, Boleto, Débito…).
+   * No crédito o cartão diz mais que a forma, então mostramos o cartão — e a
+   * fatura, quando o lançamento já está atrelado a uma.
+   */
+  readonly paymentMethods = signal<PaymentMethodLookup[]>([]);
+
+  paymentMethodLabel(id?: number | null): string {
+    if (!id) return '';
+    return this.paymentMethods().find((m) => m.id === id)?.name || '';
+  }
+
   pagamentoLabel(d: StoredExpense): string {
-    if (!d.cartao) return 'À vista';
+    if (!d.cartao) return this.paymentMethodLabel(d.paymentMethodId) || 'À vista';
     const card = this.cardLabel(d.cartao);
     if (d.statementReference) {
       return `${card} · Fatura ${d.statementReference}`;
@@ -877,6 +1026,7 @@ export class DespesasComponent implements OnInit {
       valor: Number(valorParcela.toFixed(2)),
       vencimento: formatLocaleDate(dataBase),
       cartao: this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? undefined : undefined,
+      paymentMethodId: this.formaPagamentoId,
       parcelaNumero: parcelas > 1 ? 1 : undefined,
       parcelasTotal: parcelas > 1 ? parcelas : undefined,
       serieId: parcelas > 1 ? serieId : undefined,
@@ -951,6 +1101,22 @@ export class DespesasComponent implements OnInit {
       return;
     }
     this.fixaMeses = value;
+  }
+
+  /* Tira o parâmetro sem navegar: com NoReuseStrategy + onSameUrlNavigation
+     'reload', qualquer navigate() recria a tela e fecharia o modal recém-aberto. */
+  private limparParametro(nome: string): void {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete(nome);
+    this.location.replaceState(url.pathname + url.search);
+  }
+
+  /* Atalho do combo de categoria: fecha o lançamento e leva para o cadastro —
+     sem isto o "Criar nova categoria" não fazia nada. */
+  irParaCategorias(): void {
+    this.fecharModal();
+    this.router.navigateByUrl('/categorias');
   }
 
   abrirModal(): void {

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StoredExpense } from '../data/api-data.service';
-import { expenseStatusLabel, installmentStatusTone } from '../utils/status';
+import { expenseStatusLabel, installmentStatusTone, resolveInstallmentStatus } from '../utils/status';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
@@ -38,13 +38,33 @@ export class DespesasListaComponent {
     { key: 'categoria', label: 'Categoria', sortable: true },
     { key: 'pagamento', label: 'Pagamento', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
-    { key: 'vencimento', label: 'Vencimento', sortable: true },
+    { key: 'vencimento', label: 'Venc.', sortable: true },
     { key: 'valor', label: 'Valor', sortable: true, align: 'end' },
     { key: 'acoes', label: 'Ações', align: 'end' }
   ];
 
   ordenarPor(campo: string): void {
     this.ordenar.emit(campo as 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status');
+  }
+
+  /**
+   * Segunda linha do nome: recorrência ou parcelamento. Sai do próprio
+   * lançamento — não há campo de observação no modelo, então nada é inventado.
+   */
+  subtitulo(d: StoredExpense): string {
+    if (d.fixa) {
+      const dia = (d.vencimento || '').slice(0, 2);
+      return dia ? `Recorrente · todo dia ${dia}` : 'Recorrente';
+    }
+    if (d.parcelasTotal && d.parcelasTotal > 1) return `Parcelamento em ${d.parcelasTotal}x`;
+    return '';
+  }
+
+  /** Dentro de um mês, o ano é ruído: a competência já está no título. */
+  dataCurta(valor?: string): string {
+    if (!valor) return '—';
+    const [dia, mes] = valor.split('/');
+    return dia && mes ? `${dia}/${mes}` : valor;
   }
 
   pagamentoLabel(d: StoredExpense): string {
@@ -55,12 +75,14 @@ export class DespesasListaComponent {
     return this.cardLabelFn ? this.cardLabelFn(id) : id || '';
   }
 
-  statusLabel(status?: string): string {
-    return expenseStatusLabel(status);
+  /* A etiqueta mostra o status derivado: uma parcela em aberto e vencida
+     aparece como "Atrasada", que é o que a pessoa precisa ver primeiro. */
+  statusLabel(d: StoredExpense): string {
+    return expenseStatusLabel(resolveInstallmentStatus(d.status, d.vencimento));
   }
 
-  statusTone(status?: string) {
-    return installmentStatusTone(status);
+  statusTone(d: StoredExpense) {
+    return installmentStatusTone(resolveInstallmentStatus(d.status, d.vencimento));
   }
 
   isSelecionavel(despesa: StoredExpense): boolean {

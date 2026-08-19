@@ -62,7 +62,6 @@ export class AppComponent implements OnInit, OnDestroy {
   private userContextSub?: Subscription;
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
-  private readonly mobileBottomPaths = new Set(['/dashboard', '/despesas', '/receitas', '/calendario']);
 
   constructor(
     private router: Router,
@@ -252,12 +251,33 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.appSession.hasAccess(minRole);
   }
 
-  get mobileBottomItems(): SidebarNavItem[] {
+  /* Barra inferior: dois destinos à esquerda do botão de novo lançamento e um
+     à direita. "Início" em vez de "Dashboard" — é o nome que cabe e o que a
+     pessoa espera no primeiro item de uma barra de app. */
+  get mobileBottomLeft(): SidebarNavItem[] {
+    return this.mobileBottomItemsFor(['/dashboard', '/despesas']).map((item) =>
+      item.path === '/dashboard' ? { ...item, label: 'Início' } : item
+    );
+  }
+
+  get mobileBottomRight(): SidebarNavItem[] {
+    return this.mobileBottomItemsFor(['/receitas']);
+  }
+
+  /** Abre o cadastro do contexto atual; fora de receitas, cai em despesas. */
+  quickAdd(): void {
+    const emReceitas = this.router.url.startsWith('/receitas');
+    this.router.navigate([emReceitas ? '/receitas' : '/despesas'], { queryParams: { novo: 1 } });
+  }
+
+  private mobileBottomItemsFor(paths: string[]): SidebarNavItem[] {
     const role = this.currentRole;
+    const permitidos = new Set(paths);
 
     return NAV_SECTIONS
       .flatMap(section => section.items)
-      .filter(item => this.mobileBottomPaths.has(item.path) && canShowItem(role, item));
+      .filter(item => permitidos.has(item.path) && canShowItem(role, item))
+      .sort((a, b) => paths.indexOf(a.path) - paths.indexOf(b.path));
   }
 
   toggleUserMenu(): void {

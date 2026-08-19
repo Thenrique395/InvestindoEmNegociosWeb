@@ -79,6 +79,8 @@ function createComponent() {
     accounts as any,
     { listPayments: () => of([]), uploadReceipt: () => of({ receiptUrl: '' }) } as any,
     route as any,
+    { replaceState: jasmine.createSpy('replaceState') } as any,
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
     { onDestroy: () => {} } as any
   );
@@ -98,7 +100,7 @@ describe('ReceitasComponent smoke', () => {
     ctx.component.ngOnInit();
 
     expect(ctx.component.focusMode).toBe('pending');
-    expect(ctx.component.filtroStatus).toBe('pending');
+    expect(ctx.component.filtroStatus).toBe('OPEN');
     expect(ctx.db.refreshIncomes).toHaveBeenCalled();
   });
 
@@ -106,7 +108,8 @@ describe('ReceitasComponent smoke', () => {
     const ctx = createComponent();
     ctx.component.ngOnInit();
     ctx.component.dataAtual = new Date(2026, 2, 1); // março/2026
-    ctx.component.filtroStatus = 'pending';
+    // Em aberto com recebimento já vencido é exibido (e filtrado) como atrasado.
+    ctx.component.filtroStatus = 'OVERDUE';
 
     ctx.db.emitIncomes([
       { id: 'i1', fonte: 'Salário', valor: 5000, recebimento: '05/03/2026', status: 'OPEN', fixa: true } as StoredIncome,
@@ -137,7 +140,7 @@ describe('ReceitasComponent smoke', () => {
     ctx.auth.role = 'Intermediate';
     ctx.component.ngOnInit();
     ctx.component.dataAtual = new Date(2026, 2, 1);
-    ctx.component.filtroStatus = 'all';
+    ctx.component.filtroStatus = 'ALL';
     ctx.component.contaBaixaId = null;
     ctx.component.selectedIds = new Set(['i1']);
     ctx.db.emitIncomes([
@@ -214,6 +217,8 @@ function createComponentForReceiptTests() {
     accounts as any,
     installments as any,
     route as any,
+    { replaceState: jasmine.createSpy('replaceState') } as any,
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
     { onDestroy: () => {} } as any
   );

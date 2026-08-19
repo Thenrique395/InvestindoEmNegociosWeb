@@ -26,7 +26,14 @@
 </button>
 
 @if (open()) {
-  <div class="select-menu__panel" (keydown)="onMenuKeydown($event)">
+  <!-- O painel costuma viver dentro do <label> do app-form-field, e um clique
+       dentro de um label é reencaminhado para o controle associado — aqui, o
+       próprio gatilho. Sem barrar o default, escolher uma opção fechava e o
+       label reabria o menu no mesmo clique. -->
+  <div
+    class="select-menu__panel"
+    (click)="$event.preventDefault(); $event.stopPropagation()"
+    (keydown)="onMenuKeydown($event)">
     @if (searchable()) {
       <div class="select-menu__search">
         <input

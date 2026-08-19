@@ -60,7 +60,24 @@
     </section>
   }
 
-  <section class="tx-shell">
+  <!-- Padrão mobile das listagens (ver tx-mobile-header / chips / lista). -->
+  <section class="tx-mobile">
+    <app-tx-mobile-header
+      [label]="'Total de ' + mesAtualLabel"
+      [total]="totalRendas | appCurrency"
+      [kpis]="mobileKpis"
+      (previousMonth)="mesAnterior()"
+      (nextMonth)="proximoMes()" />
+
+    <app-tx-filter-chips
+      [chips]="statusChips"
+      [selected]="filtroStatus"
+      (select)="filtroStatus = $any($event)" />
+
+    <app-tx-mobile-list [items]="mobileItems" (open)="editarPorId($event)" />
+  </section>
+
+  <section class="tx-shell tx-desktop-only">
     <app-period-hero
       eyebrow="Receitas do período"
       title="Receitas de {{ mesAtualLabel }}"
@@ -122,19 +139,8 @@
         [actions]="bulkActions" />
     }
 
-    <app-filter-bar>
+    <app-filter-bar variant="bare">
       <div filter-left class="tx-filters">
-        <label class="tx-filter tx-filter--search">
-          <span class="tx-filter__label">Busca por fonte</span>
-          <input type="text" [(ngModel)]="filtroTexto" placeholder="Ex.: Salário" />
-        </label>
-        <label class="tx-filter">
-          <span class="tx-filter__label">Tipo</span>
-          <app-select-menu
-            [options]="tipoOptions"
-            [(ngModel)]="filtroTipo"
-            ariaLabel="Filtrar por tipo" />
-        </label>
         <label class="tx-filter">
           <span class="tx-filter__label">Status</span>
           <app-select-menu
@@ -142,6 +148,27 @@
             [(ngModel)]="filtroStatus"
             ariaLabel="Filtrar por status" />
         </label>
+        <label class="tx-filter">
+          <span class="tx-filter__label">Categoria</span>
+          <app-select-menu
+            [options]="categoriaOptions"
+            [(ngModel)]="filtroCategoria"
+            [searchable]="true"
+            ariaLabel="Filtrar por categoria" />
+        </label>
+        <label class="tx-filter tx-filter--search">
+          <span class="tx-filter__label">Buscar</span>
+          <span class="tx-filter__search">
+            <svg class="tx-filter__search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+            <input type="text" [(ngModel)]="filtroTexto" placeholder="Fonte da receita" />
+          </span>
+        </label>
+        @if (filtrosAtivos) {
+          <button type="button" class="tx-filters__clear" (click)="limparFiltros()">Limpar filtros</button>
+        }
       </div>
     </app-filter-bar>
 
@@ -190,6 +217,7 @@
       (fixaChange)="novaRenda.fixa = $event"
       (aplicarSugestao)="aplicarSugestao()"
       (salvarForm)="salvar()"
+      (categoriasRequested)="irParaCategorias()"
       (fechar)="fecharModal()" />
   </section>
 </div>

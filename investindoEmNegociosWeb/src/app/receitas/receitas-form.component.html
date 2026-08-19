@@ -1,103 +1,97 @@
 <app-modal
   [open]="mostrarForm"
   [eyebrow]="editandoId ? 'Editar receita' : 'Nova receita'"
-  [title]="editandoId ? 'Atualize este recebimento' : 'Adicionar receita'"
+  [title]="editandoId ? 'Atualize este recebimento' : 'Registrar uma entrada'"
   [subtitle]="editandoId
     ? 'Revise os dados para manter o período atualizado e os relatórios consistentes.'
-    : 'Preencha os dados essenciais para registrar a entrada no período correto.'"
+    : 'Preencha o essencial. Marque como recorrente se o valor se repete todo mês.'"
   size="lg"
   (close)="fecharModal()">
 
   <form id="income-form" class="income-form" (ngSubmit)="salvar()" autocomplete="off" modal-body>
 
-    <section class="income-form__section">
-      <div class="income-form__section-head">
-        <h4 class="income-form__section-title">Dados principais</h4>
-        <p class="income-form__section-text">Defina a fonte da receita, a categoria, o valor e a data de recebimento.</p>
-      </div>
-      <div class="income-form__grid income-form__grid--main">
-        <app-form-field label="Fonte" class="income-form__field--full">
-          <input
-            class="income-form__control"
-            type="text"
-            [(ngModel)]="novaRenda.fonte"
-            name="fonte"
-            (ngModelChange)="onFonteChange($event)"
-            placeholder="Ex: Salário, PLR, Freela"
-            required />
-        </app-form-field>
-        <app-form-field label="Categoria" [error]="erroCategoria" class="income-form__field--full">
-          <select
-            class="income-form__control"
-            [(ngModel)]="novaRenda.categoryId"
-            name="categoria">
-            <option [ngValue]="null" disabled>Selecione</option>
-            @if (!categorias.length) {
-              <option [ngValue]="null" disabled>Sem categorias cadastradas</option>
-            }
-            @for (cat of categorias; track trackByIndex($index, cat)) {
-              <option [ngValue]="cat.id">{{ cat.name }}</option>
-            }
-          </select>
-        </app-form-field>
-        <app-form-field label="Valor (R$)">
+    <div class="income-form__grid">
+      <app-form-field label="Fonte" class="income-form__field--full">
+        <input
+          class="income-form__control"
+          type="text"
+          [(ngModel)]="novaRenda.fonte"
+          name="fonte"
+          (ngModelChange)="onFonteChange($event)"
+          placeholder="Ex.: salário, consultoria, aluguel recebido"
+          required />
+      </app-form-field>
+
+      <app-form-field label="Valor" description="Valor bruto, antes de descontos.">
+        <span class="income-form__amount">
+          <span class="income-form__amount-prefix" aria-hidden="true">R$</span>
           <input
             class="income-form__control"
             type="text"
             inputmode="decimal"
-            placeholder="R$ 0,00"
+            placeholder="0,00"
             [ngModel]="valorInput"
             digitOnly
             (ngModelChange)="onValorChange($event)"
             (focus)="$any($event.target).select()"
             name="valor"
             required />
-        </app-form-field>
-        <app-form-field label="Data de recebimento" [error]="erroData">
-          <app-date-picker
-            [value]="recebimentoInput"
-            [invalid]="!!erroData"
-            placeholder="DD/MM/AAAA"
-            ariaLabel="Data de recebimento"
-            (valueChange)="onRecebimentoChange($event)" />
-        </app-form-field>
+        </span>
+      </app-form-field>
+
+      <app-form-field label="Previsão de recebimento" [error]="erroData">
+        <app-date-picker
+          [value]="recebimentoInput"
+          [invalid]="!!erroData"
+          placeholder="DD/MM/AAAA"
+          ariaLabel="Previsão de recebimento"
+          (valueChange)="onRecebimentoChange($event)" />
+      </app-form-field>
+
+      <app-form-field label="Categoria" class="income-form__field--full" [error]="erroCategoria">
+        <app-select-menu
+          [options]="categoriaOptions"
+          [ngModel]="novaRenda.categoryId || ''"
+          name="categoria"
+          [searchable]="true"
+          placeholder="Selecione uma categoria"
+          createLabel="Criar nova categoria"
+          ariaLabel="Categoria da receita"
+          (valueChange)="onCategoriaChange($event)"
+          (createRequested)="categoriasRequested.emit()" />
+      </app-form-field>
+    </div>
+
+    @if (!categorias.length) {
+      <div class="income-form__warning">
+        <div class="income-form__warning-copy">
+          <p class="income-form__warning-title">Crie uma categoria antes de continuar.</p>
+          <p class="income-form__warning-text">Sem categoria, a receita entra no período, mas perde organização nos relatórios e comparativos.</p>
+        </div>
+        <a class="income-form__warning-link" routerLink="/categorias" (click)="fecharModal()">Abrir categorias</a>
       </div>
-      @if (!categorias.length) {
-        <div class="income-form__warning">
-          <div class="income-form__warning-copy">
-            <p class="income-form__warning-title">Crie uma categoria antes de continuar.</p>
-            <p class="income-form__warning-text">Sem categoria, a receita entra no período, mas perde organização nos relatórios e comparativos.</p>
+    }
+
+    <fieldset class="income-form__box">
+      <app-toggle-field
+        label="Receita recorrente"
+        description="Repete o valor nos próximos meses automaticamente."
+        [checked]="novaRenda.fixa ?? false"
+        (checkedChange)="novaRenda.fixa = $event; onFixaChange($event)">
+      </app-toggle-field>
+
+      @if (valorSugestao) {
+        <div class="income-form__hint-card">
+          <div class="income-form__hint-copy">
+            <span class="income-form__hint-title">Último valor usado para esta fonte</span>
+            <p class="income-form__hint-text">{{ valorSugestao | appCurrency }}</p>
           </div>
-          <a class="income-form__warning-link" routerLink="/categorias" (click)="fecharModal()">Abrir categorias</a>
+          <button type="button" class="income-form__hint-action" (click)="usarSugestao()">
+            Usar valor sugerido
+          </button>
         </div>
       }
-    </section>
-
-    <section class="income-form__section">
-      <div class="income-form__section-head">
-        <h4 class="income-form__section-title">Comportamento da receita</h4>
-        <p class="income-form__section-text">Defina se o recebimento deve reaparecer automaticamente nos próximos meses.</p>
-      </div>
-      <div class="income-form__stack">
-        <app-toggle-field
-          label="Receita recorrente"
-          description="Use quando essa entrada se repete todo mês automaticamente."
-          [checked]="novaRenda.fixa ?? false"
-          (checkedChange)="novaRenda.fixa = $event; onFixaChange($event)">
-        </app-toggle-field>
-        @if (valorSugestao) {
-          <div class="income-form__hint-card">
-            <div class="income-form__hint-copy">
-              <span class="income-form__hint-title">Último valor usado para esta fonte</span>
-              <p class="income-form__hint-text">{{ valorSugestao | appCurrency }}</p>
-            </div>
-            <button type="button" class="income-form__hint-action" (click)="usarSugestao()">
-              Usar valor sugerido
-            </button>
-          </div>
-        }
-      </div>
-    </section>
+    </fieldset>
 
     @if (resumoTexto) {
       <section class="income-form__summary">
@@ -108,7 +102,8 @@
 
   </form>
 
-  <div modal-footer>
+  <div modal-footer class="income-form__footer">
+    <small class="income-form__footer-hint">A receita entra no mês da previsão de recebimento.</small>
     <button type="button" class="btn-ghost sm" [disabled]="saving" (click)="fecharModal()">Cancelar</button>
     <button
       type="submit"

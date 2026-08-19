@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
+import { colorForCategory } from '../categories/categories-overview.model';
 import { RouterLink } from '@angular/router';
 import { StoredIncome } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';
@@ -13,7 +15,7 @@ import { DatePickerComponent } from '../shared/date-picker/date-picker.component
 @Component({
   selector: 'app-receitas-form',
   standalone: true,
-  imports: [FormsModule, DigitOnlyDirective, RouterLink, AppCurrencyPipe, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent],
+  imports: [FormsModule, DigitOnlyDirective, RouterLink, AppCurrencyPipe, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent, SelectMenuComponent],
   templateUrl: './receitas-form.component.html',
   styleUrls: ['./receitas-form.component.scss']
 })
@@ -35,6 +37,21 @@ export class ReceitasFormComponent {
   @Output() fonteChange = new EventEmitter<string>();
   @Output() fixaChange = new EventEmitter<boolean>();
   @Output() aplicarSugestao = new EventEmitter<void>();
+  @Output() categoriasRequested = new EventEmitter<void>();
+
+  /** Opções de categoria com o ponto colorido, como no design. */
+  get categoriaOptions(): SelectMenuOption[] {
+    return (this.categorias || []).map((c) => ({
+      value: c.id,
+      label: c.name,
+      color: colorForCategory(c.id || c.name)
+    }));
+  }
+
+  onCategoriaChange(valor: string): void {
+    this.novaRenda.categoryId = valor || null;
+  }
+
   @Output() salvarForm = new EventEmitter<void>();
   @Output() fechar = new EventEmitter<void>();
 
