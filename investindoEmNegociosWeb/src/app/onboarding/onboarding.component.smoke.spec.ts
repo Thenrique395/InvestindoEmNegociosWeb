@@ -36,7 +36,9 @@ class CardsServiceMock {
 }
 
 class PlansServiceMock {
-  create = jasmine.createSpy().and.returnValue(of({}));
+  create = jasmine.createSpy().and.returnValue(of({ id: 'plan-novo' }));
+  update = jasmine.createSpy().and.returnValue(of({ id: 'plan-existente' }));
+  list = jasmine.createSpy().and.returnValue(of([]));
 }
 
 class CategoriesServiceMock {
@@ -230,8 +232,8 @@ describe('OnboardingComponent smoke', () => {
     const ctx = createComponent();
     ctx.component.step = 2;
     ctx.component.accountReady = true;
-    ctx.component.initialIncome = { source: 'Salário', amount: 5000, receivedOn: '2026-03-05' };
-    ctx.component.initialExpense = { name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null };
+    ctx.component.initialIncome = { planId: null, source: 'Salário', amount: 5000, receivedOn: '2026-03-05', categoryId: null, recurring: false };
+    ctx.component.initialExpense = { planId: null, name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null, recurring: false };
 
     ctx.component.saveInitialEntriesAndFinish();
 
@@ -243,8 +245,8 @@ describe('OnboardingComponent smoke', () => {
     const ctx = createComponent();
     ctx.component.step = 3;
     ctx.component.accountReady = true;
-    ctx.component.initialIncome = { source: 'Salário', amount: 5000, receivedOn: '2026-03-05' };
-    ctx.component.initialExpense = { name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null };
+    ctx.component.initialIncome = { planId: null, source: 'Salário', amount: 5000, receivedOn: '2026-03-05', categoryId: null, recurring: false };
+    ctx.component.initialExpense = { planId: null, name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null, recurring: false };
     ctx.onboarding.updateStatus.and.returnValue(throwError(() => ({ error: { detail: 'Falha ao concluir onboarding E2E.' } })));
 
     ctx.component.saveInitialEntriesAndFinish();
@@ -261,8 +263,8 @@ describe('OnboardingComponent - correções (auditoria)', () => {
     const ctx = createComponent();
     ctx.component.step = 3;
     ctx.component.accountReady = true;
-    ctx.component.initialIncome = { source: '', amount: 0, receivedOn: '' };
-    ctx.component.initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null };
+    ctx.component.initialIncome = { planId: null, source: '', amount: 0, receivedOn: '', categoryId: null, recurring: false };
+    ctx.component.initialExpense = { planId: null, name: '', amount: 0, dueDate: '', categoryId: null, recurring: false };
 
     ctx.component.saveInitialEntriesAndFinish();
 
@@ -300,5 +302,101 @@ describe('OnboardingComponent - correções (auditoria)', () => {
     expect(ctx.component.modalExpenseFixaMeses).toBe(120);
     ctx.component.onExpenseParcelasChange(0);
     expect(ctx.component.modalExpenseParcelas).toBe(1);
+  });
+});
+
+describe('OnboardingComponent - lançamentos iniciais', () => {
+  function comReceitaExistente() {
+    const ctx = createComponent();
+    ctx.component.initialIncome = {
+      planId: 'plan-1',
+      source: 'Salario',
+      amount: 6000,
+      receivedOn: '2026-06-01',
+      categoryId: 'cat-1',
+      recurring: true
+    };
+    (ctx.component as any).accountReady = true;
+    return ctx;
+  }
+
+  it('abre o modal preenchido quando a receita já existe', () => {
+    const { component } = comReceitaExistente();
+
+    component.openIncomeModal();
+
+    expect(component.modalIncome.fonte).toBe('Salario');
+    expect(component.modalIncome.valor).toBe(6000);
+    expect(component.modalIncome.categoryId).toBe('cat-1');
+    expect(component.modalIncomeDateInput).toBe('01/06/2026');
+    expect(component.modalIncomeAmountInput).toContain('6.000,00');
+  });
+
+  it('abre o modal em branco quando não há receita', () => {
+    const ctx = createComponent();
+    (ctx.component as any).accountReady = true;
+
+    ctx.component.openIncomeModal();
+
+    expect(ctx.component.modalIncome.fonte).toBe('');
+    expect(ctx.component.modalIncomeAmountInput).toBe('');
+  });
+
+  it('salvar com receita existente atualiza em vez de criar outra', () => {
+    const { component, plans } = comReceitaExistente();
+    component.openIncomeModal();
+    component.modalIncome.fonte = 'Salario ajustado';
+    component.modalIncome.categoryId = 'cat-1';
+    component.modalIncomeAmountInput = '7.000,00';
+    component.modalIncomeDateInput = '01/07/2026';
+
+    component.saveIncomeModal();
+
+    expect(plans.update).toHaveBeenCalled();
+    expect(plans.update.calls.mostRecent().args[0]).toBe('plan-1');
+    expect(plans.create).not.toHaveBeenCalled();
+    // O vínculo sobrevive à edição: editar duas vezes seguidas continua editando.
+    expect(component.initialIncome.planId).toBe('plan-existente');
+  });
+
+  it('sem receita existente, salvar cria e guarda o id devolvido', () => {
+    const ctx = createComponent();
+    (ctx.component as any).accountReady = true;
+    ctx.component.openIncomeModal();
+    ctx.component.modalIncome.fonte = 'Consultoria';
+    ctx.component.modalIncome.categoryId = 'cat-2';
+    ctx.component.modalIncomeAmountInput = '1.500,00';
+    ctx.component.modalIncomeDateInput = '10/08/2026';
+
+    ctx.component.saveIncomeModal();
+
+    expect(ctx.plans.create).toHaveBeenCalled();
+    expect(ctx.plans.update).not.toHaveBeenCalled();
+    // Sem guardar o id, a próxima edição criaria um segundo lançamento.
+    expect(ctx.component.initialIncome.planId).toBe('plan-novo');
+  });
+
+  it('a despesa segue a mesma regra', () => {
+    const ctx = createComponent();
+    (ctx.component as any).accountReady = true;
+    ctx.component.initialExpense = {
+      planId: 'plan-desp',
+      name: 'Aluguel',
+      amount: 2400,
+      dueDate: '2026-08-05',
+      categoryId: 'cat-3',
+      recurring: false
+    };
+
+    ctx.component.openExpenseModal();
+    expect(ctx.component.modalExpense.nome).toBe('Aluguel');
+    expect(ctx.component.modalExpenseDateInput).toBe('05/08/2026');
+
+    ctx.component.modalExpense.categoryId = 'cat-3';
+    ctx.component.modalExpenseAmountInput = '2.500,00';
+    ctx.component.saveExpenseModal();
+
+    expect(ctx.plans.update.calls.mostRecent().args[0]).toBe('plan-desp');
+    expect(ctx.plans.create).not.toHaveBeenCalled();
   });
 });

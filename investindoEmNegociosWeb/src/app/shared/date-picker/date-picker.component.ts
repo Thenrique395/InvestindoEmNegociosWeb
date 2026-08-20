@@ -401,11 +401,18 @@ export class DatePickerComponent implements OnChanges {
     if (this.open) this.reposition();
   }
 
+  /** Cabe um mês inteiro sem apertar, e ainda entra numa tela de 320px. */
+  private static readonly PopoverWidth = 300;
+
   private reposition(): void {
     const el = this.anchor?.nativeElement;
     if (!el || typeof window === 'undefined') return;
     const rect = el.getBoundingClientRect();
-    const width = Math.max(rect.width, 260);
+    // A largura é do calendário, não do campo: sete colunas de dia têm tamanho
+    // próprio. Copiar a largura do campo esticava o grid até virar uma parede em
+    // formulário de campo largo (onboarding, perfil) — cada dia com centenas de
+    // pixels de distância do seguinte.
+    const width = Math.min(DatePickerComponent.PopoverWidth, window.innerWidth - 12);
     const estimatedHeight = 340;
     const below = rect.bottom + 6;
     const above = rect.top - estimatedHeight - 6;

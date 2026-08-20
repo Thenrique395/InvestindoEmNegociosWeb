@@ -680,6 +680,13 @@ app-onboarding {
   gap: 0.9rem;
 }
 
+/* Identificação: o nome ocupa a linha; CPF, telefone e nascimento dividem a
+   seguinte. Nascimento em linha própria deixava o campo com a largura toda — e
+   o calendário abria do tamanho do campo. */
+.onboarding-form-grid--identificacao {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .onboarding-form-grid--three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -1204,6 +1211,7 @@ app-date-picker.onboarding-control {
   .onboarding-focus-grid,
   .onboarding-mode-grid,
   .onboarding-form-grid,
+  .onboarding-form-grid--identificacao,
   .onboarding-form-grid--three,
   .onboarding-form-grid--location {
     grid-template-columns: 1fr;

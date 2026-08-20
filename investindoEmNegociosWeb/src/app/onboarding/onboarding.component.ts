@@ -9,7 +9,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { AuthService } from '../auth.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
 import { CardsService } from '../cards.service';
-import { CreatePlanPayload, PlansService } from '../plans.service';
+import { CreatePlanPayload, Plan, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
@@ -189,8 +189,26 @@ export class OnboardingComponent implements OnInit {
   modalExpenseCartaoId: string | null = null;
   modalExpenseCartoes: StoredCard[] = [];
   cardsCount = 0;
-  initialIncome = { source: '', amount: 0, receivedOn: '' };
-  initialExpense = { name: '', amount: 0, dueDate: '', categoryId: null as string | null };
+  /* Guardam o `planId` porque o botão de editar precisa saber O QUE editar:
+     sem ele, "Editar receita inicial" abria em branco e o salvar criava outro
+     lançamento — a pessoa via o card trocar e achava que substituiu, mas os
+     dois ficavam na conta. */
+  initialIncome = {
+    planId: null as string | null,
+    source: '',
+    amount: 0,
+    receivedOn: '',
+    categoryId: null as string | null,
+    recurring: false
+  };
+  initialExpense = {
+    planId: null as string | null,
+    name: '',
+    amount: 0,
+    dueDate: '',
+    categoryId: null as string | null,
+    recurring: false
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -221,6 +239,7 @@ export class OnboardingComponent implements OnInit {
 
   ngOnInit(): void {
     this.restoreDraft();
+    this.restoreInitialEntries();
 
     this.userContext.state$.subscribe((state) => {
       this.displayName = state.displayName;
@@ -492,12 +511,77 @@ export class OnboardingComponent implements OnInit {
     return (valor / parcelas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  /**
+   * Recupera os lançamentos iniciais já criados.
+   *
+   * O estado deles vivia só em memória: bastava recarregar a página para o
+   * onboarding esquecer o que tinha criado, mostrar "Adicionar receita" de novo
+   * e, no salvar, criar um segundo lançamento em vez de editar o primeiro.
+   */
+  private restoreInitialEntries(): void {
+    this.plansService.list('Income').subscribe({
+      next: (planos) => {
+        const plano = this.maisRecente(planos);
+        if (!plano) return;
+        this.initialIncome = {
+          planId: plano.id,
+          source: plano.title,
+          amount: plano.amount,
+          receivedOn: (plano.startDate || '').slice(0, 10),
+          categoryId: plano.categoryId ?? null,
+          recurring: plano.schedule === 'Recurring'
+        };
+      },
+      // Sem lançamento recuperado o passo segue como novo cadastro: é o
+      // comportamento de antes, e não vale bloquear o onboarding por isso.
+      error: () => undefined
+    });
+
+    this.plansService.list('Expense').subscribe({
+      next: (planos) => {
+        const plano = this.maisRecente(planos);
+        if (!plano) return;
+        this.initialExpense = {
+          planId: plano.id,
+          name: plano.title,
+          amount: plano.amount,
+          dueDate: (plano.startDate || '').slice(0, 10),
+          categoryId: plano.categoryId ?? null,
+          recurring: plano.schedule === 'Recurring'
+        };
+      },
+      error: () => undefined
+    });
+  }
+
+  private maisRecente(planos: Plan[] | null | undefined): Plan | null {
+    if (!planos?.length) return null;
+    return [...planos].sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''))[0];
+  }
+
   openIncomeModal(): void {
     if (!this.accountReady || this.savingIncomeModal) return;
     this.loadCategories('Income', true);
-    this.modalIncome = createIncomeDraft();
-    this.modalIncomeAmountInput = '';
-    this.modalIncomeDateInput = isoToBr(todayIso());
+
+    const existente = this.initialIncome;
+    if (existente.planId) {
+      this.modalIncome = {
+        ...createIncomeDraft(),
+        id: existente.planId,
+        fonte: existente.source,
+        valor: existente.amount,
+        categoryId: existente.categoryId,
+        recebimento: existente.receivedOn,
+        fixa: existente.recurring
+      };
+      this.modalIncomeAmountInput = maskMoneyInput(existente.amount.toFixed(2).replace('.', ','));
+      this.modalIncomeDateInput = isoToBr(existente.receivedOn);
+    } else {
+      this.modalIncome = createIncomeDraft();
+      this.modalIncomeAmountInput = '';
+      this.modalIncomeDateInput = isoToBr(todayIso());
+    }
+
     this.modalIncomeDateError = '';
     this.modalIncomeCategoryError = '';
     this.showIncomeModal = true;
@@ -559,16 +643,24 @@ export class OnboardingComponent implements OnInit {
     };
 
     this.savingIncomeModal = true;
-    this.plansService.create(payload).subscribe({
-      next: () => {
+    const editando = this.initialIncome.planId;
+    const requisicao = editando
+      ? this.plansService.update(editando, payload)
+      : this.plansService.create(payload);
+
+    requisicao.subscribe({
+      next: (plano) => {
         this.savingIncomeModal = false;
         this.showIncomeModal = false;
         this.initialIncome = {
+          planId: plano?.id ?? editando,
           source: this.modalIncome.fonte.trim(),
           amount,
-          receivedOn: brToIso(this.modalIncomeDateInput)
+          receivedOn: brToIso(this.modalIncomeDateInput),
+          categoryId: this.modalIncome.categoryId ?? null,
+          recurring: !!this.modalIncome.fixa
         };
-        this.uiFeedback.success('Receita inicial cadastrada.');
+        this.uiFeedback.success(editando ? 'Receita inicial atualizada.' : 'Receita inicial cadastrada.');
       },
       error: (err) => {
         this.savingIncomeModal = false;
@@ -580,9 +672,25 @@ export class OnboardingComponent implements OnInit {
   openExpenseModal(): void {
     if (!this.accountReady || this.savingExpenseModal) return;
     this.loadCategories('Expense', true);
-    this.modalExpense = createExpenseDraft();
-    this.modalExpenseAmountInput = '';
-    this.modalExpenseDateInput = isoToBr(todayIso());
+
+    const existente = this.initialExpense;
+    if (existente.planId) {
+      this.modalExpense = {
+        ...createExpenseDraft(),
+        id: existente.planId,
+        nome: existente.name,
+        valor: existente.amount,
+        categoryId: existente.categoryId,
+        vencimento: existente.dueDate
+      };
+      this.modalExpenseAmountInput = maskMoneyInput(existente.amount.toFixed(2).replace('.', ','));
+      this.modalExpenseDateInput = isoToBr(existente.dueDate);
+    } else {
+      this.modalExpense = createExpenseDraft();
+      this.modalExpenseAmountInput = '';
+      this.modalExpenseDateInput = isoToBr(todayIso());
+    }
+
     this.modalExpenseDateError = '';
     this.modalExpenseCategoryError = '';
     this.modalExpenseFormaPagamento = 'avista';
@@ -721,17 +829,24 @@ export class OnboardingComponent implements OnInit {
     };
 
     this.savingExpenseModal = true;
-    this.plansService.create(payload).subscribe({
-      next: () => {
+    const editando = this.initialExpense.planId;
+    const requisicao = editando
+      ? this.plansService.update(editando, payload)
+      : this.plansService.create(payload);
+
+    requisicao.subscribe({
+      next: (plano) => {
         this.savingExpenseModal = false;
         this.showExpenseModal = false;
         this.initialExpense = {
+          planId: plano?.id ?? editando,
           name: this.modalExpense.nome.trim(),
           amount,
           dueDate: brToIso(this.modalExpenseDateInput),
-          categoryId: this.modalExpense.categoryId || null
+          categoryId: this.modalExpense.categoryId || null,
+          recurring: !!this.modalExpenseFixa
         };
-        this.uiFeedback.success('Despesa inicial cadastrada.');
+        this.uiFeedback.success(editando ? 'Despesa inicial atualizada.' : 'Despesa inicial cadastrada.');
       },
       error: (err) => {
         this.savingExpenseModal = false;

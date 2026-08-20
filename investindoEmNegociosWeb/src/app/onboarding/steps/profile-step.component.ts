@@ -20,7 +20,7 @@ import { OnboardingProfileField, onboardingProfileFieldError } from '../onboardi
       <section class="onboarding-block">
         <div class="onboarding-form-section">
           <p class="onboarding-form-section__title">Identificação</p>
-          <div class="onboarding-form-grid">
+          <div class="onboarding-form-grid onboarding-form-grid--identificacao">
             <app-form-field
               class="onboarding-field--full"
               label="Nome completo"
@@ -47,7 +47,6 @@ import { OnboardingProfileField, onboardingProfileFieldError } from '../onboardi
               <input class="onboarding-control" type="tel" inputmode="numeric" formControlName="phone" placeholder="(81) 91234-1234" (input)="phoneInput.emit($event)" />
             </app-form-field>
             <app-form-field
-              class="onboarding-field--full"
               label="Data de nascimento"
               [required]="true"
               [error]="controlError('birthDate') || ''">
