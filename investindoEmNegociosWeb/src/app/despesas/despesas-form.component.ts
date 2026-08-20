@@ -95,6 +95,32 @@ export class DespesasFormComponent {
     return this.paymentMethods.filter((m) => this.allowCardPayment || !this.ehCredito(m));
   }
 
+  /**
+   * Opções da forma de pagamento e do cartão para o `app-select-menu`.
+   *
+   * O primitivo trabalha com `string`; o id do método é numérico, então a
+   * conversão acontece aqui e na volta, em `onFormaPagamentoValue`.
+   */
+  get formaPagamentoOptions(): SelectMenuOption[] {
+    return this.metodosDisponiveis.map((metodo) => ({ value: String(metodo.id), label: metodo.name }));
+  }
+
+  get formaPagamentoValue(): string {
+    return this.formaPagamentoId === null || this.formaPagamentoId === undefined
+      ? ''
+      : String(this.formaPagamentoId);
+  }
+
+  get cartaoOptions(): SelectMenuOption[] {
+    return this.cartoes
+      .filter((cartao) => !!cartao.id)
+      .map((cartao) => ({ value: cartao.id!, label: this.cartaoLabel(cartao) }));
+  }
+
+  onFormaPagamentoValue(value: string): void {
+    this.onMetodoPagamentoChange(value ? Number(value) : null);
+  }
+
   onMetodoPagamentoChange(id: number | null): void {
     this.formaPagamentoId = id;
     this.formaPagamentoIdChange.emit(id);

@@ -446,3 +446,45 @@ describe('DespesasComponent - exclusão', () => {
     expect(ui.error).toHaveBeenCalled();
   });
 });
+
+describe('DespesasComponent - aviso de competência da fatura', () => {
+  function comCache(component: DespesasComponent, lista: unknown[]): void {
+    (component as any).expensesCache = lista;
+  }
+
+  it('avisa em que fatura a despesa de cartão caiu quando não é o mês aberto', () => {
+    const { component, ui } = makeDespesas({});
+    component.dataAtual = new Date(2026, 7, 1); // agosto/2026
+    (component as any).avisoDeCompetenciaPendente = { nome: 'Notebook', cartaoId: 'card-1' };
+    comCache(component, [{ nome: 'Notebook', cartao: 'card-1', vencimento: '10/09/2026', valor: 100 }]);
+
+    (component as any).resolverAvisoDeCompetencia();
+
+    expect(ui.info).toHaveBeenCalled();
+    expect((ui.info as jasmine.Spy).calls.mostRecent().args[0]).toContain('setembro de 2026');
+    expect((component as any).avisoDeCompetenciaPendente).toBeNull();
+  });
+
+  it('não avisa quando a despesa caiu no mês aberto', () => {
+    const { component, ui } = makeDespesas({});
+    component.dataAtual = new Date(2026, 7, 1);
+    (component as any).avisoDeCompetenciaPendente = { nome: 'Mercado', cartaoId: 'card-1' };
+    comCache(component, [{ nome: 'Mercado', cartao: 'card-1', vencimento: '10/08/2026', valor: 100 }]);
+
+    (component as any).resolverAvisoDeCompetencia();
+
+    expect(ui.info).not.toHaveBeenCalled();
+    expect((component as any).avisoDeCompetenciaPendente).toBeNull();
+  });
+
+  it('mantém o aviso pendente enquanto os dados não chegam', () => {
+    const { component, ui } = makeDespesas({});
+    (component as any).avisoDeCompetenciaPendente = { nome: 'Notebook', cartaoId: 'card-1' };
+    comCache(component, []);
+
+    (component as any).resolverAvisoDeCompetencia();
+
+    expect(ui.info).not.toHaveBeenCalled();
+    expect((component as any).avisoDeCompetenciaPendente).not.toBeNull();
+  });
+});

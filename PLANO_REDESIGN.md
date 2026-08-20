@@ -482,6 +482,42 @@ Cobertura nova: `despesas.component.spec.ts` (+6 casos de exclusão) e
 `quality-tests/e2e/despesas-fluxos.spec.ts` (8 fluxos ponta a ponta, com backend em memória:
 lista, criação, exclusão avulsa/cartão/série/recorrente, erro de API e filtros).
 
+#### Validação com conta real, perfil Basic (2026-08-19)
+
+`quality-tests/e2e/live-despesas-basic.spec.ts` — **11 casos verdes** contra a API DEV, com a
+conta `e2e.basic@teste.com`, incluindo cadastro de cartão, despesa à vista, parcelada no
+cartão, recorrente, edição, busca, e as três exclusões. Roda sob demanda:
+
+```bash
+cd quality-tests
+RUN_LIVE_SERVER_E2E=1 APP_BASE_URL=http://35.174.50.187:4201 \
+  npx playwright test e2e/live-despesas-basic.spec.ts --project=chromium
+```
+
+Os dados criados são apagados pelo próprio teste (pela tela e, no que a tela recusa, pela API).
+
+**Três achados fora do escopo de Despesas. Dois resolvidos:**
+
+1. ⏳ **Mensagem de erro errada no cadastro de cartão.** O índice único é
+   `(UserId, BrandId, Last4)` (`CardConfiguration.cs:46`), mas `CardsService.CreateAsync`
+   embrulha `DbUpdateException` em *"Já existe um cartão com esse nome/apelido."* Dois cartões
+   da mesma bandeira terminando nos mesmos 4 dígitos mandam a pessoa trocar o apelido — o que
+   não resolve. **Aberto** (é correção de backend).
+2. ✅ **Compra no cartão sumia da vista e prendia o cartão.** Duas pontas, uma regra:
+   - ao lançar no cartão, quando a parcela cai em outra competência, a tela agora avisa
+     *"Lançada na fatura de setembro de 2026. Abra esse mês para vê-la."*;
+   - a recusa de remover o cartão passou a dizer **quantas** despesas existem e **em que
+     meses** — antes era só "existem despesas vinculadas a ele", verdadeiro e inútil, porque
+     as despesas podiam estar em competências futuras, invisíveis no mês aberto.
+
+   Regra em `shared/transactions/card-expense-notice.ts`, com 9 testes. O aviso espera os
+   dados voltarem do servidor em vez de recalcular o fechamento no front: duplicar a regra do
+   backend faria a mensagem mentir quando as duas divergissem.
+3. ✅ **`<select>` nativo no formulário de despesa.** "Forma de pagamento" e "Cartão" migraram
+   para `app-select-menu`. Efeito colateral que vale registrar: o `select` nativo exibia a
+   primeira opção ("Pix") mesmo com o modelo em `null` — a pessoa via um método escolhido e
+   salvava sem nenhum. O dropdown mostra "Selecione", que é o estado real.
+
 ### FASE 6 — Planejamento e análise
 
 | # | Tela | Observação |

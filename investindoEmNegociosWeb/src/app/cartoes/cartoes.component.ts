@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, Signal, computed, effect } from '@angular/core';
+import { cardRemovalBlockMessage } from '../shared/transactions/card-expense-notice';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { UpperCasePipe, DatePipe, DecimalPipe } from '@angular/common';
@@ -404,9 +405,12 @@ export class CartoesComponent implements OnInit {
   }
 
   remover(id: string): void {
-    const possuiDespesa = this.expenses.some((e) => e.cartao === id);
-    if (possuiDespesa) {
-      this.uiFeedback.error('Não é possível remover este cartão; existem despesas vinculadas a ele.');
+    // A recusa precisa dizer ONDE estão as despesas: uma compra no cartão cai na
+    // competência da fatura, que pode ser um mês à frente do que está aberto —
+    // "existem despesas vinculadas a ele" mandava procurar no escuro.
+    const vinculadas = this.expenses.filter((e) => e.cartao === id);
+    if (vinculadas.length) {
+      this.uiFeedback.error(cardRemovalBlockMessage(vinculadas));
       return;
     }
     this.cartaoParaRemover = id;

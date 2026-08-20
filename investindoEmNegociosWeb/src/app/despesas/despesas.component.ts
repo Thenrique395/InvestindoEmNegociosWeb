@@ -39,6 +39,11 @@ import { BodyPortalDirective } from '../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
 import {
+  expenseMonthKeys,
+  statementNoticeMessage,
+  statementNoticeMonth
+} from '../shared/transactions/card-expense-notice';
+import {
   formatCurrencyValue,
   formatLocaleDate,
   formatMonthYearLabel,
@@ -115,6 +120,13 @@ export class DespesasComponent implements OnInit {
   cartaoSelecionadoId: string | null = null;
   editando: { id: string; planId?: string; isParcela: boolean; isRecorrente: boolean; originalNome: string; originalCategoryId: string | null } | null = null;
   confirmEdicao: { isRecorrente: boolean } | null = null;
+  /**
+   * Lançamento de cartão recém-criado, esperando os dados voltarem para dizer
+   * em que fatura ele caiu. Guardado por nome + cartão porque o `addExpense`
+   * devolve `void` — não há id para seguir.
+   */
+  private avisoDeCompetenciaPendente: { nome: string; cartaoId: string | null } | null = null;
+
   confirmRemocao: {
     id: string;
     serieId?: string;
@@ -317,6 +329,7 @@ export class DespesasComponent implements OnInit {
     this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expensesCache = lista;
       this.rebuildDespesas();
+      this.resolverAvisoDeCompetencia();
       this.cdr.markForCheck();
     });
 
@@ -1028,6 +1041,9 @@ export class DespesasComponent implements OnInit {
       : null;
 
     this.saving = true;
+    // Guardados antes de fechar o modal, que limpa o formulário.
+    const nomeCriado = this.novaDespesa.nome;
+    const cartaoDoLancamento = this.formaPagamento === 'cartao' ? this.cartaoSelecionadoId ?? null : null;
     // Cria um único plano no backend; o back gera as parcelas conforme installmentsCount.
     this.db.addExpense({
       nome: this.novaDespesa.nome,
@@ -1051,6 +1067,9 @@ export class DespesasComponent implements OnInit {
           // não fechava. Ver cartoes.component (mesmo padrão correto).
           this.saving = false;
           this.setAlerta('Despesa salva com sucesso.', 2500, 'success');
+          if (this.formaPagamento === 'cartao') {
+            this.avisoDeCompetenciaPendente = { nome: nomeCriado, cartaoId: cartaoDoLancamento };
+          }
           this.fecharModal();
         },
         error: (err) => this.setAlerta(extractApiErrorMessage(err, 'Não foi possível salvar a despesa.'), 4000, 'error')
@@ -1255,6 +1274,30 @@ export class DespesasComponent implements OnInit {
 
   cancelarRemocao(): void {
     this.confirmRemocao = null;
+  }
+
+  /**
+   * Diz em que fatura a despesa de cartão caiu, quando não é o mês aberto.
+   *
+   * Sem isto o lançamento simplesmente sumia: a parcela entra na competência
+   * da fatura, que depende do dia de fechamento do cartão, e a pessoa ficava
+   * olhando para uma lista onde a despesa que acabou de criar não está.
+   */
+  private resolverAvisoDeCompetencia(): void {
+    const pendente = this.avisoDeCompetenciaPendente;
+    if (!pendente) return;
+
+    const doLancamento = this.expensesCache.filter(
+      (d) => d.nome === pendente.nome && (!pendente.cartaoId || d.cartao === pendente.cartaoId)
+    );
+    // Ainda não chegou no store: espera a próxima emissão.
+    if (!doLancamento.length) return;
+
+    this.avisoDeCompetenciaPendente = null;
+    const mesDaFatura = statementNoticeMonth(this.mesKey(), expenseMonthKeys(doLancamento));
+    if (mesDaFatura) {
+      this.setAlerta(statementNoticeMessage(mesDaFatura), 6000, 'info');
+    }
   }
 
   public mesKey(): string {
