@@ -38,6 +38,18 @@ export interface Parcela {
   statementMonth?: number | null;
 }
 
+/** Evento do histórico, como o endpoint `plans/{id}/history` devolve. */
+export interface EventoHistorico {
+  type: string;
+  occurredAt: string;
+  actorName?: string | null;
+  oldValue?: string | null;
+  newValue?: string | null;
+  installmentId?: string | null;
+  installmentNo?: number | null;
+  derived: boolean;
+}
+
 export interface Pagamento {
   id: string;
   installmentId: string;
@@ -72,6 +84,14 @@ export class BaseDespesas {
   readonly pagamentos: Pagamento[] = [];
 
   falhaProgramada: FalhaProgramada | null = null;
+
+  /** Eventos que o histórico devolve. Por padrão, só a criação. */
+  eventos: EventoHistorico[] = [
+    { type: 'Created', occurredAt: '2026-08-01T09:14:00', actorName: 'Henrique Santos', derived: false }
+  ];
+
+  /** Quando ligado, `GET plans/{id}/history` responde erro. */
+  falhaNoHistorico = false;
 
   private seq = 0;
 
@@ -142,6 +162,33 @@ export class BaseDespesas {
       const req = route.request();
       const url = new URL(req.url());
       const id = url.pathname.split('/').filter(Boolean).pop() || '';
+
+      if (req.method() === 'GET' && url.pathname.endsWith('/history')) {
+        if (this.falhaNoHistorico) {
+          await route.fulfill({ status: 500, json: { detail: 'Histórico indisponível.' } });
+          return;
+        }
+
+        const planoId = url.pathname.split('/').filter(Boolean).at(-2) || '';
+        const plano = this.planos.find((p) => p.id === planoId);
+        const parcelas = this.parcelas.filter((i) => i.planId === planoId);
+
+        await route.fulfill({
+          json: {
+            planId: planoId,
+            schedule: plano?.schedule ?? 'OneTime',
+            installments: parcelas.map((i) => ({
+              id: i.id,
+              installmentNo: i.installmentNo,
+              dueDate: i.dueDate,
+              amount: i.amount,
+              status: i.status
+            })),
+            events: this.eventos
+          }
+        });
+        return;
+      }
 
       if (req.method() === 'GET') {
         const tipo = url.searchParams.get('type');

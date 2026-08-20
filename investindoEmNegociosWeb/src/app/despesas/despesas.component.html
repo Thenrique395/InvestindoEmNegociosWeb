@@ -247,114 +247,24 @@
     (cancel)="cancelarRemocao()"
     (confirm)="confirmarRemocao($event)" />
 
-  @if (historicoAberto) {
-    <div appBodyPortal class="expenses-history-drawer">
-      <div class="expenses-history-drawer__backdrop" (click)="fecharHistorico()"></div>
-      <aside class="expenses-history-drawer__panel">
-        <div class="expenses-history-drawer__header">
-          <div class="expenses-history-drawer__heading">
-            <p class="expenses-history-drawer__eyebrow">Histórico</p>
-            <h3 class="expenses-history-drawer__title">{{ historicoTitulo }}</h3>
-          </div>
-          <button type="button" class="expenses-history-drawer__close" (click)="fecharHistorico()" aria-label="Fechar histórico">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-        </div>
-        <section class="expenses-history-group">
-          <div class="expenses-history-group__head">
-            <h4 class="expenses-history-group__title">Pagas</h4>
-            <p class="expenses-history-group__note">Parcelas já liquidadas neste ciclo.</p>
-          </div>
-          @if (historicoPagas.length) {
-            <div class="expenses-history-group__list">
-              @for (h of historicoPagas; track trackByIndex($index, h)) {
-                <article class="expenses-history-item expenses-history-item--paid">
-                  <div class="expenses-history-item__main">
-                    <div class="expenses-history-item__title-row">
-                      <strong class="expenses-history-item__name">{{ h.nome }}</strong>
-                      <app-status-badge [tone]="statusTone('PAID')" [label]="statusLabel('PAID')"></app-status-badge>
-                    </div>
-                    <div class="expenses-history-item__meta">
-                      @if (h.parcelasTotal) {
-                        <span>Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
-                      }
-                      <span>Vencimento {{ h.vencimento }}</span>
-                    </div>
-                  </div>
-                  <div class="expenses-history-item__value-col">
-                    <strong class="expenses-history-item__value">{{ h.valor | appCurrency }}</strong>
-                    <button
-                      type="button"
-                      class="expenses-history-item__action"
-                      [disabled]="isReversing(h.id)"
-                      (click)="estornarDespesa(h)">
-                      @if (!isReversing(h.id)) {
-                        <span>Estornar pagamento</span>
-                      }
-                      @if (isReversing(h.id)) {
-                        <span>Estornando...</span>
-                      }
-                    </button>
-                    <button
-                      type="button"
-                      class="expenses-history-item__action"
-                      [disabled]="isAttachingReceipt(h.id)"
-                      (click)="prepararAnexoComprovante(h); comprovanteInput.click()">
-                      @if (!isAttachingReceipt(h.id)) {
-                        <span>Comprovante</span>
-                      }
-                      @if (isAttachingReceipt(h.id)) {
-                        <span>Enviando...</span>
-                      }
-                    </button>
-                  </div>
-                </article>
-              }
-            </div>
-            <input
-              #comprovanteInput
-              type="file"
-              hidden
-              accept="image/*,application/pdf"
-              (change)="onComprovanteFileSelected($event)" />
-          } @else {
-            <p class="expenses-history-group__empty">Nenhuma parcela paga.</p>
-          }
-        </section>
-        <section class="expenses-history-group">
-          <div class="expenses-history-group__head">
-            <h4 class="expenses-history-group__title">Pendentes / Antecipadas</h4>
-            <p class="expenses-history-group__note">Próximas parcelas ainda em aberto ou pagas antes do vencimento.</p>
-          </div>
-          @if (historicoPendentes.length) {
-            <div class="expenses-history-group__list">
-              @for (h of historicoPendentes; track trackByIndex($index, h)) {
-                <article class="expenses-history-item">
-                  <div class="expenses-history-item__main">
-                    <div class="expenses-history-item__title-row">
-                      <strong class="expenses-history-item__name">{{ h.nome }}</strong>
-                      <app-status-badge [tone]="statusTone(h.status)" [label]="statusLabel(h.status)"></app-status-badge>
-                    </div>
-                    <div class="expenses-history-item__meta">
-                      @if (h.parcelasTotal) {
-                        <span>Parcela {{ h.parcelaNumero }}/{{ h.parcelasTotal }}</span>
-                      }
-                      <span>Vencimento {{ h.vencimento }}</span>
-                    </div>
-                  </div>
-                  <div class="expenses-history-item__value-col">
-                    <strong class="expenses-history-item__value">{{ h.valor | appCurrency }}</strong>
-                  </div>
-                </article>
-              }
-            </div>
-          } @else {
-            <p class="expenses-history-group__empty">Nenhuma parcela pendente.</p>
-          }
-        </section>
-      </aside>
-    </div>
-  }
+  <app-lancamento-historico
+    [open]="historicoAberto"
+    [titulo]="historicoTitulo"
+    [carregando]="historicoCarregando"
+    [erro]="historicoErro"
+    [parcelas]="historicoParcelas"
+    [eventosBrutos]="historicoEventos"
+    [mostraParcelas]="historicoTemSerie"
+    [parcelaAtualId]="historicoParcelaAtualId"
+    (close)="fecharHistorico()"
+    (reverse)="estornarPorId($event)"
+    (attachReceipt)="prepararAnexoPorId($event); comprovanteInput.click()" />
+
+  <input
+    #comprovanteInput
+    type="file"
+    hidden
+    accept="image/*,application/pdf"
+    (change)="onComprovanteFileSelected($event)" />
+
 </div>

@@ -27,6 +27,7 @@ export class ReceitasListaComponent {
   @Output() editar = new EventEmitter<string>();
   @Output() remover = new EventEmitter<{ planId?: string; installmentId: string }>();
   @Output() comprovante = new EventEmitter<string>();
+  @Output() historico = new EventEmitter<string>();
   @Output() selecionar = new EventEmitter<{ id: string; checked: boolean }>();
   @Output() selecionarTodos = new EventEmitter<boolean>();
   @Output() ordenar = new EventEmitter<'fonte' | 'categoria' | 'valor' | 'recebimento' | 'tipo' | 'status'>();

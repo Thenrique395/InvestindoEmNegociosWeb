@@ -82,7 +82,8 @@ function createComponent() {
     { replaceState: jasmine.createSpy('replaceState') } as any,
     { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
-    { onDestroy: () => {} } as any
+    { onDestroy: () => {} } as any,
+    { history: jasmine.createSpy('history').and.returnValue(of({ planId: 'p1', schedule: 'OneTime', installments: [], events: [] })) } as any
   );
 
   return { component, db, auth, categories, ui, accounts, route };
@@ -220,7 +221,8 @@ function createComponentForReceiptTests() {
     { replaceState: jasmine.createSpy('replaceState') } as any,
     { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
     { markForCheck: jasmine.createSpy('markForCheck') } as any,
-    { onDestroy: () => {} } as any
+    { onDestroy: () => {} } as any,
+    { history: jasmine.createSpy('history').and.returnValue(of({ planId: 'p1', schedule: 'OneTime', installments: [], events: [] })) } as any
   );
 
   return { component, installments, ui };

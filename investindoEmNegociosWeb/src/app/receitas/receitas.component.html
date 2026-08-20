@@ -186,6 +186,7 @@
         [attachingReceiptIds]="attachingReceiptIds()"
         (ordenar)="ordenarPor($event)"
         (editar)="editarPorId($event)"
+        (historico)="abrirHistorico($event)"
         (remover)="remover($event)"
         (selecionar)="toggleSelecionar($event.id, $event.checked)"
         (selecionarTodos)="toggleSelecionarTodos($event)"
@@ -247,6 +248,19 @@
     <button type="button" class="btn-primary sm" (click)="confirmarEdicaoRecebida()">Aceitar e editar</button>
   </ng-container>
 </app-confirm-sheet>
+
+<app-lancamento-historico
+  [open]="historicoAberto"
+  [titulo]="historicoTitulo"
+  [carregando]="historicoCarregando"
+  [erro]="historicoErro"
+  [parcelas]="historicoParcelas"
+  [eventosBrutos]="historicoEventos"
+  [mostraParcelas]="historicoTemSerie"
+  [parcelaAtualId]="historicoParcelaAtualId"
+  [permiteEstorno]="false"
+  (close)="fecharHistorico()"
+  (attachReceipt)="prepararAnexoComprovante($event); comprovanteInput.click()" />
 
 <app-confirm-delete
   [open]="showDeleteModal"

@@ -29,6 +29,13 @@ import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
 import { ConfirmDeleteComponent } from '../shared/confirm-delete/confirm-delete.component';
+import {
+  HistoricoParcelaView,
+  LancamentoHistoricoComponent
+} from '../shared/lancamento-historico/lancamento-historico.component';
+import { HistoryEvent } from '../shared/lancamento-historico/lancamento-historico.model';
+import { PlansService, PlanHistoryInstallmentDto } from '../plans.service';
+import { toInstallmentStatus } from '../types/money-types';
 import { DeleteKind, DeleteScope } from '../shared/confirm-delete/confirm-delete.model';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
@@ -47,7 +54,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, ConfirmDeleteComponent, BulkActionBarComponent, AppCurrencyPipe,
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, ConfirmDeleteComponent, LancamentoHistoricoComponent, BulkActionBarComponent, AppCurrencyPipe,
     SelectMenuComponent, TxMobileHeaderComponent, TxFilterChipsComponent, TxMobileListComponent],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
@@ -86,6 +93,14 @@ export class ReceitasComponent implements OnInit {
   editReceivedSource = '';
   selectedIds = new Set<string>();
   readonly attachingReceiptIds = signal<Set<string>>(new Set());
+  historicoAberto = false;
+  historicoTitulo = '';
+  historicoCarregando = false;
+  historicoErro = '';
+  historicoEventos: HistoryEvent[] = [];
+  historicoParcelas: HistoricoParcelaView[] = [];
+  historicoTemSerie = false;
+  historicoParcelaAtualId: string | null = null;
   private receiptUploadTargetId: string | null = null;
   readonly loadingRecebido = signal(false);
   readonly loadingMes = signal(true);
@@ -217,7 +232,8 @@ export class ReceitasComponent implements OnInit {
     private readonly location: Location,
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
-    private readonly destroyRef: DestroyRef
+    private readonly destroyRef: DestroyRef,
+    private readonly plansService: PlansService
   ) {}
 
   ngOnInit(): void {
@@ -735,6 +751,76 @@ export class ReceitasComponent implements OnInit {
     this.erroData = '';
     this.erroCategoria = '';
     this.valorSugestao.set(null);
+  }
+
+  /**
+   * Gaveta de histórico: eventos do lançamento e, quando é série, as parcelas.
+   * A série vem do servidor porque a tela só carrega o mês aberto.
+   */
+  abrirHistorico(id: string): void {
+    const renda = this.rendasAll().find((r) => r.id === id);
+    if (!renda) return;
+
+    this.historicoTitulo = renda.fonte || 'Receita';
+    this.historicoParcelaAtualId = renda.id ?? null;
+    this.historicoAberto = true;
+    this.historicoErro = '';
+    this.historicoEventos = [];
+    this.historicoParcelas = [];
+    this.historicoTemSerie = false;
+
+    const planId = renda.planId || null;
+    if (!planId) {
+      this.historicoErro = 'Esta receita não tem histórico disponível.';
+      return;
+    }
+
+    this.historicoCarregando = true;
+    this.plansService
+      .history(planId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resposta) => {
+          this.historicoCarregando = false;
+          this.historicoEventos = resposta.events || [];
+          const parcelas = resposta.installments || [];
+          this.historicoTemSerie = resposta.schedule !== 'Recurring' && parcelas.length > 1;
+          this.historicoParcelas = parcelas.map((parcela) => this.toParcelaView(parcela, parcelas.length));
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.historicoCarregando = false;
+          this.historicoErro = extractApiErrorMessage(err, 'Não foi possível carregar o histórico.');
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private toParcelaView(parcela: PlanHistoryInstallmentDto, total: number): HistoricoParcelaView {
+    const status = toInstallmentStatus(parcela.status) || 'OPEN';
+    const vencimento = formatLocaleDate(new Date(`${parcela.dueDate}T00:00:00`));
+
+    return {
+      id: parcela.id,
+      numero: parcela.installmentNo,
+      total,
+      vencimento,
+      valorLabel: `+ ${formatCurrencyValue(parcela.amount || 0)}`,
+      status,
+      statusLabel: incomeStatusLabel(resolveInstallmentStatus(status, vencimento)),
+      podeAgir: status === 'PAID' || status === 'PARTIALLY_PAID',
+      estornando: false,
+      anexando: this.attachingReceiptIds().has(parcela.id)
+    };
+  }
+
+  fecharHistorico(): void {
+    this.historicoAberto = false;
+    this.historicoTitulo = '';
+    this.historicoEventos = [];
+    this.historicoParcelas = [];
+    this.historicoErro = '';
+    this.historicoParcelaAtualId = null;
   }
 
   prepararAnexoComprovante(installmentId: string): void {

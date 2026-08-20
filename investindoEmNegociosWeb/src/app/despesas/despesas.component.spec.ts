@@ -17,7 +17,8 @@ function createComponent(): DespesasComponent {
     { onDestroy: () => {} } as any,
     { queryParamMap: of(convertToParamMap({})) } as any,
     { replaceState: jasmine.createSpy('replaceState') } as any,
-    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
+    { history: jasmine.createSpy('history').and.returnValue(of({ planId: 'p1', schedule: 'OneTime', installments: [], events: [] })) } as any
   );
 }
 
@@ -119,7 +120,8 @@ function createComponentForReceiptTests() {
     { onDestroy: () => {} } as any,
     { queryParamMap: of(convertToParamMap({})) } as any,
     { replaceState: jasmine.createSpy('replaceState') } as any,
-    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
+    { history: jasmine.createSpy('history').and.returnValue(of({ planId: 'p1', schedule: 'OneTime', installments: [], events: [] })) } as any
   );
   return { component, installments, uiFeedback };
 }
@@ -148,7 +150,8 @@ describe('DespesasComponent - fechar modal ao salvar', () => {
       { onDestroy: () => {} } as any,
       { queryParamMap: of(convertToParamMap({})) } as any,
     { replaceState: jasmine.createSpy('replaceState') } as any,
-    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
+    { history: jasmine.createSpy('history').and.returnValue(of({ planId: 'p1', schedule: 'OneTime', installments: [], events: [] })) } as any
     );
 
     component.mostrarForm = true;
@@ -253,7 +256,8 @@ function makeDespesas(db: any, ui = new UiFeedbackServiceMock()) {
     { onDestroy: () => {} } as any,
     { queryParamMap: of(convertToParamMap({})) } as any,
     { replaceState: jasmine.createSpy('replaceState') } as any,
-    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any
+    { navigateByUrl: jasmine.createSpy('navigateByUrl') } as any,
+    { history: jasmine.createSpy('history').and.returnValue(of({ planId: 'p1', schedule: 'OneTime', installments: [], events: [] })) } as any
   );
   return { component, ui };
 }

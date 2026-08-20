@@ -5,6 +5,32 @@ import { MoneyType, ScheduleType } from './types/money-types';
 import { API_BASE_URL } from './api.config';
 import { applyListQuery, ListQuery } from './api-query';
 
+export interface PlanHistoryEventDto {
+  type: string;
+  occurredAt: string;
+  actorName?: string | null;
+  oldValue?: string | null;
+  newValue?: string | null;
+  installmentId?: string | null;
+  installmentNo?: number | null;
+  derived: boolean;
+}
+
+export interface PlanHistoryInstallmentDto {
+  id: string;
+  installmentNo: number;
+  dueDate: string;
+  amount: number;
+  status: string;
+}
+
+export interface PlanHistoryResponse {
+  planId: string;
+  schedule: string;
+  installments: PlanHistoryInstallmentDto[];
+  events: PlanHistoryEventDto[];
+}
+
 export interface Plan {
   id: string;
   userId: string;
@@ -57,6 +83,11 @@ export class PlansService {
 
   update(id: string, payload: CreatePlanPayload): Observable<Plan> {
     return this.http.put<Plan>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  /** Histórico do lançamento: eventos gravados mais os deduzidos do estado atual. */
+  history(id: string): Observable<PlanHistoryResponse> {
+    return this.http.get<PlanHistoryResponse>(`${this.baseUrl}/${id}/history`);
   }
 
   delete(id: string): Observable<void> {

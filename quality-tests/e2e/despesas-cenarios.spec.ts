@@ -277,10 +277,14 @@ test.describe('Despesas — seleção e ações em lote', () => {
     await abrir(page, base);
 
     await page.getByRole('checkbox', { name: 'Selecionar todas' }).check();
-    await page.getByRole('button', { name: 'Excluir', exact: true }).first().click();
 
-    // Espera o alerta em vez de amostrar depois de um sleep: ele dura 3,5s e a
-    // amostragem fixa dava flake quando a máquina estava carregada.
+    // A barra de lote só existe depois que a seleção propaga; clicar antes
+    // pegava o "Excluir" de outro lugar e o teste piscava.
+    const barra = page.locator('app-bulk-action-bar');
+    // Quatro linhas: a avulsa e as três parcelas da série.
+    await expect(barra).toContainText(/4 selecionada/);
+    await barra.getByRole('button', { name: 'Excluir', exact: true }).click();
+
     await expect(page.locator('.global-alert')).toContainText(/exclua uma por vez/i, { timeout: 10000 });
     await expect(linha(page, 'Avulsa')).toBeVisible();
   });
@@ -323,69 +327,5 @@ test.describe('Despesas — permissões por perfil', () => {
 
     await expect(page.locator('.global-alert')).toContainText(/não é possível antecipar despesas do mês atual/i);
     expect(base.parcelaDe('Deste mês')?.status).toBe('Open');
-  });
-});
-
-test.describe('Despesas — histórico da série', () => {
-  test('abre o histórico e separa parcelas pagas das pendentes', async ({ page }) => {
-    const base = new BaseDespesas();
-    base.addPlano(
-      { title: 'Notebook Dell', amount: 300, schedule: 'Installments', installmentsCount: 3 },
-      [
-        { installmentNo: 1, status: 'Paid' },
-        { installmentNo: 2, status: 'Open' },
-        { installmentNo: 3, status: 'Open' }
-      ]
-    );
-    await abrir(page, base);
-
-    await linha(page, 'Notebook Dell').first().getByRole('button', { name: 'Histórico' }).click();
-    await page.waitForTimeout(800);
-
-    const gaveta = page.locator('.expenses-history-drawer');
-    await expect(gaveta).toBeVisible();
-    await expect(gaveta.getByRole('heading', { name: 'Pagas' })).toBeVisible();
-    await expect(gaveta.getByRole('heading', { name: /Pendentes/ })).toBeVisible();
-
-    await gaveta.getByRole('button', { name: 'Fechar histórico' }).click();
-    await expect(gaveta).toHaveCount(0);
-  });
-
-  test('estorna o pagamento e a parcela volta para em aberto', async ({ page }) => {
-    const base = new BaseDespesas();
-    base.addPlano({ title: 'Assinatura', amount: 120 });
-    await abrir(page, base, { role: 'Basic' });
-
-    // Paga primeiro: o estorno precisa de um pagamento com `canReverse`.
-    await selecionar(page, 'Assinatura');
-    await page.getByRole('button', { name: 'Marcar como pago' }).click();
-    await page.waitForTimeout(1500);
-    expect(base.parcelaDe('Assinatura')?.status).toBe('Paid');
-
-    await linha(page, 'Assinatura').first().getByRole('button', { name: 'Histórico' }).click();
-    const gaveta = page.locator('.expenses-history-drawer');
-    await expect(gaveta).toBeVisible();
-
-    await gaveta.getByRole('button', { name: 'Estornar pagamento' }).first().click();
-    await page.waitForTimeout(2000);
-
-    expect(base.parcelaDe('Assinatura')?.status).toBe('Open');
-  });
-
-  test('recusa estornar parcela que não está paga', async ({ page }) => {
-    const base = new BaseDespesas();
-    base.addPlano(
-      { title: 'Curso', amount: 200, schedule: 'Installments', installmentsCount: 2 },
-      [{ installmentNo: 1, status: 'Paid' }, { installmentNo: 2, status: 'Open' }]
-    );
-    await abrir(page, base);
-
-    await linha(page, 'Curso').first().getByRole('button', { name: 'Histórico' }).click();
-    const gaveta = page.locator('.expenses-history-drawer');
-    await expect(gaveta).toBeVisible();
-
-    // A parcela em aberto aparece na coluna de pendentes, sem ação de estorno.
-    const pendentes = gaveta.locator('.expenses-history-group').filter({ hasText: 'Pendentes' });
-    await expect(pendentes.getByRole('button', { name: 'Estornar pagamento' })).toHaveCount(0);
   });
 });

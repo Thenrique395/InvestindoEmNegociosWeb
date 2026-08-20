@@ -10,7 +10,7 @@ import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.serv
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
 import { InstallmentsService } from '../installments.service';
-import { InstallmentStatus } from '../types/money-types';
+import { InstallmentStatus, toInstallmentStatus } from '../types/money-types';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { AuthService } from '../auth.service';
@@ -33,7 +33,13 @@ import { PeriodTotalCardComponent } from '../shared/period-total-card/period-tot
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { PlansService, PlanHistoryInstallmentDto } from '../plans.service';
 import { ConfirmDeleteComponent } from '../shared/confirm-delete/confirm-delete.component';
+import {
+  HistoricoParcelaView,
+  LancamentoHistoricoComponent
+} from '../shared/lancamento-historico/lancamento-historico.component';
+import { HistoryEvent } from '../shared/lancamento-historico/lancamento-historico.model';
 import { DeleteKind, DeleteScope } from '../shared/confirm-delete/confirm-delete.model';
 import { BodyPortalDirective } from '../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
@@ -70,6 +76,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     FilterBarComponent,
     ConfirmSheetComponent,
     ConfirmDeleteComponent,
+    LancamentoHistoricoComponent,
     BodyPortalDirective,
     BulkActionBarComponent,
     ComparisonPillComponent,
@@ -270,6 +277,14 @@ export class DespesasComponent implements OnInit {
   readonly loadingAntecipar = signal(false);
   historicoAberto = false;
   historicoTitulo = '';
+  historicoCarregando = false;
+  historicoErro = '';
+  historicoEventos: HistoryEvent[] = [];
+  historicoParcelas: HistoricoParcelaView[] = [];
+  /** Recorrente não lista ocorrências: a gaveta mostra só a linha do tempo. */
+  historicoTemSerie = false;
+  historicoParcelaAtualId: string | null = null;
+  private historicoPlanId: string | null = null;
   historicoItens: StoredExpense[] = [];
   readonly reversingIds = signal<Set<string>>(new Set());
   readonly attachingReceiptIds = signal<Set<string>>(new Set());
@@ -291,7 +306,8 @@ export class DespesasComponent implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly route: ActivatedRoute,
     private readonly location: Location,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly plansService: PlansService
   ) {}
 
   get currentRole(): UserRole | null {
@@ -635,20 +651,111 @@ export class DespesasComponent implements OnInit {
     }
   }
 
+  /**
+   * Abre a gaveta e busca a série inteira no servidor.
+   *
+   * A tela só tem em memória as parcelas dos meses carregados — a 12ª de um
+   * parcelado pode vencer no ano seguinte. Sem buscar, a lista sairia capenga e
+   * o "6 de 12 parcelas pagas" mentiria.
+   */
   abrirHistorico(id: string): void {
     const todas = Object.values(this.despesasPorMes()).flat();
     const alvo = todas.find((d) => d.id === id);
     if (!alvo) return;
-    const chave = alvo.serieId || alvo.planId || alvo.id;
-    const relacionados = todas
-      .filter((d) => (d.serieId || d.planId || d.id) === chave)
-      .sort((a, b) => {
-        if (a.parcelaNumero && b.parcelaNumero) return a.parcelaNumero - b.parcelaNumero;
-        return this.compareDate(a.vencimento, b.vencimento);
-      });
-    this.historicoTitulo = `${alvo.nome}${alvo.parcelasTotal ? ` · ${alvo.parcelaNumero}/${alvo.parcelasTotal}` : ''}`;
-    this.historicoItens = relacionados;
+
+    const planId = alvo.planId || alvo.serieId || null;
+
+    // Só o nome: a posição da parcela já aparece na lista, com destaque na atual.
+    this.historicoTitulo = alvo.nome || 'Lançamento';
+    this.historicoParcelaAtualId = alvo.id ?? null;
     this.historicoAberto = true;
+    this.historicoErro = '';
+    this.historicoEventos = [];
+    this.historicoParcelas = [];
+    this.historicoTemSerie = false;
+    this.historicoPlanId = planId;
+
+    if (!planId) {
+      this.historicoErro = 'Este lançamento não tem histórico disponível.';
+      return;
+    }
+
+    this.historicoCarregando = true;
+    this.plansService
+      .history(planId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resposta) => {
+          this.historicoCarregando = false;
+          this.historicoEventos = resposta.events || [];
+          const parcelas = resposta.installments || [];
+          // Ocorrência de recorrente não é parcela: uma lista de 60 meses no
+          // lugar de "12x" confundiria mais do que ajudaria.
+          this.historicoTemSerie = resposta.schedule !== 'Recurring' && parcelas.length > 1;
+          this.historicoParcelas = parcelas.map((parcela) => this.toParcelaView(parcela, parcelas.length));
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.historicoCarregando = false;
+          this.historicoErro = extractApiErrorMessage(err, 'Não foi possível carregar o histórico.');
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private toParcelaView(parcela: PlanHistoryInstallmentDto, total: number): HistoricoParcelaView {
+    const status = toInstallmentStatus(parcela.status) || 'OPEN';
+    const exibido = resolveInstallmentStatus(status, formatLocaleDate(new Date(`${parcela.dueDate}T00:00:00`)));
+
+    return {
+      id: parcela.id,
+      numero: parcela.installmentNo,
+      total,
+      vencimento: formatLocaleDate(new Date(`${parcela.dueDate}T00:00:00`)),
+      valorLabel: `− ${formatCurrencyValue(parcela.amount || 0)}`,
+      status,
+      statusLabel: expenseStatusLabel(exibido),
+      podeAgir: status === 'PAID' || status === 'PARTIALLY_PAID',
+      estornando: this.isReversing(parcela.id),
+      anexando: this.isAttachingReceipt(parcela.id)
+    };
+  }
+
+  /**
+   * Recebe o id da parcela vindo da gaveta e reusa o fluxo já existente.
+   *
+   * A gaveta lista a série inteira, que veio do servidor — inclusive parcelas de
+   * meses que a tela não carregou e que, por isso, não estão em `expensesCache`.
+   * Nesse caso o alvo é montado a partir do que a própria gaveta mostra.
+   */
+  estornarPorId(installmentId: string): void {
+    const alvo = this.expensesCache.find((d) => d.id === installmentId) ?? this.despesaDaGaveta(installmentId);
+    if (!alvo) {
+      // Falhar calado aqui já custou uma sessão de depuração: a gaveta some do
+      // caminho e a pessoa fica sem saber se clicou.
+      this.setAlerta('Não foi possível localizar a parcela para estornar.', 3000, 'error');
+      return;
+    }
+    this.estornarDespesa(alvo);
+  }
+
+  prepararAnexoPorId(installmentId: string): void {
+    const alvo = this.expensesCache.find((d) => d.id === installmentId) ?? this.despesaDaGaveta(installmentId);
+    if (alvo) this.prepararAnexoComprovante(alvo);
+  }
+
+  private despesaDaGaveta(installmentId: string): StoredExpense | null {
+    const parcela = this.historicoParcelas.find((p) => p.id === installmentId);
+    if (!parcela) return null;
+
+    return {
+      id: parcela.id,
+      nome: this.historicoTitulo,
+      categoria: '',
+      valor: 0,
+      vencimento: parcela.vencimento,
+      status: parcela.status as InstallmentStatus
+    } as StoredExpense;
   }
 
   get historicoPagas(): StoredExpense[] {
@@ -663,6 +770,11 @@ export class DespesasComponent implements OnInit {
     this.historicoAberto = false;
     this.historicoItens = [];
     this.historicoTitulo = '';
+    this.historicoEventos = [];
+    this.historicoParcelas = [];
+    this.historicoErro = '';
+    this.historicoPlanId = null;
+    this.historicoParcelaAtualId = null;
     this.reversingIds.set(new Set());
   }
 
@@ -807,7 +919,7 @@ export class DespesasComponent implements OnInit {
       .subscribe({
       next: () => {
         this.atualizarStatusLocal([id], 'PAID');
-        this.db.refresh();
+        this.db.refresh(true);
         this.setAlerta('Despesa marcada como paga.', 3000, 'success');
       },
       error: () => {
@@ -847,7 +959,7 @@ export class DespesasComponent implements OnInit {
       next: () => {
         this.atualizarStatusLocal(pagaveis.map((p) => p.id), 'PAID');
         this.selectedIds.clear();
-        this.db.refresh();
+        this.db.refresh(true);
         this.setAlerta('Pagamentos registrados com sucesso.', 3000, 'success');
       },
       error: () => {
@@ -935,7 +1047,7 @@ export class DespesasComponent implements OnInit {
       next: () => {
         this.moverParaMesAtual(antecipaveis.map((a) => a.id), novaDataIso, 'ANTICIPATED');
         this.selectedIds.clear();
-        this.db.refresh();
+        this.db.refresh(true);
         this.setAlerta('Antecipação registrada.', 2500, 'success');
       },
       error: () => {
