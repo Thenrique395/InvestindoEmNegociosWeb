@@ -9,6 +9,15 @@ export interface PaymentMethodLookup {
   name: string;
 }
 
+/**
+ * Só o crédito abre cartão e parcelas; o resto é pagamento direto. A regra
+ * mora aqui porque tanto o formulário de despesa quanto o onboarding precisam
+ * dela para decidir o modo do lançamento a partir do método escolhido.
+ */
+export function isCreditPaymentMethod(metodo: PaymentMethodLookup | null | undefined): boolean {
+  return (metodo?.name || '').toLowerCase().includes('crédito');
+}
+
 export interface CardBrandLookup {
   id: number;
   code: string;

@@ -88,9 +88,40 @@ describe('authGuard', () => {
   it('deve redirecionar para /onboarding se não conseguir confirmar o status', async () => {
     onboarding.getStatus.and.returnValue(throwError(() => new Error('status indisponível')));
 
-    const result = await runGuard('/cartoes');
+    const result = await runGuard('/dashboard');
 
     expect(result instanceof UrlTree).toBeTrue();
+    expect(router.serializeUrl(result as UrlTree)).toBe('/onboarding');
+  });
+
+  // O formulário de despesa inicial oferece "Cadastrar cartão": sem esta
+  // exceção o clique só devolvia para /onboarding.
+  it('deve deixar abrir cartões mesmo com o onboarding pendente', async () => {
+    onboarding.getStatus.and.returnValue(of({ step: 3, completed: false }));
+
+    expect(await runGuard('/cartoes')).toBeTrue();
+  });
+
+  it('não consulta o status para a rota liberada — ela passa direto', async () => {
+    onboarding.getStatus.and.returnValue(throwError(() => new Error('status indisponível')));
+
+    expect(await runGuard('/cartoes')).toBeTrue();
+    expect(onboarding.getStatus).not.toHaveBeenCalled();
+  });
+
+  it('categorias segue presa: no onboarding a criação de categoria fica escondida', async () => {
+    onboarding.getStatus.and.returnValue(of({ step: 3, completed: false }));
+
+    const result = await runGuard('/categorias');
+
+    expect(router.serializeUrl(result as UrlTree)).toBe('/onboarding');
+  });
+
+  it('segue prendendo as demais rotas no onboarding', async () => {
+    onboarding.getStatus.and.returnValue(of({ step: 3, completed: false }));
+
+    const result = await runGuard('/despesas');
+
     expect(router.serializeUrl(result as UrlTree)).toBe('/onboarding');
   });
 });

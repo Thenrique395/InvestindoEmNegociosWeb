@@ -11,6 +11,7 @@ import { AccountRequest, AccountType, AccountsService } from '../accounts.servic
 import { CardsService } from '../cards.service';
 import { CreatePlanPayload, Plan, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
+import { isCreditPaymentMethod, LookupsService, PaymentMethodLookup } from '../lookups.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
 import { UiPermissionsService } from '../ui-permissions.service';
@@ -182,6 +183,10 @@ export class OnboardingComponent implements OnInit {
   modalExpenseDateError = '';
   modalExpenseCategoryError = '';
   modalExpenseFormaPagamento: 'avista' | 'cartao' = 'avista';
+  modalExpenseFormaPagamentoId: number | null = null;
+  /* Vem do backend (/lookups/payment-methods). Sem carregar aqui, o select do
+     formulário abria vazio ("Nada encontrado") — ele não busca sozinho. */
+  paymentMethods: PaymentMethodLookup[] = [];
   modalExpenseParcelar = false;
   modalExpenseParcelas = 1;
   modalExpenseFixa = false;
@@ -207,7 +212,9 @@ export class OnboardingComponent implements OnInit {
     amount: 0,
     dueDate: '',
     categoryId: null as string | null,
-    recurring: false
+    recurring: false,
+    paymentMethodId: null as number | null,
+    cardId: null as string | null
   };
 
   constructor(
@@ -221,6 +228,7 @@ export class OnboardingComponent implements OnInit {
     private cardsService: CardsService,
     private plansService: PlansService,
     private categoriesService: CategoriesService,
+    private lookupsService: LookupsService,
     private uiPermissions: UiPermissionsService,
     private onboardingDraft: OnboardingDraftService,
     private userContext: UserContextFacadeService
@@ -277,6 +285,8 @@ export class OnboardingComponent implements OnInit {
     this.loadCategories();
 
     this.loadCardsWhenAllowed();
+
+    this.loadPaymentMethods();
   }
 
   submit(): void {
@@ -518,6 +528,19 @@ export class OnboardingComponent implements OnInit {
    * onboarding esquecer o que tinha criado, mostrar "Adicionar receita" de novo
    * e, no salvar, criar um segundo lançamento em vez de editar o primeiro.
    */
+  private loadPaymentMethods(): void {
+    this.lookupsService.paymentMethods().subscribe({
+      next: (methods) => {
+        this.paymentMethods = methods || [];
+      },
+      // Lista vazia é o pior caso aceitável: a despesa inicial pode ser salva
+      // sem forma de pagamento, e o onboarding não trava por causa do lookup.
+      error: () => {
+        this.paymentMethods = [];
+      }
+    });
+  }
+
   private restoreInitialEntries(): void {
     this.plansService.list('Income').subscribe({
       next: (planos) => {
@@ -547,7 +570,9 @@ export class OnboardingComponent implements OnInit {
           amount: plano.amount,
           dueDate: (plano.startDate || '').slice(0, 10),
           categoryId: plano.categoryId ?? null,
-          recurring: plano.schedule === 'Recurring'
+          recurring: plano.schedule === 'Recurring',
+          paymentMethodId: plano.defaultPaymentMethodId ?? null,
+          cardId: plano.cardId ?? null
         };
       },
       error: () => undefined
@@ -669,6 +694,12 @@ export class OnboardingComponent implements OnInit {
     });
   }
 
+  /* Editando, o modal precisa se anunciar como edição ("Editar receita"), como
+     a despesa já faz pelo isEdit. */
+  get editandoReceitaInicial(): string | null {
+    return this.initialIncome.planId;
+  }
+
   openExpenseModal(): void {
     if (!this.accountReady || this.savingExpenseModal) return;
     this.loadCategories('Expense', true);
@@ -693,12 +724,17 @@ export class OnboardingComponent implements OnInit {
 
     this.modalExpenseDateError = '';
     this.modalExpenseCategoryError = '';
-    this.modalExpenseFormaPagamento = 'avista';
     this.modalExpenseParcelar = false;
     this.modalExpenseParcelas = 1;
-    this.modalExpenseFixa = false;
     this.modalExpenseFixaMeses = null;
-    this.modalExpenseCartaoId = null;
+
+    /* Editar tem de reabrir o lançamento como ele está: forma de pagamento,
+       cartão e recorrência inclusive. Zerar tudo aqui fazia o salvar seguinte
+       gravar por cima com os padrões, não com o que a pessoa tinha escolhido. */
+    this.modalExpenseFormaPagamentoId = existente.planId ? existente.paymentMethodId : null;
+    this.modalExpenseCartaoId = existente.planId ? existente.cardId : null;
+    this.modalExpenseFixa = existente.planId ? existente.recurring : false;
+    this.modalExpenseFormaPagamento = this.modoDoPagamento(this.modalExpenseFormaPagamentoId);
     this.showExpenseModal = true;
   }
 
@@ -713,6 +749,12 @@ export class OnboardingComponent implements OnInit {
   openCardsPage(): void {
     if (!this.canUseCards) return;
     this.router.navigateByUrl('/cartoes');
+  }
+
+  /** Crédito é o único método que abre cartão e parcelas. */
+  private modoDoPagamento(id: number | null): 'avista' | 'cartao' {
+    const metodo = this.paymentMethods.find((m) => m.id === id);
+    return metodo && isCreditPaymentMethod(metodo) && this.canUseCards ? 'cartao' : 'avista';
   }
 
   closeExpenseModal(): void {
@@ -825,6 +867,7 @@ export class OnboardingComponent implements OnInit {
       frequency,
       installmentsCount,
       categoryId: this.modalExpense.categoryId,
+      defaultPaymentMethodId: this.modalExpenseFormaPagamentoId,
       cardId: this.modalExpenseFormaPagamento === 'cartao' ? this.modalExpenseCartaoId : null
     };
 
@@ -844,7 +887,9 @@ export class OnboardingComponent implements OnInit {
           amount,
           dueDate: brToIso(this.modalExpenseDateInput),
           categoryId: this.modalExpense.categoryId || null,
-          recurring: !!this.modalExpenseFixa
+          recurring: !!this.modalExpenseFixa,
+          paymentMethodId: this.modalExpenseFormaPagamentoId,
+          cardId: payload.cardId ?? null
         };
         this.uiFeedback.success(editando ? 'Despesa inicial atualizada.' : 'Despesa inicial cadastrada.');
       },

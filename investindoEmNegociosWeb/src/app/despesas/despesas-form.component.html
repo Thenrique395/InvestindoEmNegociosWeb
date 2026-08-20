@@ -47,18 +47,56 @@
           (valueChange)="onVencimentoChange($event)" />
       </app-form-field>
 
-      <app-form-field label="Categoria" class="expense-form__field--full" [error]="erroCategoria">
+      <app-form-field label="Categoria" [error]="erroCategoria">
         <app-select-menu
           [options]="categoriaOptions"
           [ngModel]="novaDespesa.categoryId || ''"
           name="categoria"
           [searchable]="true"
           placeholder="Selecione uma categoria"
-          createLabel="Criar nova categoria"
+          [createLabel]="permiteCriarCategoria ? 'Criar nova categoria' : null"
           ariaLabel="Categoria da despesa"
           (valueChange)="onCategoriaChange($event)"
           (createRequested)="irParaCategorias()" />
       </app-form-field>
+
+      <!-- Como paga: mesma linha da categoria. O cartão só aparece quando a
+           forma escolhida é crédito, e aí ocupa a linha seguinte. -->
+      <app-form-field label="Forma de pagamento">
+        <app-select-menu
+          [options]="formaPagamentoOptions"
+          [ngModel]="formaPagamentoValue"
+          name="formaPagamento"
+          ariaLabel="Forma de pagamento"
+          (valueChange)="onFormaPagamentoValue($event)" />
+      </app-form-field>
+
+      @if (formaPagamento === 'cartao') {
+        <app-form-field label="Cartão">
+          <app-select-menu
+            [options]="cartaoOptions"
+            [ngModel]="cartaoSelecionadoId || ''"
+            name="cartao"
+            [disabled]="!cartoes.length"
+            [placeholder]="cartoes.length ? 'Selecione o cartão' : 'Nenhum cartão cadastrado'"
+            ariaLabel="Cartão do lançamento"
+            (valueChange)="onCartaoChange($event || null)" />
+        </app-form-field>
+      }
+
+      @if (semCartaoNoCredito) {
+        <div class="expense-form__warning expense-form__warning--amber expense-form__field--full">
+          <p class="expense-form__warning-title">
+            {{ allowCardPayment ? 'Nenhum cartão cadastrado.' : 'Cartão indisponível no seu plano — registre à vista.' }}
+          </p>
+          @if (allowCardPayment) {
+            <a routerLink="/cartoes" (click)="fechar()"
+              class="expense-form__warning-link expense-form__warning-link--amber">
+              Cadastrar cartão
+            </a>
+          }
+        </div>
+      }
     </div>
 
     @if (!categorias.length) {
@@ -69,45 +107,6 @@
     }
 
     <div class="expense-form__boxes">
-      <!-- Como paga: o cartão só aparece quando a forma escolhida é crédito. -->
-      <fieldset class="expense-form__box">
-        <app-form-field label="Forma de pagamento">
-          <app-select-menu
-            [options]="formaPagamentoOptions"
-            [ngModel]="formaPagamentoValue"
-            name="formaPagamento"
-            ariaLabel="Forma de pagamento"
-            (valueChange)="onFormaPagamentoValue($event)" />
-        </app-form-field>
-
-        @if (formaPagamento === 'cartao') {
-          <app-form-field label="Cartão">
-            <app-select-menu
-              [options]="cartaoOptions"
-              [ngModel]="cartaoSelecionadoId || ''"
-              name="cartao"
-              [disabled]="!cartoes.length"
-              [placeholder]="cartoes.length ? 'Selecione o cartão' : 'Nenhum cartão cadastrado'"
-              ariaLabel="Cartão do lançamento"
-              (valueChange)="onCartaoChange($event || null)" />
-          </app-form-field>
-        }
-
-        @if (semCartaoNoCredito) {
-          <div class="expense-form__warning expense-form__warning--amber">
-            <p class="expense-form__warning-title">
-              {{ allowCardPayment ? 'Nenhum cartão cadastrado.' : 'Cartão indisponível no seu plano — registre à vista.' }}
-            </p>
-            @if (allowCardPayment) {
-              <a routerLink="/cartoes" (click)="fechar()"
-                class="expense-form__warning-link expense-form__warning-link--amber">
-                Cadastrar cartão
-              </a>
-            }
-          </div>
-        }
-      </fieldset>
-
       <!-- Um controle só para as duas repetições possíveis: parcelas no cartão e
            repetição mensal fora dele. O que aparece depois depende da forma de
            pagamento — no crédito são parcelas; à vista, meses. -->

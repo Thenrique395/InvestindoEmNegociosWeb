@@ -38,6 +38,8 @@ export class ReceitasFormComponent {
   @Output() fixaChange = new EventEmitter<boolean>();
   @Output() aplicarSugestao = new EventEmitter<void>();
   @Output() categoriasRequested = new EventEmitter<void>();
+  /* Mesma regra da despesa: no onboarding não se sai da tela para criar categoria. */
+  @Input() permiteCriarCategoria = true;
 
   /** Opções de categoria com o ponto colorido, como no design. */
   get categoriaOptions(): SelectMenuOption[] {

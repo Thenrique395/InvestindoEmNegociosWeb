@@ -46,6 +46,16 @@ class CategoriesServiceMock {
   invalidateCache = jasmine.createSpy();
 }
 
+const METODOS_PAGAMENTO = [
+  { id: 1, code: 'pix', name: 'Pix' },
+  { id: 2, code: 'credit', name: 'Cartão de crédito' },
+  { id: 4, code: 'cash', name: 'Dinheiro' }
+];
+
+class LookupsServiceMock {
+  paymentMethods = jasmine.createSpy().and.returnValue(of(METODOS_PAGAMENTO));
+}
+
 class UiPermissionsServiceMock {
   canReadCards = jasmine.createSpy().and.returnValue(true);
 }
@@ -75,6 +85,7 @@ function createComponent() {
   const cards = new CardsServiceMock();
   const plans = new PlansServiceMock();
   const categories = new CategoriesServiceMock();
+  const lookups = new LookupsServiceMock();
   const uiPermissions = new UiPermissionsServiceMock();
   const onboardingDraft = new OnboardingDraftServiceMock();
   const router = new RouterMock();
@@ -91,12 +102,13 @@ function createComponent() {
     cards as any,
     plans as any,
     categories as any,
+    lookups as any,
     uiPermissions as any,
     onboardingDraft as any,
     userContext as any
   );
 
-  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, uiPermissions, onboardingDraft, router, userContext };
+  return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, lookups, uiPermissions, onboardingDraft, router, userContext };
 }
 
 describe('OnboardingComponent smoke', () => {
@@ -233,7 +245,7 @@ describe('OnboardingComponent smoke', () => {
     ctx.component.step = 2;
     ctx.component.accountReady = true;
     ctx.component.initialIncome = { planId: null, source: 'Salário', amount: 5000, receivedOn: '2026-03-05', categoryId: null, recurring: false };
-    ctx.component.initialExpense = { planId: null, name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null, recurring: false };
+    ctx.component.initialExpense = { planId: null, name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null, recurring: false, paymentMethodId: null, cardId: null };
 
     ctx.component.saveInitialEntriesAndFinish();
 
@@ -246,7 +258,7 @@ describe('OnboardingComponent smoke', () => {
     ctx.component.step = 3;
     ctx.component.accountReady = true;
     ctx.component.initialIncome = { planId: null, source: 'Salário', amount: 5000, receivedOn: '2026-03-05', categoryId: null, recurring: false };
-    ctx.component.initialExpense = { planId: null, name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null, recurring: false };
+    ctx.component.initialExpense = { planId: null, name: 'Aluguel', amount: 1500, dueDate: '2026-03-10', categoryId: null, recurring: false, paymentMethodId: null, cardId: null };
     ctx.onboarding.updateStatus.and.returnValue(throwError(() => ({ error: { detail: 'Falha ao concluir onboarding E2E.' } })));
 
     ctx.component.saveInitialEntriesAndFinish();
@@ -264,7 +276,7 @@ describe('OnboardingComponent - correções (auditoria)', () => {
     ctx.component.step = 3;
     ctx.component.accountReady = true;
     ctx.component.initialIncome = { planId: null, source: '', amount: 0, receivedOn: '', categoryId: null, recurring: false };
-    ctx.component.initialExpense = { planId: null, name: '', amount: 0, dueDate: '', categoryId: null, recurring: false };
+    ctx.component.initialExpense = { planId: null, name: '', amount: 0, dueDate: '', categoryId: null, recurring: false, paymentMethodId: null, cardId: null };
 
     ctx.component.saveInitialEntriesAndFinish();
 
@@ -385,7 +397,9 @@ describe('OnboardingComponent - lançamentos iniciais', () => {
       amount: 2400,
       dueDate: '2026-08-05',
       categoryId: 'cat-3',
-      recurring: false
+      recurring: false,
+      paymentMethodId: null,
+      cardId: null
     };
 
     ctx.component.openExpenseModal();
@@ -398,5 +412,75 @@ describe('OnboardingComponent - lançamentos iniciais', () => {
 
     expect(ctx.plans.update.calls.mostRecent().args[0]).toBe('plan-desp');
     expect(ctx.plans.create).not.toHaveBeenCalled();
+  });
+
+  it('carrega as formas de pagamento no início — sem isso o select abre vazio', () => {
+    const ctx = createComponent();
+
+    ctx.component.ngOnInit();
+
+    expect(ctx.lookups.paymentMethods).toHaveBeenCalled();
+    expect(ctx.component.paymentMethods.length).toBe(3);
+  });
+
+  it('mantém o onboarding de pé quando o lookup falha', () => {
+    const ctx = createComponent();
+    ctx.lookups.paymentMethods.and.returnValue(throwError(() => new Error('offline')));
+
+    ctx.component.ngOnInit();
+
+    expect(ctx.component.paymentMethods).toEqual([]);
+  });
+
+  it('envia a forma de pagamento escolhida no lançamento da despesa', () => {
+    const ctx = createComponent();
+    (ctx.component as any).accountReady = true;
+    ctx.component.openExpenseModal();
+    ctx.component.modalExpense.nome = 'Mercado';
+    ctx.component.modalExpense.categoryId = 'cat-3';
+    ctx.component.modalExpenseAmountInput = '350,00';
+    ctx.component.modalExpenseDateInput = '20/08/2026';
+    ctx.component.modalExpenseFormaPagamentoId = 1;
+
+    ctx.component.saveExpenseModal();
+
+    expect(ctx.plans.create.calls.mostRecent().args[0].defaultPaymentMethodId).toBe(1);
+  });
+
+  it('editar reabre a despesa com a forma de pagamento, o cartão e a recorrência que estavam salvos', () => {
+    const ctx = createComponent();
+    ctx.component.ngOnInit();
+    (ctx.component as any).accountReady = true;
+    ctx.component.initialExpense = {
+      planId: 'plan-desp',
+      name: 'Streaming',
+      amount: 39.9,
+      dueDate: '2026-08-10',
+      categoryId: 'cat-3',
+      recurring: true,
+      paymentMethodId: 2,
+      cardId: 'card-1'
+    };
+
+    ctx.component.openExpenseModal();
+
+    // 2 é "Cartão de crédito": o modo tem de vir junto, senão o campo de cartão
+    // nem aparece e o salvar apagaria o vínculo.
+    expect(ctx.component.modalExpenseFormaPagamentoId).toBe(2);
+    expect(ctx.component.modalExpenseFormaPagamento).toBe('cartao');
+    expect(ctx.component.modalExpenseCartaoId).toBe('card-1');
+    expect(ctx.component.modalExpenseFixa).toBeTrue();
+  });
+
+  it('abre a despesa nova sem forma de pagamento herdada da anterior', () => {
+    const ctx = createComponent();
+    ctx.component.ngOnInit();
+    (ctx.component as any).accountReady = true;
+    ctx.component.modalExpenseFormaPagamentoId = 2;
+
+    ctx.component.openExpenseModal();
+
+    expect(ctx.component.modalExpenseFormaPagamentoId).toBeNull();
+    expect(ctx.component.modalExpenseFormaPagamento).toBe('avista');
   });
 });

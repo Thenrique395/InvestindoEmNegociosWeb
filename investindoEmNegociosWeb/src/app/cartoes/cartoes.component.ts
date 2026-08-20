@@ -27,6 +27,7 @@ import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { installmentStatusTone, InstallmentStatusTone } from '../utils/status';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { OnboardingReturnBannerComponent } from '../shared/onboarding-return/onboarding-return-banner.component';
 import {
   buildCardMetrics,
   overviewFromMetrics,
@@ -43,6 +44,7 @@ type CardFormField = 'brand' | 'number' | 'name' | 'limit' | 'closingDay' | 'due
   standalone: true,
   imports: [
     FormsModule,
+    OnboardingReturnBannerComponent,
     UpperCasePipe,
     DatePipe,
     DecimalPipe,

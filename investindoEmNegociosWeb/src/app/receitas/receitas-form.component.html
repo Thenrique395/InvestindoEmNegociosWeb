@@ -55,7 +55,7 @@
           name="categoria"
           [searchable]="true"
           placeholder="Selecione uma categoria"
-          createLabel="Criar nova categoria"
+          [createLabel]="permiteCriarCategoria ? 'Criar nova categoria' : null"
           ariaLabel="Categoria da receita"
           (valueChange)="onCategoriaChange($event)"
           (createRequested)="categoriasRequested.emit()" />

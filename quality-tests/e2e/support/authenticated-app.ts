@@ -2388,6 +2388,20 @@ async function fulfillApi(route: Route, state: {
     return;
   }
 
+  // As mesmas formas que o banco traz no seed: sem elas o select do formulário
+  // de despesa abre vazio e os fluxos de pagamento não são exercitados.
+  if (path === '/api/v1/lookups/payment-methods') {
+    await json(route, [
+      { id: 1, code: 'pix', name: 'Pix', isActive: true },
+      { id: 2, code: 'credit_card', name: 'Cartão de crédito', isActive: true },
+      { id: 3, code: 'debit_card', name: 'Cartão de débito', isActive: true },
+      { id: 4, code: 'cash', name: 'Dinheiro', isActive: true },
+      { id: 5, code: 'boleto', name: 'Boleto', isActive: true },
+      { id: 6, code: 'transfer', name: 'Transferência', isActive: true }
+    ]);
+    return;
+  }
+
   if (path === '/api/v1/lookups/card-brands') {
     await json(route, [{ id: 1, code: 'visa', name: 'Visa', isActive: true }]);
     return;

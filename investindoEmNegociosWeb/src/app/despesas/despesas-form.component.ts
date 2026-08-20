@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PaymentMethodLookup } from '../lookups.service';
+import { isCreditPaymentMethod, PaymentMethodLookup } from '../lookups.service';
 import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
 import { colorForCategory } from '../categories/categories-overview.model';
@@ -51,6 +51,9 @@ export class DespesasFormComponent {
   @Input() paymentMethods: PaymentMethodLookup[] = [];
   @Input() formaPagamentoId: number | null = null;
   @Input() isEdit = false;
+  /* No onboarding a pessoa usa as categorias que já existem: sair para
+     cadastrar uma perderia o que ela estava preenchendo. */
+  @Input() permiteCriarCategoria = true;
 
   @Output() valorChange = new EventEmitter<string>();
   @Output() vencimentoChange = new EventEmitter<string>();
@@ -134,7 +137,7 @@ export class DespesasFormComponent {
   }
 
   private ehCredito(metodo: PaymentMethodLookup): boolean {
-    return (metodo.name || '').toLowerCase().includes('crédito');
+    return isCreditPaymentMethod(metodo);
   }
 
   onCategoriaChange(valor: string): void {
