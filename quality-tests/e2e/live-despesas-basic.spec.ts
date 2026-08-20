@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
+declare global {
+  interface Window {
+    __API_BASE_URL__?: string;
+  }
+}
+
 /**
  * Despesas ponta a ponta com **perfil Basic**, contra a API real.
  *
@@ -145,10 +151,14 @@ async function limparCartoesPelaApi(page: Page): Promise<void> {
   const xsrf = cookies.find((c) => c.name === 'XSRF-TOKEN')?.value;
   if (!xsrf) return;
 
-  // A API é sempre a da origem que serve o app: no DEV é o próprio host, no
-  // servidor local é o proxy `/api`. Fixar o host mandaria a requisição para
-  // fora do domínio dos cookies.
-  const api = (caminho: string) => new URL(`/api/v1/${caminho}`, page.url()).toString();
+  // A base da API é a que o próprio app usa: no DEV vem em `__API_BASE_URL__`
+  // (outro host, porta 5055) e no servidor local é o proxy `/api`. Fixar
+  // qualquer uma das duas quebra o teste no outro ambiente.
+  const apiBase = await page.evaluate(() => window.__API_BASE_URL__ || '/api/v1');
+  const api = (caminho: string) =>
+    apiBase.startsWith('http')
+      ? `${apiBase.replace(/\/$/, '')}/${caminho}`
+      : new URL(`${apiBase.replace(/\/$/, '')}/${caminho}`, page.url()).toString();
   const headers = { 'X-XSRF-TOKEN': xsrf };
 
   const planos = await (await page.request.get(api('plans?type=Expense'), { headers })).json();

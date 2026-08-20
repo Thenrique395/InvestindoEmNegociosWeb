@@ -495,14 +495,23 @@ RUN_LIVE_SERVER_E2E=1 APP_BASE_URL=http://35.174.50.187:4201 \
 ```
 
 Os dados criados são apagados pelo próprio teste (pela tela e, no que a tela recusa, pela API).
+A base da API vem de `window.__API_BASE_URL__`, então a mesma spec roda contra o DEV (API em
+outro host) e contra o servidor local (proxy `/api`).
+
+**Verificado no DEV depois do deploy de 2026-08-20** (`60a3aa5` no Web, `ed6b336` na API):
+12 casos verdes contra `http://35.174.50.187:4201`, e as três respostas de conflito de cartão
+conferidas na API — apelido repetido continua falando de apelido, cartão repetido passou a
+dizer *"Você já tem um cartão dessa bandeira terminando em 8811"*.
 
 **Três achados fora do escopo de Despesas. Dois resolvidos:**
 
-1. ⏳ **Mensagem de erro errada no cadastro de cartão.** O índice único é
-   `(UserId, BrandId, Last4)` (`CardConfiguration.cs:46`), mas `CardsService.CreateAsync`
-   embrulha `DbUpdateException` em *"Já existe um cartão com esse nome/apelido."* Dois cartões
-   da mesma bandeira terminando nos mesmos 4 dígitos mandam a pessoa trocar o apelido — o que
-   não resolve. **Aberto** (é correção de backend).
+1. ✅ **Mensagem de erro errada no cadastro de cartão** — corrigida no backend
+   (`InvestindoEmNegociosApi`, commit `ed6b336`). O índice único é
+   `(UserId, BrandId, Last4)`, mas qualquer `DbUpdateException` virava *"Já existe um cartão
+   com esse nome/apelido."* Agora a checagem de `(BrandId, Last4)` acontece antes do insert e
+   do update, com mensagem própria; o `catch` reconhece a constraint e, quando não reconhece,
+   deixa de afirmar um motivo que pode não ser o real. `NicknameExistsAsync` passou a filtrar
+   por espaço, como as demais consultas do repositório.
 2. ✅ **Compra no cartão sumia da vista e prendia o cartão.** Duas pontas, uma regra:
    - ao lançar no cartão, quando a parcela cai em outra competência, a tela agora avisa
      *"Lançada na fatura de setembro de 2026. Abra esse mês para vê-la."*;
