@@ -33,6 +33,8 @@ import { PeriodTotalCardComponent } from '../shared/period-total-card/period-tot
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { ConfirmDeleteComponent } from '../shared/confirm-delete/confirm-delete.component';
+import { DeleteKind, DeleteScope } from '../shared/confirm-delete/confirm-delete.model';
 import { BodyPortalDirective } from '../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
@@ -62,6 +64,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     StatusBadgeComponent,
     FilterBarComponent,
     ConfirmSheetComponent,
+    ConfirmDeleteComponent,
     BodyPortalDirective,
     BulkActionBarComponent,
     ComparisonPillComponent,
@@ -112,7 +115,14 @@ export class DespesasComponent implements OnInit {
   cartaoSelecionadoId: string | null = null;
   editando: { id: string; planId?: string; isParcela: boolean; isRecorrente: boolean; originalNome: string; originalCategoryId: string | null } | null = null;
   confirmEdicao: { isRecorrente: boolean } | null = null;
-  confirmRemocao: { id: string; serieId?: string; totalParcelas?: number; isRecurring?: boolean } | null = null;
+  confirmRemocao: {
+    id: string;
+    serieId?: string;
+    totalParcelas?: number;
+    kind: DeleteKind;
+    nome: string;
+    valor: string;
+  } | null = null;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
   filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
@@ -1209,38 +1219,35 @@ export class DespesasComponent implements OnInit {
     this.mostrarForm = true;
   }
 
-  removerDespesa(mesKey: string, index: number): void {
-    const lista = this.despesasPorMes()[mesKey] || [];
-    const item = lista[index];
-    if (!item) return;
-    this.executarRemocaoDespesa(this.db.removeExpense(item.id!));
+  /**
+   * Abre a confirmação — sempre, inclusive para lançamento avulso.
+   *
+   * O avulso era removido direto daqui, sem diálogo nenhum: um clique no ícone
+   * de lixeira da tabela e a despesa sumia.
+   *
+   * Despesa de cartão também se exclui por aqui. Havia um bloqueio no front
+   * ("altere a forma de pagamento ou exclua o cartão primeiro") que nenhuma
+   * regra de negócio sustenta: `DELETE /installments/:id` e `DELETE /plans/:id`
+   * aceitam a operação e já limpam pagamentos e lançamentos de conta. A pessoa
+   * ficava sem conseguir apagar uma compra lançada errado no cartão.
+   */
+  openRemocao(d: StoredExpense, _mesKey: string, _index: number): void {
+    this.confirmRemocao = {
+      id: d.id!,
+      serieId: d.planId || d.serieId,
+      totalParcelas: d.parcelasTotal,
+      kind: d.fixa ? 'recurring' : d.parcelasTotal && d.serieId ? 'series' : 'single',
+      nome: d.nome || 'Despesa',
+      valor: formatCurrencyValue(d.valor || 0)
+    };
   }
 
-  openRemocao(d: StoredExpense, mesKey: string, index: number): void {
-    if (d.cartao) {
-      this.uiFeedback.error(
-        'Não é possível excluir uma despesa associada a um cartão. Altere a forma de pagamento ou exclua o cartão primeiro.'
-      );
-      return;
-    }
-    if ((d.parcelasTotal && d.serieId) || d.fixa) {
-      this.confirmRemocao = {
-        id: d.id!,
-        serieId: d.planId || d.serieId,
-        totalParcelas: d.parcelasTotal,
-        isRecurring: !!d.fixa
-      };
-      return;
-    }
-    this.removerDespesa(mesKey, index);
-  }
-
-  confirmarRemocao(removerSerie: boolean): void {
+  confirmarRemocao(escopo: DeleteScope): void {
     if (!this.confirmRemocao) return;
     const { id, serieId } = this.confirmRemocao;
 
     this.executarRemocaoDespesa(
-      removerSerie && serieId ? this.db.removeExpenseSeries(serieId) : this.db.removeExpense(id)
+      escopo === 'all' && serieId ? this.db.removeExpenseSeries(serieId) : this.db.removeExpense(id)
     );
 
     this.confirmRemocao = null;

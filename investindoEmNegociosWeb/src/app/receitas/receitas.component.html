@@ -248,29 +248,11 @@
   </ng-container>
 </app-confirm-sheet>
 
-<app-confirm-sheet
+<app-confirm-delete
   [open]="showDeleteModal"
-  eyebrow="Excluir receita"
-  title="Confirmar remoção"
-  (dismiss)="fecharModalExcluir()">
-  @if (deleteIsRecurring) {
-    <p>
-      A receita <strong>{{ deleteFonte }}</strong> é recorrente. Deseja excluir apenas este mês ou encerrar a
-      recorrência?
-    </p>
-  } @else {
-    <p>
-      Tem certeza que deseja excluir a receita <strong>{{ deleteFonte }}</strong>? Essa ação não pode ser
-      desfeita.
-    </p>
-  }
-  <ng-container sheet-actions>
-    @if (deleteIsRecurring) {
-      <button type="button" class="btn-ghost sm" (click)="confirmarExcluirSomenteEsta()">Somente este mês</button>
-      <button type="button" class="btn-danger sm" (click)="confirmarExcluirRecorrencia()">Encerrar recorrência</button>
-    } @else {
-      <button type="button" class="btn-ghost sm" (click)="fecharModalExcluir()">Cancelar</button>
-      <button type="button" class="btn-danger sm" (click)="confirmarExcluirSomenteEsta()">Excluir receita</button>
-    }
-  </ng-container>
-</app-confirm-sheet>
+  [kind]="deleteKind"
+  noun="receita"
+  [itemName]="deleteFonte"
+  [itemValue]="deleteValor"
+  (cancel)="fecharModalExcluir()"
+  (confirm)="confirmarExclusao($event)" />

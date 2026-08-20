@@ -40,15 +40,20 @@ test.describe('authenticated app shell', () => {
 
     const bottomNav = page.getByRole('navigation', { name: 'Navegação principal mobile' });
     await expect(bottomNav).toBeVisible();
-    await expect(bottomNav.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+    // Quatro destinos e o botão de novo lançamento no meio: "Início" é o rótulo
+    // do dashboard aqui, e os destinos que não cabem ficam no "Mais".
+    await expect(bottomNav.getByRole('link', { name: 'Início' })).toBeVisible();
     await expect(bottomNav.getByRole('link', { name: 'Despesas' })).toBeVisible();
     await expect(bottomNav.getByRole('link', { name: 'Receitas' })).toBeVisible();
-    await expect(bottomNav.getByRole('link', { name: 'Calendário' })).toBeVisible();
+    await expect(bottomNav.getByRole('button', { name: 'Novo lançamento' })).toBeVisible();
+    await expect(bottomNav.getByRole('button', { name: 'Abrir menu completo' })).toBeVisible();
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
 
     await bottomNav.getByRole('link', { name: 'Receitas' }).click();
-    await expect(page.getByRole('heading', { level: 2, name: /Receitas de/i })).toBeVisible();
+    // Em 390px a listagem mostra o bloco mobile, não o cabeçalho de período do
+    // desktop: quem prova a navegação aqui é a rota.
+    await expect(page).toHaveURL(/\/receitas/);
 
     const menuButton = bottomNav.getByRole('button', { name: 'Abrir menu completo' });
     await menuButton.click();

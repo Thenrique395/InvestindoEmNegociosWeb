@@ -18,7 +18,6 @@ export type SidebarRouteReload = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
-  readonly isLightTheme = input.required<boolean>();
   readonly brandName = input.required<string>();
   readonly currentRole = input<UserRole | null>(null);
   readonly mobileOpen = input(false);

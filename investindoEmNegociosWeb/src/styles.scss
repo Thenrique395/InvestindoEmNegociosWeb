@@ -183,13 +183,11 @@ select:not([multiple]) {
   .invoice-import-modal__button
 ) {
   min-height: var(--h-button);
-  border: 1px solid transparent;
   border-radius: var(--radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: 0 var(--space-7);
   color: inherit;
   font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
@@ -197,6 +195,26 @@ select:not([multiple]) {
   text-decoration: none;
   cursor: pointer;
   transition: var(--control-transition);
+}
+
+/* Sem `:where()`, pelo mesmo motivo do `.btn-primary` mais abaixo: o Preflight do
+   Tailwind zera `padding` e `border` com seletores de tag (`button, input, …`,
+   especificidade 0,0,1), que ganha de `:where()` (0,0,0). Com o padding no bloco
+   acima, TODO botão do app renderizava colado no próprio texto — "Cancelar" media
+   59px, do tamanho da palavra. Encontrado em 2026-08-19 medindo o rodapé do
+   diálogo de exclusão. */
+.btn,
+.btn-primary,
+.btn-ghost,
+.btn-danger,
+.btn-cancel,
+.ghost,
+.goal-card__button,
+.modal__button,
+.account-card__action,
+.invoice-import-modal__button {
+  padding: 0 var(--space-7);
+  border: 1px solid transparent;
 }
 
 :where(

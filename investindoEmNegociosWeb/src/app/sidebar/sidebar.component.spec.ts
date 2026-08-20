@@ -13,7 +13,6 @@ describe('SidebarComponent — visibilidade por role/feature', () => {
 
   function labelsFor(role: UserRole | null): string[] {
     const fixture = TestBed.createComponent(SidebarComponent);
-    fixture.componentRef.setInput('isLightTheme', false);
     fixture.componentRef.setInput('brandName', 'Teste');
     fixture.componentRef.setInput('currentRole', role);
     return fixture.componentInstance

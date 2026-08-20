@@ -437,9 +437,50 @@ cadastradas** e a tela mostra o estado vazio — os 4 filtros existem no templat
       por contrato: o handoff pede "esta e as seguintes", mas o frontend hoje só tem APIs para
       parcela atual (`/installments/:id`) ou plano inteiro (`/plans/:id`)
 - [ ] Dashboard (5.1) — continuar pelo superconjunto Patrimônio e recortar por perfil; próximo bloco: acabamento visual incremental
-- [ ] QA visual final app real × handoff — rodar quando a rodada principal do rebrand fechar,
-      com screenshots pareados por tela/viewport e checklist de espaçamento, tipografia, cores,
-      hierarquia, estados e responsividade
+- [x] QA visual desktop × handoff — **primeira rodada feita em 2026-08-19**, com captura
+      pareada das 9 telas em 1440px. Relatório e evidências em
+      `docs/ai-reports/qa-desktop/RELATORIO.md`. Ferramenta:
+      `quality-tests/e2e/desktop-qa-visual.spec.ts` (telas inteiras, com seed de lançamentos)
+      e `desktop-qa-zoom.spec.ts` (recortes de bloco).
+
+#### O que a primeira rodada de QA visual corrigiu
+
+| # | Achado | Alcance |
+|---|---|---|
+| 1 | Logo da sidebar trocava com o tema — no tema claro o "N" navy sumia sobre a barra navy | toda tela autenticada |
+| 2 | Card de indicador punha o valor dentro da coluna do ícone, contra COMPONENTES.md §3.1 | 20 telas |
+| 3 | `padding` e `border` dos botões perdiam para o Preflight do Tailwind (`:where()` tem especificidade 0) | todo botão do app |
+| 4 | Exclusão de lançamento avulso não pedia confirmação nenhuma | Despesas e Receitas |
+
+O item 3 é o mesmo bug que o `styles.scss` já documentava para `background`: a correção
+anterior tratou a cor e deixou padding e borda. `Cancelar` media 59px — a largura da palavra.
+
+O item 4 virou `app-confirm-delete`, o diálogo do protótipo: ícone, nome e valor do
+lançamento, escolha de escopo em rádio quando há série ou recorrência, e rótulo do botão
+destrutivo acompanhando a escolha. Textos em `confirm-delete.model.ts`, com teste.
+
+- [ ] QA visual desktop — segunda rodada: Contas (a mais distante), o padrão de rótulo em
+      eyebrow onde o protótipo usa texto normal, e o acabamento de Cartões
+
+#### 🐛 Dois bugs funcionais encontrados ao varrer os fluxos de Despesas (2026-08-19)
+
+**1. A lista não atualizava depois de escrever.** `ApiDataService.refresh()` tem janela de
+1,5s para não repetir a mesma carga a cada navegação — e **toda mutação** chamava
+`refresh()` sem `force`. Excluir, editar ou criar menos de 1,5s depois de a tela carregar
+caía nessa janela: o servidor respondia 204, o app dizia "Despesa excluída", e a linha
+continuava na tabela. Quem demorava mais de 1,5s para clicar via a lista certa — daí parecer
+intermitente. As mutações passaram a chamar `refresh(true)`; a carga de navegação mantém o
+debounce. Alcança despesas, cartões e baixa de pagamento.
+
+**2. Despesa de cartão não podia ser excluída.** O front barrava com "Não é possível excluir
+uma despesa associada a um cartão. Altere a forma de pagamento ou exclua o cartão primeiro."
+— regra que **não existe na API**: `DELETE /installments/:id` e `DELETE /plans/:id` aceitam a
+operação e já limpam pagamentos e lançamentos de conta em cascata. Nem `BUSINESS_RULES.md`
+nem o handoff sustentam o bloqueio, que veio do primeiro commit. Removido.
+
+Cobertura nova: `despesas.component.spec.ts` (+6 casos de exclusão) e
+`quality-tests/e2e/despesas-fluxos.spec.ts` (8 fluxos ponta a ponta, com backend em memória:
+lista, criação, exclusão avulsa/cartão/série/recorrente, erro de API e filtros).
 
 ### FASE 6 — Planejamento e análise
 

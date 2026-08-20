@@ -125,7 +125,7 @@ export class ApiDataService {
 
   addExpense(expense: Omit<StoredExpense, 'id'>): Observable<void> {
     const payload = this.toPlanPayloadFromExpense(expense);
-    return this.plans.create(payload).pipe(tap(() => this.refresh()), map(() => void 0));
+    return this.plans.create(payload).pipe(tap(() => this.refresh(true)), map(() => void 0));
   }
 
   updateExpense(_id: string, _data: Partial<StoredExpense>): Observable<void> {
@@ -148,7 +148,7 @@ export class ApiDataService {
     };
 
     const payload = this.toPlanPayloadFromExpense(merged);
-    return this.plans.update(planId, payload).pipe(tap(() => this.refresh()), map(() => void 0));
+    return this.plans.update(planId, payload).pipe(tap(() => this.refresh(true)), map(() => void 0));
   }
 
   updateExpenseInstallment(installmentId: string, data: Partial<StoredExpense>): Observable<void> {
@@ -160,7 +160,7 @@ export class ApiDataService {
     if (!dueDate) {
       return throwError(() => new Error('Data de vencimento inválida.'));
     }
-    return this.installments.update(installmentId, { amount, dueDate }).pipe(tap(() => this.refresh()), map(() => void 0));
+    return this.installments.update(installmentId, { amount, dueDate }).pipe(tap(() => this.refresh(true)), map(() => void 0));
   }
 
   removeExpense(_id: string): Observable<void> {
@@ -168,11 +168,11 @@ export class ApiDataService {
   }
 
   removeExpenseSeries(planId: string): Observable<void> {
-    return this.plans.delete(planId).pipe(tap(() => this.refresh()), map(() => void 0));
+    return this.plans.delete(planId).pipe(tap(() => this.refresh(true)), map(() => void 0));
   }
 
   removeExpenseInstallment(installmentId: string): Observable<void> {
-    return this.installments.delete(installmentId).pipe(tap(() => this.refresh()), map(() => void 0));
+    return this.installments.delete(installmentId).pipe(tap(() => this.refresh(true)), map(() => void 0));
   }
 
   addCard(card: Omit<StoredCard, 'id'>) {
@@ -210,7 +210,7 @@ export class ApiDataService {
   }
 
   removeCard(id: string): Observable<void> {
-    return this.cardsApi.delete(id).pipe(tap(() => this.refresh()), map(() => void 0));
+    return this.cardsApi.delete(id).pipe(tap(() => this.refresh(true)), map(() => void 0));
   }
 
   addIncome(income: Omit<StoredIncome, 'id'>): Observable<void> {
@@ -277,11 +277,24 @@ export class ApiDataService {
     }).pipe(
       tap(() => {
         this.setExpenseStatusLocal(installmentId, 'PAID');
-        this.refresh();
+        this.refresh(true);
       })
     );
   }
 
+  /**
+   * Recarrega planos, parcelas, cartões e categorias.
+   *
+   * `force` existe para separar dois usos: a carga de navegação, que se repete
+   * a cada rota e por isso tem janela de 1,5s para não fazer a mesma requisição
+   * várias vezes, e a recarga **depois de uma escrita**, que não pode ser
+   * descartada — quem acabou de gravar sabe que o dado mudou.
+   *
+   * Sem isso, excluir ou editar um lançamento menos de 1,5s depois de a tela
+   * carregar deixava a linha antiga na tabela, mesmo com o servidor
+   * respondendo 204 e o app dizendo "Despesa excluída". Parecia intermitente:
+   * quem demorava mais de 1,5s para clicar via a lista certa.
+   */
   refresh(force = false): void {
     if (!this.authService.isAuthenticated()) {
       this.dbSubject.next({ expenses: [], cards: [], incomes: [] });

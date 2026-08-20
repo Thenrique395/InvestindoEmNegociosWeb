@@ -419,14 +419,14 @@ describe('ReceitasComponent - cobertura de cadastro/exclusão/estado', () => {
   it('excluir "somente este mês" chama removeIncomeInstallment', () => {
     const ctx = createComponent();
     (ctx.component as any).deleteInstallmentId = 'inst-1';
-    ctx.component.confirmarExcluirSomenteEsta();
+    ctx.component.confirmarExclusao('single');
     expect(ctx.db.removeIncomeInstallment).toHaveBeenCalledWith('inst-1');
   });
 
   it('excluir "encerrar recorrência" chama removeIncome', () => {
     const ctx = createComponent();
     (ctx.component as any).deletePlanId = 'plan-1';
-    ctx.component.confirmarExcluirRecorrencia();
+    ctx.component.confirmarExclusao('all');
     expect(ctx.db.removeIncome).toHaveBeenCalledWith('plan-1');
   });
 

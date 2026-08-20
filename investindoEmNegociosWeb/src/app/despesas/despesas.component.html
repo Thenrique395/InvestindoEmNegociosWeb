@@ -238,26 +238,14 @@
     </ng-container>
   </app-confirm-sheet>
 
-  <app-confirm-sheet
+  <app-confirm-delete
     [open]="!!confirmRemocao"
-    eyebrow="Excluir despesa"
-    title="Confirmar remoção"
-    (dismiss)="cancelarRemocao()">
-    @if (confirmRemocao && !confirmRemocao.isRecurring) {
-      <p>Esta despesa faz parte de uma série de parcelas. Deseja excluir apenas esta parcela ou todas as parcelas da série?</p>
-    }
-    @if (confirmRemocao && confirmRemocao.isRecurring) {
-      <p>Esta despesa é recorrente. Deseja excluir apenas este mês ou encerrar a recorrência?</p>
-    }
-    <ng-container sheet-actions>
-      <button type="button" class="btn-ghost sm" (click)="confirmarRemocao(false)">
-        {{ confirmRemocao && confirmRemocao.isRecurring ? 'Somente este mês' : 'Somente esta' }}
-      </button>
-      <button type="button" class="btn-danger sm" (click)="confirmarRemocao(true)">
-        {{ confirmRemocao && confirmRemocao.isRecurring ? 'Encerrar recorrência' : 'Todas as parcelas' }}
-      </button>
-    </ng-container>
-  </app-confirm-sheet>
+    [kind]="confirmRemocao?.kind || 'single'"
+    noun="despesa"
+    [itemName]="confirmRemocao?.nome || ''"
+    [itemValue]="confirmRemocao?.valor || ''"
+    (cancel)="cancelarRemocao()"
+    (confirm)="confirmarRemocao($event)" />
 
   @if (historicoAberto) {
     <div appBodyPortal class="expenses-history-drawer">

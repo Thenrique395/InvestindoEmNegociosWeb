@@ -28,6 +28,8 @@ import { PeriodTotalCardComponent } from '../shared/period-total-card/period-tot
 import { PeriodHeroComponent } from '../shared/period-hero/period-hero.component';
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
+import { ConfirmDeleteComponent } from '../shared/confirm-delete/confirm-delete.component';
+import { DeleteKind, DeleteScope } from '../shared/confirm-delete/confirm-delete.model';
 import { BulkActionBarComponent, BulkAction } from '../shared/transactions/bulk-action-bar.component';
 import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../shared/transactions/transaction-helpers';
 import {
@@ -45,7 +47,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, BulkActionBarComponent, AppCurrencyPipe,
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, ConfirmDeleteComponent, BulkActionBarComponent, AppCurrencyPipe,
     SelectMenuComponent, TxMobileHeaderComponent, TxFilterChipsComponent, TxMobileListComponent],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
@@ -77,7 +79,8 @@ export class ReceitasComponent implements OnInit {
   deletePlanId: string | null = null;
   deleteInstallmentId: string | null = null;
   deleteFonte = '';
-  deleteIsRecurring = false;
+  deleteValor = '';
+  deleteKind: DeleteKind = 'single';
   showEditReceivedModal = false;
   editReceivedId: string | null = null;
   editReceivedSource = '';
@@ -577,7 +580,8 @@ export class ReceitasComponent implements OnInit {
     this.deletePlanId = payload.planId || null;
     this.deleteInstallmentId = payload.installmentId;
     this.deleteFonte = renda.fonte;
-    this.deleteIsRecurring = renda.schedule === 'Recurring';
+    this.deleteValor = formatCurrencyValue(renda.valor || 0);
+    this.deleteKind = renda.schedule === 'Recurring' ? 'recurring' : 'single';
     this.showDeleteModal = true;
   }
 
@@ -594,15 +598,16 @@ export class ReceitasComponent implements OnInit {
     }
   }
 
-  confirmarExcluirSomenteEsta(): void {
+  confirmarExclusao(escopo: DeleteScope): void {
+    if (escopo === 'all') {
+      if (!this.deletePlanId) return;
+      this.executarRemocaoReceita(this.db.removeIncome(this.deletePlanId));
+      this.fecharModalExcluir();
+      return;
+    }
+
     if (!this.deleteInstallmentId) return;
     this.executarRemocaoReceita(this.db.removeIncomeInstallment(this.deleteInstallmentId));
-    this.fecharModalExcluir();
-  }
-
-  confirmarExcluirRecorrencia(): void {
-    if (!this.deletePlanId) return;
-    this.executarRemocaoReceita(this.db.removeIncome(this.deletePlanId));
     this.fecharModalExcluir();
   }
 
@@ -621,7 +626,8 @@ export class ReceitasComponent implements OnInit {
     this.deletePlanId = null;
     this.deleteInstallmentId = null;
     this.deleteFonte = '';
-    this.deleteIsRecurring = false;
+    this.deleteValor = '';
+    this.deleteKind = 'single';
   }
 
   confirmarEdicaoRecebida(): void {

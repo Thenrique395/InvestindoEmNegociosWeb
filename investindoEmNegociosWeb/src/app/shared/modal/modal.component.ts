@@ -2,7 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { BodyPortalDirective } from '../body-portal.directive';
 
 
-type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
+type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 @Component({
   selector: 'app-modal',
@@ -103,6 +103,8 @@ export class ModalComponent {
 
   private resolveSizeClass(size: ModalSize): string {
     switch (size) {
+      // 420px: a medida do diálogo de confirmação no handoff.
+      case 'xs': return 'max-w-[420px]';
       case 'sm': return 'max-w-md';
       case 'lg': return 'max-w-4xl';
       case 'xl': return 'max-w-6xl';

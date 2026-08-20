@@ -298,7 +298,7 @@
 .responsive-list__page.is-active {
   border-color: var(--brand-navy);
   background: var(--brand-navy);
-  color: #fff;
+  color: var(--nav-item-active);
 }
 
 .responsive-list__page:disabled {

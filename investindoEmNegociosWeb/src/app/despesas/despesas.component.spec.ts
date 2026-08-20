@@ -350,3 +350,99 @@ describe('DespesasComponent - fluxos de cadastro/edição (cobertura)', () => {
     expect(db.addExpense.calls.mostRecent().args[0].fixaMeses).toBe(120);
   });
 });
+
+describe('DespesasComponent - exclusão', () => {
+  const despesaBase = {
+    id: 'exp-1',
+    nome: 'Mercado',
+    valor: 100,
+    vencimento: '05/08/2026',
+    categoria: 'Alimentação'
+  } as any;
+
+  it('avulsa abre a confirmação em vez de excluir direto', () => {
+    const db = { removeExpense: jasmine.createSpy('removeExpense').and.returnValue(of(void 0)) };
+    const { component } = makeDespesas(db);
+
+    component.openRemocao({ ...despesaBase }, '2026-08', 0);
+
+    expect(component.confirmRemocao).not.toBeNull();
+    expect(component.confirmRemocao!.kind).toBe('single');
+    expect(component.confirmRemocao!.nome).toBe('Mercado');
+    // Nada é removido antes de confirmar.
+    expect(db.removeExpense).not.toHaveBeenCalled();
+  });
+
+  it('despesa de cartão pode ser excluída — o bloqueio do front não existia na API', () => {
+    const db = { removeExpense: jasmine.createSpy('removeExpense').and.returnValue(of(void 0)) };
+    const { component, ui } = makeDespesas(db);
+
+    component.openRemocao({ ...despesaBase, cartao: 'card-1' }, '2026-08', 0);
+
+    expect(ui.error).not.toHaveBeenCalled();
+    expect(component.confirmRemocao).not.toBeNull();
+
+    component.confirmarRemocao('single');
+    expect(db.removeExpense).toHaveBeenCalledWith('exp-1');
+  });
+
+  it('parcelada de cartão exclui a série inteira quando o escopo é "all"', () => {
+    const db = {
+      removeExpense: jasmine.createSpy('removeExpense').and.returnValue(of(void 0)),
+      removeExpenseSeries: jasmine.createSpy('removeExpenseSeries').and.returnValue(of(void 0))
+    };
+    const { component } = makeDespesas(db);
+
+    component.openRemocao(
+      { ...despesaBase, cartao: 'card-1', planId: 'plan-1', serieId: 'plan-1', parcelasTotal: 3 },
+      '2026-08',
+      0
+    );
+    expect(component.confirmRemocao!.kind).toBe('series');
+
+    component.confirmarRemocao('all');
+    expect(db.removeExpenseSeries).toHaveBeenCalledWith('plan-1');
+    expect(db.removeExpense).not.toHaveBeenCalled();
+  });
+
+  it('recorrente encerra a recorrência com escopo "all" e mantém as demais com "single"', () => {
+    const db = {
+      removeExpense: jasmine.createSpy('removeExpense').and.returnValue(of(void 0)),
+      removeExpenseSeries: jasmine.createSpy('removeExpenseSeries').and.returnValue(of(void 0))
+    };
+    const { component } = makeDespesas(db);
+
+    component.openRemocao({ ...despesaBase, fixa: true, planId: 'plan-9' }, '2026-08', 0);
+    expect(component.confirmRemocao!.kind).toBe('recurring');
+
+    component.confirmarRemocao('single');
+    expect(db.removeExpense).toHaveBeenCalledWith('exp-1');
+    expect(db.removeExpenseSeries).not.toHaveBeenCalled();
+  });
+
+  it('cancelar fecha a confirmação sem remover nada', () => {
+    const db = { removeExpense: jasmine.createSpy('removeExpense').and.returnValue(of(void 0)) };
+    const { component } = makeDespesas(db);
+
+    component.openRemocao({ ...despesaBase }, '2026-08', 0);
+    component.cancelarRemocao();
+
+    expect(component.confirmRemocao).toBeNull();
+    expect(db.removeExpense).not.toHaveBeenCalled();
+  });
+
+  it('erro da API vira mensagem de domínio e a confirmação fecha', () => {
+    const db = {
+      removeExpense: jasmine
+        .createSpy('removeExpense')
+        .and.returnValue(throwError(() => ({ error: { detail: 'Parcela já paga.' } })))
+    };
+    const { component, ui } = makeDespesas(db);
+
+    component.openRemocao({ ...despesaBase }, '2026-08', 0);
+    component.confirmarRemocao('single');
+
+    expect(component.confirmRemocao).toBeNull();
+    expect(ui.error).toHaveBeenCalled();
+  });
+});

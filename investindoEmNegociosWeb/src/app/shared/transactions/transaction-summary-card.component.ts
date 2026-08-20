@@ -25,14 +25,13 @@ export type TransactionSummaryDensity = 'default' | 'compact';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="tsc" [attr.data-tone]="tone()" [attr.data-density]="density()">
+      <!-- Ícone e rótulo dividem a primeira linha; o valor começa na borda do
+           card, não recuado atrás do ícone (COMPONENTES.md §3.1). -->
       <div class="tsc__head">
         <span class="tsc__icon" aria-hidden="true">
           <ng-content select="[stat-icon]"></ng-content>
         </span>
-        <div class="tsc__copy">
-          <p class="tsc__eyebrow">{{ eyebrow() }}</p>
-          <p class="tsc__value">{{ value() }}</p>
-        </div>
+        <p class="tsc__eyebrow">{{ eyebrow() }}</p>
         @if (tooltipText()) {
           <app-tooltip
             class="tsc__tooltip"
@@ -41,6 +40,7 @@ export type TransactionSummaryDensity = 'default' | 'compact';
             size="sm" />
         }
       </div>
+      <p class="tsc__value">{{ value() }}</p>
       <p class="tsc__note">{{ note() }}<ng-content select="[stat-note]"></ng-content></p>
     </article>
   `,
@@ -54,7 +54,10 @@ export type TransactionSummaryDensity = 'default' | 'compact';
       --tone-soft: var(--primary-tint);
 
       display: grid;
-      gap: var(--space-4);
+      align-content: start;
+      /* Sem gap no grid: as distâncias do protótipo são 10px do rótulo para o
+         valor e 6px do valor para a nota, e vêm da margem de cada um. */
+      gap: 0;
       height: 100%;
       padding: var(--card-padding);
       border: 1px solid var(--border);
@@ -68,10 +71,9 @@ export type TransactionSummaryDensity = 'default' | 'compact';
     .tsc[data-tone='danger'] { --tone: var(--expense); --tone-text: var(--expense-text); --tone-weak: var(--expense-tint); --tone-soft: var(--expense-tint); }
 
     .tsc__head {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
+      display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: var(--space-3);
     }
 
     .tsc__icon {
@@ -92,9 +94,9 @@ export type TransactionSummaryDensity = 'default' | 'compact';
       block-size: 16px;
     }
 
-    .tsc__copy { min-width: 0; }
-
     .tsc__eyebrow {
+      flex: 1;
+      min-width: 0;
       margin: 0;
       color: var(--text-tertiary);
       font-size: var(--fs-caption);
@@ -122,7 +124,7 @@ export type TransactionSummaryDensity = 'default' | 'compact';
       word-break: keep-all;
     }
 
-    .tsc__tooltip { align-self: start; }
+    .tsc__tooltip { flex: none; }
 
     .tsc__note {
       margin: var(--space-2) 0 0;

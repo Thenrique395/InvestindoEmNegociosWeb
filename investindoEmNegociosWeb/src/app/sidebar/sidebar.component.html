@@ -1,8 +1,11 @@
 <aside id="app-sidebar" class="sidebar" [class.sidebar--mobile-open]="mobileOpen()">
   <div class="sidebar__brand">
+    <!-- Sempre a versão para fundo escuro: a sidebar é navy fixo nos dois temas.
+         Trocando pelo tema, o tema claro punha o logo de fundo claro — com o
+         "N" navy — sobre o navy da barra, e metade da marca sumia. -->
     <img
       class="sidebar__logo"
-      [src]="isLightTheme() ? '/assets/logoHeaderInvestindoemNegocios2.png' : '/assets/logoHeaderInvestindoemNegocios.png'"
+      src="/assets/logoHeaderInvestindoemNegocios.png"
       [alt]="brandName()"
       width="34"
       height="34"
