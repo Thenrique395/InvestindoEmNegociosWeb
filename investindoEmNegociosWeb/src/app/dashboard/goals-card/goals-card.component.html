@@ -1,0 +1,30 @@
+<section class="goals">
+  <header class="goals__head">
+    <h2 class="goals__title">
+      Metas
+      <app-tooltip size="sm" label="Como ler as metas" [text]="tooltip" />
+    </h2>
+    <a class="goals__link" routerLink="/metas">Ver todas</a>
+  </header>
+
+  @if (rows().length) {
+    <ul class="goals__list">
+      @for (row of rows(); track row.id) {
+        <li class="goals__item">
+          <span class="goals__row">
+            <span class="goals__name">{{ row.title }}</span>
+            <span class="goals__amounts">{{ fmtCurrent()(row.current) }} / {{ fmtTarget()(row.target) }}</span>
+          </span>
+          <span
+            class="goals__bar"
+            role="img"
+            [attr.aria-label]="row.title + ': ' + (row.percent | number: '1.0-0') + '% do alvo, ' + row.paceLabel">
+            <i class="goals__bar-fill" [attr.data-pace]="row.pace" [style.width.%]="row.percent"></i>
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="goals__empty">Nenhuma meta ativa. Defina um objetivo para acompanhar o progresso aqui.</p>
+  }
+</section>

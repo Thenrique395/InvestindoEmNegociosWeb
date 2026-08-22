@@ -4,108 +4,101 @@
 
 .overview {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--space-9);
 }
 
+/* Page header — COMPONENTES.md §2. `align-items: flex-end` alinha a base do
+   texto com a base do seletor, que é o que faz o bloco parecer uma linha só. */
 .overview__header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-6);
+  gap: var(--space-7) var(--space-9);
 }
 
 .overview__heading {
+  flex: 1 1 340px;
   min-width: 0;
-  max-width: 620px;
+}
+
+.overview__eyebrow {
+  display: block;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
 }
 
 .overview__title {
-  margin: 0;
+  margin: var(--space-2) 0 var(--space-1);
   color: var(--text);
-  font-size: clamp(1.45rem, 1.7vw, 1.85rem);
-  font-weight: var(--fw-bold);
+  font-family: var(--font-display);
+  font-size: var(--fs-page-title);
+  font-weight: var(--fw-semibold);
   letter-spacing: var(--ls-tight);
   line-height: var(--lh-tight);
 }
 
+.overview__description {
+  max-width: 74ch;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-control);
+}
+
+/* Segmented control — COMPONENTES.md §5.6: trilho afundado, aba ativa branca
+   com sombra de 1px. Sem borda no trilho: a borda somada ao fundo afundado
+   deixa o controle pesado ao lado do título. */
 .overview__period {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.2rem;
-  border: 1px solid var(--border);
+  padding: 3px;
   border-radius: var(--radius-pill);
-  background: var(--surface-sunken);
+  background: var(--surface-inset);
 }
 
 .overview__period-btn {
-  padding: 0.4rem 0.9rem;
-  border: 1px solid transparent;
+  padding: var(--space-2) var(--space-7);
+  border: none;
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-tertiary);
-  font-size: var(--fs-meta);
+  font-family: inherit;
+  font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-tight);
   cursor: pointer;
-  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  transition: var(--control-transition);
 }
 
 .overview__period-btn:hover {
   color: var(--text);
 }
 
+.overview__period-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .overview__period-btn--active {
-  border-color: var(--border-strong);
   background: var(--surface);
   color: var(--text);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-segment);
 }
 
-.overview__summary {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  margin: 0;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-inner);
-  background: var(--surface-sunken);
-  color: var(--text-secondary);
-  font-size: var(--fs-meta);
-  line-height: var(--lh-control);
+/* A faixa do dashboard é o conteúdo principal da tela: o valor escala com a
+   janela em vez de ficar no tamanho fixo que as outras faixas usam. */
+.overview__strip {
+  --kpi-value-size: var(--fs-kpi-cell);
+  --kpi-feature-value-size: var(--fs-kpi-feature);
+  --kpi-cell-padding: var(--space-10) var(--space-11);
 }
 
-.overview__summary--analytical {
-  border-color: var(--primary-tint);
-  background: var(--primary-tint);
-  color: var(--text);
-}
-
-.overview__summary-icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  margin-top: 1px;
-  color: var(--text-tertiary);
-}
-
-.overview__summary--analytical .overview__summary-icon {
-  color: var(--primary-text);
-}
-
-.overview__summary-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Poppins com tracking negativo e `tabular-nums`: numa faixa de 5 valores,
-   dígitos de largura variável fazem as colunas dançarem a cada atualização. */
-/* A primeira célula é a resposta principal da tela — ganha destaque de
-   tamanho e um gradiente sutil, como no protótipo. */
 /* Esqueleto da faixa: repete a moldura do app-kpi-strip sem instanciá-lo —
    o primitivo exige `items`, e não há dados ainda. */
 .overview__skeleton-strip {
@@ -122,7 +115,7 @@
   min-width: 0;
   display: grid;
   gap: var(--space-4);
-  padding: var(--card-padding);
+  padding: var(--space-10) var(--space-11);
   box-shadow: var(--shadow-cell-divider);
 }
 
@@ -132,12 +125,6 @@
   background: linear-gradient(90deg, var(--surface-sunken) 25%, var(--surface-inset) 50%, var(--surface-sunken) 75%);
   background-size: 200% 100%;
   animation: overview-shimmer 1.4s ease-in-out infinite;
-}
-
-.overview-skeleton--icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-control);
 }
 
 .overview-skeleton--title {
@@ -153,6 +140,12 @@
 .overview-skeleton--note {
   width: 90%;
   height: 12px;
+}
+
+.overview-skeleton--bar {
+  width: 100%;
+  height: 4px;
+  border-radius: var(--radius-pill);
 }
 
 @keyframes overview-shimmer {

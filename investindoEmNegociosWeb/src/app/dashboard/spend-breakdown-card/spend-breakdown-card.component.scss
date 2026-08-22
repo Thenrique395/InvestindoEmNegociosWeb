@@ -1,0 +1,191 @@
+:host {
+  display: block;
+}
+
+/* Altura fixa: cabeçalho e rodapé ancorados, lista rolando no meio. Sem isto
+   o card cresce conforme o dado e a linha do par deixa de bater. */
+.spend {
+  display: flex;
+  flex-direction: column;
+  height: var(--h-card-spend);
+  padding: var(--space-9) var(--space-10);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.spend__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.spend__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.spend__period {
+  flex: none;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+/* `min-height: 0` é o que permite o filho de flex encolher abaixo do conteúdo
+   e, aí sim, rolar. Sem ele o `overflow` não tem efeito e o card estoura. */
+.spend__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spend__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.spend__name {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spend__value {
+  flex: none;
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.spend__bar {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-inset);
+}
+
+.spend__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-bar) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spend__bar-fill {
+    transition: none;
+  }
+}
+
+.spend__insight {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin: var(--space-7) 0 0;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--border-inner);
+  border-radius: var(--radius-item);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-body);
+}
+
+.spend__insight svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  color: var(--primary-text);
+}
+
+/* Convite, não análise: sem orçamento no plano não há teto a comparar. */
+.spend__upsell {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-7);
+  padding: var(--space-6) var(--space-7);
+  border: 1px solid var(--primary-ring);
+  border-radius: var(--radius-inner);
+  background: linear-gradient(120deg, var(--primary-tint-soft), var(--surface-subtle));
+}
+
+.spend__upsell-copy {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.spend__upsell-title {
+  display: block;
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.spend__upsell-text {
+  margin: var(--space-1) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-control);
+}
+
+.spend__upsell-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: var(--h-button-xs);
+  padding: 0 var(--space-7);
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--control-transition);
+}
+
+.spend__upsell-button:hover {
+  background: var(--primary-hover);
+}
+
+.spend__upsell-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.spend__empty {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}

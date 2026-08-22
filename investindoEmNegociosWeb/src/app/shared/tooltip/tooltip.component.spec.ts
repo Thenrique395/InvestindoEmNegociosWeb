@@ -26,4 +26,28 @@ describe('TooltipComponent', () => {
     fixture.detectChanges();
     expect(button.getAttribute('aria-expanded')).toBe('false');
   });
+
+  it('clicar de novo mantém aberto: alternar fecharia o texto que a pessoa foi ler', () => {
+    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+
+    button.click();
+    button.click();
+    fixture.detectChanges();
+
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('põe o painel no body, fora do overflow da faixa de indicadores', () => {
+    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+    button.click();
+    fixture.detectChanges();
+
+    const panel = document.body.querySelector(':scope > .tooltip__panel');
+    expect(panel).not.toBeNull();
+    expect(panel!.textContent).toContain('Detalhes do indicador.');
+
+    document.body.click();
+    fixture.detectChanges();
+    expect(document.body.querySelector(':scope > .tooltip__panel')).toBeNull();
+  });
 });

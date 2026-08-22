@@ -1,0 +1,29 @@
+<section class="evolution">
+  <header class="evolution__head">
+    <div class="evolution__titles">
+      <h2 class="evolution__title">
+        {{ view().title }}
+        <app-tooltip size="sm" [label]="'Como o gráfico de ' + view().title + ' é montado'" [text]="view().tooltip" />
+      </h2>
+      <p class="evolution__subtitle">{{ view().subtitle }}</p>
+    </div>
+    <div class="evolution__headline">
+      <strong class="evolution__value">{{ headlineValue() }}</strong>
+      <span class="evolution__tag" [attr.data-tone]="view().tag.tone">{{ view().tag.text }}</span>
+    </div>
+  </header>
+
+  <app-chart-line
+    [series]="chartSeries()"
+    [labels]="view().labels"
+    [height]="260"
+    [markLast]="true"
+    [highlightLastLabel]="true"
+    [toggleable]="true"
+    [secondaryBand]="secondaryBand()"
+    [axisNote]="axisNote()"
+    [formatValue]="fmt()"
+    [formatTick]="tickFormat()">
+    <span legend-note>{{ view().note }}</span>
+  </app-chart-line>
+</section>

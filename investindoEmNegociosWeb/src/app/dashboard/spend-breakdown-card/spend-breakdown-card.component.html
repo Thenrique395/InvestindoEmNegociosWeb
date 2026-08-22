@@ -1,0 +1,54 @@
+<section class="spend">
+  <header class="spend__head">
+    <h2 class="spend__title">
+      Onde o dinheiro foi
+      <app-tooltip size="sm" label="Como ler Onde o dinheiro foi" [text]="tooltip" />
+    </h2>
+    @if (periodLabel()) {
+      <span class="spend__period">{{ periodLabel() }}</span>
+    }
+  </header>
+
+  @if (view().rows.length) {
+    <ul class="spend__list">
+      @for (row of view().rows; track row.label) {
+        <li class="spend__item">
+          <span class="spend__row">
+            <span class="spend__name">{{ row.label }}</span>
+            <span class="spend__value">{{ fmt()(row.total) }}</span>
+          </span>
+          <span
+            class="spend__bar"
+            role="img"
+            [attr.aria-label]="row.label + ': ' + fmt()(row.total) + ', ' + row.percent.toFixed(0) + '% do total'">
+            <i class="spend__bar-fill" [style.width.%]="row.percent" [style.background]="row.color"></i>
+          </span>
+        </li>
+      }
+    </ul>
+
+    @if (canBudget()) {
+      @if (view().insight; as insight) {
+        <p class="spend__insight">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M9 18h6M10 21h4" />
+            <path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.1H9c0-.8-.4-1.5-1-2.1A6 6 0 0 1 12 3z" />
+          </svg>
+          {{ insight }}
+        </p>
+      }
+    } @else {
+      <div class="spend__upsell">
+        <div class="spend__upsell-copy">
+          <strong class="spend__upsell-title">Quer definir um teto para essas categorias?</strong>
+          <p class="spend__upsell-text">
+            O orçamento avisa quando você se aproxima do limite — disponível no plano Controle.
+          </p>
+        </div>
+        <a class="spend__upsell-button" routerLink="/planos">Conhecer planos</a>
+      </div>
+    }
+  } @else {
+    <p class="spend__empty">Nenhuma despesa categorizada no período. Categorize seus lançamentos para ver a distribuição aqui.</p>
+  }
+</section>

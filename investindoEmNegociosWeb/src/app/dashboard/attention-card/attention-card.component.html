@@ -1,0 +1,43 @@
+<section class="attention">
+  <header class="attention__head">
+    <h2 class="attention__title">
+      Precisa da sua atenção
+      <app-tooltip size="sm" label="O que entra em Precisa da sua atenção" [text]="tooltip" />
+    </h2>
+    @if (items().length) {
+      <span class="attention__count">{{ items().length }}</span>
+    }
+  </header>
+
+  @if (items().length) {
+    <ul class="attention__list">
+      @for (item of items(); track item.id) {
+        <li class="attention__item" [attr.data-tone]="item.tone">
+          <span class="attention__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              @if (item.tone === 'danger') {
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 8v5M12 16.5v.01" />
+              } @else if (item.tone === 'warning') {
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7.5V12l3 2" />
+              } @else {
+                <path d="M12 19V5m0 0l-5 5m5-5l5 5" />
+              }
+            </svg>
+          </span>
+          <span class="attention__body">
+            <span class="attention__item-title">{{ item.title }}</span>
+            <span class="attention__item-detail">{{ item.detail }}</span>
+          </span>
+          <a class="attention__action" [routerLink]="item.route" [queryParams]="item.queryParams">
+            {{ item.actionLabel }}
+            <span class="sr-only"> — {{ item.title }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="attention__empty">Nada exigindo ação hoje. Nenhuma conta vencida nem vencendo nos próximos 7 dias.</p>
+  }
+</section>

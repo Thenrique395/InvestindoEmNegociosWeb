@@ -16,10 +16,15 @@ export const formatNumberValue = (value: number, options?: Intl.NumberFormatOpti
   }).format(value);
 };
 
-export const formatCurrencyValue = (value: number, currency?: string): string => {
+export const formatCurrencyValue = (
+  value: number,
+  currency?: string,
+  /** Ajustes pontuais — ex.: `maximumFractionDigits: 0` para omitir centavos. */
+  options?: Intl.NumberFormatOptions
+): string => {
   const locale = getActiveLocale();
   const targetCurrency = currency || getActiveCurrency();
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: targetCurrency }).format(value);
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: targetCurrency, ...options }).format(value);
 };
 
 /**

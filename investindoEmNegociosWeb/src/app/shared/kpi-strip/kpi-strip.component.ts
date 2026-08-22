@@ -1,15 +1,29 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, input } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TooltipComponent } from '../tooltip/tooltip.component';
 
-export type KpiTone = 'primary' | 'success' | 'danger' | 'info' | 'warning' | 'neutral';
+export type KpiTone = 'primary' | 'success' | 'danger' | 'info' | 'warning' | 'neutral' | 'brand';
 
 export interface KpiDelta {
   direction: 'up' | 'down';
   /** A variação é boa para o usuário? Despesa subindo não é. */
   favorable: boolean;
+  /** Só a variação, dentro da pílula colorida: "2,6%". */
   text: string;
+  /** O recorte, ao lado da pílula e em cinza: "no mês". */
+  context?: string;
+}
+
+/**
+ * Barra fina no rodapé da célula, com a proporção que o indicador representa.
+ * Opcional de propósito: célula sem denominador verificável não ganha barra.
+ */
+export interface KpiProgress {
+  /** 0–100. O componente não corrige valor fora da faixa — quem monta o item corrige. */
+  percent: number;
+  /** O que a barra representa. Vira `aria-label` da barra. */
+  label: string;
 }
 
 export interface KpiItem {
@@ -23,7 +37,10 @@ export interface KpiItem {
   /** Obrigatório: indicador sem explicação do cálculo não passa em revisão. */
   tooltip: string;
   tone?: KpiTone;
+  /** Lavagem de fundo da célula, para a resposta principal da tela. */
+  wash?: 'brand' | 'income' | null;
   delta?: KpiDelta | null;
+  progress?: KpiProgress | null;
   link?: { route: string; label?: string };
 }
 
@@ -49,7 +66,7 @@ export interface KpiItem {
 @Component({
   selector: 'app-kpi-strip',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgTemplateOutlet, RouterLink, TooltipComponent],
+  imports: [DecimalPipe, NgTemplateOutlet, RouterLink, TooltipComponent],
   templateUrl: './kpi-strip.component.html',
   styleUrl: './kpi-strip.component.scss',
 })

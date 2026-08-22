@@ -1,0 +1,137 @@
+:host {
+  display: block;
+}
+
+/* Mesma altura fixa do card irmão — ver `--h-card-activity`. */
+.activity {
+  display: flex;
+  flex-direction: column;
+  height: var(--h-card-activity);
+  padding: var(--space-9) var(--space-10);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.activity__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.activity__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.activity__link {
+  flex: none;
+  color: var(--primary-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.activity__link:hover {
+  text-decoration: underline;
+}
+
+.activity__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity__row {
+  --tone-text: var(--expense-text);
+  --tone-tint: var(--expense-tint);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border-row);
+}
+
+.activity__row[data-type='income'] {
+  --tone-text: var(--income-text);
+  --tone-tint: var(--income-tint);
+}
+
+.activity__row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.activity__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--tone-tint);
+  color: var(--tone-text);
+}
+
+.activity__icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.activity__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.activity__name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Uma linha só, como o nome acima: a categoria quebrando em duas empurrava a
+   linha seguinte para fora da área visível e comia uma vaga da lista. */
+.activity__detail {
+  overflow: hidden;
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity__amount {
+  flex: none;
+  color: var(--tone-text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.activity__empty {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}

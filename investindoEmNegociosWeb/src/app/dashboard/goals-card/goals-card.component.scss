@@ -1,0 +1,134 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  /* Altura fixa, igual à dos dois irmãos da coluna: empilhados, alturas
+     diferentes viram degraus. Quem absorve a folga entre as colunas é o
+     Recorrências, do outro lado. */
+  height: var(--h-card-side);
+}
+
+/* Três metas de uma linha cada. A altura fixa mantém o fim da coluna lateral
+   no mesmo lugar quando uma meta é concluída e sai da lista. */
+.goals {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-9) var(--space-10);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.goals__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+}
+
+.goals__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.goals__link {
+  flex: none;
+  color: var(--primary-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.goals__link:hover {
+  text-decoration: underline;
+}
+
+.goals__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goals__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.goals__name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goals__amounts {
+  flex: none;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.goals__bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+}
+
+/* Escala de CONQUISTA (COMPONENTES.md §9): encher a barra é bom. É o inverso
+   da escala de consumo do orçamento — não reaproveitar uma na outra. */
+.goals__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  transition: width var(--dur-bar) var(--ease-out);
+}
+
+.goals__bar-fill[data-pace='done'] {
+  background: var(--income);
+}
+
+.goals__bar-fill[data-pace='behind'] {
+  background: var(--warning);
+}
+
+.goals__bar-fill[data-pace='late'] {
+  background: var(--expense);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goals__bar-fill {
+    transition: none;
+  }
+}
+
+.goals__empty {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}

@@ -1,42 +1,73 @@
-<svg
-  class="line"
-  [attr.viewBox]="viewBox"
-  [style.height.px]="height()"
-  preserveAspectRatio="none"
-  role="img"
-  aria-hidden="true">
-  <defs>
+<div class="line__plot">
+  <svg
+    class="line"
+    [attr.viewBox]="viewBox()"
+    role="img"
+    [attr.aria-label]="'Gráfico de linha: ' + visibleSeriesLabels()">
+    <defs>
+      @for (s of series(); track s.label; let i = $index) {
+        @if (!s.dashed) {
+          <linearGradient [attr.id]="gradientId(i)" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" [attr.stop-color]="s.color" stop-opacity="0.18" />
+            <stop offset="100%" [attr.stop-color]="s.color" stop-opacity="0" />
+          </linearGradient>
+        }
+      }
+    </defs>
+
+    @for (y of gridLines(); track y) {
+      <line class="line__grid" x1="0" [attr.y1]="y" x2="820" [attr.y2]="y" />
+    }
+
     @for (s of series(); track s.label; let i = $index) {
-      @if (!s.dashed) {
-        <linearGradient [attr.id]="gradientId(i)" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" [attr.stop-color]="s.color" stop-opacity="0.18" />
-          <stop offset="100%" [attr.stop-color]="s.color" stop-opacity="0" />
-        </linearGradient>
+      @if (!isHidden(s)) {
+        @if (showArea() && !s.dashed && s.emphasis) {
+          <path [attr.d]="areaFor(s)" [attr.fill]="'url(#' + gradientId(i) + ')'" stroke="none" />
+        }
+        <path
+          class="line__series"
+          [class.line__series--dashed]="s.dashed"
+          [class.line__series--emphasis]="s.emphasis"
+          [attr.d]="pathFor(s)"
+          [attr.stroke]="s.color"
+          fill="none" />
+        @if (markLast() && lastPoint(s); as end) {
+          <circle
+            class="line__end"
+            [attr.cx]="end.cx"
+            [attr.cy]="end.cy"
+            [attr.r]="s.emphasis ? 4.5 : 3.5"
+            [attr.stroke]="s.color" />
+        }
       }
     }
-  </defs>
 
-  @for (y of gridLines; track y) {
-    <line class="line__grid" x1="0" [attr.y1]="y" x2="600" [attr.y2]="y" />
-  }
-
-  @for (s of series(); track s.label; let i = $index) {
-    @if (showArea() && !s.dashed) {
-      <path [attr.d]="areaFor(s)" [attr.fill]="'url(#' + gradientId(i) + ')'" stroke="none" />
+    <!-- Alvos invisíveis: o `title` nativo dá o valor de cada mês sem
+         depender de camada flutuante nem de JS de posicionamento. -->
+    @for (hit of pointHits(); track $index) {
+      <circle class="line__hit" [attr.cx]="hit.cx" [attr.cy]="hit.cy" r="10">
+        <title>{{ hit.title }}</title>
+      </circle>
     }
-    <path
-      class="line__series"
-      [class.line__series--dashed]="s.dashed"
-      [attr.d]="pathFor(s)"
-      [attr.stroke]="s.color"
-      fill="none" />
+  </svg>
+
+  @if (ticks().length) {
+    <div class="line__axis" aria-hidden="true">
+      @for (tick of ticks(); track tick.label) {
+        <span class="line__tick" [style.top.%]="tick.pct">{{ tick.label }}</span>
+      }
+    </div>
   }
-</svg>
+</div>
+
+@if (axisNote()) {
+  <p class="line__note">{{ axisNote() }}</p>
+}
 
 @if (labels().length) {
   <div class="line__labels">
-    @for (label of labels(); track label) {
-      <span class="line__label">{{ label }}</span>
+    @for (label of labels(); track $index; let last = $last) {
+      <span class="line__label" [class.line__label--current]="last && highlightLastLabel()">{{ label }}</span>
     }
   </div>
 }
@@ -44,10 +75,23 @@
 @if (showLegend()) {
   <div class="line__legend">
     @for (s of series(); track s.label) {
-      <span class="line__legend-item">
-        <i class="line__marker" [class.line__marker--dashed]="s.dashed" [style.background]="s.color"></i>
-        {{ s.label }}
-      </span>
+      @if (toggleable()) {
+        <button
+          type="button"
+          class="line__legend-item"
+          [class.line__legend-item--off]="isHidden(s)"
+          [attr.aria-pressed]="!isHidden(s)"
+          (click)="toggle(s)">
+          <i class="line__marker" [class.line__marker--dashed]="s.dashed" [style.background]="s.color"></i>
+          {{ s.label }}
+        </button>
+      } @else {
+        <span class="line__legend-item">
+          <i class="line__marker" [class.line__marker--dashed]="s.dashed" [style.background]="s.color"></i>
+          {{ s.label }}
+        </span>
+      }
     }
+    <ng-content select="[legend-note]" />
   </div>
 }

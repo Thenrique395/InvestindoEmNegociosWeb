@@ -4,11 +4,17 @@
   display: block;
 }
 
-/* `preserveAspectRatio: none` + largura 100%: a série ocupa o card inteiro em
-   qualquer largura, sem recalcular pontos no TypeScript. */
+.line__plot {
+  position: relative;
+  min-width: 0;
+}
+
+/* Escala uniforme (`height: auto`, sem `preserveAspectRatio="none"`): o
+   marcador do último ponto precisa continuar redondo em card largo. */
 .line {
   display: block;
   width: 100%;
+  height: auto;
   overflow: visible;
 }
 
@@ -19,12 +25,15 @@
 }
 
 .line__series {
-  stroke-width: 2.4;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* Sem isto o `preserveAspectRatio: none` esticaria a espessura do traço
-     junto com o desenho, e a linha ficaria mais grossa em cards largos. */
+  /* Sem isto o traço engrossaria junto com o desenho em cards largos. */
   vector-effect: non-scaling-stroke;
+}
+
+.line__series--emphasis {
+  stroke-width: 2.5;
 }
 
 /* Comparação: aporte, benchmark, planejado. */
@@ -33,31 +42,107 @@
   stroke-dasharray: 5 5;
 }
 
+.line__end {
+  fill: var(--surface);
+  stroke-width: 2.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.line__hit {
+  fill: transparent;
+  cursor: help;
+}
+
+/* Rótulos de valor sobre o desenho: `translateY(-50%)` alinha o texto ao
+   traço da grade, e o fundo tampa a linha por baixo dele. */
+.line__axis {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.line__tick {
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
+  padding-right: var(--space-2);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.line__note {
+  margin: var(--space-3) 0 0;
+  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
 .line__labels {
   display: flex;
   justify-content: space-between;
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
 }
 
 .line__label {
-  color: var(--text-tertiary);
-  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.line__label--current {
+  color: var(--text-secondary);
+  font-weight: var(--fw-semibold);
 }
 
 .line__legend {
   display: flex;
-  gap: var(--space-8);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-8);
   margin-top: var(--space-7);
   padding-top: var(--space-6);
-  border-top: 1px solid var(--border-row);
+  border-top: 1px solid var(--border-inner);
 }
 
 .line__legend-item {
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
+  padding: 0;
+  border: none;
+  background: none;
   color: var(--text-secondary);
+  font-family: inherit;
   font-size: var(--fs-meta);
+  line-height: var(--lh-tight);
+}
+
+button.line__legend-item {
+  cursor: pointer;
+  transition: opacity var(--dur-hover) ease;
+}
+
+button.line__legend-item:hover {
+  opacity: 0.75;
+}
+
+button.line__legend-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+/* Série escondida: o item continua legível, só perde a cor cheia — some por
+   completo e a pessoa não acha mais como trazer a série de volta. */
+.line__legend-item--off {
+  color: var(--text-muted);
+}
+
+.line__legend-item--off .line__marker {
+  opacity: 0.3;
 }
 
 .line__marker {
@@ -69,4 +154,11 @@
 .line__marker--dashed {
   background-image: linear-gradient(90deg, currentColor 60%, transparent 0);
   background-size: 6px 3px;
+}
+
+/* Nota no rodapé da legenda ("Entrada e saída de cada mês."). */
+::ng-deep [legend-note] {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: var(--fs-meta);
 }

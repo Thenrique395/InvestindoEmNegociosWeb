@@ -1,5 +1,9 @@
 @for (item of items(); track item.key; let first = $first) {
-  <article class="kpi" [attr.data-tone]="item.tone || 'primary'" [class.kpi--feature]="first && featureFirst()">
+  <article
+    class="kpi"
+    [attr.data-tone]="item.tone || 'primary'"
+    [attr.data-wash]="item.wash || null"
+    [class.kpi--feature]="first && featureFirst()">
     <div class="kpi__head">
       @if (iconTemplate()) {
         <span class="kpi__icon" aria-hidden="true">
@@ -12,12 +16,13 @@
           <p class="kpi__question">{{ item.question }}</p>
         }
       </div>
-      <app-tooltip [label]="'Como ' + item.label + ' é calculado'" [text]="item.tooltip" />
+      <app-tooltip size="sm" [label]="'Como ' + item.label + ' é calculado'" [text]="item.tooltip" />
     </div>
 
     <div class="kpi__value-row">
       <strong class="kpi__value">{{ item.value }}</strong>
       @if (item.delta; as delta) {
+        <span class="kpi__delta-row">
         <span
           class="kpi__delta"
           [class.kpi__delta--favorable]="delta.favorable"
@@ -30,6 +35,10 @@
             }
           </svg>
           {{ delta.text }}
+        </span>
+        @if (delta.context) {
+          <span class="kpi__delta-context">{{ delta.context }}</span>
+        }
         </span>
       }
     </div>
@@ -49,6 +58,15 @@
           <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </a>
+    }
+
+    @if (item.progress; as progress) {
+      <span
+        class="kpi__bar"
+        role="img"
+        [attr.aria-label]="progress.label + ': ' + (progress.percent | number: '1.0-0') + '%'">
+        <i class="kpi__bar-fill" [style.width.%]="progress.percent"></i>
+      </span>
     }
   </article>
 }

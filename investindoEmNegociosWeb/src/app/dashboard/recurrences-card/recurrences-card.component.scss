@@ -1,0 +1,183 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  /* `min-height`, não `height`: o piso é o tamanho parametrizado, mas o card
+     pode crescer quando a coluna precisa fechar altura com a vizinha. O dado
+     continua sem influência — a lista rola por dentro. */
+  min-height: var(--h-card-recurrences);
+}
+
+/* Altura fixa como nos demais cards de lista: a grade rola por dentro e o
+   rodapé de três números fica ancorado na base, onde a pessoa aprende a
+   procurá-lo. */
+.recurrences {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-10) var(--space-11);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.recurrences__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+}
+
+.recurrences__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.recurrences__subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-tight);
+}
+
+.recurrences__link {
+  flex: none;
+  color: var(--primary-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.recurrences__link:hover {
+  text-decoration: underline;
+}
+
+/* Três por linha, como no protótipo. A base de 190px é o que garante isso na
+   largura da coluna esquerda; abaixo dela cai para dois e depois um, sem
+   breakpoint. O nome trunca de propósito — a informação que importa na varredura
+   é o valor e o dia, não o nome inteiro. */
+/* Grid com `auto-fill`, não flex: o item sozinho na última linha tem que ficar
+   com a largura de UMA coluna, e não esticar até a borda. Aqui a "célula vazia
+   à direita" que o ARQUITETURA §7 evita é justamente o comportamento correto —
+   a regra de lá vale para faixa de indicadores, onde a última célula deve
+   crescer; numa grade de cartões iguais, esticar um deles mente sobre o peso
+   dele. Por isso `auto-fill` e não `auto-fit`: `auto-fit` colapsa as trilhas
+   vazias e o órfão voltaria a esticar. */
+.recurrences__grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  align-content: flex-start;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recurrences__item {
+  --faixa: var(--chart-neutral);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--faixa);
+  border-radius: var(--radius-inner);
+  background: var(--surface-subtle);
+}
+
+.recurrences__item[data-color='1'] { --faixa: var(--chart-1); }
+.recurrences__item[data-color='2'] { --faixa: var(--chart-2); }
+.recurrences__item[data-color='3'] { --faixa: var(--chart-3); }
+.recurrences__item[data-color='4'] { --faixa: var(--chart-4); }
+.recurrences__item[data-color='5'] { --faixa: var(--chart-5); }
+.recurrences__item[data-color='6'] { --faixa: var(--chart-6); }
+.recurrences__item[data-color='7'] { --faixa: var(--chart-7); }
+
+.recurrences__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recurrences__name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Uma linha só: "todo dia 05 · Moradia" quebrando em duas desalinha a altura
+   dos cartões vizinhos da mesma linha da grade. */
+.recurrences__detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: var(--space-1);
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-tight);
+}
+
+.recurrences__amount {
+  flex: none;
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.recurrences__amount[data-direction='income'] {
+  color: var(--income-text);
+}
+
+.recurrences__foot {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-7) var(--space-11);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-inner);
+}
+
+.recurrences__stat {
+  display: flex;
+  flex: 1 1 140px;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recurrences__stat-label {
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-tight);
+}
+
+.recurrences__stat-value {
+  margin-top: var(--space-2);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  font-variant-numeric: tabular-nums;
+}

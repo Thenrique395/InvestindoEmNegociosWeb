@@ -25,6 +25,19 @@ import {
 } from './utils/home-insight.utils';
 import { AccountsService, AccountResponse, CashflowProjectionResponse, DebtSummaryResponse, InsightEngineItemResponse, InsightEngineResponse, NetWorthHistoryResponse, NetWorthSummaryResponse, RealAvailableBalanceResponse, RecommendationEngineResponse, RiskBotAssessmentResponse, SubscriptionsSummaryResponse } from './accounts.service';
 import { AuthService } from './auth.service';
+import { AttentionCardComponent } from './dashboard/attention-card/attention-card.component';
+import { AttentionInput } from './dashboard/attention-card/attention-card.model';
+import { EvolutionCardComponent } from './dashboard/evolution-card/evolution-card.component';
+import { GoalsCardComponent } from './dashboard/goals-card/goals-card.component';
+import { GoalEntry } from './dashboard/goals-card/goals-card.model';
+import { ActivityItem, RecentActivityCardComponent } from './dashboard/recent-activity-card/recent-activity-card.component';
+import { RecurrencesCardComponent } from './dashboard/recurrences-card/recurrences-card.component';
+import { SpendBreakdownCardComponent } from './dashboard/spend-breakdown-card/spend-breakdown-card.component';
+import { SpendSlice } from './dashboard/spend-breakdown-card/spend-breakdown-card.model';
+import { RecurrenceEntry } from './dashboard/recurrences-card/recurrences-card.model';
+import { EvolutionInput } from './dashboard/evolution-card/evolution-card.model';
+import { UpcomingCardComponent } from './dashboard/upcoming-card/upcoming-card.component';
+import { UpcomingEntry } from './dashboard/upcoming-card/upcoming-card.model';
 import { hasAtLeastRole, UserRole } from './roles';
 import { ProfileService } from './profile.service';
 import { NotificationsService, NotificationItem } from './notifications.service';
@@ -32,16 +45,13 @@ import { AppCurrencyPipe } from './shared/app-currency.pipe';
 import { StatusBadgeComponent } from './shared/status-badge/status-badge.component';
 import { TooltipComponent } from './shared/tooltip/tooltip.component';
 import { AiFinancialHealthResponse, AiHealthStatus, FinancialAssistantService } from './financial-assistant.service';
-import { CategoryBreakdownCardComponent } from './dashboard/category-breakdown/category-breakdown-card.component';
 import { CategorySlice } from './dashboard/category-breakdown/category-breakdown.model';
-import { DashboardActivityBoardComponent, DashboardActivityItem, DashboardReminderItem } from './dashboard/dashboard-activity-board.component';
-import { InsightActionsComponent } from './dashboard/insight-actions.component';
+import { InstallmentStatusTone } from './utils/status';
 import { UpgradeCtaComponent } from './dashboard/upgrade-cta.component';
 import { FinancialOverviewComponent } from './dashboard/financial-overview/financial-overview.component';
 import { FinancialOverviewInput } from './dashboard/financial-overview/financial-overview.model';
 import { MonthlyFlowPoint, buildMonthlyFlowSeries } from './utils/monthly-flow.utils';
 import { SectionCardComponent } from './shared/section-card/section-card.component';
-import { ComparisonPillComponent } from './shared/comparison-pill/comparison-pill.component';
 import { netWorthDelta } from './dashboard/dashboard-overview.model';
 import { BudgetResponse, BudgetService } from './budget.service';
 import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOverview } from './orcamento/budget-overview.model';
@@ -68,6 +78,20 @@ type InsightTodoItem = {
   actionLabel: string;
   route: string;
   queryParams: Record<string, string>;
+};
+
+/** Lançamento cru do extrato, antes de virar linha em "Atividade recente". */
+type DashboardActivityItem = {
+  id: string;
+  title: string;
+  date: string;
+  amount: number;
+  type: 'income' | 'expense';
+  category?: string;
+  status?: string;
+  statusTone?: InstallmentStatusTone;
+  recurring?: boolean;
+  planId?: string;
 };
 
 type DashboardRecurrenceItem = {
@@ -134,14 +158,16 @@ const CONTROLE_FLOW_MONTHS = 6;
     RouterModule,
     AppCurrencyPipe,
     StatusBadgeComponent,
-    TooltipComponent,
-    CategoryBreakdownCardComponent,
-    DashboardActivityBoardComponent,
-    InsightActionsComponent,
     UpgradeCtaComponent,
     FinancialOverviewComponent,
-    SectionCardComponent,
-    ComparisonPillComponent
+    EvolutionCardComponent,
+    RecurrencesCardComponent,
+    GoalsCardComponent,
+    SpendBreakdownCardComponent,
+    RecentActivityCardComponent,
+    AttentionCardComponent,
+    UpcomingCardComponent,
+    SectionCardComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -202,12 +228,18 @@ export class HomeComponent implements OnInit {
     expense: true,
     netWorth: true
   };
-  upcomingDueItems: DashboardReminderItem[] = [];
   receitasPeriodoAnterior: number | null = null;
   despesasPeriodoAnterior: number | null = null;
   compromissosResumo = { emAtraso: 0, proximosSeteDias: 0, valorEmAberto: 0 };
+  pendenciasDetalhadas: AttentionInput = {
+    despesasEmAtraso: { quantidade: 0, valor: 0, diasDoMaisAntigo: null },
+    despesasProximas: { quantidade: 0, valor: 0 },
+    receitasAtrasadas: { quantidade: 0, valor: 0 },
+    faturasFechando: { quantidade: 0, valor: 0 }
+  };
   loadErrorSections = new Set<string>();
   loadErrorsDismissed = false;
+  goalsRaw: Goal[] = [];
   metasResumo = {
     total: 0,
     planned: 0,
@@ -351,7 +383,6 @@ export class HomeComponent implements OnInit {
       this.atualizarDividaCartoes();
       this.updateRecentTransactions();
       this.updateMonthlyFlow();
-      this.updateUpcomingDueItems();
       this.updateOverviewDerived();
       this.updateInsight();
       this.summaryRefresh$.next();
@@ -829,32 +860,8 @@ export class HomeComponent implements OnInit {
     return this.netWorthHistory?.points || [];
   }
 
-  get patrimonioChartMonthsCount(): number {
-    return this.patrimonioLinePoints.length;
-  }
-
-  get hasPatrimonioEvolutionData(): boolean {
-    return this.patrimonioChartMonthsCount >= 2;
-  }
-
   get controleFlowSeries(): MonthlyFlowPoint[] {
     return buildMonthlyFlowSeries(this.expensesRaw, this.incomesRaw, this.dataAtual, CONTROLE_FLOW_MONTHS);
-  }
-
-  get controleFlowActiveMonthsCount(): number {
-    return this.controleFlowSeries.filter((point) => point.income > 0 || point.expense > 0).length;
-  }
-
-  get hasControleEvolutionData(): boolean {
-    return this.controleFlowActiveMonthsCount >= 2;
-  }
-
-  get hasControleEvolutionSeed(): boolean {
-    return this.controleFlowActiveMonthsCount > 0;
-  }
-
-  get controleEvolutionDescription(): string {
-    return `Receitas recebidas e despesas dos últimos ${CONTROLE_FLOW_MONTHS} meses.`;
   }
 
   get budgetOverview(): BudgetOverview {
@@ -976,16 +983,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  get patrimonioChartDescription(): string {
-    if (this.periodo === 'month') {
-      return `Realizado e projeção financeira de ${formatMonthYearLabel(this.dataAtual)}.`;
-    }
-    if (this.periodo === 'quarter') {
-      return `Realizado e projeção financeira de ${this.mesAtualLabel}.`;
-    }
-    return `Realizado e projeção financeira de janeiro a dezembro de ${this.patrimonioChartYearLabel}.`;
-  }
-
   get patrimonioHistoryDelta(): number {
     return netWorthDelta(this.patrimonioPeriodHistoryPoints);
   }
@@ -996,224 +993,6 @@ export class HomeComponent implements OnInit {
       const key = point.referenceDate.slice(0, 7);
       return this.isWithinRange(key, range);
     });
-  }
-
-  get patrimonioLinePoints(): NetWorthLinePoint[] {
-    const historyPoints = this.patrimonioPeriodHistoryPoints;
-    const historyByKey = new Map(historyPoints.map((point) => [point.referenceDate.slice(0, 7), point]));
-    const flowSeries = this.patrimonioPeriodFlowSeries;
-    const basePoints = flowSeries.length
-      ? flowSeries
-      : historyPoints.map((point) => ({
-          key: point.referenceDate.slice(0, 7),
-          label: point.label,
-          income: 0,
-          expense: 0,
-          balance: 0
-        }));
-    if (!basePoints.length) return [];
-
-    const width = 640;
-    const top = 22;
-    const right = 20;
-    const bottom = 102;
-    const left = 64;
-    const { minValue, maxValue } = this.netWorthChartDomain();
-    const range = maxValue - minValue || 1;
-    const plotWidth = width - left - right;
-    const plotHeight = bottom - top;
-    const currentMonthKey = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
-
-    return basePoints.map((flow, index) => {
-      const history = historyByKey.get(flow.key);
-      const x = basePoints.length === 1 ? left + plotWidth / 2 : left + (plotWidth / (basePoints.length - 1)) * index;
-      const toY = (value: number) => (maxValue === minValue ? bottom : top + ((maxValue - value) / range) * plotHeight);
-      const income = flow.income || 0;
-      const expense = flow.expense || 0;
-      const netWorth = history?.netWorth ?? 0;
-      return {
-        key: flow.key,
-        x,
-        label: flow.label || history?.label || '',
-        income,
-        expense,
-        netWorth,
-        incomeY: toY(income),
-        expenseY: toY(expense),
-        netWorthY: toY(netWorth),
-        isEstimated: history?.isEstimated ?? true,
-        isCurrentMonth: flow.key === currentMonthKey
-      };
-    });
-  }
-
-  get controleFlowLinePoints(): CashFlowLinePoint[] {
-    const points = this.controleFlowSeries;
-    if (!points.length) return [];
-
-    const width = 640;
-    const top = 22;
-    const right = 20;
-    const bottom = 102;
-    const left = 64;
-    const { minValue, maxValue } = this.controleFlowChartDomain();
-    const range = maxValue - minValue || 1;
-    const plotWidth = width - left - right;
-    const plotHeight = bottom - top;
-    const currentMonthKey = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
-
-    return points.map((point, index) => {
-      const x = points.length === 1 ? left + plotWidth / 2 : left + (plotWidth / (points.length - 1)) * index;
-      const toY = (value: number) => (maxValue === minValue ? bottom : top + ((maxValue - value) / range) * plotHeight);
-      return {
-        key: point.key,
-        x,
-        label: point.label,
-        income: point.income,
-        expense: point.expense,
-        incomeY: toY(point.income),
-        expenseY: toY(point.expense),
-        isCurrentMonth: point.key === currentMonthKey
-      };
-    });
-  }
-
-  get controleIncomeLinePath(): string {
-    return this.buildControleFlowLinePath('incomeY');
-  }
-
-  get controleExpenseLinePath(): string {
-    return this.buildControleFlowLinePath('expenseY');
-  }
-
-  get controleAxisTicks(): NetWorthAxisTick[] {
-    const { minValue, maxValue } = this.controleFlowChartDomain();
-    if (minValue === maxValue) {
-      return [{ value: 0, y: 102, isZero: true }];
-    }
-
-    const range = maxValue - minValue || 1;
-    const top = 22;
-    const bottom = 102;
-    const plotHeight = bottom - top;
-    const values = maxValue <= 0
-      ? [0, minValue / 2, minValue]
-      : minValue >= 0
-        ? [maxValue, maxValue / 2, 0]
-        : [maxValue, 0, minValue];
-    return values.map((value) => ({
-      value,
-      y: top + ((maxValue - value) / range) * plotHeight,
-      isZero: value === 0
-    }));
-  }
-
-  get patrimonioIncomeLinePath(): string {
-    if (!this.isPatrimonioSeriesVisible('income')) return '';
-    return this.buildPatrimonioLinePath('incomeY');
-  }
-
-  get patrimonioExpenseLinePath(): string {
-    if (!this.isPatrimonioSeriesVisible('expense')) return '';
-    return this.buildPatrimonioLinePath('expenseY');
-  }
-
-  get patrimonioNetWorthLinePath(): string {
-    if (!this.isPatrimonioSeriesVisible('netWorth')) return '';
-    return this.buildPatrimonioLinePath('netWorthY');
-  }
-
-  get patrimonioNetWorthAreaPath(): string {
-    if (!this.isPatrimonioSeriesVisible('netWorth')) return '';
-    const points = this.patrimonioLinePoints;
-    if (!points.length) return '';
-    const bottom = 102;
-    const line = this.buildPatrimonioLinePath('netWorthY');
-    const first = points[0];
-    const last = points[points.length - 1];
-    return `${line} L ${last.x.toFixed(1)} ${bottom} L ${first.x.toFixed(1)} ${bottom} Z`;
-  }
-
-  get patrimonioAxisTicks(): NetWorthAxisTick[] {
-    const { minValue, maxValue } = this.netWorthChartDomain();
-    if (minValue === maxValue) {
-      return [{ value: 0, y: 102, isZero: true }];
-    }
-
-    const range = maxValue - minValue || 1;
-    const top = 22;
-    const bottom = 102;
-    const plotHeight = bottom - top;
-    const values = maxValue <= 0
-      ? [0, minValue / 2, minValue]
-      : minValue >= 0
-        ? [maxValue, maxValue / 2, 0]
-        : [maxValue, 0, minValue];
-    return values.map((value) => ({
-      value,
-      y: top + ((maxValue - value) / range) * plotHeight,
-      isZero: value === 0
-    }));
-  }
-
-  private netWorthChartDomain(): { minValue: number; maxValue: number } {
-    const values: number[] = [];
-    if (this.isPatrimonioSeriesVisible('netWorth')) {
-      values.push(...this.patrimonioPeriodHistoryPoints.map((point) => point.netWorth));
-    }
-    if (this.isPatrimonioSeriesVisible('income')) {
-      values.push(...this.patrimonioPeriodFlowSeries.map((point) => point.income));
-    }
-    if (this.isPatrimonioSeriesVisible('expense')) {
-      values.push(...this.patrimonioPeriodFlowSeries.map((point) => point.expense));
-    }
-    if (!values.length) return { minValue: 0, maxValue: 0 };
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    if (min === 0 && max === 0) {
-      return { minValue: 0, maxValue: 0 };
-    }
-    if (min === max) {
-      return min > 0 ? { minValue: 0, maxValue: max } : { minValue: min, maxValue: 0 };
-    }
-    return { minValue: Math.min(0, min), maxValue: Math.max(0, max) };
-  }
-
-  private controleFlowChartDomain(): { minValue: number; maxValue: number } {
-    const values = this.controleFlowSeries.flatMap((point) => [point.income, point.expense]);
-    if (!values.length) return { minValue: 0, maxValue: 0 };
-
-    const max = Math.max(...values);
-    return max <= 0 ? { minValue: 0, maxValue: 0 } : { minValue: 0, maxValue: max };
-  }
-
-  private buildControleFlowLinePath(axisKey: 'incomeY' | 'expenseY'): string {
-    return this.controleFlowLinePoints
-      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(1)} ${point[axisKey].toFixed(1)}`)
-      .join(' ');
-  }
-
-  private buildPatrimonioLinePath(axisKey: 'incomeY' | 'expenseY' | 'netWorthY'): string {
-    return this.patrimonioLinePoints
-      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(1)} ${point[axisKey].toFixed(1)}`)
-      .join(' ');
-  }
-
-  isPatrimonioSeriesVisible(series: PatrimonioChartSeries): boolean {
-    return this.visiblePatrimonioSeries[series];
-  }
-
-  togglePatrimonioSeries(series: PatrimonioChartSeries): void {
-    this.visiblePatrimonioSeries = {
-      ...this.visiblePatrimonioSeries,
-      [series]: !this.visiblePatrimonioSeries[series]
-    };
-  }
-
-  formatChartAxisValue(value: number): string {
-    if (Math.abs(value) < 1) return formatCurrencyValue(0);
-    return formatCompactCurrency(value);
   }
 
   get saldoDelta(): number {
@@ -1463,35 +1242,6 @@ export class HomeComponent implements OnInit {
     return 1;
   }
 
-  private updateUpcomingDueItems(): void {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const windowEnd = new Date(today);
-    windowEnd.setDate(windowEnd.getDate() + DASHBOARD_UPCOMING_DUE_DAYS);
-
-    const items = this.expensesRaw
-      .filter((expense) => isExpenseOpen(expense.status))
-      .map((expense) => ({ expense, due: parseLocaleDate(expense.vencimento) }))
-      .filter((entry): entry is { expense: StoredExpense; due: Date } => !!entry.due && entry.due <= windowEnd)
-      .sort((a, b) => a.due.getTime() - b.due.getTime())
-      .slice(0, 5)
-      .map(({ expense, due }) => {
-        const overdue = due < today;
-        const daysUntil = Math.round((due.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
-        const dueDate = this.formatCompactLocaleDate(expense.vencimento);
-        return {
-          id: expense.id,
-          title: expense.nome || 'Despesa',
-          dueLabel: overdue ? `venceu ${dueDate}` : `vence ${dueDate}`,
-          amount: expense.valor || 0,
-          tone: overdue ? 'danger' : daysUntil <= 7 ? 'warning' : 'info',
-          statusLabel: overdue ? 'Em atraso' : daysUntil <= 1 ? 'Urgente' : 'A vencer'
-        } as DashboardReminderItem;
-      });
-
-    this.upcomingDueItems = items;
-  }
-
   private formatCompactLocaleDate(value: string): string {
     const parsed = parseLocaleDate(value);
     return parsed ? parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : value;
@@ -1534,18 +1284,50 @@ export class HomeComponent implements OnInit {
     let emAtraso = 0;
     let proximosSeteDias = 0;
     let valorEmAberto = 0;
+    // Separados porque o card "Precisa da sua atenção" trata os dois casos como
+    // pendências diferentes: o que venceu tem ação de pagar, o que vai vencer não.
+    let valorEmAtraso = 0;
+    let valorProximos = 0;
+    let maisAntigoEmAtraso: Date | null = null;
     for (const expense of this.expensesRaw) {
       if (!isExpenseOpen(expense.status)) continue;
       const due = parseLocaleDate(expense.vencimento);
       if (!due || due > seteDias) continue;
+      const valor = expense.valor || 0;
       if (due < today) {
         emAtraso += 1;
+        valorEmAtraso += valor;
+        if (!maisAntigoEmAtraso || due < maisAntigoEmAtraso) maisAntigoEmAtraso = due;
       } else {
         proximosSeteDias += 1;
+        valorProximos += valor;
       }
-      valorEmAberto += expense.valor || 0;
+      valorEmAberto += valor;
     }
+
+    let receitasAtrasadasQtd = 0;
+    let receitasAtrasadasValor = 0;
+    for (const income of this.incomesRaw) {
+      if (!isIncomePending(income.status)) continue;
+      const due = parseLocaleDate(income.recebimento);
+      if (!due || due >= today) continue;
+      receitasAtrasadasQtd += 1;
+      receitasAtrasadasValor += income.valor || 0;
+    }
+
+    const diasDoMaisAntigo = maisAntigoEmAtraso
+      ? Math.round((today.getTime() - maisAntigoEmAtraso.getTime()) / 86_400_000)
+      : null;
+
     this.compromissosResumo = { emAtraso, proximosSeteDias, valorEmAberto };
+    this.pendenciasDetalhadas = {
+      despesasEmAtraso: { quantidade: emAtraso, valor: valorEmAtraso, diasDoMaisAntigo },
+      despesasProximas: { quantidade: proximosSeteDias, valor: valorProximos },
+      receitasAtrasadas: { quantidade: receitasAtrasadasQtd, valor: receitasAtrasadasValor },
+      // Fatura de cartão ainda não tem data de fechamento no dashboard; enquanto
+      // não tiver, o item não aparece em vez de aparecer com número inventado.
+      faturasFechando: { quantidade: 0, valor: 0 }
+    };
   }
 
   private getPreviousPeriodRange(): { startKey: string; endKey: string } {
@@ -1595,8 +1377,195 @@ export class HomeComponent implements OnInit {
         dividaCartoes: this.totalDividaCartoes,
         temCartoes: this.hasCardEntries
       },
-      saude: this.aiHealth ? { status: this.aiHealth.overallStatus, resumo: this.aiHealth.overallSummary } : null
+      saude: this.aiHealth
+        ? {
+            status: this.aiHealth.overallStatus,
+            resumo: this.aiHealth.overallSummary,
+            // O índice vem do robô de risco, o mesmo que alimenta o painel de
+            // insights — dois cálculos diferentes na mesma tela dariam notas
+            // diferentes para a mesma conta.
+            score: this.insightScoreGaugeWidth,
+            fatores: this.aiHealth.areas.map((area) => ({
+              rotulo: this.aiHealthAreaLabel(area.area),
+              status: area.status,
+              explicacao: area.explanation
+            }))
+          }
+        : null
     };
+  }
+
+  /** Primeiro nome para a saudação do dashboard. Vazio quando não há nome salvo. */
+  get userName(): string {
+    return this.authService.getUserName();
+  }
+
+  /**
+   * Série do card de evolução. A janela vem do perfil — 12 meses no Patrimônio,
+   * 6 no Controle (PERFIS_E_PERMISSOES.md) — e o patrimônio líquido só entra
+   * onde existe histórico para ele.
+   */
+  get evolutionData(): EvolutionInput {
+    const patrimonio = this.hasAccess('Advanced');
+    const historyByKey = new Map(
+      this.patrimonioPeriodHistoryPoints.map((point) => [point.referenceDate.slice(0, 7), point])
+    );
+    const flow = patrimonio ? this.monthlyFlowSeries : this.controleFlowSeries;
+
+    return {
+      months: flow.map((point) => ({
+        label: (point.label || '').replace('.', ''),
+        income: point.income || 0,
+        expense: point.expense || 0,
+        netWorth: patrimonio ? historyByKey.get(point.key)?.netWorth ?? null : null
+      })),
+      sobra: this.saldo,
+      patrimonioDeltaPct: this.patrimonioDeltaPercentual
+    };
+  }
+
+  /** Variação do patrimônio no período, em porcentagem da posição anterior. */
+  private get patrimonioDeltaPercentual(): number | null {
+    if (this.patrimonioPeriodHistoryPoints.length <= 1) {
+      return null;
+    }
+    const delta = this.patrimonioHistoryDelta;
+    const anterior = this.patrimonioLiquido - delta;
+    if (anterior <= 0) {
+      return null;
+    }
+    return (delta / anterior) * 100;
+  }
+
+  get hasEvolutionData(): boolean {
+    return this.evolutionData.months.filter((m) => m.income > 0 || m.expense > 0).length >= 2;
+  }
+
+  /** Agenda dos próximos 7 dias: despesas a vencer e receitas a receber. */
+  get upcomingEntries(): UpcomingEntry[] {
+    // `flatMap` em vez de `map().filter()`: lançamento sem data legível
+    // simplesmente não entra na agenda, e o tipo sai sem `Date | null`.
+    const despesas = this.expensesRaw.flatMap<UpcomingEntry>((e) => {
+      if (!isExpenseOpen(e.status)) return [];
+      const date = parseLocaleDate(e.vencimento);
+      if (!date) return [];
+      return [{
+        id: `despesa-${e.id}`,
+        name: e.nome || 'Despesa',
+        date,
+        amount: e.valor || 0,
+        kind: 'expense',
+        context: e.categoria || ''
+      }];
+    });
+
+    const receitas = this.incomesRaw.flatMap<UpcomingEntry>((r) => {
+      if (!isIncomePending(r.status)) return [];
+      const date = parseLocaleDate(r.recebimento);
+      if (!date) return [];
+      return [{
+        id: `receita-${r.id}`,
+        name: r.fonte || 'Receita',
+        date,
+        amount: r.valor || 0,
+        kind: 'income',
+        context: r.categoria || ''
+      }];
+    });
+
+    return [...despesas, ...receitas];
+  }
+
+  get hoje(): Date {
+    return this.dataAtual;
+  }
+
+  /** Recorrências do mês, no contrato do card. */
+  get recurrenceEntries(): RecurrenceEntry[] {
+    const mesAtual = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
+
+    const despesas = this.expensesRaw.flatMap<RecurrenceEntry>((e) => {
+      if (monthKeyFromLocaleDate(e.vencimento) !== mesAtual || !this.isRecurringExpense(e)) return [];
+      const due = parseLocaleDate(e.vencimento);
+      return [{
+        id: `expense-${e.id}`,
+        title: e.nome || 'Despesa recorrente',
+        amount: e.valor || 0,
+        direction: 'expense',
+        day: due ? due.getDate() : null,
+        category: e.categoria || '',
+        settled: !isExpenseOpen(e.status)
+      }];
+    });
+
+    const receitas = this.incomesRaw.flatMap<RecurrenceEntry>((r) => {
+      if (monthKeyFromLocaleDate(r.recebimento) !== mesAtual || !r.fixa) return [];
+      const due = parseLocaleDate(r.recebimento);
+      return [{
+        id: `income-${r.id}`,
+        title: r.fonte || 'Receita recorrente',
+        amount: r.valor || 0,
+        direction: 'income',
+        day: due ? due.getDate() : null,
+        category: r.categoria || '',
+        settled: isIncomeReceived(r.status)
+      }];
+    });
+
+    return [...despesas, ...receitas];
+  }
+
+  /**
+   * Rótulo curto do período, para o canto do card de categorias. O ano já está
+   * no eyebrow do topo da tela; repeti-lo aqui só rouba largura do título.
+   */
+  get periodoCurtoLabel(): string {
+    if (this.periodo === 'year') {
+      return String(this.dataAtual.getFullYear());
+    }
+    if (this.periodo === 'quarter') {
+      return `${Math.floor(this.dataAtual.getMonth() / 3) + 1}º trimestre`;
+    }
+    return this.mesAtualLabel.replace(/ de \d{4}$/, '');
+  }
+
+  /** Fatias de despesa por categoria, no contrato do card. */
+  get spendSlices(): SpendSlice[] {
+    return this.expenseCategorySlices.map((slice) => ({
+      label: slice.label,
+      total: slice.total,
+      percent: slice.percent,
+      color: slice.color
+    }));
+  }
+
+  /**
+   * Últimos lançamentos, no contrato do card. O detalhe da linha usa a
+   * categoria, e não o status: "Alimentação" diz mais sobre o lançamento do que
+   * "Pago", que já está implícito num extrato do que aconteceu.
+   */
+  get activityItems(): ActivityItem[] {
+    return this.recentTransactions.map((t) => ({
+      id: t.id,
+      title: t.title,
+      dateLabel: this.formatCompactLocaleDate(t.date),
+      context: t.category || '',
+      amount: t.amount,
+      type: t.type
+    }));
+  }
+
+  /** Metas, no contrato do card. */
+  get goalEntries(): GoalEntry[] {
+    return this.goalsRaw.map((g) => ({
+      id: g.id,
+      title: g.title,
+      target: g.targetAmount || 0,
+      current: g.currentAmount || 0,
+      startDate: g.startDate ?? null,
+      targetDate: g.targetDate ?? null,
+      canceled: g.status === 'Canceled'
+    }));
   }
 
   get insightObservations(): string[] {
@@ -1627,6 +1596,7 @@ export class HomeComponent implements OnInit {
       type: 'expense' as const,
       // Mesmo status derivado das telas de lançamento: sem a data, uma despesa
       // vencida apareceria como "Em aberto" aqui e "Atrasada" lá.
+      category: e.categoria || '',
       status: expenseStatusLabel(resolveInstallmentStatus(e.status, e.vencimento)),
       statusTone: installmentStatusTone(resolveInstallmentStatus(e.status, e.vencimento)),
       recurring: !!e.fixa,
@@ -1638,6 +1608,7 @@ export class HomeComponent implements OnInit {
       date: i.recebimento || '—',
       amount: i.valor || 0,
       type: 'income' as const,
+      category: i.categoria || '',
       status: incomeStatusLabel(resolveInstallmentStatus(i.status, i.recebimento)),
       statusTone: installmentStatusTone(resolveInstallmentStatus(i.status, i.recebimento)),
       recurring: !!i.fixa,
@@ -2105,6 +2076,7 @@ export class HomeComponent implements OnInit {
   }
 
   private atualizarMetas(goals: Goal[]): void {
+    this.goalsRaw = goals;
     const planned = goals.filter((g) => g.status === 'Planned').length;
     const inProgress = goals.filter((g) => g.status === 'InProgress').length;
     const completed = goals.filter((g) => g.status === 'Completed').length;

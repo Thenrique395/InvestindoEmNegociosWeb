@@ -1,0 +1,41 @@
+<article class="health" [attr.data-tone]="health().tone">
+  <div class="health__score">
+    <span class="health__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+        <path d="M9 18h6M10 21h4" />
+        <path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.3-1 2.1H9c0-.8-.4-1.5-1-2.1A6 6 0 0 1 12 3z" />
+      </svg>
+    </span>
+    <div class="health__score-body">
+      <h2 class="health__label">
+        Saúde financeira
+        <app-tooltip size="sm" label="Como a saúde financeira é calculada" [text]="tooltip" />
+      </h2>
+      <p class="health__value">
+        <strong class="health__number">{{ health().score }}</strong>
+        <span class="health__scale">de 100 · {{ health().faixa }}</span>
+      </p>
+      <span
+        class="health__bar"
+        role="img"
+        [attr.aria-label]="'Nota de saúde financeira: ' + health().score + ' de 100, ' + health().faixa">
+        <i class="health__bar-fill" [style.width.%]="health().score"></i>
+      </span>
+    </div>
+  </div>
+
+  <div class="health__detail">
+    <p class="health__summary">{{ health().resumo }}</p>
+    @if (fatores().length) {
+      <ul class="health__factors">
+        @for (fator of fatores(); track fator.rotulo) {
+          <li class="health__factor" [attr.data-tone]="fator.tone" [title]="fator.explicacao">
+            <i class="health__dot" aria-hidden="true"></i>
+            {{ fator.rotulo }}
+            <span class="sr-only"> — {{ fator.severidade }}. {{ fator.explicacao }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</article>

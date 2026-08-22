@@ -378,13 +378,41 @@ if (!confirmed) return;`,
       value: 'R$ 12.480,35',
       note: 'Já descontado o comprometido',
       tooltip: 'Saldo das contas menos as despesas em aberto.',
-      tone: 'neutral',
-      delta: { direction: 'up', favorable: true, text: '+8,2%' },
+      tone: 'primary',
+      wash: 'brand',
+      delta: { direction: 'up', favorable: true, text: '8,2%', context: 'no mês' },
       link: { route: '/contas', label: 'Ver contas' }
     },
-    { key: 'receitas', label: 'Receitas', value: 'R$ 18.900,00', tooltip: 'Tudo que entrou no período.', tone: 'success' },
-    { key: 'despesas', label: 'Despesas', value: 'R$ 9.842,17', tooltip: 'Tudo que saiu ou vai sair.', tone: 'danger' },
-    { key: 'comprometido', label: 'Comprometido', value: 'R$ 2.421,65', tooltip: 'Cartões, parcelas e contas futuras.', tone: 'warning' }
+    {
+      key: 'receitas',
+      label: 'Receitas',
+      value: 'R$ 18.900,00',
+      note: 'Recebidas no mês: R$ 17.700,00 · A receber: R$ 1.200,00',
+      tooltip: 'Tudo que entrou no período.',
+      tone: 'success',
+      progress: { percent: 94, label: 'Proporção já recebida' }
+    },
+    {
+      key: 'despesas',
+      label: 'Despesas',
+      value: 'R$ 9.842,17',
+      note: 'Pagas: R$ 7.420,52 · Em aberto: R$ 2.421,65',
+      tooltip: 'Tudo que saiu ou vai sair.',
+      tone: 'danger',
+      progress: { percent: 75, label: 'Proporção já quitada' },
+      // Link E barra na mesma célula: o caso que desalinhava a faixa antes de
+      // a barra virar o último elemento. Fica na amostra para não voltar.
+      link: { route: '/despesas', label: 'Ver despesas' }
+    },
+    {
+      key: 'comprometido',
+      label: 'Comprometido',
+      value: 'R$ 2.421,65',
+      note: 'Cartões, parcelas e contas a vencer',
+      tooltip: 'Cartões, parcelas e contas futuras.',
+      tone: 'brand',
+      progress: { percent: 38, label: 'Peso na receita prevista' }
+    }
   ];
 
   readonly demoSeries = [

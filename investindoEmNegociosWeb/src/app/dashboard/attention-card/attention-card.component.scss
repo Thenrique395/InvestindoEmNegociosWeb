@@ -1,0 +1,149 @@
+:host {
+  display: block;
+}
+
+/* Até quatro pendências, cada uma com duas linhas de texto. A altura fixa
+   mantém o card seguinte no mesmo lugar quando uma delas some. */
+.attention {
+  display: flex;
+  flex-direction: column;
+  height: var(--h-card-side);
+  padding: var(--space-9) var(--space-10);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.attention__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.attention__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.attention__count {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--expense-tint);
+  color: var(--expense-text);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.attention__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attention__item {
+  --tone-text: var(--primary-text);
+  --tone-tint: var(--primary-tint);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--border-row);
+}
+
+/* O último item não leva divisor: sozinho na borda do card, ele lê como uma
+   linha de rodapé que não existe. */
+.attention__item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.attention__item:first-child {
+  padding-top: 0;
+}
+
+.attention__item[data-tone='danger'] {
+  --tone-text: var(--expense-text);
+  --tone-tint: var(--expense-tint);
+}
+
+.attention__item[data-tone='warning'] {
+  --tone-text: var(--warning-text);
+  --tone-tint: var(--warning-tint);
+}
+
+.attention__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--tone-tint);
+  color: var(--tone-text);
+}
+
+.attention__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.attention__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.attention__item-title {
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.attention__item-detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: var(--space-1);
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-tight);
+}
+
+.attention__action {
+  flex: none;
+  align-self: center;
+  color: var(--primary-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.attention__action:hover {
+  text-decoration: underline;
+}
+
+.attention__empty {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}

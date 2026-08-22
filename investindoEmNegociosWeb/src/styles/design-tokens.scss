@@ -111,6 +111,13 @@
   --fs-subhead:     14px;  /* Inter 600                                      */
   --fs-kpi:         26px;  /* Poppins 600, -.03em (faixa isolada)            */
   --fs-kpi-strip:   20px;  /* Poppins 600, -.03em (faixa unida de 5)         */
+  /* Faixa do dashboard: o protótipo escala o valor com a largura da janela em
+     vez de fixá-lo, porque lá a faixa é o conteúdo principal da tela. As
+     demais faixas (Calendário, Investimentos) seguem no tamanho fixo acima —
+     quem quiser a escala pede por `--kpi-value-size` no host.               */
+  --fs-kpi-feature: clamp(21px, 2.4vw, 34px);  /* célula em destaque         */
+  --fs-kpi-cell:    clamp(17px, 1.7vw, 24px);  /* demais células da faixa    */
+  --fs-health-score: 30px;  /* nota de saúde financeira (Poppins 600, -.03em) */
   --fs-body:        13px;
   --fs-meta:        12px;
   --fs-caption:     11px;
@@ -177,6 +184,30 @@
   --h-stepper:       38px;
   --h-table-row:     56px;
   --h-icon-button:   28px;
+
+  /* Altura fixa dos cards de lista do dashboard. É teto, não sugestão: sem ela
+     o card cresce com o dado (nome que quebra em duas linhas, rodapé que
+     aparece só em alguns planos) e a página muda de tamanho a cada mês. O
+     conteúdo rola por dentro; a contagem de linhas de cada card já é limitada
+     no modelo, então rolar é a exceção, não o caminho normal.
+
+     Um token por card, e não dois genéricos: cada um tem um conteúdo máximo
+     diferente (3 pendências de duas linhas ≠ 5 lançamentos ≠ 4 categorias mais
+     o convite de orçamento), e um valor único obrigava uns a sobrar espaço
+     enquanto outros cortavam a última linha.                                 */
+  /* Os três da coluna lateral compartilham a mesma altura: empilhados, alturas
+     diferentes viram degraus e a coluna perde o ritmo.
+
+     O valor é o de TRÊS registros no card mais exigente — Próximos 7 dias, que
+     além das linhas tem o resumo da janela (medido: 257px, contra 234 do
+     atenção e 212 do metas). Três é o que cabe sem o card virar um painel: a
+     partir do quarto a lista rola, e conforme a pessoa resolve os itens os de
+     baixo sobem.                                                              */
+  --h-card-side:        264px;  /* atenção · próximos 7 dias · metas           */
+
+  --h-card-spend:       372px;  /* 4 categorias + insight ou convite           */
+  --h-card-activity:    372px;  /* 5 lançamentos                               */
+  --h-card-recurrences: 480px;  /* piso; estica para fechar com a coluna vizinha */
 
   /* ---------- MOVIMENTO ------------------------------------------------ */
   --ease-out:      cubic-bezier(.2, .7, .3, 1);

@@ -1,0 +1,29 @@
+<section class="upcoming">
+  <header class="upcoming__head">
+    <h2 class="upcoming__title">
+      Próximos 7 dias
+      <app-tooltip size="sm" label="O que entra em Próximos 7 dias" [text]="tooltip" />
+    </h2>
+    <a class="upcoming__link" routerLink="/calendario">Ver agenda</a>
+  </header>
+
+  <p class="upcoming__summary">{{ view().summary }}</p>
+
+  @if (view().rows.length) {
+    <ul class="upcoming__list">
+      @for (row of view().rows; track row.id) {
+        <li class="upcoming__row">
+          <span class="upcoming__date" [class.upcoming__date--income]="row.kind === 'income'">
+            <span class="upcoming__day">{{ row.day }}</span>
+            <span class="upcoming__month">{{ row.month }}</span>
+          </span>
+          <span class="upcoming__body">
+            <span class="upcoming__name">{{ row.name }}</span>
+            <span class="upcoming__detail">{{ row.detail }}</span>
+          </span>
+          <span class="upcoming__amount" [attr.data-kind]="row.kind">{{ fmt()(row.amount) }}</span>
+        </li>
+      }
+    </ul>
+  }
+</section>

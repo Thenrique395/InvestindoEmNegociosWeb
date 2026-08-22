@@ -1,0 +1,45 @@
+<section class="recurrences">
+  <header class="recurrences__head">
+    <div class="recurrences__titles">
+      <h2 class="recurrences__title">
+        Recorrências do mês
+        <app-tooltip size="sm" label="O que entra em Recorrências do mês" [text]="tooltip" />
+      </h2>
+      <p class="recurrences__subtitle">Entradas e saídas que se repetem todo mês.</p>
+    </div>
+    <a class="recurrences__link" routerLink="/despesas" [queryParams]="{ focus: 'recurring' }">Ver todos</a>
+  </header>
+
+  <ul class="recurrences__grid">
+    @for (row of view().rows; track row.id) {
+      <li class="recurrences__item" [attr.data-color]="row.colorIndex">
+        <span class="recurrences__body">
+          <span class="recurrences__name">{{ row.title }}</span>
+          <span class="recurrences__detail">{{ row.detail }}</span>
+        </span>
+        <span class="recurrences__amount" [attr.data-direction]="row.direction">{{ fmt()(row.amount) }}</span>
+      </li>
+    }
+  </ul>
+
+  <footer class="recurrences__foot">
+    <div class="recurrences__stat">
+      <span class="recurrences__stat-label">Total fixo de saídas</span>
+      <strong class="recurrences__stat-value">{{ fmt()(view().outflowTotal) }}</strong>
+    </div>
+    <div class="recurrences__stat">
+      <span class="recurrences__stat-label">Peso na renda</span>
+      <strong class="recurrences__stat-value">{{ shareLabel() }}</strong>
+    </div>
+    <div class="recurrences__stat">
+      <span class="recurrences__stat-label">Próximo a vencer</span>
+      <strong class="recurrences__stat-value">
+        @if (view().nextDue; as next) {
+          {{ next.title }} · dia {{ next.day }}
+        } @else {
+          Tudo quitado
+        }
+      </strong>
+    </div>
+  </footer>
+</section>

@@ -1,0 +1,187 @@
+/* Saúde financeira — TELAS.md §1. Card de duas colunas: a nota à esquerda,
+   a leitura e os fatores à direita, separados por um divisor interno. */
+
+:host {
+  display: block;
+}
+
+.health {
+  --tone: var(--income);
+  --tone-text: var(--income-text);
+  --tone-tint: var(--income-tint);
+
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--space-11);
+  align-items: center;
+  padding: var(--panel-padding);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.health[data-tone='warning'] {
+  --tone: var(--warning);
+  --tone-text: var(--warning-text);
+  --tone-tint: var(--warning-tint);
+}
+
+.health[data-tone='danger'] {
+  --tone: var(--expense);
+  --tone-text: var(--expense-text);
+  --tone-tint: var(--expense-tint);
+}
+
+.health__score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+.health__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-item);
+  background: var(--tone-tint);
+  color: var(--tone-text);
+}
+
+.health__icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.health__score-body {
+  min-width: 0;
+}
+
+.health__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+.health__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: var(--space-1) 0 0;
+}
+
+.health__number {
+  color: var(--tone-text);
+  font-family: var(--font-display);
+  font-size: var(--fs-health-score);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tighter);
+  line-height: var(--lh-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.health__scale {
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  white-space: nowrap;
+}
+
+.health__bar {
+  display: block;
+  width: 150px;
+  max-width: 100%;
+  height: 5px;
+  margin-top: var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+}
+
+.health__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+  transition: width var(--dur-bar) var(--ease-out);
+}
+
+.health__detail {
+  min-width: 0;
+  padding-left: var(--space-11);
+  border-left: 1px solid var(--border-inner);
+}
+
+.health__summary {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.health__factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-10);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.health__factor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  cursor: help;
+}
+
+.health__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--chart-neutral);
+}
+
+.health__factor[data-tone='success'] .health__dot {
+  background: var(--income);
+}
+
+.health__factor[data-tone='warning'] .health__dot {
+  background: var(--warning);
+}
+
+.health__factor[data-tone='danger'] .health__dot {
+  background: var(--expense);
+}
+
+/* Abaixo de ~780px as duas colunas não cabem lado a lado sem espremer o texto:
+   viram uma só e o divisor passa de vertical para horizontal. */
+@media (max-width: 780px) {
+  .health {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: stretch;
+  }
+
+  .health__detail {
+    padding-left: 0;
+    padding-top: var(--space-7);
+    border-left: none;
+    border-top: 1px solid var(--border-inner);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .health__bar-fill {
+    transition: none;
+  }
+}

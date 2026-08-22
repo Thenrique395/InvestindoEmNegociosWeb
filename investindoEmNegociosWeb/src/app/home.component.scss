@@ -1,8 +1,4 @@
-.networth-chart {
-  display: grid;
-  gap: 0.45rem;
-  min-width: 0;
-}
+
 
 .dashboard-secondary {
   display: grid;
@@ -38,259 +34,63 @@
   line-height: var(--lh-control);
 }
 
-.networth-summary {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  margin-bottom: 0.7rem;
-  padding-top: 0.95rem;
-  border-top: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
-}
-
-.networth-summary__item {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 0;
-  padding: 0 1.15rem;
-  border-left: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
-}
-
-.networth-summary__item:first-child {
-  border-left: 0;
-  padding-left: 0;
-}
-
-.networth-summary__item span {
-  color: var(--text-tertiary);
-  font-size: 0.8125rem;
-  line-height: 1.15;
-}
-
-.networth-summary__item strong {
-  color: var(--text);
-  font-size: clamp(1rem, 1.8vw, 1.35rem);
-  font-weight: 750;
-  letter-spacing: 0;
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-}
-
-.networth-summary__item--income strong {
-  color: var(--chart-1, var(--primary));
-}
-
-.networth-summary__item--expense strong {
-  color: var(--expense, var(--expense));
-}
-
-.networth-summary__item--result strong {
-  color: var(--income-text);
-}
-
-.networth-chart__svg {
-  display: block;
-  width: 100%;
-  min-height: 124px;
-  overflow: visible;
-}
-
-.networth-chart__grid line {
-  stroke: color-mix(in srgb, var(--border) 58%, transparent);
-  stroke-width: 0.8;
-  vector-effect: non-scaling-stroke;
-}
-
-.networth-chart__grid--zero line {
-  stroke: color-mix(in srgb, var(--text-tertiary) 42%, transparent);
-  stroke-width: 1;
-}
-
-.networth-chart__grid text {
-  fill: color-mix(in srgb, var(--text-tertiary) 72%, transparent);
-  font-size: 0.5rem;
-  font-weight: 550;
-  letter-spacing: 0.01em;
-}
-
-.networth-chart__grid--zero text {
-  fill: color-mix(in srgb, var(--text-secondary) 78%, transparent);
-  font-weight: 650;
-}
-
-.networth-chart__month-tick line {
-  stroke: color-mix(in srgb, var(--border) 62%, transparent);
-  stroke-width: 0.8;
-  vector-effect: non-scaling-stroke;
-}
-
-.networth-chart__month-tick--current line {
-  stroke: color-mix(in srgb, var(--text-secondary) 62%, transparent);
-  stroke-width: 1.1;
-}
-
-.networth-chart__line {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-  vector-effect: non-scaling-stroke;
-}
-
-.networth-chart__line--income {
-  stroke: var(--income, var(--income));
-}
-
-.networth-chart__line--expense {
-  stroke: var(--expense, var(--expense));
-}
-
-.networth-chart__line--networth {
-  stroke: var(--chart-1, var(--primary));
-}
-
-.networth-chart__area {
-  pointer-events: none;
-}
-
-.networth-chart__area--networth {
-  fill: color-mix(in srgb, var(--chart-1, var(--primary)) 14%, transparent);
-}
-
-.networth-chart__point circle {
-  fill: var(--surface);
-  stroke-width: 1.8;
-  vector-effect: non-scaling-stroke;
-}
-
-.networth-chart__point--income circle {
-  stroke: var(--income, var(--income));
-}
-
-.networth-chart__point--expense circle {
-  stroke: var(--expense, var(--expense));
-}
-
-.networth-chart__point--networth circle {
-  stroke: var(--chart-1, var(--primary));
-}
-
-.networth-chart__point--current circle {
-  fill: var(--surface);
-  stroke-width: 2.2;
-}
-
-.networth-chart__legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.85rem;
-  padding-left: 64px;
-  color: var(--text-secondary);
-  font-size: 0.6875rem;
-  font-weight: 650;
-}
-
-.networth-chart__legend-item {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  transition: color 0.15s ease, opacity 0.15s ease;
-}
-
-.networth-chart__legend-item:hover,
-.networth-chart__legend-item:focus-visible {
-  color: var(--text);
-}
-
-.networth-chart__legend-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--primary) 38%, transparent);
-  outline-offset: 4px;
-  border-radius: 999px;
-}
-
-.networth-chart__legend-item--muted {
-  color: var(--text-tertiary);
-  opacity: 0.48;
-}
-
-.networth-chart__legend-item--muted .networth-chart__dot {
-  background: var(--surface);
-  box-shadow: inset 0 0 0 2px currentColor;
-}
-
-.networth-chart__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  flex: 0 0 6px;
-}
-
-.networth-chart__dot--income {
-  background: var(--income, var(--income));
-}
-
-.networth-chart__dot--expense {
-  background: var(--expense, var(--expense));
-}
-
-.networth-chart__dot--networth {
-  background: var(--chart-1, var(--primary));
-}
-
-.networth-chart__labels {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  padding-left: 64px;
-  padding-right: 20px;
-  gap: 0.25rem;
-}
-
-.networth-chart__label {
-  font-size: 0.6875rem;
-  color: var(--text-tertiary);
-  text-transform: capitalize;
-  text-align: center;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.networth-chart__label--current {
-  color: var(--text);
-  font-weight: 700;
-}
-
-@media (max-width: 640px) {
-  .networth-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    row-gap: 0.85rem;
-  }
-
-  .networth-summary__item:nth-child(odd) {
-    border-left: 0;
-    padding-left: 0;
-  }
-
-  .networth-chart__svg {
-    min-height: 118px;
-  }
-
-  .networth-chart__grid text {
-    font-size: 0.625rem;
-  }
-}
-
 @media (max-width: 960px) {
   .dashboard-secondary__categories {
     grid-template-columns: 1fr;
   }
+}
+
+/* Dashboard: gráfico à esquerda, pendências e agenda à direita — TELAS.md §1.
+   A proporção 1.62 : 1 é a do protótipo; abaixo de 1100px as colunas viram
+   uma só, senão o gráfico fica estreito demais para 12 meses de série. */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
+  gap: var(--space-9);
+  /* `stretch`, não `start`: as duas colunas têm que TERMINAR na mesma linha,
+     senão sobra um vazio embaixo da mais curta e a seção seguinte começa
+     desencontrada. Quem absorve a folga é o último card de cada coluna. */
+  align-items: stretch;
+}
+
+.dashboard-grid__main,
+.dashboard-grid__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-9);
+  min-width: 0;
+}
+
+/* Só Recorrências estica. Os três cards da lateral têm a MESMA altura fixa
+   (`--h-card-side`), então a coluna direita tem altura conhecida e é a esquerda
+   que fecha a diferença. Nomeado explicitamente em vez de `:last-child`: quando
+   Recorrências não tem dado e some, o gráfico não deve esticar para cobrir o
+   buraco. */
+.dashboard-grid__main > app-recurrences-card {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Par de cards de largura igual — "Onde o dinheiro foi" e "Atividade recente".
+   Colapsa antes da grade principal: dois cards de lista ficam ilegíveis
+   espremidos, enquanto o gráfico ainda aguenta. */
+.dashboard-pair {
+  display: grid;
+  /* `auto-fit` aqui, e não uma media query de viewport: o que decide se os dois
+     cards cabem lado a lado é a largura do CONTEÚDO (a sidebar come 212px), não
+     a da janela — com breakpoint de viewport eles empilhavam em telas que ainda
+     tinham espaço de sobra, e continuavam lado a lado em telas que não tinham.
+
+     A ressalva do ARQUITETURA §7 contra `auto-fit` (célula vazia à direita
+     quando a contagem não divide) não se aplica: aqui são sempre exatamente
+     dois filhos, então o resultado só pode ser 2 colunas ou 1. */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--space-9);
+  align-items: start;
 }

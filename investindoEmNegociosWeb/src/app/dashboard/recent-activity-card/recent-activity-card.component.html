@@ -1,0 +1,36 @@
+<section class="activity">
+  <header class="activity__head">
+    <h2 class="activity__title">
+      Atividade recente
+      <app-tooltip size="sm" label="O que entra em Atividade recente" [text]="tooltip" />
+    </h2>
+    <a class="activity__link" routerLink="/despesas">Ver extrato</a>
+  </header>
+
+  @if (rows().length) {
+    <ul class="activity__list">
+      @for (row of rows(); track row.id) {
+        <li class="activity__row" [attr.data-type]="row.type">
+          <span class="activity__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              @if (row.type === 'income') {
+                <path d="M12 19V5m0 0l-5 5m5-5l5 5" />
+              } @else {
+                <path d="M12 5v14m0 0l-5-5m5 5l5-5" />
+              }
+            </svg>
+          </span>
+          <span class="activity__body">
+            <span class="activity__name">{{ row.title }}</span>
+            <span class="activity__detail">{{ detail(row) }}</span>
+          </span>
+          <span class="activity__amount">
+            {{ row.type === 'income' ? '+' : '−' }} {{ fmt()(row.amount) }}
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="activity__empty">Nenhum lançamento registrado ainda. O que você cadastrar aparece aqui.</p>
+  }
+</section>

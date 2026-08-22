@@ -1,5 +1,6 @@
 import { of, throwError } from 'rxjs';
 import { HomeComponent } from './home.component';
+import { buildUpcomingView } from './dashboard/upcoming-card/upcoming-card.model';
 import { NotificationItem } from './notifications.service';
 import { DebtSummaryResponse, SubscriptionsSummaryResponse } from './accounts.service';
 import { InvestmentPosition } from './investments.service';
@@ -118,16 +119,18 @@ describe('HomeComponent smoke', () => {
     expect(component.insightTodoItems[0].queryParams['focus']).toBe('overdue');
   });
 
-  it('lista próximos vencimentos do dashboard apenas até 7 dias', () => {
+  it('agenda do dashboard mostra apenas até 7 dias', () => {
     const component = createComponent();
     (component as any).expensesRaw = [
       { id: 'due-7', nome: 'Dentro da janela', categoria: 'Casa', valor: 100, vencimento: localeDateFromToday(7), status: 'OPEN' },
       { id: 'due-8', nome: 'Fora da janela', categoria: 'Casa', valor: 200, vencimento: localeDateFromToday(8), status: 'OPEN' }
     ];
 
-    (component as any).updateUpcomingDueItems();
+    // A janela deixou de ser aplicada no container e passou a ser regra do
+    // `app-upcoming-card`; o container só entrega os lançamentos com data.
+    const view = buildUpcomingView(component.upcomingEntries, new Date());
 
-    expect(component.upcomingDueItems.map((item) => item.id)).toEqual(['due-7']);
+    expect(view.rows.map((row) => row.name)).toEqual(['Dentro da janela']);
   });
 
   it('calcula diagnóstico de vencimentos próximos com a mesma janela de 7 dias', () => {
@@ -166,10 +169,14 @@ describe('HomeComponent smoke', () => {
       '2026-06',
       '2026-07'
     ]);
-    expect(component.hasControleEvolutionData).toBeTrue();
-    expect(component.controleFlowLinePoints.length).toBe(6);
-    expect(component.controleIncomeLinePath).toContain('M ');
-    expect(component.controleExpenseLinePath).toContain('M ');
+    // O desenho saiu do componente e foi para o `app-chart-line`; o que o
+    // dashboard entrega agora é a série, não caminhos de SVG.
+    expect(component.hasEvolutionData).toBeTrue();
+    expect(component.evolutionData.months.length).toBe(6);
+    expect(component.evolutionData.months.map((m) => m.income)).toEqual([0, 0, 0, 0, 500, 700]);
+    expect(component.evolutionData.months.map((m) => m.expense)).toEqual([0, 0, 0, 0, 100, 200]);
+    // Controle não vê patrimônio: a série secundária não existe para ele.
+    expect(component.evolutionData.months.every((m) => m.netWorth === null)).toBeTrue();
   });
 
   it('usa estado de histórico começando quando Controle tem só 1 mês movimentado', () => {
@@ -179,8 +186,7 @@ describe('HomeComponent smoke', () => {
       { id: 'e-jul', nome: 'Julho', categoria: 'Casa', valor: 200, vencimento: '10/07/2026', status: 'OPEN' }
     ];
 
-    expect(component.hasControleEvolutionSeed).toBeTrue();
-    expect(component.hasControleEvolutionData).toBeFalse();
+    expect(component.hasEvolutionData).toBeFalse();
   });
 
   it('resume recorrências do mês a partir de fixas, parcelas e receitas fixas', () => {
