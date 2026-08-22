@@ -74,21 +74,23 @@ describe('CartoesComponent smoke', () => {
     expect(component.totalLimit).toBe(5000);
   });
 
-  it('permite salvar edição mesmo com número mascarado (last4) — trava regressão do bug de edição', () => {
+  it('delega o formulário ao CartaoFormComponent: editar apenas escolhe o cartão do modal', () => {
     const cardDto = {
       id: 'c1', brandId: 1, holderName: 'FULANO DE TAL', nickname: 'Meu Cartão',
       last4: '9999', bank: 'Banco X', creditLimit: 5000, statementCloseDay: 10, dueDay: 18
     };
-    const { component, cardsStore } = buildComponent({ cards: () => [cardDto] });
+    const { component } = buildComponent({ cards: () => [cardDto] });
 
-    component.editar(component.cards()[0]); // em edição o campo número carrega só o last4 "9999"
-    component.limiteCredito = 8000; // usuário altera apenas o limite
-    component.salvar();
+    component.editar(component.cards()[0]);
+    expect(component.mostrarModal).toBeTrue();
+    expect(component.cartaoEmEdicao?.id).toBe('c1');
 
-    expect(cardsStore.update).toHaveBeenCalled();
-    const [id, payload] = cardsStore.update.calls.mostRecent().args;
-    expect(id).toBe('c1');
-    expect(payload.creditLimit).toBe(8000);
+    component.onCartaoSalvo();
+    expect(component.mostrarModal).toBeFalse();
+    expect(component.cartaoEmEdicao).toBeNull();
+
+    component.abrirModal();
+    expect(component.cartaoEmEdicao).toBeNull(); // cadastro começa em branco
   });
 
   it('deve carregar dependências iniciais no init', () => {

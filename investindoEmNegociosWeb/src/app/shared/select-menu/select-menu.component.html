@@ -11,10 +11,14 @@
   (click)="toggle()"
   (keydown)="onTriggerKeydown($event)">
   <span class="select-menu__value">
-    <span
-      class="select-menu__dot"
-      [style.background]="current?.color || 'transparent'"
-      aria-hidden="true"></span>
+    @if (current?.badge; as badge) {
+      <span class="select-menu__badge">{{ badge }}</span>
+    } @else {
+      <span
+        class="select-menu__dot"
+        [style.background]="current?.color || 'transparent'"
+        aria-hidden="true"></span>
+    }
     <span class="select-menu__label" [class.select-menu__label--placeholder]="!current">
       {{ current?.label || placeholder() }}
     </span>
@@ -57,10 +61,14 @@
           [attr.aria-selected]="option.value === value()"
           [attr.aria-disabled]="option.disabled"
           (click)="select(option)">
-          <span
-            class="select-menu__dot"
-            [style.background]="option.color || 'transparent'"
-            aria-hidden="true"></span>
+          @if (option.badge; as badge) {
+            <span class="select-menu__badge">{{ badge }}</span>
+          } @else {
+            <span
+              class="select-menu__dot"
+              [style.background]="option.color || 'transparent'"
+              aria-hidden="true"></span>
+          }
           <span class="select-menu__option-label">{{ option.label }}</span>
           @if (option.meta) {
             <span class="select-menu__option-meta">{{ option.meta }}</span>

@@ -315,6 +315,14 @@ select:not([multiple]) {
   line-height: var(--lh-control);
 }
 
+/* Vêm DEPOIS da regra base de .form-field__message: a mensagem carrega as duas
+   classes e, como ambas as regras usam :where (especificidade 0), quem vence é a
+   última do arquivo — era por isso que o texto de erro saía cinza. */
+:where(.form-field__message--danger) {
+  color: var(--expense-text);
+  font-weight: var(--fw-semibold);
+}
+
 :where(.form-field__message--success) {
   color: var(--income-text);
 }

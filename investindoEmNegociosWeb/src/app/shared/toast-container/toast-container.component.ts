@@ -8,7 +8,7 @@ import { UiFeedbackMessage, UiFeedbackService } from '../../ui-feedback.service'
   imports: [AsyncPipe, NgClass, NgFor],
   template: `
     <div
-      class="pointer-events-none fixed right-4 top-4 z-[9999] grid w-[min(420px,calc(100vw-2rem))] gap-3"
+      class="pointer-events-none fixed right-4 top-4 z-[10050] grid w-[min(420px,calc(100vw-2rem))] gap-3"
       aria-live="polite"
       aria-atomic="false">
       <article

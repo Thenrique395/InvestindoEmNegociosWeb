@@ -1,0 +1,157 @@
+.card-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.card-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.card-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.card-form__control {
+  width: 100%;
+  min-height: var(--h-input, 52px);
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+  padding: 0 var(--space-6);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+}
+
+.card-form__control::placeholder {
+  color: var(--text-muted);
+}
+
+.card-form__control:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+/* Só quatro dígitos: o campo curto e espaçado deixa isso óbvio antes de digitar. */
+.card-form__control--digits {
+  letter-spacing: 0.18em;
+}
+
+/* A borda vive na caixa, não no input — sem isto o realce de foco e o de erro
+   apareceriam só em volta do texto, deixando o limite diferente dos demais campos. */
+.card-form__amount {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--h-input, 52px);
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+  padding: 0 var(--space-6);
+
+  &:focus-within {
+    border-color: var(--primary);
+    background: var(--surface);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  .card-form__control {
+    min-height: auto;
+    border: none;
+    background: none;
+    padding: 0;
+    font-weight: var(--fw-semibold);
+    /* O realce de erro/foco é da caixa; no input ele viraria um retângulo dentro
+       do outro, que era o que deixava o limite diferente dos demais campos. */
+    box-shadow: none;
+  }
+
+  .card-form__control:focus,
+  .card-form__control:focus-visible {
+    background: none;
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+app-form-field.form-field--invalid .card-form__amount {
+  border-color: var(--expense);
+  box-shadow: 0 0 0 3px var(--expense-tint);
+}
+
+app-form-field.form-field--invalid .card-form__amount:focus-within {
+  outline-color: var(--expense);
+  box-shadow: 0 0 0 4px var(--expense-tint);
+}
+
+.card-form__amount-prefix {
+  flex: none;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body);
+}
+
+.card-form__cycle {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.15rem 1.25rem 1.25rem;
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-sunken) 70%, transparent);
+}
+
+.card-form__cycle-title {
+  padding: 0;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.card-form__cycle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.card-form__hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-inner);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  line-height: 1.45;
+}
+
+.card-form__hint-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  color: var(--success);
+}
+
+.card-form__hint-label {
+  color: var(--text-secondary);
+}
+
+.card-form__hint-value {
+  color: var(--success);
+  font-weight: var(--fw-bold);
+}
+
+@media (max-width: 640px) {
+  .card-form__grid,
+  .card-form__cycle-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

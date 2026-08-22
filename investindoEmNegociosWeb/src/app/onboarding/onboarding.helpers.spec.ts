@@ -102,6 +102,7 @@ describe('onboarding helpers', () => {
       bandeira: '2',
       numero: '1234',
       nome: 'Henrique Santos',
+      holderName: 'Henrique Santos',
       banco: '',
       limiteCredito: 5000,
       diaFechamento: 10,

@@ -217,8 +217,15 @@
         (fixaChange)="onExpenseFixaChange($event)"
         (fixaMesesChange)="onExpenseFixaMesesChange($event)"
         (submitForm)="saveExpenseModal()"
+        (cadastrarCartaoRequested)="openCardModal()"
         (cancel)="closeExpenseModal()">
       </app-despesas-form>
+
+      <app-cartao-form
+        [open]="showCardModal"
+        [card]="null"
+        (close)="closeCardModal()"
+        (saved)="onCardCreated($event)" />
     </main>
     </div>
   </div>

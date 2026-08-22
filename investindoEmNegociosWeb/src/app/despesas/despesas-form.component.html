@@ -90,10 +90,10 @@
             {{ allowCardPayment ? 'Nenhum cartão cadastrado.' : 'Cartão indisponível no seu plano — registre à vista.' }}
           </p>
           @if (allowCardPayment) {
-            <a routerLink="/cartoes" (click)="fechar()"
+            <button type="button" (click)="solicitarCadastroCartao()"
               class="expense-form__warning-link expense-form__warning-link--amber">
               Cadastrar cartão
-            </a>
+            </button>
           }
         </div>
       }

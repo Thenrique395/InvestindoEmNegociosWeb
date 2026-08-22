@@ -9,6 +9,7 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
+import { CartaoFormComponent } from '../cartoes/cartao-form.component';
 import { InstallmentsService } from '../installments.service';
 import { InstallmentStatus, toInstallmentStatus } from '../types/money-types';
 import { CategoriesService, CategoryDto } from '../categories.service';
@@ -16,6 +17,8 @@ import { AccountsService, AccountResponse } from '../accounts.service';
 import { AuthService } from '../auth.service';
 import { hasAtLeastRole, UserRole } from '../roles';
 import { PaymentMethodLookup, LookupsService } from '../lookups.service';
+import { CardDto } from '../cards.service';
+import { toStoredCard } from '../cartoes/card.mapper';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { colorForCategory } from '../categories/categories-overview.model';
 import { TxMobileHeaderComponent, TxMobileKpi } from '../shared/transactions/tx-mobile-header.component';
@@ -69,6 +72,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
     FormsModule,
     DespesasListaComponent,
     DespesasFormComponent,
+    CartaoFormComponent,
     InvoiceImportComponent,
     TooltipComponent,
     TransactionSummaryCardComponent,
@@ -111,6 +115,7 @@ export class DespesasComponent implements OnInit {
   sortBy: 'nome' | 'categoria' | 'pagamento' | 'vencimento' | 'valor' | 'status' | null = null;
   sortDir: 1 | -1 = 1;
   mostrarForm = false;
+  mostrarCartaoForm = false;
   saving = false;
   valorInput = '';
   vencimentoInput = '';
@@ -1264,6 +1269,30 @@ export class DespesasComponent implements OnInit {
     if (this.saving) return;
     this.resetarFormulario();
     this.mostrarForm = true;
+  }
+
+  /* Crédito sem cartão cadastrado: em vez de mandar a pessoa para /cartoes e
+     perder o que ela já preencheu, escondemos o lançamento, abrimos o cadastro
+     de cartão e voltamos ao mesmo rascunho — com o cartão novo selecionado. */
+  abrirCadastroCartao(): void {
+    if (this.saving) return;
+    this.mostrarForm = false;
+    this.mostrarCartaoForm = true;
+  }
+
+  fecharCadastroCartao(): void {
+    this.mostrarCartaoForm = false;
+    this.mostrarForm = true;
+  }
+
+  onCartaoCriado(card: CardDto): void {
+    this.mostrarCartaoForm = false;
+    /* Entra na lista na hora para o select já abrir com ele escolhido; o
+       refresh confirma depois com o que o servidor tem. */
+    this.cartoes.set([...this.cartoes(), toStoredCard(card)]);
+    this.cartaoSelecionadoId = card.id;
+    this.mostrarForm = true;
+    this.db.refresh(true);
   }
 
   abrirImportFatura(): void {

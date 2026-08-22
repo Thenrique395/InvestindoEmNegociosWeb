@@ -209,7 +209,10 @@
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;
-  z-index: 30;
+  /* Acima dos modais (z-index 9999 no app-modal): o aviso que explica por que o
+     salvamento falhou aparece justamente com o modal aberto — atrás dele, era
+     um alerta invisível. */
+  z-index: 10050;
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;

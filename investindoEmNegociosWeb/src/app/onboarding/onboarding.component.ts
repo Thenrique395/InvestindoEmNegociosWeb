@@ -8,7 +8,7 @@ import { FocusArea, IntelligenceMode } from './onboarding.types';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AuthService } from '../auth.service';
 import { AccountRequest, AccountType, AccountsService } from '../accounts.service';
-import { CardsService } from '../cards.service';
+import { CardDto, CardsService } from '../cards.service';
 import { CreatePlanPayload, Plan, PlansService } from '../plans.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { isCreditPaymentMethod, LookupsService, PaymentMethodLookup } from '../lookups.service';
@@ -39,11 +39,12 @@ import { FocusStepComponent } from './steps/focus-step.component';
 import { PreferencesStepComponent } from './steps/preferences-step.component';
 import { ProfileStepComponent } from './steps/profile-step.component';
 import { AccountStepComponent } from './steps/account-step.component';
+import { CartaoFormComponent } from '../cartoes/cartao-form.component';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [CommonModule, ReceitasFormComponent, DespesasFormComponent, OnboardingRailComponent, FocusStepComponent, PreferencesStepComponent, ProfileStepComponent, AccountStepComponent],
+  imports: [CommonModule, ReceitasFormComponent, DespesasFormComponent, OnboardingRailComponent, FocusStepComponent, PreferencesStepComponent, ProfileStepComponent, AccountStepComponent, CartaoFormComponent],
   templateUrl: './onboarding.component.html'
 })
 export class OnboardingComponent implements OnInit {
@@ -193,6 +194,9 @@ export class OnboardingComponent implements OnInit {
   modalExpenseFixaMeses: number | null = null;
   modalExpenseCartaoId: string | null = null;
   modalExpenseCartoes: StoredCard[] = [];
+  showCardModal = false;
+  /** Só volta ao modal da despesa quem veio dele — o card opcional do passo 4 não. */
+  private voltarParaDespesaAoFecharCartao = false;
   cardsCount = 0;
   /* Guardam o `planId` porque o botão de editar precisa saber O QUE editar:
      sem ele, "Editar receita inicial" abria em branco e o salvar criava outro
@@ -746,9 +750,38 @@ export class OnboardingComponent implements OnInit {
     this.router.navigateByUrl('/');
   }
 
+  /* Card opcional do passo 4: cadastrar é aqui mesmo; gerenciar o que já existe
+     continua sendo assunto da tela de cartões. */
   openCardsPage(): void {
     if (!this.canUseCards) return;
-    this.router.navigateByUrl('/cartoes');
+    if (this.hasInitialCard) {
+      this.router.navigateByUrl('/cartoes');
+      return;
+    }
+    this.openCardModal();
+  }
+
+  /* Crédito sem cartão: o cadastro acontece aqui mesmo. Escondemos o modal da
+     despesa (o rascunho vive neste componente, então nada se perde), abrimos o
+     de cartão e voltamos com o cartão novo já escolhido. */
+  openCardModal(): void {
+    if (!this.canUseCards) return;
+    this.voltarParaDespesaAoFecharCartao = this.showExpenseModal;
+    this.showExpenseModal = false;
+    this.showCardModal = true;
+  }
+
+  closeCardModal(): void {
+    this.showCardModal = false;
+    this.showExpenseModal = this.voltarParaDespesaAoFecharCartao;
+  }
+
+  onCardCreated(card: CardDto): void {
+    this.showCardModal = false;
+    this.modalExpenseCartoes = [...this.modalExpenseCartoes, toStoredCard(card)];
+    this.cardsCount = this.modalExpenseCartoes.length;
+    this.modalExpenseCartaoId = card.id;
+    this.showExpenseModal = this.voltarParaDespesaAoFecharCartao;
   }
 
   /** Crédito é o único método que abre cartão e parcelas. */

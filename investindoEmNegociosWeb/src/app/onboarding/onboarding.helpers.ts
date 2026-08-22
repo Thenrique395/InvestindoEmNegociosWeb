@@ -1,7 +1,6 @@
 import { AbstractControl } from '@angular/forms';
 import { AccountType } from '../accounts.service';
-import { StoredCard, StoredExpense, StoredIncome } from '../data/api-data.service';
-import { CardDto } from '../cards.service';
+import { StoredExpense, StoredIncome } from '../data/api-data.service';
 
 export type OnboardingProfileField =
   | 'fullName'
@@ -124,15 +123,4 @@ export function isoToBr(value: string): string {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-export function toStoredCard(card: CardDto): StoredCard {
-  return {
-    id: card.id,
-    bandeira: String(card.brandId),
-    numero: card.last4,
-    nome: card.nickname || card.holderName,
-    banco: card.bank || '',
-    limiteCredito: card.creditLimit ?? 0,
-    diaFechamento: card.statementCloseDay ?? 1,
-    diaVencimento: card.dueDay ?? 1
-  };
-}
+export { toStoredCard } from '../cartoes/card.mapper';

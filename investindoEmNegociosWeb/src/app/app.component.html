@@ -160,7 +160,7 @@
   }
 
   @if (signupAlert) {
-    <div class="global-alert success">
+    <div appBodyPortal class="global-alert success">
       {{ signupAlert }}
       <button type="button" aria-label="Fechar alerta" (click)="signupAlert = ''">✕</button>
     </div>
@@ -168,6 +168,7 @@
 
   @if (feedbackMessage) {
     <div
+      appBodyPortal
       class="global-alert global-alert--feedback"
       [class.success]="feedbackMessage.type === 'success'"
       [class.error]="feedbackMessage.type === 'error'"

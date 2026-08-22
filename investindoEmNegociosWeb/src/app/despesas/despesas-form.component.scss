@@ -116,10 +116,12 @@
   border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   background: var(--surface);
   padding: 0.65rem 0.95rem;
+  font-family: inherit;
   font-size: var(--fs-meta);
   font-weight: var(--fw-bold);
   color: var(--text);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .expense-form__warning-link--amber {

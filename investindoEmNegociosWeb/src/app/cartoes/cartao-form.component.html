@@ -1,0 +1,120 @@
+<app-modal
+  [open]="open"
+  [eyebrow]="isEdit ? 'Editar cartão' : 'Novo cartão'"
+  [title]="isEdit ? 'Atualizar o cartão' : 'Cadastrar um cartão'"
+  subtitle="O ciclo define quando as compras entram na fatura e quando ela precisa ser paga."
+  size="md"
+  (close)="cancelar()">
+
+  <form [id]="formId" class="card-form" (ngSubmit)="salvar()" modal-body>
+    <div class="card-form__grid">
+      <app-form-field label="Nome do cartão" [error]="cardForm.error('name')">
+        <input
+          class="card-form__control"
+          type="text"
+          [(ngModel)]="nome"
+          name="nome"
+          maxlength="120"
+          placeholder="Ex.: Nubank pessoal"
+          (blur)="cardForm.markTouched('name')" />
+      </app-form-field>
+
+      <app-form-field label="Banco">
+        <input
+          class="card-form__control"
+          type="text"
+          [(ngModel)]="banco"
+          name="banco"
+          maxlength="120"
+          placeholder="Ex.: Nu Pagamentos"
+          list="bankOptions" />
+        <datalist id="bankOptions">
+          @for (inst of institutions; track trackByIndex($index, inst)) {
+            <option [value]="inst.name"></option>
+          }
+        </datalist>
+      </app-form-field>
+
+      <app-form-field label="Bandeira" class="card-form__field--full" [error]="cardForm.error('brand')">
+        <app-select-menu
+          ariaLabel="Bandeira do cartão"
+          [options]="brandOptions"
+          [(ngModel)]="bandeira"
+          name="bandeira" />
+      </app-form-field>
+
+      <app-form-field label="Últimos 4 dígitos" [error]="cardForm.error('number')">
+        <input
+          class="card-form__control card-form__control--digits"
+          type="text"
+          inputmode="numeric"
+          maxlength="4"
+          [(ngModel)]="numero"
+          name="numero"
+          digitOnly
+          placeholder="0000"
+          (input)="onNumeroInput($event)"
+          (blur)="cardForm.markTouched('number')" />
+      </app-form-field>
+
+      <app-form-field label="Limite de crédito" [error]="cardForm.error('limit')">
+        <span class="card-form__amount">
+          <span class="card-form__amount-prefix" aria-hidden="true">R$</span>
+          <input
+            class="card-form__control"
+            type="text"
+            inputmode="decimal"
+            [ngModel]="limiteCreditoInput"
+            digitOnly
+            (ngModelChange)="onLimiteChange($event)"
+            (focus)="$any($event.target).select()"
+            (blur)="cardForm.markTouched('limit')"
+            name="limiteCredito"
+            placeholder="0,00" />
+        </span>
+      </app-form-field>
+    </div>
+
+    <fieldset class="card-form__cycle">
+      <legend class="card-form__cycle-title">Ciclo da fatura</legend>
+
+      <div class="card-form__cycle-grid">
+        <app-form-field label="Dia de fechamento">
+          <app-number-stepper
+            [min]="1"
+            [max]="31"
+            [(ngModel)]="diaFechamento"
+            name="diaFechamento"
+            ariaLabel="Dia de fechamento da fatura" />
+        </app-form-field>
+
+        <app-form-field label="Dia de vencimento">
+          <app-number-stepper
+            [min]="1"
+            [max]="31"
+            [(ngModel)]="diaVencimento"
+            name="diaVencimento"
+            ariaLabel="Dia de vencimento da fatura" />
+        </app-form-field>
+      </div>
+
+      <p class="card-form__hint">
+        <svg class="card-form__hint-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7" />
+          <path d="M12 11v5.2M12 7.9v.01" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+        </svg>
+        <span>
+          <span class="card-form__hint-label">Melhor dia de compra: </span><strong class="card-form__hint-value">dia {{ melhorDiaDeCompra }}</strong><span> — logo após o fechamento, o prazo até o pagamento é o maior possível.</span>
+        </span>
+      </p>
+    </fieldset>
+  </form>
+
+  <div modal-footer>
+    <button type="button" class="btn-ghost sm" [disabled]="saving" (click)="cancelar()">Cancelar</button>
+    <button type="submit" [attr.form]="formId" class="btn-primary sm" [disabled]="saving || !podeSalvar">
+      {{ saving ? 'Salvando...' : (isEdit ? 'Salvar alterações' : 'Salvar cartão') }}
+    </button>
+  </div>
+
+</app-modal>

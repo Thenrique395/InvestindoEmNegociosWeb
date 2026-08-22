@@ -34,7 +34,7 @@ export interface InitialExpenseSummary {
       <section class="onboarding-block">
         <div class="onboarding-block__head">
           <strong>Sua conta principal</strong>
-          <span>Crie a conta que será usada como base para acompanhar saldo, receitas e despesas.</span>
+          <span>A Conta que será usada como base para acompanhar saldo, receitas e despesas.</span>
         </div>
         @if (!accountReady()) {
           <div class="onboarding-form-grid onboarding-form-grid--three">

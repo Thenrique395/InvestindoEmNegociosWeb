@@ -65,6 +65,9 @@ export class DespesasFormComponent {
   @Output() fixaChange = new EventEmitter<boolean>();
   @Output() fixaMesesChange = new EventEmitter<number | null>();
   @Output() categoriasRequested = new EventEmitter<void>();
+  /* Sem cartão cadastrado o fluxo não pode sair da tela: quem escuta abre o
+     modal de cartão e devolve a pessoa a este rascunho depois de salvar. */
+  @Output() cadastrarCartaoRequested = new EventEmitter<void>();
 
   /** Opções de categoria com o ponto colorido, como no design. */
   get categoriaOptions(): SelectMenuOption[] {
@@ -146,6 +149,10 @@ export class DespesasFormComponent {
 
   irParaCategorias(): void {
     this.categoriasRequested.emit();
+  }
+
+  solicitarCadastroCartao(): void {
+    this.cadastrarCartaoRequested.emit();
   }
 
   @Output() submitForm = new EventEmitter<void>();

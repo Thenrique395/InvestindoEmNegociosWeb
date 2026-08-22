@@ -56,6 +56,18 @@
   border-radius: 3px;
 }
 
+.select-menu__badge {
+  flex: none;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-inner);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .select-menu__label {
   overflow: hidden;
   text-overflow: ellipsis;

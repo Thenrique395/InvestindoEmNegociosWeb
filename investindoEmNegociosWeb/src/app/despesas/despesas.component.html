@@ -208,7 +208,14 @@
     (fixaMesesChange)="fixaMeses = $event"
     (submitForm)="adicionar()"
     (categoriasRequested)="irParaCategorias()"
+    (cadastrarCartaoRequested)="abrirCadastroCartao()"
     (cancel)="fecharModal()" />
+
+  <app-cartao-form
+    [open]="mostrarCartaoForm"
+    [card]="null"
+    (close)="fecharCadastroCartao()"
+    (saved)="onCartaoCriado($event)" />
 
   <app-invoice-import
     [open]="mostrarImportFatura"

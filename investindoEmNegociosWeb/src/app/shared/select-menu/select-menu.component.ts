@@ -18,6 +18,8 @@ export interface SelectMenuOption {
   label: string;
   /** Ponto colorido à esquerda — cor de categoria, por exemplo. */
   color?: string;
+  /** Selo curto à esquerda do rótulo — bandeira do cartão, por exemplo. */
+  badge?: string;
   /** Texto à direita da opção: média, contagem, atalho. */
   meta?: string;
   disabled?: boolean;

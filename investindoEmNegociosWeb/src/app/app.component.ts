@@ -7,6 +7,7 @@ import { ApiDataService } from './data/api-data.service';
 import { NotificationItem } from './notifications.service';
 import { NotificationsFacadeService } from './notifications-facade.service';
 import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
+import { BodyPortalDirective } from './shared/body-portal.directive';
 import { ThemeService } from './theme.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { TopbarComponent } from './topbar/topbar.component';
@@ -24,7 +25,7 @@ import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './navigation';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent, BillingAlertBannerComponent, ModalComponent],
+  imports: [RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent, BillingAlertBannerComponent, ModalComponent, BodyPortalDirective],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

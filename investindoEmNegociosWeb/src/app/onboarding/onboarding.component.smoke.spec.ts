@@ -483,4 +483,72 @@ describe('OnboardingComponent - lançamentos iniciais', () => {
     expect(ctx.component.modalExpenseFormaPagamentoId).toBeNull();
     expect(ctx.component.modalExpenseFormaPagamento).toBe('avista');
   });
+
+  it('cadastro de cartão acontece sem sair da despesa e volta com o cartão selecionado', () => {
+    const ctx = createComponent();
+    ctx.component.ngOnInit();
+    (ctx.component as any).accountReady = true;
+    ctx.component.openExpenseModal();
+    ctx.component.modalExpense.nome = 'Mercado';
+
+    ctx.component.openCardModal();
+
+    // o modal da despesa sai de cena, mas o rascunho continua vivo no componente
+    expect(ctx.component.showExpenseModal).toBeFalse();
+    expect(ctx.component.showCardModal).toBeTrue();
+    expect(ctx.component.modalExpense.nome).toBe('Mercado');
+    expect(ctx.router.navigateByUrl).not.toHaveBeenCalledWith('/cartoes');
+
+    ctx.component.onCardCreated({
+      id: 'card-novo', brandId: 1, holderName: 'FULANO', last4: '4321',
+      creditLimit: 5000, statementCloseDay: 10, dueDay: 18
+    } as any);
+
+    expect(ctx.component.showCardModal).toBeFalse();
+    expect(ctx.component.showExpenseModal).toBeTrue();
+    expect(ctx.component.modalExpenseCartaoId).toBe('card-novo');
+    expect(ctx.component.modalExpenseCartoes.some((c) => c.id === 'card-novo')).toBeTrue();
+    expect(ctx.component.modalExpense.nome).toBe('Mercado');
+  });
+
+  it('cancelar o cadastro de cartão devolve a pessoa ao rascunho da despesa', () => {
+    const ctx = createComponent();
+    ctx.component.ngOnInit();
+    (ctx.component as any).accountReady = true;
+    ctx.component.openExpenseModal();
+    ctx.component.openCardModal();
+
+    ctx.component.closeCardModal();
+
+    expect(ctx.component.showCardModal).toBeFalse();
+    expect(ctx.component.showExpenseModal).toBeTrue();
+  });
+
+  it('card opcional do passo 4 abre o mesmo modal, sem voltar para a despesa depois', () => {
+    const ctx = createComponent();
+    ctx.component.ngOnInit();
+    (ctx.component as any).accountReady = true;
+
+    ctx.component.openCardsPage();
+
+    expect(ctx.component.showCardModal).toBeTrue();
+    expect(ctx.router.navigateByUrl).not.toHaveBeenCalledWith('/cartoes');
+
+    ctx.component.onCardCreated({ id: 'card-opcional', brandId: 1, holderName: 'FULANO', last4: '4321' } as any);
+
+    expect(ctx.component.showCardModal).toBeFalse();
+    expect(ctx.component.showExpenseModal).toBeFalse();
+    expect(ctx.component.cardsCount).toBe(1);
+  });
+
+  it('com cartão já cadastrado, "Gerenciar cartões" continua indo para a tela de cartões', () => {
+    const ctx = createComponent();
+    ctx.component.ngOnInit();
+    ctx.component.cardsCount = 1;
+
+    ctx.component.openCardsPage();
+
+    expect(ctx.router.navigateByUrl).toHaveBeenCalledWith('/cartoes');
+    expect(ctx.component.showCardModal).toBeFalse();
+  });
 });

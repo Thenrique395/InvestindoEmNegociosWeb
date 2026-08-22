@@ -84,9 +84,21 @@ export class NumberStepperComponent implements ControlValueAccessor {
     this.commit(this._value() + this.step());
   }
 
-  /** Durante a digitação apenas guarda o texto — sem prender ao intervalo. */
-  onInput(raw: string): void {
-    this._draft.set(raw.replace(/[^\d-]/g, ''));
+  /**
+   * Durante a digitação apenas guarda o texto — sem prender ao intervalo.
+   *
+   * O que não é dígito é descartado NO PRÓPRIO input: filtrar só o rascunho não
+   * bastava, porque quando o texto limpo é igual ao já renderizado o Angular não
+   * reescreve o campo e a letra digitada continuava aparecendo ("1asd").
+   */
+  onInput(event: Event): void {
+    const target = event.target as HTMLInputElement | null;
+    const permiteNegativo = this.min() < 0;
+    const limpo = (target?.value ?? '').replace(permiteNegativo ? /[^\d-]/g : /[^\d]/g, '');
+    this._draft.set(limpo);
+    if (target && target.value !== limpo) {
+      target.value = limpo;
+    }
   }
 
   /** Ao sair do campo, sanitiza e aplica. Campo vazio volta ao mínimo. */
