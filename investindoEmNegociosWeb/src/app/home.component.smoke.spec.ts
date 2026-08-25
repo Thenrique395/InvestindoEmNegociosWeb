@@ -133,6 +133,32 @@ describe('HomeComponent smoke', () => {
     expect(view.rows.map((row) => row.name)).toEqual(['Dentro da janela']);
   });
 
+  it('conta vencimentos dos próximos 7 dias que caem no mês seguinte', () => {
+    // Data fixa de propósito: o bug só aparece quando a janela atravessa o mês,
+    // então sem congelar o relógio este teste passaria por acaso no dia 5 e só
+    // acusaria no fim do mês. Era assim que ele estava — e foi o que derrubou o
+    // quality gate a partir do dia 25.
+    jasmine.clock().install();
+    jasmine.clock().mockDate(new Date(2026, 7, 28, 12, 0, 0));
+    try {
+      const component = createComponent();
+      (component as any).expensesLoaded = true;
+      (component as any).incomesLoaded = true;
+      (component as any).expensesRaw = [
+        { id: 'set', nome: 'Vence em setembro', categoria: 'Casa', valor: 300, vencimento: '02/09/2026', status: 'OPEN' },
+        { id: 'ago', nome: 'Vence em agosto', categoria: 'Casa', valor: 100, vencimento: '30/08/2026', status: 'OPEN' },
+        { id: 'longe', nome: 'Fora da janela', categoria: 'Casa', valor: 900, vencimento: '20/09/2026', status: 'OPEN' }
+      ];
+
+      (component as any).updateInsightDiagnostics();
+
+      // 100 + 300: a virada de mês não pode esconder o que vence em 7 dias.
+      expect(component.insightDiagnostics.dueSoonExpensesAmount).toBe(400);
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
+
   it('calcula diagnóstico de vencimentos próximos com a mesma janela de 7 dias', () => {
     const component = createComponent();
     (component as any).expensesLoaded = true;

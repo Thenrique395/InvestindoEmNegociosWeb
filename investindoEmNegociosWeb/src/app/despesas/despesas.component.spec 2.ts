@@ -503,7 +503,7 @@ describe('DespesasComponent - antecipação e plano', () => {
 
   it('oferece a ação mesmo sem o plano — esconder deixava o recurso invisível', () => {
     const basic = createComponent('Basic');
-    const rotulos = basic.bulkActions.map((a: { label: string }) => a.label);
+    const rotulos = basic.selectionActions.map((a) => a.label);
 
     expect(rotulos).toContain('Solicitar antecipação');
   });

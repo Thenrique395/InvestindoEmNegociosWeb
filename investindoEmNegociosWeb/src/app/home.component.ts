@@ -2384,7 +2384,13 @@ export class HomeComponent implements OnInit {
       const date = parseLocaleDate(income.recebimento);
       return !!date && date < startOfToday;
     });
-    const dueSoonExpenses = openExpenses.filter((expense) => {
+    /* A janela de 7 dias sai de `expensesRaw`, e NÃO de `openExpenses`: este
+       último já vem recortado pelo período exibido (o mês). Do dia 25 em diante
+       parte da janela cai no mês seguinte, e o painel mostrava R$ 0,00 na
+       semana em que o dado mais importa. O recorte por período vale para os
+       totais do mês; para "próximos 7 dias", não. */
+    const dueSoonExpenses = this.expensesRaw.filter((expense) => {
+      if (!isExpenseOpen(expense.status)) return false;
       const date = parseLocaleDate(expense.vencimento);
       return !!date && date >= startOfToday && date <= dueSoonLimit;
     });
