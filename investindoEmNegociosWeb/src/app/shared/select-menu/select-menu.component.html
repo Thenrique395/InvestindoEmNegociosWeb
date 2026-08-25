@@ -35,7 +35,12 @@
        próprio gatilho. Sem barrar o default, escolher uma opção fechava e o
        label reabria o menu no mesmo clique. -->
   <div
-    class="select-menu__panel"
+    class="select-menu__panel select-menu__panel--viewport"
+    [class.select-menu__panel--above]="openAbove()"
+    [style.top.px]="panelTop()"
+    [style.bottom.px]="panelBottom()"
+    [style.left.px]="panelLeft()"
+    [style.width.px]="panelWidth()"
     (click)="$event.preventDefault(); $event.stopPropagation()"
     (keydown)="onMenuKeydown($event)">
     @if (searchable()) {

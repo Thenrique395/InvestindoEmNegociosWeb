@@ -53,6 +53,7 @@ export interface SelectMenuOption {
   ],
   host: {
     '[class.select-menu--open]': 'open()',
+    '[class.select-menu--open-above]': 'openAbove()',
     '[class.select-menu--disabled]': 'isDisabled()',
   },
 })
@@ -72,12 +73,18 @@ export class SelectMenuComponent implements ControlValueAccessor {
 
   private readonly _value = signal<string>('');
   private readonly _open = signal(false);
+  private readonly _openAbove = signal(false);
   private readonly _query = signal('');
   private readonly _activeIndex = signal(-1);
   private readonly _disabled = signal(false);
 
   readonly value = this._value.asReadonly();
   readonly open = this._open.asReadonly();
+  readonly openAbove = this._openAbove.asReadonly();
+  readonly panelTop = signal<number | null>(null);
+  readonly panelBottom = signal<number | null>(null);
+  readonly panelLeft = signal(0);
+  readonly panelWidth = signal(0);
   readonly query = this._query.asReadonly();
   readonly activeIndex = this._activeIndex.asReadonly();
   readonly isDisabled = this._disabled.asReadonly();
@@ -133,6 +140,19 @@ export class SelectMenuComponent implements ControlValueAccessor {
 
   openMenu(): void {
     if (this._disabled()) return;
+    const bounds = this.host.nativeElement.getBoundingClientRect();
+    const menuHeight = 260;
+    const dialogFooter = this.host.nativeElement
+      .closest('[role="dialog"]')
+      ?.querySelector('footer')
+      ?.getBoundingClientRect();
+    const lowerBoundary = dialogFooter?.top ?? window.innerHeight;
+    const openAbove = bounds.bottom + menuHeight > lowerBoundary && bounds.top > menuHeight;
+    this._openAbove.set(openAbove);
+    this.panelTop.set(openAbove ? null : bounds.bottom + 8);
+    this.panelBottom.set(openAbove ? window.innerHeight - bounds.top - 8 : null);
+    this.panelLeft.set(bounds.left);
+    this.panelWidth.set(bounds.width);
     this._open.set(true);
     this._query.set('');
     const index = this.visibleOptions().findIndex((o) => o.value === this._value());
@@ -147,6 +167,7 @@ export class SelectMenuComponent implements ControlValueAccessor {
   close(): void {
     if (!this._open()) return;
     this._open.set(false);
+    this._openAbove.set(false);
     this._activeIndex.set(-1);
     this.onTouched();
   }

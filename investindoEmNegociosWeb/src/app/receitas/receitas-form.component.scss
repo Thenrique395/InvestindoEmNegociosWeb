@@ -40,6 +40,10 @@
   grid-column: 1 / -1;
 }
 
+.income-form__recurring {
+  align-self: end;
+}
+
 .income-form__control {
   min-height: 42px;
   border-radius: var(--radius-inner);
@@ -192,14 +196,10 @@
   grid-column: 1 / -1;
 }
 
-.income-form__box {
-  display: grid;
-  gap: 0.75rem;
-  margin: 0.85rem 0 0;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-panel);
-  background: var(--surface-sunken);
+@media (max-width: 640px) {
+  .income-form__recurring {
+    align-self: stretch;
+  }
 }
 
 /* "R$" fixo dentro do campo: o valor digitado começa depois dele. */

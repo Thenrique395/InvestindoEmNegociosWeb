@@ -128,6 +128,12 @@
   }
 }
 
+@media (max-width: 1180px) and (min-width: 721px) {
+  .responsive-list__item--truncate {
+    min-width: 8ch;
+  }
+}
+
 .responsive-list__item--value {
   text-align: right;
   font-weight: var(--fw-semibold);

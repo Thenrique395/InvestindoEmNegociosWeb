@@ -10,6 +10,20 @@
   cursor: pointer;
 }
 
+.toggle-field--compact {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.toggle-field--compact .toggle-field__copy {
+  gap: 0.1rem;
+}
+
+.toggle-field--compact .toggle-field__text {
+  line-height: 1.2;
+}
+
 .toggle-field__copy {
   display: grid;
   gap: 0.2rem;

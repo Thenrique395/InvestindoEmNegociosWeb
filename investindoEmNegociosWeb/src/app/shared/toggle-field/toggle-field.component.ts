@@ -10,6 +10,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class ToggleFieldComponent {
   @Input() label = '';
   @Input() description = '';
+  @Input() compact = false;
   @Input() checked = false;
   @Input() disabled = false;
   @Output() checkedChange = new EventEmitter<boolean>();

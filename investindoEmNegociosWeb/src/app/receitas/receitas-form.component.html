@@ -48,7 +48,7 @@
           (valueChange)="onRecebimentoChange($event)" />
       </app-form-field>
 
-      <app-form-field label="Categoria" class="income-form__field--full" [error]="erroCategoria">
+      <app-form-field label="Categoria" [error]="erroCategoria">
         <app-select-menu
           [options]="categoriaOptions"
           [ngModel]="novaRenda.categoryId || ''"
@@ -60,6 +60,15 @@
           (valueChange)="onCategoriaChange($event)"
           (createRequested)="categoriasRequested.emit()" />
       </app-form-field>
+
+      <app-toggle-field
+        class="income-form__recurring"
+        [compact]="true"
+        label="Receita recorrente"
+        description="Repete o valor nos próximos meses automaticamente."
+        [checked]="novaRenda.fixa ?? false"
+        (checkedChange)="novaRenda.fixa = $event; onFixaChange($event)">
+      </app-toggle-field>
     </div>
 
     @if (!categorias.length) {
@@ -72,26 +81,17 @@
       </div>
     }
 
-    <fieldset class="income-form__box">
-      <app-toggle-field
-        label="Receita recorrente"
-        description="Repete o valor nos próximos meses automaticamente."
-        [checked]="novaRenda.fixa ?? false"
-        (checkedChange)="novaRenda.fixa = $event; onFixaChange($event)">
-      </app-toggle-field>
-
-      @if (valorSugestao) {
-        <div class="income-form__hint-card">
-          <div class="income-form__hint-copy">
-            <span class="income-form__hint-title">Último valor usado para esta fonte</span>
-            <p class="income-form__hint-text">{{ valorSugestao | appCurrency }}</p>
-          </div>
-          <button type="button" class="income-form__hint-action" (click)="usarSugestao()">
-            Usar valor sugerido
-          </button>
+    @if (valorSugestao !== null && valorSugestao > 0) {
+      <div class="income-form__hint-card">
+        <div class="income-form__hint-copy">
+          <span class="income-form__hint-title">Último valor usado para esta fonte</span>
+          <p class="income-form__hint-text">{{ valorSugestao | appCurrency }}</p>
         </div>
-      }
-    </fieldset>
+        <button type="button" class="income-form__hint-action" (click)="usarSugestao()">
+          Usar valor sugerido
+        </button>
+      </div>
+    }
 
     @if (resumoTexto) {
       <section class="income-form__summary">
