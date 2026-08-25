@@ -44,7 +44,7 @@
   </ng-template>
 
   <ng-template appResponsiveListCell="status" let-r>
-    <app-status-badge [tone]="statusTone(r)" [label]="statusLabel(r)"></app-status-badge>
+    <app-status-badge [tone]="statusTone(r)" [icon]="statusIcon(r)" [label]="statusLabel(r)"></app-status-badge>
   </ng-template>
 
   <ng-template appResponsiveListCell="acoes" let-r>
@@ -54,7 +54,7 @@
         class="receitas-lista__icon-action"
         (click)="historico.emit(r.id!)"
         aria-label="Histórico"
-        [attr.data-tooltip]="'Histórico'">
+        title="Histórico">
         <svg viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M12 8v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           <path d="M3.5 12a8.5 8.5 0 1 0 2.2-5.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -63,10 +63,10 @@
       </button>
       <button
         type="button"
-        class="receitas-lista__icon-action"
+        class="receitas-lista__icon-action receitas-lista__icon-action--edit"
         (click)="onEditar(r.id!)"
         aria-label="Editar"
-        [attr.data-tooltip]="'Editar'">
+        title="Editar">
         <svg viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 20h4l10-10-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           <path d="m12 6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -77,7 +77,7 @@
         class="receitas-lista__icon-action receitas-lista__icon-action--danger"
         (click)="onRemover(r.planId, r.id)"
         aria-label="Excluir"
-        [attr.data-tooltip]="'Excluir'">
+        title="Excluir">
         <svg viewBox="0 0 24 24" role="presentation" focusable="false">
           <path d="M4 7h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           <path d="M9 7V5h6v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -92,7 +92,7 @@
           [disabled]="isAttachingReceipt(r.id)"
           (click)="onComprovante(r.id)"
           aria-label="Anexar comprovante"
-          [attr.data-tooltip]="'Comprovante'">
+          title="Comprovante">
           <svg viewBox="0 0 24 24" role="presentation" focusable="false">
             <path d="M8 12.5V7a4 4 0 0 1 8 0v8a3 3 0 0 1-6 0V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>

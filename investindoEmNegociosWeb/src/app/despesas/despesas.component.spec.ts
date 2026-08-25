@@ -62,7 +62,10 @@ describe('DespesasComponent - competência de cartão no front', () => {
       })
     );
 
-    expect(label).toContain('Cartão - VISA - 1234 *********** 3456');
+    // Sem máscara: os asteriscos ocupavam metade da coluna sem identificar nada
+    // — quem reconhece o cartão reconhece pelos quatro finais.
+    expect(label).toContain('Cartão - VISA - 3456');
+    expect(label).not.toContain('*');
     expect(label).toContain('Fatura 03/2026');
   });
 
@@ -88,7 +91,7 @@ describe('DespesasComponent - competência de cartão no front', () => {
       })
     );
 
-    expect(label).toBe('Cartão - VISA - 1234 *********** 3456');
+    expect(label).toBe('Cartão - VISA - 3456');
   });
 });
 

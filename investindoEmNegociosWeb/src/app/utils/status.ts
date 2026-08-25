@@ -55,6 +55,34 @@ export const installmentStatusTone = (
   }
 };
 
+/**
+ * Glifo de cada status. Existe porque a cor sozinha não basta: `OPEN` e
+ * `CANCELED` compartilham o tom `muted`, então "Em aberto" e "Cancelada"
+ * ficavam idênticas na tabela. O ícone separa as duas sem inventar uma sétima
+ * cor — e dá a quem não distingue verde de vermelho um segundo sinal.
+ */
+export type InstallmentStatusIcon = 'check' | 'alert' | 'clock' | 'forward' | 'half' | 'x';
+
+export const installmentStatusIcon = (
+  status?: DisplayInstallmentStatus | string
+): InstallmentStatusIcon => {
+  switch (status) {
+    case 'PAID':
+      return 'check';
+    case 'PARTIALLY_PAID':
+      return 'half';
+    case 'ANTICIPATED':
+      return 'forward';
+    case 'OVERDUE':
+      return 'alert';
+    case 'CANCELED':
+      return 'x';
+    case 'OPEN':
+    default:
+      return 'clock';
+  }
+};
+
 /* Despesa é feminina ("Paga", "Cancelada"); receita segue o mesmo gênero. */
 export const expenseStatusLabel = (status?: DisplayInstallmentStatus | string): string => {
   switch (status) {

@@ -7,6 +7,7 @@ import { colorForCategory } from '../categories/categories-overview.model';
 
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';
+import { cardLabel as cardLabelUtil } from '../utils/card-label';
 import { RouterLink } from '@angular/router';
 import { CategoryDto } from '../categories.service';
 import { ModalComponent } from '../shared/modal/modal.component';
@@ -22,13 +23,6 @@ import { DatePickerComponent } from '../shared/date-picker/date-picker.component
   styleUrls: ['./despesas-form.component.scss']
 })
 export class DespesasFormComponent {
-  private readonly brandFallbackMap: Record<string, string> = {
-    '1': 'VISA',
-    '2': 'MASTERCARD',
-    '3': 'ELO',
-    '4': 'AMEX',
-    '5': 'HIPERCARD'
-  };
   @Input() mostrarForm = false;
   @Input() categorias: CategoryDto[] = [];
   @Input() cartoes: StoredCard[] = [];
@@ -162,31 +156,8 @@ export class DespesasFormComponent {
     return this.formaPagamento === 'cartao' && (!this.allowCardPayment || !this.cartoes.length);
   }
 
-  private resolveBrandName(brandIdOrName?: string): string {
-    const raw = (brandIdOrName || '').toString().trim();
-    if (!raw) return 'Cartão';
-    return (
-      this.cardBrandMap[raw] ||
-      this.cardBrandMap[raw.toUpperCase()] ||
-      this.brandFallbackMap[raw] ||
-      raw.toUpperCase()
-    );
-  }
-
-  private maskedCardNumber(numero?: string): string {
-    if (!numero) return '**** *********** ****';
-    const digits = numero.replace(/\D/g, '');
-    const last4 = digits.slice(-4).padStart(4, '*');
-    if (digits.length >= 8) {
-      const first4 = digits.slice(0, 4);
-      return `${first4} *********** ${last4}`;
-    }
-    return `**** *********** ${last4}`;
-  }
-
   cartaoLabel(cartao: StoredCard): string {
-    const bandeira = this.resolveBrandName(cartao?.bandeira);
-    return `Cartão - ${bandeira} - ${this.maskedCardNumber(cartao?.numero)}`;
+    return cardLabelUtil(cartao, this.cardBrandMap);
   }
 
   onValorChange(value: string): void {

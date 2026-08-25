@@ -35,12 +35,41 @@
   }
 }
 
+/* Cor em repouso por ação, e não os três em cinza: a coluna passa a ser
+   varrível — o vermelho anuncia a ação destrutiva antes de o ponteiro chegar,
+   e o histórico fica neutro porque só informa. O protótipo mantém os três
+   cinza e colore no hover; aqui a cor foi antecipada a pedido.
+
+   O hover precisa ser por variante. A regra antiga pintava tudo de
+   `var(--text)` no hover e, como estilo de componente vence `:where()` (que
+   tem especificidade zero), ela apagava o hover vermelho de `--danger` que já
+   existia no styles.scss e nunca chegou a aparecer. */
+.despesas-lista__icon-action--edit {
+  color: var(--primary-text);
+}
+
+.despesas-lista__icon-action--danger {
+  color: var(--expense-text);
+}
+
 .despesas-lista__icon-action:hover:not(:disabled),
 .despesas-lista__icon-action:focus-visible {
   transform: none;
   border-color: transparent;
   background: var(--surface-inset);
   color: var(--text);
+}
+
+.despesas-lista__icon-action--edit:hover:not(:disabled),
+.despesas-lista__icon-action--edit:focus-visible {
+  background: var(--primary-tint);
+  color: var(--primary-text);
+}
+
+.despesas-lista__icon-action--danger:hover:not(:disabled),
+.despesas-lista__icon-action--danger:focus-visible {
+  background: var(--expense-tint);
+  color: var(--expense-text);
 }
 
 .despesas-lista__subtitle {
@@ -60,30 +89,3 @@
   white-space: nowrap;
 }
 
-.despesas-lista__icon-action::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  inset-inline-start: 50%;
-  inset-block-end: calc(100% + 10px);
-  transform: translateX(-50%) translateY(4px);
-  padding: 0.45rem 0.65rem;
-  border-radius: var(--radius-xs);
-  background: color-mix(in srgb, var(--text) 90%, white);
-  color: white;
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-semibold);
-  line-height: var(--lh-display);
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 140ms ease,
-    transform 140ms ease;
-  z-index: 8;
-}
-
-.despesas-lista__icon-action:hover::after,
-.despesas-lista__icon-action:focus-visible::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}

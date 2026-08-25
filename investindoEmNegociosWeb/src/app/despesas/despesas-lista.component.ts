@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StoredExpense } from '../data/api-data.service';
-import { expenseStatusLabel, installmentStatusTone, resolveInstallmentStatus } from '../utils/status';
+import { expenseStatusLabel, installmentStatusIcon, installmentStatusTone, resolveInstallmentStatus } from '../utils/status';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
@@ -34,9 +34,9 @@ export class DespesasListaComponent {
   @Output() emptyAction = new EventEmitter<void>();
 
   readonly columns: ResponsiveListColumn[] = [
-    { key: 'nome', label: 'Nome', sortable: true },
-    { key: 'categoria', label: 'Categoria', sortable: true },
-    { key: 'pagamento', label: 'Pagamento', sortable: true },
+    { truncate: true, key: 'nome', label: 'Nome', sortable: true },
+    { truncate: true, key: 'categoria', label: 'Categoria', sortable: true },
+    { truncate: true, key: 'pagamento', label: 'Pagamento', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
     { key: 'vencimento', label: 'Venc.', sortable: true },
     { key: 'valor', label: 'Valor', sortable: true, align: 'end' },
@@ -83,6 +83,10 @@ export class DespesasListaComponent {
 
   statusTone(d: StoredExpense) {
     return installmentStatusTone(resolveInstallmentStatus(d.status, d.vencimento));
+  }
+
+  statusIcon(d: StoredExpense) {
+    return installmentStatusIcon(resolveInstallmentStatus(d.status, d.vencimento));
   }
 
   isSelecionavel(despesa: StoredExpense): boolean {

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StoredIncome } from '../data/api-data.service';
-import { resolveInstallmentStatus, incomeStatusLabel, installmentStatusTone } from '../utils/status';
+import { resolveInstallmentStatus, incomeStatusLabel, installmentStatusIcon, installmentStatusTone } from '../utils/status';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
@@ -37,9 +37,9 @@ export class ReceitasListaComponent {
     // Ordem do design: identificação, classificação, situação e só então os
     // números — o valor fica encostado nas ações, na borda direita.
     const base: ResponsiveListColumn[] = [
-      { key: 'fonte', label: 'Fonte', sortable: true },
-      { key: 'categoria', label: 'Categoria', sortable: true },
-      { key: 'tipo', label: 'Tipo', sortable: true }
+      { truncate: true, key: 'fonte', label: 'Fonte', sortable: true },
+      { truncate: true, key: 'categoria', label: 'Categoria', sortable: true },
+      { truncate: true, key: 'tipo', label: 'Tipo', sortable: true }
     ];
     if (this.showStatus) {
       base.push({ key: 'status', label: 'Status', sortable: true });
@@ -100,6 +100,10 @@ export class ReceitasListaComponent {
 
   statusTone(renda: StoredIncome) {
     return installmentStatusTone(resolveInstallmentStatus(renda.status, renda.recebimento));
+  }
+
+  statusIcon(renda: StoredIncome) {
+    return installmentStatusIcon(resolveInstallmentStatus(renda.status, renda.recebimento));
   }
 
   isSelecionavel(renda: StoredIncome): boolean {

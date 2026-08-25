@@ -9,6 +9,13 @@ export interface ResponsiveListColumn {
   sortable?: boolean;
   align?: 'start' | 'end';
   widthClass?: string;
+  /**
+   * Coluna que pode encolher e cortar com reticências em vez de empurrar a
+   * tabela para a rolagem horizontal. Opt-in: só as colunas de texto livre —
+   * nome, categoria, forma de pagamento. Nunca em valor, data ou status, que
+   * perdem o sentido pela metade.
+   */
+  truncate?: boolean;
 }
 
 @Component({

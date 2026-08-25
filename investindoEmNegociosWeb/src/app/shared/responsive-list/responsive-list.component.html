@@ -74,6 +74,7 @@
                 <td
                   class="responsive-list__item"
                   [class.responsive-list__item--value]="column.align === 'end'"
+                  [class.responsive-list__item--truncate]="column.truncate"
                   [attr.data-label]="column.label">
                   <ng-container *ngTemplateOutlet="cellTemplate(column.key); context: { $implicit: item }"></ng-container>
                 </td>

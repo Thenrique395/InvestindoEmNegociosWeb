@@ -17,7 +17,11 @@
 }
 
 .responsive-list__table {
-  min-width: 100%;
+  /* `width` e não `min-width`: com `min-width` a tabela cresce até o mínimo do
+     conteúdo e ignora o `max-width` das células, então nada trunca e a rolagem
+     horizontal era inevitável. Tabela sem coluna `truncate` continua rolando —
+     células que não podem encolher ainda vencem o `width`. */
+  width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-size: var(--fs-body);
@@ -100,6 +104,30 @@
   width: 52px;
 }
 
+/* Truncamento: `max-width: 0` faz a coluna deixar de reivindicar a largura do
+   conteúdo numa tabela de layout automático — ela passa a receber o que sobra e
+   corta o excedente. É o que tira a rolagem horizontal em telas estreitas sem
+   fixar largura de coluna nenhuma. O texto inteiro fica no `title` de quem
+   monta a célula. */
+.responsive-list__item--truncate {
+  max-width: 0;
+  /* Piso de legibilidade: sem ele as colunas truncáveis dividiam o aperto por
+     igual e o nome do lançamento — a coluna que mais importa — virava "Iph…"
+     ao lado de uma categoria folgada. 12 caracteres bastam para reconhecer o
+     registro; o texto inteiro fica no `title`. */
+  min-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  > * {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .responsive-list__item--value {
   text-align: right;
   font-weight: var(--fw-semibold);
@@ -107,13 +135,20 @@
   white-space: nowrap;
 }
 
+/* A coluna de ações fica fixa para continuar alcançável quando a tabela rola na
+   horizontal. Sem sombra: ela existia para insinuar a rolagem, mas o CSS não
+   sabe se há o que rolar, então na largura normal — que é a esmagadora maioria
+   das telas — sobrava um borrão escuro que não significava nada. O fundo opaco
+   já resolve a sobreposição quando a rolagem de fato acontece. */
+/* A coluna de ações guarda só ícones; o recuo de coluna de texto sobrava dos
+   dois lados e era largura roubada das colunas que têm conteúdo de verdade. */
 .responsive-list__cell:last-child,
 .responsive-list__item:last-child {
+  padding-inline: var(--space-5);
   position: sticky;
   right: 0;
   z-index: 2;
   background: inherit;
-  box-shadow: -12px 0 18px -18px color-mix(in srgb, var(--text) 40%, transparent);
 }
 
 .responsive-list__head .responsive-list__cell:last-child {

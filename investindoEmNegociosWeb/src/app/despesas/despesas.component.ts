@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { cardLabel } from '../utils/card-label';
 import { ApiDataService, StoredExpense, StoredCard } from '../data/api-data.service';
 import { DespesasListaComponent } from './despesas-lista.component';
 import { DespesasFormComponent } from './despesas-form.component';
@@ -24,7 +25,7 @@ import { colorForCategory } from '../categories/categories-overview.model';
 import { TxMobileHeaderComponent, TxMobileKpi } from '../shared/transactions/tx-mobile-header.component';
 import { TxFilterChipsComponent, TxFilterChip } from '../shared/transactions/tx-filter-chips.component';
 import { TxMobileListComponent, TxMobileItem } from '../shared/transactions/tx-mobile-list.component';
-import { DisplayInstallmentStatus, resolveInstallmentStatus, expenseStatusLabel, installmentStatusTone, InstallmentStatusTone } from '../utils/status';
+import { DisplayInstallmentStatus, resolveInstallmentStatus, expenseStatusLabel, installmentStatusIcon, installmentStatusTone, InstallmentStatusTone } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { UiPermissionsService } from '../ui-permissions.service';
 import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
@@ -92,13 +93,6 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DespesasComponent implements OnInit {
-  private readonly brandFallbackMap: Record<string, string> = {
-    '1': 'VISA',
-    '2': 'MASTERCARD',
-    '3': 'ELO',
-    '4': 'AMEX',
-    '5': 'HIPERCARD'
-  };
   dataAtual = new Date();
   // Estado assíncrono por signal (A9): despesasPorMes/categorias/cartoes/contas/cardBrandMap
   // vêm de observables/HTTP fora da zona. Campos ngModel e sync-only ficam plain (refletem
@@ -221,6 +215,7 @@ export class DespesasComponent implements OnInit {
         tom: 'expense' as const,
         statusLabel: expenseStatusLabel(status),
         statusTone: installmentStatusTone(status),
+        statusIcon: installmentStatusIcon(status),
         data: (d.vencimento || '').slice(0, 5) || '—',
         meta: this.pagamentoLabel(d)
       };
@@ -1449,31 +1444,7 @@ export class DespesasComponent implements OnInit {
   }
 
   formatarCartaoLabel(card: StoredCard): string {
-    const bandeira = this.resolveBrandName(card.bandeira);
-    const masked = this.maskedCardNumber(card.numero);
-    return `Cartão - ${bandeira} - ${masked}`;
-  }
-
-  private resolveBrandName(brandIdOrName?: string): string {
-    const raw = (brandIdOrName || '').toString().trim();
-    if (!raw) return 'Cartão';
-    const brandMap = this.cardBrandMap();
-    return (
-      brandMap[raw] ||
-      brandMap[raw.toUpperCase()] ||
-      this.brandFallbackMap[raw] ||
-      raw.toUpperCase()
-    );
-  }
-
-  private maskedCardNumber(numero?: string): string {
-    const digits = (numero || '').replace(/\D/g, '');
-    const last4 = digits.slice(-4).padStart(4, '*');
-    if (digits.length >= 8) {
-      const first4 = digits.slice(0, 4);
-      return `${first4} *********** ${last4}`;
-    }
-    return `**** *********** ${last4}`;
+    return cardLabel(card, this.cardBrandMap());
   }
 
   private mesKeyFromDate(date: Date): string {

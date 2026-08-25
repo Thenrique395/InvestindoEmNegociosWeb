@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { StatusBadgeComponent, StatusBadgeTone } from '../status-badge/status-badge.component';
+import { StatusBadgeComponent, StatusBadgeIcon, StatusBadgeTone } from '../status-badge/status-badge.component';
 
 export interface TxMobileItem {
   readonly id: string;
@@ -10,6 +10,8 @@ export interface TxMobileItem {
   readonly tom: 'expense' | 'income';
   readonly statusLabel: string;
   readonly statusTone: StatusBadgeTone;
+  /** Glifo do status. Opcional: nem toda lista que usa este item é de parcela. */
+  readonly statusIcon?: StatusBadgeIcon;
   readonly data: string;
   readonly meta?: string;
 }
@@ -148,7 +150,7 @@ export interface TxMobileItem {
             </span>
 
             <span class="tx-mlist__foot">
-              <app-status-badge size="sm" [tone]="item.statusTone" [label]="item.statusLabel" />
+              <app-status-badge size="sm" [tone]="item.statusTone" [icon]="item.statusIcon ?? null" [label]="item.statusLabel" />
               <span class="tx-mlist__meta">
                 {{ item.data }}@if (item.meta) { · {{ item.meta }} }
               </span>

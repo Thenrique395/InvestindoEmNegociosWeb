@@ -18,7 +18,7 @@ import { colorForCategory } from '../categories/categories-overview.model';
 import { TxMobileHeaderComponent, TxMobileKpi } from '../shared/transactions/tx-mobile-header.component';
 import { TxFilterChipsComponent, TxFilterChip } from '../shared/transactions/tx-filter-chips.component';
 import { TxMobileListComponent, TxMobileItem } from '../shared/transactions/tx-mobile-list.component';
-import { DisplayInstallmentStatus, resolveInstallmentStatus, incomeStatusLabel, installmentStatusTone } from '../utils/status';
+import { DisplayInstallmentStatus, resolveInstallmentStatus, incomeStatusLabel, installmentStatusIcon, installmentStatusTone } from '../utils/status';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { InstallmentsService } from '../installments.service';
@@ -187,6 +187,7 @@ export class ReceitasComponent implements OnInit {
         tom: 'income' as const,
         statusLabel: incomeStatusLabel(status),
         statusTone: installmentStatusTone(status),
+        statusIcon: installmentStatusIcon(status),
         data: (r.recebimento || '').slice(0, 5) || '—',
         meta: r.categoria || 'Sem categoria'
       };

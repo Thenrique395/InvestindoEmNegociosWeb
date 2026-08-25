@@ -12,6 +12,7 @@ import { UiFeedbackService } from '../ui-feedback.service';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { formatLocaleDate, formatNumberValue, parseLocaleDate, parseLocalizedNumber } from '../utils/locale-utils';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
+import { cardLabel } from '../utils/card-label';
 
 /**
  * Modal de **criação** de despesa, fechado em si mesmo. Irmão do
@@ -102,14 +103,6 @@ export class DespesaFormModalComponent implements OnInit {
 
   private categoriaMap = new Map<string, string>();
 
-  private readonly brandFallbackMap: Record<string, string> = {
-    '1': 'VISA',
-    '2': 'MASTERCARD',
-    '3': 'ELO',
-    '4': 'AMEX',
-    '5': 'HIPERCARD'
-  };
-
   constructor(
     private readonly db: ApiDataService,
     private readonly categoriesService: CategoriesService,
@@ -147,9 +140,7 @@ export class DespesaFormModalComponent implements OnInit {
   }
 
   get cartaoSelecionadoLabel(): string {
-    const card = this.cartoes().find((c) => c.id === this.cartaoSelecionadoId);
-    if (!card) return 'Nenhum cartão selecionado';
-    return `Cartão - ${this.resolveBrandName(card.bandeira)} - ${this.maskedCardNumber(card.numero)}`;
+    return cardLabel(this.cartoes().find((c) => c.id === this.cartaoSelecionadoId), this.cardBrandMap());
   }
 
   onValorChange(raw: string): void {
@@ -321,20 +312,6 @@ export class DespesaFormModalComponent implements OnInit {
     const byId = expense.categoryId ? this.categoriaMap.get(expense.categoryId) : null;
     if (byId) return byId;
     return expense.categoria || 'Outros';
-  }
-
-  private resolveBrandName(brandIdOrName?: string): string {
-    const raw = (brandIdOrName || '').toString().trim();
-    if (!raw) return 'Cartão';
-    const map = this.cardBrandMap();
-    return map[raw] || map[raw.toUpperCase()] || this.brandFallbackMap[raw] || raw.toUpperCase();
-  }
-
-  private maskedCardNumber(numero?: string): string {
-    const digits = (numero || '').replace(/\D/g, '');
-    const last4 = digits.slice(-4).padStart(4, '*');
-    if (digits.length >= 8) return `${digits.slice(0, 4)} *********** ${last4}`;
-    return `**** *********** ${last4}`;
   }
 
   /** Categorias, formas de pagamento e bandeiras usadas pelo formulário. */
