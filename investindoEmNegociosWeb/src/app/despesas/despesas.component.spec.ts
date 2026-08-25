@@ -501,16 +501,51 @@ describe('DespesasComponent - antecipação e plano', () => {
     return { success: jasmine.createSpy('success'), error: jasmine.createSpy('error'), info: jasmine.createSpy('info') };
   }
 
-  it('oferece a ação mesmo sem o plano — esconder deixava o recurso invisível', () => {
-    const basic = createComponent('Basic');
-    const rotulos = basic.bulkActions.map((a: { label: string }) => a.label);
+  /** Coloca uma despesa selecionada com o vencimento pedido. */
+  function comSelecao(role: string, vencimento: string, uiFeedback?: unknown): DespesasComponent {
+    const c = createComponent(role, uiFeedback);
+    const despesa = baseExpense({ id: 'sel-1', vencimento, status: 'OPEN' });
+    (c as any).despesasPorMes.set({ [(c as any).mesKey()]: [despesa] });
+    c.selectedIds.add('sel-1');
+    return c;
+  }
 
+  function emMesFuturo(): string {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 2, 15);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  function noMesCorrente(): string {
+    const d = new Date();
+    d.setDate(1);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  it('não oferece a ação quando a seleção é do mês corrente', () => {
+    const c = comSelecao('Advanced', noMesCorrente());
+
+    const rotulos = c.bulkActions.map((a: { label: string }) => a.label);
+
+    // Antecipar só vale para parcela futura; botão que só sabe recusar é pior
+    // que botão nenhum.
+    expect(rotulos).not.toContain('Solicitar antecipação');
+    expect(rotulos).toContain('Excluir');
+  });
+
+  it('oferece a ação quando a seleção é de mês futuro, mesmo sem o plano', () => {
+    const c = comSelecao('Basic', emMesFuturo());
+
+    const rotulos = c.bulkActions.map((a: { label: string }) => a.label);
+
+    // O recurso existe para esta seleção — só não está liberado. Esconder aqui
+    // deixaria o usuário sem saber que ele existe.
     expect(rotulos).toContain('Solicitar antecipação');
   });
 
   it('quem não tem o plano descobre qual libera, ao clicar', () => {
     const uiFeedback = feedbackFake();
-    const basic = createComponent('Basic', uiFeedback);
+    const basic = comSelecao('Basic', emMesFuturo(), uiFeedback);
 
     basic.anteciparSelecionadas();
 

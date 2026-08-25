@@ -503,18 +503,25 @@ export class DespesasComponent implements OnInit {
         run: () => this.pagarSelecionadas()
       }
     ];
-    /* A ação aparece para todo mundo, inclusive para quem não tem o plano.
-       Escondê-la deixava o usuário sem saber que o recurso existe — e a
-       mensagem de plano dentro de `anteciparSelecionadas()` era código morto,
-       porque nunca havia botão para chegar até ela. Agora quem não tem acesso
-       clica e descobre qual plano libera. */
-    actions.push({
-      label: 'Solicitar antecipação',
-      loadingLabel: 'Antecipando...',
-      loading: this.loadingAntecipar(),
-      tone: 'ghost',
-      run: () => this.anteciparSelecionadas()
-    });
+    /* Duas condições distintas, tratadas de formas distintas:
+
+       MÊS — antecipar só faz sentido para parcela de mês futuro. Se nada na
+       seleção é elegível, a ação não aparece: oferecer um botão que só sabe
+       recusar é pior que não oferecer.
+
+       PLANO — aqui a ação aparece mesmo sem acesso, porque o recurso EXISTE
+       para aquela seleção; só não está liberado. Quem clica descobre qual
+       plano libera, em `anteciparSelecionadas()`. Escondê-la aqui deixaria o
+       usuário sem saber que o recurso existe. */
+    if (this.selecionadosAntecipaveis.length) {
+      actions.push({
+        label: 'Solicitar antecipação',
+        loadingLabel: 'Antecipando...',
+        loading: this.loadingAntecipar(),
+        tone: 'ghost',
+        run: () => this.anteciparSelecionadas()
+      });
+    }
     actions.push({ label: 'Excluir', tone: 'danger', run: () => this.excluirSelecionadas() });
     return actions;
   }
