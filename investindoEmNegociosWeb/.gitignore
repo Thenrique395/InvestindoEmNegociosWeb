@@ -43,3 +43,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Duplicatas de código criadas por sincronização (iCloud/Finder): "arquivo 2.ts".
+# Estreito de propósito — em assets há arquivos legítimos com esse padrão no nome.
+src/app/**/* [0-9].ts
