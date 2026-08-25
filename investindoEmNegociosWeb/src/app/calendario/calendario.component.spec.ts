@@ -176,8 +176,63 @@ describe('CalendarioComponent', () => {
     fixture.detectChanges();
     const router = TestBed.inject(Router) as unknown as RouterMock;
 
-    component.createFor('/receitas');
-    expect(router.navigate).toHaveBeenCalledWith(['/receitas']);
+    component.createFor('/emprestimos');
+    expect(router.navigate).toHaveBeenCalledWith(['/emprestimos']);
     expect(component.showNewMenu).toBeFalse();
+  });
+
+  it('todos os cinco itens do menu abrem modal, nenhum navega', () => {
+    fixture.detectChanges();
+    const router = TestBed.inject(Router) as unknown as RouterMock;
+
+    for (const tipo of ['income', 'expense', 'card', 'loan', 'goal'] as const) {
+      component.abrirNovo(tipo);
+      expect(component.novoAberto).toBe(tipo);
+    }
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('abre o modal de receita sem sair da tela', () => {
+    fixture.detectChanges();
+    const router = TestBed.inject(Router) as unknown as RouterMock;
+    component.showNewMenu = true;
+
+    component.abrirNovo('income');
+
+    expect(component.novoAberto).toBe('income');
+    expect(component.showNewMenu).toBeFalse();
+    // O ponto da mudança: criar receita pelo Calendário não navega para lugar nenhum.
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('mantém um único modal aberto por vez', () => {
+    fixture.detectChanges();
+
+    component.abrirNovo('income');
+    component.abrirNovo('goal');
+
+    expect(component.novoAberto).toBe('goal');
+  });
+
+  it('fecha o modal e recompõe a agenda ao salvar', () => {
+    seed();
+    fixture.detectChanges();
+    component.abrirNovo('income');
+
+    component.onNovoSalvo();
+
+    expect(component.novoAberto).toBeNull();
+    // Recompôs a partir dos dados: o evento novo precisa nascer sem recarregar a página.
+    expect(component.allEvents().length).toBeGreaterThan(0);
+  });
+
+  it('fecha o modal sem gravar', () => {
+    fixture.detectChanges();
+    component.abrirNovo('card');
+
+    component.fecharNovo();
+
+    expect(component.novoAberto).toBeNull();
   });
 });

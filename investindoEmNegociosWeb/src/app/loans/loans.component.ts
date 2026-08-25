@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnIn
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { LoansService, LoanAmortizationType, LoanContractRequest, LoanContractResponse, LoanInstallmentResponse, LoanPaymentRequest, LoanPaymentResult, LoanSimulationComparison, LoanSimulationResponse } from '../loans.service';
+import { LoansService, LoanContractResponse, LoanInstallmentResponse, LoanPaymentRequest, LoanPaymentResult, LoanSimulationResponse } from '../loans.service';
 import { AccountsService, AccountResponse } from '../accounts.service';
 import { UiFeedbackService } from '../ui-feedback.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
@@ -16,12 +16,11 @@ import { TransactionSummaryCardComponent } from '../shared/transactions/transact
 import { SegmentedSelectorComponent, SegmentOption } from '../shared/segmented-selector/segmented-selector.component';
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { ConfirmSheetComponent } from '../shared/confirm-sheet/confirm-sheet.component';
-import { ModalComponent } from '../shared/modal/modal.component';
-import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { ResponsiveListComponent, ResponsiveListColumn } from '../shared/responsive-list/responsive-list.component';
 import { ResponsiveListCellDirective } from '../shared/responsive-list/responsive-list-cell.directive';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { LoanContractView, LoansOverview, buildContractViews, buildLoansOverview } from './loans-overview.model';
+import { LoanFormModalComponent } from './loan-form-modal.component';
 
 type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
 
@@ -42,33 +41,29 @@ type LoanStatusFilter = 'all' | 'active' | 'closed' | 'archived';
     StatusBadgeComponent,
     ProgressBarComponent,
     ConfirmSheetComponent,
-    ModalComponent,
-    FormFieldComponent,
     ResponsiveListComponent,
-    ResponsiveListCellDirective
+    ResponsiveListCellDirective,
+    LoanFormModalComponent
   ],
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoansComponent implements OnInit {
-  // Estado de exibição assíncrono por signal (A9). form (ngModel) e sync-only
-  // (editingId/expandedContractId/statusFilter/pendingDelete) ficam plain: refletem via
+  // Estado de exibição assíncrono por signal (A9). Campos sync-only
+  // (editingContract/expandedContractId/statusFilter/pendingDelete) ficam plain: refletem via
   // o CD disparado pelos signals co-setados no mesmo callback.
   readonly contracts = signal<LoanContractResponse[]>([]);
-  readonly simulation = signal<LoanSimulationResponse | null>(null);
-  readonly comparison = signal<LoanSimulationComparison | null>(null);
-  readonly comparing = signal(false);
   readonly showForm = signal(false);
   readonly loading = signal(false);
-  readonly saving = signal(false);
   readonly deleting = signal<string | null>(null);
   readonly archiving = signal<string | null>(null);
   readonly paying = signal(false);
   readonly accounts = signal<AccountResponse[]>([]);
   readonly error = signal('');
   readonly success = signal('');
-  editingId: string | null = null;
+  /** Contrato em edição — `null` quando o modal está criando. Vai como [contract]. */
+  editingContract: LoanContractResponse | null = null;
   expandedContractId: string | null = null;
   statusFilter: LoanStatusFilter = 'all';
   pendingDelete: LoanContractResponse | null = null;
@@ -79,10 +74,6 @@ export class LoansComponent implements OnInit {
   payForm = { paidAt: this.today(), accountId: '', penaltyAmount: 0, discountAmount: 0 };
   private payIdempotencyKey = '';
 
-  readonly amortizationOptions: SegmentOption[] = [
-    { value: 'Price', label: 'PRICE' },
-    { value: 'Sac', label: 'SAC' }
-  ];
   readonly installmentColumns: ResponsiveListColumn[] = [
     { key: 'number', label: '#' },
     { key: 'dueDate', label: 'Vencimento' },
@@ -91,17 +82,6 @@ export class LoansComponent implements OnInit {
     { key: 'status', label: 'Situação' },
     { key: 'actions', label: 'Ações', align: 'end' }
   ];
-  readonly simulationColumns: ResponsiveListColumn[] = [
-    { key: 'number', label: '#' },
-    { key: 'dueDate', label: 'Vencimento' },
-    { key: 'principal', label: 'Principal', align: 'end' },
-    { key: 'interest', label: 'Juros', align: 'end' },
-    { key: 'total', label: 'Total', align: 'end' },
-    { key: 'balance', label: 'Saldo', align: 'end' }
-  ];
-
-  form: LoanContractRequest = this.defaultForm();
-
   constructor(
     private readonly loansService: LoansService,
     private readonly accountsService: AccountsService,
@@ -169,10 +149,6 @@ export class LoansComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  setAmortization(value: string): void {
-    this.form.amortizationType = value as LoanAmortizationType;
-  }
-
   load(): void {
     this.loading.set(true);
     this.loansService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -189,111 +165,36 @@ export class LoansComponent implements OnInit {
     });
   }
 
-  simulate(): void {
-    this.error.set('');
-    this.success.set('');
-    this.comparison.set(null);
-    this.loansService.simulate(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (result) => { this.simulation.set(result); this.cdr.markForCheck(); },
-      error: (err) => { this.error.set(extractApiErrorMessage(err, 'Falha ao simular empréstimo.')); this.cdr.markForCheck(); }
-    });
-  }
-
-  compare(): void {
-    this.error.set('');
-    this.success.set('');
-    this.simulation.set(null);
-    this.comparing.set(true);
-    this.loansService.compare(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (result) => { this.comparison.set(result); this.comparing.set(false); this.cdr.markForCheck(); },
-      error: (err) => { this.comparing.set(false); this.error.set(extractApiErrorMessage(err, 'Falha ao comparar sistemas.')); this.cdr.markForCheck(); }
-    });
-  }
-
-  /** Escolhe um sistema a partir da comparação: ajusta o formulário e mostra a simulação escolhida. */
-  chooseSystem(type: LoanAmortizationType): void {
-    const cmp = this.comparison();
-    if (!cmp) return;
-    this.form.amortizationType = type;
-    this.simulation.set(type === 'Sac' ? cmp.sac : cmp.price);
-    this.comparison.set(null);
-    this.cdr.markForCheck();
-  }
-
-  create(): void {
-    this.error.set('');
-    this.success.set('');
-    this.saving.set(true);
-
-    if (this.editingId) {
-      this.loansService.update(this.editingId, this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (updated) => {
-          this.contracts.set(this.contracts().map(c => c.id === updated.id ? updated : c));
-          this.uiFeedback.success('Contrato atualizado com cronograma recalculado.');
-          this.saving.set(false);
-          this.closeForm();
-        },
-        error: (err) => {
-          this.error.set(extractApiErrorMessage(err, 'Falha ao atualizar contrato.'));
-          this.saving.set(false);
-          this.cdr.markForCheck();
-        }
-      });
-      return;
-    }
-
-    this.loansService.create(this.form).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (contract) => {
-        this.contracts.set([contract, ...this.contracts()]);
-        this.uiFeedback.success('Empréstimo criado com cronograma calculado.');
-        this.saving.set(false);
-        this.closeForm();
-      },
-      error: (err) => {
-        this.error.set(extractApiErrorMessage(err, 'Falha ao criar empréstimo.'));
-        this.saving.set(false);
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
   edit(contract: LoanContractResponse): void {
-    this.editingId = contract.id;
-    this.simulation.set(null);
-    this.comparison.set(null);
-    this.error.set('');
-    this.success.set('');
-    this.form = {
-      title: contract.title,
-      principalAmount: contract.principalAmount,
-      annualInterestRate: contract.annualInterestRate,
-      termMonths: contract.termMonths,
-      amortizationType: contract.amortizationType,
-      startDate: contract.startDate,
-      paymentDay: contract.paymentDay
-    };
+    this.editingContract = contract;
     this.showForm.set(true);
     this.cdr.markForCheck();
   }
 
-  /** Abre o modal para um novo contrato (formulário limpo). */
+  /** Abre o modal para um novo contrato. */
   openForm(): void {
-    this.editingId = null;
-    this.resetForm();
-    this.simulation.set(null);
-    this.comparison.set(null);
-    this.error.set('');
+    this.editingContract = null;
     this.showForm.set(true);
     this.cdr.markForCheck();
   }
 
   closeForm(): void {
     this.showForm.set(false);
-    this.editingId = null;
-    this.simulation.set(null);
-    this.comparison.set(null);
-    this.error.set('');
-    this.resetForm();
+    this.editingContract = null;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * O modal gravou. Atualiza a lista no lugar em vez de recarregar tudo — o
+   * backend já devolveu o contrato com o cronograma calculado.
+   */
+  onContratoSalvo(contrato: LoanContractResponse): void {
+    const atual = this.contracts();
+    this.contracts.set(
+      atual.some((c) => c.id === contrato.id)
+        ? atual.map((c) => (c.id === contrato.id ? contrato : c))
+        : [contrato, ...atual]
+    );
     this.cdr.markForCheck();
   }
 
@@ -320,7 +221,7 @@ export class LoansComponent implements OnInit {
     this.loansService.delete(contract.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.contracts.set(this.contracts().filter(c => c.id !== contract.id));
-        if (this.editingId === contract.id) { this.editingId = null; this.resetForm(); }
+        if (this.editingContract?.id === contract.id) this.closeForm();
         if (this.expandedContractId === contract.id) { this.expandedContractId = null; }
         this.deleting.set(null);
         this.uiFeedback.success('Contrato excluído.');
@@ -441,19 +342,4 @@ export class LoansComponent implements OnInit {
     });
   }
 
-  private resetForm(): void {
-    this.form = this.defaultForm();
-  }
-
-  private defaultForm(): LoanContractRequest {
-    return {
-      title: 'Empréstimo pessoal',
-      principalAmount: 10000,
-      annualInterestRate: 18,
-      termMonths: 24,
-      amortizationType: 'Price',
-      startDate: new Date().toISOString().slice(0, 10),
-      paymentDay: 10
-    };
-  }
 }

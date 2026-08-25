@@ -9,6 +9,7 @@ import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { ApiDataService, IncomeSummaryState, StoredIncome } from '../data/api-data.service';
 import { ReceitasListaComponent } from './receitas-lista.component';
 import { ReceitasFormComponent } from './receitas-form.component';
+import { ReceitaFormModalComponent } from './receita-form-modal.component';
 import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { AuthService } from '../auth.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
@@ -54,7 +55,7 @@ import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 @Component({
   selector: 'app-receitas',
   standalone: true,
-  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, ConfirmDeleteComponent, LancamentoHistoricoComponent, BulkActionBarComponent, AppCurrencyPipe,
+  imports: [DecimalPipe, ReceitasListaComponent, ReceitasFormComponent, ReceitaFormModalComponent, NgClass, FormsModule, TooltipComponent, TransactionSummaryCardComponent, ComparisonPillComponent, PeriodTotalCardComponent, PeriodHeroComponent, FilterBarComponent, ConfirmSheetComponent, ConfirmDeleteComponent, LancamentoHistoricoComponent, BulkActionBarComponent, AppCurrencyPipe,
     SelectMenuComponent, TxMobileHeaderComponent, TxFilterChipsComponent, TxMobileListComponent],
   templateUrl: './receitas.component.html',
   styleUrls: ['./receitas.component.scss'],
@@ -458,10 +459,22 @@ export class ReceitasComponent implements OnInit {
     this.router.navigateByUrl('/categorias');
   }
 
+  /**
+   * Criar passou a ser do `app-receita-form-modal`, que carrega o próprio motor
+   * e é o mesmo usado pelo Calendário — a regra de criação vive num lugar só.
+   * `mostrarForm` (o painel antigo) ficou sendo exclusivo da EDIÇÃO, que arrasta
+   * escopo de recorrência, comprovante e histórico e continua sendo desta tela.
+   */
+  mostrarNovo = false;
+
   abrirModal(): void {
     if (this.saving) return;
-    this.resetarForm();
-    this.mostrarForm = true;
+    this.mostrarNovo = true;
+  }
+
+  fecharNovo(): void {
+    this.mostrarNovo = false;
+    this.cdr.markForCheck();
   }
 
   fecharModal(): void {

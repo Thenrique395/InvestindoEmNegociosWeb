@@ -80,9 +80,9 @@
 
   &[data-group='income'] { background: var(--income); }
   &[data-group='expense'] { background: var(--expense); }
-  &[data-group='card'] { background: var(--warning); }
+  &[data-group='card'] { background: var(--primary); }
   &[data-group='loan'] { background: var(--warning); }
-  &[data-group='goal'] { background: var(--primary); }
+  &[data-group='goal'] { background: var(--brand-navy-soft); }
 }
 
 // ---- Cards de resumo --------------------------------------------------------
@@ -180,34 +180,6 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-tertiary);
-}
-
-.cal-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.cal-legend__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: var(--fs-caption, 0.72rem);
-  color: var(--text-tertiary);
-  cursor: help;
-}
-
-.cal-legend__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
-
-  &[data-group='income'] { background: var(--income); }
-  &[data-group='expense'] { background: var(--expense); }
-  &[data-group='card'] { background: var(--warning); }
-  &[data-group='loan'] { background: var(--warning); }
-  &[data-group='goal'] { background: var(--primary); }
 }
 
 // ---- Layout principal (visão + painel lateral) ------------------------------

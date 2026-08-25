@@ -76,74 +76,16 @@
   }
 
   <!-- Criar / editar meta -->
-  <app-modal [open]="showForm()" eyebrow="Planejamento" [title]="editingId ? 'Editar meta' : 'Nova meta'" size="md" (close)="closeForm()">
-    <div class="metas-form" modal-body>
-      <div class="metas-form__section">
-        <div class="metas-form__section-head">
-          <span>Objetivo</span>
-          <p>Defina o tipo e o valor que será acompanhado.</p>
-        </div>
 
-        <div class="metas-form__kind">
-          <span class="metas-form__label">Tipo de meta</span>
-          <app-segmented-selector [options]="kindOptions" [value]="form.kind" ariaLabel="Tipo de meta" (valueChange)="setFormKind($event)" />
-        </div>
-
-        <app-form-field label="Nome"><input type="text" [(ngModel)]="form.title" placeholder="Ex.: Alimentação, Renda extra, Reserva" /></app-form-field>
-
-        <div class="metas-form__row">
-          <app-form-field [label]="form.kind === 'Expense' ? 'Limite (R$)' : form.kind === 'Income' ? 'Objetivo (R$)' : 'Meta de aporte (R$)'">
-            <input type="number" inputmode="decimal" [(ngModel)]="form.targetAmount" placeholder="0,00" />
-          </app-form-field>
-          <app-form-field label="Recorrência">
-            <app-select-menu [options]="recurrenceOptions" [(ngModel)]="form.recurrence" ariaLabel="Recorrência" />
-          </app-form-field>
-        </div>
-      </div>
-
-      <div class="metas-form__section">
-        <div class="metas-form__section-head">
-          <span>Período</span>
-          <p>Use as datas para calcular ritmo, recorrência e prazo.</p>
-        </div>
-
-        <div class="metas-form__row">
-          <app-form-field label="Início"><app-date-picker format="iso" [value]="form.startDate" (valueChange)="form.startDate = $event" ariaLabel="Início" /></app-form-field>
-          <app-form-field label="Término"><app-date-picker format="iso" [value]="form.endDate" (valueChange)="form.endDate = $event" ariaLabel="Término" /></app-form-field>
-        </div>
-      </div>
-
-      <div class="metas-form__section">
-        <div class="metas-form__section-head">
-          <span>Regras</span>
-          <p>{{ isInvestmentForm ? 'Investimentos acompanham aportes, sem categoria de consumo.' : 'Conecte a meta a categorias e alertas de acompanhamento.' }}</p>
-        </div>
-
-        @if (!isInvestmentForm) {
-          <app-form-field label="Categoria (opcional)">
-            <app-select-menu [options]="categorySelectOptions" [(ngModel)]="form.categoryId" [searchable]="true" ariaLabel="Categoria da meta" />
-          </app-form-field>
-
-          <div class="metas-form__row">
-            <app-form-field label="Alerta de atenção (%)"><input type="number" [(ngModel)]="form.warningThreshold" /></app-form-field>
-            <app-form-field label="Alerta crítico (%)"><input type="number" [(ngModel)]="form.criticalThreshold" /></app-form-field>
-          </div>
-        } @else {
-          <div class="metas-form__note">
-            Metas de investimento acompanham aportes e evolução patrimonial. Categoria e limiares de consumo não se aplicam a este tipo.
-          </div>
-        }
-
-        <app-form-field label="Descrição (opcional)"><input type="text" [(ngModel)]="form.description" /></app-form-field>
-      </div>
-    </div>
-    <div class="metas-form__footer" modal-footer>
-      <button type="button" class="btn-ghost sm" (click)="closeForm()">Cancelar</button>
-      <button type="button" class="btn-primary sm" (click)="save()" [disabled]="saving()">{{ saving() ? 'Salvando...' : (editingId ? 'Salvar' : 'Criar meta') }}</button>
-    </div>
-  </app-modal>
 
   <!-- Aporte (investimento) -->
+  @if (showForm()) {
+    <app-meta-form-modal
+      [goal]="editingGoalRef"
+      (saved)="onFormSaved()"
+      (close)="closeForm()" />
+  }
+
   <app-modal [open]="showContribute()" eyebrow="Investimento" title="Registrar aporte" size="sm" (close)="closeContribute()">
     <div class="metas-form" modal-body>
       <app-form-field label="Valor do aporte (R$)"><input type="number" inputmode="decimal" [(ngModel)]="contributeAmount" placeholder="0,00" /></app-form-field>

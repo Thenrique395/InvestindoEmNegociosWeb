@@ -199,130 +199,7 @@
 </section>
 
 <!-- Modal: novo contrato / editar -->
-<app-modal
-  [open]="showForm()"
-  [eyebrow]="editingId ? 'Editar contrato' : 'Novo contrato'"
-  [title]="editingId ? 'Atualize o contrato' : 'Novo empréstimo ou financiamento'"
-  subtitle="Preencha os dados e simule antes de salvar. Nada é registrado sem confirmação."
-  size="lg"
-  (close)="closeForm()">
 
-  <form class="loan-form" modal-body (ngSubmit)="create()">
-    <section class="loan-form__section">
-      <div class="loan-form__section-head"><h4>Identificação</h4></div>
-      <div class="loan-form__grid">
-        <app-form-field label="Título" class="loan-form__field--full">
-          <input class="loan-form__control" type="text" name="title" [(ngModel)]="form.title"
-            placeholder="Ex: Empréstimo pessoal, financiamento do carro..." />
-        </app-form-field>
-      </div>
-    </section>
-
-    <section class="loan-form__section">
-      <div class="loan-form__section-head"><h4>Valores e condições</h4></div>
-      <div class="loan-form__grid">
-        <app-form-field label="Valor (R$)">
-          <input class="loan-form__control" type="number" min="0" name="principal" [(ngModel)]="form.principalAmount" />
-        </app-form-field>
-        <app-form-field label="Juros ao ano (%)">
-          <input class="loan-form__control" type="number" step="0.01" name="rate" [(ngModel)]="form.annualInterestRate" />
-        </app-form-field>
-        <app-form-field label="Prazo (meses)">
-          <input class="loan-form__control" type="number" min="1" name="term" [(ngModel)]="form.termMonths" />
-        </app-form-field>
-        <app-form-field label="Dia de pagamento" hint="1 a 28">
-          <input class="loan-form__control" type="number" min="1" max="28" name="paymentDay" [(ngModel)]="form.paymentDay" />
-        </app-form-field>
-        <app-form-field label="Data inicial">
-          <app-date-picker format="iso" [value]="form.startDate" (valueChange)="form.startDate = $event" ariaLabel="Data inicial" />
-        </app-form-field>
-        <app-form-field label="Sistema de amortização" class="loan-form__field--full">
-          <app-segmented-selector
-            ariaLabel="Sistema de amortização"
-            [options]="amortizationOptions"
-            [value]="form.amortizationType"
-            (valueChange)="setAmortization($event)" />
-        </app-form-field>
-      </div>
-    </section>
-
-    @if (error()) {
-      <p class="loan-form__error" role="alert">{{ error() }}</p>
-    }
-
-    @if (comparison(); as cmp) {
-      <section class="loan-form__section">
-        <div class="loan-form__section-head">
-          <h4>PRICE × SAC</h4>
-          <p class="muted text--sm">Mesmos parâmetros, dois sistemas — escolha para seguir.</p>
-        </div>
-        <div class="compare-grid">
-          @for (opt of [{ key: 'Price', label: 'PRICE', sim: cmp.price }, { key: 'Sac', label: 'SAC', sim: cmp.sac }]; track opt.key) {
-            <div class="compare-col">
-              <h3>{{ opt.label }}</h3>
-              <dl>
-                <div><dt>Parcela inicial</dt><dd>{{ opt.sim.installments[0].totalAmount | appCurrency }}</dd></div>
-                <div><dt>Parcela final</dt><dd>{{ opt.sim.installments[opt.sim.installments.length - 1].totalAmount | appCurrency }}</dd></div>
-                <div><dt>Custo total</dt><dd>{{ opt.sim.totalCost | appCurrency }}</dd></div>
-                <div><dt>Juros totais</dt><dd>{{ opt.sim.totalInterest | appCurrency }}</dd></div>
-              </dl>
-              <button type="button" class="btn-primary sm" (click)="chooseSystem($any(opt.key))">Escolher {{ opt.label }}</button>
-            </div>
-          }
-        </div>
-      </section>
-    } @else if (simulation(); as s) {
-      <section class="loan-form__section">
-        <div class="loan-form__section-head"><h4>Simulação</h4></div>
-        <div class="kpis">
-          <div><span>Parcela inicial</span><strong>{{ s.monthlyPayment | appCurrency }}</strong></div>
-          <div><span>Custo total</span><strong>{{ s.totalCost | appCurrency }}</strong></div>
-          <div><span>Juros totais</span><strong>{{ s.totalInterest | appCurrency }}</strong></div>
-        </div>
-        <app-responsive-list
-          [columns]="simulationColumns"
-          [items]="s.installments.slice(0, 6)"
-          [getId]="trackInstallment"
-          emptyIcon="$"
-          emptyTitle="Sem parcelas simuladas"
-          emptyDescription="Ajuste os dados do contrato e simule novamente.">
-          <ng-template appResponsiveListCell="number" let-item>
-            <span class="installment-number">{{ item.installmentNo }}</span>
-          </ng-template>
-          <ng-template appResponsiveListCell="dueDate" let-item>
-            {{ item.dueDate | date:'dd/MM/yyyy' }}
-          </ng-template>
-          <ng-template appResponsiveListCell="principal" let-item>
-            {{ item.principalAmount | appCurrency }}
-          </ng-template>
-          <ng-template appResponsiveListCell="interest" let-item>
-            {{ item.interestAmount | appCurrency }}
-          </ng-template>
-          <ng-template appResponsiveListCell="total" let-item>
-            {{ item.totalAmount | appCurrency }}
-          </ng-template>
-          <ng-template appResponsiveListCell="balance" let-item>
-            {{ item.endingBalance | appCurrency }}
-          </ng-template>
-        </app-responsive-list>
-      </section>
-    }
-  </form>
-
-  <div class="loan-form__footer" modal-footer>
-    @if (!editingId) {
-      <button class="btn-ghost" type="button" (click)="simulate()">Simular</button>
-      <button class="btn-ghost" type="button" (click)="compare()" [disabled]="comparing()">
-        {{ comparing() ? 'Comparando...' : 'Comparar PRICE × SAC' }}
-      </button>
-    }
-    <span class="loan-form__footer-spacer"></span>
-    <button class="btn-ghost" type="button" (click)="closeForm()">Cancelar</button>
-    <button class="btn-primary" type="button" (click)="create()" [disabled]="saving()">
-      {{ saving() ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar contrato') }}
-    </button>
-  </div>
-</app-modal>
 
 <app-confirm-sheet
   [open]="!!pendingDelete"
@@ -389,3 +266,10 @@
     </button>
   </ng-container>
 </app-confirm-sheet>
+
+@if (showForm()) {
+  <app-loan-form-modal
+    [contract]="editingContract"
+    (saved)="onContratoSalvo($event)"
+    (close)="closeForm()" />
+}

@@ -17,9 +17,9 @@ import { DatePickerComponent } from '../shared/date-picker/date-picker.component
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
-import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { extractApiErrorMessage } from '../utils/api-error.utils';
 import { GoalCardComponent } from './goal-card.component';
+import { MetaFormModalComponent } from './meta-form-modal.component';
 import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, GoalView } from './goal-view.model';
 
 @Component({
@@ -36,8 +36,8 @@ import { buildGoalsSummary, buildGoalView, filterGoals, GoalsSummary, GoalTab, G
     ConfirmDialogComponent,
     EmptyStateComponent,
     AppCurrencyPipe,
-    SelectMenuComponent,
-    GoalCardComponent
+    GoalCardComponent,
+    MetaFormModalComponent
   ],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss'],
@@ -58,10 +58,8 @@ export class MetasComponent implements OnInit {
 
   // Modal criar/editar
   readonly showForm = signal(false);
-  readonly saving = signal(false);
-  editingId: string | null = null;
-  private editingGoalRef: Goal | null = null;
-  form = this.emptyForm();
+  /** Meta em edição — `null` quando o modal está criando. Vai como [goal]. */
+  editingGoalRef: Goal | null = null;
 
   // Aporte (investimento) — campos ngModel (usuário digita, dentro da zona) ficam plain
   readonly showContribute = signal(false);
@@ -80,20 +78,6 @@ export class MetasComponent implements OnInit {
 
   // Exclusão (setado só em handlers síncronos)
   deleteTarget: Goal | null = null;
-
-  readonly kindOptions: SegmentOption[] = [
-    { value: 'Expense', label: 'Despesa', icon: '📉' },
-    { value: 'Income', label: 'Receita', icon: '📈' },
-    { value: 'Investment', label: 'Investimento', icon: '🎯' }
-  ];
-
-  readonly recurrenceOptions: { value: RecurrenceType; label: string }[] = [
-    { value: 'None', label: 'Período único' },
-    { value: 'Monthly', label: 'Mensal' },
-    { value: 'Quarterly', label: 'Trimestral' },
-    { value: 'Semiannual', label: 'Semestral' },
-    { value: 'Annual', label: 'Anual' }
-  ];
 
   constructor(
     private readonly goalsService: GoalsService,
@@ -129,26 +113,6 @@ export class MetasComponent implements OnInit {
     return `${count} ${count === 1 ? 'meta' : 'metas'} neste filtro`;
   }
 
-  get categoryOptions(): CategoryDto[] {
-    if (this.form.kind === 'Income') return this.categories().filter((c) => c.appliesTo === 'Income');
-    if (this.form.kind === 'Expense') return this.categories().filter((c) => c.appliesTo === 'Expense');
-    return [];
-  }
-
-  get categorySelectOptions(): SelectMenuOption[] {
-    return [
-      { value: '', label: `Todas as ${this.form.kind === 'Income' ? 'receitas' : 'despesas'}` },
-      ...this.categoryOptions.map((category) => ({
-        value: category.id,
-        label: category.name
-      }))
-    ];
-  }
-
-  get isInvestmentForm(): boolean {
-    return this.form.kind === 'Investment';
-  }
-
   setTab(tab: string): void {
     this.tab.set(tab as GoalTab);
   }
@@ -179,107 +143,25 @@ export class MetasComponent implements OnInit {
 
   // ---- Criar / editar -----------------------------------------------------
 
-  private emptyForm() {
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
-    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().slice(0, 10);
-    return {
-      kind: 'Expense' as GoalKind,
-      title: '',
-      targetAmount: '',
-      description: '',
-      startDate: start,
-      endDate: end,
-      recurrence: 'Monthly' as RecurrenceType,
-      warningThreshold: '80',
-      criticalThreshold: '100',
-      categoryId: '' as string
-    };
-  }
-
   openCreate(): void {
-    this.editingId = null;
     this.editingGoalRef = null;
-    this.form = this.emptyForm();
     this.showForm.set(true);
   }
 
   openEdit(goal: Goal): void {
-    const base = this.emptyForm();
-    this.editingId = goal.id;
     this.editingGoalRef = goal;
-    this.form = {
-      kind: goal.kind === 'General' ? 'Expense' : goal.kind,
-      title: goal.title,
-      targetAmount: String(goal.targetAmount ?? ''),
-      description: goal.description ?? '',
-      startDate: (goal.startDate ?? '').slice(0, 10) || base.startDate,
-      endDate: (goal.endDate ?? goal.targetDate ?? '').slice(0, 10) || base.endDate,
-      recurrence: goal.recurrence ?? 'None',
-      warningThreshold: goal.warningThreshold != null ? String(goal.warningThreshold) : '80',
-      criticalThreshold: goal.criticalThreshold != null ? String(goal.criticalThreshold) : '100',
-      categoryId: goal.scopes?.find((s) => s.scopeType === 'Category')?.refId ?? ''
-    };
     this.showForm.set(true);
   }
 
-  setFormKind(kind: string): void {
-    this.form.kind = kind as GoalKind;
-    this.form.categoryId = '';
+  /** O modal avisou que gravou: recarrega a lista e fecha. */
+  onFormSaved(): void {
+    this.loadGoals();
   }
 
   closeForm(): void {
-    if (this.saving()) return;
     this.showForm.set(false);
-  }
-
-  save(): void {
-    const title = this.form.title.trim();
-    const target = Number(this.form.targetAmount);
-    if (title.length < 2) { this.uiFeedback.warning('Informe um nome para a meta.'); return; }
-    if (!Number.isFinite(target) || target <= 0) { this.uiFeedback.warning('Informe um valor-alvo válido.'); return; }
-
-    const scopes: GoalScopeDto[] | null = this.form.categoryId
-      ? [{ scopeType: 'Category', refId: this.form.categoryId }]
-      : null;
-    const mode: GoalMode = this.form.kind === 'Expense' ? 'Limit' : this.form.kind === 'Income' ? 'Target' : 'RecurringContribution';
-    const year = this.form.startDate ? new Date(this.form.startDate).getFullYear() : new Date().getFullYear();
-
-    const payload = {
-      title,
-      targetAmount: target,
-      currentAmount: 0,
-      year,
-      description: this.form.description.trim() || null,
-      // 'InProgress' é válido no backend novo e no antigo (compat); o backend
-      // ignora o status na criação. Ao editar, preserva o status atual.
-      status: this.editingGoalRef?.status ?? 'InProgress',
-      expectedMonthly: 0,
-      targetDate: this.form.endDate || null,
-      kind: this.form.kind,
-      mode,
-      startDate: this.form.startDate || null,
-      endDate: this.form.endDate || null,
-      recurrence: this.form.recurrence,
-      warningThreshold: this.form.warningThreshold ? Number(this.form.warningThreshold) : null,
-      criticalThreshold: this.form.criticalThreshold ? Number(this.form.criticalThreshold) : null,
-      scopes
-    };
-
-    this.saving.set(true);
-    const op = this.editingId
-      ? this.goalsService.update(this.editingId, payload)
-      : this.goalsService.create(payload);
-
-    op.subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.showForm.set(false);
-        this.uiFeedback.success(this.editingId ? 'Meta atualizada.' : 'Meta criada.');
-        this.loadGoals();
-      },
-      error: (err) => { this.saving.set(false); this.uiFeedback.error(err?.error ?? 'Não foi possível salvar a meta.'); this.cdr.markForCheck(); }
-    });
+    this.editingGoalRef = null;
+    this.cdr.markForCheck();
   }
 
   // ---- Aporte (investimento) ---------------------------------------------

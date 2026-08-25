@@ -82,6 +82,39 @@ export const formatLocaleDate = (date: Date): string => {
   return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
 };
 
+/**
+ * Data por extenso com o dia da semana: `Sábado, 08 de agosto de 2026`.
+ * Usada no cabeçalho de "Resumo de hoje" (Calendário). A primeira letra é
+ * maiúscula porque em pt-BR o Intl devolve o dia da semana em minúscula e o
+ * protótipo mostra o título capitalizado.
+ */
+export const formatFullLocaleDate = (date: Date): string => {
+  const locale = getActiveLocale();
+  const text = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  }).format(date);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+/** Dia e mês sem o ano: `01/08`. Para metadados curtos ("venceu em 01/08"). */
+export const formatDayMonth = (date: Date): string => {
+  const locale = getActiveLocale();
+  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit' }).format(date);
+};
+
+/**
+ * Dia e mês abreviado em partes separadas, para a coluna de data das listas de
+ * agenda (número grande em cima, mês em cima-baixo). O ponto do `ago.` do
+ * pt-BR sai aqui porque o rótulo é renderizado em caixa alta.
+ */
+export const formatDayMonthParts = (date: Date): { day: string; month: string } => ({
+  day: String(date.getDate()).padStart(2, '0'),
+  month: formatMonthLabel(date.getFullYear(), date.getMonth(), 'short').replace('.', '')
+});
+
 export const formatLocaleDateFromIso = (iso: string): string => {
   const date = parseIsoDate(iso);
   if (!date) return '';

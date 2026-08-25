@@ -120,9 +120,9 @@ const GROUP_ORDER: CalendarEventGroup[] = ['income', 'expense', 'card', 'loan', 
     .cal__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
     .cal__dot[data-group='income'] { background: var(--income); }
     .cal__dot[data-group='expense'] { background: var(--expense); }
-    .cal__dot[data-group='card'] { background: var(--warning); }
+    .cal__dot[data-group='card'] { background: var(--primary); }
     .cal__dot[data-group='loan'] { background: var(--warning); }
-    .cal__dot[data-group='goal'] { background: var(--primary); }
+    .cal__dot[data-group='goal'] { background: var(--brand-navy-soft); }
     .cal__net {
       font-size: 0.65rem; font-weight: 600; color: var(--expense-text, var(--expense));
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

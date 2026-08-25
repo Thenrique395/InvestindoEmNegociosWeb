@@ -20,6 +20,11 @@ import { FinancialAgendaComponent } from './financial-agenda.component';
 import { FinancialTimelineComponent } from './financial-timeline.component';
 import { FinancialEventCardComponent } from './financial-event-card.component';
 import { CalendarSidebarComponent } from './calendar-sidebar.component';
+import { ReceitaFormModalComponent } from '../receitas/receita-form-modal.component';
+import { CartaoFormComponent } from '../cartoes/cartao-form.component';
+import { DespesaFormModalComponent } from '../despesas/despesa-form-modal.component';
+import { LoanFormModalComponent } from '../loans/loan-form-modal.component';
+import { MetaFormModalComponent } from '../metas/meta-form-modal.component';
 import { AppCurrencyPipe } from '../shared/app-currency.pipe';
 import { FinancialPrivacyService } from '../financial-privacy.service';
 import { formatCurrencyValue } from '../utils/locale-utils';
@@ -29,7 +34,8 @@ import {
   buildTimeline,
   CalendarEvent,
   CalendarEventGroup,
-  CALENDAR_CATEGORIES,
+  CalendarEventKind,
+  categoryFor,
   DayGroup,
   eventsForDay,
   groupByDay,
@@ -62,6 +68,11 @@ type GroupFilter = 'all' | CalendarEventGroup;
     FinancialTimelineComponent,
     FinancialEventCardComponent,
     CalendarSidebarComponent,
+    ReceitaFormModalComponent,
+    CartaoFormComponent,
+    DespesaFormModalComponent,
+    LoanFormModalComponent,
+    MetaFormModalComponent,
     SelectMenuComponent
   ],
   templateUrl: './calendario.component.html',
@@ -94,7 +105,6 @@ export class CalendarioComponent implements OnInit {
   selectedStatus = 'all';
   showNewMenu = false;
 
-  readonly legend = CALENDAR_CATEGORIES;
   readonly canAdvanced: boolean;
 
   private expenses: StoredExpense[] = [];
@@ -150,7 +160,7 @@ export class CalendarioComponent implements OnInit {
         tooltip: 'Receitas previstas menos despesas previstas do mês. É o fluxo do período isolado — não soma o saldo que você já tem em conta.',
       },
       {
-        key: 'compromissos', label: 'Compromissos', tone: 'primary',
+        key: 'compromissos', label: 'Compromissos', tone: 'neutral',
         value: s.commitments.toString(),
         note: `Vencimentos no mês: ${s.dueCount}`,
         tooltip: 'Todos os eventos do mês — receitas, despesas, parcelas, metas e vencimento de fatura. O fechamento de fatura não conta, porque não é uma data em que algo precisa ser pago.',
@@ -233,22 +243,37 @@ export class CalendarioComponent implements OnInit {
 
   get viewOptions(): SegmentOption[] {
     return [
-      { value: 'month', label: 'Mês', icon: '▦' },
-      { value: 'week', label: 'Semana', icon: '▤' },
-      { value: 'agenda', label: 'Agenda', icon: '☰', hidden: !this.canAdvanced },
-      { value: 'timeline', label: 'Timeline', icon: '↳', hidden: !this.canAdvanced }
+      { value: 'month', label: 'Mês' },
+      { value: 'week', label: 'Semana' },
+      { value: 'agenda', label: 'Agenda', hidden: !this.canAdvanced },
+      { value: 'timeline', label: 'Linha do tempo', hidden: !this.canAdvanced }
     ];
   }
 
+  /**
+   * O filtro por tipo carrega a cor de cada grupo no próprio segmento, e é por
+   * isso que a tela não tem mais uma faixa de legenda ao lado: eram os mesmos
+   * seis rótulos duas vezes, um deles clicável e o outro não. O tooltip guarda
+   * a explicação longa que estava na legenda — inclusive a de que "Cartões"
+   * cobre fechamento e vencimento de fatura, que não cabe no rótulo.
+   */
   get groupOptions(): SegmentOption[] {
     return [
-      { value: 'all', label: 'Todos' },
-      { value: 'income', label: 'Receitas' },
-      { value: 'expense', label: 'Despesas' },
-      { value: 'card', label: 'Cartões' },
-      { value: 'loan', label: 'Parcelas' },
-      { value: 'goal', label: 'Metas' }
+      { value: 'all', label: 'Todos', title: 'Todos os compromissos do período.' },
+      { value: 'income', label: 'Receitas', dot: 'var(--income)', title: this.legendTooltip('income') },
+      { value: 'expense', label: 'Despesas', dot: 'var(--expense)', title: this.legendTooltip('expense') },
+      { value: 'card', label: 'Cartões', dot: 'var(--primary)', title: this.cardTooltip },
+      { value: 'loan', label: 'Financiamentos', dot: 'var(--warning)', title: this.legendTooltip('loan') },
+      { value: 'goal', label: 'Metas', dot: 'var(--brand-navy-soft)', title: this.legendTooltip('goal') }
     ];
+  }
+
+  private legendTooltip(kind: CalendarEventKind): string {
+    return categoryFor(kind).tooltip;
+  }
+
+  private get cardTooltip(): string {
+    return `${this.legendTooltip('card-close')} ${this.legendTooltip('card-due')}`;
   }
 
   setView(view: string): void {
@@ -302,6 +327,15 @@ export class CalendarioComponent implements OnInit {
     this.selectDate(event.date);
   }
 
+  /**
+   * "Ver todos" da lateral: leva para a lista completa. A agenda é a visão que
+   * mostra tudo por data, mas ela é de plano avançado — sem permissão, a
+   * semana é o mais próximo disso.
+   */
+  showAllUpcoming(): void {
+    this.setView(this.canAdvanced ? 'agenda' : 'week');
+  }
+
   toggleNewMenu(): void {
     this.showNewMenu = !this.showNewMenu;
   }
@@ -310,6 +344,30 @@ export class CalendarioComponent implements OnInit {
     this.showNewMenu = false;
   }
 
+  /**
+   * Qual modal de criação está aberto — um de cada vez. Um campo só, e não um
+   * booleano por entidade, porque abrir dois ao mesmo tempo não é estado válido.
+   */
+  novoAberto: 'income' | 'expense' | 'card' | 'loan' | 'goal' | null = null;
+
+  abrirNovo(tipo: 'income' | 'expense' | 'card' | 'loan' | 'goal'): void {
+    this.showNewMenu = false;
+    this.novoAberto = tipo;
+  }
+
+  fecharNovo(): void {
+    this.novoAberto = null;
+    this.cdr.markForCheck();
+  }
+
+  /** Gravou: o evento tem que nascer no calendário sem recarregar a página. */
+  onNovoSalvo(): void {
+    this.novoAberto = null;
+    this.rebuild();
+    this.cdr.markForCheck();
+  }
+
+  /** Navegação avulsa do menu — hoje só o atalho de tela cheia. */
   createFor(route: string): void {
     this.showNewMenu = false;
     this.router.navigate([route]);

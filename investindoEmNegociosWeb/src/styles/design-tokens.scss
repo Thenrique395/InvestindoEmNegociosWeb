@@ -184,6 +184,10 @@
   --h-stepper:       38px;
   --h-table-row:     56px;
   --h-icon-button:   28px;
+  /* Coluna de data das listas de agenda (dia grande + mês em caixa alta).
+     Fixa para que os títulos das linhas alinhem entre si, inclusive quando o
+     dia é 1 e não 30.                                                        */
+  --w-agenda-date:   34px;
 
   /* Altura fixa dos cards de lista do dashboard. É teto, não sugestão: sem ela
      o card cresce com o dado (nome que quebra em duas linhas, rodapé que

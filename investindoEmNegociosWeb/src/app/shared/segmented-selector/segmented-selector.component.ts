@@ -5,6 +5,16 @@ export interface SegmentOption {
   label: string;
   /** Glyph/emoji opcional exibido antes do rótulo. */
   icon?: string;
+  /**
+   * Cor-guia opcional, mostrada como um ponto antes do rótulo. Serve para o
+   * segmented que filtra por categoria absorver a legenda: o mesmo controle diz
+   * o que filtra e qual cor aquilo tem no gráfico/calendário, em vez de a tela
+   * repetir a legenda numa segunda faixa. Espera um token — `var(--income)` —
+   * e não um hex, para o mapa de cores continuar sendo o design system.
+   */
+  dot?: string;
+  /** Texto de `title` — explicação longa que não cabe no rótulo. */
+  title?: string;
   /** Oculta o segmento (ex.: bloqueado por plano). */
   hidden?: boolean;
   disabled?: boolean;
@@ -30,7 +40,11 @@ export interface SegmentOption {
           [attr.aria-checked]="option.value === value()"
           [class.seg__item--active]="option.value === value()"
           [disabled]="option.disabled"
+          [attr.title]="option.title || null"
           (click)="select(option)">
+          @if (option.dot) {
+            <i class="seg__dot" aria-hidden="true" [style.background]="option.dot"></i>
+          }
           @if (option.icon) {
             <span class="seg__icon" aria-hidden="true">{{ option.icon }}</span>
           }
@@ -80,6 +94,16 @@ export interface SegmentOption {
       outline-offset: 2px;
     }
     .seg__icon { font-size: 0.95em; line-height: 1; }
+    .seg__dot {
+      width: 7px;
+      height: 7px;
+      flex: none;
+      border-radius: var(--radius-pill);
+      background: var(--text-muted);
+      /* Cor cheia mesmo no segmento inativo: o ponto é a legenda do calendário,
+         e uma legenda que desbota deixa de casar com o ponto do dia. Quem
+         carrega o estado de seleção é o fundo do segmento e a cor do rótulo. */
+    }
     /* Variante compacta: padding e raios menores. */
     :host([data-size='sm']) .seg { border-radius: var(--radius-sm); }
     :host([data-size='sm']) .seg__item {

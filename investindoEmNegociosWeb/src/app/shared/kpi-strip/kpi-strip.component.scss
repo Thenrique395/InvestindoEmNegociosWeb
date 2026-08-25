@@ -86,22 +86,25 @@
   gap: var(--space-2);
 }
 
+/* Ícone solto ao lado do rótulo, não dentro de um chip. O chip de 38px com
+   borda e fundo tingido pesava mais que o próprio número da célula e criava
+   uma segunda moldura dentro de uma faixa que já é uma caixa. Os protótipos
+   não têm essa moldura em nenhuma faixa: a de Calendário desenha o glifo em
+   15px na cor do tom, e Dashboard e Investimentos nem usam ícone. */
+/* A medida vive AQUI, no contêiner, e não num `.kpi__icon svg`: o SVG chega
+   por `ng-template` do componente-pai, então carrega o `_ngcontent` dele, e um
+   seletor descendente escrito neste arquivo vira `svg[_ngcontent-kpi]` — que
+   nunca casa. A regra antiga de 20px era código morto pelo mesmo motivo; quem
+   dava tamanho ao ícone era a caixa de 38px, e um `<svg>` sem width/height
+   preenche o bloco que o contém. Mantendo a medida no contêiner, o ícone
+   continua sendo dimensionado daqui sem depender de `::ng-deep`. */
 .kpi__icon {
-  display: grid;
+  display: inline-grid;
   flex: none;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--tone-soft);
-  border-radius: var(--radius-control);
-  background: var(--tone-weak);
+  width: 15px;
+  height: 15px;
   color: var(--tone-text);
-  margin-right: var(--space-3);
-}
-
-.kpi__icon svg {
-  width: 20px;
-  height: 20px;
 }
 
 .kpi__titles {

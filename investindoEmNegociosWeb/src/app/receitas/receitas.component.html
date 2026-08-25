@@ -200,6 +200,15 @@
       accept="image/*,application/pdf"
       (change)="onComprovanteFileSelected($event)" />
 
+    <!-- Sob @if: cada abertura monta uma instância limpa, que é o que faz o
+         formulário voltar zerado sem ninguém precisar zerá-lo à mão. -->
+    @if (mostrarNovo) {
+      <app-receita-form-modal
+        [open]="true"
+        (saved)="fecharNovo()"
+        (close)="fecharNovo()" />
+    }
+
     <app-receitas-form
       [mostrarForm]="mostrarForm"
       [novaRenda]="novaRenda"

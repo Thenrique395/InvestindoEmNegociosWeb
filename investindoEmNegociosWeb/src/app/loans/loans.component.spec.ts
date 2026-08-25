@@ -64,49 +64,40 @@ describe('LoansComponent', () => {
     expect(ctx.component.loading()).toBeFalse();
   });
 
-  it('deve simular e preencher o cronograma', () => {
+  it('onContratoSalvo insere o contrato novo no topo da lista', () => {
     const ctx = createComponent();
+    ctx.component.contracts.set([contract({ id: 'antigo' })] as never);
 
-    ctx.component.simulate();
+    ctx.component.onContratoSalvo(contract({ id: 'novo' }) as never);
 
-    expect(ctx.loansService.simulate).toHaveBeenCalledWith(ctx.component.form);
-    expect(ctx.component.simulation()?.monthlyPayment).toBe(550);
-    expect(ctx.component.error()).toBe('');
+    expect(ctx.component.contracts().map((c) => c.id)).toEqual(['novo', 'antigo']);
   });
 
-  it('deve criar contrato e limpar a simulação anterior', () => {
+  it('onContratoSalvo substitui no lugar quando o contrato já existe', () => {
     const ctx = createComponent();
-    ctx.component.simulation.set({
-      monthlyPayment: 400,
-      totalCost: 9600,
-      totalInterest: 600,
-      amortizationType: 'Price',
-      installments: []
-    });
+    ctx.component.contracts.set([contract({ id: 'c1', title: 'Antigo' })] as never);
 
-    ctx.component.create();
+    ctx.component.onContratoSalvo(contract({ id: 'c1', title: 'Novo' }) as never);
 
-    expect(ctx.loansService.create).toHaveBeenCalledWith(ctx.component.form);
-    expect(ctx.component.contracts()[0].id).toBe('c1');
-    expect(ctx.component.simulation()).toBeNull();
-    expect(ctx.uiFeedback.success).toHaveBeenCalledWith(jasmine.stringContaining('Empréstimo criado'));
-    expect(ctx.component.saving()).toBeFalse();
+    expect(ctx.component.contracts().length).toBe(1);
+    expect(ctx.component.contracts()[0].title).toBe('Novo');
   });
 
-  it('deve exibir erro quando a criação falhar', () => {
+  it('fecha o formulário se o contrato em edição for excluído', () => {
     const loansService = {
       list: jasmine.createSpy().and.returnValue(of([])),
-      simulate: jasmine.createSpy().and.returnValue(of(null)),
-      create: jasmine.createSpy().and.returnValue(throwError(() => ({ error: { detail: 'Falha ao criar' } }))),
-      update: jasmine.createSpy(),
-      delete: jasmine.createSpy()
+      delete: jasmine.createSpy().and.returnValue(of(void 0))
     };
     const ctx = createComponent({ loansService });
+    const alvo = contract({ id: 'c1' });
+    ctx.component.contracts.set([alvo] as never);
+    ctx.component.edit(alvo as never);
+    ctx.component.pendingDelete = alvo as never;
 
-    ctx.component.create();
+    ctx.component.confirmRemove();
 
-    expect(ctx.component.error()).toBe('Falha ao criar');
-    expect(ctx.component.saving()).toBeFalse();
+    expect(ctx.component.showForm()).toBeFalse();
+    expect(ctx.component.editingContract).toBeNull();
   });
 
   function contract(partial?: any) {
@@ -198,27 +189,6 @@ describe('LoansComponent', () => {
     expect(ctx.component.paySheet).toBeNull();
     expect(ctx.component.contracts()[0].openBalance).toBe(12650);
     expect(ctx.component.contracts()[0].installments[0].status).toBe('Paid');
-  });
-
-  it('compare carrega a comparação e chooseSystem escolhe o sistema', () => {
-    const comparison = {
-      price: { monthlyPayment: 550, totalCost: 13200, totalInterest: 1200, amortizationType: 'Price', installments: [{ id: 'p1', installmentNo: 1, dueDate: '2026-03-10', beginningBalance: 12000, principalAmount: 450, interestAmount: 100, totalAmount: 550, endingBalance: 11550, status: 'Open' }] },
-      sac: { monthlyPayment: 600, totalCost: 13000, totalInterest: 1000, amortizationType: 'Sac', installments: [{ id: 's1', installmentNo: 1, dueDate: '2026-03-10', beginningBalance: 12000, principalAmount: 500, interestAmount: 100, totalAmount: 600, endingBalance: 11500, status: 'Open' }] }
-    };
-    const loansService = {
-      list: jasmine.createSpy().and.returnValue(of([])),
-      compare: jasmine.createSpy().and.returnValue(of(comparison))
-    };
-    const ctx = createComponent({ loansService });
-
-    ctx.component.compare();
-    expect(loansService.compare).toHaveBeenCalled();
-    expect(ctx.component.comparison()).toBeTruthy();
-
-    ctx.component.chooseSystem('Sac');
-    expect(ctx.component.form.amortizationType).toBe('Sac');
-    expect(ctx.component.simulation()?.amortizationType).toBe('Sac');
-    expect(ctx.component.comparison()).toBeNull();
   });
 
   it('confirmArchive arquiva o contrato e atualiza a lista (sem excluir)', () => {
