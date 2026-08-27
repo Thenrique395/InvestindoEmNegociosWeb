@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 interface TokenSwatch {
   name: string;
@@ -8,6 +8,7 @@ interface TokenSwatch {
 @Component({
   selector: 'app-styleguide-tokens',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   templateUrl: './styleguide-tokens.component.html',
   styleUrls: ['./styleguide-content.scss', './styleguide-tokens.component.scss']

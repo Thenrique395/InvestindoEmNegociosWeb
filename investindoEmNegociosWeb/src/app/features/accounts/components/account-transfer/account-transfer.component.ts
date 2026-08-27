@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, output } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { SelectMenuComponent, SelectMenuOption } from '../../../../shared/select-menu/select-menu.component';
@@ -15,45 +15,49 @@ export interface AccountTransferFormValue {
 @Component({
   selector: 'app-account-transfer',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, SelectMenuComponent],
   templateUrl: './account-transfer.component.html'
 })
 export class AccountTransferComponent {
-  @Input() accounts: AccountResponse[] = [];
-  @Input() value: AccountTransferFormValue = {
+  readonly accounts = input<AccountResponse[]>([]);
+  /**
+   * Par `value`/`valueChange`: é two-way, então `model()` — que emite
+   * `valueChange` no `.set()`. Antes era `@Input() value` reatribuído dentro do
+   * componente, que é escrever em `@Input` (ARQUITETURA_ANGULAR.md §4).
+   */
+  readonly value = model<AccountTransferFormValue>({
     fromAccountId: null,
     toAccountId: null,
     amount: null,
     occurredAtInput: '',
     description: ''
-  };
-  @Input() transferring = false;
+  });
+  readonly transferring = input(false);
 
-  @Output() valueChange = new EventEmitter<AccountTransferFormValue>();
-  @Output() submitTransfer = new EventEmitter<void>();
+  readonly submitTransfer = output<void>();
 
-  get canTransfer(): boolean {
-    return this.accounts.filter((account) => account.isActive).length >= 2;
-  }
+  readonly canTransfer = computed(
+    () => this.accounts().filter((account) => account.isActive).length >= 2
+  );
 
-  get fromAccountOptions(): SelectMenuOption[] {
-    return this.accounts.map((account) => ({
+  readonly fromAccountOptions = computed<SelectMenuOption[]>(() =>
+    this.accounts().map((account) => ({
       value: account.id,
       label: account.name,
       disabled: !account.isActive,
-    }));
-  }
+    }))
+  );
 
-  get toAccountOptions(): SelectMenuOption[] {
-    return this.accounts.map((account) => ({
+  readonly toAccountOptions = computed<SelectMenuOption[]>(() =>
+    this.accounts().map((account) => ({
       value: account.id,
       label: account.name,
-      disabled: !account.isActive || account.id === this.value.fromAccountId,
-    }));
-  }
+      disabled: !account.isActive || account.id === this.value().fromAccountId,
+    }))
+  );
 
   update<K extends keyof AccountTransferFormValue>(key: K, nextValue: AccountTransferFormValue[K]): void {
-    this.value = { ...this.value, [key]: nextValue };
-    this.valueChange.emit(this.value);
+    this.value.update((atual) => ({ ...atual, [key]: nextValue }));
   }
 }

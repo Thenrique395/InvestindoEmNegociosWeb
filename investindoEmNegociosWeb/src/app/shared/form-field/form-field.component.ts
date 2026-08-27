@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgClass } from '@angular/common';
 
 type FormFieldTone = 'default' | 'danger' | 'success';
@@ -6,6 +6,7 @@ type FormFieldTone = 'default' | 'danger' | 'success';
 @Component({
   selector: 'app-form-field',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass],
   host: {
     '[class.form-field--invalid]': 'hasError()',

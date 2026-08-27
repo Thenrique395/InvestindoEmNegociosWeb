@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SectionCardComponent } from '../../../../shared/section-card/section-card.component';
@@ -23,50 +23,46 @@ export interface CategoryLearningCandidate {
 @Component({
   selector: 'app-account-import',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, SectionCardComponent, SelectMenuComponent],
   templateUrl: './account-import.component.html'
 })
 export class AccountImportComponent {
-  @Input() ofxFileName = '';
-  @Input() extractingOfx = false;
-  @Input() importingOfx = false;
-  @Input() ofxExtract: OfxExtractResponse = { items: [], rawText: '' };
-  @Input() duplicateCount = 0;
-  @Input() categories: CategoryDto[] = [];
+  readonly ofxFileName = input('');
+  readonly extractingOfx = input(false);
+  readonly importingOfx = input(false);
+  readonly ofxExtract = input<OfxExtractResponse>({ items: [], rawText: '' });
+  readonly duplicateCount = input(0);
+  readonly categories = input<CategoryDto[]>([]);
 
-  @Input() extractingCsv = false;
-  @Input() importingCsv = false;
-  @Input() csvExtract: CsvExtractResponse = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
-  @Input() csvSkipDuplicates = true;
+  readonly extractingCsv = input(false);
+  readonly importingCsv = input(false);
+  readonly csvExtract = input<CsvExtractResponse>({ delimiter: ';', detectedColumns: [], items: [], rawText: '' });
+  /** Par two-way: `model()` emite `csvSkipDuplicatesChange` sozinho no `.set()`. */
+  readonly csvSkipDuplicates = model(true);
 
-  @Output() ofxSelected = new EventEmitter<Event>();
-  @Output() csvSelected = new EventEmitter<Event>();
-  @Output() clearOfx = new EventEmitter<void>();
-  @Output() clearCsv = new EventEmitter<void>();
-  @Output() importOfx = new EventEmitter<void>();
-  @Output() importCsv = new EventEmitter<void>();
-  @Output() csvSkipDuplicatesChange = new EventEmitter<boolean>();
-  @Output() categoryChanged = new EventEmitter<CategoryLearningCandidate>();
+  readonly ofxSelected = output<Event>();
+  readonly csvSelected = output<Event>();
+  readonly clearOfx = output<void>();
+  readonly clearCsv = output<void>();
+  readonly importOfx = output<void>();
+  readonly importCsv = output<void>();
+  readonly categoryChanged = output<CategoryLearningCandidate>();
 
-  get ofxAiSuggestedCount(): number {
-    return this.ofxExtract.items.filter((item) => !!item.suggestedCategory?.categoryName || !!item.categoryId).length;
-  }
+  readonly ofxAiSuggestedCount = computed(
+    () => this.ofxExtract().items.filter((item) => !!item.suggestedCategory?.categoryName || !!item.categoryId).length
+  );
 
-  get csvAiSuggestedCount(): number {
-    return this.csvExtract.items.filter((item) => !!item.suggestedCategory?.categoryName || !!item.categoryId).length;
-  }
+  readonly csvAiSuggestedCount = computed(
+    () => this.csvExtract().items.filter((item) => !!item.suggestedCategory?.categoryName || !!item.categoryId).length
+  );
 
-  get hasOfxPreview(): boolean {
-    return this.ofxExtract.items.length > 0;
-  }
+  readonly hasOfxPreview = computed(() => this.ofxExtract().items.length > 0);
 
-  get hasCsvPreview(): boolean {
-    return this.csvExtract.items.length > 0;
-  }
+  readonly hasCsvPreview = computed(() => this.csvExtract().items.length > 0);
 
   onCsvSkipDuplicatesChange(value: boolean): void {
-    this.csvSkipDuplicates = value;
-    this.csvSkipDuplicatesChange.emit(value);
+    this.csvSkipDuplicates.set(value);
   }
 
   onCategoryChange(item: OfxTransactionPreview, selectedCategoryId: string | null, source: ImportSource): void {
@@ -91,7 +87,7 @@ export class AccountImportComponent {
 
   categoriesForItem(item: OfxTransactionPreview): CategoryDto[] {
     const appliesTo = item.kind === 'Credit' ? 'Income' : 'Expense';
-    return this.categories.filter((category) => category.appliesTo === appliesTo || category.appliesTo === null);
+    return this.categories().filter((category) => category.appliesTo === appliesTo || category.appliesTo === null);
   }
 
   categoryOptionsForItem(item: OfxTransactionPreview): SelectMenuOption[] {

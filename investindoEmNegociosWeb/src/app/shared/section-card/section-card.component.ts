@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 
 type SectionCardPadding = 'sm' | 'md' | 'lg';
@@ -8,6 +8,7 @@ type SectionCardSurface = 'default' | 'muted';
 @Component({
   selector: 'app-section-card',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   template: `
     <section [class]="cardClass()">

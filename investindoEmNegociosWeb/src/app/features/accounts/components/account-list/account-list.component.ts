@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { AccountResponse, AccountType } from '../../models/account.models';
 import { EmptyStateComponent } from '../../../../empty-state/empty-state.component';
@@ -9,40 +9,39 @@ import { AccountActivity, accountTypeLabel } from '../../../../contas/accounts-o
 @Component({
   selector: 'app-account-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [EmptyStateComponent, UiStateComponent, AccountCardComponent],
   templateUrl: './account-list.component.html',
   styleUrl: './account-list.component.scss'
 })
 export class AccountListComponent {
-  @Input() accounts: AccountResponse[] = [];
-  @Input() loading = false;
-  @Input() canManage = true;
+  readonly accounts = input<AccountResponse[]>([]);
+  readonly loading = input(false);
+  readonly canManage = input(true);
 
   /** Novos (opcionais) — retrocompatíveis com usos existentes (ex.: styleguide). */
-  @Input() showHeader = true;
-  @Input() activityMap: Record<string, AccountActivity> = {};
-  @Input() primaryAccountId: string | null = null;
-  @Input() canTransfer = false;
-  @Input() canSetPrimary = false;
+  readonly showHeader = input(true);
+  readonly activityMap = input<Record<string, AccountActivity>>({});
+  readonly primaryAccountId = input<string | null>(null);
+  readonly canTransfer = input(false);
+  readonly canSetPrimary = input(false);
 
-  @Output() refresh = new EventEmitter<void>();
-  @Output() create = new EventEmitter<void>();
-  @Output() selectAccount = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<AccountResponse>();
-  @Output() remove = new EventEmitter<AccountResponse>();
-  @Output() transfer = new EventEmitter<AccountResponse>();
-  @Output() setPrimary = new EventEmitter<AccountResponse>();
+  readonly refresh = output<void>();
+  readonly create = output<void>();
+  readonly selectAccount = output<string>();
+  readonly edit = output<AccountResponse>();
+  readonly remove = output<AccountResponse>();
+  readonly transfer = output<AccountResponse>();
+  readonly setPrimary = output<AccountResponse>();
 
-  get hasAccounts(): boolean {
-    return this.accounts.length > 0;
-  }
+  readonly hasAccounts = computed(() => this.accounts().length > 0);
 
   accountTypeLabel(type: AccountType): string {
     return accountTypeLabel(type);
   }
 
   activityFor(accountId: string): AccountActivity | null {
-    return this.activityMap[accountId] ?? null;
+    return this.activityMap()[accountId] ?? null;
   }
 
   trackByAccountId(_: number, account: AccountResponse): string {

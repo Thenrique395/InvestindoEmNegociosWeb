@@ -1,8 +1,9 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-period-total-card',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <aside class="app-period-total-card">
       <p class="app-period-total-card__eyebrow">{{ eyebrow() }}</p>

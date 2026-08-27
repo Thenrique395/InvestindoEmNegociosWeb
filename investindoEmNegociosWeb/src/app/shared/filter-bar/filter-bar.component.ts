@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 /**
  * Faixa de filtros de uma listagem.
@@ -10,6 +10,7 @@ import { Component, computed, input } from '@angular/core';
 @Component({
   selector: 'app-filter-bar',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div [class]="containerClass()">
       <div class="flex flex-wrap items-center gap-2">

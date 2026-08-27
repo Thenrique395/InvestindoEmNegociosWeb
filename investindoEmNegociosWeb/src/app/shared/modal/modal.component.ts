@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { BodyPortalDirective } from '../body-portal.directive';
 
 
@@ -7,6 +7,7 @@ type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 @Component({
   selector: 'app-modal',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BodyPortalDirective],
   template: `
     @if (open()) {

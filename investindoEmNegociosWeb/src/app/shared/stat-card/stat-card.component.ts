@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TooltipComponent } from '../tooltip/tooltip.component';
 
 export type StatCardTone = 'primary' | 'success' | 'warning' | 'info' | 'danger';
@@ -6,6 +6,7 @@ export type StatCardTone = 'primary' | 'success' | 'warning' | 'info' | 'danger'
 @Component({
   selector: 'app-stat-card',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TooltipComponent],
   template: `
     <article [class]="'app-stat-card app-stat-card--' + tone()">

@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgClass } from '@angular/common';
 
 export type ComparisonPillTrend = 'up' | 'down' | 'flat';
@@ -7,6 +7,7 @@ export type ComparisonPillPolarity = 'higher-is-better' | 'lower-is-better';
 @Component({
   selector: 'app-comparison-pill',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass],
   template: `
     <span class="app-comparison-pill">

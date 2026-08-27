@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { FormFieldComponent } from '../../../../shared/form-field/form-field.component';
@@ -11,63 +11,82 @@ type AccountFormField = 'name' | 'type' | 'initialBalance';
 @Component({
   selector: 'app-account-form',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, FormFieldComponent, SelectMenuComponent],
   templateUrl: './account-form.component.html',
   styleUrl: './account-form.component.scss'
 })
 export class AccountFormComponent {
-  @Input({ required: true }) form!: AccountRequest;
-  @Input() editingId: string | null = null;
-  @Input() saving = false;
-  @Input() accountTypes: AccountType[] = [];
-  @Input() currencies: readonly string[] = SUPPORTED_CURRENCIES;
+  /**
+   * `form` é um objeto MUTÁVEL do pai: o template escreve nele por `[(ngModel)]`.
+   * Fica como `input()` para manter exatamente esse contrato — trocar por um
+   * fluxo imutável mudaria a tela de Contas junto, e é assunto da conversão
+   * daquela tela, não deste primitivo.
+   */
+  readonly form = input.required<AccountRequest>();
+  readonly editingId = input<string | null>(null);
+  readonly saving = input(false);
+  readonly accountTypes = input<AccountType[]>([]);
+  readonly currencies = input<readonly string[]>(SUPPORTED_CURRENCIES);
 
-  @Output() save = new EventEmitter<void>();
-  @Output() clear = new EventEmitter<void>();
+  readonly save = output<void>();
+  readonly clear = output<void>();
 
-  submitted = false;
-  touched: Record<AccountFormField, boolean> = {
+  /**
+   * Estado de validação é local e mutável — vira signal para que o `OnPush`
+   * enxergue a mudança. `touched` é substituído por inteiro (nunca mutado no
+   * lugar), senão o signal não notifica.
+   */
+  private readonly submitted = signal(false);
+  private readonly touched = signal<Record<AccountFormField, boolean>>({
     name: false,
     type: false,
     initialBalance: false
-  };
+  });
 
+  readonly accountTypeOptions = computed<SelectMenuOption[]>(() =>
+    this.accountTypes().map((type) => ({ value: type, label: type }))
+  );
+
+  readonly currencyOptions = computed<SelectMenuOption[]>(() =>
+    this.currencies().map((currency) => ({ value: currency, label: currency }))
+  );
+
+  /*
+   * Os erros continuam como getter, de propósito: dependem das propriedades
+   * MUTADAS de `form()`, que não são reativas — um `computed` memoizaria em
+   * cima de uma dependência que nunca notifica e a mensagem congelaria. Como
+   * a mutação vem do `ngModel` deste mesmo componente, o evento já marca o
+   * `OnPush` como sujo e o getter reavalia na hora certa.
+   */
   get nameError(): string {
     if (!this.shouldShowError('name')) return '';
-    const name = (this.form.name || '').trim();
+    const name = (this.form().name || '').trim();
     if (!name) return 'Informe o nome da conta.';
     if (name.length < 2) return 'O nome precisa ter pelo menos 2 caracteres.';
     return '';
   }
 
-  get accountTypeOptions(): SelectMenuOption[] {
-    return this.accountTypes.map((type) => ({ value: type, label: type }));
-  }
-
-  get currencyOptions(): SelectMenuOption[] {
-    return this.currencies.map((currency) => ({ value: currency, label: currency }));
-  }
-
   get typeError(): string {
     if (!this.shouldShowError('type')) return '';
-    return this.form.type ? '' : 'Selecione o tipo da conta.';
+    return this.form().type ? '' : 'Selecione o tipo da conta.';
   }
 
   get balanceError(): string {
     if (!this.shouldShowError('initialBalance')) return '';
-    const balance = Number(this.form.initialBalance);
+    const balance = Number(this.form().initialBalance);
     return Number.isFinite(balance) ? '' : 'Informe um saldo inicial válido.';
   }
 
   get isValid(): boolean {
-    const name = (this.form.name || '').trim();
-    const balance = Number(this.form.initialBalance);
-    return name.length >= 2 && !!this.form.type && Number.isFinite(balance);
+    const name = (this.form().name || '').trim();
+    const balance = Number(this.form().initialBalance);
+    return name.length >= 2 && !!this.form().type && Number.isFinite(balance);
   }
 
   onSave(): void {
-    this.submitted = true;
-    this.touched = { name: true, type: true, initialBalance: true };
+    this.submitted.set(true);
+    this.touched.set({ name: true, type: true, initialBalance: true });
 
     if (!this.isValid) return;
     this.save.emit();
@@ -79,15 +98,15 @@ export class AccountFormComponent {
   }
 
   onTouch(field: AccountFormField): void {
-    this.touched[field] = true;
+    this.touched.update((atual) => ({ ...atual, [field]: true }));
   }
 
   private shouldShowError(field: AccountFormField): boolean {
-    return this.submitted || this.touched[field];
+    return this.submitted() || this.touched()[field];
   }
 
   private resetValidationState(): void {
-    this.submitted = false;
-    this.touched = { name: false, type: false, initialBalance: false };
+    this.submitted.set(false);
+    this.touched.set({ name: false, type: false, initialBalance: false });
   }
 }

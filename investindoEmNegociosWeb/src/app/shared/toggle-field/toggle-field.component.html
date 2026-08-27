@@ -1,16 +1,16 @@
-<label class="toggle-field" [class.toggle-field--compact]="compact">
+<label class="toggle-field" [class.toggle-field--compact]="compact()">
   <div class="toggle-field__copy">
-    <span class="toggle-field__title">{{ label }}</span>
-    @if (description) {
-      <small class="toggle-field__text">{{ description }}</small>
+    <span class="toggle-field__title">{{ label() }}</span>
+    @if (description()) {
+      <small class="toggle-field__text">{{ description() }}</small>
     }
   </div>
   <span class="toggle-field__switch">
     <input
       class="peer sr-only"
       type="checkbox"
-      [checked]="checked"
-      [disabled]="disabled"
+      [checked]="checked()"
+      [disabled]="disabled()"
       (change)="onChange($event)" />
     <span class="toggle-field__track"></span>
     <span class="toggle-field__thumb"></span>

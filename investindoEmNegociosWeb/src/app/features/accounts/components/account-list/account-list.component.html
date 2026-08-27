@@ -1,5 +1,5 @@
 <section class="account-list">
-  @if (showHeader) {
+  @if (showHeader()) {
     <div class="account-list__head">
       <div>
         <p class="account-list__eyebrow">Carteira de contas</p>
@@ -9,12 +9,12 @@
     </div>
   }
 
-  @if (loading) {
+  @if (loading()) {
     <app-ui-state type="loading" title="Carregando contas..."></app-ui-state>
   }
 
-  @if (!loading && !hasAccounts) {
-    @if (canManage) {
+  @if (!loading() && !hasAccounts()) {
+    @if (canManage()) {
       <app-empty-state
         title="Nenhuma conta cadastrada"
         description="Crie sua primeira conta"
@@ -29,16 +29,16 @@
     }
   }
 
-  @if (!loading && hasAccounts) {
+  @if (!loading() && hasAccounts()) {
     <div class="account-list__grid">
-      @for (account of accounts; track trackByAccountId($index, account)) {
+      @for (account of accounts(); track trackByAccountId($index, account)) {
         <app-account-card
           [account]="account"
           [activity]="activityFor(account.id)"
-          [isPrimary]="account.id === primaryAccountId"
-          [canManage]="canManage"
-          [canTransfer]="canTransfer"
-          [canSetPrimary]="canSetPrimary"
+          [isPrimary]="account.id === primaryAccountId()"
+          [canManage]="canManage()"
+          [canTransfer]="canTransfer()"
+          [canSetPrimary]="canSetPrimary()"
           (viewStatement)="selectAccount.emit($event.id)"
           (edit)="edit.emit($event)"
           (remove)="remove.emit($event)"

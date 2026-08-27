@@ -2,43 +2,43 @@
   <div class="account-panel__head">
     <div>
       <p class="account-panel__eyebrow">Cadastro</p>
-      <h2>{{ editingId ? 'Editar conta' : 'Nova conta' }}</h2>
+      <h2>{{ editingId() ? 'Editar conta' : 'Nova conta' }}</h2>
     </div>
   </div>
 
   <div class="account-form-grid">
 
     <app-form-field label="Nome da conta" [error]="nameError">
-      <input type="text" [(ngModel)]="form.name" (blur)="onTouch('name')" />
+      <input type="text" [(ngModel)]="form().name" (blur)="onTouch('name')" />
     </app-form-field>
 
     <app-form-field label="Tipo" [error]="typeError">
       <app-select-menu
-        [options]="accountTypeOptions"
-        [(ngModel)]="form.type"
+        [options]="accountTypeOptions()"
+        [(ngModel)]="form().type"
         ariaLabel="Tipo da conta"
         (valueChange)="onTouch('type')" />
     </app-form-field>
 
     <app-form-field label="Moeda">
       <app-select-menu
-        [options]="currencyOptions"
-        [(ngModel)]="form.currency"
+        [options]="currencyOptions()"
+        [(ngModel)]="form().currency"
         ariaLabel="Moeda da conta" />
     </app-form-field>
 
     <app-form-field label="Saldo inicial" [error]="balanceError">
-      <input type="number" [(ngModel)]="form.initialBalance" (blur)="onTouch('initialBalance')" />
+      <input type="number" [(ngModel)]="form().initialBalance" (blur)="onTouch('initialBalance')" />
     </app-form-field>
 
     <label class="account-checkbox">
-      <input type="checkbox" [(ngModel)]="form.isActive" /> Conta ativa
+      <input type="checkbox" [(ngModel)]="form().isActive" /> Conta ativa
     </label>
 
   </div>
 
   <div class="account-panel__actions">
-    <button class="btn-primary" type="button" [disabled]="saving" (click)="onSave()">{{ saving ? 'Salvando...' : 'Salvar conta' }}</button>
+    <button class="btn-primary" type="button" [disabled]="saving()" (click)="onSave()">{{ saving() ? 'Salvando...' : 'Salvar conta' }}</button>
     <button class="btn-ghost" type="button" (click)="onClear()">Limpar</button>
   </div>
 </section>

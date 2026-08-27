@@ -1,20 +1,20 @@
-<div class="responsive-list" [class.responsive-list--dimmed]="!items.length" [class.responsive-list--comfortable]="density === 'comfortable'">
+<div class="responsive-list" [class.responsive-list--dimmed]="!items().length" [class.responsive-list--comfortable]="density() === 'comfortable'">
   <div class="responsive-list__scroll">
     <table class="responsive-list__table">
       <thead class="responsive-list__head">
         <tr>
-          @if (selectable) {
+          @if (selectable()) {
             <th class="responsive-list__cell responsive-list__cell--checkbox">
               <input
                 class="responsive-list__check"
                 type="checkbox"
-                [checked]="allSelected"
-                [indeterminate]="someSelected"
+                [checked]="allSelected()"
+                [indeterminate]="someSelected()"
                 (change)="onSelectAllChange($any($event.target)?.checked ?? false)"
                 aria-label="Selecionar todas" />
             </th>
           }
-          @for (column of columns; track column.key) {
+          @for (column of columns(); track column.key) {
             <th
               class="responsive-list__cell"
               [class.responsive-list__cell--value]="column.align === 'end'"
@@ -24,8 +24,8 @@
               @if (column.sortable) {
                 <button type="button" class="responsive-list__sort" (click)="sortByColumn(column.key)">
                   {{ column.label }}
-                  @if (sortBy === column.key) {
-                    <span class="responsive-list__sort-dir">{{ sortDir === 1 ? '↑' : '↓' }}</span>
+                  @if (sortBy() === column.key) {
+                    <span class="responsive-list__sort-dir">{{ sortDir() === 1 ? '↑' : '↓' }}</span>
                   }
                 </button>
               } @else {
@@ -36,32 +36,32 @@
         </tr>
       </thead>
       <tbody class="responsive-list__body">
-        @if (loading) {
+        @if (loading()) {
           <tr>
-            <td class="responsive-list__empty" [attr.colspan]="columns.length + (selectable ? 1 : 0)">
+            <td class="responsive-list__empty" [attr.colspan]="columns().length + (selectable() ? 1 : 0)">
               <div class="responsive-list__loading">
                 <span class="responsive-list__spinner"></span>
-                {{ loadingLabel }}
+                {{ loadingLabel() }}
               </div>
             </td>
           </tr>
         }
-        @if (!loading && !items.length) {
+        @if (!loading() && !items().length) {
           <tr>
-            <td class="responsive-list__empty" [attr.colspan]="columns.length + (selectable ? 1 : 0)">
+            <td class="responsive-list__empty" [attr.colspan]="columns().length + (selectable() ? 1 : 0)">
               <app-empty-state
-                [title]="emptyTitle"
-                [description]="emptyDescription"
-                [ctaLabel]="emptyCtaLabel"
-                [icon]="emptyIcon"
+                [title]="emptyTitle()"
+                [description]="emptyDescription()"
+                [ctaLabel]="emptyCtaLabel()"
+                [icon]="emptyIcon()"
                 (action)="emptyAction.emit()"></app-empty-state>
             </td>
           </tr>
         }
-        @if (!loading) {
-          @for (item of visibleItems; track trackByRow($index, item)) {
+        @if (!loading()) {
+          @for (item of visibleItems(); track trackByRow($index, item)) {
             <tr class="responsive-list__row">
-              @if (selectable) {
+              @if (selectable()) {
                 <td class="responsive-list__item responsive-list__item--checkbox">
                   <input
                     class="responsive-list__check"
@@ -72,7 +72,7 @@
                     aria-label="Selecionar item" />
                 </td>
               }
-              @for (column of columns; track column.key) {
+              @for (column of columns(); track column.key) {
                 <td
                   class="responsive-list__item"
                   [class.responsive-list__item--value]="column.align === 'end'"
@@ -89,27 +89,27 @@
     </table>
   </div>
 
-  @if (pageSize > 0 && items.length) {
+  @if (pageSize() > 0 && items().length) {
     <footer class="responsive-list__footer">
-      <span class="responsive-list__range">{{ rangeLabel }}</span>
+      <span class="responsive-list__range">{{ rangeLabel() }}</span>
 
-      @if (paginado) {
+      @if (paginado()) {
         <nav class="responsive-list__pages" aria-label="Paginação">
           <button
             type="button"
             class="responsive-list__page responsive-list__page--nav"
-            [disabled]="page === 1"
+            [disabled]="page() === 1"
             aria-label="Página anterior"
-            (click)="irParaPagina(page - 1)">
+            (click)="irParaPagina(page() - 1)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
           </button>
 
-          @for (n of pages; track n) {
+          @for (n of pages(); track n) {
             <button
               type="button"
               class="responsive-list__page"
-              [class.is-active]="n === page"
-              [attr.aria-current]="n === page ? 'page' : null"
+              [class.is-active]="n === page()"
+              [attr.aria-current]="n === page() ? 'page' : null"
               (click)="irParaPagina(n)">
               {{ n }}
             </button>
@@ -118,9 +118,9 @@
           <button
             type="button"
             class="responsive-list__page responsive-list__page--nav"
-            [disabled]="page === totalPages"
+            [disabled]="page() === totalPages()"
             aria-label="Próxima página"
-            (click)="irParaPagina(page + 1)">
+            (click)="irParaPagina(page() + 1)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
           </button>
         </nav>
