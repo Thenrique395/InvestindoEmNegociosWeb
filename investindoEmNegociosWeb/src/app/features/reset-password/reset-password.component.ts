@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,18 +10,25 @@ import { AuthLayoutComponent } from '../layout/auth-layout/auth-layout.component
 @Component({
   selector: 'app-reset-password',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, RouterModule, AuthLayoutComponent],
   templateUrl: './reset-password.component.html'
 })
 export class ResetPasswordComponent implements OnInit {
-  token = '';
-  newPassword = '';
-  confirmPassword = '';
-  loading = false;
-  showNewPassword = false;
-  showConfirmPassword = false;
-  formError = '';
-  success = false;
+  private readonly _token = signal("");
+  readonly token = this._token.asReadonly();
+  readonly newPassword = signal("");
+  readonly confirmPassword = signal("");
+  private readonly _loading = signal(false);
+  readonly loading = this._loading.asReadonly();
+  private readonly _showNewPassword = signal(false);
+  readonly showNewPassword = this._showNewPassword.asReadonly();
+  private readonly _showConfirmPassword = signal(false);
+  readonly showConfirmPassword = this._showConfirmPassword.asReadonly();
+  private readonly _formError = signal("");
+  readonly formError = this._formError.asReadonly();
+  private readonly _success = signal(false);
+  readonly success = this._success.asReadonly();
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
@@ -33,7 +40,7 @@ export class ResetPasswordComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
+    this._token.set(this.route.snapshot.queryParamMap.get('token') ?? '');
 
     // Remove o token da barra de endereço após ler o valor, reduzindo exposição em histórico/referer.
     //
@@ -41,82 +48,70 @@ export class ResetPasswordComponent implements OnInit {
     // notifica o Router, que recria este componente — e a instância recriada lê a URL já
     // sem o token, caindo em "link inválido" mesmo com um link válido. Isso quebrava a
     // redefinição de senha por completo.
-    if (this.token && this.isBrowser) {
+    if (this.token() && this.isBrowser) {
       window.history.replaceState(window.history.state, '', '/reset-password');
     }
   }
 
-  get hasToken(): boolean {
-    return this.token.trim().length > 0;
-  }
+  readonly hasToken = computed(() => this.token().trim().length > 0);
 
-  get hasMinLength(): boolean {
-    return this.newPassword.length >= 8;
-  }
+  readonly hasMinLength = computed(() => this.newPassword().length >= 8);
 
-  get hasUppercase(): boolean {
-    return /[A-Z]/.test(this.newPassword);
-  }
+  readonly hasUppercase = computed(() => /[A-Z]/.test(this.newPassword()));
 
-  get hasNumber(): boolean {
-    return /\d/.test(this.newPassword);
-  }
+  readonly hasNumber = computed(() => /\d/.test(this.newPassword()));
 
-  get passwordsMatch(): boolean {
-    return this.newPassword.length > 0 && this.newPassword === this.confirmPassword;
-  }
+  readonly passwordsMatch = computed(() => this.newPassword().length > 0 && this.newPassword() === this.confirmPassword());
 
-  get canSubmit(): boolean {
-    return this.hasToken && this.hasMinLength && this.hasUppercase && this.hasNumber && this.passwordsMatch && !this.loading && !this.success;
-  }
+  readonly canSubmit = computed(() => this.hasToken() && this.hasMinLength() && this.hasUppercase() && this.hasNumber() && this.passwordsMatch() && !this.loading() && !this.success());
 
   get hasPasswordInput(): boolean {
-    return this.newPassword.length > 0;
+    return this.newPassword().length > 0;
   }
 
   get hasConfirmInput(): boolean {
-    return this.confirmPassword.length > 0;
+    return this.confirmPassword().length > 0;
   }
 
   toggleNewPasswordVisibility(): void {
-    this.showNewPassword = !this.showNewPassword;
+    this._showNewPassword.set(!this.showNewPassword());
   }
 
   toggleConfirmPasswordVisibility(): void {
-    this.showConfirmPassword = !this.showConfirmPassword;
+    this._showConfirmPassword.set(!this.showConfirmPassword());
   }
 
   onSubmit(): void {
-    if (this.loading) return;
-    this.formError = '';
+    if (this.loading()) return;
+    this._formError.set('');
 
-    if (!this.hasToken) {
-      this.formError = 'Token de recuperação ausente ou inválido.';
-      this.uiFeedback.error(this.formError);
+    if (!this.hasToken()) {
+      this._formError.set('Token de recuperação ausente ou inválido.');
+      this.uiFeedback.error(this.formError());
       return;
     }
-    if (!this.hasMinLength || !this.hasUppercase || !this.hasNumber) {
-      this.formError = 'A senha deve ter no mínimo 8 caracteres, 1 letra maiúscula e 1 número.';
-      this.uiFeedback.warning(this.formError);
+    if (!this.hasMinLength() || !this.hasUppercase() || !this.hasNumber()) {
+      this._formError.set('A senha deve ter no mínimo 8 caracteres, 1 letra maiúscula e 1 número.');
+      this.uiFeedback.warning(this.formError());
       return;
     }
-    if (!this.passwordsMatch) {
-      this.formError = 'As senhas não conferem.';
-      this.uiFeedback.warning(this.formError);
+    if (!this.passwordsMatch()) {
+      this._formError.set('As senhas não conferem.');
+      this.uiFeedback.warning(this.formError());
       return;
     }
 
-    this.loading = true;
-    this.auth.resetPassword(this.token, this.newPassword).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this._loading.set(true);
+    this.auth.resetPassword(this.token(), this.newPassword()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.loading = false;
-        this.success = true;
+        this._loading.set(false);
+        this._success.set(true);
         this.uiFeedback.success('Senha redefinida com sucesso. Faça login novamente.');
       },
       error: (err: unknown) => {
-        this.loading = false;
-        this.formError = err instanceof Error ? err.message : 'Falha ao redefinir senha.';
-        this.uiFeedback.error(this.formError);
+        this._loading.set(false);
+        this._formError.set(err instanceof Error ? err.message : 'Falha ao redefinir senha.');
+        this.uiFeedback.error(this.formError());
       }
     });
   }

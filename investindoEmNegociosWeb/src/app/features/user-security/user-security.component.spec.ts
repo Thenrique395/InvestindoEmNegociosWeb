@@ -31,7 +31,7 @@ describe('UserSecurityComponent', () => {
     const ctx = createComponent();
 
     expect(ctx.profileService.getSecuritySummary).toHaveBeenCalled();
-    expect(ctx.component.summary?.activeSessions).toBe(2);
+    expect(ctx.component.summary()?.activeSessions).toBe(2);
   });
 
   it('deve abrir a confirmação antes de revogar sessões', () => {
@@ -39,7 +39,7 @@ describe('UserSecurityComponent', () => {
 
     ctx.component.revokeSessions();
 
-    expect(ctx.component.confirmRevokeOpen).toBeTrue();
+    expect(ctx.component.confirmRevokeOpen()).toBeTrue();
     expect(ctx.profileService.revokeOwnSessions).not.toHaveBeenCalled();
   });
 
@@ -48,7 +48,7 @@ describe('UserSecurityComponent', () => {
 
     ctx.component.performRevokeSessions();
 
-    expect(ctx.component.confirmRevokeOpen).toBeFalse();
+    expect(ctx.component.confirmRevokeOpen()).toBeFalse();
     expect(ctx.profileService.revokeOwnSessions).toHaveBeenCalled();
     expect(ctx.profileService.getSecuritySummary).toHaveBeenCalledTimes(2);
     expect(ctx.uiFeedback.success).toHaveBeenCalled();

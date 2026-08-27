@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ProfileService, SecuritySummary } from '../../core/profile.service';
@@ -13,15 +13,20 @@ import { UiStateComponent } from '../../shared/ui-state/ui-state.component';
 @Component({
   selector: 'app-user-security',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ConfirmDialogComponent, PageHeaderComponent, SectionCardComponent, TransactionSummaryCardComponent, UiStateComponent],
   templateUrl: './user-security.component.html',
   styleUrls: ['./user-security.component.scss']
 })
 export class UserSecurityComponent {
-  summary: SecuritySummary | null = null;
-  loading = true;
-  revoking = false;
-  confirmRevokeOpen = false;
+  private readonly _summary = signal<SecuritySummary | null>(null);
+  readonly summary = this._summary.asReadonly();
+  private readonly _loading = signal(true);
+  readonly loading = this._loading.asReadonly();
+  private readonly _revoking = signal(false);
+  readonly revoking = this._revoking.asReadonly();
+  private readonly _confirmRevokeOpen = signal(false);
+  readonly confirmRevokeOpen = this._confirmRevokeOpen.asReadonly();
 
   constructor(
     private readonly profileService: ProfileService,
@@ -32,13 +37,17 @@ export class UserSecurityComponent {
   }
 
   revokeSessions(): void {
-    this.confirmRevokeOpen = true;
+    this._confirmRevokeOpen.set(true);
+  }
+
+  cancelRevokeSessions(): void {
+    this._confirmRevokeOpen.set(false);
   }
 
   performRevokeSessions(): void {
-    this.confirmRevokeOpen = false;
-    if (this.revoking) return;
-    this.revoking = true;
+    this._confirmRevokeOpen.set(false);
+    if (this.revoking()) return;
+    this._revoking.set(true);
     this.profileService.revokeOwnSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.uiFeedback.success(`${response.revokedSessions} sessão(ões) revogada(s).`);
@@ -46,24 +55,24 @@ export class UserSecurityComponent {
       },
       error: (err) => {
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao revogar sessões.'));
-        this.revoking = false;
+        this._revoking.set(false);
       },
       complete: () => {
-        this.revoking = false;
+        this._revoking.set(false);
       }
     });
   }
 
   private load(): void {
-    this.loading = true;
+    this._loading.set(true);
     this.profileService.getSecuritySummary().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (summary) => {
-        this.summary = summary;
-        this.loading = false;
+        this._summary.set(summary);
+        this._loading.set(false);
       },
       error: () => {
-        this.summary = null;
-        this.loading = false;
+        this._summary.set(null);
+        this._loading.set(false);
       }
     });
   }

@@ -4,11 +4,11 @@
     title="Sessões e login"
     description="Gerencie sessões ativas, lockout de login e resposta rápida para acesso suspeito." />
 
-  @if (!summary && loading) {
+  @if (!summary() && loading()) {
     <app-ui-state type="loading" />
   }
 
-  @if (summary; as security) {
+  @if (summary(); as security) {
     <section class="seguranca-summary-grid">
       <app-transaction-summary-card
         tone="info"
@@ -69,8 +69,8 @@
         } @else {
           <p class="muted">Use a revogação global para encerrar sessões ativas e exigir novo login com refresh token novo.</p>
         }
-        <button type="button" class="btn-danger response-action" [disabled]="revoking" (click)="revokeSessions()">
-          {{ revoking ? 'Revogando...' : 'Revogar sessões ativas' }}
+        <button type="button" class="btn-danger response-action" [disabled]="revoking()" (click)="revokeSessions()">
+          {{ revoking() ? 'Revogando...' : 'Revogar sessões ativas' }}
         </button>
       </app-section-card>
 
@@ -85,7 +85,7 @@
   }
 </section>
 
-@if (confirmRevokeOpen) {
+@if (confirmRevokeOpen()) {
   <app-confirm-dialog
     title="Revogar todas as sessões ativas?"
     message="Todos os dispositivos conectados serão desconectados e vão precisar fazer login novamente, incluindo este."
@@ -93,6 +93,6 @@
     cancelLabel="Cancelar"
     variant="danger"
     (confirmed)="performRevokeSessions()"
-    (cancelled)="confirmRevokeOpen = false">
+    (cancelled)="cancelRevokeSessions()">
   </app-confirm-dialog>
 }

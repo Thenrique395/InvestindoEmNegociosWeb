@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { STYLEGUIDE_CATEGORY_LABELS, STYLEGUIDE_COMPONENTS, StyleguideCategory } from './styleguide-catalog';
 
 @Component({
   selector: 'app-styleguide-shell',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './styleguide-shell.component.html',
   styleUrl: './styleguide-shell.component.scss'

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
@@ -12,14 +12,18 @@ import { AuthLayoutComponent } from '../layout/auth-layout/auth-layout.component
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, RouterModule, AuthLayoutComponent],
   templateUrl: './forgot-password.component.html'
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
-  email = '';
-  loading = false;
-  success = false;
-  formError = '';
+  readonly email = signal("");
+  private readonly _loading = signal(false);
+  readonly loading = this._loading.asReadonly();
+  private readonly _success = signal(false);
+  readonly success = this._success.asReadonly();
+  private readonly _formError = signal("");
+  readonly formError = this._formError.asReadonly();
 
   constructor(
     private auth: AuthService,
@@ -45,25 +49,25 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.loading) return;
-    this.formError = '';
-    if (!this.email || !this.email.includes('@')) {
-      this.formError = 'Informe um e-mail válido.';
-      this.uiFeedback.warning(this.formError);
+    if (this.loading()) return;
+    this._formError.set('');
+    if (!this.email() || !this.email().includes('@')) {
+      this._formError.set('Informe um e-mail válido.');
+      this.uiFeedback.warning(this.formError());
       return;
     }
 
-    this.loading = true;
-    this.auth.forgotPassword(this.email).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this._loading.set(true);
+    this.auth.forgotPassword(this.email()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.loading = false;
-        this.success = true;
+        this._loading.set(false);
+        this._success.set(true);
         this.uiFeedback.success('Se o e-mail existir, enviaremos instruções para redefinir sua senha.');
       },
       error: (err: unknown) => {
-        this.loading = false;
-        this.formError = err instanceof Error ? err.message : 'Falha ao solicitar recuperação de senha.';
-        this.uiFeedback.error(this.formError);
+        this._loading.set(false);
+        this._formError.set(err instanceof Error ? err.message : 'Falha ao solicitar recuperação de senha.');
+        this.uiFeedback.error(this.formError());
       }
     });
   }
