@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InvestmentType } from '../../../investments.service';
 import { BenchmarkKey } from '../../../utils/investments.utils';
@@ -33,7 +33,7 @@ export type ProfitabilityYearRow = {
   styleUrl: './investment-profitability-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InvestmentProfitabilityPanelComponent {
+export class InvestmentProfitabilityPanelComponent implements OnChanges {
   @Input() totalPercent = 0;
   @Input() totalBenchmarkPercent = 0;
   @Input() twelveMonthsPercent = 0;
@@ -54,27 +54,43 @@ export class InvestmentProfitabilityPanelComponent {
   @Output() benchmarkChange = new EventEmitter<BenchmarkKey>();
   @Output() typeFilterChange = new EventEmitter<'ALL' | InvestmentType>();
 
-  /** Série da carteira + série do índice (tracejada). O desenho é do `app-chart-line`. */
-  get chartSeries(): LineSeries[] {
-    if (!this.points.length) return [];
-    return [
-      {
-        label: 'Sua carteira',
-        color: 'var(--primary)',
-        emphasis: true,
-        points: this.points.map((p) => p.carteiraAc)
-      },
-      {
-        label: this.benchmarkLabel,
-        color: this.benchmarkColor,
-        dashed: true,
-        points: this.points.map((p) => p.benchmarkAc)
-      }
-    ];
-  }
+  /**
+   * Série da carteira + série do índice (tracejada). O desenho é do `app-chart-line`.
+   *
+   * Derivado em `ngOnChanges`, não em getter: estes dois alimentam os `input()` do
+   * `app-chart-line`. Um getter devolveria array novo a cada ciclo de detecção, o
+   * signal de entrada do gráfico veria referência nova toda vez, e todo o cálculo
+   * dele (viewBox, grade, paths, ticks) refaria sem nada ter mudado.
+   *
+   * Enquanto os `@Input()` deste componente não virarem `input()` signal, é aqui
+   * que a memoização cabe — `computed()` precisa de fonte reativa.
+   */
+  chartSeries: LineSeries[] = [];
+  chartLabels: string[] = [];
 
-  get chartLabels(): string[] {
-    return this.points.map((p) => p.label);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['points'] || changes['benchmarkLabel'] || changes['benchmarkColor']) {
+      this.chartSeries = this.points.length
+        ? [
+            {
+              label: 'Sua carteira',
+              color: 'var(--primary)',
+              emphasis: true,
+              points: this.points.map((p) => p.carteiraAc)
+            },
+            {
+              label: this.benchmarkLabel,
+              color: this.benchmarkColor,
+              dashed: true,
+              points: this.points.map((p) => p.benchmarkAc)
+            }
+          ]
+        : [];
+    }
+
+    if (changes['points']) {
+      this.chartLabels = this.points.map((p) => p.label);
+    }
   }
 
   readonly formatPercent = (value: number): string => `${value.toFixed(1)}%`;

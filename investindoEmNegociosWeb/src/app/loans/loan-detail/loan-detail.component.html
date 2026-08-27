@@ -158,10 +158,10 @@
       @if (activeTab === 'evolucao') {
         <article class="card">
           <h2>Evolução do saldo devedor</h2>
-          @if (balanceSeries; as series) {
+          @if (balanceSeries(); as series) {
             <app-chart-line
               [series]="series"
-              [labels]="balanceLabels"
+              [labels]="balanceLabels()"
               [height]="160"
               [showLegend]="false" />
             <p class="muted text--sm">Saldo devedor projetado ao final de cada parcela (1 → {{ c.installments.length }}).</p>

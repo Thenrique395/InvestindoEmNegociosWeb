@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, computed, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -157,22 +157,26 @@ export class LoanDetailComponent implements OnInit {
     });
   }
 
-  /** Saldo devedor por parcela. A escala e o desenho ficam no `app-chart-line` (ARQUITETURA_ANGULAR.md §8). */
-  get balanceSeries(): LineSeries[] | null {
-    const c = this.contract();
-    if (!c || !c.installments.length) return null;
-    const inst = [...c.installments].sort((a, b) => a.installmentNo - b.installmentNo);
-    // `emphasis` traz de volta a área sob a curva que o polígono desenhado à mão tinha.
-    return [{ label: 'Saldo devedor', color: 'var(--primary)', emphasis: true, points: inst.map((i) => i.endingBalance) }];
-  }
-
-  get balanceLabels(): string[] {
+  /**
+   * Parcelas em ordem de vencimento. `computed`, não getter: alimenta os `input()`
+   * do `app-chart-line`, então um getter devolveria array novo a cada ciclo de
+   * detecção e faria o gráfico inteiro recalcular — inclusive o sort.
+   */
+  private readonly orderedInstallments = computed(() => {
     const c = this.contract();
     if (!c) return [];
-    return [...c.installments]
-      .sort((a, b) => a.installmentNo - b.installmentNo)
-      .map((i) => String(i.installmentNo));
-  }
+    return [...c.installments].sort((a, b) => a.installmentNo - b.installmentNo);
+  });
+
+  /** Saldo devedor por parcela. A escala e o desenho ficam no `app-chart-line` (ARQUITETURA_ANGULAR.md §8). */
+  readonly balanceSeries = computed<LineSeries[] | null>(() => {
+    const inst = this.orderedInstallments();
+    if (!inst.length) return null;
+    // `emphasis` traz de volta a área sob a curva que o polígono desenhado à mão tinha.
+    return [{ label: 'Saldo devedor', color: 'var(--primary)', emphasis: true, points: inst.map((i) => i.endingBalance) }];
+  });
+
+  readonly balanceLabels = computed(() => this.orderedInstallments().map((i) => String(i.installmentNo)));
 
   // ---- Pagamento --------------------------------------------------------
 

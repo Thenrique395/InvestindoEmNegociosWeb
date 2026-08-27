@@ -86,11 +86,11 @@ describe('LoanDetailComponent', () => {
 
     // Gráfico derivado das parcelas (sem backend). O desenho é do app-chart-line;
     // a tela só produz a série de saldo devedor.
-    const series = ctx.component.balanceSeries;
+    const series = ctx.component.balanceSeries();
     expect(series).not.toBeNull();
     expect(series!.length).toBe(1);
     expect(series![0].points.length).toBe(ctx.component.contract()!.installments.length);
-    expect(ctx.component.balanceLabels.length).toBe(series![0].points.length);
+    expect(ctx.component.balanceLabels().length).toBe(series![0].points.length);
 
     // Timeline carrega só ao abrir a aba.
     expect(ctx.loansService.timeline).not.toHaveBeenCalled();
