@@ -113,10 +113,25 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.emailNotConfirmed = false;
 
-    this.auth.login(this.email, this.password).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    /*
+     * SEM `takeUntilDestroyed` aqui, de propósito — é a exceção da §5.
+     *
+     * `auth.login()` grava o cookie, e o `app.component` troca o shell assim que
+     * `isLogged` vira true. Os `<router-outlet>` do ramo deslogado e do ramo logado
+     * são elementos diferentes, então a troca DESTRÓI este componente enquanto o
+     * `getProfile()` ainda está em voo. Com `takeUntilDestroyed`, a resposta era
+     * descartada e a navegação nunca acontecia: a tela de login ficava renderizada
+     * dentro do shell autenticado, com a sidebar em volta.
+     *
+     * A §5 existe para evitar `setState` em componente morto. Aqui o efeito é
+     * NAVEGAÇÃO — global, e precisa sobreviver à destruição de quem a disparou.
+     * As escritas de estado que restam (`loading`) são inofensivas: o componente
+     * já está saindo de cena.
+     */
+    this.auth.login(this.email, this.password).subscribe({
       next: (res: AuthSessionResponse) => {
         this.uiFeedback.success(`Bem-vindo, ${res.name}.`);
-        this.profile.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        this.profile.getProfile().subscribe({
           next: (profile) => {
             this.loading = false;
             const returnTo = this.route.snapshot.queryParamMap.get('returnTo');
