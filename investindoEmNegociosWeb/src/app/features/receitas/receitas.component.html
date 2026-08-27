@@ -249,8 +249,13 @@
   eyebrow="Editar receita recebida"
   (dismiss)="cancelarEdicaoRecebida()">
   <p>
-    Ao editar esta receita <strong>{{ editReceivedSource }}</strong>, o status voltará para
-    <strong>Pendente</strong> para que o ajuste seja feito.
+    Ao alterar o <strong>valor</strong> de <strong>{{ editReceivedSource }}</strong>, o
+    recebimento registrado será <strong>estornado</strong>: o status volta para
+    <strong>Pendente</strong> e, se havia conta vinculada, o valor sai do saldo dela.
+  </p>
+  <p class="text--sm muted">
+    Depois de ajustar, registre o recebimento novamente com o valor correto. Mudar apenas a
+    data de recebimento não estorna nada.
   </p>
   <ng-container sheet-actions>
     <button type="button" class="btn-ghost sm" (click)="cancelarEdicaoRecebida()">Não aceito</button>
