@@ -94,6 +94,7 @@ export class ReceitasComponent implements OnInit {
   editReceivedSource = '';
   selectedIds = new Set<string>();
   readonly attachingReceiptIds = signal<Set<string>>(new Set());
+  readonly estornandoIds = signal<Set<string>>(new Set());
   historicoAberto = false;
   historicoTitulo = '';
   historicoCarregando = false;
@@ -850,6 +851,55 @@ export class ReceitasComponent implements OnInit {
     const next = new Set(this.attachingReceiptIds());
     next.delete(id);
     this.attachingReceiptIds.set(next);
+  }
+
+  /**
+   * Estorna o recebimento de uma parcela. O backend cria o pagamento negativo e, se havia
+   * conta vinculada, o lançamento compensatório — a parcela volta para "em aberto".
+   *
+   * Estava disponível só em Despesas, embora o backend sempre tenha suportado receita
+   * (`plan.Type == Income` gera débito na conta). Sem isto, uma receita recebida com valor
+   * errado não tinha como ser corrigida pela interface.
+   */
+  estornarRecebimento(installmentId: string): void {
+    if (!installmentId || this.estornandoIds().has(installmentId)) return;
+
+    this.marcarEstornando(installmentId, true);
+    this.installments.listPayments(installmentId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (payments) => {
+        const alvo = [...(payments || [])]
+          .filter((p) => p.canReverse && p.paidAmount > 0)
+          .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0];
+
+        if (!alvo) {
+          this.marcarEstornando(installmentId, false);
+          this.setAlerta('Nenhum recebimento disponível para estorno nesta parcela.', 3000, 'info');
+          return;
+        }
+
+        this.installments
+          .reversePayment(installmentId, alvo.id)
+          .pipe(finalize(() => this.marcarEstornando(installmentId, false)), takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.setAlerta('Recebimento estornado. A receita voltou para pendente.', 3500, 'success');
+              this.fecharHistorico();
+              this.db.refreshIncomes(this.mesKey());
+            },
+            error: () => this.setAlerta('Não foi possível estornar o recebimento.', 3000, 'error')
+          });
+      },
+      error: () => {
+        this.marcarEstornando(installmentId, false);
+        this.setAlerta('Falha ao consultar recebimentos da parcela.', 3000, 'error');
+      }
+    });
+  }
+
+  private marcarEstornando(id: string, ativo: boolean): void {
+    const atual = new Set(this.estornandoIds());
+    if (ativo) atual.add(id); else atual.delete(id);
+    this.estornandoIds.set(atual);
   }
 
   onComprovanteFileSelected(event: Event): void {

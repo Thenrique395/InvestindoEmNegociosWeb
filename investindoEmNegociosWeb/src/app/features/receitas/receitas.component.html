@@ -272,8 +272,8 @@
   [eventosBrutos]="historicoEventos"
   [mostraParcelas]="historicoTemSerie"
   [parcelaAtualId]="historicoParcelaAtualId"
-  [permiteEstorno]="false"
   (close)="fecharHistorico()"
+  (reverse)="estornarRecebimento($event)"
   (attachReceipt)="prepararAnexoComprovante($event); comprovanteInput.click()" />
 
 <app-confirm-delete
