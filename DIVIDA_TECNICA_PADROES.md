@@ -275,7 +275,11 @@ browser.
 
 ---
 
-# PARTE 3 — Backend (não tocado nesta rodada)
+# PARTE 3 — Backend
+
+**Atualização de 2026-08-27:** os três itens de maior peso foram corrigidos na branch
+`fix/isolamento-space-emprestimos` (isolamento por área, `UnauthorizedAccessException` virando
+500, e a doc apontando para `schema.sql`). O que sobra está abaixo.
 
 O backend está **bem mais aderente** que o frontend: zero `DbContext` em controller, zero
 `using Infrastructure` em `Application`, zero dependência para cima em `Domain`, controllers finos
@@ -283,80 +287,37 @@ O backend está **bem mais aderente** que o frontend: zero `DbContext` em contro
 
 ---
 
-## 🔴 ⬜ BUG — Empréstimos ficam fora do isolamento por Space
+## ✅ BUG — Empréstimos fora do isolamento por Space — **CORRIGIDO em 2026-08-27**
 
-**Onde:** API · `Application/Services/LoansService.cs:41`,
-`Infrastructure/Repositories/Loan{Contract,Payment,Amortization,Installment}Repository.cs`
+API, branch `fix/isolamento-space-emprestimos`, commit `df15edf`.
 
-**Problema:** `LoanContract`, `LoanPayment` e `LoanAmortization` **têm a coluna `SpaceId`**, mas:
+`LoansService.CreateAsync` passou a usar `ICurrentSpaceAccessor.RequireSpaceId()` (área ativa)
+no lugar de `GetDefaultByUserAsync` (área padrão), e os 4 repositórios filtram com o mesmo
+padrão das demais entidades. `LoanInstallment` é a única sem coluna `SpaceId` — o isolamento
+vem do contrato pai via `EXISTS`, sem exigir migration.
 
-1. `LoansService.CreateAsync` carimba `spaceRepository.GetDefaultByUserAsync(userId)` — o espaço
-   **padrão** do usuário, não o **ativo da sessão**
-2. nenhum dos 4 repositórios de empréstimo referencia `SpaceId` ou `ICurrentSpaceAccessor`;
-   `ListByUserAsync` filtra só `x.UserId == userId`
-
-**O que isso causa na prática:** com dois espaços, um contrato criado enquanto o usuário está no
-espaço B nasce marcado com o id do espaço A; e a listagem mostra **todos** os contratos em
-qualquer área. O isolamento que as outras 9 entidades têm, empréstimos não têm.
-
-**Contra o que viola:** `BACKEND_PADROES_IMPLEMENTACAO.md`, seção Multi-tenancy — *"entidades donas
-recebem o `SpaceId` via `ICurrentSpaceAccessor.RequireSpaceId()` no serviço de comando"* e *"o
-isolamento por área é feito injetando `ICurrentSpaceAccessor` diretamente nos repositórios"*.
-
-**Atenuante:** há um comentário no código atrelando isso à decisão "Família/CNPJ adiados". Mas a
-tela `/espacos` **já permite** criar múltiplos espaços individuais hoje — a condição que tornava
-isso inofensivo não vale mais.
-
-**A fazer:**
-- [ ] `LoansService.CreateAsync`: trocar `GetDefaultByUserAsync` por
-      `ICurrentSpaceAccessor.RequireSpaceId()`
-- [ ] Injetar `ICurrentSpaceAccessor` nos 4 repositórios e filtrar `&& x.SpaceId == accessor.SpaceId`
-      nos métodos de listagem/busca (lembrar: `SpaceId` é `Guid?` e `null` = "não filtrar", para
-      não quebrar jobs fora de request)
-- [ ] Decidir o que fazer com contratos já gravados com o espaço errado (migration de backfill?)
-- [ ] Teste de integração: contrato criado no espaço B não aparece na listagem do espaço A
-- [ ] Atualizar a lista de entidades com `SpaceId` em `BACKEND_PADROES_IMPLEMENTACAO.md` (o doc
-      fala em 9; são 13 com os de empréstimo e `PlanHistoryEntry`)
-
-**Aceite:** trocar de espaço muda a lista de empréstimos; teste de integração cobrindo o
-cross-space.
+Três testes de integração em SQLite protegem o comportamento, e ficou **verificado que o
+primeiro falha se o filtro for removido**.
 
 ---
 
-## 🟡 ⬜ BUG — `UnauthorizedAccessException` sem mapeamento vira 500
+## ✅ BUG — `UnauthorizedAccessException` virando 500 — **CORRIGIDO em 2026-08-27**
 
-**Onde:** API · `Controllers/InstallmentPaymentsController.cs`,
-`Application/Services/InstallmentsService.cs:234`
+Commit `7b29480`. O mapeamento virou global (403 — o usuário está autenticado, falta acesso ao
+recurso), em vez de depender de cada controller passar `unauthorizedAccessTitle`. Elimina a
+classe inteira do problema, não só o caso do `InstallmentPaymentsController`. O middleware de
+erro de negócio também passou a tratá-la, para não gravar stack trace de algo que não é falha
+de servidor.
 
-**Problema:** não há handler global para `UnauthorizedAccessException`. O mapeamento só acontece
-quando o controller passa `unauthorizedAccessTitle` em `ExecuteWithProblemMappingAsync`.
-**24 controllers usam o helper; só 3 passam esse parâmetro.**
+Junto: `AdminRobotsController` deixou de devolver erro fora de `problem+json`.
 
-Caso concreto: `InstallmentPaymentsController.Pay` não usa o helper, e
-`InstallmentsService.ResolveAccountForPaymentAsync` lança
-`UnauthorizedAccessException("Usuário não encontrado.")` → cai no handler global → **500 "Erro
-interno do servidor"**, com log de nível Error. É o único controller de installments sem o
-mapping (os outros dois têm).
+---
 
-**Por que importa:** `BACKEND_PADROES_IMPLEMENTACAO.md` exige *"respostas de erro consistentes"* e
-proíbe *"exceção genérica como atalho para semântica de erro que a aplicação já conhece"*. Um 500
-gera alerta falso na observabilidade e o frontend não consegue tratar.
+## ✅ Doc normativa apontando para `schema.sql` — **CORRIGIDO em 2026-08-27**
 
-**Também torto:** `SpaceService.EnterAsync` (`SpaceService.cs:72,78`) lança
-`UnauthorizedAccessException` para "Espaço não encontrado" e "Usuário não encontrado", e o
-`SpacesController` mapeia **tudo** para `401 "Senha inválida"` — a mensagem mente sobre a causa.
-
-**A fazer:**
-- [ ] `InstallmentPaymentsController`: envolver em `ExecuteWithProblemMappingAsync` com
-      `unauthorizedAccessTitle`
-- [ ] Varrer os outros 21 controllers que usam o helper sem o parâmetro e checar se o serviço
-      abaixo pode lançar `UnauthorizedAccessException`
-- [ ] Avaliar um mapeamento global de `UnauthorizedAccessException` → 401/403 em
-      `ExceptionHandlingExtensions`, em vez de opt-in por controller (elimina a classe inteira)
-- [ ] `SpaceService.EnterAsync`: separar "não encontrado" (404) de "senha inválida" (401)
-- [ ] Teste: pagar parcela com usuário inexistente devolve 4xx, não 500
-
-**Aceite:** nenhum caminho de negócio conhecido produz 500; `problem+json` com `traceId` em todos.
+Commit `7b29480`. `BACKEND_PADROES_IMPLEMENTACAO.md`, `docs/Agent.md` e `docs/README.md`
+passam a falar de EF Migrations. A contagem de entidades com `SpaceId` também estava
+desatualizada — eram 9 no texto, são 13.
 
 ---
 
@@ -412,11 +373,6 @@ documentação está desatualizada"* — está.
 ## 🟢 ⬜ Resíduos menores no backend
 
 **Onde / o quê:**
-
-1. **`Controllers/AdminRobotsController.cs:44`** — `NotFound(new { detail = ... })` é a única
-   resposta de erro ad hoc fora de `application/problem+json` em todos os controllers. O frontend
-   não consegue tratar igual às outras, e não tem `traceId`.
-   → trocar por `AppProblemException`.
 
 2. **`Application/Services/InvestmentsApplicationService.cs`** — camada 100% pass-through: 13
    métodos, todos `=> await outro.Mesmo(...)`, sem orquestração nem mapeamento de exceção. Os
