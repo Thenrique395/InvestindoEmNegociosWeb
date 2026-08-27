@@ -321,52 +321,52 @@ desatualizada — eram 9 no texto, são 13.
 
 ---
 
-## 🟡 ⬜ Três integrações HTTP fora do molde e engolindo falha
+## 🟢 ⬜ Três integrações HTTP fora do molde — **só importa quando forem ligadas**
 
-**Onde:** API · `Application/Services/B3ApiClient.cs:60`,
-`FreeMarketDataProvider.cs` (2 pontos), `InvestmentBenchmarksService.cs:68`
+**Onde:** API · `Application/Services/B3ApiClient.cs:60`, `FreeMarketDataProvider.cs` (2 pontos),
+`InvestmentBenchmarksService.cs:68`
 
-**Problema:** o doc fixa o molde para integração HTTP sem SDK: `EnsureXConfigured()` lançando
+**Problema:** o doc fixa o molde para integração HTTP sem SDK — `EnsureXConfigured()` lançando
 `AppProblemException` 503 quando falta credencial, `EnsureSuccessAsync()` lançando 502 em erro do
-upstream. `AnthropicClient` e `MercadoPagoBillingGateway` seguem. Estes três **não**: fazem
-`catch (Exception) { LogWarning; return null; }`.
+upstream. `AnthropicClient` e `MercadoPagoBillingGateway` seguem. Estas três não: fazem
+`catch (Exception) { LogWarning; return null; }` — falha de rede, credencial errada e "não há
+dado" viram a mesma coisa.
 
-**O que isso causa:** falha de rede, credencial errada e "não há dado" viram **a mesma coisa** —
-`null`. A tela mostra "sem cotação" quando na verdade a integração está quebrada, e ninguém é
-alertado. Contra *"integração crítica exige caminho de erro explícito e observável"*.
+**Severidade rebaixada de 🟡 para 🟢 em 2026-08-27.** A justificativa original dizia que "a tela
+mostra 'sem cotação' quando a integração está quebrada e ninguém é alertado". **Isso estava
+errado: não há tela.** Levantamento:
 
-**A fazer:**
-- [ ] Alinhar os três ao molde de `MercadoPagoBillingGateway.cs` / `AnthropicClient.cs`
-- [ ] Onde o `null` é comportamento desejado (cotação ausente é normal), distinguir
-      explicitamente "sem dado" de "falha", com log em nível diferente
-- [ ] Se a feature não pode quebrar por falta do provedor, aplicar o padrão de fallback
+| Integração | Estado |
+|---|---|
+| B3 (`B3ApiClient`) | `"B3Api": { "Enabled": false }`, `BaseUrl`/`ClientId`/`ClientSecret` vazios |
+| MarketData (`FreeMarketDataProvider`) | endpoint existe e `investments.service.ts` tem `getMarketQuote/Profile/History` — **nenhuma tela chama** |
+| Benchmarks (`InvestmentBenchmarksService`) | endpoint existe e `getBenchmarks()` existe — **nenhuma tela chama** |
+
+Ou seja: hoje o `return null` não engana ninguém, porque ninguém pergunta. O risco é **futuro** —
+no dia em que uma tela consumir, o silêncio vira "sem cotação" indistinguível de "integração
+caída".
+
+**Quando fazer:** antes de ligar qualquer uma delas, não agora. É pré-requisito da feature, não
+dívida corrente.
+
+**A fazer (no momento de ligar):**
+- [ ] Alinhar ao molde de `MercadoPagoBillingGateway.cs` / `AnthropicClient.cs`
+- [ ] Distinguir explicitamente "sem dado" (normal) de "falha" (anormal), com log em nível diferente
+- [ ] Se a feature não puder quebrar por falta do provedor, aplicar o padrão de fallback
       determinístico já usado no `FinancialAssistantService`
 - [ ] Teste cobrindo upstream fora do ar
 
-**Aceite:** upstream fora do ar é distinguível de "sem dado" no log e na resposta.
-
 ---
 
-## 🟢 ⬜ Doc normativa aponta para arquivo que não existe
+## 🟢 ⬜ Código morto na ponta do consumidor
 
-**Onde:** API · `docs/BACKEND_PADROES_IMPLEMENTACAO.md`, `docs/Agent.md`, `docs/README.md`
+**Onde:** Web · `core/investments.service.ts`
 
-**Problema:** os três exigem revisar `InvestindoEmNegocio/Infrastructure/Data/schema.sql` em toda
-mudança persistente, e afirmam que ele *"deve continuar suficiente para criar a base do zero"*.
-**O arquivo não existe mais** — o schema virou EF Migrations (15 arquivos em `Migrations/`,
-`Migrate()` no boot).
+Quatro métodos sem nenhum consumidor: `getBenchmarks`, `getMarketQuote`, `getMarketProfile`,
+`getMarketHistory`. Foram escritos para as integrações acima, que não estão ligadas.
 
-**Por que importa:** é uma regra de bloqueio (*"mudança persistente sem atualização de
-`schema.sql`"* está nos critérios de bloqueio) apontando para o nada. Quem seguir a doc ao pé da
-letra trava sem saber o que fazer. O `Agent.md` da raiz manda *"verificar primeiro se a
-documentação está desatualizada"* — está.
-
-**A fazer:**
-- [ ] Trocar as menções a `schema.sql` por EF Migrations nos três arquivos
-- [ ] Reescrever o critério de bloqueio: "mudança de modelo sem migration correspondente"
-- [ ] Conferir se `docs/RUNBOOK.md` e `docs/ARCHITECTURE.md` também mencionam
-
-**Aceite:** `grep -r schema.sql docs/` só retorna `docs/ARCHIVE/`.
+**Decidir:** manter (a feature está planejada e o custo é zero) ou remover (e reescrever quando
+a feature chegar). Achado ao verificar o item anterior — não vale ação isolada.
 
 ---
 
