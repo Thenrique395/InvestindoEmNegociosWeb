@@ -1155,17 +1155,20 @@ não dispara e a página sai em branco.
 
 | Etapa | Regra | Estado |
 |---|---|---|
-| 8.1 Adotar primitivos | R1 | 🔶 4 · 4 pares de 6 resolvidos; faltam gráficos e stepper |
+| 8.1 Adotar primitivos | R1 | 🔶 2 · faltam `app-money` e `app-chart-bars` |
 | 8.2 Faixa em flex | R2 | ✅ 0 |
 | 8.3 Tooltip | R3 | ✅ 0 |
-| 8.4 Gráficos | R4 | 🔴 10 · depende da 8.1 |
+| 8.4 Gráficos | R4 | ✅ 0 · concluída em 2026-08-27 |
 | 8.5 Sombra | R5 | ✅ 0 |
-| 8.6 `::ng-deep` | R9 | 🔶 14 · 8 quitados; o resto depende da 8.1 |
-| 8.7 Hex · OnPush | R6 · R8 | ✅ 0 · 🔶 49 |
+| 8.6 `::ng-deep` | R9 | ✅ 0 · concluída em 2026-08-27 |
+| 8.7 Hex · OnPush | R6 · R8 | ✅ 0 · 🔶 27 |
 
-**Tudo que sobra passa pela 8.1.** A 8.4 exige saber se o `app-chart-line` sobrevive antes de
-migrar 10 gráficos para ele; 13 dos 14 `::ng-deep` restantes miram componentes que podem ser
-apagados. Só o `OnPush` é independente, e ele desce sozinho conforme as telas são tocadas.
+**Atualização de 2026-08-27.** A premissa de que "tudo passa pela 8.1" **caiu**: o
+`app-responsive-list` e o `app-donut-chart` não iam ser apagados, então dar variante a eles
+não era trabalho jogado fora — era a solução. Com isso a 8.4 e a 8.6 fecharam sem depender
+da 8.1, e o R8 caiu de 46 para 27 num lote só (ver 8.7).
+
+O que ainda depende de decisão, não de código, está em `DIVIDA_TECNICA_PADROES.md`.
 
 
 Aberta pela auditoria da seção 5.1. **Precede a Fase 7.2 em diante**: cada tela nova
@@ -1317,14 +1320,25 @@ fora da spec porque o mock não serve `/api/v1/goals` e a tela cai no estado vaz
 84 é bom. O tooltip resolve a ambiguidade, mas o rótulo honesto seria "Saúde financeira" —
 renomear atravessa o card, o badge e a barra, e é chamada do dono do produto.
 
-### 8.4 — Gráficos para `shared/charts/` · R4: 10 → 0
+### 8.4 — Gráficos para `shared/charts/` · R4: ~~10~~ ✅ CONCLUÍDA (2026-08-27)
 
-- [ ] `home.component.html` — 6 séries de patrimônio desenhadas com `<path [attr.d]>`
-- [ ] `investment-profitability-panel` — carteira × benchmark
-- [ ] `loan-detail` — evolução do saldo devedor
-- [ ] Se o `app-chart-line` atual não cobre algum caso (área preenchida, série tracejada,
-      hover por ponto), **estender o primitivo** conforme o contrato `ChartSeries` de §8.
-      Não voltar a desenhar na feature.
+- [x] `investment-profitability-panel` — carteira × benchmark
+- [x] `loan-detail` — evolução do saldo devedor
+- [x] O `app-chart-line` cobriu os dois casos sem precisar crescer: área preenchida sai por
+      `emphasis: true`, série de comparação por `dashed: true`, hover por ponto pelo `<title>`
+      nativo que o primitivo já desenha.
+
+**Duas armadilhas que custaram tempo e valem para o próximo gráfico:**
+
+1. **`showArea` sozinho não preenche.** A área só sai quando a série também é `emphasis`.
+   No `loan-detail` o polígono desenhado à mão tinha área e a conversão perdeu — só apareceu
+   na conferência visual, não nos testes.
+2. **A série não pode vir de `get`.** Ver o sexto erro em `ARQUITETURA_ANGULAR.md` §13: getter
+   devolve array novo a cada ciclo e faz o gráfico inteiro recalcular. Use `computed()`; se a
+   fonte ainda for `@Input()` decorator, derive em `ngOnChanges`.
+
+O `home.component.html` **não tinha** as 6 séries que este item previa — a auditoria de
+2026-08-16 contou errado. O que havia lá era cor literal, tratada na 8.7.
 
 ### 8.5 — Sombra só em hover e camada flutuante · R5: ~~27~~ ✅ CONCLUÍDA
 
@@ -1353,10 +1367,10 @@ captura: os cards continuam legíveis.
 estilo nenhum: em Contas, "Nova transferência" era texto solto entre dois botões. Trocado por
 `.btn-ghost`.
 
-### 8.6 — Fim do `::ng-deep` em feature · R9: ~~22~~ 14 → 0
+### 8.6 — Fim do `::ng-deep` em feature · R9: ~~22~~ ~~14~~ ✅ CONCLUÍDA (2026-08-27)
 
-**Duas rodadas feitas, 8 quitados.** As duas seguiram o mesmo caminho, que é o modelo para o
-resto: a variação sobe para o primitivo, não desce para a tela.
+**Quatro rodadas, 22 quitados.** Todas seguiram o mesmo caminho: a variação sobe para o
+primitivo, não desce para a tela.
 
 - **Card de indicador** (−3): Relatórios, Histórico mensal e Calculadoras tinham o **mesmo**
   bloco de sete regras copiado. Virou `density="compact"`. Os `rem` do bloco reinventavam
@@ -1365,11 +1379,27 @@ resto: a variação sobe para o primitivo, não desce para a tela.
   `stretch`, seguindo o padrão de host attribute que o componente já usava em `data-size`.
   Não dependia da 8.1 porque a Fase 4.3 já decidiu que este primitivo fica.
 
-**Os 14 restantes esperam a 8.1**: 13 miram o `app-responsive-list` e o `app-donut-chart`,
-1 é uma largura de coluna. Dar `@Input` de variante a um componente que pode ser apagado é
-trabalho jogado fora — por isso param aqui.
+**Os 14 restantes fecharam em 2026-08-27**, e a premissa de que dependiam da 8.1 estava
+errada: o `app-responsive-list` e o `app-donut-chart` não seriam apagados, então dar variante
+a eles era exatamente a solução. Ver emenda **E3** em `ARQUITETURA_ANGULAR.md` para os
+contratos novos.
 
-### 8.7 — Hex literal e `OnPush` · R6: ~~4~~ ✅ CONCLUÍDA · R8: 49 → 0
+- **Largura de coluna** (−2): `widthClass` era contrato quebrado — a classe é aplicada no
+  `<th>` dentro do primitivo, então carrega o `_ngcontent` dele e a feature nunca alcança.
+  Virou `width`/`minWidth` como **valor**, que é o que a §7 já prescrevia. Orçamento e
+  Relatórios.
+- **Densidade da tabela** (−3): `density="comfortable"`.
+- **Coluna de ações no mobile** (−3): `ResponsiveListColumn.actions`.
+- **Donut em card estreito** (−5): `[compact]`.
+- **Hover da linha alcançando conteúdo projetado** (−1): custom property herdada, que
+  atravessa o encapsulamento sem `::ng-deep`.
+
+**Armadilha de especificidade:** a regra que apaga o rótulo da coluna de ações precisa ser
+`.responsive-list__item--actions[data-label]::before`. Sem o `[data-label]` ela perde para
+`.responsive-list__item[data-label]::before` e a etiqueta "Ações" reaparece acima do botão —
+passou nos testes e só apareceu na conferência visual no mobile.
+
+### 8.7 — Hex literal e `OnPush` · R6: ~~4~~ ✅ CONCLUÍDA · R8: ~~49~~ ~~46~~ 27 → 0
 
 **Hex quitado em 2026-08-16.** Eram os gradientes de Visa, Elo e Amex, pendentes desde a
 Fase 1 — que os previa para a 5.4 e não fechou. São marcas de terceiros e não seguem a paleta
@@ -1381,9 +1411,18 @@ O quarto achado era **falso positivo do gate**: ele testava comentário só pelo
 linha, e um hex citado no meio de um bloco `/* */` contava como violação. Corrigido com
 remoção de comentários antes da busca, e teste de mesa cobrindo bloco, linha e inline.
 
-- [ ] `OnPush`: dívida anterior ao redesign, 49 componentes. Segue a regra de não abrir
-      frente própria — cada tela que a Fase 8 tocar sai com `OnPush`, e o baseline desce
-      junto. Já caiu de 51 para 49 sem esforço dirigido.
+- [x] **Grupo A — 19 primitivos de apresentação (2026-08-27).** R8 de 46 para 27 num lote.
+      A regra de "não abrir frente própria" foi revista para este grupo: são componentes que
+      só recebem `@Input` e emitem `@Output`, sem serviço nem `subscribe`, então não há
+      estado interno que possa congelar sob `OnPush`. Oito aproveitaram para migrar de
+      decorator para `input()`/`output()`/`model()`.
+- [ ] **Grupo B — 19 telas médias.** Estado em campo mutável; precisa de signals antes do
+      `OnPush`. Uma tela por commit.
+- [ ] **Grupo C — 8 telas pesadas**, incluindo `home` (2704 linhas, zero signals) e
+      `app.component`, que é o shell e tem de ser **o último de todos**.
+
+**Ordem obrigatória: signals primeiro, `OnPush` depois.** O inverso congela a tela. O padrão
+de conversão validado e a lista completa estão em `DIVIDA_TECNICA_PADROES.md`.
 
 ### Encerramento da Fase 8
 

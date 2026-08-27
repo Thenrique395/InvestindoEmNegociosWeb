@@ -4,8 +4,9 @@
 > `InvestindoEmNegociosApi/docs/BACKEND_PADROES_IMPLEMENTACAO.md`.
 > Formato igual ao do `BACKLOG.md` da raiz: **onde, problema, por que importa, a fazer, aceite**.
 >
-> O que já foi resolvido está no commit `ded5a7d` (branch `chore/padroes-frontend-fase1`)
-> e resumido na seção **Já fechado**, no fim.
+> Branch `chore/padroes-frontend-fase1`. O que já foi resolvido está resumido na seção
+> **Já fechado**, no fim — commits `ded5a7d` (mecânicos), `632fbfd` (memoização dos
+> gráficos) e `27ab7a4` (Grupo A).
 
 Legenda: 🔴 alta · 🟡 média · 🟢 baixa | Status: ⬜ a fazer · 🟦 em andamento · ✅ feito
 Repos: **Web** = `InvestindoEmNegociosWeb` · **API** = `InvestindoEmNegociosApi`
@@ -102,11 +103,10 @@ que mudaram de cor.
 
 ---
 
-# PARTE 2 — Frontend: `OnPush` + signals (46 componentes)
+# PARTE 2 — Frontend: `OnPush` + signals (27 restantes de 46)
 
 **O problema comum:** `ARQUITETURA_ANGULAR.md` §4 exige *"Signals, sempre"* e
-*"`ChangeDetectionStrategy.OnPush` em todos os componentes, sem exceção"*. Hoje só 26 dos 149
-componentes usam signals.
+*"`ChangeDetectionStrategy.OnPush` em todos os componentes, sem exceção"*. Em 2026-08-27 o Grupo A fechou; restam 27 componentes.
 
 **Por que importa, além de conformidade:** sem `OnPush`, o Angular reavalia **toda** expressão de
 **todo** template a cada evento — clique, digitação, timer, resposta HTTP. Numa tela como a
@@ -138,39 +138,29 @@ depois**, na mesma tela, nunca em lotes separados.
 
 ---
 
-## 🟡 ⬜ GRUPO A — 19 componentes de pura apresentação (risco ~zero)
+## ✅ GRUPO A — 19 componentes de pura apresentação — **CONCLUÍDO em 2026-08-27**
 
-**Onde:** Web · lista abaixo
+Commit `27ab7a4`. **R8 de 46 para 27.** Verificado: typecheck limpo, 852/852 unitários,
+147/147 e2e, `build:prod` sem erro, e as evidências visuais conferidas uma a uma (o que mudou
+foi a data virando 26→27, não regressão).
 
-**Problema:** faltam `OnPush`.
+Dez já usavam `input()`/`output()` e só precisavam da estratégia. Oito migraram de decorator,
+e três decisões desse lote valem como precedente:
 
-**Por que é barato:** nenhum injeta serviço, nenhum tem `subscribe`. Só recebem `@Input` e emitem
-`@Output`. É exatamente o caso para o qual `OnPush` foi desenhada — não há estado interno mutável
-que possa "congelar". O risco de regressão é o mais baixo de toda a dívida, e derruba **R8 de 46
-para 27** de uma vez.
-
-```
-shared/  responsive-list (167) · period-hero (180) · stat-card (138) · modal (114)
-         status-badge (108) · form-field (101) · comparison-pill (67) · section-card (64)
-         filter-bar (35) · period-total-card (23) · period-action-card (23) · toggle-field (21)
-outros   account-import (149) · account-form (93) · account-transfer (59) · account-list (51)
-         styleguide-tokens (75) · ui-state (52) · empty-state (35)
-```
-
-**Atenção nos quatro de `features/accounts/`:** têm `[(ngModel)]` (10, 5, 4 e 0 respectivamente).
-Como recebem os dados por `@Input` mas escrevem em campo local, precisam dos campos como signal
-antes do `OnPush` — não é só adicionar a linha.
-
-**A fazer:**
-- [ ] `shared/` e `empty-state`/`ui-state`/`styleguide-tokens`: adicionar `OnPush` (só a linha)
-- [ ] `features/accounts/*`: campos de `ngModel` → signal, depois `OnPush`
-- [ ] Rodar `test:ci` e a suíte e2e visual (as telas de Contas dependem desses quatro)
-- [ ] Baixar `BASELINE.R8` para 27
-
-**Aceite:** `handoff:check` passa com R8 = 27; 852+ unitários e 146 e2e verdes; telas de Contas,
-Orçamento e Relatórios conferidas no browser (esses primitivos aparecem em quase tudo).
-
----
+- **`toggle-field` ficou com `input()` + `output()`, não `model()`.** É componente
+  **controlado**: o pai é dono do valor e o filho só notifica. `model()` guardaria estado
+  local e o toggle divergiria do pai caso ele decidisse não aplicar a mudança. `model()` é
+  para par two-way de verdade — foi o caso de `account-transfer.value` e
+  `account-import.csvSkipDuplicates`, que reatribuíam o próprio `@Input`.
+- **`responsive-list` perdeu o `ngOnChanges`.** O reset de página era `this.page = ...` dentro
+  do hook, ou seja, estado derivado escrito à mão (§4.2). Virou `computed` que limita a página
+  escolhida ao total atual — a lista que encolhe se ajusta sozinha. De quebra, `cellTemplate`
+  era um `find()` linear por célula (N linhas × M colunas por verificação) e virou `Map`
+  memoizado.
+- **`account-form` manteve os getters de erro de propósito.** Eles dependem de propriedades
+  **mutadas** de `form()`, que não são reativas: um `computed` memoizaria em cima de uma
+  dependência que nunca notifica e a mensagem de validação congelaria. Como a mutação vem do
+  `ngModel` do próprio componente, o evento já marca o `OnPush` como sujo.
 
 ## 🟡 ⬜ GRUPO B — 19 telas de tamanho médio
 
@@ -501,10 +491,10 @@ justamente para registrar decisão estrutural — é o caso mais grave.
 
 ---
 
-# Já fechado — commit `ded5a7d` (2026-08-27)
+# Já fechado (2026-08-27)
 
-Branch `chore/padroes-frontend-fase1`. Verificado: typecheck limpo, **852/852** unitários,
-**146/146** e2e, `build:prod` sem erro.
+Branch `chore/padroes-frontend-fase1`, três commits. Verificado ao fim: typecheck limpo,
+**852/852** unitários, **147/147** e2e, `build:prod` sem erro.
 
 | Regra / item | Antes | Depois |
 |---|---|---|
@@ -514,7 +504,7 @@ Branch `chore/padroes-frontend-fase1`. Verificado: typecheck limpo, **852/852** 
 | §5 — `subscribe` sem `takeUntilDestroyed` | 18 componentes | **0** |
 | §4 — `fb.group` não tipado | 3 | **0** |
 | §1 — imports entre features | 18 | **11** |
-| R8 — sem `OnPush` | 49 | **46** |
+| R8 — sem `OnPush` | 49 | **27** |
 | R1 — primitivo órfão | 3 | **2** |
 | Gate `handoff:check` | 5/9 verde | **7/9 verde** |
 
@@ -541,3 +531,40 @@ contratos novos e a tokenização, nos dois temas) e `quality-tests/e2e/espacos-
 
 **Correção de um número do relatório inicial:** `account-card.component.ts` **não** está morto — é
 importado por `account-list`. Eram 4 alvos de código morto, não 5.
+
+---
+
+## `632fbfd` — memoização das séries dos gráficos
+
+Regressão que **eu introduzi** no `ded5a7d` ao adotar o `app-chart-line`, encontrada numa
+auditoria contra as boas práticas do Angular, não pelos testes.
+
+`balanceSeries`/`balanceLabels` (loan-detail) e `chartSeries`/`chartLabels`
+(investment-profitability-panel) eram **getters**. Os quatro alimentam `input()` **signal** do
+`app-chart-line`, então devolviam array novo a cada ciclo de detecção: o signal de entrada via
+referência nova toda vez e todo o cálculo do gráfico (viewBox, grade, paths, ticks, pointHits)
+refazia sem nada ter mudado. No `loan-detail` havia ainda um `sort()` completo em cada passada.
+
+- `loan-detail`: `contract` já é signal → `computed()`, com o sort isolado num
+  `orderedInstallments` compartilhado.
+- `investment-profitability-panel`: os 15 inputs ainda são decorator e `computed()` precisa de
+  fonte reativa → deriva em `ngOnChanges`. Vira `computed()` quando esse componente entrar no
+  Grupo B.
+
+**O gate não pega isso.** As 9 regras do `check-handoff-fidelity.mjs` não olham valor derivado
+em getter — foi por isso que passou. Uma regra R10 candidata: `get` que retorna array/objeto
+literal e é usado em binding. Não foi adicionada porque provavelmente acusaria dezenas de casos
+pré-existentes e viraria mais um baseline; fica registrada como a lacuna conhecida do gate.
+
+## `27ab7a4` — Grupo A
+
+Ver a seção do Grupo A na Parte 2. R8 de 46 para 27.
+
+## Documentação atualizada nesta rodada
+
+- `ARQUITETURA_ANGULAR.md`: emenda **E3** com os contratos novos dos primitivos, tabela §7
+  atualizada, e um **sexto erro** na §13 (valor derivado em getter alimentando `input()`).
+- `PLANO_REDESIGN.md`: Fase 8 com 8.4 e 8.6 concluídas, 8.7 em 27, e a premissa "tudo passa
+  pela 8.1" corrigida — ela estava errada.
+- `reference_build_local_gotchas` (memória): o prerender de `/receitas` saiu de "quebra
+  conhecida" para "corrigido"; se voltar, é regressão.

@@ -141,7 +141,7 @@ Estes são os componentes que **não** podem ser reimplementados por feature. Ca
 | `app-select-menu` | `options`, `value`, `placeholder?`, `searchable?`, `createLabel?`; `valueChange` | **todo campo de valor múltiplo usa isto.** Chips em linha são proibidos — não escalam com 20 categorias. |
 | `app-number-stepper` | `value`, `min`, `max`, `step?`; `valueChange` | o campo do meio é `<input>` digitável. Stepper só com botões não passa. |
 | `app-segmented` | `options`, `value`; `valueChange` | já existe como `app-segmented-selector`; ajustar, não duplicar. |
-| ~~`app-data-table`~~ → `app-responsive-list` | `columns: ResponsiveListColumn[]`, `rows` | **uma única definição de coluna** alimenta cabeçalho e linha. Nunca dois `grid-template-columns` escritos separadamente. Sempre dentro de scroller com `min-width`. **Ver emenda E1.** |
+| ~~`app-data-table`~~ → `app-responsive-list` | `columns: ResponsiveListColumn[]`, `items`, `density?`, `pageSize?`, `selectable?` | **uma única definição de coluna** alimenta cabeçalho e linha. Nunca dois `grid-template-columns` escritos separadamente. Sempre dentro de scroller com `min-width`. Largura de coluna é **valor** (`width`/`minWidth`), nunca classe. **Ver emendas E1 e E3.** |
 | `app-modal` | `open`, `title`, `eyebrow?`, `subtitle?`, `width?`; slots `body`, `footer`; `close` | três faixas: cabeçalho `flex:none`, corpo `flex:1; min-height:0; overflow-y:auto`, rodapé `flex:none`. Sem isso a rolagem quebra o layout. |
 | `app-confirm-dialog` | `title`, `message`, `confirmLabel`, `destructive?`, `requirePhrase?` | toda exclusão passa por aqui. |
 | `app-toast` / `UiFeedbackService` | `message`, `undo?` | toda mutação confirmada oferece "Desfazer". |
@@ -150,6 +150,7 @@ Estes são os componentes que **não** podem ser reimplementados por feature. Ca
 | `app-progress-bar` | `value`, `max`, `tone` \| `mode: 'consumo' \| 'conquista'` | **os limiares de cor moram aqui**, não em cada tela. |
 | `app-money` | `value`, `sign?`, `size?` | formata BRL, aplica `tabular-nums`, aplica cor por sinal. Nunca formatar moeda à mão no template. |
 | `app-chart-*` | por tipo | ver seção 8 |
+| `app-donut-chart` | `items: DonutChartItem[]`, `compact?` | `compact` para card de coluna lateral. Diâmetro e empilhamento moram aqui, não na tela. **Ver emenda E3.** |
 
 **Definição de coluna, para não desalinhar nunca:**
 
@@ -187,6 +188,62 @@ motivos encontrados na implementação:
 
 A implementação veio da faixa que o Dashboard já tinha inline, que era a versão correta do
 §3.1(b) e mais completa que o primitivo original.
+
+---
+
+### Emenda E3 — o que a feature configura no `app-responsive-list` e no `app-donut-chart` (2026-08-27)
+
+Decidida ao zerar a regra R9 (`::ng-deep` em feature). As features abriam os primitivos por
+fora para chegar em medidas que deviam morar neles; em vez de mover o CSS de lugar, o
+**contrato cresceu**.
+
+**1. `ResponsiveListColumn.width` / `minWidth` — largura como VALOR, não como classe.**
+
+A §7 sempre disse `width: string` ('112px' | 'minmax(180px,2.1fr)'). O código tinha
+`widthClass?: string`, e isso **não funcionava**: a classe era aplicada no `<th>` que vive
+dentro do template do primitivo, então carregava o `_ngcontent` dele. A feature não tinha
+como escrever a regra sem `::ng-deep`. Orçamento e Relatórios caíram exatamente nisso.
+
+```ts
+// certo
+{ key: 'usage', label: 'Uso', width: '28%', minWidth: '12rem' }
+
+// errado — a classe não alcança de fora
+{ key: 'usage', label: 'Uso', widthClass: 'orcamento-usage-column' }
+```
+
+`widthClass` fica marcado como `@deprecated` para não quebrar consumidor antigo.
+
+**2. `density="comfortable"`.** Lista com controle embutido na célula (input, botão de
+editar) fica apertada na densidade padrão. Era o motivo de dois `::ng-deep` no Orçamento.
+No mobile a altura fixa é neutralizada pelo próprio primitivo — no card a célula vira linha
+rótulo/valor e cresce com o conteúdo.
+
+**3. `ResponsiveListColumn.actions`.** No card do mobile a coluna sobe para o topo, alinhada
+à direita e sem etiqueta — o botão é a primeira coisa que o polegar alcança. Mesma mecânica
+da coluna de seleção. Atenção à especificidade: a regra que apaga o rótulo precisa ser
+`.responsive-list__item--actions[data-label]::before`, senão perde para
+`.responsive-list__item[data-label]::before` e a etiqueta reaparece.
+
+**4. `app-donut-chart [compact]`.** Empilha o donut sobre a lista e reduz o diâmetro, para
+card de coluna lateral. É medida do desenho, não da tela.
+
+**5. Estado de hover da linha via custom property.** Conteúdo projetado pela feature carrega
+o `_ngcontent` *dela*, mas precisa reagir ao hover de um elemento do primitivo. Propriedade
+customizada é herdada e atravessa o encapsulamento:
+
+```scss
+/* no primitivo */
+.responsive-list__row              { --responsive-list-row-hover-border: transparent; }
+.responsive-list__row:hover        { --responsive-list-row-hover-border: var(--border-strong); }
+
+/* na feature, no conteúdo projetado */
+.link-btn { border: 1px dashed var(--responsive-list-row-hover-border, transparent); }
+```
+
+**Regra geral que isto estabelece:** quando uma tela precisar de uma medida que hoje só o
+`::ng-deep` alcança, a resposta é **estender o contrato do primitivo** — nunca furar o
+encapsulamento, e nunca copiar o SCSS para a feature.
 
 ---
 
@@ -315,3 +372,8 @@ Um PR de tela não entra se algum item falhar:
 3. **Guardar valor derivado em campo mutável.** Fica velho e ninguém descobre até um usuário reclamar de número errado.
 4. **Duplicar a lista de permissão por plano** entre menu e rota.
 5. **Reimplementar barra de gráfico à mão.** Reintroduz o bug de altura percentual que já foi corrigido uma vez.
+6. **Derivar valor em `get` e passar para um `input()` de outro componente.** O getter devolve
+   objeto ou array **novo a cada ciclo de detecção**; o signal de entrada do filho vê referência
+   nova toda vez e recalcula tudo sem nada ter mudado. Aconteceu em 2026-08-27 com as séries dos
+   gráficos de Empréstimos e Investimentos. Valor derivado é `computed()` — e quando a fonte
+   ainda não é reativa (`@Input()` decorator), derive em `ngOnChanges` e guarde.
