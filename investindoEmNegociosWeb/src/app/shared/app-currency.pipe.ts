@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { FinancialPrivacyService } from '../financial-privacy.service';
-import { formatCurrencyValue } from '../utils/locale-utils';
+import { FinancialPrivacyService } from '../core/financial-privacy.service';
+import { formatCurrencyValue } from '../core/utils/locale-utils';
 
 @Pipe({
   name: 'appCurrency',

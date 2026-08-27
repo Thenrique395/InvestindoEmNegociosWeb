@@ -1,4 +1,4 @@
-import { formatMonthYearLabel, getActiveLocale, parseLocaleDate } from '../../utils/locale-utils';
+import { formatMonthYearLabel, getActiveLocale, parseLocaleDate } from '../../core/utils/locale-utils';
 
 /**
  * Helpers puros compartilhados pelas telas de lançamentos (Receitas e Despesas).

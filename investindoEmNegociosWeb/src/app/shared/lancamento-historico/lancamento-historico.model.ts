@@ -1,4 +1,4 @@
-import { formatCurrencyValue, formatLocaleDate } from '../../utils/locale-utils';
+import { formatCurrencyValue, formatLocaleDate } from '../../core/utils/locale-utils';
 
 /**
  * Como cada evento do histórico é dito na tela.

@@ -1,0 +1,380 @@
+@use '../../shared/transactions/transactions-layout.scss';
+
+.cards-page {
+  display: grid;
+  gap: 1.5rem;
+  font-family: var(--font-body);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.cards-statements {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  padding: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.cards-statements__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem 1.25rem;
+  align-items: start;
+}
+
+.cards-statements__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.cards-statements__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 2.3vw, 2.25rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-tighter);
+  font-weight: var(--fw-semibold);
+  color: var(--text);
+}
+
+.cards-statements__text {
+  margin: 0.6rem 0 0;
+  max-inline-size: 58ch;
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+}
+
+.cards-statements__filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, auto));
+  gap: 0.9rem;
+  align-items: end;
+}
+
+.cards-statements__apply {
+  min-height: 3.5rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--radius-inner);
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 78%, white));
+  color: white;
+  font-weight: var(--fw-bold);
+  white-space: nowrap;
+}
+
+.cards-statements__feedback {
+  margin: 0;
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+}
+
+.cards-statements__list {
+  display: grid;
+  gap: 1rem;
+}
+
+.cards-statements__item {
+  padding: 1.2rem 1.25rem;
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+  display: grid;
+  gap: 1rem;
+}
+
+/* README §3: card em repouso tem só a borda; a elevação de 2px é do hover.
+   A fatura é clicável — sem o hover, ficava sem nenhum retorno visual. */
+.cards-statements__item:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.cards-statements__item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.cards-statements__item-title {
+  margin: 0;
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text);
+}
+
+.cards-statements__item-copy {
+  margin: 0.25rem 0 0;
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+}
+
+.cards-statements__item-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.cards-statements__item-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+}
+
+.cards-statements__metrics {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cards-statements__metric {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.88);
+
+  span {
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  strong {
+    font-size: var(--fs-subhead);
+    font-weight: var(--fw-bold);
+    color: var(--text);
+  }
+}
+
+.cards-statements__metric--success {
+  border-color: color-mix(in srgb, var(--income) 18%, transparent);
+  background: color-mix(in srgb, var(--income) 8%, transparent);
+
+  strong {
+    color: var(--income-text);
+  }
+}
+
+.cards-statements__metric--danger {
+  border-color: color-mix(in srgb, var(--expense) 16%, transparent);
+  background: color-mix(in srgb, var(--expense) 8%, transparent);
+
+  strong {
+    color: var(--expense-text);
+  }
+}
+
+.cards-purchases {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface-sunken);
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.cards-purchases__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cards-purchases__eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.cards-purchases__title {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-card-title);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
+}
+
+.cards-purchases__subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.cards-purchases__count {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.8rem;
+  background: color-mix(in srgb, var(--primary) 9%, white);
+  color: var(--primary-text);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+}
+
+.cards-purchases__empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+}
+
+.cards-purchases__list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.cards-purchases__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto auto;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  background: var(--surface);
+  padding: 0.9rem 1rem;
+}
+
+.cards-purchases__icon {
+  inline-size: 2.85rem;
+  block-size: 2.85rem;
+  border-radius: var(--radius-inner);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--expense) 14%, transparent);
+  background: rgba(254, 226, 226, 0.72);
+  color: var(--expense-text);
+
+  svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+}
+
+.cards-purchases__main {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+
+  strong {
+    color: var(--text);
+    font-size: var(--fs-subhead);
+    font-weight: var(--fw-bold);
+  }
+
+  span {
+    color: var(--text-secondary);
+    font-size: var(--fs-body);
+  }
+}
+
+.cards-purchases__date {
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+
+.cards-purchases__pill {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-sunken) 72%, white);
+  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  white-space: nowrap;
+}
+
+.cards-purchases__amount {
+  color: var(--text);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-bold);
+  text-align: right;
+}
+
+@media (max-width: 960px) {
+  .cards-summary-grid,
+  .cards-statements__metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cards-statements__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .cards-statements__header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cards-purchases__row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "icon main"
+      "pill badge"
+      "amount date";
+    row-gap: 0.5rem;
+  }
+
+  .cards-purchases__icon {
+    grid-area: icon;
+  }
+
+  .cards-purchases__main {
+    grid-area: main;
+  }
+
+  .cards-purchases__pill {
+    grid-area: pill;
+  }
+
+  .cards-purchases__row app-status-badge {
+    grid-area: badge;
+    justify-self: start;
+  }
+
+  .cards-purchases__amount {
+    grid-area: amount;
+  }
+
+  .cards-purchases__date {
+    grid-area: date;
+    justify-self: end;
+  }
+}

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { OnboardingService } from '../../onboarding.service';
+import { OnboardingService } from '../../core/onboarding.service';
 import { OnboardingReturnBannerComponent } from './onboarding-return-banner.component';
 
 describe('OnboardingReturnBannerComponent', () => {

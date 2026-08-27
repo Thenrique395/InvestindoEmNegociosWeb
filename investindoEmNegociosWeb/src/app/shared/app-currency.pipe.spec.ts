@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FinancialPrivacyService } from '../financial-privacy.service';
-import { formatCurrencyValue } from '../utils/locale-utils';
+import { FinancialPrivacyService } from '../core/financial-privacy.service';
+import { formatCurrencyValue } from '../core/utils/locale-utils';
 import { AppCurrencyPipe } from './app-currency.pipe';
 
 describe('AppCurrencyPipe', () => {

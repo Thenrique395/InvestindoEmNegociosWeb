@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FinancialPrivacyService } from '../../financial-privacy.service';
-import { formatCurrencyValue } from '../../utils/locale-utils';
+import { FinancialPrivacyService } from '../../core/financial-privacy.service';
+import { formatCurrencyValue } from '../../core/utils/locale-utils';
 import { inject } from '@angular/core';
 
 export type MoneySign = 'auto' | 'always' | 'none';

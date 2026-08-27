@@ -1,4 +1,4 @@
-@use '../period-card-actions.mixin' as actions;
+@use '../period-card-actions.mixin.scss' as actions;
 
 :host {
   display: contents;

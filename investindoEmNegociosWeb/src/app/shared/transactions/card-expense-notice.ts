@@ -1,4 +1,4 @@
-import { monthKeyFromLocaleDate } from '../../utils/locale-utils';
+import { monthKeyFromLocaleDate } from '../../core/utils/locale-utils';
 import { monthLabelFromKey } from './transaction-helpers';
 
 /**

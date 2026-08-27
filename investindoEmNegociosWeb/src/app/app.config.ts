@@ -7,10 +7,10 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
-import { authInterceptor } from './auth.interceptor';
-import { NoReuseStrategy } from './no-reuse.strategy';
-import { getInitialLocale } from './utils/locale-settings';
-import { SelectivePreloadingStrategy } from './selective-preloading.strategy';
+import { authInterceptor } from './core/auth.interceptor';
+import { NoReuseStrategy } from './core/no-reuse.strategy';
+import { getInitialLocale } from './core/utils/locale-settings';
+import { SelectivePreloadingStrategy } from './core/selective-preloading.strategy';
 import { provideServiceWorker } from '@angular/service-worker';
 
 registerLocaleData(localePt);

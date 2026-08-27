@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, computed, contentChildren, input, output, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { EmptyStateComponent } from '../../empty-state/empty-state.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { ResponsiveListCellDirective } from './responsive-list-cell.directive';
 
 export interface ResponsiveListColumn {

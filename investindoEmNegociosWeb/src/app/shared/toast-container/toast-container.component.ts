@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AsyncPipe, NgClass, NgFor } from '@angular/common';
-import { UiFeedbackMessage, UiFeedbackService } from '../../ui-feedback.service';
+import { UiFeedbackMessage, UiFeedbackService } from '../../core/ui-feedback.service';
 
 @Component({
   selector: 'app-toast-container',

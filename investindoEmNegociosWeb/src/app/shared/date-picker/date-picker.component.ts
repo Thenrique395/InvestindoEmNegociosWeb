@@ -13,8 +13,8 @@ import {
   inject
 } from '@angular/core';
 import { BodyPortalDirective } from '../body-portal.directive';
-import { getActiveLocale } from '../../utils/locale-utils';
-import { maskDateDDMMYYYY } from '../../utils/input-mask';
+import { getActiveLocale } from '../../core/utils/locale-utils';
+import { maskDateDDMMYYYY } from '../../core/utils/input-mask';
 
 interface DayCell {
   day: number;

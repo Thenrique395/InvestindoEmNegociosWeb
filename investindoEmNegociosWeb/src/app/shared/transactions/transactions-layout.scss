@@ -1,5 +1,5 @@
 // Layout compartilhado das telas de Receitas e Despesas.
-// Use via `@use '../shared/transactions/transactions-layout';` no SCSS de cada tela.
+// Use via `@use '../../../shared/transactions/transactions-layout';` no SCSS de cada tela (o número de `../` depende da profundidade da feature).
 // As diferenças entre income/expense vêm por conteúdo, não por estilo.
 
 .tx-page {

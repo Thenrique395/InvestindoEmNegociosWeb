@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DatePickerComponent } from './date-picker.component';
-import { setLocaleSettings } from '../../utils/locale-settings';
+import { setLocaleSettings } from '../../core/utils/locale-settings';
 
 function typeInto(fixture: ComponentFixture<DatePickerComponent>, text: string): void {
   const input: HTMLInputElement = fixture.nativeElement.querySelector('.date-picker__input');

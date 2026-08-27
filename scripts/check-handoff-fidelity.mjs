@@ -16,7 +16,7 @@
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
@@ -41,6 +41,12 @@ function walk(dir, exts) {
 const rel = (f) => relative(ROOT, f).split(sep).join('/');
 const isStyleguide = (f) => rel(f).includes('/styleguide/');
 const isSpec = (f) => f.endsWith('.spec.ts');
+
+/**
+ * Só `src/app/shared/` é primitivo isento das regras de feature. `features/shared/`
+ * guarda componente de DOMÍNIO reusado entre telas — continua sujeito a R4 e R9.
+ */
+const ehPrimitivoCompartilhado = (file) => rel(file).includes('/app/shared/');
 
 const scss = walk(APP, ['.scss']);
 const html = walk(APP, ['.html']);
@@ -181,7 +187,7 @@ rules.push({
     return scan(
       html,
       (line, file) =>
-        !rel(file).includes('/shared/') &&
+        !ehPrimitivoCompartilhado(file) &&
         /<(polyline|polygon|path)\b/.test(line) &&
         /\[attr\.(points|d)\]|\[attr\.points\]/.test(line),
     );
@@ -330,7 +336,7 @@ rules.push({
   titulo: 'Feature reestiliza primitivo por dentro (::ng-deep)',
   ref: 'ARQUITETURA_ANGULAR.md §3 · §7 · §13.1',
   run() {
-    return scan(scss, (line, file) => !rel(file).includes('/shared/') && line.includes('::ng-deep'));
+    return scan(scss, (line, file) => !ehPrimitivoCompartilhado(file) && line.includes('::ng-deep'));
   },
 });
 
@@ -343,7 +349,41 @@ rules.push({
  * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
  * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
  */
-export const BASELINE = { R1: 2, R4: 0, R8: 46, R9: 0 };
+/**
+ * R10 — Uma feature não importa de outra feature.
+ * ARQUITETURA_ANGULAR.md §1. Quando duas telas precisam do mesmo componente de DOMÍNIO,
+ * ele sobe para `features/shared/`; quando precisam do mesmo modelo puro, ele vai para
+ * `core/`. `features/layout/` é o chrome da aplicação e também é alvo legítimo.
+ * O `/styleguide` é catálogo (rota `devOnlyGuard`) e importa de todo lado por definição.
+ */
+rules.push({
+  id: 'R10',
+  titulo: 'Uma feature importando de outra feature',
+  ref: 'ARQUITETURA_ANGULAR.md §1 · §2',
+  run() {
+    const FEATURES = join(APP, 'features');
+    const arquivos = walk(FEATURES, ['.ts']).filter(
+      (f) => !isSpec(f) && !rel(f).includes('/features/styleguide/') && !rel(f).includes('/features/shared/'),
+    );
+    return scan(arquivos, (line, file) => {
+      const m = line.match(/from '((?:\.\.\/)+)([a-z0-9-]+)\//);
+      if (!m) return false;
+      // resolve o alvo e checa se cai em outra pasta de primeiro nível dentro de features/
+      const dir = dirname(rel(file));
+      const alvo = resolve(dir, m[1] + m[2]);
+      const relAlvo = alvo.split('/app/')[1] || '';
+      if (!relAlvo.startsWith('features/')) return false;
+      const featureDoArquivo = rel(file).split('/features/')[1]?.split('/')[0];
+      const featureDoAlvo = relAlvo.split('/')[1];
+      // `shared` guarda componente de domínio reusado; `layout` é o chrome da aplicação.
+      // Os dois são alvos legítimos — o que a §1 proíbe é tela importar de OUTRA TELA.
+      const ALVOS_PERMITIDOS = new Set(['shared', 'layout']);
+      return featureDoAlvo && featureDoAlvo !== featureDoArquivo && !ALVOS_PERMITIDOS.has(featureDoAlvo);
+    });
+  },
+});
+
+export const BASELINE = { R1: 2, R4: 0, R8: 27, R9: 0, R10: 0 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing

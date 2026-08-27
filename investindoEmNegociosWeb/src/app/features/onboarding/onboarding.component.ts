@@ -1,0 +1,1156 @@
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ProfileService } from '../../core/profile.service';
+import { OnboardingService } from '../../core/onboarding.service';
+import { FocusArea, IntelligenceMode } from './onboarding.types';
+import { UiFeedbackService } from '../../core/ui-feedback.service';
+import { AuthService } from '../../core/auth.service';
+import { AccountRequest, AccountType, AccountsService } from '../../core/accounts.service';
+import { CardDto, CardsService } from '../../core/cards.service';
+import { CreatePlanPayload, Plan, PlansService } from '../../core/plans.service';
+import { CategoriesService, CategoryDto } from '../../core/categories.service';
+import { isCreditPaymentMethod, LookupsService, PaymentMethodLookup } from '../../core/lookups.service';
+import { hasAtLeastRole, UserRole } from '../../core/roles';
+import { StoredCard, StoredExpense, StoredIncome } from '../../core/data/api-data.service';
+import { UiPermissionsService } from '../../core/ui-permissions.service';
+import { UserContextFacadeService } from '../../core/user-context-facade.service';
+import { ReceitasFormComponent } from '../shared/receitas-form/receitas-form.component';
+import { DespesasFormComponent } from '../shared/despesas-form/despesas-form.component';
+import { maskDateDDMMYYYY, maskMoneyInput } from '../../core/utils/input-mask';
+import { parseLocaleDate, parseLocalizedNumber } from '../../core/utils/locale-utils';
+import { extractApiErrorMessage } from '../../core/utils/api-error.utils';
+import {
+  brToIso,
+  createExpenseDraft,
+  createIncomeDraft,
+  isoToBr,
+  maskPhone,
+  onboardingProfileFieldError,
+  OnboardingProfileField,
+  toStoredCard,
+  todayIso
+} from '../../core/onboarding.helpers';
+import { cpfValidator, maskCpf } from '../../core/utils/cpf.utils';
+import { OnboardingDraftService } from './onboarding-draft.service';
+import { OnboardingRailComponent } from './steps/onboarding-rail.component';
+import { FocusStepComponent } from './steps/focus-step.component';
+import { PreferencesStepComponent } from './steps/preferences-step.component';
+import { ProfileStepComponent } from './steps/profile-step.component';
+import { AccountStepComponent } from './steps/account-step.component';
+import { CartaoFormComponent } from '../shared/cartao-form/cartao-form.component';
+
+@Component({
+  selector: 'app-onboarding',
+  standalone: true,
+  imports: [CommonModule, ReceitasFormComponent, DespesasFormComponent, OnboardingRailComponent, FocusStepComponent, PreferencesStepComponent, ProfileStepComponent, AccountStepComponent, CartaoFormComponent],
+  templateUrl: './onboarding.component.html'
+})
+export class OnboardingComponent implements OnInit {
+  form: FormGroup<{
+    fullName: FormControl<string>;
+    document: FormControl<string>;
+    phone: FormControl<string>;
+    birthDate: FormControl<string>;
+    city: FormControl<string>;
+    state: FormControl<string>;
+    country: FormControl<string>;
+  }>;
+  loading = false;
+  creatingAccount = false;
+  savingEntries = false;
+  liveMessage = '';
+  readonly totalSteps = 4;
+  readonly minBirthDate = '1900-01-01';
+  // Getter (não readonly): recalcula "hoje" a cada acesso, evitando ficar preso na
+  // data em que a página foi aberta caso a sessão atravesse a meia-noite.
+  get maxBirthDate(): string {
+    return todayIso();
+  }
+  /**
+   * Um quarto por etapa, e a fração sobe assim que a etapa é atendida — não só
+   * quando ela é deixada. É o que faz a barra reagir ao clique na opção, em vez
+   * de ficar parada até o "Continuar".
+   */
+  get progressPercent(): number {
+    const done = this.step + (this.isCurrentStepSatisfied ? 1 : 0);
+    return Math.min(100, (done / this.totalSteps) * 100);
+  }
+  private get isCurrentStepSatisfied(): boolean {
+    switch (this.step) {
+      case 0:
+        return !!this.focus;
+      case 1:
+        return !!this.intelligenceMode;
+      case 2:
+        return this.form.valid;
+      default:
+        return this.accountReady;
+    }
+  }
+  // Rótulos das escolhas anteriores, exibidos como resumo no trilho lateral.
+  get focusLabel(): string {
+    return this.focusOptions.find((o) => o.id === this.focus)?.title ?? '';
+  }
+  get modeLabel(): string {
+    return this.intelligenceModeOptions.find((o) => o.id === this.intelligenceMode)?.title ?? '';
+  }
+  /* Identidade na barra do onboarding (não há sidebar/topbar do app aqui).
+     Sem plano: a configuração inicial é a mesma para todos os perfis, então
+     dizer qual plano a pessoa assinou não ajuda em nada aqui. */
+  displayName = 'Usuário';
+  userInitials = 'U';
+  get firstName(): string {
+    return this.displayName.trim().split(/\s+/)[0] || this.displayName;
+  }
+  step = 0;
+  focus: FocusArea | null = null;
+  intelligenceMode: IntelligenceMode | null = null;
+  carryOverDay = 1;
+  readonly carryOverDayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+  /* Ordem do mais cauteloso ao mais exigente: a pessoa lê a régua da esquerda
+     para a direita e se posiciona nela. */
+  readonly intelligenceModeOptions: { id: IntelligenceMode; title: string; description: string; tooltip: string; icon: 'balance' | 'shield' | 'accelerate' }[] = [
+    {
+      id: 'C',
+      title: 'Conservador',
+      description: 'Foco maior em segurança de caixa, redução de risco e preservação financeira.',
+      tooltip: 'Indicado para quem prefere um início mais cauteloso, com atenção maior ao caixa, estabilidade e prevenção de imprevistos.',
+      icon: 'shield'
+    },
+    {
+      id: 'B',
+      title: 'Balanceado',
+      description: 'Orientações objetivas para manter equilíbrio entre controle, organização e crescimento.',
+      tooltip: 'Ideal para quem quer começar com orientação prática, sem excesso de alertas e sem perder visão de evolução financeira.',
+      icon: 'balance'
+    },
+    {
+      id: 'A',
+      title: 'Agressivo',
+      description: 'Metas mais altas e cobrança maior sobre sobra, aportes e quitação.',
+      tooltip: 'Para quem quer acelerar: o sistema empurra a sobra do mês para aportes ou quitação e avisa mais cedo quando o gasto sai do plano.',
+      icon: 'accelerate'
+    }
+  ];
+  focusOptions: { id: FocusArea; title: string; description: string; tooltip: string; icon: 'growth' | 'debt' | 'invest' | 'shield' }[] = [
+    {
+      id: 'vida-financeira',
+      title: 'Melhorar vida financeira',
+      description: 'Criar rotina para gastar melhor e ter mais controle no mês.',
+      tooltip: 'Essa direção ajuda a organizar a rotina financeira do mês, com mais clareza sobre entradas, saídas, orçamento e previsibilidade.',
+      icon: 'growth'
+    },
+    {
+      id: 'sair-dividas',
+      title: 'Sair das dívidas',
+      description: 'Priorizar pagamentos e reduzir pressão financeira.',
+      tooltip: 'Essa escolha prioriza quitar dívidas com mais estratégia, acompanhando juros, parcelas e evolução da quitação.',
+      icon: 'debt'
+    },
+    {
+      id: 'comecar-investir',
+      title: 'Começar a investir',
+      description: 'Organizar sobra mensal para iniciar aportes com consistência.',
+      tooltip: 'Essa direção ajuda a gerar sobra recorrente no mês para transformar parte do dinheiro em aportes com constância.',
+      icon: 'invest'
+    },
+    {
+      id: 'reserva-emergencia',
+      title: 'Criar reserva de emergência',
+      description: 'Montar segurança para imprevistos antes de assumir mais risco.',
+      tooltip: 'Essa opção foca em construir uma proteção financeira para imprevistos, reduzindo a dependência de crédito em momentos de aperto.',
+      icon: 'shield'
+    }
+  ];
+  accountReady = false;
+  hasDocument = false;
+  accountForm: AccountRequest = {
+    name: '',
+    type: 'Checking',
+    initialBalance: 0,
+    isActive: true,
+    currency: 'BRL'
+  };
+  accountTypes: AccountType[] = ['Checking', 'Savings', 'DigitalWallet', 'Cash', 'Other'];
+  expenseCategories: CategoryDto[] = [];
+  incomeCategories: CategoryDto[] = [];
+  showIncomeModal = false;
+  showExpenseModal = false;
+  savingIncomeModal = false;
+  savingExpenseModal = false;
+  showStep4Validation = false;
+  modalIncome: StoredIncome = createIncomeDraft();
+  modalIncomeAmountInput = '';
+  modalIncomeDateInput = '';
+  modalIncomeDateError = '';
+  modalIncomeCategoryError = '';
+  modalExpense: StoredExpense = createExpenseDraft();
+  modalExpenseAmountInput = '';
+  modalExpenseDateInput = '';
+  modalExpenseDateError = '';
+  modalExpenseCategoryError = '';
+  modalExpenseFormaPagamento: 'avista' | 'cartao' = 'avista';
+  modalExpenseFormaPagamentoId: number | null = null;
+  /* Vem do backend (/lookups/payment-methods). Sem carregar aqui, o select do
+     formulário abria vazio ("Nada encontrado") — ele não busca sozinho. */
+  paymentMethods: PaymentMethodLookup[] = [];
+  modalExpenseParcelar = false;
+  modalExpenseParcelas = 1;
+  modalExpenseFixa = false;
+  modalExpenseFixaMeses: number | null = null;
+  modalExpenseCartaoId: string | null = null;
+  modalExpenseCartoes: StoredCard[] = [];
+  showCardModal = false;
+  /** Só volta ao modal da despesa quem veio dele — o card opcional do passo 4 não. */
+  private voltarParaDespesaAoFecharCartao = false;
+  cardsCount = 0;
+  /* Guardam o `planId` porque o botão de editar precisa saber O QUE editar:
+     sem ele, "Editar receita inicial" abria em branco e o salvar criava outro
+     lançamento — a pessoa via o card trocar e achava que substituiu, mas os
+     dois ficavam na conta. */
+  initialIncome = {
+    planId: null as string | null,
+    source: '',
+    amount: 0,
+    receivedOn: '',
+    categoryId: null as string | null,
+    recurring: false
+  };
+  initialExpense = {
+    planId: null as string | null,
+    name: '',
+    amount: 0,
+    dueDate: '',
+    categoryId: null as string | null,
+    recurring: false,
+    paymentMethodId: null as number | null,
+    cardId: null as string | null
+  };
+
+  constructor(
+    private fb: FormBuilder,
+    private profile: ProfileService,
+    private router: Router,
+    private onboarding: OnboardingService,
+    private uiFeedback: UiFeedbackService,
+    private authService: AuthService,
+    private accountsService: AccountsService,
+    private cardsService: CardsService,
+    private plansService: PlansService,
+    private categoriesService: CategoriesService,
+    private lookupsService: LookupsService,
+    private uiPermissions: UiPermissionsService,
+    private onboardingDraft: OnboardingDraftService,
+    private userContext: UserContextFacadeService,
+    private readonly destroyRef: DestroyRef
+  ) {
+    this.form = this.fb.nonNullable.group({
+      fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
+      document: ['', [Validators.required, cpfValidator()]],
+      phone: ['', [Validators.required, this.phoneValidator()]],
+      birthDate: ['', [Validators.required, this.birthDateRangeValidator()]],
+      city: ['', [Validators.required, this.noBlankValidator()]],
+      state: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2), this.noBlankValidator()]],
+      country: ['', [Validators.required, this.noBlankValidator()]]
+    });
+
+  }
+
+  ngOnInit(): void {
+    this.restoreDraft();
+    this.restoreInitialEntries();
+
+    this.userContext.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
+      this.displayName = state.displayName;
+      this.userInitials = state.userInitials;
+    });
+    this.userContext.loadProfile();
+
+    this.onboarding.getStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (status) => {
+        if (status.completed) {
+          this.router.navigateByUrl('/dashboard');
+          return;
+        }
+        this.step = Math.min(Math.max(status.step || 0, 0), this.totalSteps - 1);
+        this.loadProfile(true);
+      },
+      error: () => {
+        this.loadProfile(true);
+      }
+    });
+
+    this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (accounts) => {
+        const active = (accounts || []).filter((a) => a.isActive);
+        this.accountReady = active.length > 0;
+        if (this.accountReady) {
+          this.accountsService.resolveDefaultAccountId(active);
+        }
+      },
+      error: () => {
+        this.accountReady = false;
+      }
+    });
+
+    this.loadCategories();
+
+    this.loadCardsWhenAllowed();
+
+    this.loadPaymentMethods();
+  }
+
+  submit(): void {
+    if (this.loading) return;
+
+    if (!this.focus) {
+      this.uiFeedback.warning('Selecione seu objetivo inicial.');
+      this.announce('Selecione um objetivo inicial para continuar.');
+      this.step = 0;
+      return;
+    }
+
+    if (!this.intelligenceMode) {
+      this.uiFeedback.warning('Selecione o estilo inicial dos insights.');
+      this.announce('Selecione o estilo inicial dos insights para continuar.');
+      this.step = 1;
+      return;
+    }
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.uiFeedback.warning('Revise os campos.');
+      this.announce('Existem campos obrigatórios para revisar.');
+      return;
+    }
+
+    this.loading = true;
+    const payload = this.normalizePayload();
+    this.profile.upsert(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.loading = false;
+        this.uiFeedback.success('Dados do perfil salvos. Vamos para a conta e os primeiros lançamentos.');
+        this.announce('Dados e objetivo salvos com sucesso.');
+        this.nextStep();
+      },
+      error: (err) => {
+        if (err?.status === 401) {
+          this.uiFeedback.error('Sessão expirada. Faça login novamente.');
+          this.announce('Sessão expirada. Faça login novamente.');
+          this.router.navigateByUrl('/login');
+        } else {
+          this.uiFeedback.error(extractApiErrorMessage(err, err instanceof Error ? err.message : 'Erro ao salvar dados.'));
+          this.announce('Falha ao salvar os dados do perfil.');
+        }
+        this.loading = false;
+      }
+    });
+  }
+
+  nextStep(): void {
+    if (this.step >= this.totalSteps - 1) {
+      this.finishOnboarding();
+      return;
+    }
+    this.step += 1;
+    this.persistStep(false);
+  }
+
+  prevStep(): void {
+    if (this.step <= 0) return;
+    this.step -= 1;
+    this.persistStep(false);
+  }
+
+  selectFocus(id: FocusArea): void {
+    this.focus = id;
+    this.saveDraft();
+  }
+
+  continueFromFocus(): void {
+    if (!this.focus) {
+      this.uiFeedback.warning('Selecione seu objetivo inicial.');
+      this.announce('Selecione um objetivo inicial para continuar.');
+      return;
+    }
+    this.saveDraft();
+    this.nextStep();
+  }
+
+  onModeSelected(mode: IntelligenceMode): void {
+    this.intelligenceMode = mode;
+    this.saveDraft();
+  }
+
+  onCarryOverDayChanged(day: number): void {
+    this.carryOverDay = day;
+    this.saveDraft();
+  }
+
+  continueFromPreferences(): void {
+    if (!this.intelligenceMode) {
+      this.uiFeedback.warning('Selecione o estilo inicial dos insights.');
+      this.announce('Selecione o estilo inicial dos insights para continuar.');
+      return;
+    }
+    this.uiFeedback.success('Preferências iniciais definidas. Vamos para seus dados básicos.');
+    this.announce('Preferências iniciais definidas.');
+    this.saveDraft();
+    this.nextStep();
+  }
+
+  finishOnboarding(): void {
+    if (this.savingEntries) return;
+    if (!this.accountReady) {
+      this.uiFeedback.warning('Crie uma conta para concluir o cadastro.');
+      this.announce('Crie uma conta ativa para concluir o cadastro.');
+      this.step = this.totalSteps - 1;
+      return;
+    }
+    this.savingEntries = true;
+    this.onboarding.updateStatus({ step: this.step, completed: true }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.savingEntries = false;
+        this.clearDraft();
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (err) => {
+        this.savingEntries = false;
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao concluir onboarding.'));
+        this.announce('Falha ao concluir onboarding.');
+      }
+    });
+  }
+
+  skipOnboarding(): void {
+    this.uiFeedback.warning('Para concluir, crie ao menos uma conta.');
+    this.step = this.totalSteps - 1;
+  }
+
+  createAccount(): void {
+    if (this.creatingAccount) return;
+    if (!this.accountForm.name?.trim()) {
+      this.uiFeedback.warning('Informe o nome da conta.');
+      this.announce('Informe o nome da conta para continuar.');
+      return;
+    }
+
+    this.creatingAccount = true;
+    this.accountsService.create({
+      name: this.accountForm.name.trim(),
+      type: this.accountForm.type,
+      initialBalance: Number(this.accountForm.initialBalance || 0),
+      isActive: true,
+      currency: 'BRL'
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (account) => {
+        this.creatingAccount = false;
+        this.accountReady = true;
+        this.accountsService.setDefaultAccountId(account.id);
+        this.uiFeedback.success('Conta criada com sucesso. Próximo: cadastrar primeira receita e despesa.');
+        this.announce('Conta criada com sucesso.');
+      },
+      error: (err) => {
+        this.creatingAccount = false;
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao criar conta.'));
+        this.announce('Falha ao criar conta.');
+      }
+    });
+  }
+
+  saveInitialEntriesAndFinish(): void {
+    // Para concluir basta ter uma CONTA ativa. Cadastrar a primeira receita/despesa é
+    // incentivado, mas opcional — não bloquear o usuário na entrada do app (#1).
+    if (!this.accountReady) {
+      this.showStep4Validation = true;
+      this.uiFeedback.warning('Crie uma conta ativa para concluir.');
+      this.announce('Crie uma conta ativa para concluir o onboarding.');
+      this.step = this.totalSteps - 1;
+      return;
+    }
+    this.showStep4Validation = false;
+    this.finishOnboarding();
+  }
+
+  onBirthDateChange(value: string): void {
+    const control = this.form.get('birthDate');
+    control?.setValue(value);
+    control?.markAsTouched();
+  }
+
+  getControlError(control: OnboardingProfileField): string | null {
+    return onboardingProfileFieldError(control, this.form.get(control));
+  }
+
+  onCpfInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const masked = maskCpf(input.value);
+    this.form.get('document')?.setValue(masked, { emitEvent: false });
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.form.get('phone')?.setValue(maskPhone(input.value), { emitEvent: false });
+  }
+
+  get hasInitialIncome(): boolean {
+    return !!this.initialIncome.source && this.initialIncome.amount > 0 && !!this.initialIncome.receivedOn;
+  }
+
+  get hasInitialExpense(): boolean {
+    return !!this.initialExpense.name && this.initialExpense.amount > 0 && !!this.initialExpense.dueDate;
+  }
+
+  get canFinishWithInitialEntries(): boolean {
+    // Conta ativa é o único requisito para concluir; receita/despesa são opcionais (#1).
+    return this.accountReady && !this.savingEntries;
+  }
+
+  get showStep4ValidationMessage(): boolean {
+    return this.showStep4Validation && !this.accountReady;
+  }
+
+  get step4ValidationMessage(): string {
+    return 'Crie sua conta principal para concluir o onboarding.';
+  }
+
+  get hasInitialCard(): boolean {
+    return this.canUseCards && this.cardsCount > 0;
+  }
+
+  get canUseCards(): boolean {
+    return this.uiPermissions.canReadCards();
+  }
+
+  /* Mesmo defeito da tela de despesas: aqui devolvia o total, então o campo
+     "Valor de cada" mostrava o valor cheio em vez da parcela. */
+  get modalExpenseParcelValueLabel(): string {
+    const valor = parseLocalizedNumber(this.modalExpenseAmountInput);
+    if (!valor) return this.modalExpenseAmountInput;
+
+    const parcelas = this.modalExpenseParcelar && this.modalExpenseParcelas > 1 ? this.modalExpenseParcelas : 1;
+    return (valor / parcelas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /**
+   * Recupera os lançamentos iniciais já criados.
+   *
+   * O estado deles vivia só em memória: bastava recarregar a página para o
+   * onboarding esquecer o que tinha criado, mostrar "Adicionar receita" de novo
+   * e, no salvar, criar um segundo lançamento em vez de editar o primeiro.
+   */
+  private loadPaymentMethods(): void {
+    this.lookupsService.paymentMethods().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (methods) => {
+        this.paymentMethods = methods || [];
+      },
+      // Lista vazia é o pior caso aceitável: a despesa inicial pode ser salva
+      // sem forma de pagamento, e o onboarding não trava por causa do lookup.
+      error: () => {
+        this.paymentMethods = [];
+      }
+    });
+  }
+
+  private restoreInitialEntries(): void {
+    this.plansService.list('Income').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (planos) => {
+        const plano = this.maisRecente(planos);
+        if (!plano) return;
+        this.initialIncome = {
+          planId: plano.id,
+          source: plano.title,
+          amount: plano.amount,
+          receivedOn: (plano.startDate || '').slice(0, 10),
+          categoryId: plano.categoryId ?? null,
+          recurring: plano.schedule === 'Recurring'
+        };
+      },
+      // Sem lançamento recuperado o passo segue como novo cadastro: é o
+      // comportamento de antes, e não vale bloquear o onboarding por isso.
+      error: () => undefined
+    });
+
+    this.plansService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (planos) => {
+        const plano = this.maisRecente(planos);
+        if (!plano) return;
+        this.initialExpense = {
+          planId: plano.id,
+          name: plano.title,
+          amount: plano.amount,
+          dueDate: (plano.startDate || '').slice(0, 10),
+          categoryId: plano.categoryId ?? null,
+          recurring: plano.schedule === 'Recurring',
+          paymentMethodId: plano.defaultPaymentMethodId ?? null,
+          cardId: plano.cardId ?? null
+        };
+      },
+      error: () => undefined
+    });
+  }
+
+  private maisRecente(planos: Plan[] | null | undefined): Plan | null {
+    if (!planos?.length) return null;
+    return [...planos].sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''))[0];
+  }
+
+  openIncomeModal(): void {
+    if (!this.accountReady || this.savingIncomeModal) return;
+    this.loadCategories('Income', true);
+
+    const existente = this.initialIncome;
+    if (existente.planId) {
+      this.modalIncome = {
+        ...createIncomeDraft(),
+        id: existente.planId,
+        fonte: existente.source,
+        valor: existente.amount,
+        categoryId: existente.categoryId,
+        recebimento: existente.receivedOn,
+        fixa: existente.recurring
+      };
+      this.modalIncomeAmountInput = maskMoneyInput(existente.amount.toFixed(2).replace('.', ','));
+      this.modalIncomeDateInput = isoToBr(existente.receivedOn);
+    } else {
+      this.modalIncome = createIncomeDraft();
+      this.modalIncomeAmountInput = '';
+      this.modalIncomeDateInput = isoToBr(todayIso());
+    }
+
+    this.modalIncomeDateError = '';
+    this.modalIncomeCategoryError = '';
+    this.showIncomeModal = true;
+  }
+
+  closeIncomeModal(): void {
+    if (this.savingIncomeModal) return;
+    this.showIncomeModal = false;
+  }
+
+  onIncomeAmountChange(raw: string): void {
+    this.modalIncomeAmountInput = maskMoneyInput(raw);
+  }
+
+  onIncomeDateChange(raw: string): void {
+    this.modalIncomeDateInput = maskDateDDMMYYYY(raw);
+    this.modalIncomeDateError =
+      !this.modalIncomeDateInput || this.isValidBrDate(this.modalIncomeDateInput)
+        ? ''
+        : 'Data inválida. Use o formato DD/MM/AAAA.';
+  }
+
+  onIncomeSourceChange(value: string): void {
+    this.modalIncome.fonte = value;
+  }
+
+  onIncomeFixaChange(value: boolean): void {
+    this.modalIncome.fixa = value;
+  }
+
+  saveIncomeModal(): void {
+    if (this.savingIncomeModal) return;
+    const amount = parseLocalizedNumber(this.modalIncomeAmountInput);
+    if (!this.modalIncome.fonte?.trim() || amount <= 0) {
+      this.uiFeedback.warning('Preencha uma receita válida.');
+      return;
+    }
+    if (!this.modalIncome.categoryId) {
+      this.modalIncomeCategoryError = 'Selecione uma categoria.';
+      return;
+    }
+    this.modalIncomeCategoryError = '';
+    if (!this.modalIncomeDateInput || !this.isValidBrDate(this.modalIncomeDateInput)) {
+      this.modalIncomeDateError = 'Data inválida. Use o formato DD/MM/AAAA.';
+      return;
+    }
+    this.modalIncomeDateError = '';
+
+    const payload: CreatePlanPayload = {
+      type: 'Income',
+      title: this.modalIncome.fonte.trim(),
+      amount,
+      schedule: this.modalIncome.fixa ? 'Recurring' : 'OneTime',
+      startDate: brToIso(this.modalIncomeDateInput),
+      frequency: this.modalIncome.fixa ? 'Monthly' : null,
+      installmentsCount: this.modalIncome.fixa ? null : 1,
+      categoryId: this.modalIncome.categoryId,
+      cardId: null
+    };
+
+    this.savingIncomeModal = true;
+    const editando = this.initialIncome.planId;
+    const requisicao = editando
+      ? this.plansService.update(editando, payload)
+      : this.plansService.create(payload);
+
+    requisicao.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (plano) => {
+        this.savingIncomeModal = false;
+        this.showIncomeModal = false;
+        this.initialIncome = {
+          planId: plano?.id ?? editando,
+          source: this.modalIncome.fonte.trim(),
+          amount,
+          receivedOn: brToIso(this.modalIncomeDateInput),
+          categoryId: this.modalIncome.categoryId ?? null,
+          recurring: !!this.modalIncome.fixa
+        };
+        this.uiFeedback.success(editando ? 'Receita inicial atualizada.' : 'Receita inicial cadastrada.');
+      },
+      error: (err) => {
+        this.savingIncomeModal = false;
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cadastrar receita inicial.'));
+      }
+    });
+  }
+
+  /* Editando, o modal precisa se anunciar como edição ("Editar receita"), como
+     a despesa já faz pelo isEdit. */
+  get editandoReceitaInicial(): string | null {
+    return this.initialIncome.planId;
+  }
+
+  openExpenseModal(): void {
+    if (!this.accountReady || this.savingExpenseModal) return;
+    this.loadCategories('Expense', true);
+
+    const existente = this.initialExpense;
+    if (existente.planId) {
+      this.modalExpense = {
+        ...createExpenseDraft(),
+        id: existente.planId,
+        nome: existente.name,
+        valor: existente.amount,
+        categoryId: existente.categoryId,
+        vencimento: existente.dueDate
+      };
+      this.modalExpenseAmountInput = maskMoneyInput(existente.amount.toFixed(2).replace('.', ','));
+      this.modalExpenseDateInput = isoToBr(existente.dueDate);
+    } else {
+      this.modalExpense = createExpenseDraft();
+      this.modalExpenseAmountInput = '';
+      this.modalExpenseDateInput = isoToBr(todayIso());
+    }
+
+    this.modalExpenseDateError = '';
+    this.modalExpenseCategoryError = '';
+    this.modalExpenseParcelar = false;
+    this.modalExpenseParcelas = 1;
+    this.modalExpenseFixaMeses = null;
+
+    /* Editar tem de reabrir o lançamento como ele está: forma de pagamento,
+       cartão e recorrência inclusive. Zerar tudo aqui fazia o salvar seguinte
+       gravar por cima com os padrões, não com o que a pessoa tinha escolhido. */
+    this.modalExpenseFormaPagamentoId = existente.planId ? existente.paymentMethodId : null;
+    this.modalExpenseCartaoId = existente.planId ? existente.cardId : null;
+    this.modalExpenseFixa = existente.planId ? existente.recurring : false;
+    this.modalExpenseFormaPagamento = this.modoDoPagamento(this.modalExpenseFormaPagamentoId);
+    this.showExpenseModal = true;
+  }
+
+  // Saída pela barra do onboarding: o rascunho local continua salvo, então a
+  // pessoa volta no mesmo ponto no próximo login.
+  logout(): void {
+    this.authService.clearSession();
+    this.userContext.reset();
+    this.router.navigateByUrl('/');
+  }
+
+  /* Card opcional do passo 4: cadastrar é aqui mesmo; gerenciar o que já existe
+     continua sendo assunto da tela de cartões. */
+  openCardsPage(): void {
+    if (!this.canUseCards) return;
+    if (this.hasInitialCard) {
+      this.router.navigateByUrl('/cartoes');
+      return;
+    }
+    this.openCardModal();
+  }
+
+  /* Crédito sem cartão: o cadastro acontece aqui mesmo. Escondemos o modal da
+     despesa (o rascunho vive neste componente, então nada se perde), abrimos o
+     de cartão e voltamos com o cartão novo já escolhido. */
+  openCardModal(): void {
+    if (!this.canUseCards) return;
+    this.voltarParaDespesaAoFecharCartao = this.showExpenseModal;
+    this.showExpenseModal = false;
+    this.showCardModal = true;
+  }
+
+  closeCardModal(): void {
+    this.showCardModal = false;
+    this.showExpenseModal = this.voltarParaDespesaAoFecharCartao;
+  }
+
+  onCardCreated(card: CardDto): void {
+    this.showCardModal = false;
+    this.modalExpenseCartoes = [...this.modalExpenseCartoes, toStoredCard(card)];
+    this.cardsCount = this.modalExpenseCartoes.length;
+    this.modalExpenseCartaoId = card.id;
+    this.showExpenseModal = this.voltarParaDespesaAoFecharCartao;
+  }
+
+  /** Crédito é o único método que abre cartão e parcelas. */
+  private modoDoPagamento(id: number | null): 'avista' | 'cartao' {
+    const metodo = this.paymentMethods.find((m) => m.id === id);
+    return metodo && isCreditPaymentMethod(metodo) && this.canUseCards ? 'cartao' : 'avista';
+  }
+
+  closeExpenseModal(): void {
+    if (this.savingExpenseModal) return;
+    this.showExpenseModal = false;
+  }
+
+  onExpenseAmountChange(raw: string): void {
+    this.modalExpenseAmountInput = maskMoneyInput(raw);
+  }
+
+  onExpenseDateChange(raw: string): void {
+    this.modalExpenseDateInput = maskDateDDMMYYYY(raw);
+    this.modalExpenseDateError =
+      !this.modalExpenseDateInput || this.isValidBrDate(this.modalExpenseDateInput)
+        ? ''
+        : 'Data inválida. Use o formato DD/MM/AAAA.';
+  }
+
+  onExpenseFormaPagamentoChange(value: 'avista' | 'cartao'): void {
+    if (value === 'cartao' && !this.canUseCards) {
+      this.modalExpenseFormaPagamento = 'avista';
+      this.modalExpenseParcelar = false;
+      this.modalExpenseParcelas = 1;
+      this.modalExpenseCartaoId = null;
+      return;
+    }
+    this.modalExpenseFormaPagamento = value;
+    if (value !== 'cartao') {
+      this.modalExpenseParcelar = false;
+      this.modalExpenseParcelas = 1;
+      this.modalExpenseCartaoId = null;
+    }
+  }
+
+  onExpenseParcelarChange(value: boolean): void {
+    this.modalExpenseParcelar = value;
+    if (!value) this.modalExpenseParcelas = 1;
+  }
+
+  onExpenseParcelasChange(value: number): void {
+    // Cartão: entre 1 e 36 parcelas (evita geração em massa / erro do backend). (#3)
+    this.modalExpenseParcelas = Math.min(Math.max(Math.trunc(Number(value || 1)), 1), 36);
+  }
+
+  onExpenseFixaChange(value: boolean): void {
+    this.modalExpenseFixa = value;
+    if (value) {
+      this.modalExpenseFormaPagamento = 'avista';
+      this.modalExpenseParcelar = false;
+      this.modalExpenseParcelas = 1;
+      this.modalExpenseCartaoId = null;
+    } else {
+      this.modalExpenseFixaMeses = null;
+    }
+  }
+
+  onExpenseFixaMesesChange(value: number | null): void {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      this.modalExpenseFixaMeses = null;
+      return;
+    }
+    // Duração de despesa fixa: entre 1 e 120 meses. (#3)
+    this.modalExpenseFixaMeses = Math.min(Math.max(Math.trunc(Number(value)), 1), 120);
+  }
+
+  saveExpenseModal(): void {
+    if (this.savingExpenseModal) return;
+    const amount = parseLocalizedNumber(this.modalExpenseAmountInput);
+    if (!this.modalExpense.nome?.trim() || amount <= 0) {
+      this.uiFeedback.warning('Preencha uma despesa válida.');
+      return;
+    }
+    if (!this.modalExpense.categoryId) {
+      this.modalExpenseCategoryError = 'Selecione uma categoria.';
+      return;
+    }
+    this.modalExpenseCategoryError = '';
+    if (!this.modalExpenseDateInput || !this.isValidBrDate(this.modalExpenseDateInput)) {
+      this.modalExpenseDateError = 'Data inválida. Use o formato DD/MM/AAAA.';
+      return;
+    }
+    this.modalExpenseDateError = '';
+
+    let schedule: 'OneTime' | 'Installments' | 'Recurring' = 'OneTime';
+    let installmentsCount: number | null = 1;
+    let frequency: 'Monthly' | null = null;
+    let launchAmount = amount;
+
+    if (this.modalExpenseFixa) {
+      if (this.modalExpenseFixaMeses && this.modalExpenseFixaMeses > 1) {
+        schedule = 'Installments';
+        installmentsCount = this.modalExpenseFixaMeses;
+      } else {
+        schedule = 'Recurring';
+        installmentsCount = null;
+        frequency = 'Monthly';
+      }
+    } else if (this.modalExpenseFormaPagamento === 'cartao' && this.modalExpenseParcelar && this.modalExpenseParcelas > 1) {
+      schedule = 'Installments';
+      installmentsCount = this.modalExpenseParcelas;
+    }
+
+    const payload: CreatePlanPayload = {
+      type: 'Expense',
+      title: this.modalExpense.nome.trim(),
+      amount: launchAmount,
+      schedule,
+      startDate: brToIso(this.modalExpenseDateInput),
+      frequency,
+      installmentsCount,
+      categoryId: this.modalExpense.categoryId,
+      defaultPaymentMethodId: this.modalExpenseFormaPagamentoId,
+      cardId: this.modalExpenseFormaPagamento === 'cartao' ? this.modalExpenseCartaoId : null
+    };
+
+    this.savingExpenseModal = true;
+    const editando = this.initialExpense.planId;
+    const requisicao = editando
+      ? this.plansService.update(editando, payload)
+      : this.plansService.create(payload);
+
+    requisicao.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (plano) => {
+        this.savingExpenseModal = false;
+        this.showExpenseModal = false;
+        this.initialExpense = {
+          planId: plano?.id ?? editando,
+          name: this.modalExpense.nome.trim(),
+          amount,
+          dueDate: brToIso(this.modalExpenseDateInput),
+          categoryId: this.modalExpense.categoryId || null,
+          recurring: !!this.modalExpenseFixa,
+          paymentMethodId: this.modalExpenseFormaPagamentoId,
+          cardId: payload.cardId ?? null
+        };
+        this.uiFeedback.success(editando ? 'Despesa inicial atualizada.' : 'Despesa inicial cadastrada.');
+      },
+      error: (err) => {
+        this.savingExpenseModal = false;
+        this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cadastrar despesa inicial.'));
+      }
+    });
+  }
+
+  private normalizePayload() {
+    const raw = this.form.getRawValue();
+    const formattedPhone = maskPhone(raw.phone) || raw.phone;
+    const birthDateIso = raw.birthDate ? `${raw.birthDate}T00:00:00Z` : undefined;
+
+    return {
+      fullName: raw.fullName.trim(),
+      phone: formattedPhone,
+      birthDate: birthDateIso,
+      avatarUrl: '',
+      city: raw.city.trim(),
+      state: raw.state.trim().toUpperCase(),
+      country: raw.country.trim(),
+      financialGoal: this.focus ?? '',
+      language: 'pt-BR',
+      carryOverDay: this.canEditCarryOverDay ? this.carryOverDay : 1,
+      intelligenceMode: this.intelligenceMode as IntelligenceMode
+    };
+  }
+
+  private loadCardsWhenAllowed(): void {
+    if (!this.canUseCards) {
+      this.cardsCount = 0;
+      this.modalExpenseCartoes = [];
+      return;
+    }
+
+    this.cardsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (cards) => {
+        this.cardsCount = (cards || []).length;
+        this.modalExpenseCartoes = (cards || []).map((card) => toStoredCard(card));
+      },
+      error: () => {
+        this.cardsCount = 0;
+        this.modalExpenseCartoes = [];
+      }
+    });
+  }
+
+  private loadCategories(type?: 'Income' | 'Expense', forceRefresh = false): void {
+    if (forceRefresh) {
+      this.categoriesService.invalidateCache();
+    }
+
+    if (!type || type === 'Expense') {
+      this.categoriesService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (categories) => {
+          this.expenseCategories = categories || [];
+        },
+        error: () => {
+          this.expenseCategories = [];
+        }
+      });
+    }
+
+    if (!type || type === 'Income') {
+      this.categoriesService.list('Income').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (categories) => {
+          this.incomeCategories = categories || [];
+        },
+        error: () => {
+          this.incomeCategories = [];
+        }
+      });
+    }
+  }
+
+  private phoneValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const digits = (control.value || '').toString().replace(/\D/g, '');
+      if (!digits) return null;
+      // Aceita fixo (10 dígitos) e celular (11 dígitos).
+      return digits.length === 10 || digits.length === 11 ? null : { phone: true };
+    };
+  }
+
+  private noBlankValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = (control.value ?? '').toString();
+      if (!value) return null;
+      return value.trim().length > 0 ? null : { blank: true };
+    };
+  }
+
+  private birthDateRangeValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = (control.value ?? '').toString().trim();
+      if (!value) return null;
+
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return { birthDateRange: true };
+
+      const min = new Date(`${this.minBirthDate}T00:00:00`);
+      const max = new Date(`${this.maxBirthDate}T00:00:00`);
+      return date >= min && date <= max ? null : { birthDateRange: true };
+    };
+  }
+
+  private persistStep(completed: boolean): void {
+    this.onboarding.updateStatus({ step: this.step, completed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      error: () => {
+        /* ignore */
+      }
+    });
+  }
+
+  get currentRole(): UserRole | null {
+    return this.authService.getRole();
+  }
+
+  get canEditCarryOverDay(): boolean {
+    return hasAtLeastRole(this.currentRole, 'Intermediate');
+  }
+
+  get showStep4ContextPanels(): boolean {
+    return this.currentRole !== 'Basic';
+  }
+
+  private isValidBrDate(value: string): boolean {
+    return !!parseLocaleDate(value);
+  }
+
+  private announce(message: string): void {
+    this.liveMessage = '';
+    setTimeout(() => {
+      this.liveMessage = message;
+    }, 0);
+  }
+
+  private loadProfile(prefillForm: boolean): void {
+    this.profile.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (data) => {
+        if (!data) {
+          if (prefillForm) this.prefillProfileFromSession();
+          return;
+        }
+
+        const goals = new Set(this.focusOptions.map((x) => x.id));
+        const savedGoal = (data as { financialGoal?: string }).financialGoal;
+        if (savedGoal && goals.has(savedGoal as FocusArea)) {
+          this.focus = savedGoal as FocusArea;
+          this.saveDraft();
+        }
+        const savedMode = (data as { intelligenceMode?: string }).intelligenceMode?.toUpperCase();
+        if (savedMode === 'A' || savedMode === 'B' || savedMode === 'C') {
+          this.intelligenceMode = savedMode as IntelligenceMode;
+          this.saveDraft();
+        }
+        const savedCarryOver = Number((data as { carryOverDay?: number }).carryOverDay);
+        if (this.canEditCarryOverDay && Number.isInteger(savedCarryOver) && savedCarryOver >= 1 && savedCarryOver <= 31) {
+          this.carryOverDay = savedCarryOver;
+        } else if (!this.canEditCarryOverDay) {
+          this.carryOverDay = 1;
+        }
+
+        this.hasDocument = !!data.document;
+        if (this.hasDocument) {
+          this.form.get('document')?.clearValidators();
+          this.form.get('document')?.updateValueAndValidity();
+        }
+
+        if (!prefillForm) return;
+
+        this.form.patchValue({
+          fullName: data.fullName || this.authService.getUserName(),
+          document: maskCpf(data.document),
+          phone: maskPhone(data.phone),
+          birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
+          city: data.city ?? '',
+          state: data.state ?? '',
+          country: data.country ?? ''
+        });
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.router.navigateByUrl('/login');
+          return;
+        }
+        if (prefillForm) this.prefillProfileFromSession();
+      }
+    });
+  }
+
+  private prefillProfileFromSession(): void {
+    const fullName = this.authService.getUserName().trim();
+    if (!fullName || this.form.get('fullName')?.value) return;
+    this.form.patchValue({ fullName });
+  }
+
+  private restoreDraft(): void {
+    const draft = this.onboardingDraft.read();
+    if (!draft) return;
+
+    this.focus = draft.focus;
+    this.intelligenceMode = draft.intelligenceMode;
+    this.carryOverDay = draft.carryOverDay;
+  }
+
+  saveDraft(): void {
+    this.onboardingDraft.save({
+      focus: this.focus,
+      intelligenceMode: this.intelligenceMode,
+      carryOverDay: this.carryOverDay
+    });
+  }
+
+  private clearDraft(): void {
+    this.onboardingDraft.clear();
+  }
+
+}

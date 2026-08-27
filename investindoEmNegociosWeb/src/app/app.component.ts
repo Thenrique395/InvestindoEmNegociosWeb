@@ -1,26 +1,26 @@
 import { Component, DestroyRef, HostBinding, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
-import { SignupComponent } from './signup/signup.component';
-import { UserRole } from './roles';
-import { ApiDataService } from './data/api-data.service';
-import { NotificationItem } from './notifications.service';
-import { NotificationsFacadeService } from './notifications-facade.service';
-import { UiFeedbackMessage, UiFeedbackService } from './ui-feedback.service';
+import { SignupComponent } from './features/signup/signup.component';
+import { UserRole } from './core/roles';
+import { ApiDataService } from './core/data/api-data.service';
+import { NotificationItem } from './core/notifications.service';
+import { NotificationsFacadeService } from './core/notifications-facade.service';
+import { UiFeedbackMessage, UiFeedbackService } from './core/ui-feedback.service';
 import { BodyPortalDirective } from './shared/body-portal.directive';
-import { ThemeService } from './theme.service';
-import { SidebarComponent } from './sidebar/sidebar.component';
-import { TopbarComponent } from './topbar/topbar.component';
-import { PublicHeaderComponent } from './public-header/public-header.component';
-import { PublicFooterComponent } from './public-footer/public-footer.component';
-import { PublicNavigationService } from './public-navigation.service';
-import { UserContextFacadeService } from './user-context-facade.service';
-import { UserPreferencesFacadeService } from './user-preferences-facade.service';
-import { AppSessionFacadeService } from './app-session-facade.service';
-import { FinancialPrivacyService } from './financial-privacy.service';
+import { ThemeService } from './core/theme.service';
+import { SidebarComponent } from './features/layout/sidebar/sidebar.component';
+import { TopbarComponent } from './features/layout/topbar/topbar.component';
+import { PublicHeaderComponent } from './features/layout/public-header/public-header.component';
+import { PublicFooterComponent } from './features/layout/public-footer/public-footer.component';
+import { PublicNavigationService } from './core/public-navigation.service';
+import { UserContextFacadeService } from './core/user-context-facade.service';
+import { UserPreferencesFacadeService } from './core/user-preferences-facade.service';
+import { AppSessionFacadeService } from './core/app-session-facade.service';
+import { FinancialPrivacyService } from './core/financial-privacy.service';
 import { BillingAlertBannerComponent } from './shared/billing-alert-banner/billing-alert-banner.component';
 import { ModalComponent } from './shared/modal/modal.component';
-import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './navigation';
+import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './core/navigation';
 
 @Component({
   selector: 'app-root',

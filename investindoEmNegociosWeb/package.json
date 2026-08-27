@@ -8,7 +8,7 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage --code-coverage-exclude=src/app/styleguide/**",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage --code-coverage-exclude=src/app/features/styleguide/**",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "legal:ready": "node ../scripts/check-legal-placeholders.mjs",
     "handoff:briefing": "node ../scripts/briefing-redesign.mjs",
