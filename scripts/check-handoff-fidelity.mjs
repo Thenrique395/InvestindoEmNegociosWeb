@@ -405,7 +405,7 @@ rules.push({
   },
 });
 
-export const BASELINE = { R1: 0, R4: 0, R8: 26, R9: 0, R10: 0, R11: 0 };
+export const BASELINE = { R1: 0, R4: 0, R8: 21, R9: 0, R10: 0, R11: 0 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing
