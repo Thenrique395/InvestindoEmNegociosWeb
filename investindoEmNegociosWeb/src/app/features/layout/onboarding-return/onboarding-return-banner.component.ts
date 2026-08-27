@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { OnboardingService } from '../../core/onboarding.service';
+import { OnboardingService } from '../../../core/onboarding.service';
 
 /**
  * Faixa de retorno para quem chegou aqui de dentro do cadastro inicial.

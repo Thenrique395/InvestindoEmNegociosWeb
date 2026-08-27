@@ -18,7 +18,7 @@ import { UserContextFacadeService } from './core/user-context-facade.service';
 import { UserPreferencesFacadeService } from './core/user-preferences-facade.service';
 import { AppSessionFacadeService } from './core/app-session-facade.service';
 import { FinancialPrivacyService } from './core/financial-privacy.service';
-import { BillingAlertBannerComponent } from './shared/billing-alert-banner/billing-alert-banner.component';
+import { BillingAlertBannerComponent } from './features/layout/billing-alert-banner/billing-alert-banner.component';
 import { ModalComponent } from './shared/modal/modal.component';
 import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './core/navigation';
 

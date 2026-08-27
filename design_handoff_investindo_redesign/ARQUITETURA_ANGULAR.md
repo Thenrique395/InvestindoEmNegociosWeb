@@ -265,6 +265,39 @@ construir quando a **segunda** tela pedir, não quando a spec descreve.
 
 ---
 
+### Emenda E6 — widget de shell não é primitivo, e serviço de UI não é domínio (2026-08-27)
+
+A §1 diz que *"`shared/` nunca importa serviço de domínio"*. Quatro componentes de `shared/`
+importavam. Ao verificar um a um, os quatro casos eram três coisas diferentes:
+
+**1. Dois estavam mortos** — `money` e `toast-container`, removidos na emenda E5. Metade do
+"problema" era código que ninguém usava.
+
+**2. Dois eram widget de shell, não primitivo** — `billing-alert-banner` (que decide sozinho se
+a cobrança está em atraso) e `onboarding-return-banner` (que decide se o onboarding ficou pela
+metade). Os dois se auto-alimentam de propósito: quem os hospeda não deveria precisar saber que
+existe uma assinatura vencida para exibir o aviso dela.
+
+A saída **não** foi afrouxar a §1 nem passar tudo por `@Input` — foi reconhecer que eles não
+pertencem a `shared/`. Foram para **`features/layout/`**, que a emenda E4 já estabeleceu como a
+casa do chrome da aplicação. A §1 fica absoluta e os componentes ficam como estavam.
+
+> Regra prática: se o componente **decide sozinho** se deve aparecer, a partir de estado de
+> domínio, ele é chrome — vai para `features/layout/`. Se ele só desenha o que recebe, é
+> primitivo — fica em `shared/`.
+
+**3. Um não era violação** — o `AppCurrencyPipe` importa `FinancialPrivacyService`, que guarda
+**um booleano** de preferência ("ocultar valores") em `localStorage`, igual ao `ThemeService`.
+É serviço de **estado de UI**, não de domínio: não conhece conta, cartão nem lançamento. A §1
+fala de serviço de domínio, e a distinção importa — senão qualquer primitivo que respeite tema
+ou locale viraria violação.
+
+Serviços de estado de UI que `shared/` **pode** consumir: `ThemeService`,
+`FinancialPrivacyService`, `UiFeedbackService`. O que continua proibido é serviço que carrega
+ou muta dado do usuário — `AccountsService`, `CardsStore`, `SubscriptionsService`.
+
+---
+
 ### Emenda E2 — contrato real do `app-kpi-strip` (2026-08-16)
 
 Decidida na Fase 8.1 do `PLANO_REDESIGN.md`, durante a implementação.

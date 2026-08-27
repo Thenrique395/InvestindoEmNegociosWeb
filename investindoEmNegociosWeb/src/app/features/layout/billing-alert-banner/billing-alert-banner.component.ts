@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth.service';
-import { CurrentSubscription, SubscriptionsService } from '../../core/subscriptions.service';
+import { AuthService } from '../../../core/auth.service';
+import { CurrentSubscription, SubscriptionsService } from '../../../core/subscriptions.service';
 
 type AlertLevel = 'warning' | 'danger';
 

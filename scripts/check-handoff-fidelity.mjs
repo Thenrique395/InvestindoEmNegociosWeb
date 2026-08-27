@@ -382,7 +382,30 @@ rules.push({
   },
 });
 
-export const BASELINE = { R1: 0, R4: 0, R8: 26, R9: 0, R10: 0 };
+/**
+ * R11 — `shared/` não importa serviço de DOMÍNIO.
+ * ARQUITETURA_ANGULAR.md §1 · emenda E6. Serviço de estado de UI é permitido (tema, ocultar
+ * valores, feedback) — o que não pode é primitivo que carrega ou muta dado do usuário.
+ * Componente que decide sozinho se aparece, a partir de domínio, é chrome: vai para
+ * `features/layout/`.
+ */
+rules.push({
+  id: 'R11',
+  titulo: '`shared/` importando serviço de domínio',
+  ref: 'ARQUITETURA_ANGULAR.md §1 · emenda E6',
+  run() {
+    const UI_PERMITIDOS = new Set(['theme.service', 'financial-privacy.service', 'ui-feedback.service']);
+    const arquivos = walk(join(APP, 'shared'), ['.ts']).filter((f) => !isSpec(f));
+    return scan(arquivos, (line) => {
+      const m = line.match(/from '(?:\.\.\/)+core\/([a-z0-9.-]+)(?:\.service|\.store)'/);
+      if (!m) return false;
+      const modulo = line.match(/core\/([a-z0-9.-]+\.(?:service|store))'/);
+      return modulo ? !UI_PERMITIDOS.has(modulo[1].replace('.store', '.service')) : false;
+    });
+  },
+});
+
+export const BASELINE = { R1: 0, R4: 0, R8: 26, R9: 0, R10: 0, R11: 0 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing
