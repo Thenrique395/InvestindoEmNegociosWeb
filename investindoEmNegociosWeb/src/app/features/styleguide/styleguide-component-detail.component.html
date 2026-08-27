@@ -20,12 +20,6 @@
           (valueChange)="demoVisao = $event" />
         <p>Visão: {{ demoVisao }}</p>
       }
-      @case ('money') {
-        <p>Neutro: <app-money [value]="12480.35" size="lg" /></p>
-        <p>Receita: <app-money [value]="18900" sign="auto" size="lg" /></p>
-        <p>Despesa: <app-money [value]="-9842.17" sign="auto" size="lg" /></p>
-        <p>KPI: <app-money [value]="12480.35" size="kpi" /></p>
-      }
       @case ('chart-line') {
         <app-chart-line [series]="demoLinha" [labels]="demoMeses" />
       }
@@ -58,21 +52,6 @@
         <app-progress-bar [value]="67" mode="conquista" ariaLabel="Progresso da meta" />
         <p>Conquista 32% fora de ritmo</p>
         <app-progress-bar [value]="32" mode="conquista" [onTrack]="false" ariaLabel="Progresso da meta" />
-      }
-      @case ('chart-bars') {
-        <app-chart-bars [series]="demoSeries" [labels]="demoMeses" [format]="formatarReal" />
-      }
-      @case ('installment-scope-modal') {
-        <button type="button" class="btn-primary" (click)="demoScopeOpen = true">Dar baixa na parcela</button>
-        @if (demoScopeEscolha) {
-          <p>Escolha: {{ demoScopeEscolha }}</p>
-        }
-        <app-installment-scope-modal
-          [open]="demoScopeOpen"
-          [context]="demoParcelaContexto"
-          actionLabel="Dar baixa"
-          (confirmed)="demoScopeEscolha = $event; demoScopeOpen = false"
-          (cancelled)="demoScopeOpen = false" />
       }
       @case ('page-header') {
         <app-page-header eyebrow="Financeiro" title="Contas" description="Gerencie suas contas e saldos">
@@ -130,30 +109,6 @@
           </button>
         </app-period-total-card>
       }
-      @case ('period-action-card') {
-        <app-period-action-card eyebrow="Próxima ação" title="Quitar despesas vencidas" description="2 despesas vencidas precisam de atenção.">
-          <button action-card-actions type="button" class="period-total-card__action period-total-card__action--ghost">
-            <span class="period-total-card__action-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
-                <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </span>
-            <span class="period-total-card__action-copy">
-              <strong>Ver despesas</strong>
-              <small>Abrir a lista filtrada por vencidas.</small>
-            </span>
-          </button>
-        </app-period-action-card>
-      }
-      @case ('stat-card') {
-        <div class="styleguide-demo__grid">
-          <app-stat-card tone="primary" eyebrow="Saldo disponível" value="R$ 12.400,00" note="Atualizado agora" tooltipText="Saldo real considerando lançamentos confirmados." />
-          <app-stat-card tone="success" eyebrow="Receitas do mês" value="R$ 8.200,00" note="+12% vs. mês anterior" />
-          <app-stat-card tone="warning" eyebrow="Despesas pendentes" value="R$ 1.350,00" note="3 contas a vencer" />
-          <app-stat-card tone="info" eyebrow="Investido" value="R$ 24.900,00" note="Carteira diversificada" />
-          <app-stat-card tone="danger" eyebrow="Despesas atrasadas" value="R$ 420,00" note="1 conta vencida" />
-        </div>
-      }
       @case ('comparison-pill') {
         <div class="styleguide-demo__row">
           <app-comparison-pill label="Receitas vs. mês anterior" trend="up" polarity="higher-is-better">+12%</app-comparison-pill>
@@ -187,15 +142,6 @@
       }
       @case ('empty-state') {
         <app-empty-state title="Nenhum registro encontrado" description="Crie um novo item para começar" ctaLabel="Novo item"></app-empty-state>
-      }
-      @case ('toast-container') {
-        <app-toast-container></app-toast-container>
-        <div class="styleguide-demo__row">
-          <button type="button" class="btn-primary sm" (click)="triggerToast('success')">Sucesso</button>
-          <button type="button" class="btn-ghost sm" (click)="triggerToast('info')">Info</button>
-          <button type="button" class="btn-ghost sm" (click)="triggerToast('warning')">Aviso</button>
-          <button type="button" class="btn-danger sm" (click)="triggerToast('error')">Erro</button>
-        </div>
       }
       @case ('billing-alert-banner') {
         <p><em>Sem demo isolado — depende de dados reais de assinatura.</em></p>

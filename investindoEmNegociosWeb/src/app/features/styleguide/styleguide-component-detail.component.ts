@@ -7,13 +7,10 @@ import { SectionCardComponent } from '../../shared/section-card/section-card.com
 import { FilterBarComponent } from '../../shared/filter-bar/filter-bar.component';
 import { PeriodHeroComponent } from '../../shared/period-hero/period-hero.component';
 import { PeriodTotalCardComponent } from '../../shared/period-total-card/period-total-card.component';
-import { PeriodActionCardComponent } from '../../shared/period-action-card/period-action-card.component';
-import { StatCardComponent } from '../../shared/stat-card/stat-card.component';
 import { ComparisonPillComponent } from '../../shared/comparison-pill/comparison-pill.component';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
 import { TooltipComponent } from '../../shared/tooltip/tooltip.component';
 import { ModalComponent } from '../../shared/modal/modal.component';
-import { ToastContainerComponent } from '../../shared/toast-container/toast-container.component';
 import { FormFieldComponent } from '../../shared/form-field/form-field.component';
 import { ToggleFieldComponent } from '../../shared/toggle-field/toggle-field.component';
 import { UiStateComponent } from '../../shared/ui-state/ui-state.component';
@@ -21,11 +18,8 @@ import { SelectMenuComponent } from '../../shared/select-menu/select-menu.compon
 import { NumberStepperComponent } from '../../shared/number-stepper/number-stepper.component';
 import { KpiItem, KpiStripComponent } from '../../shared/kpi-strip/kpi-strip.component';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { ChartBarsComponent } from '../../shared/charts/chart-bars/chart-bars.component';
 import { ChartLineComponent } from '../../shared/charts/chart-line/chart-line.component';
-import { MoneyComponent } from '../../shared/money/money.component';
 import { SegmentedSelectorComponent } from '../../shared/segmented-selector/segmented-selector.component';
-import { InstallmentScopeModalComponent } from '../../shared/installment-scope/installment-scope-modal.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { AppCurrencyPipe } from '../../shared/app-currency.pipe';
 import { UiFeedbackService } from '../../core/ui-feedback.service';
@@ -56,13 +50,10 @@ interface DemoListItem {
     FilterBarComponent,
     PeriodHeroComponent,
     PeriodTotalCardComponent,
-    PeriodActionCardComponent,
-    StatCardComponent,
     ComparisonPillComponent,
     StatusBadgeComponent,
     TooltipComponent,
     ModalComponent,
-    ToastContainerComponent,
     FormFieldComponent,
     ToggleFieldComponent,
     UiStateComponent,
@@ -77,11 +68,8 @@ interface DemoListItem {
     NumberStepperComponent,
     KpiStripComponent,
     ProgressBarComponent,
-    ChartBarsComponent,
     ChartLineComponent,
-    MoneyComponent,
-    SegmentedSelectorComponent,
-    InstallmentScopeModalComponent
+    SegmentedSelectorComponent
   ],
   templateUrl: './styleguide-component-detail.component.html',
   styleUrls: ['./styleguide-content.scss', './styleguide-component-detail.component.scss']
@@ -248,16 +236,6 @@ export class StyleguideComponentDetailComponent implements OnInit {
   eyebrow="Total do mês"
   value="R$ 5.200,00"
   description="Receitas confirmadas" />`,
-    'period-action-card': `<app-period-action-card
-  eyebrow="Próxima ação"
-  title="Quitar despesas vencidas"
-  description="2 despesas vencidas precisam de atenção." />`,
-    'stat-card': `<app-stat-card
-  tone="success"
-  eyebrow="Saldo disponível"
-  value="R$ 12.400,00"
-  note="Atualizado agora"
-  tooltipText="Saldo real considerando lançamentos confirmados." />`,
     'comparison-pill': `<app-comparison-pill label="vs. mês anterior" trend="up" polarity="higher-is-better">
   +12%
 </app-comparison-pill>`,
@@ -276,12 +254,6 @@ export class StyleguideComponentDetailComponent implements OnInit {
   ctaLabel="Novo item"
   (action)="criar()">
 </app-empty-state>`,
-    'toast-container': `// Em algum lugar montado uma única vez (hoje NÃO está montado em nenhum template real):
-<app-toast-container></app-toast-container>
-
-// Em qualquer serviço/componente:
-this.uiFeedback.success('Salvo com sucesso.');
-this.uiFeedback.error('Não foi possível concluir.');`,
     'billing-alert-banner': `<!-- Montado uma vez no shell autenticado (app.component.html) -->
 <app-billing-alert-banner />`,
     tooltip: `<app-tooltip label="Mais informações" text="Texto de ajuda contextual." />`,

@@ -40,13 +40,6 @@ describe('StyleguideComponentDetailComponent', () => {
     expect(fixture.componentInstance.modalOpen()).toBeTrue();
   });
 
-  it('renderiza o ToastContainer pro slug toast-container, com nota de componente órfão', () => {
-    const fixture = createFixture('toast-container');
-
-    expect(fixture.nativeElement.querySelector('app-toast-container')).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('não está montado em nenhum template');
-  });
-
   it('renderiza o exemplo do AppCurrencyPipe formatado', () => {
     const fixture = createFixture('app-currency-pipe');
 

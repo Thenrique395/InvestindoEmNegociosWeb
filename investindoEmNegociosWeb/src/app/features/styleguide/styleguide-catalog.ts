@@ -26,13 +26,6 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     description: 'Alternador de visão. Trilho afundado, aba ativa branca com sombra de 1px.'
   },
   {
-    slug: 'money',
-    name: 'Money',
-    selector: 'app-money',
-    category: 'data',
-    description: 'Valor monetário: formata BRL, aplica tabular-nums, colore por sinal e respeita o modo ocultar valores.'
-  },
-  {
     slug: 'chart-line',
     name: 'ChartLine',
     selector: 'app-chart-line',
@@ -66,20 +59,6 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     selector: 'app-progress-bar',
     category: 'data',
     description: 'Barra de progresso. A cor vem do modo: consumo (passar é ruim) ou conquista (chegar é bom).'
-  },
-  {
-    slug: 'chart-bars',
-    name: 'ChartBars',
-    selector: 'app-chart-bars',
-    category: 'data',
-    description: 'Gráfico de barras. Encapsula a armadilha da altura percentual — nenhuma feature desenha barra à mão.'
-  },
-  {
-    slug: 'installment-scope-modal',
-    name: 'InstallmentScopeModal',
-    selector: 'app-installment-scope-modal',
-    category: 'overlay',
-    description: 'Pergunta se a ação vale para esta parcela ou todas as seguintes. Usado por Despesas, Cartões e Calendário.'
   },
   {
     slug: 'page-header',
@@ -117,20 +96,6 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     description: 'Card lateral de total do período (valor em destaque + descrição), usado ao lado do PeriodHero.'
   },
   {
-    slug: 'period-action-card',
-    name: 'PeriodActionCard',
-    selector: 'app-period-action-card',
-    category: 'data',
-    description: 'Variante do PeriodTotalCard focada em ação recomendada em vez de valor numérico.'
-  },
-  {
-    slug: 'stat-card',
-    name: 'StatCard',
-    selector: 'app-stat-card',
-    category: 'data',
-    description: 'Card de métrica com ícone, eyebrow, valor e nota — tons primary/success/warning/info/danger.'
-  },
-  {
     slug: 'responsive-list',
     name: 'ResponsiveList',
     selector: 'app-responsive-list',
@@ -164,13 +129,6 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     selector: 'app-empty-state',
     category: 'feedback',
     description: 'Estado vazio padrão (ícone, título, descrição e CTA opcional) para listagens sem dados.'
-  },
-  {
-    slug: 'toast-container',
-    name: 'ToastContainer',
-    selector: 'app-toast-container',
-    category: 'feedback',
-    description: 'Container de toasts conectado ao UiFeedbackService. Atualmente não está montado em nenhum template do projeto — quem mostra os avisos hoje é o bloco global em app.component.html.'
   },
   {
     slug: 'billing-alert-banner',

@@ -83,15 +83,14 @@ rules.push({
   titulo: 'Primitivo de shared/ usado só no /styleguide',
   ref: 'ARQUITETURA_ANGULAR.md §7 · §13.1',
   run() {
-    // `app-data-table` saiu da lista porque foi APAGADO na 8.1: o
-    // `app-responsive-list` venceu o par (resolve tabela→cards no mobile, que o
-    // primitivo do handoff não cobria). Ver PLANO_REDESIGN §8.1.
+    // Saíram da lista por terem sido APAGADOS, não por isenção:
+    // - `app-data-table` na 8.1 (o `app-responsive-list` venceu o par — ver PLANO_REDESIGN §8.1)
+    // - `app-money` e `app-chart-bars` em 2026-08-27, por nunca terem sido adotados por
+    //   nenhuma tela. A regra da moeda passou para o `AppCurrencyPipe`. Ver emenda E5.
     const primitivos = [
       'app-kpi-strip',
-      'app-money',
       'app-number-stepper',
       'app-progress-bar',
-      'app-chart-bars',
       'app-chart-line',
       'app-select-menu',
     ];
@@ -383,7 +382,7 @@ rules.push({
   },
 });
 
-export const BASELINE = { R1: 2, R4: 0, R8: 27, R9: 0, R10: 0 };
+export const BASELINE = { R1: 0, R4: 0, R8: 26, R9: 0, R10: 0 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing

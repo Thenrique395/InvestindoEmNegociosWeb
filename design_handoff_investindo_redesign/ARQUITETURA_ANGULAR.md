@@ -146,11 +146,11 @@ Estes são os componentes que **não** podem ser reimplementados por feature. Ca
 | ~~`app-data-table`~~ → `app-responsive-list` | `columns: ResponsiveListColumn[]`, `items`, `density?`, `pageSize?`, `selectable?` | **uma única definição de coluna** alimenta cabeçalho e linha. Nunca dois `grid-template-columns` escritos separadamente. Sempre dentro de scroller com `min-width`. Largura de coluna é **valor** (`width`/`minWidth`), nunca classe. **Ver emendas E1 e E3.** |
 | `app-modal` | `open`, `title`, `eyebrow?`, `subtitle?`, `width?`; slots `body`, `footer`; `close` | três faixas: cabeçalho `flex:none`, corpo `flex:1; min-height:0; overflow-y:auto`, rodapé `flex:none`. Sem isso a rolagem quebra o layout. |
 | `app-confirm-dialog` | `title`, `message`, `confirmLabel`, `destructive?`, `requirePhrase?` | toda exclusão passa por aqui. |
-| `app-toast` / `UiFeedbackService` | `message`, `undo?` | toda mutação confirmada oferece "Desfazer". |
+| `UiFeedbackService` | `success/error/warning/info`, `undo?` | toda mutação confirmada oferece "Desfazer". O toast é renderizado inline no `app.component`. **Ver emenda E5.** |
 | `app-empty-state` | `icon`, `title`, `message`, `actionLabel?`; `action` | |
 | `app-skeleton` | `variant`, `width?`, `lines?` | só no que vem do servidor. Título e cabeçalho de tabela renderizam de imediato. |
 | `app-progress-bar` | `value`, `max`, `tone` \| `mode: 'consumo' \| 'conquista'` | **os limiares de cor moram aqui**, não em cada tela. |
-| `app-money` | `value`, `sign?`, `size?` | formata BRL, aplica `tabular-nums`, aplica cor por sinal. Nunca formatar moeda à mão no template. |
+| `AppCurrencyPipe` (`appCurrency`) | `value`, `currency?` | formata BRL e respeita "ocultar valores". Nunca formatar moeda à mão no template. Cor por sinal é decisão por tela. **Ver emenda E5.** |
 | `app-chart-*` | por tipo | ver seção 8 |
 | `app-donut-chart` | `items: DonutChartItem[]`, `compact?` | `compact` para card de coluna lateral. Diâmetro e empilhamento moram aqui, não na tela. **Ver emenda E3.** |
 
@@ -217,6 +217,51 @@ A R10 encontrou 10 violações que a revisão manual não tinha visto.
 (`OnboardingService`) e `toast-container` (`UiFeedbackService`). Resolver exige mudar o
 contrato de cada um para receber os dados por `@Input`, o que muda quem os hospeda. É trabalho
 por componente, não de pasta. Está registrado em `DIVIDA_TECNICA_PADROES.md`.
+
+---
+
+### Emenda E5 — primitivos removidos por nunca terem sido adotados (2026-08-27)
+
+Seis componentes de `shared/` existiam **apenas** na demo do `/styleguide` — nenhuma tela do
+produto os referenciava, nem por seletor em template nem por import de classe. Foram removidos.
+Quatro não constavam neste pacote; dois constavam, e é por isso que esta emenda existe.
+
+**`app-money` sai da §7.** A regra continua valendo: *"nunca formatar moeda à mão no template"*.
+O que muda é qual é o mecanismo. O **`AppCurrencyPipe`** já faz formatação BRL e respeita o modo
+"ocultar valores", e está em **27 templates**. O `app-money` era um segundo mecanismo para a
+mesma coisa, com dois extras — cor por sinal e tamanho — que nenhuma tela chegou a pedir.
+
+Adotá-lo tampouco era neutro: `sign="auto"` colore **os dois** sinais, e vários pontos hoje
+colorem só o negativo. Trocar significaria pintar variação positiva de verde em Orçamento e
+Investimentos — mudança de leitura de número financeiro, não refactor. Consolidar no pipe é o
+sistema mais simples.
+
+> Cor por sinal continua sendo decisão **por tela**, com as classes locais de tom
+> (`--income-text` / `--expense-text`). Se um dia três telas quiserem o mesmo comportamento,
+> aí o primitivo se justifica — e nasce do pipe, não do zero.
+
+**`app-chart-bars` sai da §8.** Os três primitivos de gráfico eram `app-chart-line`,
+`app-chart-bars` e `app-chart-donut`. Line e donut estão em uso; barras, nenhuma tela desenha.
+
+A "armadilha da barra proporcional" que a §8 descreve **continua documentada** ali e em
+`COMPONENTES.md` §9 — é o conhecimento que importa. Quem precisar de barras recria o primitivo
+a partir do `app-chart-line`, que já resolve escala, grade, eixos, legenda e hover; ou recupera
+o arquivo do histórico (criado no commit de 2026-08-13, "13 primitivos").
+
+**`app-toast` da §7 nunca existiu como componente.** A linha da tabela cita
+`app-toast` / `UiFeedbackService`; o que existe é o `UiFeedbackService` mais um bloco de toast
+**inline no `app.component.html`**. Havia um `shared/toast-container` — órfão desde
+2026-04-25 — que foi removido junto.
+
+**Os outros três removidos**, que não constavam no pacote: `app-stat-card` e
+`app-period-action-card` (superados pelos primitivos do redesign) e
+`app-installment-scope-modal` (nasceu no lote de 13 primitivos e nunca foi ligado a nenhuma
+tela; o `shouldAskScope()` que ele previa não é chamado em lugar nenhum).
+
+**A lição, para o próximo lote.** Três destes nasceram na mesma entrega — "13 primitivos"
+construídos a partir da spec, antes de qualquer tela pedir. Três de treze nunca foram adotados.
+Primitivo criado por antecipação vira dívida com a mesma facilidade com que vira reuso: vale
+construir quando a **segunda** tela pedir, não quando a spec descreve.
 
 ---
 
@@ -320,7 +365,7 @@ componente de tabela.
 
 ## 8. Gráficos
 
-Um componente por tipo, em `shared/charts/`: `app-chart-line`, `app-chart-bars`, `app-chart-donut`.
+Um componente por tipo, em `shared/charts/`: `app-chart-line` e `app-chart-donut`. (`app-chart-bars` foi removido em 2026-08-27 por nunca ter sido adotado — **ver emenda E5**; a armadilha da barra proporcional segue documentada abaixo, para quem recriar.)
 
 **Nenhuma feature escreve SVG.** Se um gráfico novo é necessário, ele nasce em `shared/charts/` com contrato de série.
 
