@@ -16,6 +16,8 @@ core/          serviços, guards, interceptors, modelos de domínio
 shared/        primitivos de UI sem conhecimento de domínio
    ↑
 features/      telas (dashboard, despesas, metas…)
+               ├── shared/   componente de DOMÍNIO reusado por 2+ telas  ← ver emenda E4
+               └── layout/   chrome da aplicação                          ← ver emenda E4
 ```
 
 - `shared/` **nunca** importa de `features/`.
@@ -164,6 +166,57 @@ export interface ColumnDef<T> {
 }
 ```
 O componente de tabela deriva `grid-template-columns` de `columns.map(c => c.width).join(' ')` e o usa **no cabeçalho e em cada linha**. É a única forma de garantir alinhamento.
+
+---
+
+### Emenda E4 — `features/shared/`, `features/layout/` e onde mora modelo de domínio (2026-08-27)
+
+Decidida ao aplicar a §1 de verdade: até aqui `src/app` era plano (65 arquivos soltos na raiz,
+46 pastas de tela no mesmo nível, `features/` com uma feature só). A reestruturação expôs uma
+lacuna do texto original.
+
+**O problema.** A §1 diz *"duas features nunca se importam"* e também que *"`shared/` nunca
+importa serviço de domínio"*. Havia 11 imports entre features, e todos eram componentes que
+injetam store de domínio — `CartaoFormComponent` (`LookupsStore`, `CardsStore`), os modais de
+lançamento, o `InvoiceImportComponent`. Mover para `shared/` trocaria uma violação por outra.
+Não existia lugar para **componente que conhece o domínio e é legitimamente reusado**.
+
+**A estrutura passa a ser:**
+
+```
+src/app/
+├── app.component.*  app.config*.ts  app.routes*.ts      bootstrap, fica na raiz
+├── core/       serviços, stores, guards, interceptors, MODELOS DE DOMÍNIO, utils
+├── shared/     primitivos de UI sem domínio
+└── features/
+    ├── dashboard/  layout/  contas/  despesas/  …       telas
+    ├── layout/     chrome: sidebar, topbar, headers, auth-layout
+    └── shared/     componente de DOMÍNIO reusado por 2+ telas
+```
+
+**`features/shared/` — critério: duas telas, não três.** A regra do três da §2 vale para subir
+para `shared/`, onde o componente é genérico e a terceira ocorrência confirma o padrão. Aqui é
+diferente: na **segunda** tela a §1 já está violada e não há outro lugar para o componente
+morar. Quem entra aqui pode importar de `core/`; **não pode importar de outra feature**.
+
+**`features/layout/` é alvo legítimo de import.** É o chrome da aplicação — as quatro telas de
+autenticação usam o `AuthLayoutComponent`, e isso não é "tela importando de tela".
+
+**Modelo puro consumido por duas telas vai para `core/`**, não para `features/shared/`. A §1 já
+listava "modelos de domínio" em `core/`. Foi o caso de `card-metrics`, `budget-overview`,
+`investments-overview`, `accounts-overview` e `onboarding.helpers`.
+
+**A regra agora é executável.** O gate ganhou a **R10**, que falha quando uma pasta de
+`features/` importa de outra. Isenções: `features/shared/`, `features/layout/` e
+`/styleguide`, que é catálogo em rota `devOnlyGuard` e importa de todo lado por definição.
+A R10 encontrou 10 violações que a revisão manual não tinha visto.
+
+**O que ainda viola a §1 e não foi resolvido pela reestruturação:** cinco componentes de
+`shared/` injetam serviço de domínio — `billing-alert-banner` (`AuthService`,
+`SubscriptionsService`), `money` (`FinancialPrivacyService`), `onboarding-return-banner`
+(`OnboardingService`) e `toast-container` (`UiFeedbackService`). Resolver exige mudar o
+contrato de cada um para receber os dados por `@Input`, o que muda quem os hospeda. É trabalho
+por componente, não de pasta. Está registrado em `DIVIDA_TECNICA_PADROES.md`.
 
 ---
 

@@ -1424,6 +1424,24 @@ remoção de comentários antes da busca, e teste de mesa cobrindo bloco, linha 
 **Ordem obrigatória: signals primeiro, `OnPush` depois.** O inverso congela a tela. O padrão
 de conversão validado e a lista completa estão em `DIVIDA_TECNICA_PADROES.md`.
 
+### 8.8 — Estrutura de pastas e a R10 (2026-08-27)
+
+Não estava prevista na Fase 8 porque não era regra do gate. Virou: `src/app` foi reestruturado
+nas três camadas que a §1 sempre pediu, e a regra **R10** passou a travar import entre features.
+
+Duas coisas que valem registro por terem contrariado o que estava escrito aqui:
+
+1. **A decisão "onde mora componente de domínio reusado" saiu junto.** Estava listada como
+   bloqueio que exigia escolha entre três opções; as opções 1 e 3 acabaram sendo a mesma
+   entrega. `features/shared/` existe, com critério de **duas** telas — não três, porque na
+   segunda a §1 já está violada.
+2. **A revisão manual tinha subcontado.** Eu havia mapeado 11 imports entre features; a R10,
+   depois da reestruturação, achou mais 10 (`contas` → `accounts`) que nenhuma leitura tinha
+   pego. Regra executável acha o que olho não acha — é o argumento para escrever a regra antes
+   de quitar a dívida, não depois.
+
+Ver emenda **E4** em `ARQUITETURA_ANGULAR.md`.
+
 ### Encerramento da Fase 8
 
 - [ ] `npm run handoff:check` sem nenhuma dívida aberta.

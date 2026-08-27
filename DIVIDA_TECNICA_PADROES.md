@@ -20,51 +20,54 @@ outra regra.
 
 ---
 
-## 🔴 ⬜ DECISÃO — Onde mora um componente de domínio reusado por várias telas
+## ✅ DECISÃO — Onde mora um componente de domínio reusado — **RESOLVIDA em 2026-08-27**
 
-**Onde:** Web · 11 imports em `calendario/`, `despesas/`, `onboarding/`
+Commits `68f2962` (reestruturação). Escolhida a **opção 1**: criar um lugar para o componente
+de domínio reusado, dentro da reestruturação `core/shared/features` (que era a opção 3) — as
+duas acabaram saindo juntas.
 
-**Problema:** `ARQUITETURA_ANGULAR.md` §1 diz *"duas features nunca se importam"*. Hoje isso é
-violado 11 vezes:
+`features/shared/` recebeu os 8 componentes que eram importados entre telas: `CartaoForm`,
+`DespesaFormModal`, `ReceitaFormModal`, `MetaFormModal`, `LoanFormModal`, `DespesasForm`,
+`ReceitasForm`, `InvoiceImport`. Regra: pode importar de `core/`, **não pode importar de outra
+feature**.
 
-| Feature | Importa de outra feature |
-|---|---|
-| `calendario.component.ts` | `CartaoFormComponent`, `DespesaFormModalComponent`, `LoanFormModalComponent`, `MetaFormModalComponent`, `ReceitaFormModalComponent` |
-| `despesas.component.ts` | `CartaoFormComponent`, `InvoiceImportComponent` |
-| `despesa-form-modal.component.ts` | `CartaoFormComponent` |
-| `onboarding.component.ts` | `CartaoFormComponent`, `DespesasFormComponent`, `ReceitasFormComponent` |
+**Critério: duas telas, não três.** A regra do três da §2 vale para subir a `shared/`, onde o
+componente é genérico e a terceira ocorrência confirma o padrão. Aqui é diferente — na
+**segunda** tela a §1 já está violada e não existe outro lugar.
 
-**Por que não dá para simplesmente mover para `shared/`:** a mesma §1 diz que *"`shared/` nunca
-importa serviço de domínio"*. O `CartaoFormComponent` injeta `LookupsStore` e `CardsStore`; os
-modais injetam os serviços das próprias features. Mover para `shared/` troca uma violação da §1
-por outra — não resolve, só muda o nome do problema.
+Modelos puros consumidos por duas telas foram para `core/`, que é onde a §1 põe "modelos de
+domínio": `card-metrics`, `budget-overview`, `investments-overview`, `accounts-overview`,
+`onboarding.helpers`.
 
-**Causa-raiz:** o handoff prevê duas camadas (`shared/` sem domínio, `features/` isoladas) e não
-tem lugar para a terceira coisa que existe de fato: **componente que conhece o domínio e é
-legitimamente reusado por três telas**. O `CartaoFormComponent` é usado por `calendario`,
-`despesas` e `onboarding` — bate a "regra do três" da §2, mas não tem para onde subir.
+**A regra virou executável:** o gate ganhou a **R10**, que falha quando uma pasta de `features/`
+importa de outra. Ela encontrou 10 violações que a revisão manual não tinha visto
+(`contas` → `accounts`) e hoje está em 0 com teto 0. Ver emenda **E4** em
+`ARQUITETURA_ANGULAR.md`.
 
-**Opções (escolher uma):**
+---
 
-1. **Criar `features/_shared/` (ou `domain-ui/`)** para componentes de domínio reusados.
-   Regra: pode importar de `core/`, não pode importar de uma feature específica.
-   → mexe no handoff: precisa de emenda em `ARQUITETURA_ANGULAR.md` §1 e decisão em
-   `PLANO_REDESIGN.md`, conforme o `Agent.md` exige.
-2. **Aceitar a exceção e documentá-la** — registra em `PLANO_REDESIGN.md` que formulários de
-   lançamento são reusáveis entre features, e adiciona regra no `check-handoff-fidelity.mjs`
-   permitindo só esse conjunto nominal.
-3. **Reestruturação completa `core/shared/features`** — resolve junto com o item de estrutura de
-   pastas, mas é o que o `Agent.md` lista em "não fazer sem motivo claro".
+## 🟡 ⬜ RESTA — cinco primitivos de `shared/` injetam serviço de domínio
+
+**Onde:** Web · `shared/billing-alert-banner`, `shared/money`, `shared/onboarding-return`,
+`shared/toast-container`
+
+**Problema:** a §1 diz que `shared/` **nunca** importa serviço de domínio. Estes quatro
+arquivos (cinco imports) importam: `AuthService` + `SubscriptionsService`,
+`FinancialPrivacyService`, `OnboardingService`, `UiFeedbackService`.
+
+**Por que a reestruturação não resolveu:** mover a pasta não muda a dependência. Resolver exige
+trocar o contrato de cada componente para receber os dados por `@Input`, o que muda também quem
+os hospeda — no caso do `toast-container`, o `app.component`. É trabalho por componente.
+
+**Ressalva honesta:** dois deles são discutíveis. `toast-container` é o host dos toasts e
+`billing-alert-banner` é uma faixa que decide sozinha se aparece — componentes "inteligentes"
+de `shared/` são um padrão defensável, e talvez a regra deva distinguir "primitivo burro" de
+"widget de shell". Vale decidir isso antes de refatorar os quatro.
 
 **A fazer:**
-- [ ] Escolher a opção
-- [ ] Registrar a decisão em `PLANO_REDESIGN.md`
-- [ ] Se opção 1 ou 2: emendar `ARQUITETURA_ANGULAR.md` §1
-- [ ] Adicionar regra no `scripts/check-handoff-fidelity.mjs` que trave a violação daí em diante
-- [ ] Mover o código conforme a decisão
-
-**Aceite:** nenhum import feature→feature novo passa pelo gate; os 11 atuais ou foram movidos ou
-estão numa allowlist com justificativa escrita.
+- [ ] Decidir se a §1 distingue primitivo de widget de shell
+- [ ] Se não distinguir: passar os dados por `@Input` e mover a injeção para quem hospeda
+- [ ] Adicionar regra no gate travando `shared/` → `core/*.service`
 
 ---
 
@@ -435,21 +438,23 @@ documentação está desatualizada"* — está.
 
 # PARTE 4 — Itens de estrutura (fora do escopo desta rodada)
 
-## 🟡 ⬜ `src/app` é plano: não existe `core/`, `features/` tem uma feature só
+## ✅ `src/app` plano — **RESOLVIDO em 2026-08-27**
 
-**Onde:** Web · `src/app/`
+Commit `68f2962`. 467 arquivos movidos com `git mv`, 1003 imports reescritos por resolução de
+alvo. Estrutura final: `core/` (113 arquivos), `shared/` (61), `features/` (38 pastas), e só o
+bootstrap na raiz.
 
-**Problema:** `ARQUITETURA_ANGULAR.md` §1 define `core/ ← shared/ ← features/`. Hoje:
-- **não há `core/`** — 65 arquivos `.ts` soltos na raiz de `src/app` (serviços, stores, guards,
-  interceptors, `roles.ts`, `features.ts`)
-- **`features/` tem só `accounts`** — as outras 42 telas são pastas soltas na raiz
+O que a operação ensinou, para a próxima vez:
 
-**Por que não foi feito:** são milhares de linhas de import alteradas de uma vez, e o `Agent.md`
-lista *"reestruturar a arquitetura inteira do projeto"* em "o que não fazer sem motivo claro".
-Decisão do usuário em 2026-08-27: fora do escopo por ora.
-
-**Observação:** a Parte 1 (onde mora componente de domínio reusado) pode ser resolvida junto com
-isso, se a reestruturação for aprovada — é a opção 3 daquele item.
+- **O compilador é o verificador.** Import errado não compila. O que ele **não** cobre é o que
+  vive fora de `src/app`: `src/styles.scss` importava `./app/onboarding/onboarding.styles`, e o
+  `test:ci` excluía `src/app/styleguide/**` da cobertura. Os dois quebraram só na execução.
+- **Reescrever por resolução de alvo, não por regex de caminho.** Para cada import: resolve o
+  alvo original, procura o destino no mapa, recalcula o relativo a partir da nova pasta. Um
+  `sed` de prefixo erraria em toda mudança de profundidade.
+- **O gate tinha `includes('/shared/')` para isentar primitivos.** Com `features/shared/` isso
+  passaria a isentar código de domínio por acidente — virou um helper explícito que só casa
+  `/app/shared/`.
 
 ---
 
