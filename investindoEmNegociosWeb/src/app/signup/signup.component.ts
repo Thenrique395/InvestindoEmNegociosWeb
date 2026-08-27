@@ -1,6 +1,7 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
 import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -23,7 +24,14 @@ export class SignupComponent implements OnInit, OnDestroy {
   showPassword = false;
   showConfirmPassword = false;
 
-  form: FormGroup;
+  form: FormGroup<{
+    nome: FormControl<string>;
+    email: FormControl<string>;
+    cpf: FormControl<string>;
+    senha: FormControl<string>;
+    confirmarSenha: FormControl<string>;
+    aceitarTermos: FormControl<boolean>;
+  }>;
 
   constructor(
     private fb: FormBuilder,
@@ -31,9 +39,10 @@ export class SignupComponent implements OnInit, OnDestroy {
     private router: Router,
     private uiFeedback: UiFeedbackService,
     private title: Title,
-    private meta: Meta
+    private meta: Meta,
+    private readonly destroyRef: DestroyRef
   ) {
-    this.form = this.fb.group(
+    this.form = this.fb.nonNullable.group(
       {
         nome: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
@@ -94,9 +103,10 @@ export class SignupComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    const payload = this.form.value as RegisterPayload;
+    const { nome, email, senha, cpf } = this.form.getRawValue();
+    const payload: RegisterPayload = { nome, email, senha, cpf };
 
-    this.auth.register(payload).subscribe({
+    this.auth.register(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.loading = false;
         this.signedUp.emit();

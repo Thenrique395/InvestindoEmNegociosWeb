@@ -158,13 +158,12 @@
       @if (activeTab === 'evolucao') {
         <article class="card">
           <h2>Evolução do saldo devedor</h2>
-          @if (balanceChart; as chart) {
-            <div class="balance-chart">
-              <svg viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Gráfico do saldo devedor ao longo das parcelas">
-                <polygon class="balance-chart__area" [attr.points]="chart.area" />
-                <polyline class="balance-chart__line" [attr.points]="chart.line" />
-              </svg>
-            </div>
+          @if (balanceSeries; as series) {
+            <app-chart-line
+              [series]="series"
+              [labels]="balanceLabels"
+              [height]="160"
+              [showLegend]="false" />
             <p class="muted text--sm">Saldo devedor projetado ao final de cada parcela (1 → {{ c.installments.length }}).</p>
           } @else {
             <app-empty-state icon="📉" title="Sem dados" description="O contrato ainda não possui cronograma para exibir a evolução." />

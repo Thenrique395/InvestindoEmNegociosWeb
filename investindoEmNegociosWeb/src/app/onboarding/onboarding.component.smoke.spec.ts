@@ -105,7 +105,8 @@ function createComponent() {
     lookups as any,
     uiPermissions as any,
     onboardingDraft as any,
-    userContext as any
+    userContext as any,
+    { onDestroy: () => {} } as any
   );
 
   return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, lookups, uiPermissions, onboardingDraft, router, userContext };

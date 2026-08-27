@@ -171,39 +171,7 @@
     flex-direction: column;
   }
 
-  :host ::ng-deep .installments-list .responsive-list__row {
-    display: flex;
-    flex-direction: column;
-  }
-
-  :host ::ng-deep .installments-list .responsive-list__item[data-label='Ações'] {
-    order: -1;
-    align-items: center;
-    justify-content: flex-end;
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--border-inner);
-  }
-
-  :host ::ng-deep .installments-list .responsive-list__item[data-label='Ações']::before {
-    content: none;
-  }
-
   .amort-preview__grid { grid-template-columns: minmax(0, 1fr); }
-}
-
-.balance-chart {
-  width: 100%;
-  height: 160px;
-
-  svg { width: 100%; height: 100%; }
-
-  &__area { fill: var(--primary-tint, rgba(37, 99, 235, 0.12)); stroke: none; }
-  &__line {
-    fill: none;
-    stroke: var(--primary);
-    stroke-width: 0.8;
-    vector-effect: non-scaling-stroke;
-  }
 }
 
 .timeline {

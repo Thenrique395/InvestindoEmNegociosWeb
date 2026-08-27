@@ -1,7 +1,7 @@
-import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, HostBinding, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { SignupComponent } from './signup/signup.component';
-import { Subscription } from 'rxjs';
 import { UserRole } from './roles';
 import { ApiDataService } from './data/api-data.service';
 import { NotificationItem } from './notifications.service';
@@ -57,10 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
   @HostBinding('class.light') get lightClass(): boolean {
     return this.isLightTheme;
   }
-  private sub: Subscription;
-  private feedbackSub?: Subscription;
-  private notificationsSub?: Subscription;
-  private userContextSub?: Subscription;
+  private readonly destroyRef = inject(DestroyRef);
   private userContextInitialized = false;
   private readonly isBrowser: boolean;
 
@@ -77,7 +74,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private financialPrivacy: FinancialPrivacyService
   ) {
     this.isBrowser = this.appSession.isBrowserEnvironment();
-    this.sub = this.router.events.subscribe((event) => {
+    this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.handleNavigationEnd(event);
       }
@@ -91,7 +88,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.userPreferencesFacade.initFromStorage();
     if (this.isLogged) this.ensureUserContext();
     this.appSession.startMonitoring(() => this.handleExpiredSession());
-    this.feedbackSub = this.uiFeedback.message$.subscribe((message) => {
+    this.uiFeedback.message$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((message) => {
       // Adiado para fora do ciclo de change detection atual: qualquer componente que chame
       // uiFeedback.success/error/info/warning() de forma síncrona no próprio ngOnInit (ex.:
       // LoginComponent ao detectar ?created=1) dispararia esta emissão DURANTE o ciclo de CD
@@ -102,14 +99,14 @@ export class AppComponent implements OnInit, OnDestroy {
         this.feedbackMessage = message;
       });
     });
-    this.notificationsSub = this.notificationsFacade.state$.subscribe((state) => {
+    this.notificationsFacade.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
       this.notificationsOpen = state.open;
       this.notifications = state.items;
       this.unreadCount = state.unreadCount;
       this.notificationsLoading = state.loading;
       this.notificationsError = state.error;
     });
-    this.userContextSub = this.userContextFacade.state$.subscribe((state) => {
+    this.userContextFacade.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
       this.displayName = state.displayName;
       this.avatarUrl = state.avatarUrl;
       this.userInitials = state.userInitials;
@@ -117,10 +114,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
-    this.feedbackSub?.unsubscribe();
-    this.notificationsSub?.unsubscribe();
-    this.userContextSub?.unsubscribe();
     this.appSession.stopMonitoring();
   }
 

@@ -1,5 +1,5 @@
 @if (items().length) {
-  <div class="donut-layout">
+  <div class="donut-layout" [class.donut-layout--compact]="compact()">
     <div class="donut" [style.background]="conicGradient()" aria-hidden="true"></div>
     <div class="distribution-list">
       @for (item of items(); track item.label) {

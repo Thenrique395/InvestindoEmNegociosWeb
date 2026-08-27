@@ -20,6 +20,11 @@ export interface DonutChartItem {
 export class DonutChartComponent {
   items = input.required<DonutChartItem[]>();
   emptyMessage = input('Sem dados para exibir.');
+  /**
+   * Card estreito (coluna lateral): empilha o donut sobre a lista e reduz o
+   * diâmetro. Mora no primitivo porque é medida do desenho, não da tela.
+   */
+  compact = input(false);
 
   conicGradient = computed(() => {
     const parts: string[] = [];

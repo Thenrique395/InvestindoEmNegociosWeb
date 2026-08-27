@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { FormsModule } from '@angular/forms';
 import { InvestmentType } from '../../../investments.service';
 import { BenchmarkKey } from '../../../utils/investments.utils';
+import { ChartLineComponent, LineSeries } from '../../../shared/charts/chart-line/chart-line.component';
 
 export type ProfitabilityPoint = {
   key: string;
@@ -27,7 +28,7 @@ export type ProfitabilityYearRow = {
 @Component({
   selector: 'app-investment-profitability-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, DecimalPipe],
+  imports: [CommonModule, FormsModule, DecimalPipe, ChartLineComponent],
   templateUrl: './investment-profitability-panel.component.html',
   styleUrl: './investment-profitability-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -44,9 +45,6 @@ export class InvestmentProfitabilityPanelComponent {
   @Input() benchmarkOptions: Array<{ key: BenchmarkKey; label: string; color: string }> = [];
   @Input() typeFilter: 'ALL' | InvestmentType = 'ALL';
   @Input() tipos: { value: InvestmentType; label: string }[] = [];
-  @Input() chartTicks: number[] = [];
-  @Input() linePortfolio = '';
-  @Input() lineBenchmark = '';
   @Input() points: ProfitabilityPoint[] = [];
   @Input() benchmarkLabel = 'Índice';
   @Input() benchmarkColor = 'var(--warning)';
@@ -56,7 +54,30 @@ export class InvestmentProfitabilityPanelComponent {
   @Output() benchmarkChange = new EventEmitter<BenchmarkKey>();
   @Output() typeFilterChange = new EventEmitter<'ALL' | InvestmentType>();
 
-  readonly gridLines = [1, 2, 3, 4, 5];
+  /** Série da carteira + série do índice (tracejada). O desenho é do `app-chart-line`. */
+  get chartSeries(): LineSeries[] {
+    if (!this.points.length) return [];
+    return [
+      {
+        label: 'Sua carteira',
+        color: 'var(--primary)',
+        emphasis: true,
+        points: this.points.map((p) => p.carteiraAc)
+      },
+      {
+        label: this.benchmarkLabel,
+        color: this.benchmarkColor,
+        dashed: true,
+        points: this.points.map((p) => p.benchmarkAc)
+      }
+    ];
+  }
+
+  get chartLabels(): string[] {
+    return this.points.map((p) => p.label);
+  }
+
+  readonly formatPercent = (value: number): string => `${value.toFixed(1)}%`;
 
   trackByIndex(index: number): number {
     return index;

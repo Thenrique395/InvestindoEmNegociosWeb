@@ -706,37 +706,37 @@ export class HomeComponent implements OnInit {
 
   get insightHealthToneClass(): string {
     const score = this.insightDiagnostics.healthScore;
-    if (score < 45) return 'text-[var(--expense-text)] bg-rose-500/10 border-rose-300/60';
-    if (score < 70) return 'text-[var(--warning-text)] bg-amber-500/10 border-amber-300/60';
-    return 'text-[var(--income-text)] bg-emerald-500/10 border-emerald-300/60';
+    if (score < 45) return 'text-[var(--expense-text)] bg-[var(--expense-tint)] border-[var(--expense-border)]';
+    if (score < 70) return 'text-[var(--warning-text)] bg-[var(--warning-tint)] border-[var(--warning-border)]';
+    return 'text-[var(--income-text)] bg-[var(--income-tint)] border-[var(--income-border)]';
   }
 
   get insightRiskToneClass(): string {
     if (this.insightDiagnostics.riskDayLabel) {
-      return 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]';
+      return 'border-[var(--expense-border)] bg-[var(--expense-tint)] text-[var(--expense-text)]';
     }
-    return 'border-emerald-300/60 bg-emerald-500/10 text-[var(--income-text)]';
+    return 'border-[var(--income-border)] bg-[var(--income-tint)] text-[var(--income-text)]';
   }
 
   get insightOverdueToneClass(): string {
     const totalOverdue = this.insightDiagnostics.overdueExpensesCount + this.insightDiagnostics.overdueIncomesCount;
     if (totalOverdue > 0) {
-      return 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]';
+      return 'border-[var(--expense-border)] bg-[var(--expense-tint)] text-[var(--expense-text)]';
     }
-    return 'border-slate-300/60 bg-slate-500/10 text-slate-700';
+    return 'border-[var(--neutral-border)] bg-[var(--neutral-tint)] text-[var(--text-secondary)]';
   }
 
   get insightProjectedToneClass(): string {
     if (this.insightDiagnostics.projectedBalance < 0) {
-      return 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]';
+      return 'border-[var(--expense-border)] bg-[var(--expense-tint)] text-[var(--expense-text)]';
     }
-    return 'border-sky-300/60 bg-sky-500/10 text-[var(--primary-text)]';
+    return 'border-[var(--primary-border)] bg-[var(--primary-tint)] text-[var(--primary-text)]';
   }
 
   get insightPriorityClass(): string {
-    if (this.insightPriority === 'Crítico') return 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]';
-    if (this.insightPriority === 'Atenção') return 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]';
-    return 'border-emerald-300/60 bg-emerald-500/10 text-[var(--income-text)]';
+    if (this.insightPriority === 'Crítico') return 'border-[var(--expense-border)] bg-[var(--expense-tint)] text-[var(--expense-text)]';
+    if (this.insightPriority === 'Atenção') return 'border-[var(--warning-border)] bg-[var(--warning-tint)] text-[var(--warning-text)]';
+    return 'border-[var(--income-border)] bg-[var(--income-tint)] text-[var(--income-text)]';
   }
 
   get insightScoreGaugeWidth(): number {

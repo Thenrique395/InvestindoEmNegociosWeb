@@ -92,6 +92,7 @@
           </div>
           <app-responsive-list
             class="budget-table"
+            density="comfortable"
             [columns]="categoryColumns"
             [items]="filteredItemViews"
             [getId]="trackBudgetItem"
@@ -197,7 +198,7 @@
 
         <article class="side-card side-card--chart">
           <h2>Composição planejada</h2>
-          <app-donut-chart [items]="compositionItems" emptyMessage="Sem categorias planejadas." />
+          <app-donut-chart [items]="compositionItems" [compact]="true" emptyMessage="Sem categorias planejadas." />
         </article>
 
         @if (overrunItems.length) {

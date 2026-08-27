@@ -66,7 +66,7 @@ export class RelatoriosComponent implements OnInit {
     { key: 'category', label: 'Categoria' },
     { key: 'amount', label: 'Valor', align: 'end' },
     { key: 'percent', label: '% do total', align: 'end' },
-    { key: 'share', label: 'Participação', widthClass: 'relatorios-share-column' }
+    { key: 'share', label: 'Participação', width: '32%', minWidth: '11rem' }
   ];
 
   constructor(

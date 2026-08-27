@@ -237,6 +237,8 @@
   }
 
   .responsive-list__row {
+    display: flex;
+    flex-direction: column;
     padding: var(--space-6) var(--space-7);
     margin: var(--space-5);
     border: 1px solid var(--border);
@@ -284,6 +286,20 @@
   }
 
   .responsive-list__item--checkbox::before {
+    content: none;
+  }
+
+  .responsive-list__item--actions {
+    order: -1;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-inner);
+  }
+
+  /* Precisa casar a especificidade de `.responsive-list__item[data-label]::before`,
+     senão o rótulo continua aparecendo acima do botão. */
+  .responsive-list__item--actions[data-label]::before {
     content: none;
   }
 
@@ -355,4 +371,37 @@
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* ---------- Densidade confortável ---------------------------------------- */
+/* Listas com controle embutido na célula (input, botão de editar) precisam de
+   mais altura. Opt-in via `density="comfortable"`; antes cada feature abria o
+   primitivo com `::ng-deep` para chegar nestas duas medidas. */
+.responsive-list--comfortable .responsive-list__cell {
+  padding-block: var(--space-3);
+}
+
+.responsive-list--comfortable .responsive-list__item {
+  height: 56px;
+  padding-block: var(--space-4);
+}
+
+@media (max-width: 720px) {
+  /* No card do mobile a altura fixa não faz sentido: a célula vira linha
+     rótulo/valor e cresce com o conteúdo. */
+  .responsive-list--comfortable .responsive-list__item {
+    height: auto;
+    padding-block: var(--space-2);
+  }
+}
+
+/* Estado de hover da linha exposto como custom property: propriedade herdada
+   atravessa o encapsulamento, então o conteúdo projetado pela feature pode
+   reagir ao hover da linha sem `::ng-deep`. */
+.responsive-list__row {
+  --responsive-list-row-hover-border: transparent;
+}
+
+.responsive-list__row:hover {
+  --responsive-list-row-hover-border: var(--border-strong);
 }

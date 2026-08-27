@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { ProfileService, UserProfile } from '../profile.service';
@@ -36,10 +37,10 @@ export class UserProfileComponent implements OnInit {
 
   loading = false;
 
-  constructor(private profileService: ProfileService, private uiFeedback: UiFeedbackService) {}
+  constructor(private profileService: ProfileService, private uiFeedback: UiFeedbackService, private readonly destroyRef: DestroyRef) {}
 
   ngOnInit(): void {
-    this.profileService.getProfile().subscribe((p) => {
+    this.profileService.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((p) => {
       if (!p) return;
       this.nome = p.fullName;
       this.documento = p.document;
@@ -72,7 +73,7 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     this.avatarUploading = true;
-    this.profileService.uploadAvatar(file).subscribe({
+    this.profileService.uploadAvatar(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {
         this.avatarUrl = profile.avatarUrl || '';
         this.avatarUploading = false;
@@ -102,7 +103,7 @@ export class UserProfileComponent implements OnInit {
       language: this.idioma
     };
     this.loading = true;
-    this.profileService.upsert(payload).subscribe({
+    this.profileService.upsert(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.loading = false;
         this.uiFeedback.success('Perfil atualizado.');
@@ -119,7 +120,7 @@ export class UserProfileComponent implements OnInit {
       this.uiFeedback.error('Confirme a nova senha corretamente.');
       return;
     }
-    this.profileService.changePassword({ currentPassword: this.senhaAtual, newPassword: this.novaSenha }).subscribe({
+    this.profileService.changePassword({ currentPassword: this.senhaAtual, newPassword: this.novaSenha }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.uiFeedback.success('Senha alterada.');
         this.senhaAtual = this.novaSenha = this.confirmaSenha = '';

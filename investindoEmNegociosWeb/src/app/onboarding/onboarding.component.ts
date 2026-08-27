@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileService } from '../profile.service';
 import { OnboardingService } from '../onboarding.service';
@@ -48,7 +49,15 @@ import { CartaoFormComponent } from '../cartoes/cartao-form.component';
   templateUrl: './onboarding.component.html'
 })
 export class OnboardingComponent implements OnInit {
-  form: FormGroup;
+  form: FormGroup<{
+    fullName: FormControl<string>;
+    document: FormControl<string>;
+    phone: FormControl<string>;
+    birthDate: FormControl<string>;
+    city: FormControl<string>;
+    state: FormControl<string>;
+    country: FormControl<string>;
+  }>;
   loading = false;
   creatingAccount = false;
   savingEntries = false;
@@ -235,9 +244,10 @@ export class OnboardingComponent implements OnInit {
     private lookupsService: LookupsService,
     private uiPermissions: UiPermissionsService,
     private onboardingDraft: OnboardingDraftService,
-    private userContext: UserContextFacadeService
+    private userContext: UserContextFacadeService,
+    private readonly destroyRef: DestroyRef
   ) {
-    this.form = this.fb.group({
+    this.form = this.fb.nonNullable.group({
       fullName: ['', [Validators.required, Validators.minLength(3), this.noBlankValidator()]],
       document: ['', [Validators.required, cpfValidator()]],
       phone: ['', [Validators.required, this.phoneValidator()]],
@@ -253,13 +263,13 @@ export class OnboardingComponent implements OnInit {
     this.restoreDraft();
     this.restoreInitialEntries();
 
-    this.userContext.state$.subscribe((state) => {
+    this.userContext.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
       this.displayName = state.displayName;
       this.userInitials = state.userInitials;
     });
     this.userContext.loadProfile();
 
-    this.onboarding.getStatus().subscribe({
+    this.onboarding.getStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (status) => {
         if (status.completed) {
           this.router.navigateByUrl('/dashboard');
@@ -273,7 +283,7 @@ export class OnboardingComponent implements OnInit {
       }
     });
 
-    this.accountsService.list().subscribe({
+    this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (accounts) => {
         const active = (accounts || []).filter((a) => a.isActive);
         this.accountReady = active.length > 0;
@@ -319,7 +329,7 @@ export class OnboardingComponent implements OnInit {
 
     this.loading = true;
     const payload = this.normalizePayload();
-    this.profile.upsert(payload).subscribe({
+    this.profile.upsert(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.loading = false;
         this.uiFeedback.success('Dados do perfil salvos. Vamos para a conta e os primeiros lançamentos.');
@@ -401,7 +411,7 @@ export class OnboardingComponent implements OnInit {
       return;
     }
     this.savingEntries = true;
-    this.onboarding.updateStatus({ step: this.step, completed: true }).subscribe({
+    this.onboarding.updateStatus({ step: this.step, completed: true }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.savingEntries = false;
         this.clearDraft();
@@ -435,7 +445,7 @@ export class OnboardingComponent implements OnInit {
       initialBalance: Number(this.accountForm.initialBalance || 0),
       isActive: true,
       currency: 'BRL'
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (account) => {
         this.creatingAccount = false;
         this.accountReady = true;
@@ -533,7 +543,7 @@ export class OnboardingComponent implements OnInit {
    * e, no salvar, criar um segundo lançamento em vez de editar o primeiro.
    */
   private loadPaymentMethods(): void {
-    this.lookupsService.paymentMethods().subscribe({
+    this.lookupsService.paymentMethods().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (methods) => {
         this.paymentMethods = methods || [];
       },
@@ -546,7 +556,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   private restoreInitialEntries(): void {
-    this.plansService.list('Income').subscribe({
+    this.plansService.list('Income').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (planos) => {
         const plano = this.maisRecente(planos);
         if (!plano) return;
@@ -564,7 +574,7 @@ export class OnboardingComponent implements OnInit {
       error: () => undefined
     });
 
-    this.plansService.list('Expense').subscribe({
+    this.plansService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (planos) => {
         const plano = this.maisRecente(planos);
         if (!plano) return;
@@ -677,7 +687,7 @@ export class OnboardingComponent implements OnInit {
       ? this.plansService.update(editando, payload)
       : this.plansService.create(payload);
 
-    requisicao.subscribe({
+    requisicao.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (plano) => {
         this.savingIncomeModal = false;
         this.showIncomeModal = false;
@@ -910,7 +920,7 @@ export class OnboardingComponent implements OnInit {
       ? this.plansService.update(editando, payload)
       : this.plansService.create(payload);
 
-    requisicao.subscribe({
+    requisicao.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (plano) => {
         this.savingExpenseModal = false;
         this.showExpenseModal = false;
@@ -934,18 +944,18 @@ export class OnboardingComponent implements OnInit {
   }
 
   private normalizePayload() {
-    const raw = this.form.value;
-    const formattedPhone = maskPhone(raw.phone as string) || raw.phone;
+    const raw = this.form.getRawValue();
+    const formattedPhone = maskPhone(raw.phone) || raw.phone;
     const birthDateIso = raw.birthDate ? `${raw.birthDate}T00:00:00Z` : undefined;
 
     return {
-      fullName: (raw.fullName as string).trim(),
+      fullName: raw.fullName.trim(),
       phone: formattedPhone,
       birthDate: birthDateIso,
       avatarUrl: '',
-      city: (raw.city as string).trim(),
-      state: (raw.state as string).trim().toUpperCase(),
-      country: (raw.country as string).trim(),
+      city: raw.city.trim(),
+      state: raw.state.trim().toUpperCase(),
+      country: raw.country.trim(),
       financialGoal: this.focus ?? '',
       language: 'pt-BR',
       carryOverDay: this.canEditCarryOverDay ? this.carryOverDay : 1,
@@ -960,7 +970,7 @@ export class OnboardingComponent implements OnInit {
       return;
     }
 
-    this.cardsService.list().subscribe({
+    this.cardsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (cards) => {
         this.cardsCount = (cards || []).length;
         this.modalExpenseCartoes = (cards || []).map((card) => toStoredCard(card));
@@ -978,7 +988,7 @@ export class OnboardingComponent implements OnInit {
     }
 
     if (!type || type === 'Expense') {
-      this.categoriesService.list('Expense').subscribe({
+      this.categoriesService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (categories) => {
           this.expenseCategories = categories || [];
         },
@@ -989,7 +999,7 @@ export class OnboardingComponent implements OnInit {
     }
 
     if (!type || type === 'Income') {
-      this.categoriesService.list('Income').subscribe({
+      this.categoriesService.list('Income').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (categories) => {
           this.incomeCategories = categories || [];
         },
@@ -1032,7 +1042,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   private persistStep(completed: boolean): void {
-    this.onboarding.updateStatus({ step: this.step, completed }).subscribe({
+    this.onboarding.updateStatus({ step: this.step, completed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => {
         /* ignore */
       }
@@ -1063,7 +1073,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   private loadProfile(prefillForm: boolean): void {
-    this.profile.getProfile().subscribe({
+    this.profile.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         if (!data) {
           if (prefillForm) this.prefillProfileFromSession();

@@ -219,15 +219,6 @@
           </div>
         </app-modal>
       }
-      @case ('confirm-dialog') {
-        <app-confirm-dialog></app-confirm-dialog>
-        <div class="styleguide-demo__row">
-          <button type="button" class="btn-danger sm" (click)="openConfirm()">Remover item</button>
-          @if (confirmResult) {
-            <p>Resultado: {{ confirmResult }}</p>
-          }
-        </div>
-      }
       @case ('form-field') {
         <app-form-field label="Nome" [required]="true" hint="Como aparece nos relatórios" [error]="formFieldHasError() ? 'Informe um nome válido.' : ''" [submitted]="formFieldHasError()">
           <input type="text" placeholder="Digite um nome" class="rounded-[10px] border border-[var(--border)] bg-[var(--surface-sunken)] px-3 py-2 text-[var(--text)]" />

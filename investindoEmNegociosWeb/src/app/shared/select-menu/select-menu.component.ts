@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  PLATFORM_ID,
   computed,
   forwardRef,
   inject,
@@ -11,6 +12,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 export interface SelectMenuOption {
@@ -103,6 +105,10 @@ export class SelectMenuComponent implements ControlValueAccessor {
   private onTouched: () => void = () => {};
 
   constructor() {
+    // No SSR não existe `document`: registrar o listener aqui quebrava o
+    // prerender das rotas que usam este campo (ex.: /receitas).
+    if (!isPlatformBrowser(inject(PLATFORM_ID))) return;
+
     // Fechar ao clicar fora. Sem isto, dois dropdowns abertos disputam a tela —
     // o handoff pede que abrir um feche os outros.
     const onDocClick = (event: MouseEvent) => {

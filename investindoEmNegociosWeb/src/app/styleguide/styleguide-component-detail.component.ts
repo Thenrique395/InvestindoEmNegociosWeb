@@ -13,8 +13,6 @@ import { ComparisonPillComponent } from '../shared/comparison-pill/comparison-pi
 import { StatusBadgeComponent } from '../shared/status-badge/status-badge.component';
 import { TooltipComponent } from '../shared/tooltip/tooltip.component';
 import { ModalComponent } from '../shared/modal/modal.component';
-import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.component';
-import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
 import { ToastContainerComponent } from '../shared/toast-container/toast-container.component';
 import { FormFieldComponent } from '../shared/form-field/form-field.component';
 import { ToggleFieldComponent } from '../shared/toggle-field/toggle-field.component';
@@ -64,7 +62,6 @@ interface DemoListItem {
     StatusBadgeComponent,
     TooltipComponent,
     ModalComponent,
-    ConfirmDialogComponent,
     ToastContainerComponent,
     FormFieldComponent,
     ToggleFieldComponent,
@@ -98,7 +95,6 @@ export class StyleguideComponentDetailComponent implements OnInit {
   readonly formFieldHasError = signal(false);
   readonly toggleFieldChecked = signal(true);
   readonly periodHeroEvents = signal<string[]>([]);
-  confirmResult: string | null = null;
 
   readonly demoAccounts: AccountResponse[] = [
     { id: '1', name: 'Conta Corrente', type: 'Checking', initialBalance: 5000, currentBalance: 4500, isActive: true, createdAt: '2026-01-01', updatedAt: '2026-06-01', currency: 'BRL' },
@@ -148,8 +144,7 @@ export class StyleguideComponentDetailComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
-    private readonly uiFeedback: UiFeedbackService,
-    private readonly confirmDialog: ConfirmDialogService
+    private readonly uiFeedback: UiFeedbackService
   ) {}
 
   ngOnInit(): void {
@@ -163,15 +158,6 @@ export class StyleguideComponentDetailComponent implements OnInit {
     this.uiFeedback[type](`Exemplo de toast (${type}).`);
   }
 
-  async openConfirm(): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
-      title: 'Remover item',
-      message: 'Tem certeza que deseja remover este item de exemplo?',
-      confirmLabel: 'Remover',
-      tone: 'danger'
-    });
-    this.confirmResult = confirmed ? 'Confirmado' : 'Cancelado';
-  }
 
   onPeriodHeroNav(direction: 'previous' | 'next'): void {
     this.periodHeroEvents.update((events) => [...events, direction === 'previous' ? 'Mês anterior' : 'Próximo mês']);
@@ -312,13 +298,6 @@ this.uiFeedback.error('Não foi possível concluir.');`,
     <button class="btn-primary sm">Salvar</button>
   </div>
 </app-modal>`,
-    'confirm-dialog': `const confirmed = await this.confirmDialog.confirm({
-  title: 'Remover conta',
-  message: 'Deseja remover esta conta?',
-  confirmLabel: 'Remover',
-  tone: 'danger'
-});
-if (!confirmed) return;`,
     'form-field': `<app-form-field
   label="Nome"
   [required]="true"

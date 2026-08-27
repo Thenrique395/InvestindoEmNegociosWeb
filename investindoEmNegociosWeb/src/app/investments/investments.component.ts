@@ -830,22 +830,6 @@ export class InvestmentsComponent implements OnInit {
     return Math.ceil(padded / 5) * 5;
   }
 
-  get rentabilidadeChartTicks(): number[] {
-    const min = this.rentabilidadeChartMin;
-    const max = this.rentabilidadeChartMax;
-    const steps = 5;
-    const span = max - min || 1;
-    return Array.from({ length: steps + 1 }, (_, i) => max - (span / steps) * i);
-  }
-
-  get rentabilidadeLinhaCarteira(): string {
-    return this.buildRentabilidadePolyline('carteiraAc');
-  }
-
-  get rentabilidadeLinhaCdi(): string {
-    return this.buildRentabilidadePolyline('benchmarkAc');
-  }
-
   get indiceSelecionadoLabel(): string {
     return this.benchmarkOptions.find((item) => item.key === this.rentabilidadeBenchmark)?.label || 'Índice';
   }
@@ -873,23 +857,6 @@ export class InvestmentsComponent implements OnInit {
         const benchmarkAcumulado = points[points.length - 1]?.benchmarkAc || 0;
         return { year, months, yearValue, benchmarkYearValue, acumulado, benchmarkAcumulado };
       });
-  }
-
-  private buildRentabilidadePolyline(field: 'carteiraAc' | 'benchmarkAc'): string {
-    const points = this.rentabilidadeSeries;
-    if (!points.length) return '';
-    const width = 1000;
-    const height = 280;
-    const min = this.rentabilidadeChartMin;
-    const max = this.rentabilidadeChartMax;
-    const span = max - min || 1;
-    return points
-      .map((point, index) => {
-        const x = (index / Math.max(points.length - 1, 1)) * width;
-        const y = height - (((point[field] - min) / span) * height);
-        return `${x},${y}`;
-      })
-      .join(' ');
   }
 
   get consolidacaoSeries(): ConsolidacaoBucket[] {

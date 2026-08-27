@@ -21,7 +21,7 @@ describe('UserSecurityComponent', () => {
     };
 
     return {
-      component: new UserSecurityComponent(profileService, uiFeedback),
+      component: new UserSecurityComponent(profileService, uiFeedback, { onDestroy: () => {} } as any),
       profileService,
       uiFeedback
     };

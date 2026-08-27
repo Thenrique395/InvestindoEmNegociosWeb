@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { isCreditPaymentMethod, PaymentMethodLookup } from '../lookups.service';
 import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
 import { NumberStepperComponent } from '../shared/number-stepper/number-stepper.component';
-import { colorForCategory } from '../categories/categories-overview.model';
+import { colorForCategory } from '../utils/category-color';
 
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { DigitOnlyDirective } from '../utils/digit-only.directive';

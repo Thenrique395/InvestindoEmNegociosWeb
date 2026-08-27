@@ -343,7 +343,7 @@ rules.push({
  * Cada linha aqui é uma dívida com prazo, não uma permissão permanente — a Fase 8 do plano
  * define quem zera o quê. Ao corrigir, baixe o número no mesmo commit. Meta: todos em 0.
  */
-export const BASELINE = { R1: 3, R4: 10, R8: 49, R9: 14 };
+export const BASELINE = { R1: 2, R4: 0, R8: 46, R9: 0 };
 
 /**
  * Roda todas as regras e classifica cada uma. Exportado para o briefing

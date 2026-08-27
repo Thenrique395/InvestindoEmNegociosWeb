@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { DataPortabilityService } from '../data-portability.service';
@@ -48,7 +49,8 @@ export class UserDataComponent {
     private readonly profileService: ProfileService,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly uiFeedback: UiFeedbackService
+    private readonly uiFeedback: UiFeedbackService,
+    private readonly destroyRef: DestroyRef
   ) {
     this.loadPrivacySummary();
   }
@@ -67,7 +69,7 @@ export class UserDataComponent {
   exportData(): void {
     if (this.exporting) return;
     this.exporting = true;
-    this.portabilityService.exportData().subscribe({
+    this.portabilityService.exportData().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         const fileName = this.resolveFileName(response.headers.get('content-disposition')) || 'investindo-export.json';
         const blob = response.body ?? new Blob([], { type: 'application/json' });
@@ -113,7 +115,7 @@ export class UserDataComponent {
     this.deletingAccount = true;
     this.confirmDeleteOpen = false;
 
-    this.profileService.deleteOwnAccount(this.deletePayload).subscribe({
+    this.profileService.deleteOwnAccount(this.deletePayload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.authService.clearSession();
         this.uiFeedback.success('Conta excluída com sucesso.');
@@ -134,7 +136,7 @@ export class UserDataComponent {
     this.confirmImportOpen = false;
 
     this.importing = true;
-    this.portabilityService.importData(this.selectedFile, this.replaceExisting).subscribe({
+    this.portabilityService.importData(this.selectedFile, this.replaceExisting).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.lastImportAt = new Date();
         this.uiFeedback.success(`Importação concluída. ${result.importedRecords} registro(s) processado(s).`);
@@ -160,7 +162,7 @@ export class UserDataComponent {
 
   private loadPrivacySummary(): void {
     this.privacyLoading = true;
-    this.profileService.getPrivacySummary().subscribe({
+    this.profileService.getPrivacySummary().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (summary) => {
         this.privacySummary = summary;
         this.privacyLoading = false;

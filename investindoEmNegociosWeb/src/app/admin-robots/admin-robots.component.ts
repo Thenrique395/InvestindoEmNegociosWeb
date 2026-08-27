@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminRobotsService, RobotExecutionLog, RobotMonitorSummary, RobotStatus } from '../admin-robots.service';
@@ -60,7 +61,8 @@ export class AdminRobotsComponent implements OnInit {
 
   constructor(
     private adminRobots: AdminRobotsService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +79,7 @@ export class AdminRobotsComponent implements OnInit {
       from: this.filters.from || undefined,
       to: this.filters.to || undefined,
       search: this.filters.search.trim() || undefined
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.summary24h = response.summary24h || this.summary24h;
         this.robots = response.robots || [];
@@ -109,7 +111,7 @@ export class AdminRobotsComponent implements OnInit {
     this.adminRobots.run(robotName, {
       force: this.forceRun,
       cooldownMinutes: this.cooldownMinutes
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         if (result.wasSkipped) {
           this.uiFeedback.info(`${result.robotName} pulado por segurança (${result.skipReason || 'janela recente'}).`);
@@ -137,7 +139,7 @@ export class AdminRobotsComponent implements OnInit {
     this.confirmRunAllOpen = false;
     if (this.runningAll || this.runningRobot) return;
     this.runningAll = true;
-    this.adminRobots.runAll().subscribe({
+    this.adminRobots.runAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (results) => {
         const ok = (results || []).filter((x) => x.success).length;
         const fail = (results || []).length - ok;

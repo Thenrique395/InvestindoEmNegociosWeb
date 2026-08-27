@@ -3,7 +3,7 @@
     @if (loadErrorMessage) {
       <div
         role="alert"
-        class="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-300/60 bg-amber-500/10 px-[var(--space-6)] py-[var(--space-3)] text-[0.8125rem] text-[var(--warning-text)]">
+        class="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[var(--warning-border)] bg-[var(--warning-tint)] px-[var(--space-6)] py-[var(--space-3)] text-[0.8125rem] text-[var(--warning-text)]">
         <span>{{ loadErrorMessage }}</span>
         <button
           type="button"
@@ -283,7 +283,7 @@
     </section>
   }
   @if (showInsightDetails) {
-    <div class="fixed inset-0 z-[2100] grid place-items-center bg-slate-950/60 p-[var(--space-10)] backdrop-blur-[2px]">
+    <div class="fixed inset-0 z-[2100] grid place-items-center bg-[var(--overlay)] p-[var(--space-10)] backdrop-blur-[2px]">
       <div class="relative grid w-full max-w-[620px] gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-[var(--space-10)] shadow-[var(--shadow-dropdown)] max-h-[88vh] overflow-y-auto pb-24 pb-[var(--space-10)]">
         <button class="absolute right-3 top-3 grid h-[34px] w-[34px] place-items-center rounded-full border border-[var(--border)] bg-[var(--surface-sunken)] text-[var(--fs-section)] text-[var(--text)]" type="button" (click)="closeInsightDetails()" aria-label="Fechar detalhes">
           ×
@@ -329,7 +329,7 @@
                 </div>
                 <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--surface-inset)]">
                   <div class="h-full rounded-full transition-all duration-300"
-                    [ngClass]="insightPriority === 'Crítico' ? 'bg-rose-500' : insightPriority === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'"
+                    [ngClass]="insightPriority === 'Crítico' ? 'bg-[var(--expense)]' : insightPriority === 'Atenção' ? 'bg-[var(--warning)]' : 'bg-[var(--income)]'"
                   [style.width.%]="insightScoreGaugeWidth"></div>
                 </div>
                 @if (robotScoreBreakdown.length) {
@@ -370,10 +370,10 @@
                     <article
                       class="rounded-[10px] border px-2 py-2 text-[0.8125rem]"
                 [ngClass]="todo.severity === 'danger'
-                  ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
+                  ? 'border-[var(--expense-border)] bg-[var(--expense-tint)] text-[var(--expense-text)]'
                   : todo.severity === 'warn'
-                    ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
-                    : 'border-sky-300/60 bg-sky-500/10 text-[var(--primary-text)]'">
+                    ? 'border-[var(--warning-border)] bg-[var(--warning-tint)] text-[var(--warning-text)]'
+                    : 'border-[var(--primary-border)] bg-[var(--primary-tint)] text-[var(--primary-text)]'">
                       <div class="flex flex-wrap items-center justify-between gap-2">
                         <p class="m-0 flex-1">{{ todo.text }}</p>
                         <a
@@ -410,10 +410,10 @@
                       <div
                         class="grid grid-cols-[64px_1fr_auto] items-center gap-2 rounded-[10px] border px-2 py-2 text-[0.8125rem]"
                 [ngClass]="point.tone === 'danger'
-                  ? 'border-rose-300/60 bg-rose-500/10 text-[var(--expense-text)]'
+                  ? 'border-[var(--expense-border)] bg-[var(--expense-tint)] text-[var(--expense-text)]'
                   : point.tone === 'warn'
-                    ? 'border-amber-300/60 bg-amber-500/10 text-[var(--warning-text)]'
-                    : 'border-emerald-300/60 bg-emerald-500/10 text-[var(--income-text)]'">
+                    ? 'border-[var(--warning-border)] bg-[var(--warning-tint)] text-[var(--warning-text)]'
+                    : 'border-[var(--income-border)] bg-[var(--income-tint)] text-[var(--income-text)]'">
                         <strong>{{ point.dateLabel }}</strong>
                         <span>+{{ point.incomesAmount | appCurrency }} / -{{ point.expensesAmount | appCurrency }}</span>
                         <strong>{{ point.closingBalance | appCurrency }}</strong>

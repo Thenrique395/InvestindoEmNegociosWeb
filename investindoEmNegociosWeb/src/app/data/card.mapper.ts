@@ -1,5 +1,5 @@
 import { CardDto } from '../cards.service';
-import { StoredCard } from '../data/api-data.service';
+import { StoredCard } from './api-data.service';
 
 /** Formato que as telas usam (StoredCard) a partir do que a API devolve (CardDto). */
 export function toStoredCard(card: CardDto): StoredCard {

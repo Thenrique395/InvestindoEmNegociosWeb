@@ -2,12 +2,12 @@ import { CategoryDto } from '../categories.service';
 import {
   buildCategoryViews,
   buildOverview,
-  colorForCategory,
   filterCategories,
   iconForCategory,
   sortByName,
   CategoriesFilters
 } from './categories-overview.model';
+import { colorForCategory } from '../utils/category-color';
 
 function cat(p: Partial<CategoryDto> & { id: string; name: string }): CategoryDto {
   return { appliesTo: 'Expense', isDefault: false, isActive: true, ...p };

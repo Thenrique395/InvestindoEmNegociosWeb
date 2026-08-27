@@ -1,4 +1,5 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, DestroyRef, effect, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -119,7 +120,8 @@ export class ContasComponent implements OnInit {
   constructor(
     private readonly accountsStore: AccountsStore,
     private readonly categoriesService: CategoriesService,
-    private readonly uiPermissions: UiPermissionsService
+    private readonly uiPermissions: UiPermissionsService,
+    private readonly destroyRef: DestroyRef
   ) {
     this.canAdvanced = this.uiPermissions.canUseAdvancedAccountAnalysis();
 
@@ -522,7 +524,7 @@ export class ContasComponent implements OnInit {
     this.ofxRawText = '';
     this.ofxExtract = { items: [], rawText: '' };
 
-    this.accountsStore.extractOfx(file, this.selectedAccountId).subscribe({
+    this.accountsStore.extractOfx(file, this.selectedAccountId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.ofxExtract = {
           ...result,
@@ -598,7 +600,7 @@ export class ContasComponent implements OnInit {
     this.csvRawText = '';
     this.csvExtract = { delimiter: ';', detectedColumns: [], items: [], rawText: '' };
 
-    this.accountsStore.extractCsv(file, this.selectedAccountId).subscribe({
+    this.accountsStore.extractCsv(file, this.selectedAccountId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.csvExtract = {
           ...result,
@@ -713,7 +715,7 @@ export class ContasComponent implements OnInit {
   }
 
   private loadCategories(): void {
-    this.categoriesService.list(undefined, { pageSize: 200 }).subscribe({
+    this.categoriesService.list(undefined, { pageSize: 200 }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (items) => {
         this.categories = items || [];
       }

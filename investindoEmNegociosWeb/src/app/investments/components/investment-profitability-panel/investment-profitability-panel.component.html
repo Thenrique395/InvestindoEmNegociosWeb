@@ -55,51 +55,12 @@
         <small>{{ comparisonLabel(lastMonthPercent, lastMonthBenchmarkPercent) }}</small>
       </article>
     </div>
-    <div class="rentabilidade-chart">
-      <div class="rentabilidade-axis">
-        @for (tick of chartTicks; track trackByIndex($index)) {
-          <span>{{ tick | number:'1.0-0' }}%</span>
-        }
-      </div>
-      <div class="rentabilidade-plot">
-        <div class="rentabilidade-grid-lines">
-          @for (_ of gridLines; track trackByIndex($index)) {
-            <span></span>
-          }
-        </div>
-        <svg
-          viewBox="0 0 1000 280"
-          preserveAspectRatio="none"
-          role="img"
-          aria-label="Evolução de rentabilidade da carteira e índice"
-          [style.--benchmark-color]="benchmarkColor">
-          <polyline class="line cdi" [attr.points]="lineBenchmark"></polyline>
-          <polyline class="line carteira" [attr.points]="linePortfolio"></polyline>
-        </svg>
-        @if (points.length) {
-          <div class="rentabilidade-hover-points">
-            @for (point of points; track trackByIndex($index); let i = $index) {
-              <div class="rentabilidade-hover-point" [style.left.%]="(i / (points.length - 1 || 1)) * 100">
-                <span class="chart-hover-tip">
-                  {{ point.label }}<br />
-                  Carteira: {{ point.carteiraAc | number:'1.1-1' }}%<br />
-                  {{ benchmarkLabel }}: {{ point.benchmarkAc | number:'1.1-1' }}%
-                </span>
-              </div>
-            }
-          </div>
-        }
-        <div class="rentabilidade-x-axis">
-          @for (point of points; track trackByIndex($index)) {
-            <small>{{ point.label }}</small>
-          }
-        </div>
-      </div>
-    </div>
-    <div class="legend-row">
-      <span><i class="chip carteira"></i> Sua carteira</span>
-      <span><i class="chip cdi" [style.background]="benchmarkColor"></i> {{ benchmarkLabel }}</span>
-    </div>
+    <app-chart-line
+      [series]="chartSeries"
+      [labels]="chartLabels"
+      [height]="280"
+      [formatValue]="formatPercent"
+      [formatTick]="formatPercent" />
   </article>
 </section>
 

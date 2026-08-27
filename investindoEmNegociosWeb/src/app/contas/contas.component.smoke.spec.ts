@@ -84,7 +84,8 @@ describe('ContasComponent smoke', () => {
       new ContasComponent(
         store as unknown as AccountsStore,
         categoriesService as unknown as CategoriesService,
-        new UiPermissionsServiceMock() as unknown as UiPermissionsService
+        new UiPermissionsServiceMock() as unknown as UiPermissionsService,
+        { onDestroy: () => {} } as any
       )
     );
   });

@@ -116,3 +116,28 @@
     justify-items: center;
   }
 }
+
+/* ---------- Modo compacto (coluna lateral) ------------------------------- */
+.donut-layout--compact {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  justify-items: center;
+}
+
+.donut-layout--compact .donut {
+  width: 148px;
+  height: 148px;
+}
+
+.donut-layout--compact .donut::after {
+  inset: 26px;
+}
+
+.donut-layout--compact .distribution-list {
+  width: 100%;
+  gap: var(--space-3);
+}
+
+.donut-layout--compact .distribution-item {
+  padding: 0.5rem 0.6rem;
+}

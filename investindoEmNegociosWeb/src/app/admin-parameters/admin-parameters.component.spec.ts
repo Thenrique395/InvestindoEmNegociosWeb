@@ -48,7 +48,7 @@ describe('AdminParametersComponent', () => {
     };
 
     return {
-      component: new AdminParametersComponent(adminParameters, uiFeedback),
+      component: new AdminParametersComponent(adminParameters, uiFeedback, { onDestroy: () => {} } as any),
       adminParameters,
       uiFeedback
     };

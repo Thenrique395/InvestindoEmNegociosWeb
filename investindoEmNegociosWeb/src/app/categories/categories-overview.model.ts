@@ -1,4 +1,5 @@
 import { CategoryDto, CategoryType } from '../categories.service';
+import { colorForCategory } from '../utils/category-color';
 
 /**
  * Modelo puro da Central de Categorias — foco em cadastro, edição e exclusão.
@@ -34,15 +35,6 @@ export interface CategoriesOverview {
 }
 
 /** Paleta fixa de categoria: `--chart-1` a `--chart-7`, sem seletor livre. TELAS.md §7. */
-export const CATEGORY_PALETTE = [
-  'var(--chart-1)',
-  'var(--chart-2)',
-  'var(--chart-3)',
-  'var(--chart-4)',
-  'var(--chart-5)',
-  'var(--chart-6)',
-  'var(--chart-7)'
-];
 
 const ICON_BY_NAME: Record<string, string> = {
   mercado: '🛒',
@@ -78,14 +70,6 @@ export function iconForCategory(name: string, type: CategoryType | null): string
   const key = normalizeText(name);
   if (ICON_BY_NAME[key]) return ICON_BY_NAME[key];
   return type === 'Income' ? '💵' : '🧾';
-}
-
-export function colorForCategory(seed: string): string {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash * 31 + seed.charCodeAt(i)) & 0xffffffff;
-  }
-  return CATEGORY_PALETTE[Math.abs(hash) % CATEGORY_PALETTE.length];
 }
 
 export function buildCategoryViews(categories: CategoryDto[]): CategoryView[] {

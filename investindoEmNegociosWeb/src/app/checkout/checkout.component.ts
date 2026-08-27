@@ -1,6 +1,7 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, OnDestroy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../seo-defaults';
@@ -27,7 +28,14 @@ export class CheckoutComponent implements OnDestroy {
   processing = false;
   currentStep = 1;
 
-  accountForm: FormGroup;
+  accountForm: FormGroup<{
+    nome: FormControl<string>;
+    email: FormControl<string>;
+    cpf: FormControl<string>;
+    senha: FormControl<string>;
+    confirmarSenha: FormControl<string>;
+    aceitarTermos: FormControl<boolean>;
+  }>;
   checkingAvailability = false;
   accountExists = false;
   showRegistrationFields = false;
@@ -50,15 +58,16 @@ export class CheckoutComponent implements OnDestroy {
     private readonly uiFeedback: UiFeedbackService,
     private readonly fb: FormBuilder,
     private readonly title: Title,
-    private readonly meta: Meta
+    private readonly meta: Meta,
+    private readonly destroyRef: DestroyRef
   ) {
-    route.queryParamMap.subscribe((params) => {
+    route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.selectedPlan = findMarketingPlan(params.get('plan'));
       this.selectedCycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
       this.persistIntent();
     });
 
-    this.accountForm = this.fb.group(
+    this.accountForm = this.fb.nonNullable.group(
       {
         nome: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
@@ -187,7 +196,7 @@ export class CheckoutComponent implements OnDestroy {
 
     this.processing = true;
     if (this.selectedPlan.code !== 'basic') {
-      this.billingService.startCheckout(this.selectedPlan.code, this.selectedCycle).subscribe({
+      this.billingService.startCheckout(this.selectedPlan.code, this.selectedCycle).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (response) => {
           this.checkoutIntent.save({
             plan: this.selectedPlan.code,
@@ -217,7 +226,7 @@ export class CheckoutComponent implements OnDestroy {
       return;
     }
 
-    this.subscriptionsService.change(this.selectedPlan.code, this.selectedCycle).subscribe({
+    this.subscriptionsService.change(this.selectedPlan.code, this.selectedCycle).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.authService.applySession(response.session);
         this.checkoutIntent.clear();
@@ -265,7 +274,7 @@ export class CheckoutComponent implements OnDestroy {
     }
 
     this.checkingAvailability = true;
-    this.authService.checkAvailability(email?.value, cpf?.value).subscribe({
+    this.authService.checkAvailability(email?.value, cpf?.value).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.checkingAvailability = false;
         if (res.emailExists || res.documentExists) {
@@ -296,14 +305,10 @@ export class CheckoutComponent implements OnDestroy {
 
     this.processing = true;
     this.persistIntent();
-    const payload: RegisterPayload = {
-      nome: this.accountForm.value.nome,
-      email: this.accountForm.value.email,
-      senha: this.accountForm.value.senha,
-      cpf: this.accountForm.value.cpf
-    };
+    const { nome, email, senha, cpf } = this.accountForm.getRawValue();
+    const payload: RegisterPayload = { nome, email, senha, cpf };
 
-    this.authService.register(payload).subscribe({
+    this.authService.register(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         // Double opt-in: o cadastro não loga mais. O usuário precisa confirmar o e-mail antes de
         // seguir (o fluxo de pagamento está adiado de qualquer forma).

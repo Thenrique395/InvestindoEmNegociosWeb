@@ -1,6 +1,7 @@
 import { StoredCard, StoredExpense } from '../data/api-data.service';
 import { isExpenseOpen } from '../utils/home-insight.utils';
 import { parseLocaleDate } from '../utils/locale-utils';
+import { nextOccurrenceOfDay } from '../utils/date-recurrence';
 
 export type UsageTone = 'ok' | 'warning' | 'critical';
 export type CardStatus = 'overdue' | 'due-soon' | 'on-track' | 'no-invoice';
@@ -45,31 +46,11 @@ export function bestPurchaseDay(closingDay: number): number {
   return day >= 31 ? 1 : day + 1;
 }
 
-function lastDayOfMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate();
-}
-
 /**
  * Próxima ocorrência de um dia do mês a partir de `today` (hoje conta como
  * próxima). Dias maiores que o último dia do mês (ex.: 31 em fevereiro) caem no
  * último dia daquele mês.
  */
-export function nextOccurrenceOfDay(day: number, today: Date): Date {
-  const wanted = Math.max(Number(day) || 1, 1);
-  const base = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  let year = today.getFullYear();
-  let month = today.getMonth();
-  let candidate = new Date(year, month, Math.min(wanted, lastDayOfMonth(year, month)));
-  if (candidate < base) {
-    month += 1;
-    if (month > 11) {
-      month = 0;
-      year += 1;
-    }
-    candidate = new Date(year, month, Math.min(wanted, lastDayOfMonth(year, month)));
-  }
-  return candidate;
-}
 
 function daysBetween(from: Date, to: Date): number {
   const a = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();

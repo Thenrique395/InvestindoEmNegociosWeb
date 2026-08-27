@@ -36,6 +36,7 @@
   --primary-hover:         #1D4ED8;
   --primary-text:          #1D4ED8;  /* texto/ícone azul sobre fundo claro    */
   --primary-tint:          rgba(37, 99, 235, .10);  /* badge, ícone-caixa     */
+  --primary-border:        rgba(37, 99, 235, .24);
   --primary-tint-soft:     rgba(37, 99, 235, .08);  /* item selecionado       */
   --primary-ring:          rgba(37, 99, 235, .12);  /* foco (box-shadow 4px)  */
   --primary-ring-strong:   rgba(37, 99, 235, .35);  /* :focus-visible         */
@@ -45,6 +46,7 @@
   --income-text:           #2A7551;  /* texto verde legível em fundo claro    */
   --income-tint:           rgba(52, 144, 99, .12);
   --income-tint-soft:      rgba(52, 144, 99, .07);
+  --income-border:         rgba(52, 144, 99, .24);
 
   --expense:               #D9483F;  /* despesa, estouro, atraso              */
   --expense-text:          #B3372F;
@@ -56,6 +58,11 @@
   --warning-text:          #9A5C0E;
   --warning-tint:          rgba(201, 122, 21, .14);
   --warning-tint-soft:     rgba(201, 122, 21, .08);
+  --warning-border:        rgba(201, 122, 21, .24);
+
+  /* Tom neutro para indicador sem veredito (nada vencido, nada a destacar).   */
+  --neutral-tint:          rgba(70, 96, 108, .10);
+  --neutral-border:        rgba(70, 96, 108, .22);
 
   /* ---------- SÉRIES DE GRÁFICO / CATEGORIA ----------------------------- */
   --chart-1:               #2563EB;  /* Moradia, Renda Fixa, Serviços         */

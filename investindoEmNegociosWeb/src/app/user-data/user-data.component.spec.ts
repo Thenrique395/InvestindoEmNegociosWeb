@@ -37,7 +37,7 @@ describe('UserDataComponent', () => {
     };
 
     return {
-      component: new UserDataComponent(portabilityService as any, profileService, authService, router, uiFeedback),
+      component: new UserDataComponent(portabilityService as any, profileService, authService, router, uiFeedback, { onDestroy: () => {} } as any),
       profileService,
       authService,
       router,

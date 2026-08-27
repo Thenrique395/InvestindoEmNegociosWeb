@@ -3,10 +3,10 @@ import {
   bestPurchaseDay,
   buildCardMetrics,
   buildCardsOverview,
-  nextOccurrenceOfDay,
   statementStatusFor,
   usageToneFor
 } from './card-metrics.model';
+import { nextOccurrenceOfDay } from '../utils/date-recurrence';
 
 function card(partial: Partial<StoredCard> & { id: string }): StoredCard {
   return {

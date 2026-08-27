@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
 import { ProfileService, Preferences } from '../profile.service';
@@ -40,11 +41,12 @@ export class UserPreferencesComponent implements OnInit {
     private profileService: ProfileService,
     private uiFeedback: UiFeedbackService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
-    this.profileService.getPreferences().subscribe((prefs) => {
+    this.profileService.getPreferences().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((prefs) => {
       this.moedaSelecionada = prefs.currency || 'BRL';
       if (prefs.locales?.length) {
         this.localizacoes = prefs.locales;
@@ -78,7 +80,7 @@ export class UserPreferencesComponent implements OnInit {
       }
     };
     this.loading = true;
-    this.profileService.updatePreferences(payload).subscribe({
+    this.profileService.updatePreferences(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (resp) => {
         const locale = resp.locales[0] || 'pt-BR';
         const currency = resp.currency || 'BRL';
@@ -113,7 +115,7 @@ export class UserPreferencesComponent implements OnInit {
     }
 
     this.deletingAccount = true;
-    this.profileService.deleteOwnAccount({ currentPassword: password, confirmationText }).subscribe({
+    this.profileService.deleteOwnAccount({ currentPassword: password, confirmationText }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.deletingAccount = false;
         this.authService.clearSession();

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminUsersService, AdminUserFeatureAccess, AdminUserSummary } from '../admin-users.service';
@@ -50,7 +51,8 @@ export class AdminUsersComponent implements OnInit {
 
   constructor(
     private adminUsers: AdminUsersService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
@@ -59,7 +61,7 @@ export class AdminUsersComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.adminUsers.list().subscribe({
+    this.adminUsers.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (users) => {
         this.users = users.map((user) => ({
           ...user,
@@ -113,7 +115,7 @@ export class AdminUsersComponent implements OnInit {
 
     this.savingId = user.id;
 
-    forkJoin(requests.length ? requests : [of(user)]).subscribe({
+    forkJoin(requests.length ? requests : [of(user)]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (responses) => {
         const last = responses[responses.length - 1] as AdminUserSummary;
         user.role = user.pendingRole = last.role;
@@ -151,7 +153,7 @@ export class AdminUsersComponent implements OnInit {
     if (this.featuresByUserId[user.id]?.length) return;
 
     this.featuresLoadingForUserId = user.id;
-    this.adminUsers.listFeatures(user.id).subscribe({
+    this.adminUsers.listFeatures(user.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (features) => {
         this.featuresByUserId[user.id] = features;
       },
@@ -182,7 +184,7 @@ export class AdminUsersComponent implements OnInit {
       ? this.adminUsers.clearFeatureOverride(user.id, feature.featureKey)
       : this.adminUsers.setFeatureOverride(user.id, feature.featureKey, mode === 'enabled');
 
-    request$.subscribe({
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (features) => {
         this.featuresByUserId[user.id] = features;
       },
@@ -259,7 +261,7 @@ export class AdminUsersComponent implements OnInit {
 
   private applyDeleteUser(user: AdminUserRow): void {
     this.deletingId = user.id;
-    this.adminUsers.remove(user.id).subscribe({
+    this.adminUsers.remove(user.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.users = this.users.filter((u) => u.id !== user.id);
         this.uiFeedback.success('Usuário removido com sucesso.');
@@ -303,7 +305,7 @@ export class AdminUsersComponent implements OnInit {
     if (this.grantingTrial) return;
     if (!this.trialPlanCode || this.trialDays < 1 || this.trialDays > 365) return;
     this.grantingTrial = true;
-    this.adminUsers.grantTrial(user.id, this.trialPlanCode, this.trialDays).subscribe({
+    this.adminUsers.grantTrial(user.id, this.trialPlanCode, this.trialDays).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.uiFeedback.success(`Trial de ${this.trialDays} dias (${this.trialPlanCode}) concedido a ${user.name || user.email}.`);
         this.trialOpenForUserId = null;

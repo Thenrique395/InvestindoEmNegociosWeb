@@ -52,7 +52,8 @@ function createComponent(queryParams: Record<string, string> = {}) {
     uiFeedback,
     new FormBuilder(),
     title as any,
-    meta as any
+    meta as any,
+    { onDestroy: () => {} } as any
   );
 
   return { component, route, router, authService, billingService, checkoutIntent, subscriptionsService, uiFeedback, title, meta };

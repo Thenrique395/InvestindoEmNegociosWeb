@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -78,7 +79,8 @@ export class AdminParametersComponent implements OnInit {
 
   constructor(
     private adminParameters: AdminParametersService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
@@ -124,7 +126,7 @@ export class AdminParametersComponent implements OnInit {
           return of(null);
         })
       )
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ brands, methods, institutions, notifications, robots, scalability }) => {
         this.cardBrands = brands;
         this.paymentMethods = methods;
@@ -172,7 +174,7 @@ export class AdminParametersComponent implements OnInit {
     }
 
     this.savingCreateBrand = true;
-    this.adminParameters.createCardBrand(name, code).subscribe({
+    this.adminParameters.createCardBrand(name, code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
         this.cardBrands = [...this.cardBrands, created].sort((a, b) => a.id - b.id);
         this.lastUpdatedBrands[created.id] = new Date();
@@ -228,7 +230,7 @@ export class AdminParametersComponent implements OnInit {
     }
 
     this.savingCreateMethod = true;
-    this.adminParameters.createPaymentMethod(name).subscribe({
+    this.adminParameters.createPaymentMethod(name).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
         this.paymentMethods = [...this.paymentMethods, created].sort((a, b) => a.id - b.id);
         this.lastUpdatedMethods[created.id] = new Date();
@@ -253,7 +255,7 @@ export class AdminParametersComponent implements OnInit {
     }
 
     this.savingCreateInstitution = true;
-    this.adminParameters.createInstitution(name, this.newInstitutionType).subscribe({
+    this.adminParameters.createInstitution(name, this.newInstitutionType).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
         this.institutions = [...this.institutions, created].sort((a, b) => a.name.localeCompare(b.name));
         this.lastUpdatedInstitutions[created.id] = new Date();
@@ -272,7 +274,7 @@ export class AdminParametersComponent implements OnInit {
   salvarNotificacoes(): void {
     if (this.savingNotificationSettings) return;
     this.savingNotificationSettings = true;
-    this.adminParameters.updateNotificationSettings(this.notificationSettings).subscribe({
+    this.adminParameters.updateNotificationSettings(this.notificationSettings).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         this.notificationSettings = updated;
         this.notificationsUpdatedAt = new Date();
@@ -295,7 +297,7 @@ export class AdminParametersComponent implements OnInit {
     }
 
     this.savingRobotSettings = true;
-    this.adminParameters.updateRobotSettings(this.robotSettings).subscribe({
+    this.adminParameters.updateRobotSettings(this.robotSettings).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         this.robotSettings = updated;
         this.robotsUpdatedAt = new Date();
@@ -319,7 +321,7 @@ export class AdminParametersComponent implements OnInit {
     }
 
     this.sendingTestEmail = true;
-    this.adminParameters.sendTestEmail(to).subscribe({
+    this.adminParameters.sendTestEmail(to).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.testEmailTo = result.to;
         this.testEmailSentAt = new Date(result.sentAtUtc);
@@ -442,7 +444,7 @@ export class AdminParametersComponent implements OnInit {
     this.savingKey = key;
     brand.isActive = next;
 
-    this.adminParameters.updateCardBrandStatus(brand.id, next).subscribe({
+    this.adminParameters.updateCardBrandStatus(brand.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         brand.isActive = updated.isActive;
         this.lastUpdatedBrands[brand.id] = new Date();
@@ -462,7 +464,7 @@ export class AdminParametersComponent implements OnInit {
     this.savingKey = key;
     method.isActive = next;
 
-    this.adminParameters.updatePaymentMethodStatus(method.id, next).subscribe({
+    this.adminParameters.updatePaymentMethodStatus(method.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         method.isActive = updated.isActive;
         this.lastUpdatedMethods[method.id] = new Date();
@@ -482,7 +484,7 @@ export class AdminParametersComponent implements OnInit {
     this.savingKey = key;
     institution.isActive = next;
 
-    this.adminParameters.updateInstitutionStatus(institution.id, next).subscribe({
+    this.adminParameters.updateInstitutionStatus(institution.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         institution.isActive = updated.isActive;
         this.lastUpdatedInstitutions[institution.id] = new Date();

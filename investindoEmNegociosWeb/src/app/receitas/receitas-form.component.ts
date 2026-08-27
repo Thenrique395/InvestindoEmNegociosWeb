@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SelectMenuComponent, SelectMenuOption } from '../shared/select-menu/select-menu.component';
-import { colorForCategory } from '../categories/categories-overview.model';
+import { colorForCategory } from '../utils/category-color';
 import { RouterLink } from '@angular/router';
 import { StoredIncome } from '../data/api-data.service';
 import { CategoryDto } from '../categories.service';

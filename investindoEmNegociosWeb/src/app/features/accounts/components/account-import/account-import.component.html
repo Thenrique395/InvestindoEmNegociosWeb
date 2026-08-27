@@ -98,7 +98,7 @@
             <span [ngClass]="{
               'text-[var(--income-text)]': confidenceTone(item) === 'success',
               'text-[var(--warning-text)]': confidenceTone(item) === 'warning',
-              'text-gray-500': confidenceTone(item) === 'muted'
+              'text-[var(--text-tertiary)]': confidenceTone(item) === 'muted'
             }">
                   {{ confidenceLabel(item) }}
                 </span>
@@ -162,7 +162,7 @@
             <span [ngClass]="{
               'text-[var(--income-text)]': confidenceTone(item) === 'success',
               'text-[var(--warning-text)]': confidenceTone(item) === 'warning',
-              'text-gray-500': confidenceTone(item) === 'muted'
+              'text-[var(--text-tertiary)]': confidenceTone(item) === 'muted'
             }">
                   {{ confidenceLabel(item) }}
                 </span>

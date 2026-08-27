@@ -1,4 +1,4 @@
-<div class="responsive-list" [class.responsive-list--dimmed]="!items.length">
+<div class="responsive-list" [class.responsive-list--dimmed]="!items.length" [class.responsive-list--comfortable]="density === 'comfortable'">
   <div class="responsive-list__scroll">
     <table class="responsive-list__table">
       <thead class="responsive-list__head">
@@ -18,7 +18,9 @@
             <th
               class="responsive-list__cell"
               [class.responsive-list__cell--value]="column.align === 'end'"
-              [class]="column.widthClass || ''">
+              [class]="column.widthClass || ''"
+              [style.width]="column.width || null"
+              [style.min-width]="column.minWidth || null">
               @if (column.sortable) {
                 <button type="button" class="responsive-list__sort" (click)="sortByColumn(column.key)">
                   {{ column.label }}
@@ -75,6 +77,7 @@
                   class="responsive-list__item"
                   [class.responsive-list__item--value]="column.align === 'end'"
                   [class.responsive-list__item--truncate]="column.truncate"
+                  [class.responsive-list__item--actions]="column.actions"
                   [attr.data-label]="column.label">
                   <ng-container *ngTemplateOutlet="cellTemplate(column.key); context: { $implicit: item }"></ng-container>
                 </td>

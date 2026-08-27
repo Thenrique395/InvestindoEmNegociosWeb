@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectMenuComponent } from '../shared/select-menu/select-menu.component';
 import { FormsModule } from '@angular/forms';
 import { CategoriesService, CategoryDto, CategoryType } from '../categories.service';
@@ -119,7 +120,8 @@ export class CategoriesComponent implements OnInit {
     private readonly adminCategoriesService: AdminCategoriesService,
     private readonly authService: AuthService,
     private readonly uiFeedback: UiFeedbackService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
@@ -156,7 +158,7 @@ export class CategoriesComponent implements OnInit {
 
   loadAdmin(): void {
     this.adminLoading.set(true);
-    this.adminCategoriesService.list(true).subscribe({
+    this.adminCategoriesService.list(true).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => { this.adminCategories.set(data); },
       error: () => { this.uiFeedback.error('Não foi possível carregar as categorias de sistema.'); this.adminLoading.set(false); this.cdr.markForCheck(); },
       complete: () => { this.adminLoading.set(false); this.cdr.markForCheck(); }
@@ -196,7 +198,7 @@ export class CategoriesComponent implements OnInit {
     this.saving.set(true);
 
     if (this.isAdmin && this.escopo === 'default') {
-      this.adminCategoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).subscribe({
+      this.adminCategoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => {
           this.resetCategoryForm();
           this.showModal.set(false);
@@ -211,7 +213,7 @@ export class CategoriesComponent implements OnInit {
       return;
     }
 
-    this.categoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).subscribe({
+    this.categoriesService.create({ name: nomeLimpo, appliesTo: this.tipo }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.categoriesStore.refresh();
         this.resetCategoryForm();
@@ -246,7 +248,7 @@ export class CategoriesComponent implements OnInit {
     const next = !admin.isActive;
     this.adminSaving.set(true);
     this.setAdminActive(admin.id, next); // otimista
-    this.adminCategoriesService.updateStatus(admin.id, next).subscribe({
+    this.adminCategoriesService.updateStatus(admin.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => { this.setAdminActive(admin.id, updated.isActive); this.categoriesService.invalidateCache(); this.categoriesStore.refresh(); },
       error: () => { this.setAdminActive(admin.id, !next); this.uiFeedback.error('Não foi possível atualizar o status.'); },
       complete: () => { this.adminSaving.set(false); this.cdr.markForCheck(); }
@@ -258,7 +260,7 @@ export class CategoriesComponent implements OnInit {
     if (this.saving()) return;
     const next = !view.isActive;
     this.saving.set(true);
-    this.categoriesService.setStatus(view.category.id, next).subscribe({
+    this.categoriesService.setStatus(view.category.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.categoriesStore.refresh();
         this.uiFeedback.success(next ? 'Categoria reativada.' : 'Categoria desativada.');
@@ -280,7 +282,7 @@ export class CategoriesComponent implements OnInit {
       return;
     }
     this.adminSaving.set(true);
-    this.adminCategoriesService.update(this.adminEditing.id, { name: this.adminName.trim(), appliesTo: this.adminAppliesTo || null }).subscribe({
+    this.adminCategoriesService.update(this.adminEditing.id, { name: this.adminName.trim(), appliesTo: this.adminAppliesTo || null }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.showAdminModal.set(false);
         this.adminEditing = null;
@@ -309,7 +311,7 @@ export class CategoriesComponent implements OnInit {
     if (!view) return;
     this.deleteTarget = null;
 
-    this.categoriesService.delete(view.category.id).subscribe({
+    this.categoriesService.delete(view.category.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.categoriesStore.refresh();
         if (result.action === 'deactivated') {

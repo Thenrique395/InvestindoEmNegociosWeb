@@ -317,7 +317,8 @@ input {
 }
 
 .link-btn {
-  border: 1px dashed transparent;
+  /* Reage ao hover da LINHA via custom property exposta pelo app-responsive-list. */
+  border: 1px dashed var(--responsive-list-row-hover-border, transparent);
   background: transparent;
   min-height: 34px;
   padding: 0.35rem 0.55rem;
@@ -412,48 +413,6 @@ input {
   justify-content: flex-end;
 }
 
-:host ::ng-deep .orcamento-usage-column {
-  width: 28%;
-  min-width: 12rem;
-}
-
-:host ::ng-deep .budget-table .responsive-list__cell {
-  padding-block: var(--space-3);
-}
-
-:host ::ng-deep .budget-table .responsive-list__item {
-  height: 56px;
-  padding-block: var(--space-4);
-}
-
-:host ::ng-deep .budget-table .responsive-list__row:hover .link-btn {
-  border-color: var(--border-strong);
-}
-
-:host ::ng-deep .side-card--chart .donut-layout {
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-5);
-  justify-items: center;
-}
-
-:host ::ng-deep .side-card--chart .donut {
-  width: 148px;
-  height: 148px;
-}
-
-:host ::ng-deep .side-card--chart .donut::after {
-  inset: 26px;
-}
-
-:host ::ng-deep .side-card--chart .distribution-list {
-  width: 100%;
-  gap: var(--space-3);
-}
-
-:host ::ng-deep .side-card--chart .distribution-item {
-  padding: 0.5rem 0.6rem;
-}
-
 .negative { color: var(--expense-text); }
 .over-budget { color: var(--expense-text); font-weight: 600; }
 
@@ -493,11 +452,6 @@ input {
 
   .usage-cell {
     min-width: 0;
-  }
-
-  :host ::ng-deep .budget-table .responsive-list__item {
-    height: auto;
-    padding-block: var(--space-2);
   }
 
   .budget-total-row {

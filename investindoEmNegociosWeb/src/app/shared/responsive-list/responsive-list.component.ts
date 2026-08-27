@@ -8,6 +8,17 @@ export interface ResponsiveListColumn {
   label: string;
   sortable?: boolean;
   align?: 'start' | 'end';
+  /**
+   * Largura da coluna como VALOR ('28%', '12rem', 'minmax(180px,2.1fr)') —
+   * ARQUITETURA_ANGULAR.md §7. Aplicada pelo primitivo no `<th>`.
+   *
+   * Substitui `widthClass`: a classe era aplicada dentro deste template, então
+   * carregava o `_ngcontent` do primitivo e a feature só conseguia estilizá-la
+   * furando o encapsulamento com `::ng-deep`.
+   */
+  width?: string;
+  minWidth?: string;
+  /** @deprecated Use `width`/`minWidth`. Mantido só para não quebrar consumidor antigo. */
   widthClass?: string;
   /**
    * Coluna que pode encolher e cortar com reticências em vez de empurrar a
@@ -16,6 +27,12 @@ export interface ResponsiveListColumn {
    * perdem o sentido pela metade.
    */
   truncate?: boolean;
+  /**
+   * Coluna de ações: no card do mobile ela sobe para o topo, alinhada à direita
+   * e sem etiqueta — o botão é a primeira coisa que a pessoa alcança com o polegar.
+   * Mesma mecânica da coluna de seleção; opt-in porque nem toda lista tem ações.
+   */
+  actions?: boolean;
 }
 
 @Component({
@@ -32,6 +49,13 @@ export class ResponsiveListComponent<T> implements OnChanges {
 
   @Input() sortBy: string | null = null;
   @Input() sortDir: 1 | -1 = 1;
+
+  /**
+   * `comfortable` dá mais respiro vertical à linha — listas com controle
+   * embutido na célula (input, botão de editar) ficam apertadas na densidade
+   * padrão. Mora aqui, não na feature: era o motivo de dois `::ng-deep`.
+   */
+  @Input() density: 'default' | 'comfortable' = 'default';
 
   @Input() loading = false;
   @Input() loadingLabel = 'Carregando...';

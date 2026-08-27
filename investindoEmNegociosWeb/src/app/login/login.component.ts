@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -35,7 +36,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private profile: ProfileService,
     private uiFeedback: UiFeedbackService,
     private title: Title,
-    private meta: Meta
+    private meta: Meta,
+    private readonly destroyRef: DestroyRef
   ) {}
 
   ngOnInit(): void {
@@ -59,7 +61,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     // confirmamos aqui mesmo (a tela de login renderiza de forma confiável) e mostramos o resultado.
     const confirmToken = this.route.snapshot.queryParamMap.get('confirmToken');
     if (confirmToken) {
-      this.auth.confirmEmail(confirmToken).subscribe({
+      this.auth.confirmEmail(confirmToken).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => this.uiFeedback.success('E-mail validado com sucesso! Faça login para entrar.'),
         error: () =>
           this.uiFeedback.error('Link de confirmação inválido ou expirado. Faça login para reenviar o e-mail.')
@@ -85,7 +87,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   resendConfirmation(): void {
     if (this.resending || !this.email) return;
     this.resending = true;
-    this.auth.resendConfirmation(this.email).subscribe({
+    this.auth.resendConfirmation(this.email).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.resending = false;
         this.uiFeedback.success('Se a conta estiver pendente, reenviamos o e-mail de confirmação.');
@@ -111,10 +113,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.emailNotConfirmed = false;
 
-    this.auth.login(this.email, this.password).subscribe({
+    this.auth.login(this.email, this.password).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: AuthSessionResponse) => {
         this.uiFeedback.success(`Bem-vindo, ${res.name}.`);
-        this.profile.getProfile().subscribe({
+        this.profile.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: (profile) => {
             this.loading = false;
             const returnTo = this.route.snapshot.queryParamMap.get('returnTo');

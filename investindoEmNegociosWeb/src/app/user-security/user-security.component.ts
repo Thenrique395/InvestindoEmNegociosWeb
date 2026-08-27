@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { ProfileService, SecuritySummary } from '../profile.service';
 import { UiFeedbackService } from '../ui-feedback.service';
@@ -24,7 +25,8 @@ export class UserSecurityComponent {
 
   constructor(
     private readonly profileService: ProfileService,
-    private readonly uiFeedback: UiFeedbackService
+    private readonly uiFeedback: UiFeedbackService,
+    private readonly destroyRef: DestroyRef
   ) {
     this.load();
   }
@@ -37,7 +39,7 @@ export class UserSecurityComponent {
     this.confirmRevokeOpen = false;
     if (this.revoking) return;
     this.revoking = true;
-    this.profileService.revokeOwnSessions().subscribe({
+    this.profileService.revokeOwnSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.uiFeedback.success(`${response.revokedSessions} sessão(ões) revogada(s).`);
         this.load();
@@ -54,7 +56,7 @@ export class UserSecurityComponent {
 
   private load(): void {
     this.loading = true;
-    this.profileService.getSecuritySummary().subscribe({
+    this.profileService.getSecuritySummary().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (summary) => {
         this.summary = summary;
         this.loading = false;

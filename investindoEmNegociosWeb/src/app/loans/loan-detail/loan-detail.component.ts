@@ -26,6 +26,8 @@ import { LoanContractView, buildContractView } from '../loans-overview.model';
 
 type LoanDetailTab = 'resumo' | 'parcelas' | 'evolucao' | 'historico';
 
+import { ChartLineComponent, LineSeries } from '../../shared/charts/chart-line/chart-line.component';
+
 @Component({
   selector: 'app-loan-detail',
   standalone: true,
@@ -33,7 +35,7 @@ type LoanDetailTab = 'resumo' | 'parcelas' | 'evolucao' | 'historico';
     CommonModule, FormsModule, RouterModule, AppCurrencyPipe, PageHeaderComponent, DatePickerComponent,
     TransactionSummaryCardComponent, SegmentedSelectorComponent, StatusBadgeComponent,
     ConfirmSheetComponent, UiStateComponent, EmptyStateComponent,
-    ResponsiveListComponent, ResponsiveListCellDirective
+    ResponsiveListComponent, ResponsiveListCellDirective, ChartLineComponent
   ],
   templateUrl: './loan-detail.component.html',
   styleUrl: './loan-detail.component.scss',
@@ -64,7 +66,7 @@ export class LoanDetailComponent implements OnInit {
     { key: 'total', label: 'Total', align: 'end' },
     { key: 'endingBalance', label: 'Saldo final', align: 'end' },
     { key: 'status', label: 'Situação' },
-    { key: 'actions', label: 'Ações', align: 'end' }
+    { key: 'actions', label: 'Ações', align: 'end', actions: true }
   ];
 
   readonly timeline = signal<LoanTimelineEvent[] | null>(null);
@@ -155,22 +157,21 @@ export class LoanDetailComponent implements OnInit {
     });
   }
 
-  /** Pontos do gráfico de saldo devedor (endingBalance por parcela), normalizados em viewBox 100×40. */
-  get balanceChart(): { line: string; area: string } | null {
+  /** Saldo devedor por parcela. A escala e o desenho ficam no `app-chart-line` (ARQUITETURA_ANGULAR.md §8). */
+  get balanceSeries(): LineSeries[] | null {
     const c = this.contract();
     if (!c || !c.installments.length) return null;
     const inst = [...c.installments].sort((a, b) => a.installmentNo - b.installmentNo);
-    const width = 100;
-    const height = 40;
-    const max = Math.max(c.principalAmount, ...inst.map(i => i.endingBalance), 1);
-    const n = inst.length;
-    const pts = inst.map((i, idx) => {
-      const x = n > 1 ? (idx / (n - 1)) * width : 0;
-      const y = height - (i.endingBalance / max) * height;
-      return `${x.toFixed(2)},${y.toFixed(2)}`;
-    });
-    const line = pts.join(' ');
-    return { line, area: `0,${height} ${line} ${width},${height}` };
+    // `emphasis` traz de volta a área sob a curva que o polígono desenhado à mão tinha.
+    return [{ label: 'Saldo devedor', color: 'var(--primary)', emphasis: true, points: inst.map((i) => i.endingBalance) }];
+  }
+
+  get balanceLabels(): string[] {
+    const c = this.contract();
+    if (!c) return [];
+    return [...c.installments]
+      .sort((a, b) => a.installmentNo - b.installmentNo)
+      .map((i) => String(i.installmentNo));
   }
 
   // ---- Pagamento --------------------------------------------------------

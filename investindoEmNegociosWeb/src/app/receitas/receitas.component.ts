@@ -14,7 +14,7 @@ import { maskDateDDMMYYYY, maskMoneyInput } from '../utils/input-mask';
 import { AuthService } from '../auth.service';
 import { CategoriesService, CategoryDto } from '../categories.service';
 import { hasAtLeastRole, UserRole } from '../roles';
-import { colorForCategory } from '../categories/categories-overview.model';
+import { colorForCategory } from '../utils/category-color';
 import { TxMobileHeaderComponent, TxMobileKpi } from '../shared/transactions/tx-mobile-header.component';
 import { TxFilterChipsComponent, TxFilterChip } from '../shared/transactions/tx-filter-chips.component';
 import { TxMobileListComponent, TxMobileItem } from '../shared/transactions/tx-mobile-list.component';

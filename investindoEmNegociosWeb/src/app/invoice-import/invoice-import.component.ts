@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { InvoiceImportService, InvoiceReconciliationResponse } from '../invoice-import.service';
 import { FormsModule } from '@angular/forms';
@@ -791,7 +792,7 @@ export class InvoiceImportComponent implements OnChanges {
   extract: InvoiceExtract = { items: [] };
   reconciliation: InvoiceReconciliationResponse | null = null;
 
-  constructor(private readonly invoiceImport: InvoiceImportService) {}
+  constructor(private readonly invoiceImport: InvoiceImportService, private readonly destroyRef: DestroyRef) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['cards'] && !this.selectedCardId && this.cards.length) {
@@ -822,7 +823,7 @@ export class InvoiceImportComponent implements OnChanges {
     this.rawText = '';
     this.extract = { items: [] };
 
-    this.invoiceImport.extract(file).subscribe({
+    this.invoiceImport.extract(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         const displayTotal = this.resolveDisplayTotal(response.total, response.totalDebitsBrazil);
         this.extract = {
@@ -883,6 +884,7 @@ export class InvoiceImportComponent implements OnChanges {
           categoryId: item.categoryId || this.selectedCategoryId || item.suggestedCategoryId || null
         }))
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
           this.imported.emit(result);
@@ -998,7 +1000,7 @@ export class InvoiceImportComponent implements OnChanges {
         ...item,
         categoryId: item.categoryId || this.selectedCategoryId || item.suggestedCategoryId || null
       }))
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
         this.reconciliation = result;
       },

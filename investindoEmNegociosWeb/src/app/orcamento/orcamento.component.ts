@@ -78,7 +78,7 @@ export class OrcamentoComponent implements OnInit {
     { key: 'planned', label: 'Planejado', align: 'end' },
     { key: 'realized', label: 'Realizado', align: 'end' },
     { key: 'variance', label: 'Variação', align: 'end' },
-    { key: 'usage', label: 'Uso', widthClass: 'orcamento-usage-column' },
+    { key: 'usage', label: 'Uso', width: '28%', minWidth: '12rem' },
     { key: 'actions', label: 'Ações', align: 'end' }
   ];
 

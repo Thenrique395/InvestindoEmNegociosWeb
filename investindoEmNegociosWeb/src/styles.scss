@@ -56,6 +56,7 @@
   --primary-text:      #5B9DFF;
   --on-primary:        #001620;  /* texto escuro sobre a primária clara */
   --primary-tint:      rgba(91, 157, 255, .14);
+  --primary-border:    rgba(91, 157, 255, .28);
   --primary-tint-soft: rgba(91, 157, 255, .10);
   --primary-ring:      rgba(91, 157, 255, .18);
 
@@ -63,6 +64,7 @@
   --income-text:       #7FD3A8;
   --income-tint:       rgba(127, 211, 168, .14);
   --income-tint-soft:  rgba(127, 211, 168, .08);
+  --income-border:     rgba(127, 211, 168, .28);
 
   --expense:           #F0928A;
   --expense-text:      #F0928A;
@@ -77,6 +79,10 @@
   --warning-text:      #E0A458;
   --warning-tint:      rgba(224, 164, 88, .16);
   --warning-tint-soft: rgba(224, 164, 88, .10);
+  --warning-border:    rgba(224, 164, 88, .28);
+
+  --neutral-tint:      rgba(255, 255, 255, .06);
+  --neutral-border:    rgba(255, 255, 255, .14);
 
   --overlay:           rgba(0, 8, 12, .66);
 

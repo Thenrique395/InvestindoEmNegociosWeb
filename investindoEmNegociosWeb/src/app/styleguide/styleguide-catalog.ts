@@ -194,13 +194,6 @@ export const STYLEGUIDE_COMPONENTS: StyleguideEntry[] = [
     description: 'Modal padrão com cabeçalho, corpo com scroll e rodapé de ações — tamanhos sm/md/lg/xl.'
   },
   {
-    slug: 'confirm-dialog',
-    name: 'ConfirmDialog',
-    selector: 'app-confirm-dialog',
-    category: 'overlay',
-    description: 'Diálogo de confirmação orientado a serviço (ConfirmDialogService.confirm) — substitui window.confirm.'
-  },
-  {
     slug: 'form-field',
     name: 'FormField',
     selector: 'app-form-field',

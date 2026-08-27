@@ -3,7 +3,7 @@ import { LoanContractResponse } from '../loans.service';
 import { Goal } from '../goals.service';
 import { StatusBadgeTone } from '../shared/status-badge/status-badge.component';
 import { parseLocaleDate } from '../utils/locale-utils';
-import { nextOccurrenceOfDay } from '../cartoes/card-metrics.model';
+import { nextOccurrenceOfDay } from '../utils/date-recurrence';
 
 /**
  * Modelo puro da Agenda Financeira.

@@ -31,7 +31,7 @@ function buildSpace(overrides: Partial<SpaceResponse> = {}): SpaceResponse {
 function createComponent() {
   const spacesService = new SpacesServiceMock();
   const uiFeedback = new UiFeedbackServiceMock();
-  const component = new EspacosComponent(spacesService as any, uiFeedback as any);
+  const component = new EspacosComponent(spacesService as any, uiFeedback as any, { onDestroy: () => {} } as any);
   return { component, spacesService, uiFeedback };
 }
 
@@ -42,13 +42,13 @@ describe('EspacosComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.spaces.length).toBe(2);
-    expect(component.loading).toBeFalse();
+    expect(component.spaces().length).toBe(2);
+    expect(component.loading()).toBeFalse();
   });
 
   it('avisa quando tenta criar espaço sem nome', () => {
     const { component, spacesService, uiFeedback } = createComponent();
-    component.novoNome = '   ';
+    component.novoNome.set('   ');
 
     component.criar();
 
@@ -58,14 +58,14 @@ describe('EspacosComponent', () => {
 
   it('cria um espaço novo, limpa o formulário e recarrega a lista', () => {
     const { component, spacesService, uiFeedback } = createComponent();
-    component.novoNome = 'Negócio';
-    component.novaSenha = 'segredo';
+    component.novoNome.set('Negócio');
+    component.novaSenha.set('segredo');
 
     component.criar();
 
     expect(spacesService.create).toHaveBeenCalledWith({ name: 'Negócio', password: 'segredo' });
-    expect(component.novoNome).toBe('');
-    expect(component.novaSenha).toBe('');
+    expect(component.novoNome()).toBe('');
+    expect(component.novaSenha()).toBe('');
     expect(uiFeedback.success).toHaveBeenCalled();
     expect(spacesService.list).toHaveBeenCalled();
   });
@@ -73,11 +73,11 @@ describe('EspacosComponent', () => {
   it('mostra erro quando a criação falha', () => {
     const { component, spacesService, uiFeedback } = createComponent();
     spacesService.create.and.returnValue(throwError(() => new Error('falhou')));
-    component.novoNome = 'Negócio';
+    component.novoNome.set('Negócio');
 
     component.criar();
 
-    expect(component.saving).toBeFalse();
+    expect(component.saving()).toBeFalse();
     expect(uiFeedback.error).toHaveBeenCalled();
   });
 
@@ -87,8 +87,8 @@ describe('EspacosComponent', () => {
 
     component.entrar(protegido);
 
-    expect(component.passwordPromptId).toBe('s2');
-    expect(component.passwordPromptLabel).toBe('Senha do espaço "Negócio"');
+    expect(component.passwordPromptId()).toBe('s2');
+    expect(component.passwordPromptLabel()).toBe('Senha do espaço "Negócio"');
     expect(spacesService.enter).not.toHaveBeenCalled();
   });
 
@@ -101,7 +101,7 @@ describe('EspacosComponent', () => {
     component.entrar(semSenha);
 
     expect(spacesService.enter).toHaveBeenCalledWith('s1', { password: null });
-    expect(component.enteringId).toBe('s1');
+    expect(component.enteringId()).toBe('s1');
   });
 
   it('mostra erro de senha inválida no prompt sem recarregar a página', () => {
@@ -109,12 +109,12 @@ describe('EspacosComponent', () => {
     spacesService.enter.and.returnValue(throwError(() => ({ error: { detail: 'Senha incorreta.' } })));
     const protegido = buildSpace({ id: 's2', name: 'Negócio', hasPassword: true });
     component.entrar(protegido);
-    component.passwordPromptValue = 'errada';
+    component.passwordPromptValue.set('errada');
 
     component.confirmarSenhaPrompt();
 
-    expect(component.passwordPromptError).toBe('Senha incorreta.');
-    expect(component.enteringId).toBeNull();
+    expect(component.passwordPromptError()).toBe('Senha incorreta.');
+    expect(component.enteringId()).toBeNull();
   });
 
   it('abre a confirmação de exclusão sem excluir de imediato', () => {
@@ -123,7 +123,7 @@ describe('EspacosComponent', () => {
 
     component.excluir(space);
 
-    expect(component.spaceToDelete).toEqual(space);
+    expect(component.spaceToDelete()).toEqual(space);
     expect(spacesService.delete).not.toHaveBeenCalled();
   });
 
@@ -133,7 +133,7 @@ describe('EspacosComponent', () => {
 
     component.cancelarExclusao();
 
-    expect(component.spaceToDelete).toBeNull();
+    expect(component.spaceToDelete()).toBeNull();
     expect(spacesService.delete).not.toHaveBeenCalled();
   });
 
@@ -144,7 +144,7 @@ describe('EspacosComponent', () => {
     component.confirmarExclusao();
 
     expect(spacesService.delete).toHaveBeenCalledWith('s2');
-    expect(component.spaceToDelete).toBeNull();
+    expect(component.spaceToDelete()).toBeNull();
     expect(uiFeedback.success).toHaveBeenCalled();
     expect(spacesService.list).toHaveBeenCalled();
   });
