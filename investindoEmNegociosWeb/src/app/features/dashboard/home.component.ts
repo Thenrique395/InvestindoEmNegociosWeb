@@ -1232,14 +1232,26 @@ export class HomeComponent implements OnInit {
       this.expensesRaw,
       this.incomesRaw,
       reference,
-      this.periodMonthsCount()
+      this.historyMonthsCount()
     );
   }
 
-  private periodMonthsCount(): number {
+  /**
+   * Janela do HISTÓRICO — quantos meses a série de tendência cobre.
+   *
+   * Não é o tamanho do período selecionado: o seletor governa os indicadores, a tendência
+   * precisa de janela própria. Com "Mês" isto devolvia 1, e daí saíam dois defeitos que
+   * pareciam independentes:
+   *
+   *  - o card "Receitas e despesas" nunca aparecia, porque `hasEvolutionData` exige 2 meses
+   *    com movimento e a série tinha um só — o usuário via "Histórico começando" para sempre;
+   *  - a evolução patrimonial falhava com 400, porque o backend recusa menos de 3 meses.
+   *
+   * Ambos vinham daqui. O piso de 3 é o do backend; 6 dá tendência legível sem pesar.
+   */
+  private historyMonthsCount(): number {
     if (this.periodo === 'year') return 12;
-    if (this.periodo === 'quarter') return 3;
-    return 1;
+    return 6;
   }
 
   private formatCompactLocaleDate(value: string): string {
@@ -1883,8 +1895,7 @@ export class HomeComponent implements OnInit {
      * próprio. Com "Mês" o cálculo devolvia 1, o backend recusa com 400 ("use um valor
      * entre 3 e 24") e o dashboard abria com o aviso vermelho de falha logo após o login.
      */
-    const MESES_MINIMOS_DE_HISTORICO = 3;
-    const months = Math.max(this.periodMonthsCount(), MESES_MINIMOS_DE_HISTORICO);
+    const months = this.historyMonthsCount();
     const referenceDate = this.periodo === 'year'
       ? this.toIsoDate(new Date(this.dataAtual.getFullYear(), 11, 31))
       : this.toIsoDate(rangeEndDate(this.getPeriodRange().endKey));

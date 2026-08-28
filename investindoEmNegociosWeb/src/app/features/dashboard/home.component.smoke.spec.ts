@@ -215,6 +215,29 @@ describe('HomeComponent smoke', () => {
     expect(component.hasEvolutionData).toBeFalse();
   });
 
+  it('Patrimônio também vê a evolução: a janela do histórico não é o tamanho do período', () => {
+    // O perfil Advanced usa `monthlyFlowSeries`, que seguia o seletor de período. Com "Mês"
+    // (o padrão) a série tinha 1 ponto, `hasEvolutionData` exigia 2 e o card ficava preso em
+    // "Histórico começando" para sempre. O caminho do Controle usava 6 e passava — por isso
+    // o defeito só aparecia para quem tem Patrimônio.
+    const component = createComponent();
+    (component as any).authService = { getRole: () => 'Advanced' };
+    spyOn(component, 'hasAccess').and.returnValue(true);
+    component.dataAtual = new Date(2026, 6, 15);
+    (component as any).expensesRaw = [
+      { id: 'e-jun', nome: 'Junho', categoria: 'Casa', valor: 100, vencimento: '10/06/2026', status: 'OPEN' },
+      { id: 'e-jul', nome: 'Julho', categoria: 'Casa', valor: 200, vencimento: '10/07/2026', status: 'OPEN' }
+    ];
+    (component as any).incomesRaw = [
+      { id: 'i-jun', nome: 'Junho', categoria: 'Salário', valor: 500, recebimento: '05/06/2026', status: 'PAID' },
+      { id: 'i-jul', nome: 'Julho', categoria: 'Salário', valor: 700, recebimento: '05/07/2026', status: 'PAID' }
+    ];
+    (component as any).updateMonthlyFlow();
+
+    expect(component.evolutionData.months.length).toBe(6);
+    expect(component.hasEvolutionData).toBeTrue();
+  });
+
   it('resume recorrências do mês a partir de fixas, parcelas e receitas fixas', () => {
     const component = createComponent();
     component.dataAtual = new Date(2026, 6, 15);
