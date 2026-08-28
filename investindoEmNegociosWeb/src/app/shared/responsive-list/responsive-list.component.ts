@@ -76,6 +76,27 @@ export class ResponsiveListComponent<T> {
   readonly pageSize = input(0);
   readonly itemsLabel = input('itens');
 
+  /**
+   * Opções de itens por página oferecidas no rodapé. Vazio (padrão) esconde o seletor —
+   * listas que não paginam continuam como estavam.
+   */
+  readonly pageSizeOptions = input<number[]>([]);
+
+  /** Escolha da pessoa nesta visita. Não persiste: ao reabrir a tela volta ao padrão. */
+  private readonly tamanhoEscolhido = signal<number | null>(null);
+
+  /** O que vale de fato: a escolha da pessoa, ou o padrão que a tela declarou. */
+  readonly tamanhoPagina = computed(() => this.tamanhoEscolhido() ?? this.pageSize());
+
+  aoTrocarTamanho(valor: string): void {
+    const n = Number(valor);
+    if (!Number.isFinite(n) || n <= 0) return;
+    this.tamanhoEscolhido.set(n);
+    // Trocar o tamanho reposiciona no começo: manter a página 5 depois de dobrar o
+    // tamanho jogaria a pessoa num trecho que ela não estava vendo.
+    this.paginaEscolhida.set(1);
+  }
+
   readonly sort = output<string>();
   readonly selectionChange = output<{ id: string; checked: boolean }>();
   readonly selectAllChange = output<boolean>();
@@ -93,21 +114,21 @@ export class ResponsiveListComponent<T> {
   private readonly paginaEscolhida = signal(1);
 
   readonly totalPages = computed(() => {
-    const tamanho = this.pageSize();
+    const tamanho = this.tamanhoPagina();
     if (tamanho <= 0) return 1;
     return Math.max(1, Math.ceil(this.items().length / tamanho));
   });
 
   readonly page = computed(() => Math.min(this.paginaEscolhida(), this.totalPages()) || 1);
 
-  readonly paginado = computed(() => this.pageSize() > 0 && this.items().length > this.pageSize());
+  readonly paginado = computed(() => this.tamanhoPagina() > 0 && this.items().length > this.tamanhoPagina());
 
   readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   readonly visibleItems = computed(() => {
     if (!this.paginado()) return this.items();
-    const inicio = (this.page() - 1) * this.pageSize();
-    return this.items().slice(inicio, inicio + this.pageSize());
+    const inicio = (this.page() - 1) * this.tamanhoPagina();
+    return this.items().slice(inicio, inicio + this.tamanhoPagina());
   });
 
   readonly rangeLabel = computed(

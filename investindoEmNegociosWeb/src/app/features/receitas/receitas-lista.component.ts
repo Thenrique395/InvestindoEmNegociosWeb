@@ -36,17 +36,20 @@ export class ReceitasListaComponent {
   get columns(): ResponsiveListColumn[] {
     // Ordem do design: identificação, classificação, situação e só então os
     // números — o valor fica encostado nas ações, na borda direita.
+    // Mesma proporção de Despesas: o grupo da direita é compacto e fica junto, e o espaço
+    // sobra para Fonte, que é onde o texto varia. Sem `width`, o `truncate` encolheria as
+    // colunas de texto até o piso e deixaria as curtas folgadas.
     const base: ResponsiveListColumn[] = [
-      { truncate: true, key: 'fonte', label: 'Fonte', sortable: true },
-      { truncate: true, key: 'categoria', label: 'Categoria', sortable: true },
-      { truncate: true, key: 'tipo', label: 'Tipo', sortable: true }
+      { truncate: true, key: 'fonte', label: 'Fonte', sortable: true, width: this.showStatus ? '34%' : '40%' },
+      { truncate: true, key: 'categoria', label: 'Categoria', sortable: true, width: '17%' },
+      { truncate: true, key: 'tipo', label: 'Tipo', sortable: true, width: '13%' }
     ];
     if (this.showStatus) {
-      base.push({ key: 'status', label: 'Status', sortable: true });
+      base.push({ key: 'status', label: 'Status', sortable: true, width: '10%' });
     }
-    base.push({ key: 'recebimento', label: 'Receb.', sortable: true });
-    base.push({ key: 'valor', label: 'Valor', sortable: true, align: 'end' });
-    base.push({ key: 'acoes', label: 'Ações', align: 'end' });
+    base.push({ key: 'recebimento', label: 'Receb.', sortable: true, width: '8%' });
+    base.push({ key: 'valor', label: 'Valor', sortable: true, align: 'end', width: '12%' });
+    base.push({ key: 'acoes', label: 'Ações', align: 'end', width: '6%' });
     return base;
   }
 

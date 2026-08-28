@@ -33,14 +33,23 @@ export class DespesasListaComponent {
   @Output() selecionarTodos = new EventEmitter<boolean>();
   @Output() emptyAction = new EventEmitter<void>();
 
+  /*
+   * Larguras declaradas de propósito. Sem elas, `truncate` aplica `max-width: 0` e as três
+   * colunas de texto encolhem até o piso enquanto Status/Venc./Valor/Ações — de conteúdo
+   * curto e previsível — ficam com a largura natural. O resultado era "Compras mercado Pa…"
+   * e "Cartão - Visa - 9391 · Fatura …" ao lado de colunas folgadas.
+   *
+   * O grupo da direita é compacto e fica junto; o espaço vai para Nome e Pagamento, que são
+   * os campos onde o texto varia e importa.
+   */
   readonly columns: ResponsiveListColumn[] = [
-    { truncate: true, key: 'nome', label: 'Nome', sortable: true },
-    { truncate: true, key: 'categoria', label: 'Categoria', sortable: true },
-    { truncate: true, key: 'pagamento', label: 'Pagamento', sortable: true },
-    { key: 'status', label: 'Status', sortable: true },
-    { key: 'vencimento', label: 'Venc.', sortable: true },
-    { key: 'valor', label: 'Valor', sortable: true, align: 'end' },
-    { key: 'acoes', label: 'Ações', align: 'end' }
+    { truncate: true, key: 'nome', label: 'Nome', sortable: true, width: '30%' },
+    { truncate: true, key: 'categoria', label: 'Categoria', sortable: true, width: '13%' },
+    { truncate: true, key: 'pagamento', label: 'Pagamento', sortable: true, width: '25%' },
+    { key: 'status', label: 'Status', sortable: true, width: '9%' },
+    { key: 'vencimento', label: 'Venc.', sortable: true, width: '7%' },
+    { key: 'valor', label: 'Valor', sortable: true, align: 'end', width: '10%' },
+    { key: 'acoes', label: 'Ações', align: 'end', width: '6%' }
   ];
 
   ordenarPor(campo: string): void {

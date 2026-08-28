@@ -78,6 +78,8 @@
                   [class.responsive-list__item--value]="column.align === 'end'"
                   [class.responsive-list__item--truncate]="column.truncate"
                   [class.responsive-list__item--actions]="column.actions"
+                  [style.width]="column.width || null"
+                  [style.max-width]="column.width || null"
                   [attr.data-label]="column.label">
                   <ng-container *ngTemplateOutlet="cellTemplate(column.key); context: { $implicit: item }"></ng-container>
                 </td>
@@ -91,7 +93,23 @@
 
   @if (pageSize() > 0 && items().length) {
     <footer class="responsive-list__footer">
-      <span class="responsive-list__range">{{ rangeLabel() }}</span>
+      <div class="responsive-list__footer-info">
+        <span class="responsive-list__range">{{ rangeLabel() }}</span>
+
+        @if (pageSizeOptions().length) {
+          <label class="responsive-list__page-size">
+            <span class="responsive-list__page-size-label">Por página</span>
+            <select
+              class="responsive-list__page-size-select"
+              [value]="tamanhoPagina()"
+              (change)="aoTrocarTamanho($any($event.target).value)">
+              @for (opcao of pageSizeOptions(); track opcao) {
+                <option [value]="opcao">{{ opcao }}</option>
+              }
+            </select>
+          </label>
+        }
+      </div>
 
       @if (paginado()) {
         <nav class="responsive-list__pages" aria-label="Paginação">
