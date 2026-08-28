@@ -1877,7 +1877,14 @@ export class HomeComponent implements OnInit {
     }
 
     this.subNetWorthHistory?.unsubscribe();
-    const months = this.periodMonthsCount();
+    /*
+     * A evolução patrimonial é um gráfico de HISTÓRICO — precisa de série, não de ponto.
+     * O seletor de período governa os indicadores; a profundidade do histórico tem piso
+     * próprio. Com "Mês" o cálculo devolvia 1, o backend recusa com 400 ("use um valor
+     * entre 3 e 24") e o dashboard abria com o aviso vermelho de falha logo após o login.
+     */
+    const MESES_MINIMOS_DE_HISTORICO = 3;
+    const months = Math.max(this.periodMonthsCount(), MESES_MINIMOS_DE_HISTORICO);
     const referenceDate = this.periodo === 'year'
       ? this.toIsoDate(new Date(this.dataAtual.getFullYear(), 11, 31))
       : this.toIsoDate(rangeEndDate(this.getPeriodRange().endKey));
