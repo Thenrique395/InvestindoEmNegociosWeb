@@ -1,5 +1,13 @@
 # Modais de criação no Calendário — desenho
 
+> ✅ **CONCLUÍDO** — os cinco modais foram entregues (ver "Resultado" abaixo) e estão em uso no
+> Calendário. Este arquivo é registro de desenho, não trabalho pendente.
+>
+> Um detalhe mudou desde então: na reestruturação `core/shared/features` (commit `68f2962`) os
+> componentes saíram de `shared/` para **`features/shared/`**, por serem componentes de domínio
+> reusados entre telas e não primitivos. Os caminhos citados no corpo do documento refletem o
+> lugar antigo.
+
 **Data:** 2026-08-22
 
 ## Problema

@@ -34,13 +34,25 @@ Responder três perguntas práticas:
 
 ### Infraestrutura e segurança
 
-- domínio oficial definido
-- HTTPS com reverse proxy
-- ambientes separados para `staging` e `production`
-- segredos fora do repositório
-- backup diário com teste de restore
-- rollback simples e documentado
-- rate limit e headers de segurança aplicados
+Status conferido ao vivo em **2026-08-28** (headers do PRD por `curl`, cron e scripts na VPS,
+busca no repositório). O PRD **já está no ar com dados reais** — os itens ❌ abaixo são risco
+corrente, não preparação para o futuro.
+
+| Gate | Status | Como foi verificado |
+|---|---|---|
+| domínio oficial definido | ❌ | acesso só por IP (`44.222.213.37`) |
+| HTTPS com reverse proxy | ❌ | Caddy responde só em `:80`; depende do domínio acima |
+| ambientes separados `staging`/`production` | ✅ | VPS distintas: DEV `35.174.50.187`, PRD `44.222.213.37`, cada um com seu Postgres |
+| segredos fora do repositório | ✅ | GitHub Secrets/Variables; PRD subiu com segredos frescos |
+| **backup diário com teste de restore** | ❌ | **nenhum** `pg_dump`, cron ou workflow de backup no repositório nem na VPS |
+| rollback simples e documentado | ⚠️ | deploy é manual por workflow; rollback não está documentado em lugar nenhum |
+| rate limit | ✅ | `AddRateLimiter` + `UseRateLimiter` (`ServiceCollectionExtensions.cs:201`) |
+| **headers de segurança** | ❌ | resposta do PRD **não traz nenhum**: sem `X-Frame-Options`, `X-Content-Type-Options`, `Content-Security-Policy` nem `Referrer-Policy` |
+
+> **Os dois ❌ em negrito são os mais graves**, porque o app é financeiro e o PRD já tem dados
+> reais: *sem backup*, uma perda de volume é definitiva; *sem headers*, sobra superfície para
+> clickjacking e MIME sniffing — e esses dois headers funcionam sobre HTTP, não dependem do
+> domínio. Registrados no `BACKLOG.md` da raiz.
 
 ### Qualidade mínima
 

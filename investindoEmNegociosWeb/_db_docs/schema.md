@@ -1,13 +1,34 @@
-# Schema do banco de dados
+# Schema do banco de dados — mapa parcial e desatualizado
 
-Ultima atualizacao manual: `2026-02-06`
+> ## ⚠️ Leia antes de usar
+>
+> **Última atualização manual: `2026-02-06`.** Conferido contra o banco em 2026-08-28:
+> este documento descreve **20 tabelas das 43 que existem**. Faltam áreas inteiras do
+> produto — `accounts`, `account_transactions`, `loan_contracts`, `loan_installments`,
+> `loan_amortizations`, `billing_checkouts`, `billing_webhook_events`, `goal_occurrences`,
+> `goal_scopes`, `investment_allocation_targets`, entre outras.
+>
+> **A fonte de verdade do schema é EF Migrations**, em `InvestindoEmNegocio/Migrations/`,
+> aplicadas por `Migrate()` no boot. Não existe mais `schema.sql`.
+>
+> Para ver o schema real:
+>
+> ```bash
+> # lista as tabelas
+> docker exec investindoemnegocio-postgres-1 psql -U investindo -d meu_mentor_db -c '\dt'
+> # detalha uma tabela
+> docker exec investindoemnegocio-postgres-1 psql -U investindo -d meu_mentor_db -c '\d accounts'
+> ```
+>
+> Mantido porque as 20 tabelas descritas continuam corretas e o texto explica
+> relacionamentos lógicos que o schema sozinho não mostra. **Não trate como completo.**
 
-Este documento e um mapa textual do schema principal persistido pelo `InvestDbContext`.
-O diagrama visual correspondente continua em `schema.svg`.
+Mapa textual parcial do schema persistido pelo `InvestDbContext`. O diagrama visual
+correspondente continua em `schema.svg` — e tem a mesma limitação de data.
 
 ## Escopo
 
-- descreve as tabelas mais relevantes para o produto
+- descreve as tabelas mais relevantes para o produto **em fevereiro de 2026**
 - destaca FKs reais e relacionamentos apenas logicos
 - serve como apoio rapido de leitura, nao como fonte unica de migration
 

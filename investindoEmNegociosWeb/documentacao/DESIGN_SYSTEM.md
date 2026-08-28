@@ -1,5 +1,11 @@
 # Design System - Investindo em Negócios
 
+> **Catálogo de componentes fica em outro arquivo.** Este documento traz princípios, tokens,
+> heurísticas e checklist de revisão — o *como e por quê*. A lista de *quais* componentes
+> existem, com seletor e exemplo de uso, está em
+> [`../../docs/frontend-ui-components.md`](../../docs/frontend-ui-components.md).
+> Em conflito sobre regra de estilo, vale este documento.
+
 Documento normativo de padrões visuais e de interface reutilizáveis do frontend.
 
 ## Objetivo e escopo

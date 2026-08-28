@@ -1,5 +1,23 @@
 # Auditoria de padrões do frontend - 2026-08-05
 
+> ## 📕 SUPERADA — registro histórico, não é plano ativo
+>
+> Duas coisas passaram por cima deste documento:
+>
+> 1. **A recomendação central caiu.** A auditoria dizia "não recomendo redesenhar o frontend
+>    agora, consolidar o padrão já aprovado". A decisão de produto foi outra: o **rebrand**
+>    aconteceu, e está em [`../../PLANO_REDESIGN.md`](../../PLANO_REDESIGN.md).
+> 2. **O levantamento de divergências foi refeito e virou trabalho rastreado** em
+>    [`../../DIVIDA_TECNICA_PADROES.md`](../../DIVIDA_TECNICA_PADROES.md) (2026-08-27), que é
+>    mais recente, cobre front **e** back, e tem gate automatizado — o
+>    `check-handoff-fidelity.mjs`, com as regras R1–R11 e teto de dívida que impede regressão.
+>
+> Vários itens da lista de prioridades daqui foram efetivamente resolvidos por lá (contrato de
+> tokens, padronização de listas e estados vazios, unificação de modais, utilitários soltos).
+>
+> Mantido porque descreve **o estado do frontend antes da reestruturação
+> `core/shared/features`** e explica de onde veio o padrão atual.
+
 Documento de revisão do frontend web do Investindo em Negócios.
 
 ## Escopo

@@ -1,6 +1,19 @@
-# Design System — Investindo em Negócios
+# Catálogo de componentes do frontend
 
-Este documento define os componentes reutilizáveis do frontend, quando usar cada um e exemplos de implementação.
+> **Este NÃO é o Design System.** São dois documentos com escopos diferentes, e até 2026-08-28
+> os dois se chamavam "Design System", o que gerava confusão sobre qual consultar:
+>
+> | Documento | Responde |
+> |---|---|
+> | **este** | *quais* componentes existem, com seletor e exemplo de uso |
+> | [`DESIGN_SYSTEM.md`](../investindoEmNegociosWeb/documentacao/DESIGN_SYSTEM.md) | *como e por quê*: princípios, tokens oficiais, heurísticas, acessibilidade, checklist de revisão |
+>
+> Em conflito entre os dois sobre regra de estilo, vale o `DESIGN_SYSTEM.md` — é ele que o
+> `Agent.md` do frontend trata como normativo.
+
+Este documento cataloga os componentes reutilizáveis do frontend, quando usar cada um e exemplos
+de implementação. Catálogo conferido contra o código em 2026-08-28: os seletores abaixo existem,
+salvo onde marcado como removido.
 
 > **Referência viva**: a rota `/styleguide` (dev-only, bloqueada em produção pelo `devOnlyGuard`)
 > mostra demos interativos de todos os componentes catalogados aqui, mais Design Tokens e classes
@@ -198,25 +211,14 @@ Quando usar:
 
 ---
 
-### StatCardComponent
+### ~~StatCardComponent~~ — **REMOVIDO em 2026-08-27**
 
-Uso: card de métrica (eyebrow + valor em destaque + nota), com ícone e tooltip opcionais.
+`app-stat-card` **não existe mais**. Foi um dos seis primitivos apagados no commit `ba04b4e`
+por não terem nenhum consumidor fora da demo do `/styleguide` — junto com `money`,
+`chart-bars`, `installment-scope`, `period-action-card` e `toast-container`.
 
-```html
-<app-stat-card
-  tone="success"
-  eyebrow="Saldo disponível"
-  value="R$ 12.400,00"
-  note="Atualizado agora"
-  tooltipText="Saldo real considerando lançamentos confirmados.">
-</app-stat-card>
-```
-
-Tons disponíveis: `primary`, `success`, `warning`, `info`, `danger`.
-
-Quando usar:
-
-- Resumos numéricos no topo de uma tela (saldo, total do mês, score).
+Para card de métrica, use `app-section-card` ou `app-period-total-card`. Recuperável pelo git
+se voltar a ser necessário.
 
 ---
 
@@ -234,9 +236,11 @@ Uso: pílula de comparação (ex.: "vs. mês anterior"), com cor condicionada à
 
 ---
 
-### PeriodHeroComponent + PeriodTotalCardComponent + PeriodActionCardComponent
+### PeriodHeroComponent + PeriodTotalCardComponent
 
-Uso: hero de página com navegação de mês anterior/próximo e um card lateral (aside) — `PeriodTotalCardComponent` mostra um valor em destaque, `PeriodActionCardComponent` mostra uma ação recomendada em texto.
+Uso: hero de página com navegação de mês anterior/próximo e um card lateral (aside); `PeriodTotalCardComponent` mostra um valor em destaque.
+
+> `PeriodActionCardComponent` (ação recomendada em texto) **foi removido em 2026-08-27** no mesmo commit `ba04b4e` — não tinha consumidor fora do `/styleguide`.
 
 ```html
 <app-period-hero
