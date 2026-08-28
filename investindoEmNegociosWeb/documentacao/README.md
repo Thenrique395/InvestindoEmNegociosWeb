@@ -99,10 +99,10 @@ No diretório `InvestindoEmNegociosWeb/investindoEmNegociosWeb`:
 
 - rotas principais: `src/app/app.routes.ts`
 - configuração global da aplicação: `src/app/app.config.ts`
-- base da API: `src/app/api.config.ts`
-- gating por feature: `src/app/features.ts`
-- roles e hierarquia de perfis: `src/app/roles.ts`
-- camada agregadora de dados: `src/app/data/api-data.service.ts`
+- base da API: `src/app/core/api.config.ts`
+- gating por feature: `src/app/core/features.ts`
+- roles e hierarquia de perfis: `src/app/core/roles.ts`
+- camada agregadora de dados: `src/app/core/data/api-data.service.ts`
 
 ## Integrações principais
 
@@ -138,7 +138,7 @@ Backend relacionado:
 
 ## Cuidados atuais
 
-- a base da API ainda tem fallback para endpoint remoto em `src/app/api.config.ts`; tratar mudanças de ambiente com cuidado
+- a base da API ainda tem fallback para endpoint remoto em `src/app/core/api.config.ts`; tratar mudanças de ambiente com cuidado
 - o frontend espelha parte do gating por role/feature para UX, mas a fonte final continua sendo o backend
 - mudanças em rotas protegidas precisam permanecer coerentes com a matriz de autorização da API
 - neste momento, rotas como `assistente` e `snapshots` merecem revisão para alinhar o frontend ao backend atual; `emprestimos` já cobre pagamento de parcela por contrato com cronograma expansível

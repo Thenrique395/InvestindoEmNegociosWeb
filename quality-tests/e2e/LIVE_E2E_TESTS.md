@@ -115,7 +115,7 @@ mês atual é diferente de março/2026.
 O segundo teste deste arquivo falhava em `incomesPage.reloadAndExpectRow(incomeName)` porque,
 após criar a receita, a tabela de `/receitas` nunca era atualizada:
 
-- O frontend (`src/app/receitas-summary.service.ts`) chamava
+- O frontend (`src/app/core/receitas-summary.service.ts`) chamava
   `GET ${API_BASE_URL}/receitas/summary?month=...`.
 - O backend (`IncomeSummaryController`) só expõe `[Route("api/incomes")]` /
   `[Route("api/v1/incomes")]` com `[HttpGet("summary")]`, ou seja, o caminho correto é

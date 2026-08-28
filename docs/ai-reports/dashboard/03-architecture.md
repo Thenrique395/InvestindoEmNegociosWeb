@@ -7,12 +7,12 @@
 | Arquivo | Papel |
 | --- | --- |
 | `src/app/home.component.{ts,html,scss}` | Componente da rota `/dashboard` (2 variantes por perfil) |
-| `src/app/home.component.smoke.spec.ts` | Spec Karma — instancia por construtor posicional (11 args) → **construtor não pode mudar** |
-| `src/app/utils/home-insight.utils.ts` | Heurísticas de insight/health/score |
+| `src/app/features/dashboard/home.component.smoke.spec.ts` | Spec Karma — instancia por construtor posicional (11 args) → **construtor não pode mudar** |
+| `src/app/core/utils/home-insight.utils.ts` | Heurísticas de insight/health/score |
 | `src/app/utils/{locale-utils,status}.ts` | Formatação e status compartilhados |
 | `src/app/shared/{stat-card,status-badge,tooltip,donut-chart,empty-state…}` | Design system |
 | `src/app/app.routes.ts:46` | Rota com `authGuard`+`roleGuard` (minRole Basic) |
-| `src/app/roles.ts` (`hasAtLeastRole`) | Diferenciação Basic < Intermediate < Advanced (< Admin) |
+| `src/app/core/roles.ts` (`hasAtLeastRole`) | Diferenciação Basic < Intermediate < Advanced (< Admin) |
 
 **Como o sistema diferencia perfis:** `roleGuard` na rota + `hasAccess(minRole)`
 no template + revalidação em cada `load*()` antes de chamar API. `isBasicProfile`

@@ -72,9 +72,9 @@ Usar estes pontos de referencia para navegar mais rapido:
 
 - rotas principais: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/app.routes.ts`
 - configuracao global da aplicacao: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/app.config.ts`
-- base da API: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/api.config.ts`
-- gating por feature: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/features.ts`
-- roles e hierarquia de perfis: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/roles.ts`
+- base da API: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/core/api.config.ts`
+- gating por feature: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/core/features.ts`
+- roles e hierarquia de perfis: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/core/roles.ts`
 - guards: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/*guard*.ts`
 - interceptors: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/*interceptor*.ts`
 - componentes e telas: `InvestindoEmNegociosWeb/investindoEmNegociosWeb/src/app/`

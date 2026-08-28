@@ -15,10 +15,10 @@ app é acima da média para SPAs.
 ### Autenticação — FORTE
 
 - JWT **nunca** exposto ao JavaScript: `access_token`/`refresh_token` vivem em
-  **cookies httpOnly** definidos pelo backend ([auth.service.ts:41-42](../../investindoEmNegociosWeb/src/app/auth.service.ts#L41-L42));
+  **cookies httpOnly** definidos pelo backend ([auth.service.ts:41-42](../../investindoEmNegociosWeb/src/app/core/auth.service.ts#L41-L42));
   o localStorage guarda apenas metadados de sessão (mitiga roubo de token via XSS).
 - **CSRF**: interceptor adiciona `X-XSRF-TOKEN` (double-submit cookie
-  `XSRF-TOKEN`) em todos os métodos mutantes ([auth.interceptor.ts](../../investindoEmNegociosWeb/src/app/auth.interceptor.ts)).
+  `XSRF-TOKEN`) em todos os métodos mutantes ([auth.interceptor.ts](../../investindoEmNegociosWeb/src/app/core/auth.interceptor.ts)).
 - Rota `/dashboard` protegida por `authGuard` + `roleGuard` (minRole Basic);
   interceptor trata 401/403 com refresh/redirect e throttling de feedback.
 

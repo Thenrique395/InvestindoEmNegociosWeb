@@ -1,6 +1,19 @@
 # Plano de Ambientes DEV e PRD
 
-> **Status atual (2026-07):** o ambiente **PRD está pausado** — foco em DEV enquanto os fluxos críticos são estabilizados. Ver `docs/DECISIONS/2026-06-15-pausar-ambiente-prd-focar-dev.md`. Este plano descreve a estratégia-alvo; ao reativar o PRD, revalidar os passos abaixo.
+> **Status atual (2026-08-28): o PRD está NO AR** — a pausa de 2026-06-15 acabou. O ambiente foi
+> recriado em **VPS Lightsail dedicada (`http://44.222.213.37`)**, não como segunda stack na
+> mesma máquina do DEV, que é o que este plano originalmente propunha (seção 2.1, "mesma VPS,
+> containers e portas diferentes"). **A estratégia de separar por porta na mesma VPS foi
+> abandonada em favor de máquinas separadas.**
+>
+> Consequências para a leitura deste documento:
+> - as portas `5059` (DEV) e `5060` (PRD) **não existem mais**. Hoje: DEV com backend em `5055`
+>   e frontend em `4201`; PRD servindo tudo por Caddy na `80`. Topologia real em `../../docs/RUNBOOK.md`;
+> - o item sobre o fallback de `api.config.ts` apontando para `5060` perdeu o objeto — mas
+>   **confira o valor atual do fallback** antes de assumir que está certo;
+> - o que continua valendo: deploy de PRD manual e deliberado, e a ordem banco → API → frontend.
+>
+> Falta só **HTTPS** nos dois ambientes (sem domínio ainda).
 
 Este documento define a ordem recomendada para separar os ambientes do projeto. A ordem correta e mais segura e:
 
@@ -42,7 +55,12 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 - [x] Padronizar estrategia de branch: `main` entrega DEV; PRD e promovido manualmente pelo workflow de producao.
 - [x] Padronizar portas da API: DEV publica em `5059` e PRD publica em `5060`; a API continua ouvindo em `5059` dentro do container.
 - [x] Definir modelo oficial de deploy: por enquanto sera `compose` unico com variaveis por ambiente.
-- [ ] Remover fallback fixo do frontend para `http://35.174.50.187:5060/api/v1` e exigir `API_BASE_URL` correta por ambiente. Fallback ainda presente em `api.config.ts:7` — **atencao**: aponta para PRD (`5060`), que esta pausado desde 2026-06-15, nao para DEV (`5059`); se algum build novo rodar sem `API_BASE_URL` configurada, o frontend tentara falar com um backend pausado em vez de com DEV (revisado em 2026-06-28; valor real no codigo confirmado, doc anterior dizia `5059` por engano).
+- [x] Remover fallback fixo do frontend e exigir `API_BASE_URL` correta por ambiente. **FEITO** —
+  conferido em 2026-08-28 em `src/app/core/api.config.ts` (o arquivo mudou de lugar na
+  reestruturação `core/shared/features`): a base agora vem de `window.__API_BASE_URL__` no
+  navegador (injetado por `/config.js` a partir do env do container) ou de
+  `process.env['API_BASE_URL']` no SSR, com fallback final `http://localhost:4200/api/v1`.
+  O fallback antigo apontava para o PRD na porta `5060` — risco eliminado, o default agora é local — **atencao**: aponta para PRD (`5060`), que esta pausado desde 2026-06-15, nao para DEV (`5059`); se algum build novo rodar sem `API_BASE_URL` configurada, o frontend tentara falar com um backend pausado em vez de com DEV (revisado em 2026-06-28; valor real no codigo confirmado, doc anterior dizia `5059` por engano).
 - [x] Adicionar validacao pos-deploy do frontend para garantir que a tela abriu e chamou a API certa.
 
 ### Ainda pendente ou nao confirmado
@@ -196,8 +214,12 @@ Sem dominio oficial ainda, pode usar portas na VPS:
 
 | Ambiente | Front | API |
 | --- | --- | --- |
-| DEV | `http://35.174.50.187:4201` | `http://35.174.50.187:5059/api/v1` |
-| PRD | `http://35.174.50.187:4200` | `http://35.174.50.187:5060/api/v1` |
+| DEV | `http://35.174.50.187:4201` | `http://35.174.50.187:5055/api/v1` |
+| PRD | `http://44.222.213.37` | `http://44.222.213.37/api/v1` (mesma origem, via Caddy) |
+
+> Conferido por `docker ps` nas duas VPS em 2026-08-28. A tabela anterior colocava os dois
+> ambientes na mesma máquina (`35.174.50.187`, portas `4200`/`5060`) — **isso não é mais
+> verdade**: o PRD ganhou VPS própria e essas portas estão fechadas.
 
 Quando houver dominio:
 

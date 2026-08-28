@@ -313,6 +313,46 @@ Junto: `AdminRobotsController` deixou de devolver erro fora de `problem+json`.
 
 ---
 
+## 🔴 ⬜ BUG — Export/import de dados não funciona entre instâncias
+
+**Onde:** API · `Application/Services/DataPortabilityService.cs`, `Application/DTOs/DataPortabilityDtos.cs`
+
+Descoberto em 2026-08-28 ao copiar a base do PRD para o DEV usando a própria feature do produto.
+São **dois defeitos independentes**, os dois reproduzidos ao vivo.
+
+**1. FK de categoria quebra a importação (400).** O export leva apenas as categorias
+*customizadas* do usuário. Os planos, porém, também referenciam as categorias **padrão do
+sistema** — e essas têm GUID diferente em cada instância, porque cada ambiente foi semeado
+separadamente. Importar em outra instância falha com:
+
+```
+23503: insert or update on table "money_plans"
+violates foreign key constraint "FK_money_plans_categories_CategoryId"
+```
+
+Medido no caso real: 10 categorias referenciadas pelos planos, **8 fora do export**; das 22
+categorias do PRD, **as 22 tinham id inexistente no DEV**.
+
+**2. O import não preserva ids de pagamento.** Gera ids novos, então qualquer coisa que aponte
+para um pagamento por id (`account_transactions.SourceId`) fica órfã depois da importação.
+
+**Por que importa:** portabilidade de dados é **feature de plano pago**. Hoje um usuário que
+exporte e importe em outra instância recebe 400. Também é o caminho de LGPD para levar os dados
+embora — se ele não volta a lugar nenhum, não cumpre o propósito.
+
+**A fazer:** (a) incluir no export as categorias padrão referenciadas, ou casar por
+`(Name, AppliesTo)` na importação em vez de por id; (b) decidir se o import preserva ids ou se
+publica um mapa de remapeamento para as tabelas que referenciam por id.
+
+**Aceite:** exportar de uma instância e importar em outra, com planos usando categorias padrão,
+termina em 200 e sem referência órfã.
+
+**Contorno usado nesta migração** (não é correção): remapeamento das categorias por nome +
+inserção das 2 que faltavam, e remapeamento dos pagamentos por `(PaidAt, PaidAmount)` — 34/34
+casaram porque a chave era única no caso concreto. Não serve como solução geral.
+
+---
+
 ## ✅ Doc normativa apontando para `schema.sql` — **CORRIGIDO em 2026-08-27**
 
 Commit `7b29480`. `BACKEND_PADROES_IMPLEMENTACAO.md`, `docs/Agent.md` e `docs/README.md`
@@ -520,6 +560,41 @@ pré-existentes e viraria mais um baseline; fica registrada como a lacuna conhec
 ## `27ab7a4` — Grupo A
 
 Ver a seção do Grupo A na Parte 2. R8 de 46 para 27.
+
+## ✅ Limpeza de código morto e docs — **FEITO em 2026-08-28**
+
+**Removido depois de verificar que nada referencia** (tudo recuperável pelo git):
+
+| Arquivo | Por que morto |
+|---|---|
+| `core/api-validation-errors.service.ts` | `ApiValidationErrorsService`: 0 referências |
+| `core/utils/form-scroll.utils.ts` | `scrollToFirstInvalidFormField` e seu tipo: 0 referências |
+| `assets/landing/hero-financial-control.png` (2,2 MB) | 0 referências no repo, docs e protótipos |
+| `assets/login/office-portrait.jpg` (3,7 MB) | idem |
+| `assets/login/finance-workspace.jpg` (900 KB) | idem |
+| `assets/logoHeaderInvestindoemNegocios 2.png` (254 KB) | duplicata de sync do iCloud; só o original de 3,5 KB é usado |
+| `assets/logoHeaderInvestindoemNegocios2 2.png` (253 KB) | idem |
+| `quality-tests/e2e/primitivos-contratos.spec 2.ts` | duplicata de sync do iCloud, versionada por engano |
+| API · `Domain/Finance/MissingSequenceSumCalculator.cs` + teste | kata de algoritmo em `Domain/Finance/`; referenciado só pelo próprio teste |
+
+Total: ~7,3 MB de assets. `Users/` na raiz (árvore vazia criada por caminho absoluto escrito como
+relativo) também foi removida.
+
+**Verificado e mantido** — parecia morto e não é: `onboarding.styles.scss` (importado por
+`styles.scss`), `StripeSubscriptionMapping` / `MercadoPagoSubscriptionMapping` (extension methods,
+chamados como `x.ToProviderSnapshot()`), `InvoiceParserFactory` (registrado no DI). Controllers,
+`*Validator` e `*Configuration` do backend são resolvidos **por convenção** — varredura por
+referência textual sempre os aponta como mortos e sempre erra.
+
+**Docs corrigidas:** 13 caminhos `src/app/...` quebrados pela reestruturação `core/shared/features`,
+em 5 documentos.
+
+**`docs/ROADMAP.md` reconstruído como índice:** era citado por 13 documentos como fonte única de
+pendências e **não existia mais** — perdido sem histórico, porque a raiz do monorepo não é
+versionada (ver seção acima). O conteúdo original é irrecuperável; o índice novo aponta para as
+fontes vivas e não inventa roadmap.
+
+---
 
 ## Documentação atualizada nesta rodada
 
