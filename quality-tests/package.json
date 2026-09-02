@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@lhci/cli": "0.15.1",
-    "@playwright/test": "^1.53.1",
+    "@playwright/test": "^1.62.1",
     "lighthouse": "^12.8.2"
   },
   "overrides": {
