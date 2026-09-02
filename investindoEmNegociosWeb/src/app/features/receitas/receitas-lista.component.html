@@ -33,7 +33,7 @@
   </ng-template>
 
   <ng-template appResponsiveListCell="valor" let-r>
-    <span class="receitas-lista__amount">+&nbsp;{{ r.valor | appCurrency }}</span>
+    <span class="receitas-lista__amount">{{ r.valor | appCurrency }}</span>
   </ng-template>
 
   <ng-template appResponsiveListCell="recebimento" let-r>

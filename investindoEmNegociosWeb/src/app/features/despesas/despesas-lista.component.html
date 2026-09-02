@@ -43,7 +43,7 @@
   </ng-template>
 
   <ng-template appResponsiveListCell="valor" let-d>
-    <span class="despesas-lista__amount">&minus;&nbsp;{{ d.valor | appCurrency }}</span>
+    <span class="despesas-lista__amount">{{ d.valor | appCurrency }}</span>
     @if (d.parcelasTotal) {
       <small class="despesas-lista__recurrence">{{ d.parcelaNumero }}/{{ d.parcelasTotal }}</small>
     }
