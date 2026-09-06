@@ -22,14 +22,15 @@ describe('buildMonthlyFlowSeries', () => {
     const incomes: IncomeSample[] = [
       { valor: 300, recebimento: '01/07/2026', status: 'PAID' },
       { valor: 200, recebimento: '02/07/2026', status: 'OPEN' }, // pendente: não conta
+      // Antecipada não conta: mudou de mês, mas ainda não foi recebida.
       { valor: 120, recebimento: '15/06/2026', status: 'ANTICIPATED' }
     ];
     const points = buildMonthlyFlowSeries(expenses, incomes, reference, 2);
     const june = points[0];
     const july = points[1];
     expect(june.expense).toBe(80);
-    expect(june.income).toBe(120);
-    expect(june.balance).toBe(40);
+    expect(june.income).toBe(0);
+    expect(june.balance).toBe(-80);
     expect(july.expense).toBe(150);
     expect(july.income).toBe(300);
     expect(july.balance).toBe(150);

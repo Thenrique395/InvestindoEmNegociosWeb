@@ -97,9 +97,9 @@ describe('histórico do lançamento — progresso das parcelas', () => {
     expect(progresso.pagas).toBe(0);
   });
 
-  it('antecipada conta como paga', () => {
+  it('antecipada não conta como paga: mudou de mês, não foi paga', () => {
     const progresso = installmentProgress([parcela(1, 'ANTICIPATED'), parcela(2, 'OPEN')]);
-    expect(progresso.pagas).toBe(1);
+    expect(progresso.pagas).toBe(0);
   });
 
   it('sem parcelas, não divide por zero', () => {

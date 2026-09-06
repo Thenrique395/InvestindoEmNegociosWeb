@@ -143,7 +143,8 @@ export interface InstallmentProgress {
   readonly label: string;
 }
 
-const STATUS_PAGOS = new Set(['PAID', 'ANTICIPATED']);
+/* Antecipada não é paga: só mudou de mês, ainda em aberto. */
+const STATUS_PAGOS = new Set(['PAID']);
 
 /**
  * Progresso da série. "Parcialmente paga" não conta como paga: a barra mede o

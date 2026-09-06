@@ -50,16 +50,25 @@ export function dateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/*
+ * ANTICIPATED conta como EM ABERTO.
+ *
+ * Antecipar só puxa a parcela para um mês anterior — não registra pagamento
+ * (`Anticipate` no backend) e ela continua podendo ser marcada como paga.
+ * Como estas funções são complementares, deixá-la de fora daqui fazia o resto
+ * do app tratá-la como paga: o dashboard somava a antecipada em "Pagas no mês"
+ * e a tirava de "A pagar".
+ */
 export function isExpenseOpen(status?: string): boolean {
-  return !status || status === 'OPEN' || status === 'PARTIALLY_PAID';
+  return !status || status === 'OPEN' || status === 'PARTIALLY_PAID' || status === 'ANTICIPATED';
 }
 
 export function isIncomeReceived(status?: string): boolean {
-  return status === 'PAID' || status === 'PARTIALLY_PAID' || status === 'ANTICIPATED';
+  return status === 'PAID' || status === 'PARTIALLY_PAID';
 }
 
 export function isIncomePending(status?: string): boolean {
-  return !status || status === 'OPEN';
+  return !status || status === 'OPEN' || status === 'ANTICIPATED';
 }
 
 export function hasCriticalOverdueExpenseContext(

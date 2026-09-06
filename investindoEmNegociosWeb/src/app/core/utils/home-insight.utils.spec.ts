@@ -78,10 +78,10 @@ describe('home-insight.utils', () => {
   });
 
   describe('isIncomeReceived', () => {
-    it('considera recebida receita PAID, PARTIALLY_PAID ou ANTICIPATED', () => {
+    it('considera recebida receita PAID ou PARTIALLY_PAID; ANTICIPATED ainda não entrou', () => {
       expect(isIncomeReceived('PAID')).toBeTrue();
       expect(isIncomeReceived('PARTIALLY_PAID')).toBeTrue();
-      expect(isIncomeReceived('ANTICIPATED')).toBeTrue();
+      expect(isIncomeReceived('ANTICIPATED')).toBeFalse();
       expect(isIncomeReceived('OPEN')).toBeFalse();
     });
   });

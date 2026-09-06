@@ -138,14 +138,14 @@ function parseIsoLocal(value?: string | null): Date | null {
 
 function expenseStatus(raw: string | undefined, date: Date, today: Date): CalendarEventStatus {
   const status = (raw || 'OPEN').toUpperCase();
-  if (status === 'PAID' || status === 'ANTICIPATED') return 'paid';
+  if (status === 'PAID') return 'paid';
   if (status === 'CANCELED') return 'canceled';
   return startOfDay(date) < startOfDay(today) ? 'overdue' : 'forecast';
 }
 
 function incomeStatus(raw: string | undefined, date: Date, today: Date): CalendarEventStatus {
   const status = (raw || 'OPEN').toUpperCase();
-  if (status === 'PAID' || status === 'ANTICIPATED') return 'received';
+  if (status === 'PAID') return 'received';
   if (status === 'CANCELED') return 'canceled';
   return startOfDay(date) < startOfDay(today) ? 'overdue' : 'forecast';
 }
