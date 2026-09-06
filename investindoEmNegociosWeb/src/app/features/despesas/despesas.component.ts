@@ -27,6 +27,7 @@ import { TxMobileHeaderComponent, TxMobileKpi } from '../../shared/transactions/
 import { TxFilterChipsComponent, TxFilterChip } from '../../shared/transactions/tx-filter-chips.component';
 import { TxMobileListComponent, TxMobileItem } from '../../shared/transactions/tx-mobile-list.component';
 import { DisplayInstallmentStatus, resolveInstallmentStatus, expenseStatusLabel, installmentStatusIcon, installmentStatusTone, InstallmentStatusTone } from '../../core/utils/status';
+import { isExpenseOpen } from '../../core/utils/home-insight.utils';
 import { UiFeedbackService } from '../../core/ui-feedback.service';
 import { UiPermissionsService } from '../../core/ui-permissions.service';
 import { InvoiceImportComponent } from '../shared/invoice-import/invoice-import.component';
@@ -466,8 +467,18 @@ export class DespesasComponent implements OnInit {
     return this.despesasPorMes()[this.mesKey()] || [];
   }
 
+  /*
+   * Antecipada entra em Pendentes: antecipar muda o vencimento de mês, não
+   * paga. O card de Antecipadas é um recorte deste total, não um bucket
+   * separado — só as PAGAS ficam de fora.
+   *
+   * Usa `isExpenseOpen` de propósito, em vez de repetir a lista de status: era
+   * a duplicação dessa regra em cada tela que deixava os totais divergentes.
+   */
   get totalPendentes(): number {
-    return this.somaPorStatus(['OPEN', 'PARTIALLY_PAID']);
+    return this.despesas
+      .filter((d) => isExpenseOpen(d.status))
+      .reduce((sum, d) => sum + (d.valor || 0), 0);
   }
 
   get totalAntecipadas(): number {

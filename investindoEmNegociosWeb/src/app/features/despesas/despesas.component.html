@@ -4,9 +4,9 @@
       tone="warning"
       eyebrow="Pendentes"
       [value]="totalPendentes | appCurrency"
-      note="Contas abertas para o período atual."
+      note="Contas abertas no período, incluindo as antecipadas."
       tooltipLabel="Mais informações sobre despesas pendentes"
-      tooltipText="Total de despesas pendentes do mês: contas abertas com vencimento no período que ainda não foram pagas.">
+      tooltipText="Tudo que ainda não foi pago no período: contas abertas mais as parcelas antecipadas, que mudaram de mês mas continuam devendo.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
         <path d="M12 6v6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
         <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
@@ -17,7 +17,7 @@
       tone="info"
       eyebrow="Antecipadas"
       [value]="totalAntecipadas | appCurrency"
-      note="Parcelas puxadas para este período."
+      note="Já contadas em Pendentes."
       tooltipLabel="Mais informações sobre despesas antecipadas"
       tooltipText="Parcelas de meses seguintes que você trouxe para este período. Continuam em aberto: antecipar muda o vencimento, não registra pagamento.">
       <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
