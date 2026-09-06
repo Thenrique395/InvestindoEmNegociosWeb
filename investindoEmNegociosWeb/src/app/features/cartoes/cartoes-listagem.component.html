@@ -6,15 +6,7 @@
           <div class="cards-list__top">
             <div class="cards-list__identity">
               <div class="cards-list__brand" [ngClass]="'cards-list__brand--' + brandCode(m.card)" aria-hidden="true">
-                @if (!isMastercard(brandCode(m.card))) {
-                  {{ brandName(m.card) }}
-                } @else {
-                  <span class="cards-list__mastercard">
-                    <span></span>
-                    <span></span>
-                  </span>
-                  <span class="cards-list__mastercard-label">mastercard</span>
-                }
+                {{ brandName(m.card) }}
               </div>
               <span class="cards-list__bank-tag">{{ m.card.banco || 'Banco não informado' }}</span>
             </div>
@@ -64,7 +56,7 @@
             </div>
             <div class="cards-list__meta-item">
               <span class="cards-list__meta-label">Melhor dia de compra</span>
-              <strong class="cards-list__meta-value">Dia {{ m.bestPurchaseDay }}</strong>
+              <strong class="cards-list__meta-value cards-list__meta-value--highlight">Dia {{ m.bestPurchaseDay }}</strong>
             </div>
             <div class="cards-list__meta-item">
               <span class="cards-list__meta-label">Ciclo</span>

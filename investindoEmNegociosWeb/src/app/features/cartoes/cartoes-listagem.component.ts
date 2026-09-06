@@ -71,10 +71,6 @@ export class CartoesListagemComponent {
     return `${first} •••• •••• ${last}`;
   }
 
-  isMastercard(code: string): boolean {
-    return (code || '').toLowerCase() === 'mastercard';
-  }
-
   statusLabel(status: CardStatus): string {
     switch (status) {
       case 'overdue':

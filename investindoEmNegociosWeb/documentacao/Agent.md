@@ -18,6 +18,7 @@ Este agente cuida de:
 - `InvestindoEmNegociosWeb/investindoEmNegociosWeb`
 - rotas, guards, telas, componentes e servicos web
 - SSR, configuracao da API, UX do produto autenticado e paginas comerciais
+- responsividade e experiencia em telas pequenas (mobile-first do proprio web)
 - documentacao especializada do frontend
 
 ## Quando acionar
@@ -29,7 +30,8 @@ Use este agente para:
 - componentes, formularios e fluxo de navegacao
 - integracao com API, interceptors e tratamento de erro
 - paginas de marketing, pricing, checkout e portal no frontend
-- SSR, PWA, service worker e Capacitor
+- SSR, PWA e service worker
+- layout quebrando no celular, scroll lateral, tabela ruim ou area tocavel pequena
 - testes unitarios e E2E do frontend
 - ambiente, base URL e configuracao operacional do app web
 
@@ -114,7 +116,7 @@ Ler nesta ordem:
 4. `./DESIGN_SYSTEM.md`
 5. `./systemDesigner.md`
 
-### Mudanca de SSR, browser APIs, service worker, PWA ou Capacitor
+### Mudanca de SSR, browser APIs, service worker ou PWA
 
 Ler nesta ordem:
 
@@ -159,9 +161,9 @@ Considerar impacto compartilhado com backend quando:
 - role, feature gate ou acesso funcional mudar
 - fluxo de autenticacao, onboarding, billing ou portal mudar
 
-Considerar impacto compartilhado com mobile quando:
+Tratar como parte do proprio trabalho de frontend, sem escalar para fora:
 
-- a mudanca afetar responsividade, toque, viewport, PWA ou Capacitor
+- responsividade, toque, viewport, PWA e service worker sao escopo deste agente
 
 Parar e escalar quando:
 
@@ -191,7 +193,19 @@ O Codex nao deve seguir adiante sem registrar o problema quando houver:
 
 - revisar estado, validacao, loading e erro
 - revisar coerencia com `DESIGN_SYSTEM.md`
-- validar desktop e mobile quando a tela for relevante para ambos
+- validar a tela em largura pequena primeiro, depois tablet e desktop
+- identificar o ponto de quebra real em vez de remendar o visual
+
+### Responsividade e telas pequenas
+
+Regras (mobile-first e obrigatorio; a solucao mobile nao pode quebrar a leitura desktop):
+
+- sem scroll lateral como solucao padrao, e nunca esconder o problema com `overflow-x`
+- desktop pode usar tabela quando fizer sentido; no celular, preferir cards, blocos verticais
+  e leitura direta em vez de manter uma tabela unica ruim
+- formularios em fluxo linear; acoes criticas visiveis, sem exigir precisao excessiva de toque
+- nao reduzir fonte, botao ou area clicavel so para "caber"
+- nao resolver mobile quebrando a semantica ou a manutencao da tela
 
 ### API, interceptor ou autenticacao
 
@@ -199,7 +213,7 @@ O Codex nao deve seguir adiante sem registrar o problema quando houver:
 - revisar contrato HTTP e comportamento de erro
 - validar expiracao, refresh, logout ou fallback quando aplicavel
 
-### SSR, PWA ou Capacitor
+### SSR, PWA ou service worker
 
 - revisar acessos a APIs de browser
 - validar hidratacao, renderizacao inicial e comportamento offline quando aplicavel

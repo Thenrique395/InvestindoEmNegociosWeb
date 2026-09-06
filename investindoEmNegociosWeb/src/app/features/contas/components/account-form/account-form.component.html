@@ -1,10 +1,12 @@
-<section class="account-panel">
-  <div class="account-panel__head">
-    <div>
-      <p class="account-panel__eyebrow">Cadastro</p>
-      <h2>{{ editingId() ? 'Editar conta' : 'Nova conta' }}</h2>
+<section class="account-panel" [class.account-panel--bare]="bare()">
+  @if (!bare()) {
+    <div class="account-panel__head">
+      <div>
+        <p class="account-panel__eyebrow">Cadastro</p>
+        <h2>{{ editingId() ? 'Editar conta' : 'Nova conta' }}</h2>
+      </div>
     </div>
-  </div>
+  }
 
   <div class="account-form-grid">
 

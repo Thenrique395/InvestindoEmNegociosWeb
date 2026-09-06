@@ -5,15 +5,15 @@
     description="Acompanhe seus saldos, movimentações e distribuição financeira em um único lugar."
     [hasMeta]="false">
     <div page-actions class="accounts-actions">
+      <button type="button" class="btn-ghost sm" (click)="refreshBalances()" aria-label="Atualizar saldos das contas">Atualizar saldos</button>
+      @if (canTransfer) {
+        <button type="button" class="btn-ghost sm" (click)="focusTransfer()">Nova transferência</button>
+      }
       @if (canManageAccounts) {
         <button type="button" class="btn-primary sm" (click)="focusCreate()">
           <span aria-hidden="true">+</span> Nova conta
         </button>
       }
-      @if (canTransfer) {
-        <button type="button" class="btn-ghost sm" (click)="focusTransfer()">Nova transferência</button>
-      }
-      <button type="button" class="btn-ghost sm" (click)="refreshBalances()" aria-label="Atualizar saldos das contas">Atualizar saldos</button>
     </div>
   </app-page-header>
 
@@ -60,7 +60,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card density="compact" [tone]="availableTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
+      <app-transaction-summary-card density="compact" [tone]="availableTone" [valueTone]="availableValueTone" eyebrow="Saldo disponível" [value]="availableBalance | appCurrency"
         [note]="availableNote"
         tooltipText="Saldo total menos as despesas já lançadas e ainda não pagas. É o que sobra de fato depois de honrar os compromissos em aberto.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -68,7 +68,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card density="compact" tone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
+      <app-transaction-summary-card density="compact" tone="success" valueTone="success" eyebrow="Entradas" [value]="overview.totalIncome | appCurrency"
         [note]="'Receitas reais ' + periodLabel + '.'"
         tooltipText="Receitas efetivamente recebidas no período, não as previstas. Transferências entre contas suas não contam como entrada.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -76,7 +76,7 @@
         </svg>
       </app-transaction-summary-card>
 
-      <app-transaction-summary-card density="compact" tone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
+      <app-transaction-summary-card density="compact" tone="danger" valueTone="danger" eyebrow="Saídas" [value]="overview.totalExpense | appCurrency"
         [note]="'Despesas reais ' + periodLabel + ' (sem transferências).'"
         tooltipText="Despesas efetivamente pagas no período. Transferência entre contas suas não é saída — só muda o dinheiro de lugar.">
         <svg stat-icon viewBox="0 0 24 24" role="presentation" focusable="false">
@@ -230,36 +230,45 @@
       }
     </div>
 
-    <!-- Gerenciar: cadastro + transferência -->
+    <!-- Cadastro e transferência vivem no modal, como no handoff: inline, o
+         formulário ficava no meio da página com meia tela vazia ao lado. -->
     @if (canManageAccounts) {
-      <section id="accounts-workspace" class="accounts-workspace" [class.accounts-workspace--single]="!canTransfer">
-        <app-account-form
-          [form]="form"
-          [editingId]="editingId"
-          [saving]="saving"
-          [accountTypes]="accountTypes"
-          (save)="save()"
-          (clear)="startCreate()">
-        </app-account-form>
-
-        @if (canTransfer) {
-          <div id="accounts-transfer">
-            <app-account-transfer
-              [accounts]="accounts"
-              [value]="transferForm"
-              [transferring]="transferring"
-              (valueChange)="onTransferChange($event)"
-              (submitTransfer)="transfer()">
-            </app-account-transfer>
-          </div>
+      <app-modal
+        [open]="modalAberto !== null"
+        size="md"
+        [eyebrow]="modalEyebrow"
+        [title]="modalTitulo"
+        [hasFooter]="false"
+        (close)="fecharModal()">
+        @if (modalAberto === 'account') {
+          <app-account-form
+            [bare]="true"
+            [form]="form"
+            [editingId]="editingId"
+            [saving]="saving"
+            [accountTypes]="accountTypes"
+            (save)="save()"
+            (clear)="startCreate()">
+          </app-account-form>
         }
-      </section>
+        @if (modalAberto === 'transfer' && canTransfer) {
+          <app-account-transfer
+            [bare]="true"
+            [accounts]="accounts"
+            [value]="transferForm"
+            [transferring]="transferring"
+            (valueChange)="onTransferChange($event)"
+            (submitTransfer)="transfer()">
+          </app-account-transfer>
+        }
+      </app-modal>
     }
 
     <!-- Extrato da conta selecionada -->
     @if (selectedAccount) {
       <app-section-card
         id="accounts-statement"
+        eyebrow="Movimentações"
         [title]="'Extrato: ' + selectedAccount.name"
         description="Movimentações, filtros e importação de extrato.">
         <div card-actions class="accounts-statement__filters">
@@ -272,9 +281,22 @@
             <input type="datetime-local" [(ngModel)]="toInput" />
           </label>
           <button type="button" class="btn-primary sm" (click)="loadTransactions()">Filtrar</button>
+          @if (canImportAccounts) {
+            <button
+              type="button"
+              class="btn-ghost sm accounts-statement__import-toggle"
+              [attr.aria-expanded]="mostrarImportExtrato"
+              (click)="mostrarImportExtrato = !mostrarImportExtrato">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M14 3v6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Importar extrato
+            </button>
+          }
         </div>
 
-        @if (canImportAccounts) {
+        @if (canImportAccounts && mostrarImportExtrato) {
           <app-account-import
             [ofxFileName]="ofxFileName"
             [extractingOfx]="extractingOfx"

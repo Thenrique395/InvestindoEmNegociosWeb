@@ -76,7 +76,6 @@ Fluxo principal:
 - Service Worker
 - Playwright para E2E
 - Karma/Jasmine para testes unitários
-- Capacitor para empacotamento mobile
 
 Integrações e stack relacionadas:
 

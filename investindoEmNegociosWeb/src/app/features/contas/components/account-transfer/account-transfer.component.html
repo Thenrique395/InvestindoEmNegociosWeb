@@ -1,5 +1,7 @@
-<section class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-card-hover)]">
-  <h2 class="mb-3 text-lg font-semibold text-[var(--text)]">Transferência entre contas</h2>
+<section [class]="shellClass()">
+  @if (!bare()) {
+    <h2 class="mb-3 text-lg font-semibold text-[var(--text)]">Transferência entre contas</h2>
+  }
   <p class="mb-3 text-sm text-[var(--text-tertiary)]">
     Registra débito na conta de origem e crédito na conta de destino em uma operação única.
   </p>

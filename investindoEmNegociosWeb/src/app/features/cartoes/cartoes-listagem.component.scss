@@ -16,11 +16,11 @@
 
 .cards-list__card {
   display: grid;
-  gap: 0.65rem;
-  padding: 0.95rem;
-  border-radius: var(--radius-panel);
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  border-radius: var(--radius-card);
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), var(--surface) 58%);
+  background: var(--surface);
   max-width: 100%;
 }
 
@@ -47,76 +47,32 @@
 }
 
 .cards-list__brand {
-  min-inline-size: 4.4rem;
-  min-block-size: 3rem;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  gap: 0.12rem;
-  padding: 0.45rem 0.65rem;
-  border-radius: var(--radius-inner);
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
-  background: var(--surface-sunken);
-  color: var(--text);
-  font-size: var(--fs-caption);
+  block-size: 1.625rem;
+  padding: 0 0.625rem;
+  border-radius: var(--radius-xs);
+  background: var(--brand-mastercard);
+  color: var(--text-secondary);
+  font-size: var(--fs-micro);
   font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-eyebrow);
+  letter-spacing: var(--ls-column);
   text-transform: uppercase;
-  text-align: center;
   line-height: var(--lh-display);
-  overflow: hidden;
+  white-space: nowrap;
 }
 
 .cards-list__bank-tag {
   display: inline-flex;
   align-items: center;
-  min-height: 2rem;
-  padding: 0.45rem 0.8rem;
+  padding: 0.1875rem 0.5625rem;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
   background: var(--surface-sunken);
-  color: var(--text-secondary);
-  font-size: 0.73rem;
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-column);
-  text-transform: uppercase;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   white-space: nowrap;
-}
-
-.cards-list__mastercard {
-  position: relative;
-  inline-size: 2.55rem;
-  block-size: 1.5rem;
-  display: inline-block;
-
-  span {
-    position: absolute;
-    inset-block-start: 0;
-    inline-size: 1.5rem;
-    block-size: 1.5rem;
-    border-radius: var(--radius-pill);
-  }
-
-  span:first-child {
-    inset-inline-start: 0;
-    background: rgba(244, 63, 94, 0.85);
-  }
-
-  span:last-child {
-    inset-inline-end: 0;
-    background: rgba(251, 191, 36, 0.9);
-    mix-blend-mode: multiply;
-  }
-}
-
-.cards-list__mastercard-label {
-  font-size: 0.4rem;
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-normal);
-  text-transform: lowercase;
-  line-height: var(--lh-display);
-  white-space: nowrap;
-  color: color-mix(in srgb, var(--text) 78%, transparent);
 }
 
 .cards-list__copy {
@@ -138,15 +94,14 @@
 .cards-list__title-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.625rem;
 }
 
 .cards-list__title {
   margin: 0;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--fs-body);
+  font-size: var(--fs-card-title);
   line-height: var(--lh-display);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--ls-tight);
@@ -156,27 +111,53 @@
 }
 
 .cards-list__masked-inline {
-  margin: 0.08rem 0 0;
-  font-size: var(--fs-caption);
+  margin: 0.3125rem 0 0;
+  font-size: var(--fs-meta);
   font-weight: var(--fw-semibold);
-  letter-spacing: var(--ls-eyebrow);
-  color: var(--text-tertiary);
+  letter-spacing: var(--ls-column);
+  color: var(--text-muted);
 }
 
 .cards-list__actions {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.1875rem;
   align-self: flex-start;
 }
 
+/* O protótipo tira a moldura destes dois: dentro de um card já cercado de
+   borda, a caixa do botão competia com o próprio card. Só o ícone fica. */
 .cards-list__action {
-  inline-size: 42px;
-  block-size: 42px;
+  display: grid;
+  place-items: center;
+  inline-size: var(--h-icon-button);
+  block-size: var(--h-icon-button);
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--control-transition);
 
   svg {
-    inline-size: 18px;
-    block-size: 18px;
+    inline-size: 15px;
+    block-size: 15px;
+  }
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: var(--surface-sunken);
+    color: var(--primary-text);
+  }
+}
+
+.cards-list__action--danger {
+  color: color-mix(in srgb, var(--expense-text) 45%, var(--text-muted));
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: color-mix(in srgb, var(--expense) 8%, transparent);
+    color: var(--expense-text);
   }
 }
 
@@ -193,15 +174,12 @@
 }
 
 .cards-list__usage-label {
-  font-size: 0.64rem;
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+  color: var(--text-secondary);
 }
 
 .cards-list__usage-percent {
-  font-size: var(--fs-meta);
+  font-size: var(--fs-body);
   font-weight: var(--fw-bold);
   color: var(--income-text);
 }
@@ -214,7 +192,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.35rem 1rem;
-  font-size: var(--fs-caption);
+  font-size: var(--fs-meta);
   color: var(--text-tertiary);
 }
 
@@ -226,9 +204,9 @@
 .cards-list__meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--border);
+  gap: 0.75rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--border-row);
 }
 
 .cards-list__meta-item {
@@ -238,77 +216,52 @@
 }
 
 .cards-list__meta-label {
-  font-size: 0.62rem;
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
+  font-size: var(--fs-caption);
   color: var(--text-tertiary);
 }
 
 .cards-list__meta-value {
   overflow: hidden;
-  font-size: var(--fs-caption);
+  margin-top: 0.1875rem;
+  font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
   color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.cards-list__card--visa {
-  background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 38%),
-    linear-gradient(135deg, color-mix(in srgb, var(--primary) 5%, transparent), var(--surface) 60%);
-
-  .cards-list__brand {
-    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-    background: linear-gradient(135deg, var(--brand-visa-from), var(--primary-text));
-    color: white;
-  }
+/* Comprar logo após o fechamento é o maior prazo até pagar: o verde marca
+   isso como a informação que o usuário procura no card. */
+.cards-list__meta-value--highlight {
+  color: var(--income-text);
 }
 
-.cards-list__card--mastercard {
-  background:
-    radial-gradient(circle at top left, rgba(251, 191, 36, 0.16), transparent 34%),
-    radial-gradient(circle at top right, rgba(244, 63, 94, 0.1), transparent 28%),
-    linear-gradient(135deg, rgba(148, 163, 184, 0.04), var(--surface) 62%);
-
-  .cards-list__brand {
-    min-inline-size: 5rem;
-    min-block-size: 3.2rem;
-    gap: 0.08rem;
-    border-color: rgba(148, 163, 184, 0.14);
-    background: rgba(255, 255, 255, 0.9);
-  }
+/* O card é branco para todas as bandeiras — o gradiente por marca tingia o
+   fundo e fazia cartões iguais parecerem estados diferentes. A identidade da
+   marca fica só no selo, que é o único lugar onde ela informa algo. */
+.cards-list__card--visa .cards-list__brand {
+  background: var(--brand-visa);
+  color: white;
 }
 
-.cards-list__card--elo {
-  background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--income) 12%, transparent), transparent 38%),
-    linear-gradient(135deg, rgba(2, 132, 199, 0.04), var(--surface) 60%);
-
-  .cards-list__brand {
-    border-color: rgba(15, 23, 42, 0.12);
-    background: linear-gradient(135deg, var(--brand-elo-from), var(--brand-elo-to));
-    color: white;
-  }
+.cards-list__card--mastercard .cards-list__brand {
+  background: var(--brand-mastercard);
+  color: var(--text-secondary);
 }
 
-.cards-list__card--amex {
-  background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 16%, transparent), transparent 36%),
-    linear-gradient(135deg, rgba(6, 182, 212, 0.05), var(--surface) 60%);
-
-  .cards-list__brand {
-    border-color: rgba(8, 145, 178, 0.18);
-    background: linear-gradient(135deg, var(--brand-amex-from), var(--brand-amex-to));
-    color: white;
-  }
+.cards-list__card--elo .cards-list__brand {
+  background: var(--brand-elo);
+  color: white;
 }
 
-.cards-list__card--default {
-  .cards-list__brand {
-    background: var(--surface-sunken);
-  }
+.cards-list__card--amex .cards-list__brand {
+  background: var(--brand-amex);
+  color: white;
+}
+
+.cards-list__card--default .cards-list__brand {
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
 }
 
 .cards-list__empty {

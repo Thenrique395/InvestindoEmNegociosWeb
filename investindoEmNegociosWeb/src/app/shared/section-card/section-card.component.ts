@@ -12,9 +12,14 @@ type SectionCardSurface = 'default' | 'muted';
   imports: [],
   template: `
     <section [class]="cardClass()">
-      @if (title() || description() || hasHeaderActions()) {
+      @if (eyebrow() || title() || description() || hasHeaderActions()) {
         <header class="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div class="min-w-0 space-y-1">
+            @if (eyebrow()) {
+              <p class="m-0 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+                {{ eyebrow() }}
+              </p>
+            }
             @if (title()) {
               <h2 class="m-0 text-base font-semibold text-[var(--text)]">
                 {{ title() }}
@@ -37,6 +42,7 @@ type SectionCardSurface = 'default' | 'muted';
     `
 })
 export class SectionCardComponent {
+  readonly eyebrow = input<string>('');
   readonly title = input<string>('');
   readonly description = input<string>('');
   readonly padding = input<SectionCardPadding>('md');

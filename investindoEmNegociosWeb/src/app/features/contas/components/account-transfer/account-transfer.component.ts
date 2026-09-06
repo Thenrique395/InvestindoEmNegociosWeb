@@ -34,6 +34,14 @@ export class AccountTransferComponent {
     description: ''
   });
   readonly transferring = input(false);
+  /** Dentro do modal a moldura vem de fora — senão vira card dentro de card. */
+  readonly bare = input<boolean>(false);
+
+  readonly shellClass = computed(() =>
+    this.bare()
+      ? ''
+      : 'rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-card-hover)]'
+  );
 
   readonly submitTransfer = output<void>();
 

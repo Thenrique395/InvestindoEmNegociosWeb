@@ -29,6 +29,7 @@ import { TransactionSummaryCardComponent } from '../../shared/transactions/trans
 import { SegmentedSelectorComponent, SegmentOption } from '../../shared/segmented-selector/segmented-selector.component';
 import { DonutChartComponent } from '../../shared/donut-chart/donut-chart.component';
 import { UiPermissionsService } from '../../core/ui-permissions.service';
+import { ModalComponent } from '../../shared/modal/modal.component';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import {
   AccountPeriod,
@@ -60,12 +61,15 @@ import {
     SegmentedSelectorComponent,
     DonutChartComponent,
     ConfirmDialogComponent,
+    ModalComponent,
     SelectMenuComponent
   ],
   templateUrl: './contas.component.html',
   styleUrls: ['./contas.component.scss']
 })
 export class ContasComponent implements OnInit {
+  /** O painel de importação fica atrás do botão, como no handoff. */
+  mostrarImportExtrato = false;
   loading = false;
   saving = false;
   error = '';
@@ -112,7 +116,8 @@ export class ContasComponent implements OnInit {
   period: AccountPeriod = 'month';
   filters: AccountsFilters = { search: '', type: 'all', status: 'all', balance: 'all' };
   sort: AccountSort = 'primary';
-  showManageWorkspace = false;
+  /** Qual formulário está aberto no modal. `null` = fechado. */
+  modalAberto: 'account' | 'transfer' | null = null;
   readonly canAdvanced: boolean;
 
   private lastActivityKey = '';
@@ -206,8 +211,13 @@ export class ContasComponent implements OnInit {
     return 'Sem compromissos em aberto no período.';
   }
 
-  get availableTone(): 'info' | 'warning' {
-    return this.availableBalance < 0 ? 'warning' : 'info';
+  get availableTone(): 'success' | 'danger' {
+    return this.availableBalance < 0 ? 'danger' : 'success';
+  }
+
+  /** Só o negativo pinta o valor: no positivo ele é escuro, como o saldo total. */
+  get availableValueTone(): 'default' | 'danger' {
+    return this.availableBalance < 0 ? 'danger' : 'default';
   }
 
   get forecastAmount(): number {
@@ -309,14 +319,26 @@ export class ContasComponent implements OnInit {
   }
 
   focusCreate(): void {
-    this.showManageWorkspace = true;
     this.startCreate();
-    queueMicrotask(() => this.scrollTo('accounts-workspace'));
+    this.modalAberto = 'account';
   }
 
   focusTransfer(): void {
-    this.showManageWorkspace = true;
-    queueMicrotask(() => this.scrollTo('accounts-transfer'));
+    this.modalAberto = 'transfer';
+  }
+
+  fecharModal(): void {
+    this.modalAberto = null;
+  }
+
+  get modalEyebrow(): string {
+    if (this.modalAberto === 'transfer') return 'Transferência';
+    return 'Cadastro';
+  }
+
+  get modalTitulo(): string {
+    if (this.modalAberto === 'transfer') return 'Transferência entre contas';
+    return this.editingId ? 'Editar conta' : 'Nova conta';
   }
 
   private scrollTo(id: string): void {
@@ -364,7 +386,7 @@ export class ContasComponent implements OnInit {
   startEdit(account: AccountResponse): void {
     this.error = '';
     this.editingId = account.id;
-    this.showManageWorkspace = true;
+    this.modalAberto = 'account';
     this.form = {
       name: account.name,
       type: account.type,
@@ -372,7 +394,6 @@ export class ContasComponent implements OnInit {
       isActive: account.isActive,
       currency: account.currency
     };
-    queueMicrotask(() => this.scrollTo('accounts-workspace'));
   }
 
   save(): void {
@@ -400,6 +421,7 @@ export class ContasComponent implements OnInit {
     const done = () => {
       this.startCreate();
       this.saving = false;
+      this.fecharModal();
     };
 
     if (this.editingId) {
@@ -497,6 +519,7 @@ export class ContasComponent implements OnInit {
         occurredAtInput: ''
       };
       this.transferring = false;
+      this.fecharModal();
     });
   }
 

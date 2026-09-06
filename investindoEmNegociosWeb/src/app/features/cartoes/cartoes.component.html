@@ -102,32 +102,36 @@
           <h3 class="cards-statements__title">Como suas compras entram na fatura</h3>
           <p class="cards-statements__text">Escolha o cartão, o ano e o mês para ver fechamento, vencimento e total de cada fatura.</p>
         </div>
-        <app-filter-bar>
-          <div filter-left class="cards-statements__filters">
-            <label class="tx-filter">
-              <span class="tx-filter__label">Cartão</span>
-              <app-select-menu
-                ariaLabel="Cartão para faturas"
-                placeholder="Selecione"
-                [options]="statementCardOptions"
-                [(ngModel)]="statementCardId"
-                (ngModelChange)="loadStatementCycles()" />
-            </label>
-            <label class="tx-filter">
-              <span class="tx-filter__label">Ano</span>
-              <input type="number" min="2000" max="2100" [(ngModel)]="statementYear" />
-            </label>
-            <label class="tx-filter">
-              <span class="tx-filter__label">Mês</span>
-              <app-select-menu
-                ariaLabel="Mês da fatura"
-                [options]="statementMonthOptions"
-                [ngModel]="statementMonthValue"
-                (ngModelChange)="onStatementMonthChange($event)" />
-            </label>
-          </div>
-          <button filter-right type="button" class="cards-statements__apply" (click)="loadStatementCycles()">Aplicar filtros</button>
-        </app-filter-bar>
+      </div>
+
+      <div class="cards-statements__filters">
+        <label class="tx-filter cards-statements__filter--card">
+          <span class="tx-filter__label">Cartão</span>
+          <app-select-menu
+            ariaLabel="Cartão para faturas"
+            placeholder="Selecione"
+            [options]="statementCardOptions"
+            [(ngModel)]="statementCardId"
+            (ngModelChange)="loadStatementCycles()" />
+        </label>
+        <div class="tx-filter cards-statements__filter--year">
+          <span class="tx-filter__label">Ano</span>
+          <app-number-stepper
+            [min]="2000"
+            [max]="2100"
+            ariaLabel="Ano da fatura"
+            [(ngModel)]="statementYear"
+            (valueChange)="loadStatementCycles()" />
+        </div>
+        <label class="tx-filter cards-statements__filter--month">
+          <span class="tx-filter__label">Mês</span>
+          <app-select-menu
+            ariaLabel="Mês da fatura"
+            [options]="statementMonthOptions"
+            [ngModel]="statementMonthValue"
+            (ngModelChange)="onStatementMonthChange($event)" />
+        </label>
+        <button type="button" class="cards-statements__apply" (click)="loadStatementCycles()">Aplicar filtros</button>
       </div>
 
       @if (canViewCardStatements) {
@@ -145,78 +149,75 @@
           <div class="cards-statements__list">
             @for (cycle of statementCycles; track trackByStatement($index, cycle)) {
               <article class="cards-statements__item">
-                <div class="cards-statements__item-head">
-                  <div>
+                <div class="cards-statements__item-row">
+                <div class="cards-statements__item-main">
+                  <div class="cards-statements__item-title-row">
                     <h4 class="cards-statements__item-title">Ciclo {{ statementMonthLabel(cycle.statementMonth) }}/{{ cycle.statementYear }}</h4>
-                    <p class="cards-statements__item-copy">Fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} · vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}</p>
-                  </div>
-                  <div class="cards-statements__item-tags">
                     <app-status-badge
                       [tone]="statementStatusTone(statementStatus(cycle))"
                       [label]="statementStatusLabel(statementStatus(cycle))"
                       size="sm" />
-                    <span class="cards-statements__item-badge">{{ cycle.itemsCount }} lançamento(s)</span>
                   </div>
+                  <p class="cards-statements__item-copy">Fecha {{ cycle.statementCloseDate | date:'dd/MM/yyyy' }} · vence {{ cycle.statementDueDate | date:'dd/MM/yyyy' }}</p>
                 </div>
-                <div class="cards-statements__metrics">
-                  <div class="cards-statements__metric">
-                    <span>Total</span>
-                    <strong>{{ cycle.totalAmount | appCurrency }}</strong>
-                  </div>
-                  <div class="cards-statements__metric cards-statements__metric--success">
-                    <span>Pago</span>
-                    <strong>{{ cycle.totalPaid | appCurrency }}</strong>
-                  </div>
-                  <div class="cards-statements__metric cards-statements__metric--danger">
-                    <span>Em aberto</span>
-                    <strong>{{ cycle.totalOpen | appCurrency }}</strong>
-                  </div>
+                <div class="cards-statements__metric">
+                  <span>Lançamentos</span>
+                  <strong>{{ cycle.itemsCount }}</strong>
                 </div>
+                <div class="cards-statements__metric">
+                  <span>Parcelas</span>
+                  <strong>{{ statementInstallmentsCount(cycle) }}</strong>
+                </div>
+                <div class="cards-statements__metric cards-statements__metric--total">
+                  <span>Total</span>
+                  <strong>{{ cycle.totalAmount | appCurrency }}</strong>
+                </div>
+                <div class="cards-statements__item-action">
+                  <button
+                    type="button"
+                    class="cards-statements__view"
+                    [attr.aria-expanded]="isCicloAberto(cycle)"
+                    [attr.aria-controls]="'fatura-' + cicloKey(cycle)"
+                    (click)="alternarFatura(cycle)">
+                    {{ isCicloAberto(cycle) ? 'Ocultar' : 'Ver fatura' }}
+                    <svg class="cards-statements__view-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+                </div>
+
+                @if (isCicloAberto(cycle)) {
+                  <div class="cards-statements__detail" [id]="'fatura-' + cicloKey(cycle)">
+                    @if (!faturaItens.length) {
+                      <p class="cards-statements__detail-empty">Nenhuma compra caiu neste ciclo.</p>
+                    } @else {
+                      @for (item of faturaItens; track item.id) {
+                        <article class="statement-detail__row">
+                          <span class="statement-detail__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                              <path d="M6 8h12M7 13h7M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v11A2.5 2.5 0 0 1 16.5 20h-9A2.5 2.5 0 0 1 5 17.5v-11Z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                          </span>
+                          <div class="statement-detail__main">
+                            <strong>{{ item.titulo }}</strong>
+                            <span>{{ item.categoria }}</span>
+                          </div>
+                          <span class="statement-detail__pill">Parcela {{ item.parcela }}</span>
+                          <app-status-badge [tone]="item.statusTone" [label]="item.statusLabel" size="sm" />
+                          <strong class="statement-detail__amount">{{ item.valor | appCurrency }}</strong>
+                          <span class="statement-detail__date">Vence {{ item.vencimento }}</span>
+                        </article>
+                      }
+                    }
+                  </div>
+                }
               </article>
             }
           </div>
         }
       }
 
-      <section class="cards-purchases">
-        <div class="cards-purchases__header">
-          <div>
-            <p class="cards-purchases__eyebrow">Compras do cartão</p>
-            <h4 class="cards-purchases__title">Compras registradas neste cartão</h4>
-            <p class="cards-purchases__subtitle">Consulte descrição, parcela, valor e vencimento sem misturar com outros cartões.</p>
-          </div>
-          <span class="cards-purchases__count">{{ selectedCardExpenses.length }} lançamento(s)</span>
-        </div>
-
-        @if (!selectedCardExpenses.length) {
-          <app-empty-state
-            icon="$"
-            title="Nenhuma compra encontrada"
-            description="Não há compras deste cartão nos filtros atuais." />
-        }
-
-        @if (selectedCardExpenses.length) {
-          <div class="cards-purchases__list">
-            @for (expense of selectedCardExpenses; track trackByIndex($index, expense)) {
-              <article class="cards-purchases__row">
-                <span class="cards-purchases__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M6 8h12M7 13h7M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v11A2.5 2.5 0 0 1 16.5 20h-9A2.5 2.5 0 0 1 5 17.5v-11Z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-                <div class="cards-purchases__main">
-                  <strong>{{ expense.nome }}</strong>
-                  <span>{{ expense.categoria || 'Sem categoria' }}</span>
-                </div>
-                <span class="cards-purchases__pill">Parcela {{ cardExpenseInstallmentLabel(expense) }}</span>
-                <app-status-badge [tone]="cardExpenseStatusTone(expense)" [label]="cardExpenseStatusLabel(expense)"></app-status-badge>
-                <strong class="cards-purchases__amount">{{ expense.valor | appCurrency }}</strong>
-                <span class="cards-purchases__date">Vence {{ expense.vencimento }}</span>
-              </article>
-            }
-          </div>
-        }
-      </section>
     </section>
   </section>
 

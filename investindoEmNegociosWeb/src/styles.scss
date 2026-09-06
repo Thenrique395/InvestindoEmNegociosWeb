@@ -226,7 +226,6 @@ select:not([multiple]) {
 :where(
   .receitas-table__icon-action,
   .expenses-table__icon-action,
-  .cards-list__action,
   .receitas-lista__icon-action,
   .despesas-lista__icon-action
 ) {
@@ -245,14 +244,12 @@ select:not([multiple]) {
 :where(
   .receitas-table__icon-action,
   .expenses-table__icon-action,
-  .cards-list__action,
   .receitas-lista__icon-action,
   .despesas-lista__icon-action
 ):hover:not(:disabled),
 :where(
   .receitas-table__icon-action,
   .expenses-table__icon-action,
-  .cards-list__action,
   .receitas-lista__icon-action,
   .despesas-lista__icon-action
 ):focus-visible {
@@ -265,14 +262,12 @@ select:not([multiple]) {
 :where(
   .receitas-table__icon-action--danger,
   .expenses-table__icon-action--danger,
-  .cards-list__action--danger,
   .receitas-lista__icon-action--danger,
   .despesas-lista__icon-action--danger
 ):hover:not(:disabled),
 :where(
   .receitas-table__icon-action--danger,
   .expenses-table__icon-action--danger,
-  .cards-list__action--danger,
   .receitas-lista__icon-action--danger,
   .despesas-lista__icon-action--danger
 ):focus-visible {

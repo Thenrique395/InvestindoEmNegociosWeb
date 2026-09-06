@@ -45,5 +45,7 @@
 .account-list__grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  /* auto-fill com 318px é a medida do handoff: com auto-fit + 260px, duas
+     contas esticavam para meia tela cada. */
+  grid-template-columns: repeat(auto-fill, minmax(318px, 1fr));
 }

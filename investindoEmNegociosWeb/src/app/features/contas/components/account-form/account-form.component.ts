@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { FormFieldComponent } from '../../../../shared/form-field/form-field.component';
 import { SelectMenuComponent, SelectMenuOption } from '../../../../shared/select-menu/select-menu.component';
 import { AccountRequest, AccountType } from '../../../../core/account.models';
+import { accountTypeLabel } from '../../../../core/accounts-overview.model';
 import { SUPPORTED_CURRENCIES } from '../../../../core/utils/locale-settings';
 
 type AccountFormField = 'name' | 'type' | 'initialBalance';
@@ -44,8 +45,11 @@ export class AccountFormComponent {
     initialBalance: false
   });
 
+  /** Dentro do modal o cabeçalho e a moldura vêm de fora — senão vira card dentro de card. */
+  readonly bare = input<boolean>(false);
+
   readonly accountTypeOptions = computed<SelectMenuOption[]>(() =>
-    this.accountTypes().map((type) => ({ value: type, label: type }))
+    this.accountTypes().map((type) => ({ value: type, label: accountTypeLabel(type) }))
   );
 
   readonly currencyOptions = computed<SelectMenuOption[]>(() =>

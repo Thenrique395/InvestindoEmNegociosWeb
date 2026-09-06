@@ -19,9 +19,10 @@ import { PeriodHeroComponent } from '../../shared/period-hero/period-hero.compon
 import { PeriodTotalCardComponent } from '../../shared/period-total-card/period-total-card.component';
 import { UiPermissionsService } from '../../core/ui-permissions.service';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
-import { FilterBarComponent } from '../../shared/filter-bar/filter-bar.component';
 import { SelectMenuComponent, SelectMenuOption } from '../../shared/select-menu/select-menu.component';
+import { NumberStepperComponent } from '../../shared/number-stepper/number-stepper.component';
 import { installmentStatusTone, InstallmentStatusTone } from '../../core/utils/status';
+import { formatMonthLabel } from '../../core/utils/locale-utils';
 import { ConfirmSheetComponent } from '../../shared/confirm-sheet/confirm-sheet.component';
 import { OnboardingReturnBannerComponent } from '../layout/onboarding-return/onboarding-return-banner.component';
 import {
@@ -32,6 +33,18 @@ import {
   statementStatusFor,
   StatementStatus
 } from '../../core/card-metrics.model';
+
+/** Linha da fatura: extrato da API + o que a despesa local sabe a mais. */
+interface StatementItemView {
+  id: string;
+  titulo: string;
+  categoria: string;
+  parcela: string;
+  statusLabel: string;
+  statusTone: InstallmentStatusTone;
+  valor: number;
+  vencimento: string;
+}
 
 @Component({
   selector: 'app-cartoes',
@@ -50,8 +63,8 @@ import {
     PeriodHeroComponent,
     PeriodTotalCardComponent,
     StatusBadgeComponent,
-    FilterBarComponent,
     SelectMenuComponent,
+    NumberStepperComponent,
     ConfirmSheetComponent,
 ],
   templateUrl: './cartoes.component.html',
@@ -73,6 +86,11 @@ export class CartoesComponent implements OnInit {
   statementMonth: number | null = null;
   statementLoading = false;
   statementCycles: CardStatementCycleDto[] = [];
+  /** Acordeão: só um ciclo aberto por vez, e seus itens já cruzados. */
+  cicloAberto: string | null = null;
+  faturaItens: StatementItemView[] = [];
+  /** Só na primeira carga de cada consulta: depois quem manda é o usuário. */
+  private autoAbrirCicloCorrente = true;
   private autoLoadedStatementCardId: string | null = null;
 
   get totalCards(): number {
@@ -122,7 +140,7 @@ export class CartoesComponent implements OnInit {
       { value: '', label: 'Todos' },
       ...Array.from({ length: 12 }, (_, index) => {
         const month = index + 1;
-        return { value: String(month), label: this.statementMonthLabel(month) };
+        return { value: String(month), label: formatMonthLabel(this.statementYear, index, 'long') };
       }),
     ];
   }
@@ -190,33 +208,6 @@ export class CartoesComponent implements OnInit {
         return 'info';
     }
   }
-
-  get selectedCardExpenses(): StoredExpense[] {
-    if (!this.statementCardId) return [];
-
-    return this.expenses
-      .filter((expense) => {
-        if (expense.cartao !== this.statementCardId) return false;
-
-        if (this.statementYear && expense.statementYear && expense.statementYear !== this.statementYear) {
-          return false;
-        }
-
-        if (this.statementMonth && expense.statementMonth && expense.statementMonth !== this.statementMonth) {
-          return false;
-        }
-
-        if ((!expense.statementYear || !expense.statementMonth) && this.statementYear) {
-          const date = this.parseLocaleDate(expense.vencimento);
-          if (!date || date.getFullYear() !== this.statementYear) return false;
-          if (this.statementMonth && date.getMonth() + 1 !== this.statementMonth) return false;
-        }
-
-        return true;
-      })
-      .sort((a, b) => this.sortExpenseByDateDesc(a, b));
-  }
-
   constructor(
     private db: ApiDataService,
     private lookupsStore: LookupsStore,
@@ -268,6 +259,7 @@ export class CartoesComponent implements OnInit {
     effect(() => {
       this.statementCycles = this.cardsStore.statements();
       this.statementLoading = this.cardsStore.statementsLoading();
+      this.abrirCicloCorrente();
       const error = this.cardsStore.statementsError();
       if (error) {
         this.uiFeedback.error(error);
@@ -280,6 +272,7 @@ export class CartoesComponent implements OnInit {
   ngOnInit(): void {
     this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
       this.expenses = lista;
+      this.recalcularFaturaAberta();
       this.cdr.markForCheck();
     });
     this.lookupsStore.loadCardBrands();
@@ -353,26 +346,106 @@ export class CartoesComponent implements OnInit {
     return digits.padStart(4, '•');
   }
 
-  loadStatementCycles(): void {
-    if (!this.canViewCardStatements) return;
+  /**
+   * "Parcelas" do ciclo: quantos lançamentos são continuação de uma compra
+   * anterior. A API devolve o total de itens, não este recorte — daí a conta
+   * aqui, sobre os itens que já vêm no ciclo.
+   */
+  statementInstallmentsCount(cycle: CardStatementCycleDto): number {
+    return cycle.items.filter((item) => item.installmentNo > 1).length;
+  }
 
-    if (!this.statementCardId) {
-      this.statementCycles = [];
-      this.autoLoadedStatementCardId = null;
-      this.cardsStore.selectCard(null);
+  /**
+   * A tela abre com a fatura do mês corrente já expandida — é a que o usuário
+   * veio ver. Filtrar a lista por esse mês seria o caminho curto, mas aí as
+   * faturas anteriores somem, e é justamente nelas que se confere o que já foi
+   * pago. Abrir uma sem esconder as outras resolve os dois lados.
+   */
+  private abrirCicloCorrente(): void {
+    if (!this.autoAbrirCicloCorrente || this.statementLoading || !this.statementCycles.length) return;
+
+    const hoje = new Date();
+    const corrente = this.statementCycles.find(
+      (cycle) => cycle.statementYear === hoje.getFullYear() && cycle.statementMonth === hoje.getMonth() + 1
+    );
+
+    this.autoAbrirCicloCorrente = false;
+    if (!corrente) return;
+
+    this.cicloAberto = this.cicloKey(corrente);
+    this.faturaItens = this.montarItensDaFatura(corrente);
+  }
+
+  cicloKey(cycle: CardStatementCycleDto): string {
+    return `${cycle.statementYear}-${cycle.statementMonth}`;
+  }
+
+  isCicloAberto(cycle: CardStatementCycleDto): boolean {
+    return this.cicloAberto === this.cicloKey(cycle);
+  }
+
+  alternarFatura(cycle: CardStatementCycleDto): void {
+    const key = this.cicloKey(cycle);
+    if (this.cicloAberto === key) {
+      this.cicloAberto = null;
+      this.faturaItens = [];
       return;
     }
 
-    this.autoLoadedStatementCardId = this.statementCardId;
-    this.cardsStore.selectCard(this.statementCardId);
-    this.cardsStore.loadStatements(this.statementCardId, {
-      year: this.statementYear || undefined,
-      month: this.statementMonth || undefined
+    this.cicloAberto = key;
+    this.faturaItens = this.montarItensDaFatura(cycle);
+  }
+
+  /**
+   * Junta as duas metades da mesma compra: o extrato da API sabe em qual ciclo
+   * a parcela caiu (é o backend que aplica o dia de fechamento), mas não traz
+   * categoria nem o total de parcelas; a despesa local traz os dois. O `id` da
+   * despesa é o próprio `installmentId`, então o encontro é direto.
+   *
+   * Sem par local — mês que ainda não foi carregado — a linha ainda aparece,
+   * com o que o extrato sabe. Some o rótulo da categoria, não a compra.
+   */
+  private recalcularFaturaAberta(): void {
+    if (!this.cicloAberto) return;
+    const cycle = this.statementCycles.find((c) => this.cicloKey(c) === this.cicloAberto);
+    this.faturaItens = cycle ? this.montarItensDaFatura(cycle) : [];
+  }
+
+  private montarItensDaFatura(cycle: CardStatementCycleDto): StatementItemView[] {
+    return cycle.items.map((item) => {
+      const local = this.expenses.find((expense) => expense.id === item.installmentId);
+      const status = local?.status ?? item.status;
+
+      return {
+        id: item.installmentId,
+        titulo: local?.nome || item.title,
+        categoria: local?.categoria || 'Sem categoria',
+        parcela: local ? this.cardExpenseInstallmentLabel(local) : String(item.installmentNo),
+        statusLabel: this.statusDaParcela(status),
+        statusTone: installmentStatusTone(status),
+        valor: item.amount,
+        vencimento: this.dataCurta(item.dueDate)
+      };
     });
   }
 
+  private statusDaParcela(status?: string | null): string {
+    switch ((status || '').toUpperCase()) {
+      case 'PAID':
+        return 'Paga';
+      case 'ANTICIPATED':
+        return 'Antecipada';
+      default:
+        return 'Pendente';
+    }
+  }
+
+  private dataCurta(iso: string): string {
+    return (iso || '').slice(0, 10).split('-').reverse().join('/');
+  }
+
   statementMonthLabel(month: number): string {
-    return String(month).padStart(2, '0');
+    return formatMonthLabel(this.statementYear, month - 1, 'short').replace('.', '');
   }
 
   cardExpenseInstallmentLabel(expense: StoredExpense): string {
@@ -383,25 +456,7 @@ export class CartoesComponent implements OnInit {
     return '1/1';
   }
 
-  cardExpenseStatusLabel(expense: StoredExpense): string {
-    switch ((expense.status || '').toUpperCase()) {
-      case 'PAID':
-        return 'Paga';
-      case 'ANTICIPATED':
-        return 'Antecipada';
-      default:
-        return 'Pendente';
-    }
-  }
-
-  cardExpenseStatusTone(expense: StoredExpense): InstallmentStatusTone {
-    return installmentStatusTone(expense.status);
-  }
-
   trackByStatement(index: number, _item?: unknown): number {
-    return index;
-  }
-  trackByIndex(index: number, _item?: unknown): number {
     return index;
   }
 
@@ -420,17 +475,24 @@ export class CartoesComponent implements OnInit {
     };
   }
 
-  private parseLocaleDate(value: string): Date | null {
-    const [day, month, year] = (value || '').split('/').map((part) => Number(part));
-    if (!day || !month || !year) return null;
-    const date = new Date(year, month - 1, day);
-    return Number.isNaN(date.getTime()) ? null : date;
-  }
+  loadStatementCycles(): void {
+    if (!this.canViewCardStatements) return;
 
-  private sortExpenseByDateDesc(a: StoredExpense, b: StoredExpense): number {
-    const dateA = this.parseLocaleDate(a.vencimento)?.getTime() ?? 0;
-    const dateB = this.parseLocaleDate(b.vencimento)?.getTime() ?? 0;
-    return dateB - dateA;
-  }
+    if (!this.statementCardId) {
+      this.statementCycles = [];
+      this.autoLoadedStatementCardId = null;
+      this.cardsStore.selectCard(null);
+      return;
+    }
 
+    this.autoLoadedStatementCardId = this.statementCardId;
+    this.autoAbrirCicloCorrente = true;
+    this.cicloAberto = null;
+    this.faturaItens = [];
+    this.cardsStore.selectCard(this.statementCardId);
+    this.cardsStore.loadStatements(this.statementCardId, {
+      year: this.statementYear || undefined,
+      month: this.statementMonth || undefined
+    });
+  }
 }

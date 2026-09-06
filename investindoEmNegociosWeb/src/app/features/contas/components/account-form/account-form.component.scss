@@ -70,3 +70,11 @@
   flex-wrap: wrap;
   gap: 0.65rem;
 }
+
+/* Sem moldura: o modal já é o card. */
+.account-panel--bare {
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}

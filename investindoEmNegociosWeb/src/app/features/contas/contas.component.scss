@@ -43,6 +43,17 @@
   min-width: 0;
 }
 
+.accounts-statement__import-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  svg {
+    inline-size: 14px;
+    block-size: 14px;
+  }
+}
+
 // ---- Controles --------------------------------------------------------------
 
 .accounts-controls {

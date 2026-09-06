@@ -24,7 +24,7 @@ export type TransactionSummaryDensity = 'default' | 'compact';
   imports: [TooltipComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <article class="tsc" [attr.data-tone]="tone()" [attr.data-density]="density()">
+    <article class="tsc" [attr.data-tone]="tone()" [attr.data-density]="density()" [attr.data-value-tone]="valueTone()">
       <!-- Ícone e rótulo dividem a primeira linha; o valor começa na borda do
            card, não recuado atrás do ícone (COMPONENTES.md §3.1). -->
       <div class="tsc__head">
@@ -69,6 +69,16 @@ export type TransactionSummaryDensity = 'default' | 'compact';
     .tsc[data-tone='warning'] { --tone: var(--warning); --tone-text: var(--warning-text); --tone-weak: var(--warning-tint); --tone-soft: var(--warning-tint); }
     .tsc[data-tone='info'] { --tone: var(--primary); --tone-text: var(--primary-text); --tone-weak: var(--primary-tint); --tone-soft: var(--primary-tint); }
     .tsc[data-tone='danger'] { --tone: var(--expense); --tone-text: var(--expense-text); --tone-weak: var(--expense-tint); --tone-soft: var(--expense-tint); }
+
+    /* A cor do VALOR é independente do tom do ícone — é o handoff que separa as
+       duas. Em Despesas os três cards têm ícone colorido e valor escuro; em
+       Contas, Entradas e Saídas pintam o valor também. Por isso valueTone é
+       um input próprio, e o padrão continua escuro. */
+    .tsc[data-value-tone='success'] .tsc__value { color: var(--income-text); }
+    .tsc[data-value-tone='danger'] .tsc__value { color: var(--expense-text); }
+    .tsc[data-value-tone='warning'] .tsc__value { color: var(--warning-text); }
+    .tsc[data-value-tone='primary'] .tsc__value,
+    .tsc[data-value-tone='info'] .tsc__value { color: var(--primary-text); }
 
     .tsc__head {
       display: flex;
@@ -135,12 +145,12 @@ export type TransactionSummaryDensity = 'default' | 'compact';
 
     /* ---- densidade compacta ------------------------------------------------
        Para faixa unida de 4+ indicadores, onde cada card fica estreito demais
-       para o valor a 26px. É a distinção que o próprio handoff tokeniza:
-       --fs-kpi (26px) é "faixa isolada", --fs-kpi-strip (20px) é "faixa unida
-       de 5". Vale em toda largura, porque depende da contagem de cards e não
-       da viewport. */
+       para o valor a 26px. O handoff usa 22px nesta faixa (Contas, cinco
+       cards) — não os 20px de --fs-kpi-strip, que é a faixa do dashboard,
+       outro componente. Vale em toda largura, porque depende da contagem de
+       cards e não da viewport. */
     .tsc[data-density='compact'] .tsc__value {
-      font-size: var(--fs-kpi-strip);
+      font-size: 22px;
       letter-spacing: var(--ls-tighter);
       white-space: nowrap;
     }
@@ -175,6 +185,8 @@ export type TransactionSummaryDensity = 'default' | 'compact';
 export class TransactionSummaryCardComponent {
   readonly tone = input<TransactionSummaryTone>('primary');
   readonly density = input<TransactionSummaryDensity>('default');
+  /** Cor do valor. `default` mantém o escuro — a maioria das faixas usa isso. */
+  readonly valueTone = input<TransactionSummaryTone | 'default'>('default');
   readonly eyebrow = input.required<string>();
   readonly value = input.required<string>();
   readonly note = input<string>('');
