@@ -73,3 +73,7 @@ Quando `APP_BASE_URL` fica vazio, o Playwright sobe o app Angular localmente.
 `npm run audit:all` audita este projeto separadamente da aplicação Angular e é bloqueante no workflow Quality Tests. Lighthouse CI 0.16.1 e Lighthouse 13.6.0 substituem as versões antigas e seus overrides; manter o lockfile versionado. Após a atualização, auditoria sem alertas, contrato com 13 enums e 197 E2E locais aprovados; 64 live opt-in ignorados.
 
 Para verificar Lighthouse localmente sem enviar relatórios: `APP_ENVIRONMENT=development npx lhci collect --config=performance/lighthouserc.json --numberOfRuns=1`, seguido de `npx lhci assert --config=performance/lighthouserc.json`. Isso não substitui o benchmark completo de produção. [Evidências e limites](../docs/ai-reports/validacao-2026-11-18.md).
+
+### Disparo manual e URL de destino
+
+No workflow Quality Tests, `app_base_url` explícita tem prioridade. Na chamada reutilizável de pós-deploy, a URL usa `VPS_HOST` e `frontend_port` somente quando ambos existem. Sem esses valores, a variável fica vazia e o Playwright inicia Angular localmente; não montar `http://:`. O smoke pós-deploy intercepta o login e confirma URL/configuração, sem homologar autenticação real.
