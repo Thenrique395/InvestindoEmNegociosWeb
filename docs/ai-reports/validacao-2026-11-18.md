@@ -49,6 +49,7 @@ Referências de atualização: [Lighthouse 13.6.0](https://github.com/GoogleChro
 - Branch nos dois repos: `chore/consolidacao-validacao-2026-11-18`.
 - API: `f501ffc`, consolidação das correções financeiras, espaços, segurança e runtime .NET 10.
 - Web: `6f9ecb1`, consolidação Angular, E2E, SSR/publicação legal e ferramentas de qualidade.
+- Na etapa posterior de preparação, as branches foram publicadas nos PRs API #56 e Web #26, ambos em rascunho. Consulte o estado da entrega abaixo; os resultados locais anteriores continuam vinculados à execução descrita.
 - Os commits consolidam alterações locais preexistentes junto ao trabalho desta execução. Não constituem revisão exaustiva de todas as regras do produto.
 - Os 64 testes live são opt-in e ficaram ignorados na execução padrão. E2E local usa interceptações de API; não comprova integração completa com banco/gateways. Permanecem pendentes testes live em ambiente autorizado e homologação externa de cobrança.
 - Item 1 da lista do chat (revisão do escopo das consultas de pagamentos) não foi incluído no pedido atual e continua pendente.
@@ -60,3 +61,14 @@ Referências de atualização: [Lighthouse 13.6.0](https://github.com/GoogleChro
 Logs e relatórios JSON ficam em [validacao-2026-11-18](validacao-2026-11-18/). Evidência de Lighthouse é uma coleta local, não benchmark de produção. Auditorias retratam os avisos disponíveis na data da execução e não garantem ausência de outras vulnerabilidades.
 
 Os logs versionados foram normalizados apenas para remover sequências de cor ANSI e espaços finais; comandos, resultados e falhas foram preservados.
+
+## Estado da entrega — conferido em 2026-11-18
+
+| Repositório | PR | Commit de código validado | CI remoto | Entrega |
+|---|---|---|---|---|
+| API | [#56](https://github.com/Thenrique395/InvestindoEmNegociosApi/pull/56) | `285119d` | [Aprovado](https://github.com/Thenrique395/InvestindoEmNegociosApi/actions/runs/44311077325): 55 smoke e 684 testes, nenhum ignorado; PostgreSQL incluído | Rascunho, sem merge |
+| Web | [#26](https://github.com/Thenrique395/InvestindoEmNegociosWeb/pull/26) | `c85d963` | [Falhou na auditoria completa](https://github.com/Thenrique395/InvestindoEmNegociosWeb/actions/runs/44311082320): 28 alertas altos; 907 testes, build e auditoria de produção aprovados | Rascunho, sem merge |
+
+As branches foram publicadas. Nenhum deploy DEV ou PRD foi realizado nesta entrega. Os resultados acima pertencem aos SHAs indicados; atualizações documentais posteriores não equivalem a uma nova execução de testes. O gate do frontend permanece bloqueante.
+
+O próximo passo da entrega é resolver o bloqueio de dependência do frontend, obter CI aprovado para o candidato e confirmar banco DEV isolado e preservação dos comprovantes legados antes do merge. Depois, validar a integração real em DEV. Os 64 E2E live continuam pendentes; as duas execuções locais tiveram 197 aprovados cada, com API interceptada. Homologação de cobrança em sandbox permanece separada.

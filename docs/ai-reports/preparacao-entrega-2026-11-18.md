@@ -30,3 +30,14 @@ Corrigidos: consultas de saúde/logs do DEV backend agora usam explicitamente `d
 ## Estado
 
 PRs criados e branches publicadas. Nenhum merge, deploy DEV ou publicação PRD realizado nesta preparação. DEV do candidato continua pendente; o bloqueio de auditoria do frontend impede considerar a entrega conjunta pronta. CI remoto acompanhado separadamente por SHA.
+
+## Estado da entrega — conferido em 2026-11-18
+
+| Repositório | PR | Commit de código validado | CI remoto | Entrega |
+|---|---|---|---|---|
+| API | [#56](https://github.com/Thenrique395/InvestindoEmNegociosApi/pull/56) | `285119d` | [Aprovado](https://github.com/Thenrique395/InvestindoEmNegociosApi/actions/runs/44311077325): 55 smoke e 684 testes, nenhum ignorado; PostgreSQL incluído | Rascunho, sem merge |
+| Web | [#26](https://github.com/Thenrique395/InvestindoEmNegociosWeb/pull/26) | `c85d963` | [Falhou na auditoria completa](https://github.com/Thenrique395/InvestindoEmNegociosWeb/actions/runs/44311082320): 28 alertas altos; 907 testes, build e auditoria de produção aprovados | Rascunho, sem merge |
+
+As branches foram publicadas. Nenhum deploy DEV ou PRD foi realizado nesta entrega. Os resultados acima pertencem aos SHAs indicados; atualizações documentais posteriores não equivalem a uma nova execução de testes. O gate do frontend permanece bloqueante.
+
+O próximo passo da entrega é resolver o bloqueio de dependência do frontend, obter CI aprovado para o candidato e confirmar banco DEV isolado e preservação dos comprovantes legados antes do merge. Depois, validar a integração real em DEV. Os 64 E2E live continuam pendentes; as duas execuções locais tiveram 197 aprovados cada, com API interceptada. Homologação de cobrança em sandbox permanece separada.
