@@ -1,3 +1,5 @@
+import { openAccountImport } from './support/account-import';
+import { selectOption } from './support/select-option';
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 
@@ -18,17 +20,14 @@ test.describe('cartões — cenários de erro', () => {
     await page.getByRole('button', { name: /Adicionar cartão|Registrar um/i }).first().click();
 
     const brandSelect = page.getByLabel('Bandeira');
-    if (await brandSelect.isVisible().catch(() => false)) {
-      const firstBrand = await brandSelect.locator('option').first().getAttribute('value');
-      if (firstBrand) await brandSelect.selectOption(firstBrand);
-    }
+    await selectOption(brandSelect, { index: 0 });
 
-    await page.getByLabel('Número do cartão').fill('5555 4444 3333 9999');
-    await page.getByLabel(/Nome( impresso)? (do|no) cartão/).fill('Cartao Duplicado');
+    await page.getByLabel('Últimos 4 dígitos').fill('9999');
+    await page.getByLabel('Nome do cartão', { exact: true }).fill('Cartao Duplicado');
     await page.getByLabel(/Banco( \(opcional\))?/).fill('Banco Teste');
     await page.getByLabel('Limite de crédito').fill('3000');
-    await page.getByLabel('Dia do fechamento').fill('10');
-    await page.getByLabel('Dia do vencimento').fill('20');
+    await page.getByLabel('Dia de fechamento da fatura').fill('10');
+    await page.getByLabel('Dia de vencimento da fatura').fill('20');
     await page.getByRole('button', { name: 'Salvar cartão' }).click();
 
     await expect(page.getByText('Já existe um cartão com esse número cadastrado.')).toBeVisible();
@@ -47,9 +46,9 @@ test.describe('cartões — cenários de erro', () => {
     });
 
     await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
-    await page.locator('[title="Editar cartão"]').first().click();
-    await page.getByLabel('Número do cartão').fill('5555 4444 3333 1234');
-    await page.getByLabel(/Nome( impresso)? (do|no) cartão/).fill('Nome Alterado');
+    await page.getByRole('button', { name: 'Editar cartão' }).first().click();
+    await page.getByLabel('Últimos 4 dígitos').fill('1234');
+    await page.getByLabel('Nome do cartão', { exact: true }).fill('Nome Alterado');
     await page.getByRole('button', { name: 'Salvar alterações' }).click();
 
     await expect(page.getByText('Não foi possível atualizar o cartão.')).toBeVisible();
@@ -91,6 +90,7 @@ test.describe('importações OFX/CSV — cenários de erro adicionais', () => {
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Extrato' }).first().click();
+    await openAccountImport(page);
     await page.locator('input[type="file"]').first().setInputFiles({
       name: 'sample.ofx',
       mimeType: 'application/x-ofx',
@@ -117,6 +117,7 @@ test.describe('importações OFX/CSV — cenários de erro adicionais', () => {
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Extrato' }).first().click();
+    await openAccountImport(page);
     await page.locator('input[type="file"]').nth(1).setInputFiles({
       name: 'broken.csv',
       mimeType: 'text/csv',

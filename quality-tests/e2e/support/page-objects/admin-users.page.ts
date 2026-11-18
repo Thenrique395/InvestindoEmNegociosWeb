@@ -1,3 +1,4 @@
+import { selectOption } from '../select-option';
 import { expect, type Locator, type Page } from '@playwright/test';
 
 export class AdminUsersPage {
@@ -29,7 +30,7 @@ export class AdminUsersPage {
   async changeRole(email: string, role: string) {
     const row = this.rowByEmail(email);
     await expect(row).toBeVisible({ timeout: 20000 });
-    await row.locator('select').first().selectOption(role);
+    await selectOption(row.locator('select').first(), role);
     const response = this.page.waitForResponse((resp) =>
       resp.request().method() === 'PUT' &&
       resp.url().includes('/admin/users/') &&
@@ -54,7 +55,7 @@ export class AdminUsersPage {
       resp.url().includes('/admin/users/') &&
       resp.url().includes('/features/')
     );
-    await row.locator('select').selectOption({ label: this.featureModeLabel(mode) });
+    await selectOption(row.locator('select'), { label: this.featureModeLabel(mode) });
     return response;
   }
 

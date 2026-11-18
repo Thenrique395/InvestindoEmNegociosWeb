@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SelectMenuComponent, SelectMenuOption } from '../../../shared/select-menu/select-menu.component';
 import { colorForCategory } from '../../../core/utils/category-color';
@@ -13,6 +13,7 @@ import { ToggleFieldComponent } from '../../../shared/toggle-field/toggle-field.
 import { DatePickerComponent } from '../../../shared/date-picker/date-picker.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-receitas-form',
   standalone: true,
   imports: [FormsModule, DigitOnlyDirective, RouterLink, AppCurrencyPipe, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent, SelectMenuComponent],

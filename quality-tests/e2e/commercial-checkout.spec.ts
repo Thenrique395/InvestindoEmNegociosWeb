@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('commercial checkout', () => {
-  test('leva da pagina de planos ao checkout com o plano selecionado', async ({ page }) => {
+  test('leva da pagina de planos ao cadastro com o plano selecionado', async ({ page }) => {
     await page.goto('/planos', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { level: 1, name: /comece com clareza/i })).toBeVisible();
 
-    await page.getByRole('link', { name: /Escolher Controle/i }).click();
+    await page.getByRole('button', { name: 'Quero fazer parte', exact: true }).click();
 
-    await expect(page).toHaveURL(/\/checkout\?plan=intermediate&cycle=Monthly/);
-    await expect(page.getByRole('heading', { level: 1, name: /finalize sua assinatura/i })).toBeVisible();
+    await expect(page).toHaveURL(/\/register\?plano=intermediate/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Vamos começar' })).toBeVisible();
   });
 
   test('finaliza o retorno do checkout pago com status real vindo do backend', async ({ page }) => {

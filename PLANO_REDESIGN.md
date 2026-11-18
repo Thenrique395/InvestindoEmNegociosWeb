@@ -1150,18 +1150,25 @@ não dispara e a página sai em branco.
 
 ## 8. FASE 8 — Quitação da dívida de fidelidade
 
-**Placar em 2026-08-16: 143 → 80 violações.** Quatro regras zeradas e fora do `BASELINE`
-(R2, R3, R5, R6) — viraram regra dura, e reincidência quebra o gate na hora.
+**Estado ao vivo em 2026-09-12: 21 violações herdadas.** O gate confirma R1, R2, R3, R4,
+R5, R6, R7, R9, R10 e R11 zeradas. A única dívida aberta é R8 (`OnPush`), dentro do
+`BASELINE` atual de 21. Antes de mexer em tela, rode `npm run handoff:briefing` para ler o
+placar vivo, porque os números abaixo são histórico e orientação, não substituem o gate.
+
+Histórico: em 2026-08-16 o placar caiu de 143 para 80 violações. Em 2026-08-27, R4 e R9
+também foram quitadas, R10/R11 entraram no gate e R8 caiu para 27. Em 2026-09-12, o gate
+está em R8 = 21.
 
 | Etapa | Regra | Estado |
 |---|---|---|
-| 8.1 Adotar primitivos | R1 | 🔶 2 · faltam `app-money` e `app-chart-bars` |
+| 8.1 Adotar primitivos | R1 | ✅ 0 |
 | 8.2 Faixa em flex | R2 | ✅ 0 |
 | 8.3 Tooltip | R3 | ✅ 0 |
 | 8.4 Gráficos | R4 | ✅ 0 · concluída em 2026-08-27 |
 | 8.5 Sombra | R5 | ✅ 0 |
 | 8.6 `::ng-deep` | R9 | ✅ 0 · concluída em 2026-08-27 |
-| 8.7 Hex · OnPush | R6 · R8 | ✅ 0 · 🔶 27 |
+| 8.7 Hex · OnPush | R6 · R8 | ✅ 0 · 🔶 21 |
+| 8.8 Estrutura de pastas e import entre features | R10 · R11 | ✅ 0 · ✅ 0 |
 
 **Atualização de 2026-08-27.** A premissa de que "tudo passa pela 8.1" **caiu**: o
 `app-responsive-list` e o `app-donut-chart` não iam ser apagados, então dar variante a eles
@@ -1181,7 +1188,7 @@ Regra para todas as etapas: **uma etapa por commit**, com o `BASELINE` do
 `scripts/check-handoff-fidelity.mjs` baixado no mesmo commit, e captura Playwright
 desktop/mobile da tela afetada em `docs/ai-reports/`.
 
-### 8.1 — Adotar os primitivos ou apagá-los · R1: 7 → 5 🔶 EM ANDAMENTO
+### 8.1 — Adotar os primitivos ou apagá-los · R1: 7 → 0 ✅ CONCLUÍDA
 
 **Decisão tomada em 2026-08-16**, na ausência de contraindicação e com a recomendação
 registrada três vezes. Ela está aqui para ser contestada: se algum par estiver errado, é
@@ -1262,7 +1269,10 @@ Investimentos tinha o próprio `Intl.NumberFormat`; `home` e `category-breakdown
 forma abreviada `R$ 12,3 mil`. Um usuário com outra moeda via o símbolo errado no eixo do
 gráfico. Virou `formatCompactCurrency` no `locale-utils`, com teste que troca a moeda.
 
-- [ ] Depois: `app-money`, `app-number-stepper`, e a 8.4 para os gráficos.
+**Atualização de 2026-09-12:** R1 está zerada no gate. `app-money` e `app-chart-bars` saíram da
+lista porque foram apagados, não isentados; a regra de moeda ficou no `AppCurrencyPipe` e os
+gráficos que restaram foram cobertos por `app-chart-line`. `app-number-stepper` e
+`app-select-menu` permanecem porque têm adoção real fora do `/styleguide`.
 
 ### 8.2 — Faixa de indicadores em flex · R2: ~~6~~ ✅ CONCLUÍDA
 
@@ -1399,7 +1409,7 @@ contratos novos.
 `.responsive-list__item[data-label]::before` e a etiqueta "Ações" reaparece acima do botão —
 passou nos testes e só apareceu na conferência visual no mobile.
 
-### 8.7 — Hex literal e `OnPush` · R6: ~~4~~ ✅ CONCLUÍDA · R8: ~~49~~ ~~46~~ 27 → 0
+### 8.7 — Hex literal e `OnPush` · R6: ~~4~~ ✅ CONCLUÍDA · R8: ~~49~~ ~~46~~ 27 → 21
 
 **Hex quitado em 2026-08-16.** Eram os gradientes de Visa, Elo e Amex, pendentes desde a
 Fase 1 — que os previa para a 5.4 e não fechou. São marcas de terceiros e não seguem a paleta
@@ -1416,10 +1426,13 @@ remoção de comentários antes da busca, e teste de mesa cobrindo bloco, linha 
       só recebem `@Input` e emitem `@Output`, sem serviço nem `subscribe`, então não há
       estado interno que possa congelar sob `OnPush`. Oito aproveitaram para migrar de
       decorator para `input()`/`output()`/`model()`.
-- [ ] **Grupo B — 19 telas médias.** Estado em campo mutável; precisa de signals antes do
-      `OnPush`. Uma tela por commit.
-- [ ] **Grupo C — 8 telas pesadas**, incluindo `home` (2704 linhas, zero signals) e
-      `app.component`, que é o shell e tem de ser **o último de todos**.
+- [x] **Seis componentes adicionais quitados até 2026-09-12.** O gate vivo agora mede
+      `BASELINE.R8 = 21`.
+- [ ] **Grupo B — telas médias restantes.** Estado em campo mutável; precisa de signals antes
+      do `OnPush`. Uma tela por commit.
+- [ ] **Grupo C — telas pesadas restantes**, incluindo `home`, `onboarding`,
+      `invoice-import`, `contas`, `admin-parameters`, `styleguide-component-detail`,
+      `checkout` e `app.component`, que é o shell e tem de ser **o último de todos**.
 
 **Ordem obrigatória: signals primeiro, `OnPush` depois.** O inverso congela a tela. O padrão
 de conversão validado e a lista completa estão em `DIVIDA_TECNICA_PADROES.md`.
@@ -1447,3 +1460,9 @@ Ver emenda **E4** em `ARQUITETURA_ANGULAR.md`.
 - [ ] `npm run handoff:check` sem nenhuma dívida aberta.
 - [ ] Todo `BASELINE` do script em `0`, e o objeto vazio no arquivo.
 - [ ] Só então as fases 6.1 a 6.4 voltam a `✅ CONCLUÍDA` e a Fase 7.2 começa.
+
+## Atualização vigente — 2026-11-15
+
+O gate `handoff:check` agora exige **R8 = 0** e confirma as 11 regras zeradas. Os 21 componentes restantes receberam `OnPush` e notificações nas fronteiras assíncronas. As medições de setembro permanecem como histórico. Refatoração adicional para signals e decomposição de containers deve preservar contratos e ser validada por fluxo.
+
+Termos e privacidade são renderizados no servidor com dados oficiais de runtime (`LEGAL_NAME`, `LEGAL_TAX_ID`, `LEGAL_ADDRESS`, `LEGAL_CONTACT_EMAIL`). A publicação de produção é bloqueada quando a identificação está ausente ou inválida. Valores fictícios não substituem dados do responsável.

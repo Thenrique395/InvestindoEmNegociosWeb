@@ -91,7 +91,7 @@ test.describe('Despesas — período e ordenação', () => {
     // Filtrar por texto pega os três cards: o tooltip de cada um cita os outros.
     const card = (rotulo: string) => page.locator(`app-transaction-summary-card[eyebrow="${rotulo}"]`);
 
-    await expect(card('Pendentes')).toContainText('R$ 100,00');
+    await expect(card('Pendentes')).toContainText('R$ 400,00');
     await expect(card('Pagas')).toContainText('R$ 200,00');
     await expect(card('Antecipadas')).toContainText('R$ 300,00');
     await expect(page.locator('app-period-total-card')).toContainText('R$ 600,00');
@@ -306,8 +306,11 @@ test.describe('Despesas — permissões por perfil', () => {
 
   test('Intermediate ganha antecipação, conta de baixa e importação', async ({ page }) => {
     const base = new BaseDespesas();
-    base.addPlano({ title: 'Qualquer', amount: 30 });
+    const futuro = new Date(); futuro.setMonth(futuro.getMonth() + 1, 5);
+    const vencimento = `${futuro.getFullYear()}-${String(futuro.getMonth() + 1).padStart(2, '0')}-05`;
+    base.addPlano({ title: 'Qualquer', amount: 30 }, [{ dueDate: vencimento }]);
     await abrir(page, base, { role: 'Intermediate' });
+    await page.getByRole('button', { name: /Próximo mês|próximo/i }).first().click();
 
     await expect(page.getByRole('button', { name: /Importar fatura/i })).toBeVisible();
 
@@ -322,10 +325,7 @@ test.describe('Despesas — permissões por perfil', () => {
     await abrir(page, base, { role: 'Intermediate' });
 
     await selecionar(page, 'Deste mês');
-    await page.getByRole('button', { name: /Solicitar antecipação/i }).click();
-    await page.waitForTimeout(1000);
-
-    await expect(page.locator('.global-alert')).toContainText(/não é possível antecipar despesas do mês atual/i);
+    await expect(page.getByRole('button', { name: /Solicitar antecipação/i })).toHaveCount(0);
     expect(base.parcelaDe('Deste mês')?.status).toBe('Open');
   });
 });

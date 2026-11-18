@@ -8,7 +8,7 @@
 >
 > Consequências para a leitura deste documento:
 > - as portas `5059` (DEV) e `5060` (PRD) **não existem mais**. Hoje: DEV com backend em `5055`
->   e frontend em `4201`; PRD servindo tudo por Caddy na `80`. Topologia real em `../../docs/RUNBOOK.md`;
+>   e frontend em `4201`; PRD servindo tudo por Caddy na `80`. Topologia real em [runbook.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/05-operacao/runbook.md>);
 > - o item sobre o fallback de `api.config.ts` apontando para `5060` perdeu o objeto — mas
 >   **confira o valor atual do fallback** antes de assumir que está certo;
 > - o que continua valendo: deploy de PRD manual e deliberado, e a ordem banco → API → frontend.
@@ -76,7 +76,7 @@ Este checklist reflete o que foi encontrado no repositorio. Itens de VPS, GitHub
 - [ ] Validar frontend PRD apontando para API PRD.
 - [ ] Validar fluxo completo em cada ambiente: pagina publica, login, dashboard, despesas, receitas, cartoes e logout.
 - [ ] Definir dominios finais ou manter estrategia por portas ate a publicacao oficial.
-- [ ] Ambiente PRD (porta `5060`) esta PAUSADO desde 2026-06-15 — ver `../../docs/DECISIONS/2026-06-15-pausar-ambiente-prd-focar-dev.md`; retomar somente apos decisao explicita.
+- [ ] Ambiente PRD (porta `5060`) esta PAUSADO desde 2026-06-15 — ver [2026-06-15-pausar-ambiente-prd-focar-dev.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/03-decisoes/2026-06-15-pausar-ambiente-prd-focar-dev.md>); retomar somente apos decisao explicita.
 
 ## 1. Banco de Dados
 

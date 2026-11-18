@@ -1,6 +1,6 @@
 # Backlog — Shell do app (Sidebar + Topbar) e Dashboard
 
-> **Consolidado no roadmap único** do monorepo: [`../../docs/ROADMAP.md`](../../docs/ROADMAP.md)
+> **Consolidado no roadmap único** do Obsidian: [roadmap.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/roadmap.md>)
 > (seções "UX / Shell", "Dashboard — Visão Geral Financeira" e "Dívidas técnicas / riscos").
 >
 > A **busca global do header** — que estava listada aqui como preparada só visualmente — foi

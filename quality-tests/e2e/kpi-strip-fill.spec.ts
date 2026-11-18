@@ -13,7 +13,7 @@ import { setupAuthenticatedApp } from './support/authenticated-app';
 
 const TELAS = [
   { rota: '/contas', cls: '.accounts-summary', nome: 'Contas' },
-  { rota: '/calendario', cls: '.cal-summary', nome: 'Calendário' },
+  { rota: '/calendario', cls: 'app-kpi-strip', nome: 'Calendário' },
   { rota: '/categorias', cls: '.cat-summary', nome: 'Categorias' },
   { rota: '/snapshots', cls: '.snapshots-summary-grid', nome: 'Histórico mensal' },
   { rota: '/emprestimos', cls: '.loans-summary-grid', nome: 'Empréstimos' },

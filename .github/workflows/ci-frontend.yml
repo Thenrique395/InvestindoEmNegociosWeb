@@ -27,9 +27,5 @@ jobs:
           cache: npm
           cache-dependency-path: investindoEmNegociosWeb/package-lock.json
 
-      - name: Frontend quality gate
+      - name: Frontend quality gate (testes, cobertura, build e auditoria)
         run: bash ./scripts/quality-frontend.sh
-
-      - name: npm audit (informativo, não bloqueia o build)
-        working-directory: investindoEmNegociosWeb
-        run: npm audit --audit-level=high || true

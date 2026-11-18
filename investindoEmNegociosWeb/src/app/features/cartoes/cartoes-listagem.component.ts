@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass, DecimalPipe } from '@angular/common';
 import { StoredCard } from '../../core/data/api-data.service';
 import { CardBrandLookup } from '../../core/lookups.service';
@@ -8,6 +8,7 @@ import { StatusBadgeComponent, StatusBadgeTone } from '../../shared/status-badge
 import { CardMetrics, CardStatus } from '../../core/card-metrics.model';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-cartoes-listagem',
   standalone: true,
   imports: [NgClass, DecimalPipe, AppCurrencyPipe, StatusBadgeComponent, ProgressBarComponent],

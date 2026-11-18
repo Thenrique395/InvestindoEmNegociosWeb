@@ -69,6 +69,10 @@ jobs:
         run: npm ci
         working-directory: quality-tests
 
+      - name: Audit quality test dependencies
+        run: npm run audit:all
+        working-directory: quality-tests
+
       - name: Install Playwright browser
         if: ${{ inputs.suite == 'e2e' || inputs.suite == 'post-deploy' }}
         run: npx playwright install --with-deps chromium

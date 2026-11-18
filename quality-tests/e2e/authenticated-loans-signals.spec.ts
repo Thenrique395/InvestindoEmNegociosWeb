@@ -21,11 +21,12 @@ test.describe('empréstimos — carga e simulação (verificação A9: OnPush + 
     await expect(page.getByRole('heading', { name: 'Contratos cadastrados' })).toBeVisible();
 
     // 2) Simular → o card "Simulação" aparece a partir da resposta assíncrona (signal).
-    await page.getByRole('button', { name: 'Simular' }).click();
+    await page.getByRole('button', { name: 'Novo contrato', exact: true }).click();
+    await page.getByRole('button', { name: 'Simular', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Simulação' })).toBeVisible();
 
     // Rigor: confirma o signal `simulation` preenchido no componente.
-    const monthly = await page.locator('app-loans').evaluate((el: any) => {
+    const monthly = await page.locator('app-loan-form-modal').evaluate((el: any) => {
       const cmp = (window as any).ng.getComponent(el);
       return cmp.simulation()?.monthlyPayment ?? null;
     });

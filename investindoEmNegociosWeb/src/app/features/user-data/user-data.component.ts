@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -16,6 +16,7 @@ import { TransactionSummaryCardComponent } from '../../shared/transactions/trans
 import { UiStateComponent } from '../../shared/ui-state/ui-state.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-data',
   standalone: true,
   imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, PageHeaderComponent, SectionCardComponent, TransactionSummaryCardComponent, UiStateComponent],
@@ -23,6 +24,8 @@ import { UiStateComponent } from '../../shared/ui-state/ui-state.component';
   styleUrls: ['./user-data.component.scss']
 })
 export class UserDataComponent {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   exporting = false;
   importing = false;
   deletingAccount = false;
@@ -71,6 +74,7 @@ export class UserDataComponent {
     this.exporting = true;
     this.portabilityService.exportData().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
+        this.changeDetector.markForCheck();
         const fileName = this.resolveFileName(response.headers.get('content-disposition')) || 'investindo-export.json';
         const blob = response.body ?? new Blob([], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
@@ -83,10 +87,12 @@ export class UserDataComponent {
         this.uiFeedback.success('Exportação concluída.');
       },
       error: (err: HttpErrorResponse) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao exportar dados.'));
         this.exporting = false;
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.exporting = false;
       }
     });
@@ -117,15 +123,18 @@ export class UserDataComponent {
 
     this.profileService.deleteOwnAccount(this.deletePayload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.authService.clearSession();
         this.uiFeedback.success('Conta excluída com sucesso.');
         this.router.navigateByUrl('/');
       },
       error: (err: HttpErrorResponse) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao excluir conta.'));
         this.deletingAccount = false;
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.deletingAccount = false;
       }
     });
@@ -138,15 +147,18 @@ export class UserDataComponent {
     this.importing = true;
     this.portabilityService.importData(this.selectedFile, this.replaceExisting).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
+        this.changeDetector.markForCheck();
         this.lastImportAt = new Date();
         this.uiFeedback.success(`Importação concluída. ${result.importedRecords} registro(s) processado(s).`);
         this.clearFile(input);
       },
       error: (err: HttpErrorResponse) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao importar dados.'));
         this.importing = false;
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.importing = false;
       }
     });
@@ -164,10 +176,12 @@ export class UserDataComponent {
     this.privacyLoading = true;
     this.profileService.getPrivacySummary().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (summary) => {
+        this.changeDetector.markForCheck();
         this.privacySummary = summary;
         this.privacyLoading = false;
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.privacySummary = null;
         this.privacyLoading = false;
       }

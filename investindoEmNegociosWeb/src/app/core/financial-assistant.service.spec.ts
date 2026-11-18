@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { API_BASE_URL } from './api.config';
+import { AuthService } from './auth.service';
 import { FinancialAssistantService } from './financial-assistant.service';
 
 describe('FinancialAssistantService', () => {
@@ -19,6 +20,24 @@ describe('FinancialAssistantService', () => {
 
   afterEach(() => {
     httpMock.verify();
+  });
+
+  it('limpa a conversa no logout mesmo quando a API falha', () => {
+    service.addMessage({ question: 'Privada', answer: 'Resposta' } as any);
+    TestBed.inject(AuthService).clearSession();
+    expect(service.conversation).toEqual([]);
+    httpMock.expectOne(`${API_BASE_URL}/auth/logout`).flush({}, { status: 500, statusText: 'Erro' });
+    expect(service.conversation).toEqual([]);
+  });
+
+  it('limpa a conversa ao receber sessão de outro usuário', () => {
+    const auth = TestBed.inject(AuthService);
+    auth.applySession({ userId: 'a', email: 'a@example.test', name: 'A', role: 'Basic', expiresAt: '' });
+    service.addMessage({ question: 'Privada', answer: 'Resposta' } as any);
+    auth.applySession({ userId: 'b', email: 'b@example.test', name: 'B', role: 'Basic', expiresAt: '' });
+    expect(service.conversation).toEqual([]);
+    auth.clearSession();
+    httpMock.expectOne(`${API_BASE_URL}/auth/logout`).flush(null);
   });
 
   it('busca o contexto na rota com hífen (financial-assistant)', () => {

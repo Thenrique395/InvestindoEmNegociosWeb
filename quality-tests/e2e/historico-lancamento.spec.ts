@@ -155,7 +155,7 @@ test.describe('histórico do lançamento', () => {
     expect(base.parcelaDe('Assinatura')?.status).toBe('Open');
   });
 
-  test('Receitas usa a mesma gaveta, sem estorno', async ({ page }) => {
+  test('Receitas usa a mesma gaveta, com estorno e comprovante', async ({ page }) => {
     const base = new BaseDespesas();
     base.addPlano(
       { title: 'Consultoria', amount: 1500, type: 'Income', schedule: 'Installments', installmentsCount: 2 },
@@ -174,9 +174,9 @@ test.describe('histórico do lançamento', () => {
     await expect(gaveta(page).getByRole('heading', { name: 'Consultoria' })).toBeVisible();
     await expect(gaveta(page).getByText('1 de 2 parcelas pagas')).toBeVisible();
 
-    // Receitas não tem fluxo de estorno; comprovante continua disponível.
+    // Receitas expõe estorno do recebimento, conforme o fluxo REC-10 documentado.
     const paga = gaveta(page).locator('.lh__parcela').filter({ hasText: 'Parcela 1/2' });
-    await expect(paga.getByRole('button', { name: 'Estornar' })).toHaveCount(0);
+    await expect(paga.getByRole('button', { name: 'Estornar' })).toBeVisible();
     await expect(paga.getByRole('button', { name: 'Comprovante' })).toBeVisible();
   });
 });

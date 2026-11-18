@@ -5,6 +5,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { legalPublisherFromEnvironment, validateLegalPublisher } from './legal-publisher.mjs';
 import compression from 'compression';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,10 +13,16 @@ import { fileURLToPath } from 'node:url';
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
+const publisher = legalPublisherFromEnvironment(process.env);
+const legalIssues = validateLegalPublisher(publisher);
+const publicationRequired = process.env['APP_ENVIRONMENT'] === 'production' ||
+  (process.env['NODE_ENV'] === 'production' && process.env['APP_ENVIRONMENT'] !== 'development');
 const app = express();
-// Desabilita a proteção SSRF de host no ambiente dev (HTTP sem domínio fixo).
-// Em produção com HTTPS e domínio real, substitua '*' pela lista de origens permitidas.
-const angularApp = new AngularNodeAppEngine({ allowedHosts: ['*'] });
+// Somente os hosts configurados podem ser renderizados pelo SSR.
+const allowedHosts = (process.env['ANGULAR_ALLOWED_HOSTS'] || 'localhost,127.0.0.1')
+  .split(',').map(host => host.trim()).filter(Boolean)
+  .map(host => new URL(`http://${host}`).hostname);
+const angularApp = new AngularNodeAppEngine({ allowedHosts });
 
 app.use(
   compression({
@@ -101,7 +108,8 @@ app.get('/config.js', (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.send(
     `window.__API_BASE_URL__=${JSON.stringify(apiBaseUrl)};` +
-      `window.__FARO_URL__=${JSON.stringify(faroUrl)};`,
+      `window.__FARO_URL__=${JSON.stringify(faroUrl)};` +
+      `window.__LEGAL_PUBLISHER__=${JSON.stringify(publisher)};`,
   );
 });
 
@@ -122,6 +130,10 @@ app.use('/**', (req, res, next) => {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url)) {
+  if (publicationRequired && legalIssues.length) {
+    console.error(`Publicação bloqueada: configure ${legalIssues.join(', ')}.`);
+    process.exit(1);
+  }
   const port = process.env['PORT'] || 4000;
   app.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);

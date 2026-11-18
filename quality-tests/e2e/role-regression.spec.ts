@@ -13,7 +13,7 @@ test.describe('role regression', () => {
     await expect(page.getByRole('link', { name: 'Categorias', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Metas', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Calculadoras', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Contas', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Contas', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Investimentos', exact: true })).toHaveCount(0);
     await expect(page.getByRole('link', { name: /Controle de acessos/i })).toHaveCount(0);
 
@@ -93,7 +93,7 @@ test.describe('role regression', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('link', { name: 'Investimentos', exact: true })).toBeVisible();
-    await expect(page.getByText('Evolução patrimonial').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Patrimônio líquido', exact: true })).toBeVisible();
   });
 
   test('Admin acessa modulos administrativos', async ({ page }) => {

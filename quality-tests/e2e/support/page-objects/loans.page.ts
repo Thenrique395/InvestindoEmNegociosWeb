@@ -11,7 +11,7 @@ export class LoansPage {
   async simulate(title: string) {
     await this.page.getByLabel('Título').fill(title);
     await this.page.getByRole('button', { name: 'Simular' }).click();
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 4, name: 'Simulação' })).toBeVisible();
   }
 
   async createContract(title: string) {

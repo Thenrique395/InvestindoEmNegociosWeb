@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/page-header/page-header.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-preferences',
   standalone: true,
   imports: [FormsModule, PageHeaderComponent],
@@ -18,6 +19,8 @@ import { PageHeaderComponent } from '../../shared/page-header/page-header.compon
   styleUrls: ['./user-preferences.component.scss']
 })
 export class UserPreferencesComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   moedas: readonly string[] = SUPPORTED_CURRENCIES;
   moedaSelecionada = 'BRL';
   localizacoes: string[] = ['pt-BR'];
@@ -47,6 +50,7 @@ export class UserPreferencesComponent implements OnInit {
 
   ngOnInit(): void {
     this.profileService.getPreferences().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((prefs) => {
+        this.changeDetector.markForCheck();
       this.moedaSelecionada = prefs.currency || 'BRL';
       if (prefs.locales?.length) {
         this.localizacoes = prefs.locales;
@@ -82,6 +86,7 @@ export class UserPreferencesComponent implements OnInit {
     this.loading = true;
     this.profileService.updatePreferences(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (resp) => {
+        this.changeDetector.markForCheck();
         const locale = resp.locales[0] || 'pt-BR';
         const currency = resp.currency || 'BRL';
         document.documentElement.lang = locale;
@@ -90,10 +95,11 @@ export class UserPreferencesComponent implements OnInit {
         this.loading = false;
         this.uiFeedback.success('Preferências salvas.');
         if (locale !== previousLocale) {
-          setTimeout(() => window.location.reload(), 700);
+          setTimeout(() => { this.changeDetector.markForCheck(); return window.location.reload(); }, 700);
         }
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
         this.uiFeedback.error('Falha ao salvar preferências.');
       }
@@ -117,12 +123,14 @@ export class UserPreferencesComponent implements OnInit {
     this.deletingAccount = true;
     this.profileService.deleteOwnAccount({ currentPassword: password, confirmationText }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.deletingAccount = false;
         this.authService.clearSession();
         this.uiFeedback.success('Conta excluída com sucesso.');
         this.router.navigateByUrl('/login');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.deletingAccount = false;
         const message = extractApiErrorMessage(err, 'Não foi possível excluir a conta.');
         this.uiFeedback.error(message);

@@ -37,10 +37,10 @@ test.describe('onboarding error flows', () => {
     ]);
 
     await advanceToProfileStep(page);
-    await page.getByRole('button', { name: 'Salvar e continuar para conta e lançamentos' }).click();
+    await page.getByRole('button', { name: 'Salvar e continuar', exact: true }).click();
 
     await expect(page).toHaveURL(/\/onboarding$/);
-    await expect(page.getByRole('heading', { level: 2, name: 'Dados Básicos' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Dados básicos' })).toBeVisible();
     await expect(page.getByText('Falha ao salvar perfil E2E.')).toBeVisible();
   });
 
@@ -57,10 +57,11 @@ test.describe('onboarding error flows', () => {
 
     await advanceToInitialEntriesStep(page);
     await page.getByRole('button', { name: 'Adicionar receita' }).click();
-    const incomeDialog = page.getByRole('dialog', { name: 'Adicionar receita' });
+    const incomeDialog = page.getByRole('dialog', { name: 'Registrar uma entrada' });
     await incomeDialog.getByRole('textbox', { name: 'Fonte' }).fill('Salário E2E');
-    await incomeDialog.getByRole('combobox', { name: 'Categoria' }).selectOption({ label: 'Salário' });
-    await incomeDialog.getByRole('textbox', { name: 'Valor (R$)' }).fill('520000');
+    await incomeDialog.getByRole('combobox', { name: 'Categoria da receita' }).click();
+    await page.getByRole('option', { name: 'Salário', exact: true }).click();
+    await incomeDialog.getByRole('textbox', { name: /^Valor/ }).fill('520000');
     await incomeDialog.getByRole('button', { name: 'Salvar receita' }).click();
 
     await expect(incomeDialog).toBeVisible();
@@ -81,10 +82,11 @@ test.describe('onboarding error flows', () => {
     await advanceToInitialEntriesStep(page);
     await saveInitialIncome(page);
     await page.getByRole('button', { name: 'Adicionar despesa' }).click();
-    const expenseDialog = page.getByRole('dialog', { name: 'Adicionar lançamento' });
-    await expenseDialog.getByRole('textbox', { name: 'Nome da despesa' }).fill('Mercado E2E');
-    await expenseDialog.getByRole('combobox', { name: 'Categoria' }).selectOption({ label: 'Mercado' });
-    await expenseDialog.getByRole('textbox', { name: 'Valor (R$)' }).fill('43050');
+    const expenseDialog = page.getByRole('dialog', { name: 'Registrar uma saída' });
+    await expenseDialog.getByRole('textbox', { name: 'Descrição' }).fill('Mercado E2E');
+    await expenseDialog.getByRole('combobox', { name: 'Categoria da despesa' }).click();
+    await page.getByRole('option', { name: 'Mercado', exact: true }).click();
+    await expenseDialog.getByRole('textbox', { name: /^Valor/ }).fill('43050');
     await expenseDialog.getByRole('button', { name: 'Salvar despesa' }).click();
 
     await expect(expenseDialog).toBeVisible();
@@ -104,7 +106,7 @@ test.describe('onboarding error flows', () => {
 
     await advanceToInitialEntriesStep(page);
     await completeInitialEntries(page);
-    await page.getByRole('button', { name: 'Concluir onboarding' }).click();
+    await page.getByRole('button', { name: 'Concluir', exact: true }).click();
 
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(page.getByRole('heading', { level: 2, name: 'Ative sua conta e seus primeiros movimentos' })).toBeVisible();

@@ -9,14 +9,15 @@ test.describe('empréstimos — edição e exclusão', () => {
   test('edita título de um contrato existente', async ({ page }) => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
+    await page.getByRole('button', { name: 'Novo contrato', exact: true }).click();
     await page.getByLabel('Título').fill('Empréstimo Original');
     await page.getByRole('button', { name: 'Simular', exact: true }).click();
-    await expect(page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'Simulação' })).toBeVisible();
     await page.getByRole('button', { name: 'Criar contrato' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Empréstimo Original' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Editar' }).first().click();
-    await expect(page.getByRole('heading', { level: 2, name: 'Editar contrato' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Atualize o contrato' })).toBeVisible();
 
     await page.getByLabel('Título').fill('Empréstimo Atualizado');
     await page.getByRole('button', { name: 'Salvar alterações' }).click();
@@ -28,9 +29,10 @@ test.describe('empréstimos — edição e exclusão', () => {
   test('exclui um contrato e remove da listagem', async ({ page }) => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
+    await page.getByRole('button', { name: 'Novo contrato', exact: true }).click();
     await page.getByLabel('Título').fill('Contrato para Excluir');
     await page.getByRole('button', { name: 'Simular', exact: true }).click();
-    await expect(page.getByRole('heading', { level: 2, name: 'Simulação' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 4, name: 'Simulação' })).toBeVisible();
     await page.getByRole('button', { name: 'Criar contrato' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Excluir' })).toBeVisible();
 
@@ -45,16 +47,18 @@ test.describe('empréstimos — edição e exclusão', () => {
   test('cancelar edição restaura o formulário para criação', async ({ page }) => {
     await page.goto('/emprestimos', { waitUntil: 'domcontentloaded' });
 
+    await page.getByRole('button', { name: 'Novo contrato', exact: true }).click();
     await page.getByLabel('Título').fill('Contrato para Cancelar Edição');
     await page.getByRole('button', { name: 'Simular', exact: true }).click();
     await page.getByRole('button', { name: 'Criar contrato' }).click();
     await expect(page.getByRole('heading', { level: 3, name: 'Contrato para Cancelar Edição' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Editar' }).first().click();
-    await expect(page.getByRole('heading', { level: 2, name: 'Editar contrato' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Atualize o contrato' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Cancelar' }).click();
-    await expect(page.getByRole('heading', { level: 2, name: 'Novo contrato' })).toBeVisible();
+    await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
+    await page.getByRole('button', { name: 'Novo contrato', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 2, name: 'Novo empréstimo ou financiamento' })).toBeVisible();
   });
 });
 

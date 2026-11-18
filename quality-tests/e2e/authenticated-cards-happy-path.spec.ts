@@ -1,3 +1,4 @@
+import { selectOption } from './support/select-option';
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 
@@ -18,16 +19,13 @@ test.describe('cartões — happy path (regressões A19/A20)', () => {
     await page.getByRole('button', { name: /Adicionar cartão|Registrar um/i }).first().click();
 
     const brandSelect = page.getByLabel('Bandeira');
-    if (await brandSelect.isVisible().catch(() => false)) {
-      const firstBrand = await brandSelect.locator('option').first().getAttribute('value');
-      if (firstBrand) await brandSelect.selectOption(firstBrand);
-    }
-    await page.getByLabel('Número do cartão').fill('4111 1111 1111 4321');
-    await page.getByLabel(/Nome( impresso)? (do|no) cartão/).fill('TITULAR E2E QA');
+    await selectOption(brandSelect, { index: 0 });
+    await page.getByLabel('Últimos 4 dígitos').fill('4321');
+    await page.getByLabel('Nome do cartão', { exact: true }).fill('TITULAR E2E QA');
     await page.getByLabel(/Banco( \(opcional\))?/).fill('Banco QA');
     await page.getByLabel('Limite de crédito').fill('500000'); // máscara: valor/100 => R$ 5.000,00
-    await page.getByLabel('Dia do fechamento').fill('10');
-    await page.getByLabel('Dia do vencimento').fill('18');
+    await page.getByLabel('Dia de fechamento da fatura').fill('10');
+    await page.getByLabel('Dia de vencimento da fatura').fill('18');
     await page.getByRole('button', { name: 'Salvar cartão' }).click();
 
     // A19 — o cartão recém-criado DEVE aparecer NA LISTA (antes do fix, a tela ficava vazia).

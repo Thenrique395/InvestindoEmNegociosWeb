@@ -55,11 +55,11 @@ Consultar sempre:
 
 - `../../../Agent.md`
 - `./README.md`
-- `../../../docs/README.md`
-- `../../../docs/PRODUCT.md`
-- `../../../docs/BUSINESS_RULES.md`
-- `../../../docs/ARCHITECTURE.md`
-- `../../../docs/ROADMAP.md`
+- `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/README.md`
+- `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/estrategia/visao-e-oferta-do-produto.md`
+- `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/regras/regras-de-negocio.md`
+- `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/02-arquitetura/arquitetura.md`
+- `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/roadmap.md`
 
 Consultar quando aplicavel:
 
@@ -93,7 +93,7 @@ Ler nesta ordem:
 1. `../../../Agent.md`
 2. `./Agent.md`
 3. `./README.md`
-4. `../../../docs/BUSINESS_RULES.md`
+4. `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/regras/regras-de-negocio.md`
 5. `../../../InvestindoEmNegociosApi/docs/AUTHORIZATION_MATRIX.md`
 
 ### Mudanca de endpoint consumido, DTO, status HTTP, erro ou interceptor
@@ -123,7 +123,7 @@ Ler nesta ordem:
 1. `../../../Agent.md`
 2. `./Agent.md`
 3. `./README.md`
-4. `../../../docs/ARCHITECTURE.md`
+4. `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/02-arquitetura/arquitetura.md`
 
 ### Mudanca de pricing, checkout, portal, assinatura ou billing no frontend
 
@@ -132,8 +132,8 @@ Ler nesta ordem:
 1. `../../../Agent.md`
 2. `./Agent.md`
 3. `./README.md`
-4. `../../../docs/PRODUCT.md`
-5. `../../../docs/BUSINESS_RULES.md`
+4. `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/estrategia/visao-e-oferta-do-produto.md`
+5. `/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/regras/regras-de-negocio.md`
 6. `../../../InvestindoEmNegociosApi/docs/AUTHORIZATION_MATRIX.md`
 7. `../../../InvestindoEmNegociosApi/docs/API_CONTRATO_ERROS.md`
 

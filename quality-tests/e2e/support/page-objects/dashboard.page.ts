@@ -9,7 +9,7 @@ export class DashboardPage {
   }
 
   async expectLoaded() {
-    await expect(this.page.getByRole('heading', { level: 1, name: /Visão Geral Financeira/i })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 1, name: /(Bom dia|Boa tarde|Boa noite)(,|$)/i })).toBeVisible();
   }
 
   async expectRealBalanceVisible() {
@@ -27,7 +27,10 @@ export class DashboardPage {
   }
 
   async expectNetWorthHistoryVisible() {
-    await expect(this.page.getByText('Evolução patrimonial')).toBeVisible();
+    await this.page.getByRole('link', { name: 'Histórico mensal', exact: true }).click();
+    await expect(this.page).toHaveURL(/\/snapshots$/);
+    await expect(this.page.getByRole('heading', { level: 1, name: /Histórico mensal/ })).toBeVisible();
+    await this.goto();
   }
 
   async expectDebtMapVisible() {
@@ -41,7 +44,7 @@ export class DashboardPage {
   // O painel de risco detalhado e a troca de período por heading foram removidos no
   // refactor do dashboard; a saúde financeira agora é um card no overview.
   async expectHealthVisible() {
-    await expect(this.page.getByRole('heading', { name: 'Saúde financeira (IA)' }).first()).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: /^Saúde financeira/ }).first()).toBeVisible();
   }
 
   async expectNoHorizontalOverflow() {

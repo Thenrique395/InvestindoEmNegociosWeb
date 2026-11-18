@@ -1,3 +1,4 @@
+import { openAccountImport } from './support/account-import';
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 import { AccountsPage } from './support/page-objects/accounts.page';
@@ -25,9 +26,11 @@ test.describe('authenticated write flows', () => {
   });
 
   test('importa OFX pela interface e atualiza o extrato', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-03-15T12:00:00-03:00') });
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
     await page.getByRole('button', { name: 'Extrato' }).first().click();
+    await openAccountImport(page);
     await page.locator('input[type="file"]').first().setInputFiles({
       name: 'sample.ofx',
       mimeType: 'application/x-ofx',
@@ -44,9 +47,11 @@ test.describe('authenticated write flows', () => {
   });
 
   test('importa CSV pela interface e atualiza o extrato', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-03-15T12:00:00-03:00') });
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
     await page.getByRole('button', { name: 'Extrato' }).first().click();
+    await openAccountImport(page);
     await page.locator('input[type="file"]').nth(1).setInputFiles({
       name: 'sample.csv',
       mimeType: 'text/csv',

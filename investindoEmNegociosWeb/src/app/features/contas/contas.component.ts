@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, OnInit } from '@angular/core';
+import { Component, DestroyRef, effect, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectMenuComponent } from '../../shared/select-menu/select-menu.component';
 import { CommonModule } from '@angular/common';
@@ -42,6 +42,7 @@ import {
 } from '../../core/accounts-overview.model';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-contas',
   standalone: true,
   imports: [
@@ -68,6 +69,8 @@ import {
   styleUrls: ['./contas.component.scss']
 })
 export class ContasComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   /** O painel de importação fica atrás do botão, como no handoff. */
   mostrarImportExtrato = false;
   loading = false;
@@ -131,6 +134,7 @@ export class ContasComponent implements OnInit {
     this.canAdvanced = this.uiPermissions.canUseAdvancedAccountAnalysis();
 
     effect(() => {
+        this.changeDetector.markForCheck();
       this.accounts = this.accountsStore.accounts();
       this.loading = this.accountsStore.loading();
       this.error = this.accountsStore.error() || this.error;
@@ -145,6 +149,7 @@ export class ContasComponent implements OnInit {
     });
 
     effect(() => {
+        this.changeDetector.markForCheck();
       this.transactions = this.accountsStore.transactions();
       this.transactionsTotalCount = this.accountsStore.transactionsTotalCount();
       this.transactionsPage = this.accountsStore.transactionsPage();
@@ -158,6 +163,7 @@ export class ContasComponent implements OnInit {
     // Recarrega a atividade por conta quando o conjunto de contas muda.
     effect(
       () => {
+        this.changeDetector.markForCheck();
         const key = this.accountsStore.accounts().map((account) => account.id).sort().join(',');
         if (key && key !== this.lastActivityKey) {
           this.lastActivityKey = key;
@@ -419,6 +425,7 @@ export class ContasComponent implements OnInit {
     };
 
     const done = () => {
+        this.changeDetector.markForCheck();
       this.startCreate();
       this.saving = false;
       this.fecharModal();
@@ -446,6 +453,7 @@ export class ContasComponent implements OnInit {
     this.accountToRemove = null;
 
     this.accountsStore.delete(account.id, () => {
+        this.changeDetector.markForCheck();
       if (this.selectedAccountId === account.id) {
         this.selectedAccountId = null;
         this.transactions = [];
@@ -512,6 +520,7 @@ export class ContasComponent implements OnInit {
     };
 
     this.accountsStore.transfer(payload, () => {
+        this.changeDetector.markForCheck();
       this.transferForm = {
         ...this.transferForm,
         amount: null,
@@ -549,6 +558,7 @@ export class ContasComponent implements OnInit {
 
     this.accountsStore.extractOfx(file, this.selectedAccountId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
+        this.changeDetector.markForCheck();
         this.ofxExtract = {
           ...result,
           items: (result.items || []).map((item) => ({
@@ -559,10 +569,12 @@ export class ContasComponent implements OnInit {
         this.ofxRawText = result.rawText || '';
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.error = extractApiErrorMessage(err, 'Falha ao processar arquivo OFX.');
         this.clearOfxState();
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.extractingOfx = false;
         input.value = '';
       }
@@ -588,6 +600,7 @@ export class ContasComponent implements OnInit {
         categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
       }))
     }, () => {
+        this.changeDetector.markForCheck();
       this.clearOfxState();
       this.importingOfx = false;
     });
@@ -625,6 +638,7 @@ export class ContasComponent implements OnInit {
 
     this.accountsStore.extractCsv(file, this.selectedAccountId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
+        this.changeDetector.markForCheck();
         this.csvExtract = {
           ...result,
           items: (result.items || []).map((item) => ({
@@ -635,10 +649,12 @@ export class ContasComponent implements OnInit {
         this.csvRawText = result.rawText || '';
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.error = extractApiErrorMessage(err, 'Falha ao processar arquivo CSV.');
         this.clearCsvState();
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.extractingCsv = false;
         input.value = '';
       }
@@ -664,6 +680,7 @@ export class ContasComponent implements OnInit {
         categoryId: item.categoryId ?? item.suggestedCategory?.categoryId ?? null
       }))
     }, () => {
+        this.changeDetector.markForCheck();
       this.clearCsvState();
       this.importingCsv = false;
     });
@@ -740,6 +757,7 @@ export class ContasComponent implements OnInit {
   private loadCategories(): void {
     this.categoriesService.list(undefined, { pageSize: 200 }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (items) => {
+        this.changeDetector.markForCheck();
         this.categories = items || [];
       }
     });

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
@@ -9,6 +9,7 @@ import { SectionCardComponent } from '../../shared/section-card/section-card.com
 import { DatePickerComponent } from '../../shared/date-picker/date-picker.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-profile',
   standalone: true,
   imports: [FormsModule, PageHeaderComponent, SectionCardComponent, DatePickerComponent],
@@ -16,6 +17,8 @@ import { DatePickerComponent } from '../../shared/date-picker/date-picker.compon
   styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfileComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   nome = '';
   email = '';
   documento = '';
@@ -41,6 +44,7 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.profileService.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((p) => {
+        this.changeDetector.markForCheck();
       if (!p) return;
       this.nome = p.fullName;
       this.documento = p.document;
@@ -75,10 +79,12 @@ export class UserProfileComponent implements OnInit {
     this.avatarUploading = true;
     this.profileService.uploadAvatar(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {
+        this.changeDetector.markForCheck();
         this.avatarUrl = profile.avatarUrl || '';
         this.avatarUploading = false;
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.avatarUploading = false;
         this.uiFeedback.error(err?.message || 'Falha ao enviar a imagem.');
       }
@@ -105,10 +111,12 @@ export class UserProfileComponent implements OnInit {
     this.loading = true;
     this.profileService.upsert(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
         this.uiFeedback.success('Perfil atualizado.');
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
         this.uiFeedback.error('Falha ao atualizar perfil.');
       }
@@ -122,10 +130,12 @@ export class UserProfileComponent implements OnInit {
     }
     this.profileService.changePassword({ currentPassword: this.senhaAtual, newPassword: this.novaSenha }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.success('Senha alterada.');
         this.senhaAtual = this.novaSenha = this.confirmaSenha = '';
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error('Falha ao alterar senha.');
       }
     });

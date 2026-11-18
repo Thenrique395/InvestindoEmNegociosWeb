@@ -22,7 +22,7 @@ test.describe('onboarding regression', () => {
     await expect(page.getByRole('link', { name: 'Dashboard' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Cartões' })).toHaveCount(0);
 
-    await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
+    await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(page.getByRole('heading', { level: 2, name: 'Vamos definir seu foco inicial' })).toBeVisible();

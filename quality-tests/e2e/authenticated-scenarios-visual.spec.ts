@@ -7,6 +7,7 @@ test.describe('simulador — captura visual rebrand', () => {
 
     for (const viewport of [
       { name: 'desktop', width: 1440, height: 1200 },
+      { name: 'tablet', width: 1024, height: 1000 },
       { name: 'mobile', width: 390, height: 900 }
     ]) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -20,7 +21,7 @@ test.describe('simulador — captura visual rebrand', () => {
       await page.getByLabel('Receita extra mensal').fill('1200');
       await page.getByLabel('Despesa extra mensal').fill('300');
       await page.getByLabel('Taxa de poupança (%)').fill('8');
-      await page.getByRole('radio', { name: '6 meses' }).click();
+      await page.getByRole('radio', { name: 'Este trimestre' }).click();
       await page.getByRole('button', { name: 'Simular cenário' }).click();
 
       await expect(page.getByText('Saldo projetado (base)')).toBeVisible();

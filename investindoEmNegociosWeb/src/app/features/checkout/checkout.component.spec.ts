@@ -1,6 +1,8 @@
+import { inComponentContext } from '../../../testing/component-context';
 import { FormBuilder } from '@angular/forms';
 import { convertToParamMap } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CheckoutComponent } from './checkout.component';
 
 class TitleMock {
@@ -42,7 +44,9 @@ function createComponent(queryParams: Record<string, string> = {}) {
   const title = new TitleMock();
   const meta = new MetaMock();
 
-  const component = new CheckoutComponent(
+  const destroyCallbacks = new Set<() => void>();
+  const destroy = () => [...destroyCallbacks].forEach(callback => callback());
+  const component = inComponentContext(() => new CheckoutComponent(
     route,
     router,
     authService,
@@ -53,10 +57,13 @@ function createComponent(queryParams: Record<string, string> = {}) {
     new FormBuilder(),
     title as any,
     meta as any,
-    { onDestroy: () => {} } as any
-  );
+    { onDestroy: (callback: () => void) => {
+      destroyCallbacks.add(callback);
+      return () => destroyCallbacks.delete(callback);
+    } } as any
+  ));
 
-  return { component, route, router, authService, billingService, checkoutIntent, subscriptionsService, uiFeedback, title, meta };
+  return { component, destroy, route, router, authService, billingService, checkoutIntent, subscriptionsService, uiFeedback, title, meta };
 }
 
 describe('CheckoutComponent', () => {
@@ -174,6 +181,36 @@ describe('CheckoutComponent', () => {
     expect(component.accountForm.get('email')?.hasError('emailInUse')).toBeTrue();
   });
 
+  it('libera nova consulta de conta após falha de rede', () => {
+    const { component, authService, uiFeedback } = createComponent();
+    component.accountForm.patchValue({ nome: 'Joanna Amanda', email: 'joanna@example.com', cpf: '111.444.777-35' });
+    authService.checkAvailability.and.returnValue(throwError(() => new Error('offline')));
+
+    component.checkAccount();
+
+    expect(component.checkingAvailability).toBeFalse();
+    expect(component.showRegistrationFields).toBeFalse();
+    expect(uiFeedback.error).toHaveBeenCalled();
+    component.checkAccount();
+    expect(authService.checkAvailability).toHaveBeenCalledTimes(2);
+  });
+
+  it('libera nova tentativa de cadastro após falha sem autenticar o usuário', () => {
+    const { component, authService, uiFeedback } = createComponent();
+    component.accountForm.setValue({ nome: 'Joanna Amanda', email: 'joanna@example.com', cpf: '111.444.777-35',
+      senha: 'SenhaForte123!', confirmarSenha: 'SenhaForte123!', aceitarTermos: true });
+    authService.register.and.returnValue(throwError(() => new Error('offline')));
+
+    component.submitRegistration();
+
+    expect(component.processing).toBeFalse();
+    expect(authService.applySession).not.toHaveBeenCalled();
+    expect(uiFeedback.success).not.toHaveBeenCalled();
+    expect(uiFeedback.error).toHaveBeenCalledWith('offline');
+    component.submitRegistration();
+    expect(authService.register).toHaveBeenCalledTimes(2);
+  });
+
   it('acusa senhas diferentes como erro de formulário', () => {
     const { component } = createComponent();
     component.accountForm.patchValue({ senha: 'abcdef', confirmarSenha: 'ghijkl' });
@@ -226,4 +263,59 @@ describe('CheckoutComponent', () => {
 
     expect(billingService.startCheckout).toHaveBeenCalledWith('intermediate', 'Monthly');
   });
+  for (const plan of ['basic', 'intermediate']) {
+    for (const status of [0, 400, 403, 409, 500]) {
+      it(`libera nova tentativa do plano ${plan} após erro ${status}`, () => {
+        const { component, authService, billingService, subscriptionsService, router, checkoutIntent } = createComponent({ plan });
+        authService.isAuthenticated.and.returnValue(true);
+        const operation = plan === 'basic' ? subscriptionsService.change : billingService.startCheckout;
+        operation.and.returnValue(throwError(() => new HttpErrorResponse({ status })));
+
+        component.activatePlan();
+
+        expect(component.processing).toBeFalse();
+        expect(router.navigate).toHaveBeenCalledWith(['/checkout/falha'], jasmine.anything());
+        expect(authService.applySession).not.toHaveBeenCalled();
+        expect(checkoutIntent.clear).not.toHaveBeenCalled();
+        component.activatePlan();
+        expect(operation).toHaveBeenCalledTimes(2);
+      });
+    }
+
+    it(`libera processamento ao destruir o checkout pendente do plano ${plan}`, () => {
+      const { component, destroy, authService, billingService, subscriptionsService, router } = createComponent({ plan });
+      authService.isAuthenticated.and.returnValue(true);
+      const operation = plan === 'basic' ? subscriptionsService.change : billingService.startCheckout;
+      const response = new Subject<any>();
+      operation.and.returnValue(response);
+      component.activatePlan();
+      expect(component.processing).toBeTrue();
+
+      destroy();
+
+      expect(component.processing).toBeFalse();
+      response.next({ checkoutId: 'late', session: {}, current: { planName: 'Essencial' } });
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(authService.applySession).not.toHaveBeenCalled();
+    });
+
+    it(`bloqueia envios simultâneos e libera após sucesso do plano ${plan}`, () => {
+      const { component, authService, billingService, subscriptionsService } = createComponent({ plan });
+      authService.isAuthenticated.and.returnValue(true);
+      const operation = plan === 'basic' ? subscriptionsService.change : billingService.startCheckout;
+      const response = new Subject<any>();
+      operation.and.returnValue(response);
+
+      component.activatePlan();
+      component.activatePlan();
+      expect(component.processing).toBeTrue();
+      expect(operation).toHaveBeenCalledTimes(1);
+      response.next(plan === 'basic'
+        ? { session: {}, current: { planName: 'Essencial' } }
+        : { checkoutId: 'id-1', checkoutUrl: '' });
+      response.complete();
+      expect(component.processing).toBeFalse();
+    });
+  }
+
 });

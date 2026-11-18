@@ -1,3 +1,13 @@
+import {
+  filterExpenseEntries,
+  selectedExpenseIds,
+  anticipatableExpenses,
+  expenseMonthComparison,
+  expenseTotal,
+  matchesExpenseStatus,
+  matchesExpenseCategory,
+  matchesExpenseName
+} from './expense-list.model';
 import { computed, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,7 +37,6 @@ import { TxMobileHeaderComponent, TxMobileKpi } from '../../shared/transactions/
 import { TxFilterChipsComponent, TxFilterChip } from '../../shared/transactions/tx-filter-chips.component';
 import { TxMobileListComponent, TxMobileItem } from '../../shared/transactions/tx-mobile-list.component';
 import { DisplayInstallmentStatus, resolveInstallmentStatus, expenseStatusLabel, installmentStatusIcon, installmentStatusTone, InstallmentStatusTone } from '../../core/utils/status';
-import { isExpenseOpen } from '../../core/utils/home-insight.utils';
 import { UiFeedbackService } from '../../core/ui-feedback.service';
 import { UiPermissionsService } from '../../core/ui-permissions.service';
 import { InvoiceImportComponent } from '../shared/invoice-import/invoice-import.component';
@@ -49,7 +58,7 @@ import { HistoryEvent } from '../../shared/lancamento-historico/lancamento-histo
 import { DeleteKind, DeleteScope } from '../../shared/confirm-delete/confirm-delete.model';
 import { BodyPortalDirective } from '../../shared/body-portal.directive';
 import { BulkActionBarComponent, BulkAction } from '../../shared/transactions/bulk-action-bar.component';
-import { collate as collateText, compareLocaleDate, monthKeyFromDate, monthLabelFromKey } from '../../shared/transactions/transaction-helpers';
+import { monthKeyFromDate, monthLabelFromKey } from '../../shared/transactions/transaction-helpers';
 import {
   expenseMonthKeys,
   statementNoticeMessage,
@@ -144,7 +153,7 @@ export class DespesasComponent implements OnInit {
   } | null = null;
   private alertaTimeout?: ReturnType<typeof setTimeout>;
   selectedIds = new Set<string>();
-  filtroStatus: ('ALL' | InstallmentStatus) = 'ALL';
+  filtroStatus: ('ALL' | DisplayInstallmentStatus) = 'ALL';
 
   /** Opções do dropdown de status. Rótulos vêm de `expenseStatusLabel`. */
   /* Ordem do design: do que ainda vai acontecer para o que já saiu do caminho.
@@ -267,11 +276,7 @@ export class DespesasComponent implements OnInit {
     ];
   }
 
-  private statusMatch(d: StoredExpense): boolean {
-    return this.filtroStatus === 'ALL'
-      ? true
-      : resolveInstallmentStatus(d.status, d.vencimento) === this.filtroStatus;
-  }
+  private statusMatch(expense: StoredExpense): boolean { return matchesExpenseStatus(expense, this.filtroStatus); }
   filtroCategoria: string = 'ALL';
   filtroNome: string = '';
   readonly loadingPagar = signal(false);
@@ -437,30 +442,9 @@ export class DespesasComponent implements OnInit {
     return this.mesAtualLabel;
   }
 
-  get previousComparison(): {
-    month: string;
-    delta: number;
-    deltaAbs: number;
-    percent: number;
-    trend: 'up' | 'down' | 'flat';
-    isNew: boolean;
-  } | null {
-    const prevKey = this.previousMonthKey();
-    const prevTotal = this.totalMesByKey(prevKey);
-    const currentTotal = this.totalMes();
-    if (prevTotal === 0 && currentTotal === 0) return null;
-    const delta = currentTotal - prevTotal;
-    const trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
-    const isNew = prevTotal === 0 && currentTotal > 0;
-    const percent = prevTotal === 0 ? (currentTotal ? 100 : 0) : (delta / prevTotal) * 100;
-    return {
-      month: this.formatMonthLabel(prevKey),
-      delta,
-      deltaAbs: Math.abs(delta),
-      percent,
-      trend,
-      isNew
-    };
+  get previousComparison() {
+    const previous = this.previousMonthKey();
+    return expenseMonthComparison(this.totalMesByKey(previous), this.totalMes(), this.formatMonthLabel(previous));
   }
 
   get despesas(): StoredExpense[] {
@@ -475,29 +459,13 @@ export class DespesasComponent implements OnInit {
    * Usa `isExpenseOpen` de propósito, em vez de repetir a lista de status: era
    * a duplicação dessa regra em cada tela que deixava os totais divergentes.
    */
-  get totalPendentes(): number {
-    return this.despesas
-      .filter((d) => isExpenseOpen(d.status))
-      .reduce((sum, d) => sum + (d.valor || 0), 0);
-  }
+  get totalPendentes(): number { return expenseTotal(this.despesas, 'pending'); }
 
-  get totalAntecipadas(): number {
-    return this.somaPorStatus(['ANTICIPATED']);
-  }
+  get totalAntecipadas(): number { return expenseTotal(this.despesas, 'anticipated'); }
 
-  get totalPagas(): number {
-    return this.somaPorStatus(['PAID']);
-  }
+  get totalPagas(): number { return expenseTotal(this.despesas, 'paid'); }
 
-  get selecionados(): string[] {
-    const visiveisSelecionaveis = new Set(
-      this.despesasFiltradas
-        .filter((d) => d.status !== 'PAID' && d.status !== 'CANCELED')
-        .map((d) => d.id)
-        .filter((id): id is string => !!id)
-    );
-    return Array.from(this.selectedIds).filter((id) => visiveisSelecionaveis.has(id));
-  }
+  get selecionados(): string[] { return selectedExpenseIds(this.despesasFiltradas, this.selectedIds); }
 
   get selecionadosPagaveis(): StoredExpense[] {
     const selecionados = new Set(this.selecionados);
@@ -538,19 +506,7 @@ export class DespesasComponent implements OnInit {
   }
 
   get selecionadosAntecipaveis(): StoredExpense[] {
-    // Regra: pode antecipar apenas se o vencimento for em mês futuro em relação à data de hoje
-    const hoje = new Date();
-    const mesHoje = hoje.getMonth();
-    const anoHoje = hoje.getFullYear();
-    const selecionados = new Set(this.selecionados);
-    return this.despesas.filter((d) => {
-      if (!selecionados.has(d.id)) return false;
-      if (d.status === 'PAID' || d.status === 'CANCELED' || d.status === 'ANTICIPATED') return false;
-      const data = this.parseData(d.vencimento || '');
-      if (!data) return false;
-      // Vencimento precisa ser depois do mês atual (hoje) para ser elegível
-      return data.getFullYear() > anoHoje || (data.getFullYear() === anoHoje && data.getMonth() > mesHoje);
-    });
+    return anticipatableExpenses(this.despesas, this.selecionados, new Date());
   }
 
   /* Valor de CADA parcela, não o total: com 1000 em 12x o campo mostra 83,33.
@@ -563,38 +519,15 @@ export class DespesasComponent implements OnInit {
     return formatNumberValue(valor / parcelas);
   }
 
-  private categoriaMatch(d: StoredExpense): boolean {
-    return this.filtroCategoria === 'ALL' ? true : d.categoryId === this.filtroCategoria;
-  }
+  private categoriaMatch(expense: StoredExpense): boolean { return matchesExpenseCategory(expense, this.filtroCategoria); }
 
-  private nomeMatch(d: StoredExpense): boolean {
-    return this.filtroNome ? (d.nome || '').toLowerCase().includes(this.filtroNome.toLowerCase()) : true;
-  }
+  private nomeMatch(expense: StoredExpense): boolean { return matchesExpenseName(expense, this.filtroNome); }
 
   get despesasFiltradas(): StoredExpense[] {
-    const base = this.despesas.filter((d) => {
-      return this.statusMatch(d) && this.categoriaMatch(d) && this.nomeMatch(d);
-    });
-    if (!this.sortBy) return base;
-    const compare = (a: StoredExpense, b: StoredExpense) => {
-      switch (this.sortBy) {
-        case 'nome':
-          return this.collate(a.nome, b.nome);
-        case 'categoria':
-          return this.collate(a.categoria, b.categoria);
-        case 'pagamento':
-          return this.collate(this.pagamentoLabel(a), this.pagamentoLabel(b));
-        case 'vencimento':
-          return this.compareDate(a.vencimento, b.vencimento);
-        case 'valor':
-          return (a.valor || 0) - (b.valor || 0);
-        case 'status':
-          return this.collate(this.statusLabel(a.status), this.statusLabel(b.status));
-        default:
-          return 0;
-      }
-    };
-    return base.sort((a, b) => compare(a, b) * this.sortDir);
+    return filterExpenseEntries(this.despesas, {
+      status: this.filtroStatus, category: this.filtroCategoria, name: this.filtroNome,
+      sortBy: this.sortBy, sortDir: this.sortDir
+    }, item => this.pagamentoLabel(item));
   }
 
   get cartaoSelecionadoLabel(): string {
@@ -1546,12 +1479,6 @@ export class DespesasComponent implements OnInit {
     return parseLocalizedNumber(value);
   }
 
-  private somaPorStatus(statuses: string[]): number {
-    return this.despesas
-      .filter((d) => statuses.includes(d.status || 'OPEN'))
-      .reduce((sum, d) => sum + (d.valor || 0), 0);
-  }
-
   private setAlerta(msg: string, duracao = 3000, tipo: 'info' | 'success' | 'error' = 'info'): void {
     if (this.alertaTimeout) {
       clearTimeout(this.alertaTimeout);
@@ -1571,13 +1498,7 @@ export class DespesasComponent implements OnInit {
     return data.getFullYear() === hoje.getFullYear() && data.getMonth() === hoje.getMonth();
   }
 
-  private collate(a: string | undefined, b: string | undefined): number {
-    return collateText(a, b);
-  }
 
-  private compareDate(a: string | undefined, b: string | undefined): number {
-    return compareLocaleDate(a, b);
-  }
 
   private isDataValida(value: string): boolean {
     return !!parseLocaleDate(value);

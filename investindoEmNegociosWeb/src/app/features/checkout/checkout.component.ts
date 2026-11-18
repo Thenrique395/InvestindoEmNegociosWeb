@@ -1,5 +1,6 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, DestroyRef, OnDestroy } from '@angular/core';
+import { finalize } from 'rxjs';
+import { Component, DestroyRef, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
@@ -15,6 +16,7 @@ import { cpfValidator, maskCpf } from '../../core/utils/cpf.utils';
 import { extractApiErrorMessage } from '../../core/utils/api-error.utils';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-checkout',
   standalone: true,
   imports: [CommonModule, RouterLink, CurrencyPipe, ReactiveFormsModule],
@@ -22,6 +24,8 @@ import { extractApiErrorMessage } from '../../core/utils/api-error.utils';
   styleUrl: './checkout.component.scss'
 })
 export class CheckoutComponent implements OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   plans = MARKETING_PLANS;
   selectedPlan: MarketingPlan = findMarketingPlan(null);
   selectedCycle: MarketingBillingCycle = 'Monthly';
@@ -62,6 +66,7 @@ export class CheckoutComponent implements OnDestroy {
     private readonly destroyRef: DestroyRef
   ) {
     route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+        this.changeDetector.markForCheck();
       this.selectedPlan = findMarketingPlan(params.get('plan'));
       this.selectedCycle = params.get('cycle') === 'Yearly' ? 'Yearly' : 'Monthly';
       this.persistIntent();
@@ -196,8 +201,15 @@ export class CheckoutComponent implements OnDestroy {
 
     this.processing = true;
     if (this.selectedPlan.code !== 'basic') {
-      this.billingService.startCheckout(this.selectedPlan.code, this.selectedCycle).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      this.billingService.startCheckout(this.selectedPlan.code, this.selectedCycle).pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.processing = false;
+          this.changeDetector.markForCheck();
+        })
+      ).subscribe({
         next: (response) => {
+          this.changeDetector.markForCheck();
           this.checkoutIntent.save({
             plan: this.selectedPlan.code,
             cycle: this.selectedCycle
@@ -211,6 +223,7 @@ export class CheckoutComponent implements OnDestroy {
           });
         },
         error: (err) => {
+          this.changeDetector.markForCheck();
           this.router.navigate(['/checkout/falha'], {
             queryParams: {
               plan: this.selectedPlan.code,
@@ -218,16 +231,20 @@ export class CheckoutComponent implements OnDestroy {
               message: extractApiErrorMessage(err, 'Não foi possível iniciar o checkout de cobrança.')
             }
           });
-        },
-        complete: () => {
-          this.processing = false;
         }
       });
       return;
     }
 
-    this.subscriptionsService.change(this.selectedPlan.code, this.selectedCycle).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.subscriptionsService.change(this.selectedPlan.code, this.selectedCycle).pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.processing = false;
+          this.changeDetector.markForCheck();
+        })
+      ).subscribe({
       next: (response) => {
+        this.changeDetector.markForCheck();
         this.authService.applySession(response.session);
         this.checkoutIntent.clear();
         this.uiFeedback.success(`Plano ${response.current.planName} ativado com sucesso.`);
@@ -236,6 +253,7 @@ export class CheckoutComponent implements OnDestroy {
         });
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.router.navigate(['/checkout/falha'], {
           queryParams: {
             plan: this.selectedPlan.code,
@@ -243,9 +261,6 @@ export class CheckoutComponent implements OnDestroy {
             message: extractApiErrorMessage(err, 'Não foi possível concluir a contratação neste momento.')
           }
         });
-      },
-      complete: () => {
-        this.processing = false;
       }
     });
   }
@@ -276,6 +291,7 @@ export class CheckoutComponent implements OnDestroy {
     this.checkingAvailability = true;
     this.authService.checkAvailability(email?.value, cpf?.value).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
+        this.changeDetector.markForCheck();
         this.checkingAvailability = false;
         if (res.emailExists || res.documentExists) {
           this.accountExists = true;
@@ -288,6 +304,7 @@ export class CheckoutComponent implements OnDestroy {
         }
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.checkingAvailability = false;
         this.uiFeedback.error('Não foi possível verificar seus dados. Tente novamente.');
       }
@@ -310,12 +327,14 @@ export class CheckoutComponent implements OnDestroy {
 
     this.authService.register(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         // Double opt-in: o cadastro não loga mais. O usuário precisa confirmar o e-mail antes de
         // seguir (o fluxo de pagamento está adiado de qualquer forma).
         this.processing = false;
         this.uiFeedback.success('Conta criada! Enviamos um e-mail de confirmação — confirme para poder entrar.');
       },
       error: (err: unknown) => {
+        this.changeDetector.markForCheck();
         this.processing = false;
         const code = err && typeof err === 'object' && 'code' in err ? (err as { code?: string }).code : undefined;
         if (code === 'emailInUse') {

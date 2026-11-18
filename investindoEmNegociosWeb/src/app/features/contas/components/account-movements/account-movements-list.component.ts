@@ -17,20 +17,20 @@ import { AccountTransactionResponse, AccountTransactionType } from '../../../../
   template: `
     <div class="mv">
       <div class="mv__scroll">
-        <div class="mv__grid">
-          <div class="mv__head">
-            <span>Data</span><span>Descrição</span><span>Tipo</span><span class="mv__num">Valor</span>
+        <div class="mv__grid" role="table" aria-label="Movimentações da conta">
+          <div class="mv__head" role="row">
+            <span role="columnheader">Data</span><span role="columnheader">Descrição</span><span role="columnheader">Tipo</span><span role="columnheader" class="mv__num">Valor</span>
           </div>
 
           @for (tx of transactions(); track tx.id) {
-            <div class="mv__row">
-              <span class="mv__date">{{ tx.occurredAt | date:'dd/MM' }}</span>
-              <div class="mv__main">
+            <div class="mv__row" role="row">
+              <span class="mv__date" role="cell">{{ tx.occurredAt | date:'dd/MM' }}</span>
+              <div class="mv__main" role="cell">
                 <span class="mv__desc">{{ tx.description }}</span>
                 <span class="mv__sub">{{ sourceLabel(tx) }}</span>
               </div>
-              <span><app-status-badge [tone]="typeTone(tx.type)" size="sm" [label]="typeLabel(tx.type)" /></span>
-              <span class="mv__num" [class.mv__pos]="tx.kind === 'Credit'">
+              <span role="cell"><app-status-badge [tone]="typeTone(tx.type)" size="sm" [label]="typeLabel(tx.type)" /></span>
+              <span class="mv__num" role="cell" [class.mv__pos]="tx.kind === 'Credit'">
                 {{ tx.kind === 'Credit' ? '' : '− ' }}{{ tx.amount | appCurrency:currency() }}
               </span>
             </div>

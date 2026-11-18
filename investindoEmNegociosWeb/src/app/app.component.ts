@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostBinding, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, HostBinding, HostListener, OnDestroy, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { SignupComponent } from './features/signup/signup.component';
@@ -23,6 +23,7 @@ import { ModalComponent } from './shared/modal/modal.component';
 import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './core/navigation';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterLink, SignupComponent, SidebarComponent, TopbarComponent, PublicHeaderComponent, PublicFooterComponent, BillingAlertBannerComponent, ModalComponent, BodyPortalDirective],
@@ -30,6 +31,8 @@ import { NAV_SECTIONS, canShowItem, type SidebarNavItem } from './core/navigatio
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   title = 'Investindo em Negócios';
   brandName = 'Investindo em Negócios';
   brandSlogan = 'Finanças com clareza, controle e confiança.';
@@ -75,6 +78,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {
     this.isBrowser = this.appSession.isBrowserEnvironment();
     this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
+        this.changeDetector.markForCheck();
       if (event instanceof NavigationEnd) {
         this.handleNavigationEnd(event);
       }
@@ -89,6 +93,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isLogged) this.ensureUserContext();
     this.appSession.startMonitoring(() => this.handleExpiredSession());
     this.uiFeedback.message$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((message) => {
+        this.changeDetector.markForCheck();
       // Adiado para fora do ciclo de change detection atual: qualquer componente que chame
       // uiFeedback.success/error/info/warning() de forma síncrona no próprio ngOnInit (ex.:
       // LoginComponent ao detectar ?created=1) dispararia esta emissão DURANTE o ciclo de CD
@@ -96,10 +101,12 @@ export class AppComponent implements OnInit, OnDestroy {
       // já ter sido checado — NG0100 (ExpressionChangedAfterItHasBeenChecked). Corrigido aqui,
       // na raiz, em vez de em cada chamador — protege qualquer uso futuro também.
       setTimeout(() => {
+        this.changeDetector.markForCheck();
         this.feedbackMessage = message;
       });
     });
     this.notificationsFacade.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
+        this.changeDetector.markForCheck();
       this.notificationsOpen = state.open;
       this.notifications = state.items;
       this.unreadCount = state.unreadCount;
@@ -107,6 +114,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.notificationsError = state.error;
     });
     this.userContextFacade.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
+        this.changeDetector.markForCheck();
       this.displayName = state.displayName;
       this.avatarUrl = state.avatarUrl;
       this.userInitials = state.userInitials;
@@ -140,7 +148,7 @@ export class AppComponent implements OnInit, OnDestroy {
   handleSignupDone(): void {
     this.showSignupModal = false;
     this.signupAlert = 'Conta criada com sucesso. Faça login para entrar.';
-    setTimeout(() => (this.signupAlert = ''), 5000);
+    setTimeout(() => { this.changeDetector.markForCheck(); return (this.signupAlert = ''); }, 5000);
   }
 
   dismissFeedback(): void {

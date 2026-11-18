@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ type AdminUserRow = AdminUserSummary & {
 };
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-admin-users',
   standalone: true,
   imports: [CommonModule, FormsModule, ConfirmDialogComponent, PageHeaderComponent, StatusBadgeComponent, UiStateComponent, EmptyStateComponent],
@@ -27,6 +28,8 @@ type AdminUserRow = AdminUserSummary & {
   styleUrls: ['./admin-users.component.scss']
 })
 export class AdminUsersComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   users: AdminUserRow[] = [];
   loading = false;
   savingId: string | null = null;
@@ -63,6 +66,7 @@ export class AdminUsersComponent implements OnInit {
     this.loading = true;
     this.adminUsers.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (users) => {
+        this.changeDetector.markForCheck();
         this.users = users.map((user) => ({
           ...user,
           pendingRole: user.role,
@@ -71,10 +75,11 @@ export class AdminUsersComponent implements OnInit {
         }));
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error('Não foi possível carregar os usuários.');
         this.loading = false;
       },
-      complete: () => (this.loading = false)
+      complete: () => { this.changeDetector.markForCheck(); return (this.loading = false); }
     });
   }
 
@@ -117,6 +122,7 @@ export class AdminUsersComponent implements OnInit {
 
     forkJoin(requests.length ? requests : [of(user)]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (responses) => {
+        this.changeDetector.markForCheck();
         const last = responses[responses.length - 1] as AdminUserSummary;
         user.role = user.pendingRole = last.role;
         user.isActive = user.pendingActive = last.isActive;
@@ -124,9 +130,11 @@ export class AdminUsersComponent implements OnInit {
         this.uiFeedback.success('Alterações salvas com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível salvar as alterações.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.savingId = null;
       }
     });
@@ -155,12 +163,15 @@ export class AdminUsersComponent implements OnInit {
     this.featuresLoadingForUserId = user.id;
     this.adminUsers.listFeatures(user.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (features) => {
+        this.changeDetector.markForCheck();
         this.featuresByUserId[user.id] = features;
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível carregar as permissões por feature.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.featuresLoadingForUserId = null;
       }
     });
@@ -186,12 +197,15 @@ export class AdminUsersComponent implements OnInit {
 
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (features) => {
+        this.changeDetector.markForCheck();
         this.featuresByUserId[user.id] = features;
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível atualizar o override da feature.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.featureSavingKey = null;
       }
     });
@@ -263,13 +277,16 @@ export class AdminUsersComponent implements OnInit {
     this.deletingId = user.id;
     this.adminUsers.remove(user.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.users = this.users.filter((u) => u.id !== user.id);
         this.uiFeedback.success('Usuário removido com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível excluir o usuário.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.deletingId = null;
       }
     });
@@ -307,13 +324,16 @@ export class AdminUsersComponent implements OnInit {
     this.grantingTrial = true;
     this.adminUsers.grantTrial(user.id, this.trialPlanCode, this.trialDays).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.success(`Trial de ${this.trialDays} dias (${this.trialPlanCode}) concedido a ${user.name || user.email}.`);
         this.trialOpenForUserId = null;
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, 'Não foi possível conceder o trial.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.grantingTrial = false;
       }
     });

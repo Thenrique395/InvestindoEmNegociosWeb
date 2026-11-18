@@ -3,9 +3,7 @@ import { setupAuthenticatedApp } from './support/authenticated-app';
 import { loginIntoOnboarding } from './support/onboarding-flow';
 
 /**
- * Leva até o passo dos lançamentos iniciais. O helper compartilhado
- * (onboarding-flow) ainda procura rótulos que a tela não usa mais, então a
- * navegação vive aqui até aquele arquivo ser atualizado.
+ * Leva até o passo dos lançamentos iniciais escolhendo as primeiras opções.
  */
 async function irParaLancamentosIniciais(page: Parameters<typeof setupAuthenticatedApp>[0]) {
   await loginIntoOnboarding(page, 'atalhos.e2e@example.com', 'senha-e2e-123');

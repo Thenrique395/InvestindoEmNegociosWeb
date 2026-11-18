@@ -1,3 +1,4 @@
+import { inComponentContext } from '../../../testing/component-context';
 import { FormBuilder } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { OnboardingComponent } from './onboarding.component';
@@ -91,7 +92,7 @@ function createComponent() {
   const router = new RouterMock();
   const userContext = new UserContextFacadeServiceMock();
 
-  const component = new OnboardingComponent(
+  const component = inComponentContext(() => new OnboardingComponent(
     new FormBuilder(),
     profile as any,
     router as any,
@@ -107,7 +108,7 @@ function createComponent() {
     onboardingDraft as any,
     userContext as any,
     { onDestroy: () => {} } as any
-  );
+  ));
 
   return { component, profile, onboarding, ui, auth, accounts, cards, plans, categories, lookups, uiPermissions, onboardingDraft, router, userContext };
 }

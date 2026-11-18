@@ -1,3 +1,4 @@
+import { selectOption } from '../select-option';
 import { expect, type Locator, type Page } from '@playwright/test';
 import { brl } from '../format';
 
@@ -5,6 +6,7 @@ export class AccountsPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
+    await this.page.clock.install({ time: new Date('2026-03-15T12:00:00-03:00') });
     await this.page.goto('/contas', { waitUntil: 'domcontentloaded' });
     await expect(this.page.getByRole('heading', { name: /Contas|Controle saldos e transferências/i }).first()).toBeVisible();
   }
@@ -38,6 +40,7 @@ export class AccountsPage {
   }
 
   async createAccount(name: string, initialBalance: string) {
+    await this.page.getByRole('button', { name: 'Nova conta', exact: true }).click();
     await this.page.getByLabel(/Nome( da conta)?/).fill(name);
     await this.page.getByLabel('Saldo inicial').fill(initialBalance);
     await this.saveButton().click();
@@ -49,8 +52,9 @@ export class AccountsPage {
   }
 
   async transfer(origin: string, destination: string, amount: string, description: string) {
-    await this.page.getByLabel('Conta origem').selectOption({ label: origin });
-    await this.page.getByLabel('Conta destino').selectOption({ label: destination });
+    await this.page.getByRole('button', { name: 'Nova transferência', exact: true }).click();
+    await selectOption(this.page.getByLabel('Conta de origem'), { label: origin });
+    await selectOption(this.page.getByLabel('Conta de destino'), { label: destination });
     await this.page.getByLabel('Valor', { exact: true }).fill(amount);
     await this.page.getByLabel('Descrição (opcional)').fill(description);
     await this.page.getByRole('button', { name: 'Transferir agora' }).click();
@@ -63,7 +67,7 @@ export class AccountsPage {
   }
 
   async editAccount(currentName: string, nextName: string, initialBalance: string) {
-    await this.accountCard(currentName).getByRole('button', { name: 'Editar' }).click();
+    await this.accountCard(currentName).getByRole('button', { name: /^Editar conta /i }).click();
     await expect(this.page.getByLabel(/Nome( da conta)?/)).toHaveValue(currentName);
     await this.page.getByLabel(/Nome( da conta)?/).fill(nextName);
     await this.page.getByLabel('Saldo inicial').fill(initialBalance);
@@ -72,7 +76,7 @@ export class AccountsPage {
   }
 
   async removeAccount(name: string) {
-    await this.accountCard(name).getByRole('button', { name: 'Remover' }).click();
+    await this.accountCard(name).getByRole('button', { name: /Remover( conta)?/ }).click();
     // Remover conta agora usa um confirm-dialog (não confirm() nativo).
     await this.page.getByRole('dialog').getByRole('button', { name: 'Remover conta' }).click();
     await this.expectAccountNotVisible(name);

@@ -1,4 +1,18 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import {
+  resolveLocalInsightPriority,
+  resolveLocalInsightAction,
+  resolveLocalInsightGoal,
+  resolveLocalInsightDeadline
+} from './dashboard-advice.model';
+import {
+  dashboardPeriodRange,
+  previousDashboardPeriodRange,
+  dateInDashboardPeriod,
+  dashboardBalanceBefore,
+  sumDashboardExpenses,
+  sumDashboardIncomes
+} from './dashboard-period.model';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { EMPTY, Subject, Subscription, filter, fromEvent, interval, merge, debounceTime } from 'rxjs';
@@ -52,6 +66,14 @@ import { FinancialOverviewComponent } from './financial-overview/financial-overv
 import { FinancialOverviewInput } from './financial-overview/financial-overview.model';
 import { MonthlyFlowPoint, buildMonthlyFlowSeries } from '../../core/utils/monthly-flow.utils';
 import { SectionCardComponent } from '../../shared/section-card/section-card.component';
+import {
+  buildDashboardRecurrences,
+  DashboardRecurrenceItem,
+  isRecurringExpense,
+  formatCompactLocaleDate
+} from './dashboard-recurrences.model';
+import { buildDashboardCategories } from './dashboard-categories.model';
+import { buildDashboardCommitments } from './dashboard-commitments.model';
 import { netWorthDelta } from './dashboard-overview.model';
 import { BudgetResponse, BudgetService } from '../../core/budget.service';
 import { BudgetItemView, BudgetOverview, buildBudgetItemViews, buildBudgetOverview } from '../../core/budget-overview.model';
@@ -92,16 +114,6 @@ type DashboardActivityItem = {
   statusTone?: InstallmentStatusTone;
   recurring?: boolean;
   planId?: string;
-};
-
-type DashboardRecurrenceItem = {
-  id: string;
-  title: string;
-  amount: number;
-  dateLabel: string;
-  kindLabel: string;
-  tone: 'success' | 'warning' | 'danger' | 'info' | 'muted';
-  direction: 'income' | 'expense';
 };
 
 type DashboardDebtItem = {
@@ -150,6 +162,7 @@ const DASHBOARD_UPCOMING_DUE_DAYS = 7;
 const CONTROLE_FLOW_MONTHS = 6;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-home',
   standalone: true,
   imports: [
@@ -173,6 +186,8 @@ const CONTROLE_FLOW_MONTHS = 6;
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   private subRealBalance?: Subscription;
   private subDebtSummary?: Subscription;
   private subSubscriptionsSummary?: Subscription;
@@ -350,11 +365,12 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.summaryRefresh$
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.refreshSummaries());
+      .subscribe(() => { this.changeDetector.markForCheck(); return this.refreshSummaries(); });
     if (this.isLogged) {
       this.loadProfileSnapshot();
       this.onboardingService.getStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (status) => {
+        this.changeDetector.markForCheck();
           if (!status.completed) {
             this.router.navigateByUrl('/onboarding');
             return;
@@ -365,6 +381,7 @@ export class HomeComponent implements OnInit {
           this.onboardingLoaded = true;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.onboardingStep = 0;
           this.onboardingDone = false;
           this.hideOnboarding = false;
@@ -375,6 +392,7 @@ export class HomeComponent implements OnInit {
       this.setupDashboardRealtimeRefresh();
     }
     this.db.expenses$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
+        this.changeDetector.markForCheck();
       this.expensesLoaded = true;
       this.expensesRaw = lista;
       this.updatePeriodTotals();
@@ -388,6 +406,7 @@ export class HomeComponent implements OnInit {
       this.summaryRefresh$.next();
     });
     this.db.incomes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
+        this.changeDetector.markForCheck();
       this.incomesLoaded = true;
       this.incomesRaw = lista;
       this.updatePeriodTotals();
@@ -400,6 +419,7 @@ export class HomeComponent implements OnInit {
       this.summaryRefresh$.next();
     });
     this.db.cards$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((lista) => {
+        this.changeDetector.markForCheck();
       this.cards = lista;
     });
     if (this.isLogged) {
@@ -421,7 +441,7 @@ export class HomeComponent implements OnInit {
         filter(() => this.isLogged && !this.isDocumentHidden()),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(() => this.refreshDashboardRealtimeData());
+      .subscribe(() => { this.changeDetector.markForCheck(); return this.refreshDashboardRealtimeData(); });
   }
 
   private refreshDashboardRealtimeData(): void {
@@ -440,10 +460,12 @@ export class HomeComponent implements OnInit {
   private loadProfileSnapshot(): void {
     this.profileService.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (profile) => {
+        this.changeDetector.markForCheck();
         this.financialGoal = profile?.financialGoal || null;
         this.updateInsight();
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.financialGoal = null;
       }
     });
@@ -451,8 +473,9 @@ export class HomeComponent implements OnInit {
 
   private loadRobotInsightsSnapshot(): void {
     this.notificationsService.list(false, 20).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (items) => this.consumeRobotInsight(items || []),
+      next: (items) => { this.changeDetector.markForCheck(); return this.consumeRobotInsight(items || []); },
       error: () => {
+        this.changeDetector.markForCheck();
         this.robotInsightTips = [];
       }
     });
@@ -461,11 +484,13 @@ export class HomeComponent implements OnInit {
   private loadAccountsSnapshot(): void {
     this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (accounts) => {
+        this.changeDetector.markForCheck();
         this.accountBalances = (accounts || []).filter((a) => a.isActive);
         this.accountsService.resolveDefaultAccountId(this.accountBalances);
         this.refreshSummaries();
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.accountBalances = [];
         this.realBalanceSummary = null;
         this.debtSummary = null;
@@ -486,8 +511,8 @@ export class HomeComponent implements OnInit {
 
   private loadGoalsSnapshot(): void {
     this.goalsService.list(this.dataAtual.getFullYear()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (goals) => this.atualizarMetas(goals),
-      error: () => this.atualizarMetas([])
+      next: (goals) => { this.changeDetector.markForCheck(); return this.atualizarMetas(goals); },
+      error: () => { this.changeDetector.markForCheck(); return this.atualizarMetas([]); }
     });
   }
 
@@ -883,38 +908,7 @@ export class HomeComponent implements OnInit {
   }
 
   get allRecurrenceItems(): DashboardRecurrenceItem[] {
-    const currentMonthKey = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
-    const expenseItems: DashboardRecurrenceItem[] = this.expensesRaw
-      .filter((expense) => monthKeyFromLocaleDate(expense.vencimento) === currentMonthKey)
-      .filter((expense) => this.isRecurringExpense(expense))
-      .map((expense): DashboardRecurrenceItem => ({
-        id: `expense-${expense.id}`,
-        title: expense.nome || 'Despesa recorrente',
-        amount: expense.valor || 0,
-        dateLabel: this.formatCompactLocaleDate(expense.vencimento),
-        kindLabel: this.recurringExpenseKindLabel(expense),
-        tone: isExpenseOpen(expense.status) ? 'warning' : 'muted',
-        direction: 'expense' as const
-      }));
-    const incomeItems: DashboardRecurrenceItem[] = this.incomesRaw
-      .filter((income) => monthKeyFromLocaleDate(income.recebimento) === currentMonthKey)
-      .filter((income) => !!income.fixa)
-      .map((income): DashboardRecurrenceItem => ({
-        id: `income-${income.id}`,
-        title: income.fonte || 'Receita recorrente',
-        amount: income.valor || 0,
-        dateLabel: this.formatCompactLocaleDate(income.recebimento),
-        kindLabel: 'Receita fixa',
-        tone: isIncomeReceived(income.status) ? 'success' : 'info',
-        direction: 'income' as const
-      }));
-
-    return [...expenseItems, ...incomeItems]
-      .sort((a, b) => {
-        const directionOrder = a.direction === b.direction ? 0 : a.direction === 'expense' ? -1 : 1;
-        if (directionOrder !== 0) return directionOrder;
-        return b.amount - a.amount;
-      });
+    return buildDashboardRecurrences(this.expensesRaw, this.incomesRaw, this.dataAtual);
   }
 
   get recurrenceOutflowTotal(): number {
@@ -935,19 +929,6 @@ export class HomeComponent implements OnInit {
 
   get recurrenceIncomeCount(): number {
     return this.allRecurrenceItems.filter((item) => item.direction === 'income').length;
-  }
-
-  private isRecurringExpense(expense: StoredExpense): boolean {
-    return !!expense.fixa || !!expense.serieId || (!!expense.parcelasTotal && expense.parcelasTotal > 1);
-  }
-
-  private recurringExpenseKindLabel(expense: StoredExpense): string {
-    const category = (expense.categoria || '').toLowerCase();
-    if (category.includes('assinatura')) return 'Assinatura';
-    if (expense.parcelasTotal && expense.parcelasTotal > 1) {
-      return `Parcela ${expense.parcelaNumero || 1}/${expense.parcelasTotal}`;
-    }
-    return 'Conta fixa';
   }
 
   get patrimonioChartYearLabel(): string {
@@ -1061,7 +1042,6 @@ export class HomeComponent implements OnInit {
     return this.cards.length > 0;
   }
 
-
   hasAccess(minRole: UserRole): boolean {
     return hasAtLeastRole(this.currentRole, minRole);
   }
@@ -1069,10 +1049,12 @@ export class HomeComponent implements OnInit {
   private atualizarDividaCartoes(): void {
     this.cardsService.debtTotal().subscribe({
       next: ({ total }) => {
+        this.changeDetector.markForCheck();
         this.totalDividaCartoes = total ?? 0;
         this.updateInsight();
       },
-      error: () => {}
+      error: () => {
+        this.changeDetector.markForCheck();}
     });
   }
 
@@ -1082,147 +1064,33 @@ export class HomeComponent implements OnInit {
 
   private atualizarSaldo(): void {
     const range = this.getPeriodRange();
-    this.saldoAnterior = this.calcularSaldoAnterior(range);
+    this.saldoAnterior = dashboardBalanceBefore(this.expensesRaw, this.incomesRaw, range);
     this.saldo = this.saldoPrincipal;
   }
 
   private updatePeriodTotals(): void {
-    this.totalDespesas = this.somarDespesasMes(this.expensesRaw);
-    this.totalDespesasPagas = this.somarDespesasPagasMes(this.expensesRaw);
-    this.totalDespesasEmAberto = this.somarDespesasEmAbertoMes(this.expensesRaw);
-    this.totalRendas = this.somarRendasMes(this.incomesRaw);
-    this.totalRendasPendentes = this.somarRendasPendentesMes(this.incomesRaw);
-  }
-
-  private isDateInRange(date: string, range: { startKey: string; endKey: string }): boolean {
-    const key = monthKeyFromLocaleDate(date);
-    return key ? this.isWithinRange(key, range) : false;
-  }
-
-  private somarDespesasMes(
-    lista: StoredExpense[],
-    range: { startKey: string; endKey: string } = this.getPeriodRange()
-  ): number {
-    return lista
-      .filter((d) => this.isDateInRange(d.vencimento, range))
-      .reduce((sum, d) => sum + (d.valor || 0), 0);
-  }
-
-  private somarDespesasPagasMes(
-    lista: StoredExpense[],
-    range: { startKey: string; endKey: string } = this.getPeriodRange()
-  ): number {
-    return lista
-      .filter((d) => this.isDateInRange(d.vencimento, range) && !isExpenseOpen(d.status))
-      .reduce((sum, d) => sum + (d.valor || 0), 0);
-  }
-
-  private somarDespesasEmAbertoMes(
-    lista: StoredExpense[],
-    range: { startKey: string; endKey: string } = this.getPeriodRange()
-  ): number {
-    return lista
-      .filter((d) => this.isDateInRange(d.vencimento, range) && isExpenseOpen(d.status))
-      .reduce((sum, d) => sum + (d.valor || 0), 0);
-  }
-
-  private somarRendasMes(
-    lista: StoredIncome[],
-    range: { startKey: string; endKey: string } = this.getPeriodRange()
-  ): number {
-    return lista
-      .filter((r) => this.isDateInRange(r.recebimento, range) && isIncomeReceived(r.status))
-      .reduce((sum, r) => sum + (r.valor || 0), 0);
-  }
-
-  private somarRendasPendentesMes(
-    lista: StoredIncome[],
-    range: { startKey: string; endKey: string } = this.getPeriodRange()
-  ): number {
-    return lista
-      .filter((r) => this.isDateInRange(r.recebimento, range) && isIncomePending(r.status))
-      .reduce((sum, r) => sum + (r.valor || 0), 0);
-  }
-
-  private calcularSaldoAnterior(range: { startKey: string; endKey: string }): number {
-    const receitasRecebidasAntes = this.incomesRaw
-      .filter((r) => this.isBeforeRange(r.recebimento, range) && isIncomeReceived(r.status))
-      .reduce((sum, r) => sum + (r.valor || 0), 0);
-    const despesasAntes = this.expensesRaw
-      .filter((d) => this.isBeforeRange(d.vencimento, range))
-      .reduce((sum, d) => sum + (d.valor || 0), 0);
-    return receitasRecebidasAntes - despesasAntes;
-  }
-
-  private isBeforeRange(date: string, range: { startKey: string; endKey: string }): boolean {
-    const key = monthKeyFromLocaleDate(date);
-    return !!key && key < range.startKey;
+    this.totalDespesas = sumDashboardExpenses(this.expensesRaw, this.getPeriodRange());
+    this.totalDespesasPagas = sumDashboardExpenses(this.expensesRaw, this.getPeriodRange(), 'settled');
+    this.totalDespesasEmAberto = sumDashboardExpenses(this.expensesRaw, this.getPeriodRange(), 'open');
+    this.totalRendas = sumDashboardIncomes(this.incomesRaw, this.getPeriodRange());
+    this.totalRendasPendentes = sumDashboardIncomes(this.incomesRaw, this.getPeriodRange(), 'pending');
   }
 
   private updateCategoryCharts(): void {
     const range = this.getPeriodRange();
-    const expenses = this.expensesRaw.filter((d) => this.isDateInRange(d.vencimento, range));
-    const incomes = this.incomesRaw.filter((r) => this.isDateInRange(r.recebimento, range));
-
-    const groupByLabel = <T extends { valor: number }>(
-      items: T[],
-      labelGetter: (item: T) => string
-    ): { label: string; total: number }[] => {
-      const map = new Map<string, number>();
-      for (const item of items) {
-        const label = labelGetter(item).trim() || 'Sem categoria';
-        map.set(label, (map.get(label) || 0) + (item.valor || 0));
-      }
-      return Array.from(map.entries())
-        .map(([label, total]) => ({ label, total }))
-        .sort((a, b) => b.total - a.total);
-    };
-
-    const cap = (items: { label: string; total: number }[], limit = 6) => {
-      if (items.length <= limit) return items;
-      const head = items.slice(0, limit - 1);
-      const rest = items.slice(limit - 1).reduce((sum, item) => sum + item.total, 0);
-      return [...head, { label: 'Outros', total: rest }];
-    };
-
-    const toTotalsMap = (items: { label: string; total: number }[]): Map<string, number> =>
-      new Map(items.map((item) => [item.label, item.total]));
-
-    const prevRange = this.getPreviousPeriodRange();
-    const prevExpenses = this.expensesRaw.filter((d) => this.isDateInRange(d.vencimento, prevRange));
-    const prevIncomes = this.incomesRaw.filter((r) => this.isDateInRange(r.recebimento, prevRange));
-    const prevExpenseByLabel = toTotalsMap(groupByLabel(prevExpenses, (d) => d.categoria || 'Sem categoria'));
-    const prevIncomeByLabel = toTotalsMap(groupByLabel(prevIncomes, (r) => r.categoria || 'Sem categoria'));
-
-    const expenseData = cap(groupByLabel(expenses, (d) => d.categoria || 'Sem categoria'));
-    const incomeData = cap(groupByLabel(incomes, (r) => r.categoria || 'Sem categoria'));
-
-    this.expenseCategoryTotal = expenseData.reduce((sum, item) => sum + item.total, 0);
-    this.expenseCategorySlices = expenseData.map((item, index) =>
-      this.toCategorySlice(item, index, this.expenseCategoryTotal, this.expenseCategoryColors, prevExpenseByLabel)
-    );
-    this.incomeSourceTotal = incomeData.reduce((sum, item) => sum + item.total, 0);
-    this.incomeSourceSlices = incomeData.map((item, index) =>
-      this.toCategorySlice(item, index, this.incomeSourceTotal, this.incomeSourceColors, prevIncomeByLabel)
-    );
-  }
-
-  private toCategorySlice(
-    item: { label: string; total: number },
-    index: number,
-    total: number,
-    palette: string[],
-    previousByLabel: Map<string, number>
-  ): CategorySlice {
-    // "Outros" agrega categorias diferentes entre períodos — não é comparável.
-    const previousTotal = item.label === 'Outros' ? null : previousByLabel.get(item.label) ?? null;
-    return {
-      label: item.label,
-      total: item.total,
-      percent: total > 0 ? (item.total / total) * 100 : 0,
-      color: palette[index % palette.length],
-      previousTotal
-    };
+    const previous = this.getPreviousPeriodRange();
+    const expenses = buildDashboardCategories(
+      this.expensesRaw.filter(item => dateInDashboardPeriod(item.vencimento, range)),
+      this.expensesRaw.filter(item => dateInDashboardPeriod(item.vencimento, previous)),
+      this.expenseCategoryColors);
+    const incomes = buildDashboardCategories(
+      this.incomesRaw.filter(item => dateInDashboardPeriod(item.recebimento, range)),
+      this.incomesRaw.filter(item => dateInDashboardPeriod(item.recebimento, previous)),
+      this.incomeSourceColors);
+    this.expenseCategoryTotal = expenses.total;
+    this.expenseCategorySlices = expenses.slices;
+    this.incomeSourceTotal = incomes.total;
+    this.incomeSourceSlices = incomes.slices;
   }
 
   private updateMonthlyFlow(): void {
@@ -1254,11 +1122,6 @@ export class HomeComponent implements OnInit {
     return 6;
   }
 
-  private formatCompactLocaleDate(value: string): string {
-    const parsed = parseLocaleDate(value);
-    return parsed ? parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : value;
-  }
-
   private formatCompactIsoDate(value: string): string {
     const parsed = value ? new Date(`${value.slice(0, 10)}T00:00:00`) : null;
     return parsed && !Number.isNaN(parsed.getTime())
@@ -1281,82 +1144,19 @@ export class HomeComponent implements OnInit {
    */
   private updateOverviewDerived(): void {
     const prevRange = this.getPreviousPeriodRange();
-    const hasPrevExpenses = this.expensesRaw.some((d) => this.isDateInRange(d.vencimento, prevRange));
-    const hasPrevIncomes = this.incomesRaw.some((r) => this.isDateInRange(r.recebimento, prevRange));
-    this.despesasPeriodoAnterior = hasPrevExpenses ? this.somarDespesasMes(this.expensesRaw, prevRange) : null;
+    const hasPrevExpenses = this.expensesRaw.some((d) => dateInDashboardPeriod(d.vencimento, prevRange));
+    const hasPrevIncomes = this.incomesRaw.some((r) => dateInDashboardPeriod(r.recebimento, prevRange));
+    this.despesasPeriodoAnterior = hasPrevExpenses ? sumDashboardExpenses(this.expensesRaw, prevRange) : null;
     this.receitasPeriodoAnterior = hasPrevIncomes
-      ? this.somarRendasMes(this.incomesRaw, prevRange) + this.somarRendasPendentesMes(this.incomesRaw, prevRange)
+      ? sumDashboardIncomes(this.incomesRaw, prevRange) + sumDashboardIncomes(this.incomesRaw, prevRange, 'pending')
       : null;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const seteDias = new Date(today);
-    seteDias.setDate(seteDias.getDate() + 7);
-
-    let emAtraso = 0;
-    let proximosSeteDias = 0;
-    let valorEmAberto = 0;
-    // Separados porque o card "Precisa da sua atenção" trata os dois casos como
-    // pendências diferentes: o que venceu tem ação de pagar, o que vai vencer não.
-    let valorEmAtraso = 0;
-    let valorProximos = 0;
-    let maisAntigoEmAtraso: Date | null = null;
-    for (const expense of this.expensesRaw) {
-      if (!isExpenseOpen(expense.status)) continue;
-      const due = parseLocaleDate(expense.vencimento);
-      if (!due || due > seteDias) continue;
-      const valor = expense.valor || 0;
-      if (due < today) {
-        emAtraso += 1;
-        valorEmAtraso += valor;
-        if (!maisAntigoEmAtraso || due < maisAntigoEmAtraso) maisAntigoEmAtraso = due;
-      } else {
-        proximosSeteDias += 1;
-        valorProximos += valor;
-      }
-      valorEmAberto += valor;
-    }
-
-    let receitasAtrasadasQtd = 0;
-    let receitasAtrasadasValor = 0;
-    for (const income of this.incomesRaw) {
-      if (!isIncomePending(income.status)) continue;
-      const due = parseLocaleDate(income.recebimento);
-      if (!due || due >= today) continue;
-      receitasAtrasadasQtd += 1;
-      receitasAtrasadasValor += income.valor || 0;
-    }
-
-    const diasDoMaisAntigo = maisAntigoEmAtraso
-      ? Math.round((today.getTime() - maisAntigoEmAtraso.getTime()) / 86_400_000)
-      : null;
-
-    this.compromissosResumo = { emAtraso, proximosSeteDias, valorEmAberto };
-    this.pendenciasDetalhadas = {
-      despesasEmAtraso: { quantidade: emAtraso, valor: valorEmAtraso, diasDoMaisAntigo },
-      despesasProximas: { quantidade: proximosSeteDias, valor: valorProximos },
-      receitasAtrasadas: { quantidade: receitasAtrasadasQtd, valor: receitasAtrasadasValor },
-      // Fatura de cartão ainda não tem data de fechamento no dashboard; enquanto
-      // não tiver, o item não aparece em vez de aparecer com número inventado.
-      faturasFechando: { quantidade: 0, valor: 0 }
-    };
+    const commitments = buildDashboardCommitments(this.expensesRaw, this.incomesRaw, new Date());
+    this.compromissosResumo = commitments.summary;
+    this.pendenciasDetalhadas = commitments.details;
   }
 
-  private getPreviousPeriodRange(): { startKey: string; endKey: string } {
-    const monthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    if (this.periodo === 'year') {
-      const ano = this.dataAtual.getFullYear() - 1;
-      return { startKey: `${ano}-01`, endKey: `${ano}-12` };
-    }
-    if (this.periodo === 'quarter') {
-      const quarterStartMonth = Math.floor(this.dataAtual.getMonth() / 3) * 3;
-      const start = new Date(this.dataAtual.getFullYear(), quarterStartMonth - 3, 1);
-      const end = new Date(this.dataAtual.getFullYear(), quarterStartMonth - 1, 1);
-      return { startKey: monthKey(start), endKey: monthKey(end) };
-    }
-    const prev = new Date(this.dataAtual.getFullYear(), this.dataAtual.getMonth() - 1, 1);
-    return { startKey: monthKey(prev), endKey: monthKey(prev) };
-  }
+  private getPreviousPeriodRange(): { startKey: string; endKey: string } { return previousDashboardPeriodRange(this.dataAtual, this.periodo); }
 
   get overviewData(): FinancialOverviewInput {
     return {
@@ -1497,7 +1297,7 @@ export class HomeComponent implements OnInit {
     const mesAtual = `${this.dataAtual.getFullYear()}-${String(this.dataAtual.getMonth() + 1).padStart(2, '0')}`;
 
     const despesas = this.expensesRaw.flatMap<RecurrenceEntry>((e) => {
-      if (monthKeyFromLocaleDate(e.vencimento) !== mesAtual || !this.isRecurringExpense(e)) return [];
+      if (monthKeyFromLocaleDate(e.vencimento) !== mesAtual || !isRecurringExpense(e)) return [];
       const due = parseLocaleDate(e.vencimento);
       return [{
         id: `expense-${e.id}`,
@@ -1560,7 +1360,7 @@ export class HomeComponent implements OnInit {
     return this.recentTransactions.map((t) => ({
       id: t.id,
       title: t.title,
-      dateLabel: this.formatCompactLocaleDate(t.date),
+      dateLabel: formatCompactLocaleDate(t.date),
       context: t.category || '',
       amount: t.amount,
       type: t.type
@@ -1647,7 +1447,7 @@ export class HomeComponent implements OnInit {
 
     const range = this.getPeriodRange();
     const all = Array.from(grouped.values()).filter((item) => {
-      return this.isDateInRange(item.date, range);
+      return dateInDashboardPeriod(item.date, range);
     });
     all.sort((a, b) => {
       const da = parseLocaleDate(a.date)?.getTime() || 0;
@@ -1656,7 +1456,7 @@ export class HomeComponent implements OnInit {
     });
     const slice = all.slice(0, 6).map((item) => ({
       ...item,
-      date: this.formatCompactLocaleDate(item.date)
+      date: formatCompactLocaleDate(item.date)
     }));
     this.recentTransactions = slice;
   }
@@ -1708,6 +1508,7 @@ export class HomeComponent implements OnInit {
   private persistOnboarding(): void {
     this.onboardingService.updateStatus({ step: this.onboardingStep, completed: this.onboardingDone }).subscribe({
       error: () => {
+        this.changeDetector.markForCheck();
         /* ignore */
       }
     });
@@ -1753,10 +1554,12 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
+        this.changeDetector.markForCheck();
           this.realBalanceSummary = summary;
           this.updateInsight();
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.realBalanceSummary = null;
           this.registerLoadError('saldo disponível');
           this.updateInsight();
@@ -1776,10 +1579,12 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
+        this.changeDetector.markForCheck();
           this.debtSummary = summary;
           this.totalDividaCartoes = summary?.cardDebt ?? this.totalDividaCartoes;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.debtSummary = null;
           this.registerLoadError('dívidas');
         }
@@ -1798,9 +1603,11 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
+        this.changeDetector.markForCheck();
           this.subscriptionsSummary = summary;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.subscriptionsSummary = null;
           this.registerLoadError('assinaturas');
         }
@@ -1819,11 +1626,13 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (health) => {
+        this.changeDetector.markForCheck();
           this.aiHealth = this.isAiHealthResponse(health)
             ? { ...health, areas: Array.isArray(health.areas) ? health.areas : [] }
             : null;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.aiHealth = null;
           this.registerLoadError('saúde financeira');
         }
@@ -1873,9 +1682,11 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
+        this.changeDetector.markForCheck();
           this.netWorthSummary = summary;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.netWorthSummary = null;
           this.registerLoadError('patrimônio');
         }
@@ -1904,9 +1715,11 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (history) => {
+        this.changeDetector.markForCheck();
           this.netWorthHistory = history;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.netWorthHistory = null;
           this.registerLoadError('evolução patrimonial');
         }
@@ -1925,10 +1738,12 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (projection) => {
+        this.changeDetector.markForCheck();
           this.cashflowProjection = projection;
           this.updateInsight();
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.cashflowProjection = null;
           this.registerLoadError('projeção de caixa');
           this.updateInsight();
@@ -1948,10 +1763,12 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (assessment) => {
+        this.changeDetector.markForCheck();
           this.riskAssessment = assessment;
           this.updateInsight();
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.riskAssessment = null;
           this.registerLoadError('análise de risco');
           this.updateInsight();
@@ -1972,11 +1789,13 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (insights) => {
+        this.changeDetector.markForCheck();
           this.insightEngine = insights;
           this.engineInsightTips = insights.primaryInsight?.tips || [];
           this.updateInsight();
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.insightEngine = null;
           this.engineInsightTips = [];
           this.registerLoadError('insights');
@@ -1997,10 +1816,12 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (recommendations) => {
+        this.changeDetector.markForCheck();
           this.recommendationEngine = recommendations;
           this.updateInsight();
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.recommendationEngine = null;
           this.registerLoadError('recomendações');
           this.updateInsight();
@@ -2020,9 +1841,11 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (budget) => {
+        this.changeDetector.markForCheck();
           this.budgetSummary = budget;
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.budgetSummary = null;
         }
       });
@@ -2040,9 +1863,11 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (positions) => {
+        this.changeDetector.markForCheck();
           this.investmentPositions = positions || [];
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.investmentPositions = [];
           this.registerLoadError('investimentos');
         }
@@ -2064,23 +1889,7 @@ export class HomeComponent implements OnInit {
     }, 0);
   }
 
-  private getPeriodRange(): { startKey: string; endKey: string } {
-    const ano = this.dataAtual.getFullYear();
-    if (this.periodo === 'year') {
-      return { startKey: `${ano}-01`, endKey: `${ano}-12` };
-    }
-    if (this.periodo === 'quarter') {
-      const quarter = Math.floor(this.dataAtual.getMonth() / 3);
-      const startMonth = quarter * 3 + 1;
-      const endMonth = startMonth + 2;
-      return {
-        startKey: `${ano}-${String(startMonth).padStart(2, '0')}`,
-        endKey: `${ano}-${String(endMonth).padStart(2, '0')}`
-      };
-    }
-    const mes = this.dataAtual.getMonth() + 1;
-    return { startKey: `${ano}-${String(mes).padStart(2, '0')}`, endKey: `${ano}-${String(mes).padStart(2, '0')}` };
-  }
+  private getPeriodRange(): { startKey: string; endKey: string } { return dashboardPeriodRange(this.dataAtual, this.periodo); }
 
   private toIsoDate(value: Date): string {
     const year = value.getFullYear();
@@ -2386,11 +2195,11 @@ export class HomeComponent implements OnInit {
     const range = this.getPeriodRange();
 
     const openExpenses = this.expensesRaw.filter((expense) => {
-      if (!this.isDateInRange(expense.vencimento, range)) return false;
+      if (!dateInDashboardPeriod(expense.vencimento, range)) return false;
       return isExpenseOpen(expense.status);
     });
     const openIncomes = this.incomesRaw.filter((income) => {
-      if (!this.isDateInRange(income.recebimento, range)) return false;
+      if (!dateInDashboardPeriod(income.recebimento, range)) return false;
       return isIncomePending(income.status);
     });
 
@@ -2462,90 +2271,22 @@ export class HomeComponent implements OnInit {
     projectedBalance: number,
     pendingIncomeAmount: number,
     dueSoonExpenseAmount: number
-  ): void {
-    if (
-      projectedBalance < 0 ||
-      hasCriticalOverdueExpenseContext(overdueExpensesCount, overdueExpensesAmount, this.saldoBaseDisponivel, this.saldoPrincipal)
-    ) {
-      this.insightPriority = 'Crítico';
-      return;
-    }
-    if (pendingIncomeAmount > 0 || dueSoonExpenseAmount > 0) {
-      this.insightPriority = 'Atenção';
-      return;
-    }
-    this.insightPriority = 'Estável';
-  }
+  ): void { this.insightPriority = resolveLocalInsightPriority(overdueExpensesCount, overdueExpensesAmount, projectedBalance, pendingIncomeAmount, dueSoonExpenseAmount, this.saldoBaseDisponivel, this.saldoPrincipal); }
 
   private updateInsightActionSentence(
     overdueExpensesCount: number,
     overdueExpensesAmount: number,
     projectedBalance: number,
     overdueIncomesCount: number
-  ): void {
-    if (overdueExpensesCount > 0) {
-      const overdueCritical = hasCriticalOverdueExpenseContext(
-        overdueExpensesCount,
-        overdueExpensesAmount,
-        this.saldoBaseDisponivel,
-        this.saldoPrincipal
-      );
-      this.insightActionSentence = overdueCritical
-        ? `Pague ${overdueExpensesCount} despesa(s) atrasada(s) hoje para evitar agravamento do caixa.`
-        : `Você tem saldo para quitar ${overdueExpensesCount} despesa(s) atrasada(s). Pague e dê baixa no sistema.`;
-      return;
-    }
-    if (projectedBalance < 0) {
-      this.insightActionSentence = `Seu fechamento projetado está negativo. Ajuste gastos ainda hoje para evitar déficit.`;
-      return;
-    }
-    if (overdueIncomesCount > 0) {
-      this.insightActionSentence = `Confirme as receitas em atraso para corrigir o caixa real do mês.`;
-      return;
-    }
-    this.insightActionSentence = `Mantenha o ritmo e acompanhe os próximos vencimentos para fechar o mês com folga.`;
-  }
+  ): void { this.insightActionSentence = resolveLocalInsightAction(overdueExpensesCount, overdueExpensesAmount, projectedBalance, overdueIncomesCount, this.saldoBaseDisponivel, this.saldoPrincipal); }
 
   private updateInsightShortGoal(
     projectedBalance: number,
     dueSoonExpenseAmount: number,
     overdueExpensesCount: number
-  ): void {
-    if (projectedBalance < 0) {
-      this.insightShortGoal = `Meta de curto prazo: recuperar ${formatCurrency(Math.abs(projectedBalance))} para fechar o mês em zero.`;
-      return;
-    }
-    if (overdueExpensesCount > 0) {
-      this.insightShortGoal = `Meta de curto prazo: zerar despesas atrasadas até o próximo fechamento.`;
-      return;
-    }
-    if (dueSoonExpenseAmount > 0) {
-      this.insightShortGoal = `Meta de curto prazo: reservar ${formatCurrency(dueSoonExpenseAmount)} para os próximos ${DASHBOARD_UPCOMING_DUE_DAYS} dias.`;
-      return;
-    }
-    this.insightShortGoal = `Meta de curto prazo: manter saúde financeira acima de 70/100 até o fim do mês.`;
-  }
+  ): void { this.insightShortGoal = resolveLocalInsightGoal(projectedBalance, dueSoonExpenseAmount, overdueExpensesCount, DASHBOARD_UPCOMING_DUE_DAYS); }
 
-  private updateInsightDeadline(today: Date, openExpenses: StoredExpense[]): void {
-    const nextDue = openExpenses
-      .map((expense) => parseLocaleDate(expense.vencimento))
-      .filter((date): date is Date => !!date && date >= today)
-      .sort((a, b) => a.getTime() - b.getTime())[0];
-
-    if (!nextDue) {
-      this.insightDeadlineLabel = 'Sem vencimentos em aberto no período.';
-      return;
-    }
-
-    const msPerDay = 1000 * 60 * 60 * 24;
-    const days = Math.round((nextDue.getTime() - today.getTime()) / msPerDay);
-    const labelDate = nextDue.toLocaleDateString('pt-BR');
-    if (days <= 0) {
-      this.insightDeadlineLabel = `Próximo vencimento: hoje (${labelDate}).`;
-      return;
-    }
-    this.insightDeadlineLabel = `Próximo vencimento em ${days} dia(s) (${labelDate}).`;
-  }
+  private updateInsightDeadline(today: Date, openExpenses: StoredExpense[]): void { this.insightDeadlineLabel = resolveLocalInsightDeadline(today, openExpenses); }
 
   private updateInsightComparison(): void {
     const year = this.dataAtual.getFullYear();
@@ -2556,8 +2297,8 @@ export class HomeComponent implements OnInit {
 
     const currentExpenses = this.sumByMonthKey(this.expensesRaw, currentKey);
     const prevExpenses = this.sumByMonthKey(this.expensesRaw, prevKey);
-    const currentReceived = this.somarRendasMes(this.incomesRaw, { startKey: currentKey, endKey: currentKey });
-    const prevReceived = this.somarRendasMes(this.incomesRaw, { startKey: prevKey, endKey: prevKey });
+    const currentReceived = sumDashboardIncomes(this.incomesRaw, { startKey: currentKey, endKey: currentKey });
+    const prevReceived = sumDashboardIncomes(this.incomesRaw, { startKey: prevKey, endKey: prevKey });
 
     this.insightComparison = [
       `Despesas: ${formatDelta(currentExpenses, prevExpenses)}`,

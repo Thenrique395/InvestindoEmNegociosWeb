@@ -1,3 +1,4 @@
+import { selectOption } from './support/select-option';
 import { expect, test, type Page } from '@playwright/test';
 
 function calculateCpfVerifier(base: string, startWeight: number): number {
@@ -115,7 +116,7 @@ async function completeLiveOnboarding(page: Page, workerIndex: number, retry: nu
   await page.getByRole('button', { name: 'Adicionar receita' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
   await page.getByLabel('Fonte').fill('Salario teste live');
-  await page.locator('select[name="categoria"]').first().selectOption({ index: 1 });
+  await selectOption(page.locator('select[name="categoria"]').first(), { index: 1 });
   await page.locator('input[name="valor"]').fill('500000');
   await page.locator('input[name="recebimento"]').fill('09032026');
   await page.getByRole('button', { name: 'Salvar receita' }).click();
@@ -124,7 +125,7 @@ async function completeLiveOnboarding(page: Page, workerIndex: number, retry: nu
   await page.getByRole('button', { name: 'Adicionar despesa' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
   await page.getByLabel('Nome da despesa').fill('Mercado teste live');
-  await page.locator('select[name="categoria"]').last().selectOption({ index: 1 });
+  await selectOption(page.locator('select[name="categoria"]').last(), { index: 1 });
   await page.locator('input[name="valor"]').last().fill('9000');
   await page.locator('input[name="vencimento"]').fill('09032026');
   await page.getByRole('button', { name: 'Salvar despesa' }).click();
@@ -155,12 +156,12 @@ test.describe('live auth flow', () => {
     await expect(page.getByRole('heading', { level: 2, name: 'Seus cartões e ciclos de fatura' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Adicionar cartão' }).first().click();
-    await page.getByLabel('Número do cartão').fill(`5555 4444 3333 ${last4}`);
+    await page.getByLabel('Últimos 4 dígitos').fill(last4);
     await page.getByLabel('Nome do cartão').fill(`Cartao Live ${last4}`);
     await page.getByLabel('Banco').fill('Banco Live');
     await page.getByLabel('Limite de crédito').fill('850000');
-    await page.getByLabel('Dia do fechamento').fill('12');
-    await page.getByLabel('Dia do vencimento').fill('20');
+    await page.getByLabel('Dia de fechamento da fatura').fill('12');
+    await page.getByLabel('Dia de vencimento da fatura').fill('20');
     await page.getByRole('button', { name: 'Salvar cartão' }).click();
 
     await expect(page.getByText(`Cartao Live ${last4}`)).toBeVisible({ timeout: 20000 });

@@ -6,9 +6,9 @@ Este arquivo não é o backlog central do projeto.
 
 Use:
 
-- [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md) para pendências ativas, gaps e próximos passos
-- [../../../docs/PRODUCT.md](../../../docs/PRODUCT.md) para oferta, planos e decisões comerciais
-- [../../../docs/BUSINESS_RULES.md](../../../docs/BUSINESS_RULES.md) para regras operacionais do sistema
+- [roadmap.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/roadmap.md>) para pendências ativas, gaps e próximos passos
+- [visao-e-oferta-do-produto.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/estrategia/visao-e-oferta-do-produto.md>) para oferta, planos e decisões comerciais
+- [regras-de-negocio.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto/regras/regras-de-negocio.md>) para regras operacionais do sistema
 
 ## Objetivo
 
@@ -52,7 +52,7 @@ corrente, não preparação para o futuro.
 > **Os dois ❌ em negrito são os mais graves**, porque o app é financeiro e o PRD já tem dados
 > reais: *sem backup*, uma perda de volume é definitiva; *sem headers*, sobra superfície para
 > clickjacking e MIME sniffing — e esses dois headers funcionam sobre HTTP, não dependem do
-> domínio. Registrados no `BACKLOG.md` da raiz.
+> domínio. Registrados em [backlog.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/backlog.md>).
 
 ### Qualidade mínima
 
@@ -115,4 +115,4 @@ Este arquivo não deve virar:
 - status funcional por tela
 - repositório de decisões já consolidadas
 
-Quando um item aqui virar pendência operacional concreta, ele deve ser acompanhado no [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md).
+Quando um item aqui virar pendência operacional concreta, ele deve ser acompanhado no [roadmap.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/roadmap.md>).
