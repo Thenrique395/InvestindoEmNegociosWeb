@@ -67,3 +67,9 @@ O comando `test:load` exige o binario `k6` instalado na maquina ou no runner.
 O workflow `Quality Tests` roda sob demanda pelo GitHub Actions.
 Ele aceita a suite `e2e` ou `performance` e permite informar `APP_BASE_URL`.
 Quando `APP_BASE_URL` fica vazio, o Playwright sobe o app Angular localmente.
+
+## Dependências e validação — 2026-11-18
+
+`npm run audit:all` audita este projeto separadamente da aplicação Angular e é bloqueante no workflow Quality Tests. Lighthouse CI 0.16.1 e Lighthouse 13.6.0 substituem as versões antigas e seus overrides; manter o lockfile versionado. Após a atualização, auditoria sem alertas, contrato com 13 enums e 197 E2E locais aprovados; 64 live opt-in ignorados.
+
+Para verificar Lighthouse localmente sem enviar relatórios: `APP_ENVIRONMENT=development npx lhci collect --config=performance/lighthouserc.json --numberOfRuns=1`, seguido de `npx lhci assert --config=performance/lighthouserc.json`. Isso não substitui o benchmark completo de produção. [Evidências e limites](../docs/ai-reports/validacao-2026-11-18.md).

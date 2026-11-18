@@ -1,0 +1,30 @@
+10.0.404
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Infrastructure/Data/Configurations/LoanPaymentConfiguration.cs(49,9): warning CS0618: "RelationalEntityTypeBuilderExtensions.HasCheckConstraint<TEntity>(EntityTypeBuilder<TEntity>, string, string?)" é obsoleto: "Configure this using ToTable(t => t.HasCheckConstraint()) instead." [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Infrastructure/Data/Configurations/LoanAmortizationConfiguration.cs(48,9): warning CS0618: "RelationalEntityTypeBuilderExtensions.HasCheckConstraint<TEntity>(EntityTypeBuilder<TEntity>, string, string?)" é obsoleto: "Configure this using ToTable(t => t.HasCheckConstraint()) instead." [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Application/Services/BillingSubscriptionSyncService.cs(66,38): warning CS8602: Desreferência de uma referência possivelmente nula. [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Application/Services/BillingSubscriptionSyncService.cs(102,127): warning CS8602: Desreferência de uma referência possivelmente nula. [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Application/Services/BillingSubscriptionSyncService.cs(116,147): warning CS8602: Desreferência de uma referência possivelmente nula. [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Application/Services/BillingSubscriptionSyncService.cs(124,17): warning CS8602: Desreferência de uma referência possivelmente nula. [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Application/Services/BillingSubscriptionSyncService.cs(140,17): warning CS8602: Desreferência de uma referência possivelmente nula. [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/Application/Services/BillingSubscriptionSyncService.cs(147,55): warning CS8602: Desreferência de uma referência possivelmente nula. [/Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/InvestindoEmNegocio.csproj]
+  InvestindoEmNegocio -> /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/bin/Release/net10.0/InvestindoEmNegocio.dll
+  InvestindoEmNegocio.Tests -> /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio.Tests/bin/Release/net10.0/InvestindoEmNegocio.Tests.dll
+Execução de teste para /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio.Tests/bin/Release/net10.0/InvestindoEmNegocio.Tests.dll (.NETCoreApp,Version=v10.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+
+Aprovado!  – Com falha:     0, Aprovado:    55, Ignorado:     0, Total:    55, Duração: 1 s - InvestindoEmNegocio.Tests.dll (net10.0)
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  InvestindoEmNegocio -> /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio/bin/Release/net10.0/InvestindoEmNegocio.dll
+  InvestindoEmNegocio.Tests -> /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio.Tests/bin/Release/net10.0/InvestindoEmNegocio.Tests.dll
+Execução de teste para /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosApi/InvestindoEmNegocio.Tests/bin/Release/net10.0/InvestindoEmNegocio.Tests.dll (.NETCoreApp,Version=v10.0)
+1 arquivos de teste no total corresponderam ao padrão especificado.
+[xUnit.net 00:00:01.05]     InvestindoEmNegocio.Tests.DbMigrationExtensionsTests.Postgres_Bootstrap_Should_Be_Idempotent_And_Preserve_Legacy_Rows [SKIP]
+  Ignorado InvestindoEmNegocio.Tests.DbMigrationExtensionsTests.Postgres_Bootstrap_Should_Be_Idempotent_And_Preserve_Legacy_Rows [1 ms]
+
+Aprovado!  – Com falha:     0, Aprovado:   683, Ignorado:     1, Total:   684, Duração: 9 s - InvestindoEmNegocio.Tests.dll (net10.0)
+NuGet: nenhuma vulnerabilidade reportada nas dependências da API.

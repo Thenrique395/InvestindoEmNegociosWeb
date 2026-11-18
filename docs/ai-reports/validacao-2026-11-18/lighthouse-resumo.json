@@ -1,0 +1,14 @@
+{
+  "lighthouseVersion": "13.6.0",
+  "requestedUrl": "http://127.0.0.1:4000/",
+  "categories": {
+    "performance": 0.96,
+    "accessibility": 1,
+    "best-practices": 1,
+    "seo": 1,
+    "agentic-browsing": 0.5
+  },
+  "runs": 1,
+  "environment": "SSR local development",
+  "uploaded": false
+}
