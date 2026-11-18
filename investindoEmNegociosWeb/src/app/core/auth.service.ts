@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, finalize, map, of, shareReplay, throwError } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import { parseRole, UserRole } from './roles';
+import { FinancialAssistantService } from './financial-assistant.service';
 
 export interface AuthSessionResponse {
   userId: string;
@@ -44,7 +45,7 @@ export class AuthService {
   private readonly baseUrl = `${API_BASE_URL}/auth`;
   private refreshInFlight$?: Observable<AuthSessionResponse>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private readonly assistant: FinancialAssistantService) {}
 
   // O JWT em si fica só no cookie httpOnly (access_token/refresh_token), nunca acessível
   // ao JS — o backend define os cookies na resposta. Aqui só guardamos os metadados
@@ -138,6 +139,7 @@ export class AuthService {
   }
 
   private persistSession(res: AuthSessionResponse): AuthSessionResponse {
+    if (res.email !== this.getUserEmail()) this.assistant.clearConversation();
     if (res.role) this.setStorageItem('user_role', res.role);
     if (res.expiresAt) this.setStorageItem('access_expires_at', res.expiresAt);
     if (res.name) this.setStorageItem('user_name', res.name);
@@ -165,6 +167,7 @@ export class AuthService {
   // — o JS não consegue apagá-los diretamente. Mesmo se a chamada falhar (rede, etc.),
   // os metadados locais são removidos de qualquer forma.
   clearSession(): void {
+    this.assistant.clearConversation();
     this.removeStorageItem('user_role');
     this.removeStorageItem('user_name');
     this.removeStorageItem('user_email');

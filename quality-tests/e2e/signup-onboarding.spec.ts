@@ -22,10 +22,10 @@ test.describe('signup onboarding', () => {
     await page.getByLabel('Nome completo').fill(signupName);
     await page.getByLabel('E-mail').fill(signupEmail);
     await page.getByPlaceholder('000.000.000-00').fill('529.982.247-25');
-    await page.getByPlaceholder('Digite sua senha').fill(signupPassword);
-    await page.getByPlaceholder('Confirme sua senha').fill(signupPassword);
+    await page.getByPlaceholder('Crie uma senha').fill(signupPassword);
+    await page.getByPlaceholder('Repita a senha').fill(signupPassword);
     await page.getByLabel('Li e aceito os termos de uso e a política de privacidade.').check();
-    await page.getByRole('button', { name: 'Criar conta agora' }).click();
+    await page.getByRole('button', { name: 'Criar conta', exact: true }).click();
 
     await expect(page).toHaveURL(/\/login$/, { timeout: 10000 });
     await loginIntoOnboarding(page, signupEmail, signupPassword);

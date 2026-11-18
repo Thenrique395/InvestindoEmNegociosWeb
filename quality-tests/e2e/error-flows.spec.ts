@@ -1,3 +1,5 @@
+import { openAccountImport } from './support/account-import';
+import { selectOption } from './support/select-option';
 import { expect, test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 
@@ -15,8 +17,9 @@ test.describe('authenticated error flows', () => {
     });
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
-    await page.getByLabel('Conta origem').selectOption({ label: 'Conta principal' });
-    await page.getByLabel('Conta destino').selectOption({ label: 'Reserva' });
+    await page.getByRole('button', { name: 'Nova transferência', exact: true }).click();
+    await selectOption(page.getByLabel('Conta de origem'), { label: 'Conta principal' });
+    await selectOption(page.getByLabel('Conta de destino'), { label: 'Reserva' });
     await page.getByLabel('Valor', { exact: true }).fill('99999');
     await page.getByRole('button', { name: 'Transferir agora' }).click();
 
@@ -37,6 +40,7 @@ test.describe('authenticated error flows', () => {
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Extrato' }).first().click();
+    await openAccountImport(page);
     await page.locator('input[type="file"]').first().setInputFiles({
       name: 'broken.ofx',
       mimeType: 'application/x-ofx',
@@ -60,6 +64,7 @@ test.describe('authenticated error flows', () => {
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Extrato' }).first().click();
+    await openAccountImport(page);
     await page.locator('input[type="file"]').nth(1).setInputFiles({
       name: 'sample.csv',
       mimeType: 'text/csv',
@@ -83,6 +88,7 @@ test.describe('authenticated error flows', () => {
     });
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: 'Nova conta', exact: true }).click();
     await page.getByLabel('Nome da conta').fill('Conta com erro');
     await page.getByRole('button', { name: 'Salvar' }).click();
 
@@ -103,7 +109,7 @@ test.describe('authenticated error flows', () => {
 
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
     const contaPrincipal = page.locator('article').filter({ hasText: 'Conta principal' });
-    await contaPrincipal.getByRole('button', { name: 'Editar' }).click();
+    await contaPrincipal.getByRole('button', { name: /^Editar conta /i }).click();
     await page.getByLabel('Nome da conta').fill('Conta principal alterada');
     await page.getByRole('button', { name: 'Salvar' }).click();
 

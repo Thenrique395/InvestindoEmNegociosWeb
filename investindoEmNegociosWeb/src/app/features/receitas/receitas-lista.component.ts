@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { StoredIncome } from '../../core/data/api-data.service';
 import { resolveInstallmentStatus, incomeStatusLabel, installmentStatusIcon, installmentStatusTone } from '../../core/utils/status';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
@@ -7,6 +7,7 @@ import { ResponsiveListCellDirective } from '../../shared/responsive-list/respon
 import { AppCurrencyPipe } from '../../shared/app-currency.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-receitas-lista',
   standalone: true,
   imports: [StatusBadgeComponent, ResponsiveListComponent, ResponsiveListCellDirective, AppCurrencyPipe],

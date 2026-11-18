@@ -47,7 +47,8 @@ test.describe('tooltips de indicador — legibilidade', () => {
         const gatilho = gatilhos.nth(i);
         await gatilho.click();
 
-        const painel = gatilho.locator('.tooltip__panel');
+        await expect(gatilho).toHaveAttribute('aria-describedby', /.+/);
+        const painel = page.locator('#' + await gatilho.getAttribute('aria-describedby'));
         await expect(painel).toBeVisible();
 
         const caixa = await painel.boundingBox();
@@ -66,8 +67,9 @@ test.describe('tooltips de indicador — legibilidade', () => {
           `${nome}: tooltip ${i} sai pela direita`,
         ).toBeLessThanOrEqual(1440);
 
-        // Fecha antes do próximo, senão dois painéis abertos se sobrepõem.
-        await gatilho.click();
+        // O contrato atual abre no clique e fecha por Escape ou clique fora.
+        await gatilho.press('Escape');
+        await expect(painel).toBeHidden();
       }
     });
   }
@@ -84,6 +86,6 @@ test.describe('tooltips de indicador — legibilidade', () => {
 
     // A distinção que o rótulo esconde: saldo devedor soma todos os contratos, a parcela
     // mensal só os ativos. É por isso que os dois números não se correspondem.
-    await expect(gatilho.locator('.tooltip__panel')).toContainText('status Ativo');
+    await expect(page.locator('.tooltip__panel:visible')).toContainText('status Ativo');
   });
 });

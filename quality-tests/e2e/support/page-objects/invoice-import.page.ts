@@ -1,3 +1,4 @@
+import { selectOption } from '../select-option';
 import { expect, type Page } from '@playwright/test';
 
 export class InvoiceImportPage {
@@ -32,7 +33,7 @@ export class InvoiceImportPage {
     if (!optionValue) {
       throw new Error(`Cartão ${cardId} não encontrado no seletor de importação.`);
     }
-    await select.selectOption(optionValue);
+    await selectOption(select, optionValue);
   }
 
   async expectCardOption(cardId: string) {
@@ -45,7 +46,7 @@ export class InvoiceImportPage {
   }
 
   async selectDefaultCategory(categoryLabel: string) {
-    await this.modal().getByLabel('Categoria padrão').selectOption({ label: categoryLabel });
+    await selectOption(this.modal().getByLabel('Categoria padrão'), { label: categoryLabel });
   }
 
   async expectSaveEnabled() {

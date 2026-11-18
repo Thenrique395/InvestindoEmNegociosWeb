@@ -1,3 +1,4 @@
+import { inComponentContext } from '../../../testing/component-context';
 import { of, throwError } from 'rxjs';
 import { AdminParametersComponent } from './admin-parameters.component';
 import { resolveApiErrorMessage } from '../../core/utils/api-error.mapper';
@@ -48,7 +49,7 @@ describe('AdminParametersComponent', () => {
     };
 
     return {
-      component: new AdminParametersComponent(adminParameters, uiFeedback, { onDestroy: () => {} } as any),
+      component: inComponentContext(() => new AdminParametersComponent(adminParameters, uiFeedback, { onDestroy: () => {} } as any)),
       adminParameters,
       uiFeedback
     };

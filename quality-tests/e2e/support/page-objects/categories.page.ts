@@ -1,3 +1,4 @@
+import { selectOption } from '../select-option';
 import { expect, type Page } from '@playwright/test';
 
 export class CategoriesPage {
@@ -22,7 +23,7 @@ export class CategoriesPage {
   async createCategory(name: string, type: 'Income' | 'Expense') {
     await this.openCreateModal();
     await this.page.getByPlaceholder('Ex.: Moradia').fill(name);
-    await this.modalSelects().nth(0).selectOption(type);
+    await selectOption(this.modalSelects().nth(0), type);
     const createResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'POST' && response.url().includes('/categories')
     );
@@ -54,8 +55,8 @@ export class CategoriesPage {
   async createDefaultCategory(name: string, type: 'Income' | 'Expense') {
     await this.openCreateModal();
     await this.page.getByPlaceholder('Ex.: Moradia').fill(name);
-    await this.modalSelects().nth(0).selectOption(type); // Tipo
-    await this.modalSelects().nth(1).selectOption('default'); // Escopo
+    await selectOption(this.modalSelects().nth(0), type); // Tipo
+    await selectOption(this.modalSelects().nth(1), 'default'); // Escopo
     const createResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'POST' && response.url().includes('/admin/categories')
     );

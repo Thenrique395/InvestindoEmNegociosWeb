@@ -1,3 +1,4 @@
+import { inComponentContext } from '../../../testing/component-context';
 import { of, throwError } from 'rxjs';
 import { HomeComponent } from './home.component';
 import { buildUpcomingView } from './upcoming-card/upcoming-card.model';
@@ -6,7 +7,7 @@ import { DebtSummaryResponse, SubscriptionsSummaryResponse } from '../../core/ac
 import { InvestmentPosition } from '../../core/investments.service';
 
 function createComponent(): HomeComponent {
-  return new HomeComponent(
+  return inComponentContext(() => new HomeComponent(
     { expenses$: of([]), incomes$: of([]), cards$: of([]) } as any,
     { list: () => of([]) } as any,
     { debtTotal: () => of({ total: 0 }) } as any,
@@ -20,7 +21,7 @@ function createComponent(): HomeComponent {
     { listPositions: () => of([]) } as any,
     { navigateByUrl: jasmine.createSpy() } as any,
     { onDestroy: () => {} } as any
-  );
+  ));
 }
 
 function localeDateFromToday(offsetDays: number): string {
@@ -413,7 +414,7 @@ function createComponentForSubscriptionTests() {
   const authService = new AuthServiceMock();
   const budgetService = new BudgetServiceMock();
   const investmentsService = new InvestmentsServiceMock();
-  const component = new HomeComponent(
+  const component = inComponentContext(() => new HomeComponent(
     { expenses$: of([]), incomes$: of([]), cards$: of([]) } as any,
     { list: () => of([]) } as any,
     { debtTotal: () => of({ total: 0 }) } as any,
@@ -427,7 +428,7 @@ function createComponentForSubscriptionTests() {
     investmentsService as any,
     { navigateByUrl: jasmine.createSpy() } as any,
     { onDestroy: () => {} } as any
-  );
+  ));
   return { component, accountsService, authService, budgetService, investmentsService };
 }
 
@@ -575,7 +576,7 @@ function createComponentForAiHealthTests() {
   const financialAssistantService = new FinancialAssistantServiceMock();
   const budgetService = new BudgetServiceMock();
   const investmentsService = new InvestmentsServiceMock();
-  const component = new HomeComponent(
+  const component = inComponentContext(() => new HomeComponent(
     { expenses$: of([]), incomes$: of([]), cards$: of([]) } as any,
     { list: () => of([]) } as any,
     { debtTotal: () => of({ total: 0 }) } as any,
@@ -589,7 +590,7 @@ function createComponentForAiHealthTests() {
     investmentsService as any,
     { navigateByUrl: jasmine.createSpy() } as any,
     { onDestroy: () => {} } as any
-  );
+  ));
   return { component, authService, financialAssistantService };
 }
 

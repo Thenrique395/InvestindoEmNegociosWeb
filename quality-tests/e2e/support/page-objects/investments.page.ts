@@ -1,3 +1,4 @@
+import { selectOption } from '../select-option';
 import { expect, type Page } from '@playwright/test';
 
 export class InvestmentsPage {
@@ -25,7 +26,7 @@ export class InvestmentsPage {
   async createPosition(assetName: string) {
     await this.page.getByRole('button', { name: 'Novo lançamento' }).click();
     await expect(this.page.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
-    await this.page.locator('select[name="type"]').selectOption({ index: 1 });
+    await selectOption(this.page.locator('select[name="type"]'), { index: 1 });
     await this.page.locator('input[name="asset"]').fill(assetName);
     await this.page.locator('input[name="quantity"]').fill('2');
     await this.page.locator('input[name="avgPrice"]').fill('100');

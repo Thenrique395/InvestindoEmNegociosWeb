@@ -44,9 +44,8 @@ export class CenariosComponent {
 
   readonly periodOptions: SegmentOption[] = [
     { value: 'month', label: 'Este mês' },
-    { value: 'quarter', label: '3 meses' },
-    { value: 'semester', label: '6 meses' },
-    { value: 'year', label: '12 meses' }
+    { value: 'quarter', label: 'Este trimestre' },
+    { value: 'year', label: 'Este ano' }
   ];
 
   params = {
@@ -64,9 +63,12 @@ export class CenariosComponent {
 
   setPeriod(value: string): void {
     this.params.period = value;
+    this.result.set(null);
   }
 
   simulate(): void {
+    if (this.loading()) return;
+    this.result.set(null);
     this.loading.set(true);
     this.error.set('');
     this.cenariosService.simulate({ ...this.params, referenceDate: null })

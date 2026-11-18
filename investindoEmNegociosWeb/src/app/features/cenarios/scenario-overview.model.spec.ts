@@ -52,9 +52,8 @@ describe('scenario-overview.model', () => {
 
   it('traduz o rótulo do período', () => {
     expect(scenarioPeriodLabel('month')).toBe('Este mês');
-    expect(scenarioPeriodLabel('quarter')).toBe('Próximos 3 meses');
-    expect(scenarioPeriodLabel('semester')).toBe('Próximos 6 meses');
-    expect(scenarioPeriodLabel('year')).toBe('Próximos 12 meses');
+    expect(scenarioPeriodLabel('quarter')).toBe('Até o fim deste trimestre');
+    expect(scenarioPeriodLabel('year')).toBe('Até o fim deste ano');
     expect(scenarioPeriodLabel('desconhecido')).toBe('Este mês');
   });
 });

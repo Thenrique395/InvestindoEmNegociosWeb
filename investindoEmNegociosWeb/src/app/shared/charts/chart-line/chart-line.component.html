@@ -3,7 +3,7 @@
     class="line"
     [attr.viewBox]="viewBox()"
     role="img"
-    [attr.aria-label]="'Gráfico de linha: ' + visibleSeriesLabels()">
+    [attr.aria-label]="ariaLabel() || ('Gráfico de linha: ' + visibleSeriesLabels())">
     <defs>
       @for (s of series(); track s.label; let i = $index) {
         @if (!s.dashed) {

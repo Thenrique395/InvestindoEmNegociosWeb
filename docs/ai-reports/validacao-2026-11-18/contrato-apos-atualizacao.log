@@ -1,0 +1,5 @@
+
+> investindo-em-negocios-quality-tests@0.0.0 test:contract
+> node scripts/contract-enums.mjs
+
+✅ Contrato FE↔Back ok — 13 enums alinhados.

@@ -1,0 +1,15 @@
+
+> investindo-em-negocios-quality-tests@0.0.0 test:e2e
+> env -u FORCE_COLOR -u NO_COLOR playwright test e2e/financial-models-responsive.spec.ts
+
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/financial-models-responsive.spec.ts:7:5 › dashboard mantém leitura e renderização em 390px (969ms)
+  ✓  2 [chromium] › e2e/financial-models-responsive.spec.ts:7:5 › despesas mantém leitura e renderização em 390px (588ms)
+  ✓  3 [chromium] › e2e/financial-models-responsive.spec.ts:7:5 › dashboard mantém leitura e renderização em 1024px (585ms)
+  ✓  4 [chromium] › e2e/financial-models-responsive.spec.ts:7:5 › despesas mantém leitura e renderização em 1024px (465ms)
+  ✓  5 [chromium] › e2e/financial-models-responsive.spec.ts:7:5 › dashboard mantém leitura e renderização em 1440px (579ms)
+  ✓  6 [chromium] › e2e/financial-models-responsive.spec.ts:7:5 › despesas mantém leitura e renderização em 1440px (495ms)
+
+  6 passed (14.6s)

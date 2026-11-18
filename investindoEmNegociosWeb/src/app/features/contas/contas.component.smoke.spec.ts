@@ -1,3 +1,4 @@
+import { inComponentContext } from '../../../testing/component-context';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -81,12 +82,12 @@ describe('ContasComponent smoke', () => {
     store = new AccountsStoreMock();
     categoriesService = new CategoriesServiceMock();
     component = TestBed.runInInjectionContext(() =>
-      new ContasComponent(
+      inComponentContext(() => new ContasComponent(
         store as unknown as AccountsStore,
         categoriesService as unknown as CategoriesService,
         new UiPermissionsServiceMock() as unknown as UiPermissionsService,
         { onDestroy: () => {} } as any
-      )
+      ))
     );
   });
 

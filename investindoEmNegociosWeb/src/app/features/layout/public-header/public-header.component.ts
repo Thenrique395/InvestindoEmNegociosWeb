@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, input, output, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 export type PublicSectionRequest = {
@@ -13,6 +13,7 @@ type PublicNavItem = {
 };
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-public-header',
   standalone: true,
   imports: [RouterLink],

@@ -1,3 +1,4 @@
+import { inComponentContext } from '../../../testing/component-context';
 import { of, throwError } from 'rxjs';
 import { UserDataComponent } from './user-data.component';
 
@@ -37,7 +38,7 @@ describe('UserDataComponent', () => {
     };
 
     return {
-      component: new UserDataComponent(portabilityService as any, profileService, authService, router, uiFeedback, { onDestroy: () => {} } as any),
+      component: inComponentContext(() => new UserDataComponent(portabilityService as any, profileService, authService, router, uiFeedback, { onDestroy: () => {} } as any)),
       profileService,
       authService,
       router,

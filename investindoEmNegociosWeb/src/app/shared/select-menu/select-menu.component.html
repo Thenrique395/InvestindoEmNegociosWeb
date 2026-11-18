@@ -64,8 +64,9 @@
           [class.select-menu__option--active]="i === activeIndex()"
           [class.select-menu__option--disabled]="option.disabled"
           [attr.aria-selected]="option.value === value()"
+          [attr.data-value]="option.value"
           [attr.aria-disabled]="option.disabled"
-          (click)="select(option)">
+          (click)="$event.preventDefault(); $event.stopPropagation(); select(option)">
           @if (option.badge; as badge) {
             <span class="select-menu__badge">{{ badge }}</span>
           } @else {

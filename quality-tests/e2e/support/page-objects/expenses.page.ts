@@ -1,3 +1,4 @@
+import { selectOption, expectOption } from '../select-option';
 import { expect, type Locator, type Page } from '@playwright/test';
 
 export class ExpensesPage {
@@ -13,11 +14,11 @@ export class ExpensesPage {
 
   async openCreateModal() {
     await this.page.getByRole('button', { name: 'Adicionar despesa' }).first().click();
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Adicionar lançamento' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 2, name: 'Registrar uma saída' })).toBeVisible();
   }
 
   createForm(): Locator {
-    return this.page.locator('form').filter({ has: this.page.getByLabel('Nome da despesa') }).first();
+    return this.page.locator('form').filter({ has: this.page.getByLabel('Descrição', { exact: true }) }).first();
   }
 
   editForm(): Locator {
@@ -30,15 +31,15 @@ export class ExpensesPage {
   }
 
   async expectCategoryOptionVisible(name: string) {
-    await expect(this.createForm().getByLabel('Categoria')).toContainText(name);
+    await expectOption(this.createForm().getByRole('combobox', { name: 'Categoria da despesa', exact: true }), name);
   }
 
   async createExpense(name: string, categoryName: string, amount: string, dueDateDDMMYYYY = '09032026') {
     const form = this.createForm();
-    await form.getByLabel('Nome da despesa').fill(name);
-    await form.getByLabel('Categoria').selectOption({ label: categoryName });
-    await form.getByLabel('Valor (R$)').fill(amount);
-    await form.getByLabel('Primeiro vencimento').fill(dueDateDDMMYYYY);
+    await form.getByLabel('Descrição', { exact: true }).fill(name);
+    await selectOption(form.getByRole('combobox', { name: 'Categoria da despesa', exact: true }), { label: categoryName });
+    await form.getByLabel('Valor', { exact: true }).fill(amount);
+    await form.getByRole('textbox', { name: 'Vencimento', exact: true }).fill(dueDateDDMMYYYY);
     const response = this.page.waitForResponse((res) => res.request().method() === 'POST' && res.url().includes('/plans'));
     await form.getByRole('button', { name: 'Salvar despesa' }).click();
     await expect.poll(async () => (await response).ok()).toBeTruthy();
@@ -72,8 +73,8 @@ export class ExpensesPage {
 
   async saveExpenseEdit(name: string, amount: string) {
     const form = this.editForm();
-    await form.getByLabel('Nome da despesa').fill(name);
-    await form.getByLabel('Valor (R$)').fill(amount);
+    await form.getByLabel('Descrição', { exact: true }).fill(name);
+    await form.getByLabel('Valor', { exact: true }).fill(amount);
     const response = this.page.waitForResponse((res) => res.request().method() === 'PUT' && res.url().includes('/plans/'));
     await form.getByRole('button', { name: 'Salvar alterações' }).click();
     await expect.poll(async () => (await response).ok()).toBeTruthy();
@@ -113,7 +114,7 @@ export class ExpensesPage {
   }
 
   async selectDefaultInvoiceCategory(name: string) {
-    await this.page.getByLabel('Categoria padrão').selectOption({ label: name });
+    await selectOption(this.page.getByLabel('Categoria padrão'), { label: name });
   }
 
   async expectInvoiceImportDisabled() {

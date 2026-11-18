@@ -128,7 +128,9 @@ Frontend:
 - E2E padrão: `npm run test:e2e`
 - fidelidade ao design: `npm run handoff:check` (bloqueia regressão) e `npm run handoff:report`
   (lista o que está aberto). Enquanto o rebrand estiver em andamento, nenhuma tela é dada
-  como concluída sem passar nele — ver seção 5.1 e Fase 8 do `../../PLANO_REDESIGN.md`
+  como concluída sem passar nele — ver seção 5.1 e Fase 8 do `../../PLANO_REDESIGN.md`.
+  Em 2026-09-12, `npm run handoff:briefing` mostra R1, R2, R3, R4, R5, R6, R7, R9, R10 e R11
+  zeradas; a dívida aberta é R8, com 21 componentes sem `OnPush`.
 
 Backend relacionado:
 
@@ -140,18 +142,19 @@ Backend relacionado:
 - a base da API ainda tem fallback para endpoint remoto em `src/app/core/api.config.ts`; tratar mudanças de ambiente com cuidado
 - o frontend espelha parte do gating por role/feature para UX, mas a fonte final continua sendo o backend
 - mudanças em rotas protegidas precisam permanecer coerentes com a matriz de autorização da API
-- neste momento, rotas como `assistente` e `snapshots` merecem revisão para alinhar o frontend ao backend atual; `emprestimos` já cobre pagamento de parcela por contrato com cronograma expansível
+- neste momento, a principal dívida mensurável do rebrand é `OnPush`/signals nos 21 componentes
+  apontados pelo gate; `emprestimos` já cobre pagamento de parcela por contrato com cronograma expansível
 
 ## Relação com a documentação central
 
-- o mapa principal da documentação compartilhada desta pasta de trabalho está em [../../../docs/README.md](../../../docs/README.md)
-- estratégia de produto, planos, billing comercial e regras centrais vivem no `docs/` da raiz
+- o mapa principal da documentação compartilhada desta pasta de trabalho está em [Documentacao/README.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/README.md>)
+- estratégia de produto, planos, billing comercial e regras centrais vivem no Obsidian em [01-produto/](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/01-produto>)
 - este diretório deve concentrar documentação especializada do frontend web
-- quando um conteúdo daqui virar direção central de produto, ele deve ser consolidado no `docs/` da raiz e aqui ficar apenas como apoio especializado
+- quando um conteúdo daqui virar direção central de produto, ele deve ser consolidado no Obsidian e aqui ficar apenas como apoio especializado
 
 Leitura prática:
 
-- use o `docs/README.md` da raiz para decidir qual documento é fonte principal
+- use o mapa do Obsidian para decidir qual documento humano é fonte principal
 - use este diretório quando a dúvida for específica de status funcional, testes, design system ou operação da aplicação web
 
 ## Quando consultar este diretório
@@ -165,7 +168,7 @@ Leitura prática:
 ## Fonte de verdade
 
 - Execução operacional do frontend: [Agent.md](./Agent.md)
-- Status do produto e backlog central: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
+- Status do produto e backlog central: [roadmap.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/roadmap.md>)
 - Design system e padrões visuais: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
 - Auditoria de divergências e próximos ajustes do frontend: [AUDITORIA_FRONTEND_PADROES_2026-08-05.md](./AUDITORIA_FRONTEND_PADROES_2026-08-05.md)
 - Checklist de validação visual com Playwright: [CHECKLIST_VALIDACAO_VISUAL_PLAYWRIGHT.md](./CHECKLIST_VALIDACAO_VISUAL_PLAYWRIGHT.md)
@@ -174,7 +177,7 @@ Leitura prática:
 
 ## Planejamento e produto
 
-- Backlog futuro priorizado: [../../../docs/ROADMAP.md](../../../docs/ROADMAP.md)
+- Backlog futuro priorizado: [roadmap.md](</Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao/08-backlog/roadmap.md>)
 - Custos e plano de go-live: [PRD_CUSTOS_E_PROXIMOS_PASSOS.md](./PRD_CUSTOS_E_PROXIMOS_PASSOS.md)
 
 ## Documentação externa relacionada
@@ -186,12 +189,12 @@ Leitura prática:
 - copy comercial oficial e estratégia de planos
 - regras centrais de produto já consolidadas no `docs/` da raiz
 - contrato técnico do backend
-- decisões formais que deveriam estar em `docs/DECISIONS/`
+- decisões formais que deveriam estar em `Documentacao/03-decisoes/`
 
 ## Regra de manutenção
 
 - Não duplicar contratos ou padrões do backend neste diretório.
-- Quando um item sair do backlog e virar entrega, atualizar primeiro o `docs/ROADMAP.md` da raiz.
+- Quando um item sair do backlog e virar entrega, atualizar primeiro o roadmap no Obsidian.
 
 ## Quando atualizar este README
 

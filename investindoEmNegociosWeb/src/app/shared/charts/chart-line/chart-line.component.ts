@@ -56,6 +56,7 @@ export type ChartValueFormatter = (value: number) => string;
 })
 export class ChartLineComponent {
   readonly series = input.required<readonly LineSeries[]>();
+  readonly ariaLabel = input<string | null>(null);
   readonly labels = input<readonly string[]>([]);
   /** Altura do `viewBox`. Com a largura fixa de 820, é o que define a proporção. */
   readonly height = input(190);

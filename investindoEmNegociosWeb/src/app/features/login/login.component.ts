@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
@@ -12,12 +12,15 @@ import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../../core/seo-defaults
 import { AuthLayoutComponent } from '../layout/auth-layout/auth-layout.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login',
   standalone: true,
   imports: [FormsModule, RouterModule, AuthLayoutComponent],
   templateUrl: './login.component.html',
 })
 export class LoginComponent implements OnInit, OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   email = '';
   password = '';
   loading = false;
@@ -58,9 +61,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     const confirmToken = this.route.snapshot.queryParamMap.get('confirmToken');
     if (confirmToken) {
       this.auth.confirmEmail(confirmToken).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => this.uiFeedback.success('E-mail validado com sucesso! Faça login para entrar.'),
+        next: () => { this.changeDetector.markForCheck(); return this.uiFeedback.success('E-mail validado com sucesso! Faça login para entrar.'); },
         error: () =>
-          this.uiFeedback.error('Link de confirmação inválido ou expirado. Faça login para reenviar o e-mail.')
+          { this.changeDetector.markForCheck(); return this.uiFeedback.error('Link de confirmação inválido ou expirado. Faça login para reenviar o e-mail.'); }
       });
       this.router.navigate([], {
         relativeTo: this.route,
@@ -85,10 +88,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.resending = true;
     this.auth.resendConfirmation(this.email).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.resending = false;
         this.uiFeedback.success('Se a conta estiver pendente, reenviamos o e-mail de confirmação.');
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.resending = false;
         this.uiFeedback.success('Se a conta estiver pendente, reenviamos o e-mail de confirmação.');
       }
@@ -126,9 +131,11 @@ export class LoginComponent implements OnInit, OnDestroy {
      */
     this.auth.login(this.email, this.password).subscribe({
       next: (res: AuthSessionResponse) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.success(`Bem-vindo, ${res.name}.`);
         this.profile.getProfile().subscribe({
           next: (profile) => {
+        this.changeDetector.markForCheck();
             this.loading = false;
             const returnTo = this.route.snapshot.queryParamMap.get('returnTo');
             const plan = this.route.snapshot.queryParamMap.get('plan');
@@ -157,12 +164,14 @@ export class LoginComponent implements OnInit, OnDestroy {
             }
           },
           error: () => {
+        this.changeDetector.markForCheck();
             this.loading = false;
             this.router.navigateByUrl('/onboarding');
           }
         });
       },
       error: (err: unknown) => {
+        this.changeDetector.markForCheck();
         if (err instanceof HttpErrorResponse) {
           if (err.status === 423) {
             this.uiFeedback.error('Conta bloqueada temporariamente. Tente novamente em alguns minutos.');

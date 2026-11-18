@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isCreditPaymentMethod, PaymentMethodLookup } from '../../../core/lookups.service';
 import { SelectMenuComponent, SelectMenuOption } from '../../../shared/select-menu/select-menu.component';
@@ -16,6 +16,7 @@ import { ToggleFieldComponent } from '../../../shared/toggle-field/toggle-field.
 import { DatePickerComponent } from '../../../shared/date-picker/date-picker.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-despesas-form',
   standalone: true,
   imports: [FormsModule, DigitOnlyDirective, RouterLink, ModalComponent, FormFieldComponent, ToggleFieldComponent, DatePickerComponent, SelectMenuComponent, NumberStepperComponent],

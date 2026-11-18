@@ -1,6 +1,8 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
+  { path: 'termos', renderMode: RenderMode.Server },
+  { path: 'privacidade', renderMode: RenderMode.Server },
   { path: 'calculadora/:id', renderMode: RenderMode.Server },
   { path: 'emprestimos/:id', renderMode: RenderMode.Server },
   { path: 'despesas', renderMode: RenderMode.Prerender },

@@ -1,3 +1,4 @@
+import { selectOption } from './support/select-option';
 import { test } from '@playwright/test';
 import { setupAuthenticatedApp } from './support/authenticated-app';
 import { CategoriesPage } from './support/page-objects/categories.page';
@@ -21,8 +22,8 @@ test.describe('authenticated admin categories', () => {
     await categoriesPage.goto();
     await categoriesPage.openCreateModal();
     await page.getByPlaceholder('Ex.: Moradia').fill('Mercado');
-    await page.getByRole('dialog').locator('select').nth(0).selectOption('Expense'); // Tipo
-    await page.getByRole('dialog').locator('select').nth(1).selectOption('default'); // Escopo
+    await selectOption(page.getByRole('dialog').locator('select').nth(0), 'Expense'); // Tipo
+    await selectOption(page.getByRole('dialog').locator('select').nth(1), 'default'); // Escopo
     await page.getByRole('button', { name: 'Criar categoria' }).click();
     await categoriesPage.expectDuplicateDefaultWarning();
   });

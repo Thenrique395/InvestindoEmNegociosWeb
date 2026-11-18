@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, signal, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +41,7 @@ interface DemoListItem {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-styleguide-component-detail',
   standalone: true,
   imports: [
@@ -75,6 +76,8 @@ interface DemoListItem {
   styleUrls: ['./styleguide-content.scss', './styleguide-component-detail.component.scss']
 })
 export class StyleguideComponentDetailComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   slug = '';
   entry: StyleguideEntry | undefined;
 
@@ -137,6 +140,7 @@ export class StyleguideComponentDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+        this.changeDetector.markForCheck();
       this.slug = params.get('slug') || '';
       this.entry = STYLEGUIDE_COMPONENTS.find((item) => item.slug === this.slug);
     });

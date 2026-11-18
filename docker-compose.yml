@@ -5,6 +5,7 @@ services:
       - "${FRONTEND_PORT:-4200}:4000"
     environment:
       PORT: 4000
+      APP_ENVIRONMENT: development
       API_BASE_URL: ${API_BASE_URL:-http://35.174.50.187:5055/api/v1}
       # Grafana Faro (RUM) — URL do collector (pública/client-side). Injetada no
       # navegador via /config.js. Vazio = Faro desligado.

@@ -1,0 +1,1419 @@
+
+> investindo-em-negocios-web@0.0.0 quality:frontend
+> npm run test:legal && npm run typecheck && npm run handoff:check && npm run test:ci && npm run build:prod && npm run test:legal-runtime && npm run audit:production && npm run audit:all
+
+
+> investindo-em-negocios-web@0.0.0 test:legal
+> node --test ../scripts/legal-publisher.test.mjs
+
+✔ identificação incompleta impede publicação (0.917875ms)
+✔ identificação com CNPJ válido resolve a configuração (4.631417ms)
+✔ CPF válido também é aceito e dígito fiscal incorreto é rejeitado (0.270375ms)
+✔ placeholders e e-mail inválido não passam pelo gate (0.083292ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 105.136292
+
+> investindo-em-negocios-web@0.0.0 typecheck
+> tsc --noEmit -p tsconfig.app.json
+
+
+> investindo-em-negocios-web@0.0.0 handoff:check
+> node ../scripts/check-handoff-fidelity.mjs
+
+
+  Fidelidade ao handoff de design
+  ────────────────────────────────────────────────────────────────
+
+  ✓ R1  Primitivo de shared/ usado só no /styleguide
+       ARQUITETURA_ANGULAR.md §7 · §13.1
+
+  ✓ R2  grid auto-fit/auto-fill em faixa de indicadores
+       README.md §4 · ARQUITETURA_ANGULAR.md §7, §12
+
+  ✓ R3  Card de indicador sem tooltip
+       README.md §8 · ARQUITETURA_ANGULAR.md §7
+
+  ✓ R4  SVG de gráfico dentro de feature (use shared/charts)
+       ARQUITETURA_ANGULAR.md §8 · §13.5
+
+  ✓ R5  Sombra de hover aplicada em estado de repouso
+       README.md §3
+
+  ✓ R6  Cor hex literal fora de design-tokens.scss
+       ARQUITETURA_ANGULAR.md §6 · §12
+
+  ✓ R7  Token do handoff ausente em design-tokens.scss
+       README.md "Fidelidade" · tokens.css
+
+  ✓ R8  Componente sem ChangeDetectionStrategy.OnPush
+       ARQUITETURA_ANGULAR.md §4.5 · §12
+
+  ✓ R9  Feature reestiliza primitivo por dentro (::ng-deep)
+       ARQUITETURA_ANGULAR.md §3 · §7 · §13.1
+
+  ✓ R10  Uma feature importando de outra feature
+       ARQUITETURA_ANGULAR.md §1 · §2
+
+  ✓ R11  `shared/` importando serviço de domínio
+       ARQUITETURA_ANGULAR.md §1 · emenda E6
+
+  Tudo conforme o handoff, sem dívida aberta.
+
+
+> investindo-em-negocios-web@0.0.0 test:ci
+> ng test --watch=false --browsers=ChromeHeadless --code-coverage --code-coverage-exclude=src/app/features/styleguide/**
+
+- Generating browser application bundles (phase: setup)...
+✔ Browser application bundle generation complete.
+18 11 2026 09:37:41.242:INFO [karma-server]: Karma v6.4.4 server started at http://localhost:9876/
+18 11 2026 09:37:41.243:INFO [launcher]: Launching browsers ChromeHeadless with concurrency unlimited
+18 11 2026 09:37:41.247:INFO [launcher]: Starting browser ChromeHeadless
+18 11 2026 09:37:43.076:INFO [Chrome Headless 148.0.0.0 (Mac OS 10.15.7)]: Connected on socket aexXrVVaqMjmrAr9AAAA with id 44977936
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 0 of 907 SUCCESS (0 secs / 0 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 1 of 907 SUCCESS (0 secs / 0.002 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 2 of 907 SUCCESS (0 secs / 0.002 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 3 of 907 SUCCESS (0 secs / 0.003 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 4 of 907 SUCCESS (0 secs / 0.003 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 5 of 907 SUCCESS (0 secs / 0.003 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 6 of 907 SUCCESS (0 secs / 0.01 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 7 of 907 SUCCESS (0 secs / 0.011 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 8 of 907 SUCCESS (0 secs / 0.011 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 9 of 907 SUCCESS (0 secs / 0.012 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 10 of 907 SUCCESS (0 secs / 0.013 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 11 of 907 SUCCESS (0 secs / 0.014 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 12 of 907 SUCCESS (0 secs / 0.015 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 13 of 907 SUCCESS (0 secs / 0.015 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 14 of 907 SUCCESS (0 secs / 0.015 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 15 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 16 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 17 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 18 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 19 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 20 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 21 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 22 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 23 of 907 SUCCESS (0 secs / 0.016 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 24 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 25 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 26 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 27 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 28 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 29 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 30 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 31 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 32 of 907 SUCCESS (0 secs / 0.017 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 33 of 907 SUCCESS (0 secs / 0.018 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 34 of 907 SUCCESS (0 secs / 0.018 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 35 of 907 SUCCESS (0 secs / 0.018 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 36 of 907 SUCCESS (0 secs / 0.018 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 37 of 907 SUCCESS (0 secs / 0.018 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 38 of 907 SUCCESS (0 secs / 0.018 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 39 of 907 SUCCESS (0 secs / 0.054 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 40 of 907 SUCCESS (0 secs / 0.056 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 41 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 42 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 43 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 44 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 45 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 46 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 47 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 48 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 49 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 50 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 51 of 907 SUCCESS (0 secs / 0.057 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 52 of 907 SUCCESS (0 secs / 0.058 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 53 of 907 SUCCESS (0 secs / 0.058 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 54 of 907 SUCCESS (0 secs / 0.058 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 55 of 907 SUCCESS (0 secs / 0.059 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 56 of 907 SUCCESS (0 secs / 0.059 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 57 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 58 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 59 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 60 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 61 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 62 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 63 of 907 SUCCESS (0 secs / 0.06 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 64 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 65 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 66 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 67 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 68 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 69 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 70 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 71 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 72 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 73 of 907 SUCCESS (0 secs / 0.062 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 74 of 907 SUCCESS (0 secs / 0.063 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 75 of 907 SUCCESS (0 secs / 0.064 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 76 of 907 SUCCESS (0 secs / 0.065 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 77 of 907 SUCCESS (0 secs / 0.065 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 78 of 907 SUCCESS (0 secs / 0.066 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 79 of 907 SUCCESS (0 secs / 0.067 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 80 of 907 SUCCESS (0 secs / 0.067 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 81 of 907 SUCCESS (0 secs / 0.068 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 82 of 907 SUCCESS (0 secs / 0.068 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 83 of 907 SUCCESS (0 secs / 0.069 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 84 of 907 SUCCESS (0 secs / 0.069 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 85 of 907 SUCCESS (0 secs / 0.07 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 86 of 907 SUCCESS (0 secs / 0.07 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 87 of 907 SUCCESS (0 secs / 0.071 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 88 of 907 SUCCESS (0 secs / 0.071 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 89 of 907 SUCCESS (0 secs / 0.071 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 90 of 907 SUCCESS (0 secs / 0.072 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 91 of 907 SUCCESS (0 secs / 0.072 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 92 of 907 SUCCESS (0 secs / 0.073 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 93 of 907 SUCCESS (0 secs / 0.073 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 94 of 907 SUCCESS (0 secs / 0.074 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 95 of 907 SUCCESS (0 secs / 0.075 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 96 of 907 SUCCESS (0 secs / 0.075 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 97 of 907 SUCCESS (0 secs / 0.076 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 98 of 907 SUCCESS (0 secs / 0.076 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 99 of 907 SUCCESS (0 secs / 0.077 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 100 of 907 SUCCESS (0 secs / 0.077 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 101 of 907 SUCCESS (0 secs / 0.077 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 102 of 907 SUCCESS (0 secs / 0.077 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 103 of 907 SUCCESS (0 secs / 0.077 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 104 of 907 SUCCESS (0 secs / 0.077 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 105 of 907 SUCCESS (0 secs / 0.078 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 106 of 907 SUCCESS (0 secs / 0.139 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 107 of 907 SUCCESS (0 secs / 0.143 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 108 of 907 SUCCESS (0 secs / 0.146 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 109 of 907 SUCCESS (0 secs / 0.148 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 110 of 907 SUCCESS (0 secs / 0.151 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 111 of 907 SUCCESS (0 secs / 0.154 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 112 of 907 SUCCESS (0 secs / 0.156 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 113 of 907 SUCCESS (0 secs / 0.159 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 114 of 907 SUCCESS (0 secs / 0.162 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 115 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 116 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 117 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 118 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 119 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 120 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 121 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 122 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 123 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 124 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 125 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 126 of 907 SUCCESS (0 secs / 0.164 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 127 of 907 SUCCESS (0 secs / 0.175 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 128 of 907 SUCCESS (0 secs / 0.177 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 129 of 907 SUCCESS (0 secs / 0.179 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 130 of 907 SUCCESS (0 secs / 0.182 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 131 of 907 SUCCESS (0 secs / 0.187 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 132 of 907 SUCCESS (0 secs / 0.189 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 133 of 907 SUCCESS (0 secs / 0.191 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 134 of 907 SUCCESS (0 secs / 0.198 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 135 of 907 SUCCESS (0 secs / 0.202 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 136 of 907 SUCCESS (0 secs / 0.203 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 137 of 907 SUCCESS (0 secs / 0.203 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 138 of 907 SUCCESS (0 secs / 0.203 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 139 of 907 SUCCESS (0 secs / 0.203 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 140 of 907 SUCCESS (0 secs / 0.204 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 141 of 907 SUCCESS (0 secs / 0.205 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 142 of 907 SUCCESS (0 secs / 0.205 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 143 of 907 SUCCESS (0 secs / 0.205 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 144 of 907 SUCCESS (0 secs / 0.205 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 145 of 907 SUCCESS (0 secs / 0.206 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 146 of 907 SUCCESS (0 secs / 0.206 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 147 of 907 SUCCESS (0 secs / 0.207 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 148 of 907 SUCCESS (0 secs / 0.208 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 149 of 907 SUCCESS (0 secs / 0.208 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 150 of 907 SUCCESS (0 secs / 0.211 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 151 of 907 SUCCESS (0 secs / 0.211 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 152 of 907 SUCCESS (0 secs / 0.211 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 153 of 907 SUCCESS (0 secs / 0.211 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 154 of 907 SUCCESS (0 secs / 0.211 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 155 of 907 SUCCESS (0 secs / 0.212 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 156 of 907 SUCCESS (0 secs / 0.212 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 157 of 907 SUCCESS (0 secs / 0.212 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 158 of 907 SUCCESS (0 secs / 0.213 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 159 of 907 SUCCESS (0 secs / 0.213 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 160 of 907 SUCCESS (0 secs / 0.213 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 161 of 907 SUCCESS (0 secs / 0.213 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 162 of 907 SUCCESS (0 secs / 0.213 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 163 of 907 SUCCESS (0 secs / 0.213 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 164 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 165 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 166 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 167 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 168 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 169 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 170 of 907 SUCCESS (0 secs / 0.214 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 171 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 172 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 173 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 174 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 175 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 176 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 177 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 178 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 179 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 180 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 181 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 182 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 183 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 184 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 185 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 186 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 187 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 188 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 189 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 190 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 191 of 907 SUCCESS (0 secs / 0.215 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 192 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 193 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 194 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 195 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 196 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 197 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 198 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 199 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 200 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 201 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 202 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 203 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 204 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 205 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 206 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 207 of 907 SUCCESS (0 secs / 0.216 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 208 of 907 SUCCESS (0 secs / 0.217 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 209 of 907 SUCCESS (0 secs / 0.218 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 210 of 907 SUCCESS (0 secs / 0.218 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 211 of 907 SUCCESS (0 secs / 0.219 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 212 of 907 SUCCESS (0 secs / 0.219 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 213 of 907 SUCCESS (0 secs / 0.22 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 214 of 907 SUCCESS (0 secs / 0.221 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 215 of 907 SUCCESS (0 secs / 0.221 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 216 of 907 SUCCESS (0 secs / 0.222 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 217 of 907 SUCCESS (0 secs / 0.222 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 218 of 907 SUCCESS (0 secs / 0.223 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 219 of 907 SUCCESS (0 secs / 0.223 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 220 of 907 SUCCESS (0 secs / 0.223 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 221 of 907 SUCCESS (0 secs / 0.223 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 222 of 907 SUCCESS (0 secs / 0.224 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 223 of 907 SUCCESS (0 secs / 0.224 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 224 of 907 SUCCESS (0 secs / 0.224 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 225 of 907 SUCCESS (0 secs / 0.224 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 226 of 907 SUCCESS (0 secs / 0.224 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 227 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 228 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 229 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 230 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 231 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 232 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 233 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 234 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 235 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 236 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 237 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 238 of 907 SUCCESS (0 secs / 0.225 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 239 of 907 SUCCESS (0 secs / 0.226 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 240 of 907 SUCCESS (0 secs / 0.226 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 241 of 907 SUCCESS (0 secs / 0.226 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 242 of 907 SUCCESS (0 secs / 0.226 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 243 of 907 SUCCESS (0 secs / 0.226 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 244 of 907 SUCCESS (0 secs / 0.227 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 245 of 907 SUCCESS (0 secs / 0.227 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 246 of 907 SUCCESS (0 secs / 0.227 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 247 of 907 SUCCESS (0 secs / 0.228 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 248 of 907 SUCCESS (0 secs / 0.228 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 249 of 907 SUCCESS (0 secs / 0.228 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 250 of 907 SUCCESS (0 secs / 0.229 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 251 of 907 SUCCESS (0 secs / 0.229 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 252 of 907 SUCCESS (0 secs / 0.229 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 253 of 907 SUCCESS (0 secs / 0.229 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 254 of 907 SUCCESS (0 secs / 0.229 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 255 of 907 SUCCESS (0 secs / 0.229 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 256 of 907 SUCCESS (0 secs / 0.23 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 257 of 907 SUCCESS (0 secs / 0.23 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 258 of 907 SUCCESS (0 secs / 0.231 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 259 of 907 SUCCESS (0 secs / 0.231 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 260 of 907 SUCCESS (0 secs / 0.232 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 261 of 907 SUCCESS (0 secs / 0.232 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 262 of 907 SUCCESS (0 secs / 0.233 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 263 of 907 SUCCESS (0 secs / 0.233 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 264 of 907 SUCCESS (0 secs / 0.233 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 265 of 907 SUCCESS (0 secs / 0.234 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 266 of 907 SUCCESS (0 secs / 0.234 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 267 of 907 SUCCESS (0 secs / 0.237 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 268 of 907 SUCCESS (0 secs / 0.238 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 269 of 907 SUCCESS (0 secs / 0.239 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 270 of 907 SUCCESS (0 secs / 0.242 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 271 of 907 SUCCESS (0 secs / 0.243 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 272 of 907 SUCCESS (0 secs / 0.244 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 273 of 907 SUCCESS (0 secs / 0.244 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 274 of 907 SUCCESS (0 secs / 0.244 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 275 of 907 SUCCESS (0 secs / 0.245 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 276 of 907 SUCCESS (0 secs / 0.245 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 277 of 907 SUCCESS (0 secs / 0.245 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 278 of 907 SUCCESS (0 secs / 0.245 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 279 of 907 SUCCESS (0 secs / 0.245 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 280 of 907 SUCCESS (0 secs / 0.245 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 281 of 907 SUCCESS (0 secs / 0.246 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 282 of 907 SUCCESS (0 secs / 0.246 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 283 of 907 SUCCESS (0 secs / 0.247 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 284 of 907 SUCCESS (0 secs / 0.247 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 285 of 907 SUCCESS (0 secs / 0.248 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 286 of 907 SUCCESS (0 secs / 0.248 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 287 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 288 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 289 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 290 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 291 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 292 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 293 of 907 SUCCESS (0 secs / 0.249 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 294 of 907 SUCCESS (0 secs / 0.25 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 295 of 907 SUCCESS (0 secs / 0.25 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 296 of 907 SUCCESS (0 secs / 0.25 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 297 of 907 SUCCESS (0 secs / 0.251 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 298 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 299 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 300 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 301 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 302 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 303 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 304 of 907 SUCCESS (0 secs / 0.252 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 305 of 907 SUCCESS (0 secs / 0.253 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 306 of 907 SUCCESS (0 secs / 0.253 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 307 of 907 SUCCESS (0 secs / 0.254 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 308 of 907 SUCCESS (0 secs / 0.254 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 309 of 907 SUCCESS (0 secs / 0.263 secs)
+18 11 2026 09:37:44.790:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios.png
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 310 of 907 SUCCESS (0 secs / 0.265 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 311 of 907 SUCCESS (0 secs / 0.266 secs)
+18 11 2026 09:37:44.794:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios.png
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 312 of 907 SUCCESS (0 secs / 0.267 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 313 of 907 SUCCESS (0 secs / 0.268 secs)
+18 11 2026 09:37:44.797:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios.png
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 314 of 907 SUCCESS (0 secs / 0.269 secs)
+18 11 2026 09:37:44.798:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios2.png
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 315 of 907 SUCCESS (0 secs / 0.27 secs)
+18 11 2026 09:37:44.799:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios.png
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 316 of 907 SUCCESS (0 secs / 0.271 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 317 of 907 SUCCESS (0 secs / 0.273 secs)
+18 11 2026 09:37:44.802:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios.png
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 317 of 907 SUCCESS (0 secs / 0.273 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 318 of 907 SUCCESS (0 secs / 0.274 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 318 of 907 SUCCESS (0 secs / 0.274 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 319 of 907 SUCCESS (0 secs / 0.275 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 319 of 907 SUCCESS (0 secs / 0.275 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 320 of 907 SUCCESS (0 secs / 0.275 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 320 of 907 SUCCESS (0 secs / 0.275 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 321 of 907 SUCCESS (0 secs / 0.276 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 321 of 907 SUCCESS (0 secs / 0.276 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 322 of 907 SUCCESS (0 secs / 0.276 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 322 of 907 SUCCESS (0 secs / 0.276 secs)
+WARN: 'The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)'
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 323 of 907 SUCCESS (0 secs / 0.277 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 324 of 907 SUCCESS (0 secs / 0.277 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 325 of 907 SUCCESS (0 secs / 0.277 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 326 of 907 SUCCESS (0 secs / 0.277 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 327 of 907 SUCCESS (0 secs / 0.277 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 328 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 329 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 330 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 331 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 332 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 333 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 334 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 335 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 336 of 907 SUCCESS (0 secs / 0.278 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 337 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 338 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 339 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 340 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 341 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 342 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 343 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 344 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 345 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 346 of 907 SUCCESS (0 secs / 0.279 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 347 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 348 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 349 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 350 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 351 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 352 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 353 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 354 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 355 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 356 of 907 SUCCESS (0 secs / 0.28 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 357 of 907 SUCCESS (0 secs / 0.281 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 358 of 907 SUCCESS (0 secs / 0.281 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 359 of 907 SUCCESS (0 secs / 0.285 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 360 of 907 SUCCESS (0 secs / 0.285 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 361 of 907 SUCCESS (0 secs / 0.286 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 362 of 907 SUCCESS (0 secs / 0.286 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 363 of 907 SUCCESS (0 secs / 0.287 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 364 of 907 SUCCESS (0 secs / 0.287 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 365 of 907 SUCCESS (0 secs / 0.287 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 366 of 907 SUCCESS (0 secs / 0.288 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 367 of 907 SUCCESS (0 secs / 0.289 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 368 of 907 SUCCESS (0 secs / 0.289 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 369 of 907 SUCCESS (0 secs / 0.319 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 370 of 907 SUCCESS (0 secs / 0.319 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 371 of 907 SUCCESS (0 secs / 0.319 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 372 of 907 SUCCESS (0 secs / 0.32 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 373 of 907 SUCCESS (0 secs / 0.32 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 374 of 907 SUCCESS (0 secs / 0.32 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 375 of 907 SUCCESS (0 secs / 0.32 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 376 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 377 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 378 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 379 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 380 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 381 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 382 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 383 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 384 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 385 of 907 SUCCESS (0 secs / 0.321 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 386 of 907 SUCCESS (0 secs / 0.332 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 387 of 907 SUCCESS (0 secs / 0.334 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 388 of 907 SUCCESS (0 secs / 0.335 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 389 of 907 SUCCESS (0 secs / 0.335 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 390 of 907 SUCCESS (0 secs / 0.336 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 391 of 907 SUCCESS (0 secs / 0.336 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 392 of 907 SUCCESS (0 secs / 0.336 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 393 of 907 SUCCESS (0 secs / 0.336 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 394 of 907 SUCCESS (0 secs / 0.336 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 395 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 396 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 397 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 398 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 399 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 400 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 401 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 402 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 403 of 907 SUCCESS (0 secs / 0.337 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 404 of 907 SUCCESS (0 secs / 0.353 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 405 of 907 SUCCESS (0 secs / 0.356 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 406 of 907 SUCCESS (0 secs / 0.358 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 407 of 907 SUCCESS (0 secs / 0.36 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 408 of 907 SUCCESS (0 secs / 0.362 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 409 of 907 SUCCESS (0 secs / 0.364 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 410 of 907 SUCCESS (0 secs / 0.366 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 411 of 907 SUCCESS (0 secs / 0.368 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 412 of 907 SUCCESS (0 secs / 0.371 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 413 of 907 SUCCESS (0 secs / 0.371 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 414 of 907 SUCCESS (0 secs / 0.371 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 415 of 907 SUCCESS (0 secs / 0.372 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 416 of 907 SUCCESS (0 secs / 0.372 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 417 of 907 SUCCESS (0 secs / 0.372 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 418 of 907 SUCCESS (0 secs / 0.373 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 419 of 907 SUCCESS (0 secs / 0.373 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 420 of 907 SUCCESS (0 secs / 0.373 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 421 of 907 SUCCESS (0 secs / 0.373 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 422 of 907 SUCCESS (0 secs / 0.373 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 423 of 907 SUCCESS (0 secs / 0.374 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 424 of 907 SUCCESS (0 secs / 0.374 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 425 of 907 SUCCESS (0 secs / 0.374 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 426 of 907 SUCCESS (0 secs / 0.374 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 427 of 907 SUCCESS (0 secs / 0.374 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 428 of 907 SUCCESS (0 secs / 0.374 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 429 of 907 SUCCESS (0 secs / 0.375 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 430 of 907 SUCCESS (0 secs / 0.375 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 431 of 907 SUCCESS (0 secs / 0.375 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 432 of 907 SUCCESS (0 secs / 0.377 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 433 of 907 SUCCESS (0 secs / 0.377 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 434 of 907 SUCCESS (0 secs / 0.378 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 435 of 907 SUCCESS (0 secs / 0.378 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 436 of 907 SUCCESS (0 secs / 0.378 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 437 of 907 SUCCESS (0 secs / 0.378 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 438 of 907 SUCCESS (0 secs / 0.378 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 439 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 440 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 441 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 442 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 443 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 444 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 445 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 446 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 447 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 448 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 449 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 450 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 451 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 452 of 907 SUCCESS (0 secs / 0.379 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 453 of 907 SUCCESS (0 secs / 0.38 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 454 of 907 SUCCESS (0 secs / 0.381 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 455 of 907 SUCCESS (0 secs / 0.403 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 456 of 907 SUCCESS (0 secs / 0.406 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 457 of 907 SUCCESS (0 secs / 0.407 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 458 of 907 SUCCESS (0 secs / 0.408 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 459 of 907 SUCCESS (0 secs / 0.41 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 460 of 907 SUCCESS (0 secs / 0.411 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 461 of 907 SUCCESS (0 secs / 0.413 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 462 of 907 SUCCESS (0 secs / 0.415 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 463 of 907 SUCCESS (0 secs / 0.416 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 464 of 907 SUCCESS (0 secs / 0.417 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 465 of 907 SUCCESS (0 secs / 0.417 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 466 of 907 SUCCESS (0 secs / 0.417 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 467 of 907 SUCCESS (0 secs / 0.417 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 468 of 907 SUCCESS (0 secs / 0.418 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 469 of 907 SUCCESS (0 secs / 0.419 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 470 of 907 SUCCESS (0 secs / 0.419 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 471 of 907 SUCCESS (0 secs / 0.42 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 472 of 907 SUCCESS (0 secs / 0.42 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 473 of 907 SUCCESS (0 secs / 0.421 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 474 of 907 SUCCESS (0 secs / 0.421 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 475 of 907 SUCCESS (0 secs / 0.422 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 476 of 907 SUCCESS (0 secs / 0.422 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 477 of 907 SUCCESS (0 secs / 0.423 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 478 of 907 SUCCESS (0 secs / 0.423 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 479 of 907 SUCCESS (0 secs / 0.424 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 480 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 481 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 482 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 483 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 484 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 485 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 486 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 487 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 488 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 489 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 490 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 491 of 907 SUCCESS (0 secs / 0.425 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 492 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 493 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 494 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 495 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 496 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 497 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 498 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 499 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 500 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 501 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 502 of 907 SUCCESS (0 secs / 0.426 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 503 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 504 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 505 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 506 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 507 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 508 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 509 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 510 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 511 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 512 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 513 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 514 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 515 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 516 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 517 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 518 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 519 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 520 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 521 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 522 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 523 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 524 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 525 of 907 SUCCESS (0 secs / 0.427 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 526 of 907 SUCCESS (0 secs / 0.472 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 527 of 907 SUCCESS (0 secs / 0.474 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 528 of 907 SUCCESS (0 secs / 0.476 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 529 of 907 SUCCESS (0 secs / 0.477 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 530 of 907 SUCCESS (0 secs / 0.484 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 531 of 907 SUCCESS (0 secs / 0.486 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 532 of 907 SUCCESS (0 secs / 0.487 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 533 of 907 SUCCESS (0 secs / 0.488 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 534 of 907 SUCCESS (0 secs / 0.489 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 535 of 907 SUCCESS (0 secs / 0.49 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 536 of 907 SUCCESS (0 secs / 0.491 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 537 of 907 SUCCESS (0 secs / 0.492 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 538 of 907 SUCCESS (0 secs / 0.496 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 539 of 907 SUCCESS (0 secs / 0.499 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 540 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 541 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 542 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 543 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 544 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 545 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 546 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 547 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 548 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 549 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 550 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 551 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 552 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 553 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 554 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 555 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 556 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 557 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 558 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 559 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 560 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 561 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 562 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 563 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 564 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 565 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 566 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 567 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 568 of 907 SUCCESS (0 secs / 0.5 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 569 of 907 SUCCESS (0 secs / 0.501 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 570 of 907 SUCCESS (0 secs / 0.502 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 571 of 907 SUCCESS (0 secs / 0.503 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 572 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 573 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 574 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 575 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 576 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 577 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 578 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 579 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 580 of 907 SUCCESS (0 secs / 0.505 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 581 of 907 SUCCESS (0 secs / 0.509 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 582 of 907 SUCCESS (0 secs / 0.509 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 583 of 907 SUCCESS (0 secs / 0.509 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 584 of 907 SUCCESS (0 secs / 0.509 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 585 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 586 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 587 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 588 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 589 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 590 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 591 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 592 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 593 of 907 SUCCESS (0 secs / 0.51 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 594 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 595 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 596 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 597 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 598 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 599 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 600 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 601 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 602 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 603 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 604 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 605 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 606 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 607 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 608 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 609 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 610 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 611 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 612 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 613 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 614 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 615 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 616 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 617 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 618 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 619 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 620 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 621 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 622 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 623 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 624 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 625 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 626 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 627 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 628 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 629 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 630 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 631 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 632 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 633 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 634 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 635 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 636 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 637 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 638 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 639 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 640 of 907 SUCCESS (0 secs / 0.511 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 641 of 907 SUCCESS (0 secs / 0.512 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 642 of 907 SUCCESS (0 secs / 0.512 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 643 of 907 SUCCESS (0 secs / 0.515 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 644 of 907 SUCCESS (0 secs / 0.518 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 645 of 907 SUCCESS (0 secs / 0.52 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 646 of 907 SUCCESS (0 secs / 0.527 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 647 of 907 SUCCESS (0 secs / 0.529 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 648 of 907 SUCCESS (0 secs / 0.53 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 649 of 907 SUCCESS (0 secs / 0.531 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 650 of 907 SUCCESS (0 secs / 0.535 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 651 of 907 SUCCESS (0 secs / 0.536 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 652 of 907 SUCCESS (0 secs / 0.537 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 653 of 907 SUCCESS (0 secs / 0.538 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 654 of 907 SUCCESS (0 secs / 0.539 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 655 of 907 SUCCESS (0 secs / 0.54 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 656 of 907 SUCCESS (0 secs / 0.541 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 657 of 907 SUCCESS (0 secs / 0.543 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 658 of 907 SUCCESS (0 secs / 0.543 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 659 of 907 SUCCESS (0 secs / 0.544 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 660 of 907 SUCCESS (0 secs / 0.544 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 661 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 662 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 663 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 664 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 665 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 666 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 667 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 668 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 669 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 670 of 907 SUCCESS (0 secs / 0.545 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 671 of 907 SUCCESS (0 secs / 0.55 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 672 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 673 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 674 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 675 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 676 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 677 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 678 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 679 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 680 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 681 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 682 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 683 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 684 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 685 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 686 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 687 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 688 of 907 SUCCESS (0 secs / 0.551 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 689 of 907 SUCCESS (0 secs / 0.569 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 690 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 691 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 692 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 693 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 694 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 695 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 696 of 907 SUCCESS (0 secs / 0.57 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 697 of 907 SUCCESS (0 secs / 0.572 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 698 of 907 SUCCESS (0 secs / 0.572 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 699 of 907 SUCCESS (0 secs / 0.573 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 700 of 907 SUCCESS (0 secs / 0.574 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 701 of 907 SUCCESS (0 secs / 0.574 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 702 of 907 SUCCESS (0 secs / 0.574 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 703 of 907 SUCCESS (0 secs / 0.574 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 704 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 705 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 706 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 707 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 708 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 709 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 710 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 711 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 712 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 713 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 714 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 715 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 716 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 717 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 718 of 907 SUCCESS (0 secs / 0.575 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 719 of 907 SUCCESS (0 secs / 0.576 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 720 of 907 SUCCESS (0 secs / 0.576 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 721 of 907 SUCCESS (0 secs / 0.576 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 722 of 907 SUCCESS (0 secs / 0.576 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 723 of 907 SUCCESS (0 secs / 0.576 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 724 of 907 SUCCESS (0 secs / 0.576 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 725 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 726 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 727 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 728 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 729 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 730 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 731 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 732 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 733 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 734 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 735 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 736 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 737 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 738 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 739 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 740 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 741 of 907 SUCCESS (0 secs / 0.577 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 742 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 743 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 744 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 745 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 746 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 747 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 748 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 749 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 750 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 751 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 752 of 907 SUCCESS (0 secs / 0.578 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 753 of 907 SUCCESS (0 secs / 0.597 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 754 of 907 SUCCESS (0 secs / 0.599 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 755 of 907 SUCCESS (0 secs / 0.607 secs)
+18 11 2026 09:37:45.205:WARN [web-server]: 404: /_karma_webpack_/assets/logoHeaderInvestindoemNegocios.png
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 756 of 907 SUCCESS (0 secs / 0.608 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 757 of 907 SUCCESS (0 secs / 0.609 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 758 of 907 SUCCESS (0 secs / 0.609 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 759 of 907 SUCCESS (0 secs / 0.61 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 760 of 907 SUCCESS (0 secs / 0.61 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 761 of 907 SUCCESS (0 secs / 0.61 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 762 of 907 SUCCESS (0 secs / 0.61 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 763 of 907 SUCCESS (0 secs / 0.61 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 764 of 907 SUCCESS (0 secs / 0.61 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 765 of 907 SUCCESS (0 secs / 0.611 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 766 of 907 SUCCESS (0 secs / 0.611 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 767 of 907 SUCCESS (0 secs / 0.611 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 768 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 769 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 770 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 771 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 772 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 773 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 774 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 775 of 907 SUCCESS (0 secs / 0.612 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 776 of 907 SUCCESS (0 secs / 0.613 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 777 of 907 SUCCESS (0 secs / 0.614 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 778 of 907 SUCCESS (0 secs / 0.614 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 779 of 907 SUCCESS (0 secs / 0.615 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 780 of 907 SUCCESS (0 secs / 0.617 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 781 of 907 SUCCESS (0 secs / 0.618 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 782 of 907 SUCCESS (0 secs / 0.619 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 783 of 907 SUCCESS (0 secs / 0.62 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 784 of 907 SUCCESS (0 secs / 0.62 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 785 of 907 SUCCESS (0 secs / 0.621 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 786 of 907 SUCCESS (0 secs / 0.621 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 787 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 788 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 789 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 790 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 791 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 792 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 793 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 794 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 795 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 796 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 797 of 907 SUCCESS (0 secs / 0.622 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 798 of 907 SUCCESS (0 secs / 0.623 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 799 of 907 SUCCESS (0 secs / 0.623 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 800 of 907 SUCCESS (0 secs / 0.623 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 801 of 907 SUCCESS (0 secs / 0.624 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 802 of 907 SUCCESS (0 secs / 0.624 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 803 of 907 SUCCESS (0 secs / 0.624 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 804 of 907 SUCCESS (0 secs / 0.625 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 805 of 907 SUCCESS (0 secs / 0.625 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 806 of 907 SUCCESS (0 secs / 0.626 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 807 of 907 SUCCESS (0 secs / 0.626 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 808 of 907 SUCCESS (0 secs / 0.626 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 809 of 907 SUCCESS (0 secs / 0.627 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 810 of 907 SUCCESS (0 secs / 0.627 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 811 of 907 SUCCESS (0 secs / 0.627 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 812 of 907 SUCCESS (0 secs / 0.628 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 813 of 907 SUCCESS (0 secs / 0.628 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 814 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 815 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 816 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 817 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 818 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 819 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 820 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 821 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 822 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 823 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 824 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 825 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 826 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 827 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 828 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 829 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 830 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 831 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 832 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 833 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 834 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 835 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 836 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 837 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 838 of 907 SUCCESS (0 secs / 0.629 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 839 of 907 SUCCESS (0 secs / 0.63 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 840 of 907 SUCCESS (0 secs / 0.63 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 841 of 907 SUCCESS (0 secs / 0.63 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 842 of 907 SUCCESS (0 secs / 0.63 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 843 of 907 SUCCESS (0 secs / 0.63 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 844 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 845 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 846 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 847 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 848 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 849 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 850 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 851 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 852 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 853 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 854 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 855 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 856 of 907 SUCCESS (0 secs / 0.631 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 857 of 907 SUCCESS (0 secs / 0.632 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 858 of 907 SUCCESS (0 secs / 0.664 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 859 of 907 SUCCESS (0 secs / 0.671 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 860 of 907 SUCCESS (0 secs / 0.677 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 861 of 907 SUCCESS (0 secs / 0.681 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 862 of 907 SUCCESS (0 secs / 0.686 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 863 of 907 SUCCESS (0 secs / 0.689 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 864 of 907 SUCCESS (0 secs / 0.694 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 865 of 907 SUCCESS (0 secs / 0.698 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 866 of 907 SUCCESS (0 secs / 0.703 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 867 of 907 SUCCESS (0 secs / 0.709 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 868 of 907 SUCCESS (0 secs / 0.713 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 869 of 907 SUCCESS (0 secs / 0.72 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 870 of 907 SUCCESS (0 secs / 0.723 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 871 of 907 SUCCESS (0 secs / 0.726 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 872 of 907 SUCCESS (0 secs / 0.731 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 873 of 907 SUCCESS (0 secs / 0.731 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 874 of 907 SUCCESS (0 secs / 0.732 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 875 of 907 SUCCESS (0 secs / 0.732 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 876 of 907 SUCCESS (0 secs / 0.733 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 877 of 907 SUCCESS (0 secs / 0.733 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 878 of 907 SUCCESS (0 secs / 0.734 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 879 of 907 SUCCESS (0 secs / 0.734 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 880 of 907 SUCCESS (0 secs / 0.734 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 881 of 907 SUCCESS (0 secs / 0.734 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 882 of 907 SUCCESS (0 secs / 0.734 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 883 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 884 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 885 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 886 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 887 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 888 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 889 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 890 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 891 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 892 of 907 SUCCESS (0 secs / 0.735 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 893 of 907 SUCCESS (0 secs / 0.736 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 894 of 907 SUCCESS (0 secs / 0.736 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 895 of 907 SUCCESS (0 secs / 0.736 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 896 of 907 SUCCESS (0 secs / 0.736 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 897 of 907 SUCCESS (0 secs / 0.736 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 898 of 907 SUCCESS (0 secs / 0.744 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 899 of 907 SUCCESS (0 secs / 0.745 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 900 of 907 SUCCESS (0 secs / 0.747 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 901 of 907 SUCCESS (0 secs / 0.748 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 902 of 907 SUCCESS (0 secs / 0.749 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 903 of 907 SUCCESS (0 secs / 0.75 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 904 of 907 SUCCESS (0 secs / 0.751 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 905 of 907 SUCCESS (0 secs / 0.751 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 906 of 907 SUCCESS (0 secs / 0.752 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 907 of 907 SUCCESS (0 secs / 0.752 secs)
+Chrome Headless 148.0.0.0 (Mac OS 10.15.7): Executed 907 of 907 SUCCESS (0.987 secs / 0.752 secs)
+TOTAL: 907 SUCCESS
+✔ Browser application bundle generation complete.
+
+=============================== Coverage summary ===============================
+Statements   : 50.38% ( 6228/12361 )
+Branches     : 40.39% ( 2375/5880 )
+Functions    : 42.04% ( 1520/3615 )
+Lines        : 52.67% ( 5739/10896 )
+================================================================================
+
+> investindo-em-negocios-web@0.0.0 build:prod
+> ng build --configuration production
+
+❯ Building...
+✔ Building...
+Browser bundles
+Initial chunk files   | Names                      |  Raw size | Estimated transfer size
+main-N37TDR2Y.js      | main                       | 245.94 kB |                62.38 kB
+chunk-SYGR3HC6.js     | -                          | 171.19 kB |                50.31 kB
+chunk-DNRJXJH7.js     | -                          |  99.08 kB |                24.93 kB
+styles-Q3FKLGI7.css   | styles                     |  73.28 kB |                12.52 kB
+chunk-U4YMIPY5.js     | -                          |  54.41 kB |                16.08 kB
+chunk-BW6RIMZ5.js     | -                          |  50.49 kB |                 9.94 kB
+polyfills-5CFQRCPP.js | polyfills                  |  34.59 kB |                11.33 kB
+chunk-XOUBU6KK.js     | -                          |  14.62 kB |                 3.83 kB
+chunk-O65TJJQ6.js     | -                          |  13.16 kB |                 3.46 kB
+chunk-MGR5B4G2.js     | -                          |  11.08 kB |                 3.57 kB
+chunk-W2MPIQ77.js     | -                          |   6.14 kB |                 1.43 kB
+chunk-XXQB4AF3.js     | -                          |   5.20 kB |                 1.72 kB
+chunk-FZ2LON7X.js     | -                          |   4.04 kB |                 1.41 kB
+chunk-4WR4H4SF.js     | -                          |   3.49 kB |               872 bytes
+chunk-QEHMRIHG.js     | -                          |   2.87 kB |                 1.06 kB
+chunk-DZDSLT27.js     | -                          |   2.52 kB |               959 bytes
+chunk-YCRB7BGR.js     | -                          |   2.45 kB |               972 bytes
+chunk-R7LJSFQP.js     | -                          |   2.00 kB |               692 bytes
+chunk-5J76VYWG.js     | -                          |   1.49 kB |               466 bytes
+chunk-O25DXQ66.js     | -                          |   1.48 kB |               557 bytes
+chunk-SGP7GUJU.js     | -                          |   1.39 kB |               392 bytes
+chunk-OSQMNGTH.js     | -                          |   1.31 kB |               574 bytes
+chunk-GMW2R32S.js     | -                          |   1.22 kB |               552 bytes
+chunk-UQVNU2AK.js     | -                          |   1.16 kB |               528 bytes
+chunk-LDC4K5M6.js     | -                          | 937 bytes |               937 bytes
+chunk-FOXKRBRD.js     | -                          | 830 bytes |               830 bytes
+chunk-QFDV77GN.js     | -                          | 820 bytes |               820 bytes
+chunk-YQFKL6YI.js     | -                          | 758 bytes |               758 bytes
+chunk-IHAKFLSK.js     | -                          | 748 bytes |               748 bytes
+chunk-U26IO7RX.js     | -                          | 609 bytes |               609 bytes
+chunk-6D4UN3ZS.js     | -                          | 549 bytes |               549 bytes
+chunk-SINQ3L6Z.js     | -                          | 491 bytes |               491 bytes
+chunk-JDPEWRV3.js     | -                          | 438 bytes |               438 bytes
+chunk-G2VTB4WK.js     | -                          | 346 bytes |               346 bytes
+chunk-7I3YBRM2.js     | -                          | 343 bytes |               343 bytes
+chunk-CTZPMYCE.js     | -                          | 284 bytes |               284 bytes
+chunk-2VJHGVR7.js     | -                          | 253 bytes |               253 bytes
+chunk-3WVQLCXL.js     | -                          | 252 bytes |               252 bytes
+chunk-ZBMCDFL4.js     | -                          | 235 bytes |               235 bytes
+
+                      | Initial total              | 812.51 kB |               218.43 kB
+
+Lazy chunk files      | Names                      |  Raw size | Estimated transfer size
+chunk-N533OKDT.js     | relatorios-component       | 467.28 kB |               127.47 kB
+chunk-S2MH7AIR.js     | html2canvas                | 202.86 kB |                38.48 kB
+chunk-P6C3O7UN.js     | index-es                   | 159.12 kB |                46.96 kB
+chunk-DRURFZKL.js     | home-component             | 146.15 kB |                30.11 kB
+chunk-RW42EULA.js     | investments-component      | 138.35 kB |                27.34 kB
+chunk-UAXP7SFS.js     | despesas-component         |  87.87 kB |                20.30 kB
+chunk-OSLYHCBL.js     | calculator-component       |  72.28 kB |                13.60 kB
+chunk-EVVVLXT2.js     | calendario-component       |  68.94 kB |                15.94 kB
+chunk-UZNZE25I.js     | onboarding-component       |  68.21 kB |                15.37 kB
+chunk-DLGUHTAX.js     | contas-component           |  64.05 kB |                14.14 kB
+chunk-SAE63THR.js     | receitas-component         |  51.76 kB |                13.31 kB
+chunk-VK4HYOFK.js     | checkout-component         |  44.83 kB |                 9.41 kB
+chunk-NLGXHYVH.js     | metas-component            |  38.24 kB |                 9.44 kB
+chunk-DO7QB47G.js     | admin-parameters-component |  35.39 kB |                 6.79 kB
+chunk-4XZCIQUP.js     | -                          |  34.63 kB |                 7.73 kB
+...and 89 more lazy chunks files. Use "--verbose" to show all the files.
+
+
+Server bundles
+Initial chunk files   | Names                      |  Raw size
+server.mjs            | server                     |   1.03 MB |
+main.server.mjs       | main.server                | 570.64 kB |
+polyfills.server.mjs  | polyfills.server           | 266.74 kB |
+chunk-LPITBHYS.mjs    | -                          | 200.67 kB |
+chunk-QTIMHXTG.mjs    | -                          |  99.34 kB |
+chunk-JME7VLZM.mjs    | -                          |  54.18 kB |
+chunk-6JBNSU5N.mjs    | -                          |  50.52 kB |
+chunk-ETA52RPQ.mjs    | -                          |  14.66 kB |
+chunk-JOQNRUGK.mjs    | -                          |  13.20 kB |
+chunk-IYGAAMOG.mjs    | -                          |  11.13 kB |
+chunk-UCLQEBNZ.mjs    | -                          |   6.19 kB |
+chunk-YRCQH5GH.mjs    | -                          |   5.24 kB |
+chunk-H4UX3WH5.mjs    | -                          |   4.08 kB |
+chunk-L6XBJZP4.mjs    | -                          |   3.53 kB |
+chunk-FYU4I3VZ.mjs    | -                          |   3.08 kB |
+chunk-RTGKJVNZ.mjs    | -                          |   2.90 kB |
+chunk-U2HPJZR3.mjs    | -                          |   2.55 kB |
+chunk-H5JZIMJI.mjs    | -                          |   2.49 kB |
+chunk-PXJPOL3Y.mjs    | -                          |   2.03 kB |
+chunk-7ITDCL4L.mjs    | -                          |   1.53 kB |
+chunk-2BUHHH2R.mjs    | -                          |   1.52 kB |
+chunk-FTJ2L55N.mjs    | -                          |   1.43 kB |
+chunk-ITOR7NUX.mjs    | -                          |   1.38 kB |
+chunk-ZR6JBDIZ.mjs    | -                          |   1.26 kB |
+chunk-KFL2OR3E.mjs    | -                          |   1.19 kB |
+chunk-MFYBY6V4.mjs    | -                          | 971 bytes |
+chunk-3B3SK5KA.mjs    | -                          | 864 bytes |
+chunk-TB37FZN2.mjs    | -                          | 856 bytes |
+chunk-VY5HG3NT.mjs    | -                          | 794 bytes |
+chunk-3LL3GT5T.mjs    | -                          | 783 bytes |
+chunk-2SHDKKBS.mjs    | -                          | 642 bytes |
+chunk-IQOLEKOG.mjs    | -                          | 585 bytes |
+chunk-MAZ6TBMJ.mjs    | -                          | 525 bytes |
+chunk-7ZNS44SP.mjs    | -                          | 474 bytes |
+chunk-YK52SLCF.mjs    | -                          | 380 bytes |
+chunk-RZFFVZUA.mjs    | -                          | 376 bytes |
+chunk-HZ74T5NC.mjs    | -                          | 317 bytes |
+chunk-FZASNWK7.mjs    | -                          | 286 bytes |
+chunk-23X72C44.mjs    | -                          | 286 bytes |
+chunk-P5W4KXO2.mjs    | -                          | 268 bytes |
+
+Lazy chunk files      | Names                      |  Raw size
+chunk-FMWCGLZL.mjs    | relatorios-component       | 965.32 kB |
+chunk-AQWDUX5B.mjs    | home-component             | 146.22 kB |
+chunk-GGONSQXT.mjs    | investments-component      | 138.41 kB |
+chunk-XX2CP2IS.mjs    | despesas-component         |  87.95 kB |
+chunk-YKYOEJKV.mjs    | calculator-component       |  72.32 kB |
+chunk-VYQOAB7T.mjs    | calendario-component       |  69.02 kB |
+chunk-7XV3UIX4.mjs    | onboarding-component       |  68.28 kB |
+chunk-VS2WUKBW.mjs    | contas-component           |  64.12 kB |
+chunk-HW77P3RP.mjs    | receitas-component         |  51.84 kB |
+chunk-2EO2KW7W.mjs    | checkout-component         |  44.88 kB |
+chunk-L4S5473E.mjs    | metas-component            |  38.31 kB |
+chunk-PYCOGR77.mjs    | admin-parameters-component |  35.43 kB |
+chunk-7IST2OHO.mjs    | -                          |  34.67 kB |
+chunk-BQPY5VV6.mjs    | cartoes-component          |  33.39 kB |
+chunk-FM3SNFDH.mjs    | orcamento-component        |  32.84 kB |
+...and 87 more lazy chunks files. Use "--verbose" to show all the files.
+
+Prerendered 38 static routes.
+Application bundle generation complete. [9.669 seconds] - 2026-11-18T12:37:57.444Z
+
+▲ [WARNING] Module 'core-js/modules/es.promise.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.match.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.replace.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.starts-with.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.array.iterator.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/web.dom-collections.iterator.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.array.reduce.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.ends-with.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.split.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'raf' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.trim.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'rgbcolor' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.array.index-of.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.string.includes.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.array.reverse.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'core-js/modules/es.regexp.to-string.js' used by 'node_modules/canvg/lib/index.es.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'jspdf' used by 'src/app/features/relatorios/relatorios.component.ts' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+▲ [WARNING] Module 'ua-parser-js' used by 'node_modules/@grafana/faro-web-sdk/dist/esm/metas/shared/uaParser.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+Output location: /Users/henriquesantos/Desktop/Codes/InvestindoEmNegocios/InvestindoEmNegociosWeb/investindoEmNegociosWeb/dist/investindo-em-negocios-web
+
+
+> investindo-em-negocios-web@0.0.0 test:legal-runtime
+> node --test ../scripts/legal-runtime.test.mjs
+
+✔ produção sem identificação oficial encerra com erro (137.313166ms)
+✔ SSR resolve os campos de termos e privacidade com a configuração de runtime (401.649458ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 635.54525
+
+> investindo-em-negocios-web@0.0.0 audit:production
+> npm audit --omit=dev --audit-level=moderate
+
+found 0 vulnerabilities
+
+> investindo-em-negocios-web@0.0.0 audit:all
+> npm audit --audit-level=low
+
+# npm audit report
+
+picomatch  *
+Severity: high
+picomatch vulnerable to ReDoS through single-branch repeated extglobs - https://github.com/advisories/GHSA-fc5q-39xc-vjpf
+fix available via `npm audit fix --force`
+Will install @angular-devkit/build-angular@16.0.0, which is a breaking change
+node_modules/anymatch/node_modules/picomatch
+node_modules/karma/node_modules/picomatch
+node_modules/micromatch/node_modules/picomatch
+node_modules/picomatch
+node_modules/tailwindcss/node_modules/picomatch
+node_modules/webpack-dev-server/node_modules/picomatch
+  @angular-devkit/build-angular  0.1000.0-next.0 - 0.1000.0-rc.1 || >=0.1100.0-next.0
+  Depends on vulnerable versions of @angular-devkit/architect
+  Depends on vulnerable versions of @angular-devkit/build-webpack
+  Depends on vulnerable versions of @angular-devkit/core
+  Depends on vulnerable versions of @angular/build
+  Depends on vulnerable versions of copy-webpack-plugin
+  Depends on vulnerable versions of http-proxy-middleware
+  Depends on vulnerable versions of karma
+  Depends on vulnerable versions of picomatch
+  Depends on vulnerable versions of tinyglobby
+  Depends on vulnerable versions of webpack-dev-server
+  node_modules/@angular-devkit/build-angular
+  @angular-devkit/core  >=16.2.1
+  Depends on vulnerable versions of picomatch
+  node_modules/@angular-devkit/core
+    @angular-devkit/architect  0.1000.0-next.0 - 0.1000.0-rc.1 || >=0.1602.1
+    Depends on vulnerable versions of @angular-devkit/core
+    node_modules/@angular-devkit/architect
+      @angular-devkit/build-webpack  >=0.1300.0-next.0
+      Depends on vulnerable versions of @angular-devkit/architect
+      Depends on vulnerable versions of webpack-dev-server
+      node_modules/@angular-devkit/build-webpack
+    @angular-devkit/schematics  >=16.2.1
+    Depends on vulnerable versions of @angular-devkit/core
+    node_modules/@angular-devkit/schematics
+    @angular/cli  10.0.0-next.0 - 10.0.0-rc.1 || 14.1.0-next.0 - 14.1.0-rc.3 || >=16.2.1
+    Depends on vulnerable versions of @angular-devkit/architect
+    Depends on vulnerable versions of @angular-devkit/core
+    Depends on vulnerable versions of @angular-devkit/schematics
+    Depends on vulnerable versions of @schematics/angular
+    node_modules/@angular/cli
+    @schematics/angular  >=16.2.1
+    Depends on vulnerable versions of @angular-devkit/core
+    Depends on vulnerable versions of @angular-devkit/schematics
+    node_modules/@schematics/angular
+  @angular/build  *
+  Depends on vulnerable versions of @angular-devkit/architect
+  Depends on vulnerable versions of karma
+  Depends on vulnerable versions of picomatch
+  Depends on vulnerable versions of tinyglobby
+  Depends on vulnerable versions of vite
+  node_modules/@angular-devkit/build-angular/node_modules/@angular/build
+  @parcel/watcher  >=2.5.4
+  Depends on vulnerable versions of picomatch
+  node_modules/@parcel/watcher
+  anymatch  >=3.0.0
+  Depends on vulnerable versions of picomatch
+  node_modules/anymatch
+  fdir  >=5.2.1
+  Depends on vulnerable versions of picomatch
+  node_modules/fdir
+    vite  >=6.3.0-beta.0
+    Depends on vulnerable versions of fdir
+    Depends on vulnerable versions of picomatch
+    Depends on vulnerable versions of tinyglobby
+    node_modules/@angular-devkit/build-angular/node_modules/@angular/build/node_modules/vite
+  micromatch  >=4.0.0
+  Depends on vulnerable versions of picomatch
+  node_modules/micromatch
+    fast-glob  >=3.0.0
+    Depends on vulnerable versions of micromatch
+    node_modules/fast-glob
+    http-proxy-middleware  >=0.20.0-beta.0
+    Depends on vulnerable versions of micromatch
+    node_modules/http-proxy-middleware
+    node_modules/webpack-dev-server/node_modules/http-proxy-middleware
+      webpack-dev-server  >=4.0.0-beta.0
+      Depends on vulnerable versions of chokidar
+      Depends on vulnerable versions of http-proxy-middleware
+      node_modules/webpack-dev-server
+    tailwindcss  <=0.0.0-oxide-insiders.ff2c25f || 2.1.0-canary.1 - 3.4.19
+    Depends on vulnerable versions of chokidar
+    Depends on vulnerable versions of fast-glob
+    Depends on vulnerable versions of micromatch
+    node_modules/tailwindcss
+  readdirp  3.0.0 - 3.6.0
+  Depends on vulnerable versions of picomatch
+  node_modules/karma/node_modules/readdirp
+  node_modules/tailwindcss/node_modules/readdirp
+  node_modules/webpack-dev-server/node_modules/readdirp
+    chokidar  3.0.0 - 3.6.0
+    Depends on vulnerable versions of anymatch
+    Depends on vulnerable versions of readdirp
+    node_modules/karma/node_modules/chokidar
+    node_modules/tailwindcss/node_modules/chokidar
+    node_modules/webpack-dev-server/node_modules/chokidar
+      karma  >=4.2.0
+      Depends on vulnerable versions of chokidar
+      node_modules/karma
+        karma-jasmine  >=5.0.0
+        Depends on vulnerable versions of karma
+        node_modules/karma-jasmine
+        karma-jasmine-html-reporter  >=2.0.0
+        Depends on vulnerable versions of karma
+        Depends on vulnerable versions of karma-jasmine
+        node_modules/karma-jasmine-html-reporter
+  tinyglobby  *
+  Depends on vulnerable versions of fdir
+  Depends on vulnerable versions of picomatch
+  node_modules/tinyglobby
+    copy-webpack-plugin  >=13.0.0
+    Depends on vulnerable versions of tinyglobby
+    node_modules/copy-webpack-plugin
+    node-gyp  >=11.2.0
+    Depends on vulnerable versions of tinyglobby
+    node_modules/node-gyp
+      @npmcli/run-script  >=10.0.3
+      Depends on vulnerable versions of node-gyp
+      node_modules/@npmcli/run-script
+    sucrase  >=3.35.1
+    Depends on vulnerable versions of tinyglobby
+    node_modules/sucrase
+
+28 high severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

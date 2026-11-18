@@ -11,7 +11,7 @@
  * └──────────────────────────────────────────────────────────────────────┘
  *
  * Os placeholders abaixo precisam dos dados reais antes de publicar:
- *   {{RAZAO_SOCIAL}}  {{CNPJ}}  {{ENDERECO}}  {{EMAIL_CONTATO}}
+ *   {{RAZAO_SOCIAL}}  {{DOCUMENTO}}  {{ENDERECO}}  {{EMAIL_CONTATO}}
  */
 
 export interface LegalSection {
@@ -29,7 +29,7 @@ export interface LegalDocument {
   sections: readonly LegalSection[];
 }
 
-const CONTATO = 'contato@investindoemnegocios.com.br';
+const CONTATO = '{{EMAIL_CONTATO}}';
 
 export const TERMOS_DE_USO: LegalDocument = {
   slug: 'termos',
@@ -37,12 +37,12 @@ export const TERMOS_DE_USO: LegalDocument = {
   title: 'Termos de uso',
   summary:
     'As regras de uso da plataforma Investindo em Negócios: o que você pode esperar de nós e o que esperamos de você.',
-  updatedAt: '12 de agosto de 2026',
+  updatedAt: '15 de novembro de 2026',
   sections: [
     {
       title: '1. Quem somos e o que este documento cobre',
       paragraphs: [
-        'A plataforma Investindo em Negócios é operada por {{RAZAO_SOCIAL}}, inscrita no CNPJ {{CNPJ}}, com sede em {{ENDERECO}}.',
+        'A plataforma Investindo em Negócios é operada por {{RAZAO_SOCIAL}}, identificada pelo CPF/CNPJ {{DOCUMENTO}}, com sede em {{ENDERECO}}.',
         'Estes Termos regulam o acesso e o uso do site e do aplicativo web. Ao criar uma conta ou usar a plataforma, você concorda com eles. Se não concordar, não use o serviço.',
       ],
     },
@@ -119,12 +119,12 @@ export const POLITICA_PRIVACIDADE: LegalDocument = {
   title: 'Política de privacidade',
   summary:
     'Quais dados coletamos, por que coletamos, com quem compartilhamos e como você exerce seus direitos sob a LGPD.',
-  updatedAt: '12 de agosto de 2026',
+  updatedAt: '15 de novembro de 2026',
   sections: [
     {
       title: '1. Controlador e encarregado',
       paragraphs: [
-        'O controlador dos dados é {{RAZAO_SOCIAL}}, CNPJ {{CNPJ}}. Para exercer seus direitos ou tirar dúvidas sobre privacidade, fale com o encarregado pelo tratamento de dados em {{EMAIL_CONTATO}}.',
+        'O controlador dos dados é {{RAZAO_SOCIAL}}, CPF/CNPJ {{DOCUMENTO}}. Para exercer seus direitos ou tirar dúvidas sobre privacidade, fale com o encarregado pelo tratamento de dados em {{EMAIL_CONTATO}}.',
       ],
     },
     {

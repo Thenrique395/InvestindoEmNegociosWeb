@@ -92,6 +92,7 @@ test.describe('orçamento mensal', () => {
   });
 
   test('copia orçamento do mês anterior para o mês atual', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-08-15T12:00:00-03:00') });
     await page.route('**/api/v1/budget/**', async (route) => {
       const request = route.request();
       const url = new URL(request.url());
@@ -298,7 +299,7 @@ test.describe('simulador de cenários', () => {
   test('simula com diferentes períodos usando o seletor', async ({ page }) => {
     await page.goto('/simulador', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('radio', { name: '3 meses' }).click();
+    await page.getByRole('radio', { name: 'Este trimestre' }).click();
     await page.getByRole('button', { name: 'Simular cenário' }).click();
 
     await expect(page.getByText('Saldo projetado (base)')).toBeVisible();

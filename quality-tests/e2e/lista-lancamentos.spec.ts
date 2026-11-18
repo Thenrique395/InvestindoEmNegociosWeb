@@ -1,3 +1,4 @@
+import { selectOption } from './support/select-option';
 /**
  * Guarda os dois ajustes da tabela de lançamentos:
  *  - largura declarada por coluna (sem ela, `truncate` aplica max-width:0 e as colunas de
@@ -45,12 +46,12 @@ test.describe('tabela de lançamentos: larguras e itens por página', () => {
     if (await sel.count()) {
       console.log('opções:', await sel.locator('option').allTextContents());
 
-      await sel.selectOption('16');
+      await selectOption(sel, '16');
       await page.waitForTimeout(400);
       console.log('após escolher 16 -> linhas:', await page.locator('.responsive-list__row').count());
       console.log('rodapé:', (await page.locator('.responsive-list__range').textContent())?.trim());
 
-      await sel.selectOption('8');
+      await selectOption(sel, '8');
       await page.waitForTimeout(400);
       console.log('voltando a 8  -> linhas:', await page.locator('.responsive-list__row').count());
 

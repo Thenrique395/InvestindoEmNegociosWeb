@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
@@ -43,12 +43,15 @@ import { AccountStepComponent } from './steps/account-step.component';
 import { CartaoFormComponent } from '../shared/cartao-form/cartao-form.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-onboarding',
   standalone: true,
   imports: [CommonModule, ReceitasFormComponent, DespesasFormComponent, OnboardingRailComponent, FocusStepComponent, PreferencesStepComponent, ProfileStepComponent, AccountStepComponent, CartaoFormComponent],
   templateUrl: './onboarding.component.html'
 })
 export class OnboardingComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   form: FormGroup<{
     fullName: FormControl<string>;
     document: FormControl<string>;
@@ -264,6 +267,7 @@ export class OnboardingComponent implements OnInit {
     this.restoreInitialEntries();
 
     this.userContext.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((state) => {
+        this.changeDetector.markForCheck();
       this.displayName = state.displayName;
       this.userInitials = state.userInitials;
     });
@@ -271,6 +275,7 @@ export class OnboardingComponent implements OnInit {
 
     this.onboarding.getStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (status) => {
+        this.changeDetector.markForCheck();
         if (status.completed) {
           this.router.navigateByUrl('/dashboard');
           return;
@@ -279,12 +284,14 @@ export class OnboardingComponent implements OnInit {
         this.loadProfile(true);
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.loadProfile(true);
       }
     });
 
     this.accountsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (accounts) => {
+        this.changeDetector.markForCheck();
         const active = (accounts || []).filter((a) => a.isActive);
         this.accountReady = active.length > 0;
         if (this.accountReady) {
@@ -292,6 +299,7 @@ export class OnboardingComponent implements OnInit {
         }
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.accountReady = false;
       }
     });
@@ -331,12 +339,14 @@ export class OnboardingComponent implements OnInit {
     const payload = this.normalizePayload();
     this.profile.upsert(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
         this.uiFeedback.success('Dados do perfil salvos. Vamos para a conta e os primeiros lançamentos.');
         this.announce('Dados e objetivo salvos com sucesso.');
         this.nextStep();
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         if (err?.status === 401) {
           this.uiFeedback.error('Sessão expirada. Faça login novamente.');
           this.announce('Sessão expirada. Faça login novamente.');
@@ -413,11 +423,13 @@ export class OnboardingComponent implements OnInit {
     this.savingEntries = true;
     this.onboarding.updateStatus({ step: this.step, completed: true }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.savingEntries = false;
         this.clearDraft();
         this.router.navigateByUrl('/dashboard');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.savingEntries = false;
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao concluir onboarding.'));
         this.announce('Falha ao concluir onboarding.');
@@ -447,6 +459,7 @@ export class OnboardingComponent implements OnInit {
       currency: 'BRL'
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (account) => {
+        this.changeDetector.markForCheck();
         this.creatingAccount = false;
         this.accountReady = true;
         this.accountsService.setDefaultAccountId(account.id);
@@ -454,6 +467,7 @@ export class OnboardingComponent implements OnInit {
         this.announce('Conta criada com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.creatingAccount = false;
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao criar conta.'));
         this.announce('Falha ao criar conta.');
@@ -545,11 +559,13 @@ export class OnboardingComponent implements OnInit {
   private loadPaymentMethods(): void {
     this.lookupsService.paymentMethods().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (methods) => {
+        this.changeDetector.markForCheck();
         this.paymentMethods = methods || [];
       },
       // Lista vazia é o pior caso aceitável: a despesa inicial pode ser salva
       // sem forma de pagamento, e o onboarding não trava por causa do lookup.
       error: () => {
+        this.changeDetector.markForCheck();
         this.paymentMethods = [];
       }
     });
@@ -558,6 +574,7 @@ export class OnboardingComponent implements OnInit {
   private restoreInitialEntries(): void {
     this.plansService.list('Income').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (planos) => {
+        this.changeDetector.markForCheck();
         const plano = this.maisRecente(planos);
         if (!plano) return;
         this.initialIncome = {
@@ -571,11 +588,12 @@ export class OnboardingComponent implements OnInit {
       },
       // Sem lançamento recuperado o passo segue como novo cadastro: é o
       // comportamento de antes, e não vale bloquear o onboarding por isso.
-      error: () => undefined
+      error: () => { this.changeDetector.markForCheck(); return undefined; }
     });
 
     this.plansService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (planos) => {
+        this.changeDetector.markForCheck();
         const plano = this.maisRecente(planos);
         if (!plano) return;
         this.initialExpense = {
@@ -589,7 +607,7 @@ export class OnboardingComponent implements OnInit {
           cardId: plano.cardId ?? null
         };
       },
-      error: () => undefined
+      error: () => { this.changeDetector.markForCheck(); return undefined; }
     });
   }
 
@@ -689,6 +707,7 @@ export class OnboardingComponent implements OnInit {
 
     requisicao.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (plano) => {
+        this.changeDetector.markForCheck();
         this.savingIncomeModal = false;
         this.showIncomeModal = false;
         this.initialIncome = {
@@ -702,6 +721,7 @@ export class OnboardingComponent implements OnInit {
         this.uiFeedback.success(editando ? 'Receita inicial atualizada.' : 'Receita inicial cadastrada.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.savingIncomeModal = false;
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cadastrar receita inicial.'));
       }
@@ -922,6 +942,7 @@ export class OnboardingComponent implements OnInit {
 
     requisicao.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (plano) => {
+        this.changeDetector.markForCheck();
         this.savingExpenseModal = false;
         this.showExpenseModal = false;
         this.initialExpense = {
@@ -937,6 +958,7 @@ export class OnboardingComponent implements OnInit {
         this.uiFeedback.success(editando ? 'Despesa inicial atualizada.' : 'Despesa inicial cadastrada.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.savingExpenseModal = false;
         this.uiFeedback.error(extractApiErrorMessage(err, 'Falha ao cadastrar despesa inicial.'));
       }
@@ -972,10 +994,12 @@ export class OnboardingComponent implements OnInit {
 
     this.cardsService.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (cards) => {
+        this.changeDetector.markForCheck();
         this.cardsCount = (cards || []).length;
         this.modalExpenseCartoes = (cards || []).map((card) => toStoredCard(card));
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.cardsCount = 0;
         this.modalExpenseCartoes = [];
       }
@@ -990,9 +1014,11 @@ export class OnboardingComponent implements OnInit {
     if (!type || type === 'Expense') {
       this.categoriesService.list('Expense').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (categories) => {
+        this.changeDetector.markForCheck();
           this.expenseCategories = categories || [];
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.expenseCategories = [];
         }
       });
@@ -1001,9 +1027,11 @@ export class OnboardingComponent implements OnInit {
     if (!type || type === 'Income') {
       this.categoriesService.list('Income').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (categories) => {
+        this.changeDetector.markForCheck();
           this.incomeCategories = categories || [];
         },
         error: () => {
+        this.changeDetector.markForCheck();
           this.incomeCategories = [];
         }
       });
@@ -1044,6 +1072,7 @@ export class OnboardingComponent implements OnInit {
   private persistStep(completed: boolean): void {
     this.onboarding.updateStatus({ step: this.step, completed }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => {
+        this.changeDetector.markForCheck();
         /* ignore */
       }
     });
@@ -1068,6 +1097,7 @@ export class OnboardingComponent implements OnInit {
   private announce(message: string): void {
     this.liveMessage = '';
     setTimeout(() => {
+        this.changeDetector.markForCheck();
       this.liveMessage = message;
     }, 0);
   }
@@ -1075,6 +1105,7 @@ export class OnboardingComponent implements OnInit {
   private loadProfile(prefillForm: boolean): void {
     this.profile.getProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
+        this.changeDetector.markForCheck();
         if (!data) {
           if (prefillForm) this.prefillProfileFromSession();
           return;
@@ -1117,6 +1148,7 @@ export class OnboardingComponent implements OnInit {
         });
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         if (err.status === 401) {
           this.router.navigateByUrl('/login');
           return;

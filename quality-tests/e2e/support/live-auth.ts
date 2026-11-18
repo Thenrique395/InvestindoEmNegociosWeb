@@ -1,3 +1,4 @@
+import { selectOption } from './select-option';
 import { expect, type Page } from '@playwright/test';
 import { LoginPage } from './page-objects/login.page';
 import { UserMenuComponent } from './page-objects/user-menu.component';
@@ -200,7 +201,7 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
   await page.getByRole('button', { name: 'Adicionar receita' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar receita' })).toBeVisible();
   await page.getByLabel('Fonte').fill('Salario teste live');
-  await page.locator('select[name="categoria"]').first().selectOption({ index: 1 });
+  await selectOption(page.locator('select[name="categoria"]').first(), { index: 1 });
   await page.locator('input[name="valor"]').fill('500000');
   await page.locator('input[name="recebimento"]').fill('09032026');
   await page.getByRole('button', { name: 'Salvar receita' }).click();
@@ -209,7 +210,7 @@ export async function completeLiveOnboarding(page: Page, workerIndex: number, re
   await page.getByRole('button', { name: 'Adicionar despesa' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Adicionar lançamento' })).toBeVisible();
   await page.getByLabel('Nome da despesa').fill('Mercado teste live');
-  await page.locator('select[name="categoria"]').last().selectOption({ index: 1 });
+  await selectOption(page.locator('select[name="categoria"]').last(), { index: 1 });
   await page.locator('input[name="valor"]').last().fill('9000');
   await page.locator('input[name="vencimento"]').fill('09032026');
   await page.getByRole('button', { name: 'Salvar despesa' }).click();

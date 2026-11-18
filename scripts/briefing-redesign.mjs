@@ -120,22 +120,14 @@ if (total === 0 && !regressoes.length) {
 } else {
   console.log(`  ${amarelo}${total} violações${fim} de dívida herdada, mapeadas na ${NEGRITO}Fase 8${fim} do PLANO_REDESIGN.md.
 
-  A ordem é por dependência, não por tamanho — 8.1 primeiro, porque as etapas seguintes
-  reescrevem os mesmos arquivos. Ajustar sombra num card que vai ser trocado é trabalho
-  jogado fora.
+  Se só R8 estiver aberta, a frente atual é migração gradual para signals + OnPush. Faça uma
+  tela por vez: signals primeiro, ${fraco}ChangeDetectionStrategy.OnPush${fim} depois, e baixe
+  o ${fraco}BASELINE.R8${fim} no mesmo commit.
 
-  ${NEGRITO}8.1 tem uma decisão pendente que bloqueia o resto${fim} e não é de escrever código:
-  em cada par ${fraco}primitivo do handoff × componente legado${fim}, decidir qual sobrevive.
-  O outro é ${NEGRITO}apagado${fim} — manter os dois é o que a regra R1 mede.
-
-    app-kpi-strip      × app-transaction-summary-card
-    app-progress-bar   × app-usage-bar
-    app-data-table     × app-responsive-list      ${fraco}← o legado tem argumento real:${fim}
-    app-money          × formatCurrency na tela   ${fraco}  já resolve tabela→cards no mobile${fim}
-    app-chart-line     × SVG próprio da feature
-
-  Registre a decisão na tabela da Fase 8 ${NEGRITO}antes${fim} de migrar. Se o legado vencer, o
-  primitivo é apagado e ARQUITETURA_ANGULAR.md §7 recebe a emenda.`);
+  Comece pelas telas menores, deixe ${fraco}home${fim}, ${fraco}onboarding${fim},
+  ${fraco}invoice-import${fim}, ${fraco}contas${fim}, ${fraco}checkout${fim} e
+  ${fraco}app.component${fim} para as frentes maiores. O ${fraco}app.component${fim} é o shell:
+  ele deve ser o último.`);
 }
 
 /* ------------------------------------------------------------------- fechamento */

@@ -6,3 +6,9 @@ test-results
 .vscode
 *.log
 npm-debug.log*
+
+# Configuração e histórico locais não pertencem à imagem.
+.git
+.env
+.env.*
+!.env.example

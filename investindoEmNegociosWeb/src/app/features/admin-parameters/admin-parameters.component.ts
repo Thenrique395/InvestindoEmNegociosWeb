@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { UiStateComponent } from '../../shared/ui-state/ui-state.component';
 import { resolveApiErrorMessage } from '../../core/utils/api-error.mapper';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-admin-parameters',
   standalone: true,
   imports: [FormsModule, ConfirmDialogComponent, PageHeaderComponent, StatusBadgeComponent, UiStateComponent],
@@ -19,6 +20,8 @@ import { resolveApiErrorMessage } from '../../core/utils/api-error.mapper';
   styleUrls: ['./admin-parameters.component.scss']
 })
 export class AdminParametersComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   cardBrands: CardBrandAdmin[] = [];
   paymentMethods: PaymentMethodAdmin[] = [];
   institutions: InstitutionAdmin[] = [];
@@ -128,6 +131,7 @@ export class AdminParametersComponent implements OnInit {
       )
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: ({ brands, methods, institutions, notifications, robots, scalability }) => {
+        this.changeDetector.markForCheck();
         this.cardBrands = brands;
         this.paymentMethods = methods;
         this.institutions = institutions;
@@ -140,10 +144,12 @@ export class AdminParametersComponent implements OnInit {
         this.scalabilityRuntime = scalability;
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error('Não foi possível carregar os parâmetros.');
         this.loading = false;
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
       }
     });
@@ -176,6 +182,7 @@ export class AdminParametersComponent implements OnInit {
     this.savingCreateBrand = true;
     this.adminParameters.createCardBrand(name, code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
+        this.changeDetector.markForCheck();
         this.cardBrands = [...this.cardBrands, created].sort((a, b) => a.id - b.id);
         this.lastUpdatedBrands[created.id] = new Date();
         this.newBrandName = '';
@@ -183,9 +190,11 @@ export class AdminParametersComponent implements OnInit {
         this.uiFeedback.success('Bandeira cadastrada com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao cadastrar a bandeira.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.savingCreateBrand = false;
       }
     });
@@ -232,15 +241,18 @@ export class AdminParametersComponent implements OnInit {
     this.savingCreateMethod = true;
     this.adminParameters.createPaymentMethod(name).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
+        this.changeDetector.markForCheck();
         this.paymentMethods = [...this.paymentMethods, created].sort((a, b) => a.id - b.id);
         this.lastUpdatedMethods[created.id] = new Date();
         this.newMethodName = '';
         this.uiFeedback.success('Forma de pagamento cadastrada com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao cadastrar a forma de pagamento.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.savingCreateMethod = false;
       }
     });
@@ -257,15 +269,18 @@ export class AdminParametersComponent implements OnInit {
     this.savingCreateInstitution = true;
     this.adminParameters.createInstitution(name, this.newInstitutionType).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (created) => {
+        this.changeDetector.markForCheck();
         this.institutions = [...this.institutions, created].sort((a, b) => a.name.localeCompare(b.name));
         this.lastUpdatedInstitutions[created.id] = new Date();
         this.newInstitutionName = '';
         this.uiFeedback.success('Instituição cadastrada com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao cadastrar a instituição.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.savingCreateInstitution = false;
       }
     });
@@ -276,14 +291,17 @@ export class AdminParametersComponent implements OnInit {
     this.savingNotificationSettings = true;
     this.adminParameters.updateNotificationSettings(this.notificationSettings).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
+        this.changeDetector.markForCheck();
         this.notificationSettings = updated;
         this.notificationsUpdatedAt = new Date();
         this.uiFeedback.success('Notificações globais atualizadas com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao salvar notificações.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.savingNotificationSettings = false;
       }
     });
@@ -299,14 +317,17 @@ export class AdminParametersComponent implements OnInit {
     this.savingRobotSettings = true;
     this.adminParameters.updateRobotSettings(this.robotSettings).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
+        this.changeDetector.markForCheck();
         this.robotSettings = updated;
         this.robotsUpdatedAt = new Date();
         this.uiFeedback.success('Agendamento dos robôs atualizado com sucesso.');
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao salvar agendamento dos robôs.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.savingRobotSettings = false;
       }
     });
@@ -323,14 +344,17 @@ export class AdminParametersComponent implements OnInit {
     this.sendingTestEmail = true;
     this.adminParameters.sendTestEmail(to).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
+        this.changeDetector.markForCheck();
         this.testEmailTo = result.to;
         this.testEmailSentAt = new Date(result.sentAtUtc);
         this.uiFeedback.success(`E-mail de teste enviado para ${result.to}.`);
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(resolveApiErrorMessage(err,'Erro ao enviar e-mail de teste.'));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.sendingTestEmail = false;
       }
     });
@@ -446,16 +470,18 @@ export class AdminParametersComponent implements OnInit {
 
     this.adminParameters.updateCardBrandStatus(brand.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
+        this.changeDetector.markForCheck();
         brand.isActive = updated.isActive;
         this.lastUpdatedBrands[brand.id] = new Date();
         this.uiFeedback.success(`Bandeira ${updated.isActive ? 'ativada' : 'desativada'} com sucesso.`);
       },
       error: () => {
+        this.changeDetector.markForCheck();
         brand.isActive = !next;
         this.uiFeedback.error('Erro ao atualizar a bandeira.');
         this.savingKey = '';
       },
-      complete: () => (this.savingKey = '')
+      complete: () => { this.changeDetector.markForCheck(); return (this.savingKey = ''); }
     });
   }
 
@@ -466,16 +492,18 @@ export class AdminParametersComponent implements OnInit {
 
     this.adminParameters.updatePaymentMethodStatus(method.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
+        this.changeDetector.markForCheck();
         method.isActive = updated.isActive;
         this.lastUpdatedMethods[method.id] = new Date();
         this.uiFeedback.success(`Forma de pagamento ${updated.isActive ? 'ativada' : 'desativada'} com sucesso.`);
       },
       error: () => {
+        this.changeDetector.markForCheck();
         method.isActive = !next;
         this.uiFeedback.error('Erro ao atualizar a forma de pagamento.');
         this.savingKey = '';
       },
-      complete: () => (this.savingKey = '')
+      complete: () => { this.changeDetector.markForCheck(); return (this.savingKey = ''); }
     });
   }
 
@@ -486,16 +514,18 @@ export class AdminParametersComponent implements OnInit {
 
     this.adminParameters.updateInstitutionStatus(institution.id, next).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
+        this.changeDetector.markForCheck();
         institution.isActive = updated.isActive;
         this.lastUpdatedInstitutions[institution.id] = new Date();
         this.uiFeedback.success(`Instituição ${updated.isActive ? 'ativada' : 'desativada'} com sucesso.`);
       },
       error: () => {
+        this.changeDetector.markForCheck();
         institution.isActive = !next;
         this.uiFeedback.error('Erro ao atualizar a instituição.');
         this.savingKey = '';
       },
-      complete: () => (this.savingKey = '')
+      complete: () => { this.changeDetector.markForCheck(); return (this.savingKey = ''); }
     });
   }
 

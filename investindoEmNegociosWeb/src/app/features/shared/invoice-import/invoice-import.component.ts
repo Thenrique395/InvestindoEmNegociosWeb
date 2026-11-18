@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { InvoiceImportService, InvoiceReconciliationResponse } from '../../../core/invoice-import.service';
@@ -44,6 +44,7 @@ type InvoiceExtract = {
 };
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-invoice-import',
   standalone: true,
   imports: [FormsModule],
@@ -775,6 +776,8 @@ type InvoiceExtract = {
   `]
 })
 export class InvoiceImportComponent implements OnChanges {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   @Input() open = false;
   @Input() cards: StoredCard[] = [];
   @Input() categories: CategoryDto[] = [];
@@ -825,6 +828,7 @@ export class InvoiceImportComponent implements OnChanges {
 
     this.invoiceImport.extract(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
+        this.changeDetector.markForCheck();
         const displayTotal = this.resolveDisplayTotal(response.total, response.totalDebitsBrazil);
         this.extract = {
           total: displayTotal,
@@ -843,9 +847,11 @@ export class InvoiceImportComponent implements OnChanges {
         this.refreshReconciliation();
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.error = extractApiErrorMessage(err, 'Nao foi possivel ler o PDF.');
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
         input.value = '';
       }
@@ -887,14 +893,17 @@ export class InvoiceImportComponent implements OnChanges {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
+        this.changeDetector.markForCheck();
           this.imported.emit(result);
           this.clear();
           this.close.emit();
         },
         error: (err) => {
+        this.changeDetector.markForCheck();
           this.error = extractApiErrorMessage(err, 'Falha ao salvar a fatura.');
         },
         complete: () => {
+        this.changeDetector.markForCheck();
           this.importing = false;
         }
       });
@@ -1002,12 +1011,15 @@ export class InvoiceImportComponent implements OnChanges {
       }))
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
+        this.changeDetector.markForCheck();
         this.reconciliation = result;
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.reconciliation = null;
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.reconciling = false;
       }
     });

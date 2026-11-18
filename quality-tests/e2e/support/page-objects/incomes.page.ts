@@ -1,3 +1,4 @@
+import { selectOption, expectOption } from '../select-option';
 import { expect, type Locator, type Page } from '@playwright/test';
 
 export class IncomesPage {
@@ -10,7 +11,7 @@ export class IncomesPage {
 
   async openCreateModal() {
     await this.page.getByRole('button', { name: 'Adicionar receita', exact: true }).click();
-    await expect(this.page.getByRole('heading', { level: 2, name: 'Adicionar receita' })).toBeVisible();
+    await expect(this.page.getByRole('heading', { level: 2, name: 'Registrar uma entrada' })).toBeVisible();
   }
 
   createForm(): Locator {
@@ -27,13 +28,13 @@ export class IncomesPage {
   }
 
   async expectCategoryOptionVisible(name: string) {
-    await expect(this.createForm().getByLabel('Categoria')).toContainText(name);
+    await expectOption(this.createForm().getByLabel('Categoria'), name);
   }
 
   async createIncome(name: string, categoryName: string, amount: string, recurring = false, receivedDateDDMMYYYY = '09032026') {
     const form = this.createForm();
     await form.getByRole('textbox', { name: 'Fonte', exact: true }).fill(name);
-    await form.getByLabel('Categoria').selectOption({ label: categoryName });
+    await selectOption(form.getByLabel('Categoria'), { label: categoryName });
     if (recurring) {
       // O input real é "sr-only" (escondido visualmente; a UI usa um switch customizado),
       // então o Playwright não o considera "visible" para a ação check() padrão.
@@ -68,7 +69,7 @@ export class IncomesPage {
   }
 
   async filterRecurring() {
-    await this.page.getByLabel('Tipo').selectOption('recurring');
+    await selectOption(this.page.getByLabel('Tipo'), 'recurring');
   }
 
   async openEdit(name: string) {

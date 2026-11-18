@@ -65,9 +65,8 @@ export function buildScenarioChartPoints(
 /** Rótulo amigável do período simulado. */
 export function scenarioPeriodLabel(period: string): string {
   switch (period) {
-    case 'quarter': return 'Próximos 3 meses';
-    case 'semester': return 'Próximos 6 meses';
-    case 'year': return 'Próximos 12 meses';
+    case 'quarter': return 'Até o fim deste trimestre';
+    case 'year': return 'Até o fim deste ano';
     default: return 'Este mês';
   }
 }

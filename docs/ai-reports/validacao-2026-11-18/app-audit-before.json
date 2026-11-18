@@ -1,0 +1,594 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@angular-devkit/architect": {
+      "name": "@angular-devkit/architect",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@angular-devkit/core"
+      ],
+      "effects": [
+        "@angular-devkit/build-webpack"
+      ],
+      "range": "0.1000.0-next.0 - 0.1000.0-rc.1 || >=0.1602.1",
+      "nodes": [
+        "node_modules/@angular-devkit/architect"
+      ],
+      "fixAvailable": true
+    },
+    "@angular-devkit/build-angular": {
+      "name": "@angular-devkit/build-angular",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@angular-devkit/architect",
+        "@angular-devkit/build-webpack",
+        "@angular-devkit/core",
+        "@angular/build",
+        "copy-webpack-plugin",
+        "http-proxy-middleware",
+        "karma",
+        "picomatch",
+        "tinyglobby",
+        "webpack-dev-server"
+      ],
+      "effects": [],
+      "range": "0.1000.0-next.0 - 0.1000.0-rc.1 || >=0.1100.0-next.0",
+      "nodes": [
+        "node_modules/@angular-devkit/build-angular"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@angular-devkit/build-webpack": {
+      "name": "@angular-devkit/build-webpack",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@angular-devkit/architect",
+        "webpack-dev-server"
+      ],
+      "effects": [],
+      "range": ">=0.1300.0-next.0",
+      "nodes": [
+        "node_modules/@angular-devkit/build-webpack"
+      ],
+      "fixAvailable": true
+    },
+    "@angular-devkit/core": {
+      "name": "@angular-devkit/core",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "picomatch"
+      ],
+      "effects": [
+        "@angular-devkit/architect",
+        "@angular-devkit/build-angular",
+        "@angular-devkit/schematics",
+        "@angular/cli",
+        "@schematics/angular"
+      ],
+      "range": ">=16.2.1",
+      "nodes": [
+        "node_modules/@angular-devkit/core"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@angular-devkit/schematics": {
+      "name": "@angular-devkit/schematics",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@angular-devkit/core"
+      ],
+      "effects": [],
+      "range": ">=16.2.1",
+      "nodes": [
+        "node_modules/@angular-devkit/schematics"
+      ],
+      "fixAvailable": true
+    },
+    "@angular/build": {
+      "name": "@angular/build",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@angular-devkit/architect",
+        "karma",
+        "picomatch",
+        "tinyglobby",
+        "vite"
+      ],
+      "effects": [
+        "@angular-devkit/build-angular"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@angular-devkit/build-angular/node_modules/@angular/build"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@angular/cli": {
+      "name": "@angular/cli",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@angular-devkit/architect",
+        "@angular-devkit/core",
+        "@angular-devkit/schematics",
+        "@schematics/angular"
+      ],
+      "effects": [],
+      "range": "10.0.0-next.0 - 10.0.0-rc.1 || 14.1.0-next.0 - 14.1.0-rc.3 || >=16.2.1",
+      "nodes": [
+        "node_modules/@angular/cli"
+      ],
+      "fixAvailable": {
+        "name": "@angular/cli",
+        "version": "16.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/run-script": {
+      "name": "@npmcli/run-script",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "node-gyp"
+      ],
+      "effects": [],
+      "range": ">=10.0.3",
+      "nodes": [
+        "node_modules/@npmcli/run-script"
+      ],
+      "fixAvailable": true
+    },
+    "@parcel/watcher": {
+      "name": "@parcel/watcher",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "picomatch"
+      ],
+      "effects": [],
+      "range": ">=2.5.4",
+      "nodes": [
+        "node_modules/@parcel/watcher"
+      ],
+      "fixAvailable": true
+    },
+    "@schematics/angular": {
+      "name": "@schematics/angular",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@angular-devkit/core",
+        "@angular-devkit/schematics"
+      ],
+      "effects": [],
+      "range": ">=16.2.1",
+      "nodes": [
+        "node_modules/@schematics/angular"
+      ],
+      "fixAvailable": true
+    },
+    "anymatch": {
+      "name": "anymatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "picomatch"
+      ],
+      "effects": [
+        "chokidar"
+      ],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/anymatch"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.5",
+        "isSemVerMajor": true
+      }
+    },
+    "chokidar": {
+      "name": "chokidar",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "anymatch",
+        "readdirp"
+      ],
+      "effects": [
+        "karma",
+        "tailwindcss",
+        "webpack-dev-server"
+      ],
+      "range": "3.0.0 - 3.6.0",
+      "nodes": [
+        "node_modules/karma/node_modules/chokidar",
+        "node_modules/tailwindcss/node_modules/chokidar",
+        "node_modules/webpack-dev-server/node_modules/chokidar"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.5",
+        "isSemVerMajor": true
+      }
+    },
+    "copy-webpack-plugin": {
+      "name": "copy-webpack-plugin",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "tinyglobby"
+      ],
+      "effects": [
+        "@angular-devkit/build-angular"
+      ],
+      "range": ">=13.0.0",
+      "nodes": [
+        "node_modules/copy-webpack-plugin"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "fast-glob": {
+      "name": "fast-glob",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/fast-glob"
+      ],
+      "fixAvailable": true
+    },
+    "fdir": {
+      "name": "fdir",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "picomatch"
+      ],
+      "effects": [
+        "vite"
+      ],
+      "range": ">=5.2.1",
+      "nodes": [
+        "node_modules/fdir"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "http-proxy-middleware": {
+      "name": "http-proxy-middleware",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "@angular-devkit/build-angular",
+        "webpack-dev-server"
+      ],
+      "range": ">=0.20.0-beta.0",
+      "nodes": [
+        "node_modules/http-proxy-middleware",
+        "node_modules/webpack-dev-server/node_modules/http-proxy-middleware"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "karma": {
+      "name": "karma",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "chokidar"
+      ],
+      "effects": [
+        "@angular-devkit/build-angular",
+        "@angular/build",
+        "karma-jasmine",
+        "karma-jasmine-html-reporter"
+      ],
+      "range": ">=4.2.0",
+      "nodes": [
+        "node_modules/karma"
+      ],
+      "fixAvailable": {
+        "name": "karma",
+        "version": "4.1.0",
+        "isSemVerMajor": true
+      }
+    },
+    "karma-jasmine": {
+      "name": "karma-jasmine",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "karma"
+      ],
+      "effects": [],
+      "range": ">=5.0.0",
+      "nodes": [
+        "node_modules/karma-jasmine"
+      ],
+      "fixAvailable": {
+        "name": "karma-jasmine",
+        "version": "4.0.2",
+        "isSemVerMajor": true
+      }
+    },
+    "karma-jasmine-html-reporter": {
+      "name": "karma-jasmine-html-reporter",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "karma",
+        "karma-jasmine"
+      ],
+      "effects": [],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/karma-jasmine-html-reporter"
+      ],
+      "fixAvailable": {
+        "name": "karma-jasmine-html-reporter",
+        "version": "1.7.0",
+        "isSemVerMajor": true
+      }
+    },
+    "micromatch": {
+      "name": "micromatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "picomatch"
+      ],
+      "effects": [
+        "fast-glob",
+        "http-proxy-middleware",
+        "tailwindcss"
+      ],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/micromatch"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.5",
+        "isSemVerMajor": true
+      }
+    },
+    "node-gyp": {
+      "name": "node-gyp",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "tinyglobby"
+      ],
+      "effects": [
+        "@npmcli/run-script"
+      ],
+      "range": ">=11.2.0",
+      "nodes": [
+        "node_modules/node-gyp"
+      ],
+      "fixAvailable": true
+    },
+    "picomatch": {
+      "name": "picomatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1247710,
+          "name": "picomatch",
+          "dependency": "picomatch",
+          "title": "picomatch vulnerable to ReDoS through single-branch repeated extglobs",
+          "url": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=4.0.7"
+        }
+      ],
+      "effects": [
+        "@angular-devkit/build-angular",
+        "@angular-devkit/core",
+        "@angular/build",
+        "@parcel/watcher",
+        "anymatch",
+        "fdir",
+        "micromatch",
+        "readdirp",
+        "tinyglobby",
+        "vite"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/anymatch/node_modules/picomatch",
+        "node_modules/karma/node_modules/picomatch",
+        "node_modules/micromatch/node_modules/picomatch",
+        "node_modules/picomatch",
+        "node_modules/tailwindcss/node_modules/picomatch",
+        "node_modules/webpack-dev-server/node_modules/picomatch"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "readdirp": {
+      "name": "readdirp",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "picomatch"
+      ],
+      "effects": [],
+      "range": "3.0.0 - 3.6.0",
+      "nodes": [
+        "node_modules/karma/node_modules/readdirp",
+        "node_modules/tailwindcss/node_modules/readdirp",
+        "node_modules/webpack-dev-server/node_modules/readdirp"
+      ],
+      "fixAvailable": true
+    },
+    "sucrase": {
+      "name": "sucrase",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "tinyglobby"
+      ],
+      "effects": [],
+      "range": ">=3.35.1",
+      "nodes": [
+        "node_modules/sucrase"
+      ],
+      "fixAvailable": true
+    },
+    "tailwindcss": {
+      "name": "tailwindcss",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "chokidar",
+        "fast-glob",
+        "micromatch"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-oxide-insiders.ff2c25f || 2.1.0-canary.1 - 3.4.19",
+      "nodes": [
+        "node_modules/tailwindcss"
+      ],
+      "fixAvailable": {
+        "name": "tailwindcss",
+        "version": "4.3.5",
+        "isSemVerMajor": true
+      }
+    },
+    "tinyglobby": {
+      "name": "tinyglobby",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fdir",
+        "picomatch"
+      ],
+      "effects": [
+        "@angular-devkit/build-angular",
+        "@angular/build",
+        "copy-webpack-plugin",
+        "node-gyp",
+        "sucrase"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/tinyglobby"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "vite": {
+      "name": "vite",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "fdir",
+        "picomatch",
+        "tinyglobby"
+      ],
+      "effects": [
+        "@angular/build"
+      ],
+      "range": ">=6.3.0-beta.0",
+      "nodes": [
+        "node_modules/@angular-devkit/build-angular/node_modules/@angular/build/node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "webpack-dev-server": {
+      "name": "webpack-dev-server",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "chokidar",
+        "http-proxy-middleware"
+      ],
+      "effects": [
+        "@angular-devkit/build-angular",
+        "@angular-devkit/build-webpack"
+      ],
+      "range": ">=4.0.0-beta.0",
+      "nodes": [
+        "node_modules/webpack-dev-server"
+      ],
+      "fixAvailable": {
+        "name": "@angular-devkit/build-angular",
+        "version": "16.0.0",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 28,
+      "critical": 0,
+      "total": 28
+    },
+    "dependencies": {
+      "prod": 120,
+      "dev": 981,
+      "optional": 154,
+      "peer": 3,
+      "peerOptional": 0,
+      "total": 1116
+    }
+  }
+}

@@ -1,0 +1,4 @@
+Started a web server with "PORT=4000 npm --prefix ../investindoEmNegociosWeb run serve:ssr:investindoEmNegociosWeb"...
+Running Lighthouse 1 time(s) on http://127.0.0.1:4000/
+Run #1...done.
+Done running Lighthouse!

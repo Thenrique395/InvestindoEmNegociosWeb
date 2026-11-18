@@ -7,6 +7,7 @@ import { SiteHeaderComponent } from '../shared/site-header/site-header.component
 import { SiteFooterComponent } from '../shared/site-footer/site-footer.component';
 import { VENDAS_FOOTER_COLUMNS } from '../vendas/vendas.content';
 import { LEGAL_DOCUMENTS, type LegalDocument } from './legal.content';
+import { legalPublicationReady, resolveLegalDocument } from './legal-publisher';
 
 /**
  * Página de documento legal — serve Termos de uso e Política de privacidade.
@@ -25,6 +26,7 @@ import { LEGAL_DOCUMENTS, type LegalDocument } from './legal.content';
   styleUrl: './legal-page.component.scss',
 })
 export class LegalPageComponent {
+  readonly publicationReady = legalPublicationReady();
   readonly footerColumns = VENDAS_FOOTER_COLUMNS;
 
   private readonly title = inject(Title);
@@ -43,7 +45,7 @@ export class LegalPageComponent {
   readonly document = computed<LegalDocument>(() => {
     const doc = LEGAL_DOCUMENTS[this.slug()];
     if (!doc) throw new Error(`Documento legal desconhecido: ${this.slug()}`);
-    return doc;
+    return resolveLegalDocument(doc);
   });
 
   /**

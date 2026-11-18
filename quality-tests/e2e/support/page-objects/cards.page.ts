@@ -1,3 +1,4 @@
+import { selectOption } from '../select-option';
 import { expect, type Locator, type Page } from '@playwright/test';
 
 export class CardsPage {
@@ -11,19 +12,13 @@ export class CardsPage {
   async createCard(holderName: string, last4: string) {
     await this.openCreateModal();
     const brandSelect = this.page.getByLabel('Bandeira');
-    if (await brandSelect.isVisible().catch(() => false)) {
-      await expect(brandSelect.locator('option')).not.toHaveCount(0);
-      const firstBrand = await brandSelect.locator('option').first().getAttribute('value');
-      if (firstBrand) {
-        await brandSelect.selectOption(firstBrand);
-      }
-    }
-    await this.page.getByLabel('Número do cartão').fill(`5555 4444 3333 ${last4}`);
-    await this.page.getByLabel(/Nome( impresso)? (do|no) cartão/).fill(holderName);
+    await selectOption(brandSelect, { index: 0 });
+    await this.page.getByLabel('Últimos 4 dígitos').fill(last4);
+    await this.page.getByLabel('Nome do cartão', { exact: true }).fill(holderName);
     await this.page.getByLabel(/Banco( \(opcional\))?/).fill('Banco Live');
     await this.page.getByLabel('Limite de crédito').fill('850000');
-    await this.page.getByLabel('Dia do fechamento').fill('12');
-    await this.page.getByLabel('Dia do vencimento').fill('20');
+    await this.page.getByLabel('Dia de fechamento da fatura').fill('12');
+    await this.page.getByLabel('Dia de vencimento da fatura').fill('20');
     const saveButton = this.page.getByRole('button', { name: 'Salvar cartão' });
     await expect(saveButton).toBeEnabled();
     const responsePromise = this.page.waitForResponse((response) =>
@@ -57,10 +52,10 @@ export class CardsPage {
   }
 
   async editCard(currentName: string, nextName: string, last4: string) {
-    await this.card(currentName).getByRole('button', { name: 'Editar' }).click();
-    await this.page.getByLabel('Número do cartão').fill(`9999 8888 7777 ${last4}`);
-    await this.page.getByLabel(/Nome( impresso)? (do|no) cartão/).fill(nextName);
-    await this.page.getByLabel('Apelido (opcional)').fill(nextName);
+    await this.card(currentName).getByRole('button', { name: 'Editar cartão' }).click();
+    await this.page.getByLabel('Últimos 4 dígitos').fill(last4);
+    await this.page.getByLabel('Nome do cartão', { exact: true }).fill(nextName);
+    await this.page.getByLabel('Nome do cartão', { exact: true }).fill(nextName);
     await this.page.getByLabel(/Banco( \(opcional\))?/).fill('Banco Atualizado');
     await this.page.getByLabel('Limite de crédito').fill('9500');
     await this.page.getByRole('button', { name: 'Salvar alterações' }).click();
@@ -72,7 +67,7 @@ export class CardsPage {
     const deleteResponse = this.page.waitForResponse((response) =>
       response.request().method() === 'DELETE' && response.url().includes('/cards/')
     );
-    await this.card(holderName).getByRole('button', { name: 'Remover' }).click();
+    await this.card(holderName).getByRole('button', { name: 'Remover cartão' }).click();
     // Remover cartão agora usa um confirm-sheet.
     await this.page.getByRole('dialog').getByRole('button', { name: 'Remover cartão' }).click();
     await expect.poll(async () => (await deleteResponse).ok()).toBeTruthy();

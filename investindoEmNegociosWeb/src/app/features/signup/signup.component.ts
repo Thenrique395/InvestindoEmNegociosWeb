@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, OnDestroy, OnInit, Output, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -12,12 +12,15 @@ import { DEFAULT_META_DESCRIPTION, DEFAULT_TITLE } from '../../core/seo-defaults
 import { AuthLayoutComponent } from '../layout/auth-layout/auth-layout.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-signup',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, NgTemplateOutlet, AuthLayoutComponent],
   templateUrl: './signup.component.html'
 })
 export class SignupComponent implements OnInit, OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   @Output() signedUp = new EventEmitter<void>();
 
   loading = false;
@@ -108,6 +111,7 @@ export class SignupComponent implements OnInit, OnDestroy {
 
     this.auth.register(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
         this.signedUp.emit();
         if (this.isRoutePage) {
@@ -117,6 +121,7 @@ export class SignupComponent implements OnInit, OnDestroy {
         this.uiFeedback.success('Conta criada! Enviamos um e-mail de confirmação — confirme para poder entrar.');
       },
       error: (err: unknown) => {
+        this.changeDetector.markForCheck();
         const code = err && typeof err === 'object' && 'code' in err ? (err as { code?: string }).code : undefined;
         if (code === 'emailInUse') {
           this.form.get('email')?.setErrors({ emailInUse: true });

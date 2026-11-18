@@ -2,7 +2,7 @@
 
 > Levantado na revisão de 2026-08-27 contra `Agent.md`, `ARQUITETURA_ANGULAR.md` e
 > `InvestindoEmNegociosApi/docs/BACKEND_PADROES_IMPLEMENTACAO.md`.
-> Formato igual ao do `BACKLOG.md` da raiz: **onde, problema, por que importa, a fazer, aceite**.
+> Formato igual ao do backlog no Obsidian: **onde, problema, por que importa, a fazer, aceite**.
 >
 > Branch `chore/padroes-frontend-fase1`. O que já foi resolvido está resumido na seção
 > **Já fechado**, no fim — commits `ded5a7d` (mecânicos), `632fbfd` (memoização dos
@@ -46,70 +46,46 @@ importa de outra. Ela encontrou 10 violações que a revisão manual não tinha 
 
 ---
 
-## 🟡 ⬜ RESTA — cinco primitivos de `shared/` injetam serviço de domínio
+## ✅ DECISÃO — `shared/` importando serviço de domínio — **RESOLVIDA até 2026-09-12**
 
-**Onde:** Web · `shared/billing-alert-banner`, `shared/money`, `shared/onboarding-return`,
-`shared/toast-container`
+**Onde:** Web · `src/app/shared/`, `scripts/check-handoff-fidelity.mjs`
 
-**Problema:** a §1 diz que `shared/` **nunca** importa serviço de domínio. Estes quatro
-arquivos (cinco imports) importam: `AuthService` + `SubscriptionsService`,
-`FinancialPrivacyService`, `OnboardingService`, `UiFeedbackService`.
+**Estado verificado em 2026-09-12:** R11 está em **0** no `npm run handoff:report`.
 
-**Por que a reestruturação não resolveu:** mover a pasta não muda a dependência. Resolver exige
-trocar o contrato de cada componente para receber os dados por `@Input`, o que muda também quem
-os hospeda — no caso do `toast-container`, o `app.component`. É trabalho por componente.
+**O que ficou permitido:** `shared/` pode depender de serviços de UI, como tema, ocultar valores
+e feedback visual. A varredura atual encontrou `FinancialPrivacyService` em
+`shared/app-currency.pipe.ts`, e o gate permite esse caso porque ele controla apresentação
+(`ocultar valores`), não carrega nem muta domínio do usuário.
 
-**Ressalva honesta:** dois deles são discutíveis. `toast-container` é o host dos toasts e
-`billing-alert-banner` é uma faixa que decide sozinha se aparece — componentes "inteligentes"
-de `shared/` são um padrão defensável, e talvez a regra deva distinguir "primitivo burro" de
-"widget de shell". Vale decidir isso antes de refatorar os quatro.
+**Regra que fica:** componente primitivo não importa serviço de domínio. Se precisar decidir
+aparecimento com dados do usuário, ele vira componente de shell ou recebe tudo por `@Input`.
 
-**A fazer:**
-- [ ] Decidir se a §1 distingue primitivo de widget de shell
-- [ ] Se não distinguir: passar os dados por `@Input` e mover a injeção para quem hospeda
-- [ ] Adicionar regra no gate travando `shared/` → `core/*.service`
+**Aceite atual:** R11 segue em 0 no gate.
 
 ---
 
-## 🟡 ⬜ DECISÃO — Adotar `app-money` (regra R1, 2 de dívida no teto)
+## ✅ DECISÃO — Primitivos órfãos do handoff — **RESOLVIDA até 2026-09-12**
 
-**Onde:** Web · `src/app/shared/money/`, `src/app/shared/charts/chart-bars/`
+**Onde:** Web · `scripts/check-handoff-fidelity.mjs`, `src/app/shared/`
 
-**Problema:** dois primitivos de `shared/` existem só na demo do `/styleguide` — nenhuma tela usa.
-A §7 diz que `app-money` é obrigatório: *"nunca formatar moeda à mão no template"*.
+**Estado verificado em 2026-09-12:** `npm run handoff:briefing` e `npm run handoff:report`
+mostram R1 em **0**. Não há mais primitivo de `shared/` existindo apenas no `/styleguide`.
 
-**Por que não é swap mecânico:** `app-money` com `sign="auto"` colore **os dois sinais** — positivo
-verde, negativo vermelho. Vários pontos hoje colorem só o negativo:
+**Decisão efetiva:** `app-money` e `app-chart-bars` foram removidos da regra porque não viraram
+contrato adotado. A regra de moeda fica no `AppCurrencyPipe`/`formatCurrencyValue`; gráfico de
+linha fica em `app-chart-line`; barra de progresso fica em `app-progress-bar`. Se a necessidade
+voltar, nasce contrato novo no handoff antes de nascer componente novo.
 
-| Local | Hoje | Com `app-money` |
-|---|---|---|
-| `orcamento.component.html:128` | `[class.negative]` só se `< 0` | positivo vira **verde** |
-| `investment-consolidation-panel:38` | `[class.negative]` só se `< 0` | positivo vira **verde** |
-| `investment-assets-list:121` | `.success`/`.danger` nos dois sinais | equivalente ✅ |
-
-Além da cor, `app-money` aplica `font-weight: var(--fw-semibold)` (600); onde hoje há `<strong>`,
-isso **reduz** o peso (700 → 600).
-
-Mudar a cor de um número financeiro sem decisão explícita é o tipo de coisa que faz a pessoa ler
-errado o próprio dinheiro. Por isso ficou de fora da rodada mecânica.
-
-**A fazer:**
-- [ ] Decidir, por tela, se saldo/variação positivo deve ser verde ou neutro
-- [ ] Adotar `app-money` onde a decisão for "colorir os dois sinais"
-- [ ] Onde for "só negativo": ou adicionar um modo `sign="negative-only"` ao primitivo, ou manter
-      a classe local e registrar a exceção
-- [ ] `app-chart-bars`: encontrar tela que precise de barras, ou remover o primitivo
-- [ ] Baixar `BASELINE.R1` no mesmo commit
-
-**Aceite:** R1 em 0, ou em 1 com justificativa registrada. Evidência visual antes/depois das telas
-que mudaram de cor.
+**Aceite atual:** R1 segue em 0 no gate. Qualquer primitivo novo deve nascer com uso real fora do
+`/styleguide`, ou a regra volta a acusar.
 
 ---
 
-# PARTE 2 — Frontend: `OnPush` + signals (27 restantes de 46)
+# PARTE 2 — Frontend: `OnPush` + signals (21 restantes de 46)
 
 **O problema comum:** `ARQUITETURA_ANGULAR.md` §4 exige *"Signals, sempre"* e
-*"`ChangeDetectionStrategy.OnPush` em todos os componentes, sem exceção"*. Em 2026-08-27 o Grupo A fechou; restam 27 componentes.
+*"`ChangeDetectionStrategy.OnPush` em todos os componentes, sem exceção"*. Em 2026-08-27 o Grupo A
+fechou com 27 restantes; em 2026-09-12 o gate vivo está em **21 restantes**.
 
 **Por que importa, além de conformidade:** sem `OnPush`, o Angular reavalia **toda** expressão de
 **todo** template a cada evento — clique, digitação, timer, resposta HTTP. Numa tela como a
@@ -165,16 +141,14 @@ e três decisões desse lote valem como precedente:
   dependência que nunca notifica e a mensagem de validação congelaria. Como a mutação vem do
   `ngModel` do próprio componente, o evento já marca o `OnPush` como sujo.
 
-## 🟡 ⬜ GRUPO B — 19 telas de tamanho médio
+## 🟡 ⬜ GRUPO B — 13 telas de tamanho médio
 
 **Onde:** Web
 
 ```
-admin-users (337) · despesas-form (203) · admin-robots (196) · user-preferences (192)
-signup (191) · user-data (176) · login (176) · user-profile (133) · receitas-lista (126)
-reset-password (123) · cartoes-listagem (123) · despesas-lista (113) · receitas-form (91)
-public-header (83) · toast-container (81) · user-security (70) · forgot-password (70)
-styleguide-shell (20) · styleguide-overview (15)
+admin-users · admin-robots · user-preferences · signup · user-data · login · user-profile
+receitas-lista · cartoes-listagem · despesas-lista · despesas-form · receitas-form
+public-header
 ```
 
 **Problema:** estado em campo mutável, sem `OnPush`. Todas já receberam `takeUntilDestroyed`
@@ -185,10 +159,9 @@ verificação global; e o estado espalhado em 10–20 campos booleanos (`loading
 `editingId`, `deletingId`...) é o que a §4 aponta como fonte de bug — nada garante que dois
 campos que deveriam andar juntos andem.
 
-**Ordem sugerida** (menor risco primeiro): `forgot-password`, `reset-password`, `user-security`,
-`styleguide-*`, `toast-container`, `public-header` → depois `login`, `signup`, `user-profile`,
-`user-data`, `user-preferences` → depois `admin-robots`, `admin-users`, `cartoes-listagem`,
-`despesas-lista`, `receitas-lista`, `receitas-form`, `despesas-form`.
+**Ordem sugerida** (menor risco primeiro): `public-header` → depois `login`, `signup`,
+`user-profile`, `user-data`, `user-preferences` → depois `admin-robots`, `admin-users`,
+`cartoes-listagem`, `despesas-lista`, `receitas-lista`, `receitas-form`, `despesas-form`.
 
 **Cuidado especial:**
 - `login`, `signup`, `reset-password`, `forgot-password` — caminho de autenticação. Testar login
@@ -471,6 +444,25 @@ hoje não tem. A regra do handoff não se aplica bem a estado de catálogo.
 
 ---
 
+## 🟢 ⬜ Pastas vazias com sufixo ` 2`
+
+**Onde:** Web · `investindoEmNegociosWeb/src/app/**`
+
+**Problema:** há várias pastas vazias com sufixo ` 2` sob `core/` e `features/`, por exemplo
+`features/dashboard 2`, `features/login 2`, `features/site 2` e equivalentes. A varredura de
+2026-09-12 confirmou que elas não contêm arquivos.
+
+**Por que importa pouco:** não entram no build, não alteram rota e não mudam o comportamento do
+app. Ainda assim poluem busca, navegação no editor e leitura de estrutura.
+
+**A fazer:**
+- [ ] Remover os diretórios vazios depois de conferir `git status`
+- [ ] Se voltarem, investigar sincronização do iCloud/Finder antes de limpar de novo
+
+**Aceite:** `find investindoEmNegociosWeb/src/app -type d -name '* 2'` sem resultados.
+
+---
+
 ## 🟡 ⬜ A raiz do monorepo não é versionada
 
 **Onde:** `/InvestindoEmNegocios/` (raiz)
@@ -478,17 +470,20 @@ hoje não tem. A regra do handoff não se aplica bem a estado de catálogo.
 **Problema:** só `InvestindoEmNegociosApi/` e `InvestindoEmNegociosWeb/` são repositórios git. Tudo
 na raiz — **`Agent.md`, `BACKLOG.md`, `docs/`, `scripts/`** — está **fora de controle de versão**.
 
-**O que isso causa:** o `Agent.md`, que é a fonte de verdade operacional do projeto inteiro, e toda
-a documentação central (`ARCHITECTURE.md`, `BUSINESS_RULES.md`, `DECISIONS/`) não têm histórico,
-não passam por review, e somem se a máquina for trocada. O `docs/DECISIONS/` — que existe
-justamente para registrar decisão estrutural — é o caso mais grave.
+**O que isso causava:** o `Agent.md`, que é a fonte de verdade operacional do projeto inteiro, e
+toda a documentação central (`ARCHITECTURE.md`, `BUSINESS_RULES.md`, `DECISIONS/`) não tinham
+histórico, não passavam por review, e somiam se a máquina fosse trocada.
+
+**Mitigação em 2026-09-12:** a documentação humana central foi consolidada no Obsidian em
+`/Users/henriquesantos/Documents/my second brain/Investindo em Negocio/Documentacao`, e os
+arquivos duplicados na raiz viraram ponteiros. Continua pendente decidir versionamento/backup do
+vault e dos ponteiros operacionais.
 
 **A fazer:**
-- [ ] Decidir: `git init` na raiz (com os dois subprojetos como submódulos ou ignorados), ou mover
-      a documentação central para dentro de um dos repos
-- [ ] Fazer backup do estado atual antes de qualquer coisa
+- [ ] Decidir como versionar ou fazer backup do vault Obsidian e dos ponteiros da raiz
+- [ ] Fazer backup do estado atual antes de qualquer reorganização destrutiva
 
-**Aceite:** `Agent.md` e `docs/DECISIONS/` com histórico de commits.
+**Aceite:** documentação central e decisões formais com histórico recuperável.
 
 ---
 
@@ -505,9 +500,9 @@ Branch `chore/padroes-frontend-fase1`, três commits. Verificado ao fim: typeche
 | §5 — `subscribe` sem `takeUntilDestroyed` | 18 componentes | **0** |
 | §4 — `fb.group` não tipado | 3 | **0** |
 | §1 — imports entre features | 18 | **11** |
-| R8 — sem `OnPush` | 49 | **27** |
-| R1 — primitivo órfão | 3 | **2** |
-| Gate `handoff:check` | 5/9 verde | **7/9 verde** |
+| R8 — sem `OnPush` | 49 | **21** em 2026-09-12 |
+| R1 — primitivo órfão | 3 | **0** em 2026-09-12 |
+| Gate `handoff:check` | 5/9 verde | **10/11 regras zeradas; R8 dentro do baseline** |
 
 **Dois bugs corrigidos de passagem:**
 
@@ -559,7 +554,8 @@ pré-existentes e viraria mais um baseline; fica registrada como a lacuna conhec
 
 ## `27ab7a4` — Grupo A
 
-Ver a seção do Grupo A na Parte 2. R8 de 46 para 27.
+Ver a seção do Grupo A na Parte 2. R8 de 46 para 27. Em 2026-09-12, a medição viva do gate
+está em 21.
 
 ## ✅ Limpeza de código morto e docs — **FEITO em 2026-08-28**
 
@@ -600,7 +596,13 @@ fontes vivas e não inventa roadmap.
 
 - `ARQUITETURA_ANGULAR.md`: emenda **E3** com os contratos novos dos primitivos, tabela §7
   atualizada, e um **sexto erro** na §13 (valor derivado em getter alimentando `input()`).
-- `PLANO_REDESIGN.md`: Fase 8 com 8.4 e 8.6 concluídas, 8.7 em 27, e a premissa "tudo passa
-  pela 8.1" corrigida — ela estava errada.
+- `PLANO_REDESIGN.md`: Fase 8 com R1, R4, R9, R10 e R11 zeradas, 8.7 em 21, e a premissa
+  "tudo passa pela 8.1" corrigida — ela estava errada.
 - `reference_build_local_gotchas` (memória): o prerender de `/receitas` saiu de "quebra
   conhecida" para "corrigido"; se voltar, é regressão.
+
+## Atualização de 2026-11-15 — estado vigente
+
+R8 foi reduzida de 21 para **0**; o gate verifica todas as 11 regras sem tolerância residual. Os 21 componentes herdados usam `OnPush`, com marcação explícita nas fronteiras assíncronas do estado imperativo existente. Isso evita congelamento da interface sem impor uma reescrita funcional nesta correção. As contagens de 21 acima são histórico, não o estado atual.
+
+A conversão completa de estado imperativo para signals e a decomposição de containers extensos continuam sendo melhoria estrutural incremental; OnPush não resolve essas duas dimensões sozinho. Cobertura medida em 2026-11-15: statements 49,20%, branches 38,29%, functions 41,01%, lines 51,52%. Não há garantia de cobertura integral. Priorizar testes de regras e fluxos críticos conforme alterações, evitando testes que apenas reproduzem implementação.

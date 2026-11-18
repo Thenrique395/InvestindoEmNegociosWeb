@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { EmptyStateComponent } from '../../shared/empty-state/empty-state.compon
 import { runStatusLabel, runStatusTone, successRateTone } from './robots-monitor.model';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-admin-robots',
   standalone: true,
   imports: [
@@ -30,6 +31,8 @@ import { runStatusLabel, runStatusTone, successRateTone } from './robots-monitor
   styleUrls: ['./admin-robots.component.scss']
 })
 export class AdminRobotsComponent implements OnInit {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   loading = false;
   runningAll = false;
   confirmRunAllOpen = false;
@@ -81,14 +84,17 @@ export class AdminRobotsComponent implements OnInit {
       search: this.filters.search.trim() || undefined
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
+        this.changeDetector.markForCheck();
         this.summary24h = response.summary24h || this.summary24h;
         this.robots = response.robots || [];
         this.recentRuns = response.recentRuns || [];
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error('Não foi possível carregar o monitor de robôs.');
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.loading = false;
       }
     });
@@ -113,6 +119,7 @@ export class AdminRobotsComponent implements OnInit {
       cooldownMinutes: this.cooldownMinutes
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
+        this.changeDetector.markForCheck();
         if (result.wasSkipped) {
           this.uiFeedback.info(`${result.robotName} pulado por segurança (${result.skipReason || 'janela recente'}).`);
         } else if (result.success) {
@@ -123,9 +130,11 @@ export class AdminRobotsComponent implements OnInit {
         this.load();
       },
       error: (err) => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error(extractApiErrorMessage(err, `Falha ao executar ${robotName}.`));
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.runningRobot = null;
       }
     });
@@ -141,15 +150,18 @@ export class AdminRobotsComponent implements OnInit {
     this.runningAll = true;
     this.adminRobots.runAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (results) => {
+        this.changeDetector.markForCheck();
         const ok = (results || []).filter((x) => x.success).length;
         const fail = (results || []).length - ok;
         this.uiFeedback.info(`Execução concluída. Sucesso: ${ok}. Falhas: ${fail}.`);
         this.load();
       },
       error: () => {
+        this.changeDetector.markForCheck();
         this.uiFeedback.error('Falha ao executar todos os robôs.');
       },
       complete: () => {
+        this.changeDetector.markForCheck();
         this.runningAll = false;
       }
     });

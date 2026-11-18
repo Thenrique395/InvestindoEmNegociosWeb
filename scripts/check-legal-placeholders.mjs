@@ -1,38 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { legalPublisherFromEnvironment, validateLegalPublisher } from '../investindoEmNegociosWeb/src/legal-publisher.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(__dirname, '..');
-const legalContentPath = resolve(repoRoot, 'investindoEmNegociosWeb/src/app/site/legal/legal.content.ts');
-const source = readFileSync(legalContentPath, 'utf8');
-
-const placeholders = [
-  '{{RAZAO_SOCIAL}}',
-  '{{CNPJ}}',
-  '{{ENDERECO}}',
-  '{{EMAIL_CONTATO}}',
-];
-
-const lines = source.split(/\r?\n/);
-const contentStart = lines.findIndex((line) => line.startsWith('export const TERMOS_DE_USO'));
-const findings = [];
-
-for (const placeholder of placeholders) {
-  lines.forEach((line, index) => {
-    if (index < contentStart) return;
-    if (line.includes(placeholder)) {
-      findings.push({ placeholder, line: index + 1 });
-    }
-  });
-}
-
-if (findings.length > 0) {
-  console.error('Legal pages are not ready for publication. Replace these placeholders first:');
-  for (const finding of findings) {
-    console.error(`- ${finding.placeholder} in ${legalContentPath}:${finding.line}`);
-  }
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const source = readFileSync(resolve(repoRoot, 'investindoEmNegociosWeb/src/app/features/site/legal/legal.content.ts'), 'utf8');
+const known = new Set(['RAZAO_SOCIAL', 'DOCUMENTO', 'ENDERECO', 'EMAIL_CONTATO']);
+const unknown = [...source.matchAll(/\{\{(\w+)\}\}/g)].map(match => match[1]).filter(key => !known.has(key));
+const findings = [...validateLegalPublisher(legalPublisherFromEnvironment(process.env)), ...unknown.map(key => `Campo sem resolução: ${key}`)];
+if (findings.length) {
+  console.error('Publicação legal bloqueada. Configure a identificação e o contato oficiais do responsável:');
+  for (const finding of findings) console.error(`- ${finding}`);
   process.exit(1);
 }
-
-console.log('Legal pages do not contain publication-blocking placeholders.');
+console.log('Dados institucionais configurados e campos dos documentos legais resolvidos.');

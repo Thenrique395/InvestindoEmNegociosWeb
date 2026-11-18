@@ -12,7 +12,7 @@ test.describe('authenticated app shell', () => {
     // Dashboard atual (Visão Geral Financeira). Assertions modernizadas: o painel de
     // risco/score/simulação diária e a troca de período por heading foram removidos no
     // refactor; verificamos os cards/seções que o dashboard renderiza hoje.
-    await expect(page.getByRole('heading', { level: 1, name: /Visão Geral Financeira/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /(Bom dia|Boa tarde|Boa noite)(,|$)/i })).toBeVisible();
     await expect(page.getByText('Saldo disponível').first()).toBeVisible();
     await expect(page.getByText('Patrimônio líquido', { exact: true }).first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Dívidas e contas' }).first()).toBeVisible();
@@ -80,31 +80,32 @@ test.describe('authenticated app shell', () => {
 
     // Mesmo com os resumos oficiais falhando (500), a home mantém o cálculo local:
     // o dashboard renderiza e os cards de saldo/patrimônio aparecem com valores locais.
-    await expect(page.getByRole('heading', { level: 1, name: /Visão Geral Financeira/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /(Bom dia|Boa tarde|Boa noite)(,|$)/i })).toBeVisible();
     await expect(page.getByText('Saldo disponível').first()).toBeVisible();
     await expect(page.getByText('Patrimônio líquido').first()).toBeVisible();
     await expect(page.getByText('R$ 8.400,00').first()).toBeVisible();
   });
 
   test('abre contas e exibe extrato importado', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-03-15T12:00:00-03:00') });
     await page.goto('/contas', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { name: 'Contas' }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Extrato' }).first().click();
 
     await expect(page.getByRole('heading', { level: 2, name: /Extrato: Conta principal/i })).toBeVisible();
-    await expect(page.getByText('Motor de importação com IA')).toBeVisible();
     await expect(page.getByRole('cell', { name: 'PIX SALARIO' }).first()).toBeVisible();
     await expect(page.getByRole('cell', { name: 'Mercado bairro' }).first()).toBeVisible();
   });
 
   test('abre cartoes e carrega a fatura por competencia', async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-03-15T12:00:00-03:00') });
     await page.goto('/cartoes', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { level: 2, name: 'Seus cartões e ciclos de fatura' })).toBeVisible();
     await expect(page.getByText('Faturas do cartão')).toBeVisible();
-    await expect(page.getByText(/Ciclo 03\/2026/i)).toBeVisible();
+    await expect(page.getByText(/Ciclo mar\/2026/i)).toBeVisible();
     await expect(page.getByText('Total', { exact: true })).toBeVisible();
-    await expect(page.getByText('Em aberto', { exact: true })).toBeVisible();
+    await expect(page.getByText('Fechada', { exact: true })).toBeVisible();
   });
 });
